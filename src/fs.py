@@ -1,18 +1,12 @@
 # Module for generic flight-simulator interfaces
 
-# Flight simulator type: MS Flight Simulator 2004
-TYPE_FS2K4 = 1
+#-------------------------------------------------------------------------------
 
-# Flight simulator type: MS Flight Simulator X
-TYPE_FSX = 2
+import const
 
-# Flight simulator type: X-Plane 9
-TYPE_XPLANE9 = 3
+#-------------------------------------------------------------------------------
 
-# Flight simulator type: X-Plane 10
-TYPE_XPLANE10 = 4
-
-class ConnectionListener:
+class ConnectionListener(object):
     """Base class for listeners on connections to the flight simulator."""
     def connected(self, fsType, descriptor):
         """Called when a connection has been established to the flight
@@ -23,3 +17,78 @@ class ConnectionListener:
         """Called when a connection to the flight simulator has been broken."""
         print "fs.ConnectionListener.disconnected"
 
+#-------------------------------------------------------------------------------
+
+class SimulatorException(Exception):
+    """Exception thrown by the simulator interface for communication failure."""
+
+#-------------------------------------------------------------------------------
+
+def createSimulator(type, connectionListener):
+    """Create a simulator instance for the given simulator type with the given
+    connection listener.
+
+    The returned object should provide the following members:
+    FIXME: add info
+    """
+    assert type==const.TYPE_MSFS9, "Only MS Flight Simulator 2004 is supported"
+    import fsuipc
+    return fsuipc.Simulator(connectionListener)
+
+#-------------------------------------------------------------------------------
+
+class AircraftState(object):
+    """Base class for the aircraft state produced by the aircraft model based
+    on readings from the simulator.
+
+    The following data members should be provided at least:
+    - timestamp: the simulator time of the measurement in seconds since the
+    epoch (float)
+    - paused: a boolean indicating if the flight simulator is paused for
+    whatever reason (it could be a pause mode, or a menu, a dialog, or a
+    replay, etc.)
+    - trickMode: a boolean indicating if some "trick" mode (e.g. "SLEW" in
+    MSFS) is activated
+    - overspeed: a boolean indicating if the aircraft is in overspeed
+    - stalled: a boolean indicating if the aircraft is stalled
+    - onTheGround: a boolean indicating if the aircraft is on the ground
+    - grossWeight: the gross weight in kilograms (float)
+    - heading: the heading of the aircraft in degrees (float)
+    - pitch: the pitch of the aircraft in degrees. Positive means pitch down,
+    negative means pitch up (float)
+    - bank: the bank of the aircraft in degrees. Positive means bank left,
+    negative means bank right (float)
+    - ias: the indicated airspeed in knots (float)    
+    - vs: the vertical speed in feet/minutes (float)
+    - altitude: the altitude of the aircraft in feet (float)
+    - flapsSet: the selected degrees of the flaps (float)
+    - flaps: the actual degrees of the flaps (float)
+    - n1[]: the N1 values of the turbine engines (array of floats
+    of as many items as the number of engines, present only for aircraft with
+    turbines)
+    - rpm[]: the RPM values of the piston engines (array of floats
+    of as many items as the number of engines, present only for aircraft with
+    pistons)
+    - reverser[]: an array of booleans indicating if the thrust reversers are
+    activated on any of the engines. The number of items equals to the number
+    of engines.
+    - navLightsOn: a boolean indicating if the navigation lights are on
+    - antiCollisionLightsOn: a boolean indicating if the anti-collision lights are on
+    - strobeLightsOn: a boolean indicating if the strobe lights are on
+    - langingLightsOn: a boolean indicating if the landing lights are on
+    - pitotHeatOn: a boolean indicating if the pitot heat is on
+    - gearsDown: a boolean indicating if the gears are down
+    - spoilersArmed: a boolean indicating if the spoilers have been armed for
+    automatic deployment
+    - spoilersExtension: the percentage of how much the spoiler is extended
+    (float) 
+
+    FIXME: needed when taxiing only:
+    - zfw: the Zero Fuel Weight in klograms (float)
+
+    FIXME: needed for touchdown only:
+    - ambientWindDirection: the ambient wind direction around the aircraft (float)
+    - ambientWindSpeed: the ambient wind speed around the aircraft in knowns (float)
+    - tdRate: the touchdown rate calculated by FSUIPC (float)
+    """
+    

@@ -1,17 +1,35 @@
 # Module handling the connection to FSUIPC
 
+#------------------------------------------------------------------------------
+
+import fs
+import const
+import util
+
 import threading
 import os
-import fs
 import time
+import calendar
+import sys
 
 if os.name == "nt":
     import pyuipc
 else:
     import pyuipc_emu as pyuipc
 
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The thread to handle the FSUIPC requests."""
+    @staticmethod
+    def _callSafe(fun):
+        """Call the given function and swallow any exceptions."""
+        try:
+            return fun()
+        except Exception, e:
+            print >> sys.stderr, str(e)
+            return None
+
     class Request(object):
         """A simple, one-shot request."""
         def __init__(self, forWrite, data, callback, extra):
@@ -22,15 +40,22 @@ class Handler(threading.Thread):
             self._extra = extra
             
         def process(self, time):
-            """Process the request."""
+            """Process the request."""            
             if self._forWrite:
                 pyuipc.write(self._data)
-                self._callback(self._extra)
+                Handler._callSafe(lambda: self._callback(True, self._extra))
             else:
                 values = pyuipc.read(self._data)
-                self._callback(values, self._extra)            
+                Handler._callSafe(lambda: self._callback(values, self._extra))
 
             return True
+
+        def fail(self):
+            """Handle the failure of this request."""
+            if self._forWrite:
+                Handler._callSafe(lambda: self._callback(False, self._extra))
+            else:
+                Handler._callSafe(lambda: self._callback(None, self._extra))
 
     class PeriodicRequest(object):
         """A periodic request."""
@@ -67,12 +92,16 @@ class Handler(threading.Thread):
                 
             values = pyuipc.read(self._preparedData)
 
-            self._callback(values, self._extra)
+            Handler._callSafe(lambda: self._callback(values, self._extra))
 
             while self._nextFire <= time:
                 self._nextFire += self._period
             
             return True
+
+        def fail(self):
+            """Handle the failure of this request."""
+            pass
 
         def __cmp__(self, other):
             """Compare two periodic requests. They are ordered by their next
@@ -102,7 +131,7 @@ class Handler(threading.Thread):
         - the type letter of the data as a string
 
         callback is a function that receives two pieces of data:
-        - the values retrieved
+        - the values retrieved or None on error
         - the extra parameter
 
         It will be called in the handler's thread!
@@ -119,12 +148,47 @@ class Handler(threading.Thread):
         - the type letter of the data as a string
         - the data to write
 
-        callback is a function that receives the extra data when writing was
-        succesful. It will called in the handler's thread!
+        callback is a function that receives two pieces of data:
+        - a boolean indicating if writing was successful
+        - the extra data
+        It will be called in the handler's thread!
         """
         with self._requestCondition:
             self._requests.append(Handler.Request(True, data, callback, extra))
             self._requestCondition.notify()
+
+    @staticmethod
+    def _readWriteCallback(data, extra):
+        """Callback for the read() and write() calls below."""
+        extra.append(data)
+        with extra[0] as condition:
+            condition.notify()
+
+    def read(self, data):
+        """Read the given data synchronously.
+
+        If a problem occurs, an exception is thrown."""
+        with threading.Condition() as condition:
+            extra = [condition]
+            self._requestRead(data, self._readWriteCallback, extra)
+            while len(extra)<2:
+                condition.wait()
+            if extra[1] is None:
+                raise fs.SimulatorException("reading failed")
+            else:
+                return extra[1]
+
+    def write(self, data):
+        """Write the given data synchronously.
+
+        If a problem occurs, an exception is thrown."""
+        with threading.Condition() as condition:
+            extra = [condition]
+            self._requestWrite(data, self._writeCallback, extra)
+            while len(extra)<2:
+                condition.wait()
+            if extra[1] is None:
+                raise fs.SimulatorException("writing failed")
 
     def requestPeriodicRead(self, period, data, callback, extra = None):
         """Request a periodic read of data.
@@ -188,10 +252,13 @@ class Handler(threading.Thread):
                 description = "(FSUIPC version: 0x%04x, library version: 0x%04x, FS version: %d)" % \
                     (pyuipc.fsuipc_version, pyuipc.lib_version, 
                      pyuipc.fs_version)
-                self._connectionListener.connected(fs.TYPE_FS2K4, description)
+                Handler._callSafe(lambda:     
+                                  self._connectionListener.connected(const.TYPE_MSFS9, 
+                                                                     description))
                 return True
             except Exception, e:
                 print "fsuipc.Handler._connect: connection failed: " + str(e)
+                time.sleep(0.1)
 
         return False
                 
@@ -211,7 +278,19 @@ class Handler(threading.Thread):
     def _disconnect(self):
         """Disconnect from the flight simulator."""
         pyuipc.close()
-        self._connectionListener.disconnected()
+        Handler._callSafe(lambda: self._connectionListener.disconnected())
+
+    def _failRequests(self, request):
+        """Fail the outstanding, single-shot requuests."""
+        request.fail()
+        with self._requestCondition:
+            for request in self._requests:
+                try:
+                    self._requestCondition.release()
+                    request.fail()
+                finally:
+                    self._requestCondition.acquire()
+            self._requests = []        
 
     def _processRequest(self, request, time):
         """Process the given request. 
@@ -229,6 +308,7 @@ class Handler(threading.Thread):
             print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
                 str(e) + ") reconnecting."
             self._disconnect()
+            self._failRequests(request)
             if not self._connect(): return None
             else: return True
         finally:
@@ -253,3 +333,259 @@ class Handler(threading.Thread):
                 return False
 
         return self._connectionRequested
+
+#------------------------------------------------------------------------------
+
+class Simulator(object):
+    """The simulator class representing the interface to the flight simulator
+    via FSUIPC."""
+    def __init__(self, connectionListener):
+        """Construct the simulator."""
+        self._handler = Handler(connectionListener)
+        self._handler.start()
+        self._aircraft = None
+        self._aircraftName = None
+        self._aircraftModel = None
+        self._monitoringRequestID = None
+
+    def connect(self):
+        """Initiate a connection to the simulator."""
+        self._handler.connect()
+
+    def startMonitoring(self, aircraft):
+        """Start the periodic monitoring of the aircraft and pass the resulting
+        state to the given aircraft object periodically.
+        
+        The aircraft object passed must provide the following members:
+        - type: one of the AIRCRAFT_XXX constants from const.py
+        - modelChanged(aircraftName, modelName): called when the model handling
+        the aircraft has changed.
+        - handleState(aircraftState): handle the given state."""
+        assert self._aircraft is None
+
+        self._aircraft = aircraft
+        self._startMonitoring()
+
+    def stopMonitoring(self):
+        """Stop the periodic monitoring of the aircraft."""
+        self._aircraft = None
+
+    def disconnect(self):
+        """Disconnect from the simulator."""
+        self._handler.disconnect()
+
+    def _startMonitoring(self):
+        """The internal call to start monitoring."""
+        self._handler.requestRead([(0x3d00, -256)], self._monitoringStartCallback)
+
+    def _monitoringStartCallback(self, data, extra):
+        """Callback for the data read when the monitoring has started.
+        
+        The following data items are expected:
+        - the name of the aircraft
+        """
+        if self._aircraft is None:
+            return
+        elif data is None:
+            self._startMonitoring()
+        else:
+            self._setAircraftName(data[0])            
+
+    def _setAircraftName(self, name):
+        """Set the name of the aicraft and if it is different from the
+        previous, create a new model for it.
+        
+        If so, also notifty the aircraft about the change."""
+        if name==self._aircraftName:
+            return
+
+        self._aircraftName = name
+        if self._aircraftModel is None or \
+           not self._aircraftModel.doesHandle(name):            
+            self._setAircraftModel(AircraftModel.create(self._aircraft, name))
+        
+        self._aircraft.modelChanged(self._aircraftName, 
+                                    self._aircraftModel.name)
+
+    def _setAircraftModel(self, model):
+        """Set a new aircraft model.
+
+        It will be queried for the data to monitor and the monitoring request
+        will be replaced by a new one."""
+        self._aircraftModel = model
+        
+        if self._monitoringRequestID is not None:
+            self._handler.clearPeriodic(self._monitoringRequestID)
+            
+        self._monitoringRequestID = \
+            self._handler.requestPeriodicRead(1.0, 
+                                              model.getMonitoringData(),
+                                              self._handleMonitoringData)
+
+    def _handleMonitoringData(self, data, extra):
+        """Handle the monitoring data."""
+        if self._aircraft is None:
+            self._handler.clearPeriodic(self._monitoringRequestID)
+            return
+
+        self._setAircraftName(data[0])
+        aircraftState = self._aircraftModel.getAircraftState(self._aircraft, data)
+        self._aircraft.handleState(aircraftState)
+
+#------------------------------------------------------------------------------
+
+class AircraftModel(object):
+    """Base class for the aircraft models.
+
+    Aircraft models handle the data arriving from FSUIPC and turn it into an
+    object describing the aircraft's state."""
+    monitoringData = [("aircraftName", 0x3d00, -256),
+                      ("year", 0x0240, "H"),
+                      ("dayOfYear", 0x023e, "H"),
+                      ("zuluHour", 0x023b, "b"),
+                      ("zuluMinute", 0x023c, "b"),
+                      ("seconds", 0x023a, "b"),
+                      ("paused", 0x0264, "H"),
+                      ("frozen", 0x3364, "H"),
+                      ("slew", 0x05dc, "H"),
+                      ("overspeed", 0x036d, "b"),
+                      ("stalled", 0x036c, "b"),
+                      ("onTheGround", 0x0366, "H"),
+                      ("grossWeight", 0x30c0, "f"),
+                      ("heading", 0x0580, "d"),
+                      ("pitch", 0x0578, "d"),
+                      ("bank", 0x057c, "d"),
+                      ("ias", 0x02bc, "d"),
+                      ("vs", 0x02c8, "d"),
+                      ("altitude", 0x0570, "l"),
+                      ("flapsControl", 0x0bdc, "d"),
+                      ("flapsLeft", 0x0be0, "d"),
+                      ("flapsRight", 0x0be4, "d"),
+                      ("lights", 0x0d0c, "H"),
+                      ("pitot", 0x029c, "b"),
+                      ("noseGear", 0x0bec, "d"),
+                      ("spoilersArmed", 0x0bcc, "d"),
+                      ("spoilers", 0x0bd0, "d")]
+
+    @staticmethod
+    def create(aircraft, aircraftName):
+        """Create the model for the given aircraft name, and notify the
+        aircraft about it."""        
+        return AircraftModel([0, 10, 20, 30])
+
+    def __init__(self, flapsNotches):
+        """Construct the aircraft model.
+        
+        flapsNotches is a list of degrees of flaps that are available on the aircraft."""
+        self._flapsNotches = flapsNotches
+    
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic"
+    
+    def doesHandle(self, aircraftName):
+        """Determine if the model handles the given aircraft name.
+        
+        This default implementation returns True."""
+        return True
+
+    def addDataWithIndexMembers(self, dest, prefix, data):
+        """Add FSUIPC data to the given array and also corresponding index
+        member variables with the given prefix.
+
+        data is a list of triplets of the following items:
+        - the name of the data item. The index member variable will have a name
+        created by prepending the given prefix to this name.
+        - the FSUIPC offset
+        - the FSUIPC type
+        
+        The latter two items will be appended to dest."""
+        index = len(dest)
+        for (name, offset, type) in data:
+            setattr(self, prefix + name, index)
+            dest.append((offset, type))
+            index += 1
+            
+    def getMonitoringData(self):
+        """Get the data specification for monitoring.
+        
+        The first item should always be the aircraft name (0x3d00, -256)."""
+        data = []
+        self.addDataWithIndexMembers(data, "_monidx_",
+                                     AircraftModel.monitoringData)
+        return data
+    
+    def getAircraftState(self, aircraft, data):
+        """Get an aircraft state object for the given monitoring data."""
+        state = fs.AircraftState()
+        
+        timestamp = calendar.timegm(time.struct_time([data[self._monidx_year],
+                                                      1, 1, 0, 0, 0, -1, 1, 0]))
+        timestamp += data[self._monidx_dayOfYear] * 24 * 3600
+        timestamp += data[self._monidx_zuluHour] * 3600
+        timestamp += data[self._monidx_zuluMinute] * 60
+        timestamp += data[self._monidx_seconds]        
+        state.timestamp = timestamp
+        
+        state.paused = data[self._monidx_paused]!=0 or \
+            data[self._monidx_frozen]!=0
+        state.trickMode = data[self._monidx_slew]!=0
+
+        state.overspeed = data[self._monidx_overspeed]!=0
+        state.stalled = data[self._monidx_stalled]!=0
+        state.onTheGround = data[self._monidx_onTheGround]!=0
+
+        state.grossWeight = data[self._monidx_grossWeight] * util.LBSTOKG
+        
+        state.heading = data[self._monidx_heading]*360.0/65536.0/65536.0
+        if state.heading<0.0: state.heading += 360.0
+
+        state.pitch = data[self._monidx_pitch]*360.0/65536.0/65536.0
+        state.bank = data[self._monidx_bank]*360.0/65536.0/65536.0
+
+        state.ias = data[self._monidx_ias]/128.0
+        state.vs = data[self._monidx_vs]*60.0*3.28984/256.0
+
+        state.altitude = data[self._monidx_altitude]*3.28084/65536.0/65536.0
+        
+        numNotchesM1 = len(self._flapsNotches) - 1
+        flapsIncrement = 16383 / numNotchesM1
+        flapsControl = data[self._monidx_flapsControl]
+        flapsIndex = flapsControl / flapsIncrement
+        if flapsIndex < numNotchesM1:
+            if (flapsControl - (flapsIndex*flapsIncrement) >
+                (flapsIndex+1)*flapsIncrement - flapsControl):
+                flapsIndex += 1
+        state.flapsSet = self._flapsNotches[flapsIndex]
+        
+        flapsLeft = data[self._monidx_flapsLeft]
+        flapsIndex = flapsLeft / flapsIncrement
+        state.flaps = self._flapsNotches[flapsIndex]
+        if flapsIndex != numNotchesM1:
+            thisNotch = flapsIndex * flapsIncrement
+            nextNotch = thisNotch + flapsIncrement
+            
+            state.flaps += (self._flapsNotches[flapsIndex+1] - state.flaps) * \
+                (flapsLeft - thisNotch) / (nextNotch - thisNotch)
+        
+        lights = data[self._monidx_lights]
+        
+        state.navLightsOn = (lights%0x01) != 0
+        state.antiCollisionLightsOn = (lights%0x02) != 0
+        state.landingLightsOn = (lights%0x04) != 0
+        state.strobeLightsOn = (lights%0x10) != 0
+        
+        state.pitotHeatOn = data[self._monidx_pitot]!=0
+
+        state.gearsDown = data[self._monidx_noseGear]==16383
+
+        state.spoilersArmed = data[self._monidx_spoilersArmed]!=0
+        
+        spoilers = data[self._monidx_spoilers]
+        if spoilers<=4800:
+            state.spoilersExtension = 0.0
+        else:
+            state.spoilersExtension = (spoilers - 4800) * 100.0 / (16383 - 4800)
+        
+        return state
