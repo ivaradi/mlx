@@ -2,17 +2,25 @@
 
 #-------------------------------------------------------------------------------
 
+# The ratio between lbs and kg
+LBSTOKG=0.4536
+
+# The ratio between feet and metre
+FEETTOMETRES=0.3048
+
+#-------------------------------------------------------------------------------
+
 # Flight simulator type: MS Flight Simulator 2004
-TYPE_MSFS9 = 1
+SIM_MSFS9 = 1
 
 # Flight simulator type: MS Flight Simulator X
-TYPE_MSFSX = 2
+SIM_MSFSX = 2
 
 # Flight simulator type: X-Plane 9
-TYPE_XPLANE9 = 3
+SIM_XPLANE9 = 3
 
 # Flight simulator type: X-Plane 10
-TYPE_XPLANE10 = 4
+SIM_XPLANE10 = 4
 
 #-------------------------------------------------------------------------------
 

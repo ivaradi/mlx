@@ -9,7 +9,7 @@ def callback(data, extra):
     print data
 
 def main():
-    simulator = fs.createSimulator(const.TYPE_MSFS9, fs.ConnectionListener(),
+    simulator = fs.createSimulator(const.SIM_MSFS9, fs.ConnectionListener(),
                                    acft.Aircraft(const.AIRCRAFT_B737))
     simulator.connect()
 

@@ -31,7 +31,7 @@ def createSimulator(type, connectionListener, aircraft):
     The returned object should provide the following members:
     FIXME: add info
     """
-    assert type==const.TYPE_MSFS9, "Only MS Flight Simulator 2004 is supported"
+    assert type==const.SIM_MSFS9, "Only MS Flight Simulator 2004 is supported"
     import fsuipc
     return fsuipc.Simulator(connectionListener, aircraft)
 

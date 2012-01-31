@@ -253,7 +253,7 @@ class Handler(threading.Thread):
                     (pyuipc.fsuipc_version, pyuipc.lib_version, 
                      pyuipc.fs_version)
                 Handler._callSafe(lambda:     
-                                  self._connectionListener.connected(const.TYPE_MSFS9, 
+                                  self._connectionListener.connected(const.SIM_MSFS9, 
                                                                      description))
                 return True
             except Exception, e:
@@ -577,7 +577,7 @@ class AircraftModel(object):
         state.stalled = data[self._monidx_stalled]!=0
         state.onTheGround = data[self._monidx_onTheGround]!=0
 
-        state.grossWeight = data[self._monidx_grossWeight] * util.LBSTOKG
+        state.grossWeight = data[self._monidx_grossWeight] * const.LBSTOKG
         
         state.heading = data[self._monidx_heading]*360.0/65536.0/65536.0
         if state.heading<0.0: state.heading += 360.0
@@ -587,9 +587,9 @@ class AircraftModel(object):
 
         state.ias = data[self._monidx_ias]/128.0
         state.groundSpeed = data[self._monidx_groundSpeed]* 3600.0/65536.0/1852.0
-        state.vs = data[self._monidx_vs]*60.0*3.28984/256.0
+        state.vs = data[self._monidx_vs]*60.0/const.FEETTOMETRES/256.0
 
-        state.altitude = data[self._monidx_altitude]*3.28084/65536.0/65536.0
+        state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
 
         state.gLoad = data[self._monidx_gLoad] / 625.0
         
