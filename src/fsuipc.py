@@ -339,57 +339,85 @@ class Handler(threading.Thread):
 class Simulator(object):
     """The simulator class representing the interface to the flight simulator
     via FSUIPC."""
-    def __init__(self, connectionListener):
-        """Construct the simulator."""
-        self._handler = Handler(connectionListener)
-        self._handler.start()
-        self._aircraft = None
-        self._aircraftName = None
-        self._aircraftModel = None
-        self._monitoringRequestID = None
+    # The basic data that should be queried all the time once we are connected
+    normalData = [ (0x3d00, -256) ]
 
-    def connect(self):
-        """Initiate a connection to the simulator."""
-        self._handler.connect()
-
-    def startMonitoring(self, aircraft):
-        """Start the periodic monitoring of the aircraft and pass the resulting
-        state to the given aircraft object periodically.
+    def __init__(self, connectionListener, aircraft):
+        """Construct the simulator.
         
         The aircraft object passed must provide the following members:
         - type: one of the AIRCRAFT_XXX constants from const.py
         - modelChanged(aircraftName, modelName): called when the model handling
         the aircraft has changed.
         - handleState(aircraftState): handle the given state."""
-        assert self._aircraft is None
-
         self._aircraft = aircraft
-        self._startMonitoring()
+
+        self._handler = Handler(connectionListener)
+        self._handler.start()
+
+        self._normalRequestID = None
+
+        self._monitoringRequested = False
+        self._monitoring = False
+
+        self._aircraftName = None
+        self._aircraftModel = None
+
+    def connect(self):
+        """Initiate a connection to the simulator."""
+        self._handler.connect()
+        self._startDefaultNormal()
+                                                            
+    def startMonitoring(self):
+        """Start the periodic monitoring of the aircraft and pass the resulting
+        state to the aircraft object periodically."""
+        assert not self._monitoringRequested         
+        self._monitoringRequested = True
 
     def stopMonitoring(self):
         """Stop the periodic monitoring of the aircraft."""
-        self._aircraft = None
+        assert self._monitoringRequested 
+        self._monitoringRequested = False
 
     def disconnect(self):
         """Disconnect from the simulator."""
+        assert not self._monitoringRequested 
+        
+        self._stopNormal()
         self._handler.disconnect()
 
-    def _startMonitoring(self):
-        """The internal call to start monitoring."""
-        self._handler.requestRead([(0x3d00, -256)], self._monitoringStartCallback)
+    def _startDefaultNormal(self):
+        """Start the default normal periodic request."""
+        assert self._normalRequestID is None
+        self._normalRequestID = self._handler.requestPeriodicRead(1.0,
+                                                                  Simulator.normalData,
+                                                                  self._handleNormal)
 
-    def _monitoringStartCallback(self, data, extra):
-        """Callback for the data read when the monitoring has started.
-        
-        The following data items are expected:
-        - the name of the aircraft
+    def _stopNormal(self):
+        """Stop the normal period request."""
+        assert self._normalRequestID is not None
+        self._handler.clearPeriodic(self._normalRequestID)
+        self._normalRequestID = None
+
+    def _handleNormal(self, data, extra):
+        """Handle the reply to the normal request.
+
+        At the beginning the result consists the data for normalData. When
+        monitoring is started, it contains the result also for the
+        aircraft-specific values.
         """
-        if self._aircraft is None:
-            return
-        elif data is None:
+        self._setAircraftName(data[0])
+        if self._monitoringRequested and not self._monitoring:
+            self._monitoring = True
+            self._stopNormal()
             self._startMonitoring()
-        else:
-            self._setAircraftName(data[0])            
+        elif self._monitoring and not self._monitoringRequested:
+            self._monitoring = False
+            self._stopNormal()
+            self._startDefaultNormal()
+        elif self._monitoring and self._aircraftModel is not None:
+            aircraftState = self._aircraftModel.getAircraftState(self._aircraft, data)
+            self._aircraft.handleState(aircraftState)
 
     def _setAircraftName(self, name):
         """Set the name of the aicraft and if it is different from the
@@ -414,23 +442,20 @@ class Simulator(object):
         will be replaced by a new one."""
         self._aircraftModel = model
         
-        if self._monitoringRequestID is not None:
-            self._handler.clearPeriodic(self._monitoringRequestID)
+        if self._monitoring:
+            self._handler.clearPeriodic(self._normalRequestID)            
+            self._startMonitoring()
             
-        self._monitoringRequestID = \
-            self._handler.requestPeriodicRead(1.0, 
-                                              model.getMonitoringData(),
-                                              self._handleMonitoringData)
+    def _startMonitoring(self):
+        """Start monitoring with the current aircraft model."""
+        assert self._monitoring
 
-    def _handleMonitoringData(self, data, extra):
-        """Handle the monitoring data."""
-        if self._aircraft is None:
-            self._handler.clearPeriodic(self._monitoringRequestID)
-            return
-
-        self._setAircraftName(data[0])
-        aircraftState = self._aircraftModel.getAircraftState(self._aircraft, data)
-        self._aircraft.handleState(aircraftState)
+        data = Simulator.normalData[:]
+        self._aircraftModel.addMonitoringData(data)
+        
+        self._normalRequestID = \
+            self._handler.requestPeriodicRead(1.0, data, 
+                                              self._handleNormal)
 
 #------------------------------------------------------------------------------
 
@@ -439,14 +464,14 @@ class AircraftModel(object):
 
     Aircraft models handle the data arriving from FSUIPC and turn it into an
     object describing the aircraft's state."""
-    monitoringData = [("aircraftName", 0x3d00, -256),
-                      ("year", 0x0240, "H"),
+    monitoringData = [("year", 0x0240, "H"),
                       ("dayOfYear", 0x023e, "H"),
                       ("zuluHour", 0x023b, "b"),
                       ("zuluMinute", 0x023c, "b"),
                       ("seconds", 0x023a, "b"),
                       ("paused", 0x0264, "H"),
                       ("frozen", 0x3364, "H"),
+                      ("replay", 0x0628, "d"),
                       ("slew", 0x05dc, "H"),
                       ("overspeed", 0x036d, "b"),
                       ("stalled", 0x036c, "b"),
@@ -456,8 +481,10 @@ class AircraftModel(object):
                       ("pitch", 0x0578, "d"),
                       ("bank", 0x057c, "d"),
                       ("ias", 0x02bc, "d"),
+                      ("groundSpeed", 0x02b4, "d"),
                       ("vs", 0x02c8, "d"),
                       ("altitude", 0x0570, "l"),
+                      ("gLoad", 0x11ba, "H"),
                       ("flapsControl", 0x0bdc, "d"),
                       ("flapsLeft", 0x0be0, "d"),
                       ("flapsRight", 0x0be4, "d"),
@@ -465,13 +492,28 @@ class AircraftModel(object):
                       ("pitot", 0x029c, "b"),
                       ("noseGear", 0x0bec, "d"),
                       ("spoilersArmed", 0x0bcc, "d"),
-                      ("spoilers", 0x0bd0, "d")]
+                      ("spoilers", 0x0bd0, "d"),
+                      ("altimeter", 0x0330, "H"),
+                      ("nav1", 0x0350, "H"),
+                      ("nav2", 0x0352, "H")]
 
     @staticmethod
     def create(aircraft, aircraftName):
         """Create the model for the given aircraft name, and notify the
         aircraft about it."""        
         return AircraftModel([0, 10, 20, 30])
+
+    @staticmethod
+    def convertFrequency(data):
+        """Convert the given frequency data to a string."""
+        frequency = ""
+        for i in range(0, 4):
+            digit = chr(ord('0') + (data&0x0f))
+            data >>= 4
+            frequency = digit + frequency
+            if i==1:
+                frequency = "." + frequency
+        return "1" + frequency            
 
     def __init__(self, flapsNotches):
         """Construct the aircraft model.
@@ -507,14 +549,12 @@ class AircraftModel(object):
             dest.append((offset, type))
             index += 1
             
-    def getMonitoringData(self):
+    def addMonitoringData(self, data):
         """Get the data specification for monitoring.
         
-        The first item should always be the aircraft name (0x3d00, -256)."""
-        data = []
+        Add the model-specific monitoring data to the given array."""
         self.addDataWithIndexMembers(data, "_monidx_",
                                      AircraftModel.monitoringData)
-        return data
     
     def getAircraftState(self, aircraft, data):
         """Get an aircraft state object for the given monitoring data."""
@@ -529,7 +569,8 @@ class AircraftModel(object):
         state.timestamp = timestamp
         
         state.paused = data[self._monidx_paused]!=0 or \
-            data[self._monidx_frozen]!=0
+            data[self._monidx_frozen]!=0 or \
+            data[self._monidx_replay]!=0
         state.trickMode = data[self._monidx_slew]!=0
 
         state.overspeed = data[self._monidx_overspeed]!=0
@@ -545,9 +586,12 @@ class AircraftModel(object):
         state.bank = data[self._monidx_bank]*360.0/65536.0/65536.0
 
         state.ias = data[self._monidx_ias]/128.0
+        state.groundSpeed = data[self._monidx_groundSpeed]* 3600.0/65536.0/1852.0
         state.vs = data[self._monidx_vs]*60.0*3.28984/256.0
 
         state.altitude = data[self._monidx_altitude]*3.28084/65536.0/65536.0
+
+        state.gLoad = data[self._monidx_gLoad] / 625.0
         
         numNotchesM1 = len(self._flapsNotches) - 1
         flapsIncrement = 16383 / numNotchesM1
@@ -571,10 +615,10 @@ class AircraftModel(object):
         
         lights = data[self._monidx_lights]
         
-        state.navLightsOn = (lights%0x01) != 0
-        state.antiCollisionLightsOn = (lights%0x02) != 0
-        state.landingLightsOn = (lights%0x04) != 0
-        state.strobeLightsOn = (lights%0x10) != 0
+        state.navLightsOn = (lights&0x01) != 0
+        state.antiCollisionLightsOn = (lights&0x02) != 0
+        state.landingLightsOn = (lights&0x04) != 0
+        state.strobeLightsOn = (lights&0x10) != 0
         
         state.pitotHeatOn = data[self._monidx_pitot]!=0
 
@@ -587,5 +631,13 @@ class AircraftModel(object):
             state.spoilersExtension = 0.0
         else:
             state.spoilersExtension = (spoilers - 4800) * 100.0 / (16383 - 4800)
+
+        state.altimeter = data[self._monidx_altimeter] / 16.0
+           
+        state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
+        state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
         
         return state
+
+#------------------------------------------------------------------------------
+

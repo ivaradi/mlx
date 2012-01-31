@@ -24,7 +24,7 @@ class SimulatorException(Exception):
 
 #-------------------------------------------------------------------------------
 
-def createSimulator(type, connectionListener):
+def createSimulator(type, connectionListener, aircraft):
     """Create a simulator instance for the given simulator type with the given
     connection listener.
 
@@ -33,7 +33,7 @@ def createSimulator(type, connectionListener):
     """
     assert type==const.TYPE_MSFS9, "Only MS Flight Simulator 2004 is supported"
     import fsuipc
-    return fsuipc.Simulator(connectionListener)
+    return fsuipc.Simulator(connectionListener, aircraft)
 
 #-------------------------------------------------------------------------------
 
@@ -59,10 +59,14 @@ class AircraftState(object):
     - bank: the bank of the aircraft in degrees. Positive means bank left,
     negative means bank right (float)
     - ias: the indicated airspeed in knots (float)    
+    - groundSpeed: the ground speed (float)
     - vs: the vertical speed in feet/minutes (float)
     - altitude: the altitude of the aircraft in feet (float)
+    - gLoad: G-load (float)
     - flapsSet: the selected degrees of the flaps (float)
     - flaps: the actual degrees of the flaps (float)
+    - fuelWeight[]: the fuel weights in the different tanks in kgs (array of
+    floats of as many items as the number fuel tanks)
     - n1[]: the N1 values of the turbine engines (array of floats
     of as many items as the number of engines, present only for aircraft with
     turbines)
@@ -82,13 +86,22 @@ class AircraftState(object):
     automatic deployment
     - spoilersExtension: the percentage of how much the spoiler is extended
     (float) 
+    - altimeter: the altimeter setting in hPa (float)
+    - nav1: the frequency of the NAV1 radio in MHz (string)
+    - nav2: the frequency of the NAV1 radio in MHz (string)
 
     FIXME: needed when taxiing only:
     - zfw: the Zero Fuel Weight in klograms (float)
+    - payload weight
 
     FIXME: needed for touchdown only:
     - ambientWindDirection: the ambient wind direction around the aircraft (float)
     - ambientWindSpeed: the ambient wind speed around the aircraft in knowns (float)
     - tdRate: the touchdown rate calculated by FSUIPC (float)
+
+    FIXME: needed rarely:
+    - latitude, longitude
+    - transporter
+    - visibility 
     """
     

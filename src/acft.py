@@ -48,6 +48,11 @@ class Aircraft(object):
                 (timeStr, aircraftState.stalled)
 
         if self._aircraftState is None or \
+           self._aircraftState.onTheGround != aircraftState.onTheGround:
+            print "Aircraft.handleState: %s: onTheGround=%d" % \
+                (timeStr, aircraftState.onTheGround)
+
+        if self._aircraftState is None or \
            self._aircraftState.grossWeight != aircraftState.grossWeight:
             print "Aircraft.handleState: %s: grossWeight=%f" % \
                 (timeStr, aircraftState.grossWeight)
@@ -73,6 +78,11 @@ class Aircraft(object):
                 (timeStr, aircraftState.ias)
 
         if self._aircraftState is None or \
+           self._aircraftState.groundSpeed != aircraftState.groundSpeed:
+            print "Aircraft.handleState: %s: groundSpeed=%f" % \
+                (timeStr, aircraftState.groundSpeed)
+
+        if self._aircraftState is None or \
            self._aircraftState.vs != aircraftState.vs:
             print "Aircraft.handleState: %s: vs=%f" % \
                 (timeStr, aircraftState.vs)
@@ -81,6 +91,11 @@ class Aircraft(object):
            self._aircraftState.altitude != aircraftState.altitude:
             print "Aircraft.handleState: %s: altitude=%f" % \
                 (timeStr, aircraftState.altitude)
+
+        if self._aircraftState is None or \
+           self._aircraftState.gLoad != aircraftState.gLoad:
+            print "Aircraft.handleState: %s: gLoad=%f" % \
+                (timeStr, aircraftState.gLoad)
 
         if self._aircraftState is None or \
            self._aircraftState.flapsSet != aircraftState.flapsSet:
@@ -131,6 +146,21 @@ class Aircraft(object):
            self._aircraftState.spoilersExtension != aircraftState.spoilersExtension:
             print "Aircraft.handleState: %s: spoilersExtension=%f" % \
                 (timeStr, aircraftState.spoilersExtension)
+
+        if self._aircraftState is None or \
+           self._aircraftState.altimeter != aircraftState.altimeter:
+            print "Aircraft.handleState: %s: altimeter=%f" % \
+                (timeStr, aircraftState.altimeter)
+
+        if self._aircraftState is None or \
+           self._aircraftState.nav1 != aircraftState.nav1:
+            print "Aircraft.handleState: %s: nav1=%s" % \
+                (timeStr, aircraftState.nav1)
+
+        if self._aircraftState is None or \
+           self._aircraftState.nav2 != aircraftState.nav2:
+            print "Aircraft.handleState: %s: nav2=%s" % \
+                (timeStr, aircraftState.nav2)
 
         self._aircraftState = aircraftState
             
