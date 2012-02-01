@@ -33,23 +33,23 @@ AIRCRAFT_B737 = 2
 # Aircraft type: Boeing 737-800
 AIRCRAFT_B738 = 3
 
-# Aircraft type: Dash-8 Q400
-AIRCRAFT_DH8D = 4
-
 # Aircraft type: Boeing 737-300
-AIRCRAFT_B733 = 5
+AIRCRAFT_B733 = 4
 
 # Aircraft type: Boeing 737-400
-AIRCRAFT_B734 = 6
+AIRCRAFT_B734 = 5
 
 # Aircraft type: Boeing 737-500
-AIRCRAFT_B735 = 7
+AIRCRAFT_B735 = 6
+
+# Aircraft type: Dash-8 Q400
+AIRCRAFT_DH8D = 7
 
 # Aircraft type: Boeing 767-200
 AIRCRAFT_B762 = 8
 
 # Aircraft type: Boeing 767-300
-AIRCRAFT_B762 = 9
+AIRCRAFT_B763 = 9
 
 # Aircraft type: Canadair CRJ-200
 AIRCRAFT_CRJ2 = 10
@@ -57,7 +57,7 @@ AIRCRAFT_CRJ2 = 10
 # Aircraft type: Fokker F-70
 AIRCRAFT_F70 = 11
 
-# Aircraft type: Lisunov Li-3
+# Aircraft type: Lisunov Li-2
 AIRCRAFT_DC3 = 12
 
 # Aircraft type: Tupolev Tu-134

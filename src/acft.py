@@ -4,6 +4,8 @@
 
 import time
 
+import const
+
 #---------------------------------------------------------------------------------------
 
 class Aircraft(object):
@@ -162,7 +164,193 @@ class Aircraft(object):
             print "Aircraft.handleState: %s: nav2=%s" % \
                 (timeStr, aircraftState.nav2)
 
+        if self._aircraftState is None or \
+           self._aircraftState.fuel != aircraftState.fuel:
+            print "Aircraft.handleState: %s: fuel=%s" % \
+                (timeStr, aircraftState.fuel)
+
+        if self._aircraftState is None or \
+           self._aircraftState.n1 != aircraftState.n1:
+            print "Aircraft.handleState: %s: n1=%s" % \
+                (timeStr, aircraftState.n1)
+
+        if self._aircraftState is None or \
+           self._aircraftState.reverser != aircraftState.reverser:
+            print "Aircraft.handleState: %s: reverser=%s" % \
+                (timeStr, aircraftState.reverser)
+
         self._aircraftState = aircraftState
             
 #---------------------------------------------------------------------------------------
-            
+
+class Boeing737(Aircraft):
+    """Base class for the various aircraft in the Boeing 737 family.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right
+    - n1: left, right
+    - reverser: left, right"""
+    pass
+
+#---------------------------------------------------------------------------------------
+
+class B736(Boeing737):
+    """Boeing 737-600 aircraft."""
+    def __init__(self):
+        super(B736, self).__init__(const.AIRCRAFT_B736)
+
+#---------------------------------------------------------------------------------------
+
+class B737(Boeing737):
+    """Boeing 737-700 aircraft."""
+    def __init__(self):
+        super(B737, self).__init__(const.AIRCRAFT_B737)
+
+#---------------------------------------------------------------------------------------
+
+class B738(Boeing737):
+    """Boeing 737-800 aircraft."""
+    def __init__(self):
+        super(B738, self).__init__(const.AIRCRAFT_B738)
+
+#---------------------------------------------------------------------------------------
+
+class B733(Boeing737):
+    """Boeing 737-300 aircraft."""
+    def __init__(self):
+        super(B733, self).__init__(const.AIRCRAFT_B733)
+
+#---------------------------------------------------------------------------------------
+
+class B734(Boeing737):
+    """Boeing 737-400 aircraft."""
+    def __init__(self):
+        super(B734, self).__init__(const.AIRCRAFT_B734)
+
+#---------------------------------------------------------------------------------------
+
+class B735(Boeing737):
+    """Boeing 737-500 aircraft."""
+    def __init__(self):
+        super(B735, self).__init__(const.AIRCRAFT_B735)
+
+#---------------------------------------------------------------------------------------
+
+class DH8D(Aircraft):
+    """Bombardier Dash-8 Q400 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right
+    - n1: left, right
+    - reverser: left, right."""
+    def __init__(self):
+        super(DH8D, self).__init__(const.AIRCRAFT_DH8D)
+
+#---------------------------------------------------------------------------------------
+
+class Boeing767(Aircraft):
+    """Base class for the various aircraft in the Boeing 767 family.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right
+    - n1: left, right
+    - reverser: left, right"""
+
+#---------------------------------------------------------------------------------------
+
+class B762(Boeing767):
+    """Boeing 767-200 aircraft."""
+    def __init__(self):
+        super(B762, self).__init__(const.AIRCRAFT_B762)
+
+#---------------------------------------------------------------------------------------
+
+class B763(Boeing767):
+    """Boeing 767-300 aircraft."""
+    def __init__(self):
+        super(B763, self).__init__(const.AIRCRAFT_B763)
+
+#---------------------------------------------------------------------------------------
+
+class CRJ2(Aircraft):
+    """Bombardier CRJ-200 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right
+    - n1: left, right
+    - reverser: left, right."""
+    def __init__(self):
+        super(CRJ2, self).__init__(const.AIRCRAFT_CRJ2)
+
+#---------------------------------------------------------------------------------------
+
+class F70(Aircraft):
+    """Fokker 70 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right
+    - n1: left, right
+    - reverser: left, right."""
+    def __init__(self):
+        super(F70, self).__init__(const.AIRCRAFT_F70)
+
+#---------------------------------------------------------------------------------------
+
+class DC3(Aircraft):
+    """Lisunov Li-2 (DC-3) aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: left, right, left aux, right aix
+    - rpm: left, right
+    - reverser: left, right."""
+    def __init__(self):
+        super(DC3, self).__init__(const.AIRCRAFT_DC3)
+
+#---------------------------------------------------------------------------------------
+
+class T134(Aircraft):
+    """Tupolev Tu-134 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left tip, left aux, right tip, right aux, external 1,
+    external 2
+    - n1: left, right
+    - reverser: left, right."""
+    def __init__(self):
+        super(T134, self).__init__(const.AIRCRAFT_T134)
+
+#---------------------------------------------------------------------------------------
+
+class T154(Aircraft):
+    """Tupolev Tu-154 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: centre, left, right, centre 2, left aux, right aux
+    - n1: left, centre, right
+    - reverser: left, right"""
+    def __init__(self):
+        super(T154, self).__init__(const.AIRCRAFT_T154)
+
+#---------------------------------------------------------------------------------------
+
+class YK40(Aircraft):
+    """Yakovlev Yak-40 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: left, right
+    - n1: left, right
+    - reverser: left, right"""
+    def __init__(self):
+        super(YK40, self).__init__(const.AIRCRAFT_YK40)
+
+#---------------------------------------------------------------------------------------
+

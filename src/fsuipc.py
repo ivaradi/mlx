@@ -497,11 +497,41 @@ class AircraftModel(object):
                       ("nav1", 0x0350, "H"),
                       ("nav2", 0x0352, "H")]
 
+    genericModels = { const.AIRCRAFT.B736 : B737Model,
+                      const.AIRCRAFT_B737 : B737Model,
+                      const.AIRCRAFT_B738 : B737Model,
+                      const.AIRCRAFT_B733 : B737Model,
+                      const.AIRCRAFT_B734 : B737Model,
+                      const.AIRCRAFT_B735 : B737Model,
+                      const.AIRCRAFT_DH8D : DH8DModel,
+                      const.AIRCRAFT_B762 : B767Model,
+                      const.AIRCRAFT_B763 : B767Model,
+                      const.AIRCRAFT_CRJ2 : B767Model,
+                      const.AIRCRAFT_F79  : F70Model,
+                      const.AIRCRAFT_DC3  : DC3Model,
+                      const.AIRCRAFT_T134 : T134Model,
+                      const.AIRCRAFT_T154 : T154Model,
+                      const.AIRCRAFT_YK40 : YK40Model }
+
+    specialModels = []
+
+    @staticmethod
+    def registerSpecial(clazz):
+        """Register the given class as a special model."""
+        AircraftModel.specialModels.append(clazz)
+
     @staticmethod
     def create(aircraft, aircraftName):
         """Create the model for the given aircraft name, and notify the
-        aircraft about it."""        
-        return AircraftModel([0, 10, 20, 30])
+        aircraft about it."""
+        for specialModel in AircraftModel.specialModels:
+            if specialModel.doesHandle(aircraft, aircraftName):
+                return specialModel(aircraft, aircraftName)
+        
+        if aircraft.type in AircraftModel.genericModels:
+            return AircraftModel.genericModels[aircraft.type]()
+        else:
+            return GenericModel()
 
     @staticmethod
     def convertFrequency(data):
@@ -529,10 +559,17 @@ class AircraftModel(object):
     def doesHandle(self, aircraftName):
         """Determine if the model handles the given aircraft name.
         
-        This default implementation returns True."""
-        return True
+        This default implementation returns False."""
+        return False
 
-    def addDataWithIndexMembers(self, dest, prefix, data):
+    def _addOffsetWithIndexMember(self, dest, offset, type, attrName = None):
+        """Add the given FSUIPC offset and type to the given array and a member
+        attribute with the given name."""        
+        dest.append((offset, type))
+        if attrName is not None:
+            setattr(self, attrName, len(dest))
+
+    def _addDataWithIndexMembers(self, dest, prefix, data):
         """Add FSUIPC data to the given array and also corresponding index
         member variables with the given prefix.
 
@@ -543,16 +580,11 @@ class AircraftModel(object):
         - the FSUIPC type
         
         The latter two items will be appended to dest."""
-        index = len(dest)
         for (name, offset, type) in data:
-            setattr(self, prefix + name, index)
-            dest.append((offset, type))
-            index += 1
+            self._addOffsetWithIndexMember(dest, offset, type, prefix + name)
             
     def addMonitoringData(self, data):
-        """Get the data specification for monitoring.
-        
-        Add the model-specific monitoring data to the given array."""
+        """Add the model-specific monitoring data to the given array."""
         self.addDataWithIndexMembers(data, "_monidx_",
                                      AircraftModel.monitoringData)
     
@@ -638,6 +670,246 @@ class AircraftModel(object):
         state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
         
         return state
+
+#------------------------------------------------------------------------------
+
+class GenericAircraftModel(AircraftModel):
+    """A generic aircraft model that can handle the fuel levels, the N1 or RPM
+    values and some other common parameters in a generic way."""
+    def __init__(self, flapsNotches, fuelInfo, numEngines, isN1 = True):
+        """Construct the generic aircraft model with the given data.
+
+        flapsNotches is an array of how much degrees the individual flaps
+        notches mean.
+
+        fuelInfo is an array of FSUIPC offsets for the levels of the fuel
+        tanks. It is assumed to be a 4-byte value, followed by another 4-byte
+        value, which is the fuel tank capacity.
+
+        numEngines is the number of engines the aircraft has.
+
+        isN1 determines if the engines have an N1 value or an RPM value
+        (e.g. pistons)."""
+        super(GenericAircraftModel, self).__init__(flapsNotches = flapsNotches)
+
+        self._fuelInfo = fuelInfo
+        self._fuelStartIndex = None
+        self._numEngines = numEngines
+        self._engineStartIndex = None
+        self._isN1 = isN1
+
+    def addMonitoringData(self, data):
+        """Add the model-specific monitoring data to the given array."""
+        super(GenericAircraftModel, self).addMonitoringData(data)
+        
+        self._addOffsetWithIndexMember(data, 0x0af4, "H", "_monidx_fuelWeight")
+
+        self._fuelStartIndex = len(data)
+        for offset in self._fuelInfo:
+            self._addOffsetWithIndexMember(data, offset, "u")    # tank level
+            self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
+
+        if self._isN1:
+            self._engineStartIndex = len(data)
+            for i in range(0, self._numEngines):
+                self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "u")  # N1
+                self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "d")  # throttle lever
+        
+    def getAircraftState(self, aircraft, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then add the data about the fuel levels and 
+        the engine parameters."""
+        state = super(GenericAircraftModel, self).getAircraftState(aircraft,
+                                                                   data)
+
+        fuelWeight = data[self._monidx_fuelWeight]/256.0
+        state.fuel = []
+        for i in range(self._fuelStartIndex, 
+                       self._fuelStartIndex + 2*len(self._fuelInfo), 2):
+            fuel = data[i+1]*data[i]*fuelWeight*const.LBSTOKG/128.0/65536.0
+            state.fuel.append(fuel)
+
+        state.n1 = []
+        state.reverser = []
+        for i in range(self._engineStartIndex,
+                       self._engineStartIndex + 2*self._numEngines, 2):
+            state.n1.append(data[i]*100.0/16384.0)
+            state.reverser.append(data[i+1]<0)
+
+        return state
+
+#------------------------------------------------------------------------------
+
+class GenericModel(GenericAircraftModel):
+    """Generic aircraft model for an unknown type."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 10, 20, 30],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic"    
+
+#------------------------------------------------------------------------------
+
+class B737Model(GenericAircraftModel):
+    """Generic model for the Boeing 737 Classing and NG aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Boeing 737"
+
+#------------------------------------------------------------------------------
+
+class B767Model(GenericAircraftModel):
+    """Generic model for the Boeing 767 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 1, 5, 15, 20, 25, 30],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Boeing 767"
+
+#------------------------------------------------------------------------------
+
+class DH8DModel(GenericAircraftModel):
+    """Generic model for the Boeing 737 NG aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 5, 10, 15, 35],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Bombardier Dash-8 Q400"
+
+#------------------------------------------------------------------------------
+
+class CRJ2Model(GenericAircraftModel):
+    """Generic model for the Bombardier CRJ-200 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 8, 20, 30, 45],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Bombardier CRJ-200"
+
+#------------------------------------------------------------------------------
+
+class F70Model(GenericAircraftModel):
+    """Generic model for the Fokker F70 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 8, 15, 25, 42],
+                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Fokker 70"
+
+#------------------------------------------------------------------------------
+
+class DC3Model(GenericAircraftModel):
+    """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 15, 30, 45],
+                     fuelInfo = [0x0b7c, 0x0b84, 0x0b94, 0x0b9c], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Lisunov Li-2"
+
+#------------------------------------------------------------------------------
+
+class T134Model(GenericAircraftModel):
+    """Generic model for the Tupolev Tu-134 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 10, 20, 30],
+                     fuelInfo = [0x0b74, 
+                                 0x0b8c, 0x0b84, 
+                                 0x0ba4, 0x0b9c,
+                                 0x1254, 0x125c], 
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Tupolev Tu-134"
+
+#------------------------------------------------------------------------------
+
+class T154Model(GenericAircraftModel):
+    """Generic model for the Tupolev Tu-134 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 15, 28, 45],
+                     fuelInfo = [0x0b74, 0x0b7c, 0x0b94, 
+                                 0x1244, 0x0b84, 0x0b9c]
+                     numEngines = 3)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Tupolev Tu-154"
+
+    def getAircraftState(self, aircraft, data):
+        """Get an aircraft state object for the given monitoring data.
+
+        This removes the reverser value for the middle engine."""
+        state = super(T154Model, self).getAircraftState(aircraft, data)
+        del state.reverser[1]
+        return state
+
+#------------------------------------------------------------------------------
+
+class YK40Model(GenericAircraftModel):
+    """Generic model for the Yakovlev Yak-40 aircraft."""
+    def __init__(self):
+        """Construct the model."""
+        super(GenericAircraftModel, self).
+            __init__(flapsNotches = [0, 20, 35],
+                     fuelInfo = [0x0b7c, 0x0b94]
+                     numEngines = 2)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic Yakovlev Yak-40"
 
 #------------------------------------------------------------------------------
 
