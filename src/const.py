@@ -69,3 +69,40 @@ AIRCRAFT_T154 = 14
 # Aircraft type: Yakovlev Yak-40
 AIRCRAFT_YK40 = 15
 
+#-------------------------------------------------------------------------------
+
+# Flight stage: boarding
+STAGE_BOARDING = 1
+
+# Flight stage: pushback, startup and taxi
+STAGE_PUSHANDTAXI = 2
+
+# Flight stage: takeoff
+STAGE_TAKEOFF = 3
+
+# Flight stage: RTO
+STAGE_RTO = 4
+
+# Flight stage: climb
+STAGE_CLIMB = 5
+
+# Flight stage: cruise
+STAGE_CRUISE = 6
+
+# Flight stage: descent
+STAGE_DESCENT = 7
+
+# Flight stage: landing
+STAGE_LANDING = 8
+
+# Flight stage: taxi after landing
+STAGE_TAXIAFTERLAND = 9
+
+# Flight stage: parking
+STAGE_PARKING = 10
+
+# Flight stage: go-around
+STAGE_GOAROUND = 11
+
+# Flight stage: end
+STAGE_END = 12

@@ -61,6 +61,7 @@ class AircraftState(object):
     - ias: the indicated airspeed in knots (float)    
     - groundSpeed: the ground speed (float)
     - vs: the vertical speed in feet/minutes (float)
+    - radioAltitude: the radio altitude of the aircraft in feet (float)
     - altitude: the altitude of the aircraft in feet (float)
     - gLoad: G-load (float)
     - flapsSet: the selected degrees of the flaps (float)
@@ -81,6 +82,7 @@ class AircraftState(object):
     - strobeLightsOn: a boolean indicating if the strobe lights are on
     - langingLightsOn: a boolean indicating if the landing lights are on
     - pitotHeatOn: a boolean indicating if the pitot heat is on
+    - parking: a boolean indicating if the parking brake is set
     - gearsDown: a boolean indicating if the gears are down
     - spoilersArmed: a boolean indicating if the spoilers have been armed for
     automatic deployment
@@ -89,6 +91,7 @@ class AircraftState(object):
     - altimeter: the altimeter setting in hPa (float)
     - nav1: the frequency of the NAV1 radio in MHz (string)
     - nav2: the frequency of the NAV1 radio in MHz (string)
+    - squawk: the transponder code
 
     FIXME: needed when taxiing only:
     - zfw: the Zero Fuel Weight in klograms (float)

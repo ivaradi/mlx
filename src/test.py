@@ -1,27 +1,34 @@
 # Test module
 
 import fs
+import flight
+import logger
 import acft
 import const
+
 import time
+import sys
 
 def callback(data, extra):
     print data
 
 def main():
-    simulator = fs.createSimulator(const.SIM_MSFS9, fs.ConnectionListener(),
-                                   acft.Aircraft(const.AIRCRAFT_B737))
-    simulator.connect()
+    with open(sys.argv[1], "wt") as output:
+        fl = flight.Flight(logger.Logger(output = output))
+        fl.cruiseAltitude = 18000
+        fl.aircraftType = const.AIRCRAFT_B736
+        fl.aircraft = acft.Aircraft.create(fl)
+        simulator = fs.createSimulator(const.SIM_MSFS9, fs.ConnectionListener(),
+                                       fl.aircraft)
+        fl.simulator = simulator
 
-    time.sleep(10)
-    simulator.startMonitoring()
+        simulator.connect()
+        simulator.startMonitoring()
+        
+        fl.wait()
 
-    while True:
-        time.sleep(1000)
-    simulator.stopMonitoring()
-    simulator.disconnect()
-
-    time.sleep(5)
+        simulator.stopMonitoring()
+        simulator.disconnect()
 
 if __name__ == "__main__":
     main()

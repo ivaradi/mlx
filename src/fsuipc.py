@@ -340,8 +340,14 @@ class Simulator(object):
     """The simulator class representing the interface to the flight simulator
     via FSUIPC."""
     # The basic data that should be queried all the time once we are connected
-    normalData = [ (0x3d00, -256) ]
-
+    normalData = [ (0x0240, "H"),
+                   (0x023e, "H"),
+                   (0x023b, "b"),
+                   (0x023c, "b"),
+                   (0x023a, "b"),
+                   (0x3d00, -256),
+                   (0x3c00, -256) ]
+    
     def __init__(self, connectionListener, aircraft):
         """Construct the simulator.
         
@@ -406,7 +412,15 @@ class Simulator(object):
         monitoring is started, it contains the result also for the
         aircraft-specific values.
         """
-        self._setAircraftName(data[0])
+        timestamp = calendar.timegm(time.struct_time([data[0],
+                                                      1, 1, 0, 0, 0, -1, 1, 0]))
+        timestamp += data[1] * 24 * 3600
+        timestamp += data[2] * 3600
+        timestamp += data[3] * 60
+        timestamp += data[4]        
+
+        createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
+        
         if self._monitoringRequested and not self._monitoring:
             self._monitoring = True
             self._stopNormal()
@@ -415,25 +429,38 @@ class Simulator(object):
             self._monitoring = False
             self._stopNormal()
             self._startDefaultNormal()
-        elif self._monitoring and self._aircraftModel is not None:
-            aircraftState = self._aircraftModel.getAircraftState(self._aircraft, data)
+        elif self._monitoring and self._aircraftModel is not None and \
+             not createdNewModel:
+            aircraftState = self._aircraftModel.getAircraftState(self._aircraft, 
+                                                                 timestamp, data)
             self._aircraft.handleState(aircraftState)
 
-    def _setAircraftName(self, name):
+    def _setAircraftName(self, timestamp, name, airPath):
         """Set the name of the aicraft and if it is different from the
         previous, create a new model for it.
         
-        If so, also notifty the aircraft about the change."""
-        if name==self._aircraftName:
-            return
+        If so, also notifty the aircraft about the change.
 
-        self._aircraftName = name
-        if self._aircraftModel is None or \
-           not self._aircraftModel.doesHandle(name):            
-            self._setAircraftModel(AircraftModel.create(self._aircraft, name))
+        Return if a new model was created."""
+        aircraftName = (name, airPath)
+        if aircraftName==self._aircraftName:
+            return False
+
+        self._aircraftName = aircraftName
+        needNew = self._aircraftModel is None
+        needNew = needNew or\
+            not self._aircraftModel.doesHandle(self._aircraft, aircraftName)
+        if not needNew:
+            specialModel = AircraftModel.findSpecial(self._aircraft, aircraftName)
+            needNew = specialModel is not None and \
+                specialModel is not self._aircraftModel.__class__
+
+        if needNew:
+            self._setAircraftModel(AircraftModel.create(self._aircraft, aircraftName))
         
-        self._aircraft.modelChanged(self._aircraftName, 
-                                    self._aircraftModel.name)
+        self._aircraft.modelChanged(timestamp, name, self._aircraftModel.name)        
+
+        return needNew
 
     def _setAircraftModel(self, model):
         """Set a new aircraft model.
@@ -443,7 +470,7 @@ class Simulator(object):
         self._aircraftModel = model
         
         if self._monitoring:
-            self._handler.clearPeriodic(self._normalRequestID)            
+            self._stopNormal()
             self._startMonitoring()
             
     def _startMonitoring(self):
@@ -464,12 +491,7 @@ class AircraftModel(object):
 
     Aircraft models handle the data arriving from FSUIPC and turn it into an
     object describing the aircraft's state."""
-    monitoringData = [("year", 0x0240, "H"),
-                      ("dayOfYear", 0x023e, "H"),
-                      ("zuluHour", 0x023b, "b"),
-                      ("zuluMinute", 0x023c, "b"),
-                      ("seconds", 0x023a, "b"),
-                      ("paused", 0x0264, "H"),
+    monitoringData = [("paused", 0x0264, "H"),
                       ("frozen", 0x3364, "H"),
                       ("replay", 0x0628, "d"),
                       ("slew", 0x05dc, "H"),
@@ -483,6 +505,7 @@ class AircraftModel(object):
                       ("ias", 0x02bc, "d"),
                       ("groundSpeed", 0x02b4, "d"),
                       ("vs", 0x02c8, "d"),
+                      ("radioAltitude", 0x31e4, "d"),
                       ("altitude", 0x0570, "l"),
                       ("gLoad", 0x11ba, "H"),
                       ("flapsControl", 0x0bdc, "d"),
@@ -490,28 +513,14 @@ class AircraftModel(object):
                       ("flapsRight", 0x0be4, "d"),
                       ("lights", 0x0d0c, "H"),
                       ("pitot", 0x029c, "b"),
+                      ("parking", 0x0bc8, "H"),
                       ("noseGear", 0x0bec, "d"),
                       ("spoilersArmed", 0x0bcc, "d"),
                       ("spoilers", 0x0bd0, "d"),
                       ("altimeter", 0x0330, "H"),
                       ("nav1", 0x0350, "H"),
-                      ("nav2", 0x0352, "H")]
-
-    genericModels = { const.AIRCRAFT.B736 : B737Model,
-                      const.AIRCRAFT_B737 : B737Model,
-                      const.AIRCRAFT_B738 : B737Model,
-                      const.AIRCRAFT_B733 : B737Model,
-                      const.AIRCRAFT_B734 : B737Model,
-                      const.AIRCRAFT_B735 : B737Model,
-                      const.AIRCRAFT_DH8D : DH8DModel,
-                      const.AIRCRAFT_B762 : B767Model,
-                      const.AIRCRAFT_B763 : B767Model,
-                      const.AIRCRAFT_CRJ2 : B767Model,
-                      const.AIRCRAFT_F79  : F70Model,
-                      const.AIRCRAFT_DC3  : DC3Model,
-                      const.AIRCRAFT_T134 : T134Model,
-                      const.AIRCRAFT_T154 : T154Model,
-                      const.AIRCRAFT_YK40 : YK40Model }
+                      ("nav2", 0x0352, "H"),
+                      ("squawk", 0x0354, "H")]
 
     specialModels = []
 
@@ -521,29 +530,40 @@ class AircraftModel(object):
         AircraftModel.specialModels.append(clazz)
 
     @staticmethod
+    def findSpecial(aircraft, aircraftName):
+        for specialModel in AircraftModel.specialModels:
+            if specialModel.doesHandle(aircraft, aircraftName):
+                return specialModel
+        return None
+
+    @staticmethod
     def create(aircraft, aircraftName):
         """Create the model for the given aircraft name, and notify the
         aircraft about it."""
-        for specialModel in AircraftModel.specialModels:
-            if specialModel.doesHandle(aircraft, aircraftName):
-                return specialModel(aircraft, aircraftName)
-        
-        if aircraft.type in AircraftModel.genericModels:
-            return AircraftModel.genericModels[aircraft.type]()
+        specialModel = AircraftModel.findSpecial(aircraft, aircraftName)
+        if specialModel is not None:
+            return specialModel()
+        if aircraft.type in _genericModels:
+            return _genericModels[aircraft.type]()
         else:
             return GenericModel()
 
     @staticmethod
-    def convertFrequency(data):
-        """Convert the given frequency data to a string."""
-        frequency = ""
-        for i in range(0, 4):
+    def convertBCD(data, length):
+        """Convert a data item encoded as BCD into a string of the given number
+        of digits."""
+        bcd = ""
+        for i in range(0, length):
             digit = chr(ord('0') + (data&0x0f))
             data >>= 4
-            frequency = digit + frequency
-            if i==1:
-                frequency = "." + frequency
-        return "1" + frequency            
+            bcd = digit + bcd
+        return bcd
+
+    @staticmethod
+    def convertFrequency(data):
+        """Convert the given frequency data to a string."""
+        bcd = AircraftModel.convertBCD(data, 4)
+        return "1" + bcd[0:2] + "." + bcd[2:4]
 
     def __init__(self, flapsNotches):
         """Construct the aircraft model.
@@ -556,7 +576,7 @@ class AircraftModel(object):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic"
     
-    def doesHandle(self, aircraftName):
+    def doesHandle(self, aircraft, aircraftName):
         """Determine if the model handles the given aircraft name.
         
         This default implementation returns False."""
@@ -567,7 +587,7 @@ class AircraftModel(object):
         attribute with the given name."""        
         dest.append((offset, type))
         if attrName is not None:
-            setattr(self, attrName, len(dest))
+            setattr(self, attrName, len(dest)-1)
 
     def _addDataWithIndexMembers(self, dest, prefix, data):
         """Add FSUIPC data to the given array and also corresponding index
@@ -585,19 +605,13 @@ class AircraftModel(object):
             
     def addMonitoringData(self, data):
         """Add the model-specific monitoring data to the given array."""
-        self.addDataWithIndexMembers(data, "_monidx_",
-                                     AircraftModel.monitoringData)
+        self._addDataWithIndexMembers(data, "_monidx_",
+                                      AircraftModel.monitoringData)
     
-    def getAircraftState(self, aircraft, data):
+    def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data."""
         state = fs.AircraftState()
         
-        timestamp = calendar.timegm(time.struct_time([data[self._monidx_year],
-                                                      1, 1, 0, 0, 0, -1, 1, 0]))
-        timestamp += data[self._monidx_dayOfYear] * 24 * 3600
-        timestamp += data[self._monidx_zuluHour] * 3600
-        timestamp += data[self._monidx_zuluMinute] * 60
-        timestamp += data[self._monidx_seconds]        
         state.timestamp = timestamp
         
         state.paused = data[self._monidx_paused]!=0 or \
@@ -621,6 +635,7 @@ class AircraftModel(object):
         state.groundSpeed = data[self._monidx_groundSpeed]* 3600.0/65536.0/1852.0
         state.vs = data[self._monidx_vs]*60.0/const.FEETTOMETRES/256.0
 
+        state.radioAltitude = data[self._monidx_radioAltitude]/const.FEETTOMETRES/65536.0
         state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
 
         state.gLoad = data[self._monidx_gLoad] / 625.0
@@ -654,6 +669,8 @@ class AircraftModel(object):
         
         state.pitotHeatOn = data[self._monidx_pitot]!=0
 
+        state.parking = data[self._monidx_parking]!=0
+
         state.gearsDown = data[self._monidx_noseGear]==16383
 
         state.spoilersArmed = data[self._monidx_spoilersArmed]!=0
@@ -668,6 +685,7 @@ class AircraftModel(object):
            
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
         state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
+        state.squawk = AircraftModel.convertBCD(data[self._monidx_squawk], 4)
         
         return state
 
@@ -698,6 +716,12 @@ class GenericAircraftModel(AircraftModel):
         self._engineStartIndex = None
         self._isN1 = isN1
 
+    def doesHandle(self, aircraft, aircraftName):
+        """Determine if the model handles the given aircraft name.
+        
+        This implementation returns True."""
+        return True
+
     def addMonitoringData(self, data):
         """Add the model-specific monitoring data to the given array."""
         super(GenericAircraftModel, self).addMonitoringData(data)
@@ -715,12 +739,13 @@ class GenericAircraftModel(AircraftModel):
                 self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "u")  # N1
                 self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "d")  # throttle lever
         
-    def getAircraftState(self, aircraft, data):
+    def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
         Get it from the parent, and then add the data about the fuel levels and 
         the engine parameters."""
         state = super(GenericAircraftModel, self).getAircraftState(aircraft,
+                                                                   timestamp,
                                                                    data)
 
         fuelWeight = data[self._monidx_fuelWeight]/256.0
@@ -745,7 +770,7 @@ class GenericModel(GenericAircraftModel):
     """Generic aircraft model for an unknown type."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(GenericModel, self). \
             __init__(flapsNotches = [0, 10, 20, 30],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -761,7 +786,7 @@ class B737Model(GenericAircraftModel):
     """Generic model for the Boeing 737 Classing and NG aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(B737Model, self). \
             __init__(flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -773,11 +798,52 @@ class B737Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
+class PMDGBoeing737NGModel(B737Model):
+    """A model handler for the PMDG Boeing 737NG model."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type in [const.AIRCRAFT_B736,
+                                 const.AIRCRAFT_B737,
+                                 const.AIRCRAFT_B738] and \
+            (name.find("PMDG")!=-1 or airPath.find("PMDG")!=-1) and \
+            (name.find("737")!=-1 or airPath.find("737")!=-1) and \
+            (name.find("600")!=-1 or airPath.find("600")!=-1 or \
+             name.find("700")!=-1 or airPath.find("700")!=-1 or \
+             name.find("800")!=-1 or airPath.find("800")!=-1 or \
+             name.find("900")!=-1 or airPath.find("900")!=-1)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/PMDG Boeing 737NG"
+
+    def addMonitoringData(self, data):
+        """Add the model-specific monitoring data to the given array."""
+        super(PMDGBoeing737NGModel, self).addMonitoringData(data)
+                
+        self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then check some PMDG-specific stuff."""
+        state = super(PMDGBoeing737NGModel, self).getAircraftState(aircraft,
+                                                                   timestamp,
+                                                                   data)
+        if data[self._pmdgidx_switches]&0x01==0x01:
+            state.altimeter = 1013.25
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class B767Model(GenericAircraftModel):
     """Generic model for the Boeing 767 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(B767Model, self). \
             __init__(flapsNotches = [0, 1, 5, 15, 20, 25, 30],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -793,7 +859,7 @@ class DH8DModel(GenericAircraftModel):
     """Generic model for the Boeing 737 NG aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(DH8DModel, self). \
             __init__(flapsNotches = [0, 5, 10, 15, 35],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -809,7 +875,7 @@ class CRJ2Model(GenericAircraftModel):
     """Generic model for the Bombardier CRJ-200 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(CRJ2Model, self). \
             __init__(flapsNotches = [0, 8, 20, 30, 45],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -825,7 +891,7 @@ class F70Model(GenericAircraftModel):
     """Generic model for the Fokker F70 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(F70Model, self). \
             __init__(flapsNotches = [0, 8, 15, 25, 42],
                      fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
                      numEngines = 2)
@@ -841,7 +907,7 @@ class DC3Model(GenericAircraftModel):
     """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(DC3Model, self). \
             __init__(flapsNotches = [0, 15, 30, 45],
                      fuelInfo = [0x0b7c, 0x0b84, 0x0b94, 0x0b9c], 
                      numEngines = 2)
@@ -857,7 +923,7 @@ class T134Model(GenericAircraftModel):
     """Generic model for the Tupolev Tu-134 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(T134Model, self). \
             __init__(flapsNotches = [0, 10, 20, 30],
                      fuelInfo = [0x0b74, 
                                  0x0b8c, 0x0b84, 
@@ -876,10 +942,10 @@ class T154Model(GenericAircraftModel):
     """Generic model for the Tupolev Tu-134 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(T154Model, self). \
             __init__(flapsNotches = [0, 15, 28, 45],
                      fuelInfo = [0x0b74, 0x0b7c, 0x0b94, 
-                                 0x1244, 0x0b84, 0x0b9c]
+                                 0x1244, 0x0b84, 0x0b9c],
                      numEngines = 3)
 
     @property
@@ -887,11 +953,11 @@ class T154Model(GenericAircraftModel):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic Tupolev Tu-154"
 
-    def getAircraftState(self, aircraft, data):
+    def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data.
 
         This removes the reverser value for the middle engine."""
-        state = super(T154Model, self).getAircraftState(aircraft, data)
+        state = super(T154Model, self).getAircraftState(aircraft, timestamp, data)
         del state.reverser[1]
         return state
 
@@ -901,15 +967,37 @@ class YK40Model(GenericAircraftModel):
     """Generic model for the Yakovlev Yak-40 aircraft."""
     def __init__(self):
         """Construct the model."""
-        super(GenericAircraftModel, self).
+        super(YK40Model, self). \
             __init__(flapsNotches = [0, 20, 35],
-                     fuelInfo = [0x0b7c, 0x0b94]
+                     fuelInfo = [0x0b7c, 0x0b94],
                      numEngines = 2)
 
     @property
     def name(self):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic Yakovlev Yak-40"
+
+#------------------------------------------------------------------------------
+
+_genericModels = { const.AIRCRAFT_B736 : B737Model,
+                   const.AIRCRAFT_B737 : B737Model,
+                   const.AIRCRAFT_B738 : B737Model,
+                   const.AIRCRAFT_B733 : B737Model,
+                   const.AIRCRAFT_B734 : B737Model,
+                   const.AIRCRAFT_B735 : B737Model,
+                   const.AIRCRAFT_DH8D : DH8DModel,
+                   const.AIRCRAFT_B762 : B767Model,
+                   const.AIRCRAFT_B763 : B767Model,
+                   const.AIRCRAFT_CRJ2 : B767Model,
+                   const.AIRCRAFT_F70  : F70Model,
+                   const.AIRCRAFT_DC3  : DC3Model,
+                   const.AIRCRAFT_T134 : T134Model,
+                   const.AIRCRAFT_T154 : T154Model,
+                   const.AIRCRAFT_YK40 : YK40Model }
+
+#------------------------------------------------------------------------------
+
+AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 
 #------------------------------------------------------------------------------
 
