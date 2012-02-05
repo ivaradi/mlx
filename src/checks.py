@@ -108,11 +108,30 @@ class CruiseSpeedLogger(StateChecker):
             (self._lastTime+800)<=state.timestamp):
                 if state.altitude>24500.0:
                     logger.message(state.timestamp,
-                                   "Cruise speed: %.2f mach" % (state.mach,))
+                                   "Cruise speed: %.3f mach" % (state.mach,))
                 else:
                     logger.message(state.timestamp,
                                    "Cruise speed: %.0f knots" % (state.ias,))
                 self._lastTime = state.timestamp
+
+#---------------------------------------------------------------------------------------
+
+class SpoilerLogger(StateChecker):
+    """Logger for the cruise speed."""
+    def __init__(self):
+        """Construct the logger."""
+        self._logged = False
+        self._spoilerExtension = None
+    
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Log the cruise speed if necessary."""
+        if flight.stage==const.STAGE_LANDING and not self._logged:
+            if state.onTheGround:
+                if state.spoilerExtension!=self._spoilerExtension:
+                    logger.message(state.timestamp, "Spoilers deployed")
+                    self._logged = True
+            else:
+                self._spoilerExtension = state.spoilerExtension
 
 #---------------------------------------------------------------------------------------
 

@@ -43,8 +43,8 @@ class Aircraft(object):
         self._checkers.append(checks.FlapsLogger())
 
         self._checkers.append(checks.GearsLogger())
-
         self._checkers.append(checks.CruiseSpeedLogger())
+        self._checkers.append(checks.SpoilerLogger())
 
     @property
     def type(self):
