@@ -18,6 +18,7 @@ def main():
         fl.cruiseAltitude = 18000
         fl.aircraftType = const.AIRCRAFT_B736
         fl.aircraft = acft.Aircraft.create(fl)
+        #fl._stage = const.STAGE_LANDING
         simulator = fs.createSimulator(const.SIM_MSFS9, fs.ConnectionListener(),
                                        fl.aircraft)
         fl.simulator = simulator

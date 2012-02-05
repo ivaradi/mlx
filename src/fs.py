@@ -52,6 +52,7 @@ class AircraftState(object):
     - overspeed: a boolean indicating if the aircraft is in overspeed
     - stalled: a boolean indicating if the aircraft is stalled
     - onTheGround: a boolean indicating if the aircraft is on the ground
+    - zfw: the zero-fuel weight in kilograms (float)
     - grossWeight: the gross weight in kilograms (float)
     - heading: the heading of the aircraft in degrees (float)
     - pitch: the pitch of the aircraft in degrees. Positive means pitch down,
@@ -59,6 +60,7 @@ class AircraftState(object):
     - bank: the bank of the aircraft in degrees. Positive means bank left,
     negative means bank right (float)
     - ias: the indicated airspeed in knots (float)    
+    - mach: the airspeed in mach (float)    
     - groundSpeed: the ground speed (float)
     - vs: the vertical speed in feet/minutes (float)
     - radioAltitude: the radio altitude of the aircraft in feet (float)
@@ -92,15 +94,11 @@ class AircraftState(object):
     - nav1: the frequency of the NAV1 radio in MHz (string)
     - nav2: the frequency of the NAV1 radio in MHz (string)
     - squawk: the transponder code
+    - windSpeed: the speed of the wind at the aircraft in knots (float)
+    - windDirection: the direction of the wind at the aircraft in degrees (float)
 
     FIXME: needed when taxiing only:
-    - zfw: the Zero Fuel Weight in klograms (float)
     - payload weight
-
-    FIXME: needed for touchdown only:
-    - ambientWindDirection: the ambient wind direction around the aircraft (float)
-    - ambientWindSpeed: the ambient wind speed around the aircraft in knowns (float)
-    - tdRate: the touchdown rate calculated by FSUIPC (float)
 
     FIXME: needed rarely:
     - latitude, longitude

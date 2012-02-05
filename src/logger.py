@@ -40,11 +40,10 @@ class Logger(object):
         print >> self._output, timeStr + ":", msg
         print timeStr + ":", msg        
 
-    def debug(self, timestamp, msg):
+    def debug(self, msg):
         """Log a debug message."""
-        timeStr = Logger._getTimeStr(timestamp)
-        print >> self._output, timeStr + ": [DEBUG] ", msg
-        print timeStr + ": [DEBUG]", msg        
+        print >> self._output, "[DEBUG] ", msg
+        print "[DEBUG]", msg
 
     def stage(self, timestamp, stage):
         """Report a change in the flight stage."""

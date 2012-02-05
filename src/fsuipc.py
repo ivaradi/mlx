@@ -22,6 +22,33 @@ else:
 class Handler(threading.Thread):
     """The thread to handle the FSUIPC requests."""
     @staticmethod
+    def fsuipc2VS(data):
+        """Convert the given vertical speed data read from FSUIPC into feet/min."""
+        return data*60.0/const.FEETTOMETRES/256.0
+
+    @staticmethod
+    def fsuipc2radioAltitude(data):
+        """Convert the given radio altitude data read from FSUIPC into feet."""
+        return data/const.FEETTOMETRES/65536.0
+
+    @staticmethod
+    def fsuipc2Degrees(data):
+        """Convert the given data into degrees."""
+        return data * 360.0 / 65536.0 / 65536.0
+
+    @staticmethod
+    def fsuipc2PositiveDegrees(data):
+        """Convert the given data into positive degrees."""
+        degrees = Handler.fsuipc2Degrees(data)
+        if degrees<0.0: degrees += 360.0
+        return degrees
+
+    @staticmethod
+    def fsuipc2IAS(data):
+        """Convert the given data into indicated airspeed."""
+        return data / 128.0
+
+    @staticmethod
     def _callSafe(fun):
         """Call the given function and swallow any exceptions."""
         try:
@@ -340,14 +367,31 @@ class Simulator(object):
     """The simulator class representing the interface to the flight simulator
     via FSUIPC."""
     # The basic data that should be queried all the time once we are connected
-    normalData = [ (0x0240, "H"),
-                   (0x023e, "H"),
-                   (0x023b, "b"),
-                   (0x023c, "b"),
-                   (0x023a, "b"),
-                   (0x3d00, -256),
-                   (0x3c00, -256) ]
-    
+    normalData = [ (0x0240, "H"),            # Year
+                   (0x023e, "H"),            # Number of day in year
+                   (0x023b, "b"),            # UTC hour
+                   (0x023c, "b"),            # UTC minute
+                   (0x023a, "b"),            # seconds
+                   (0x3d00, -256),           # The name of the current aircraft
+                   (0x3c00, -256) ]          # The path of the current AIR file
+
+    flareData1 = [ (0x023a, "b"),            # Seconds of time
+                   (0x31e4, "d"),            # Radio altitude
+                   (0x02c8, "d") ]           # Vertical speed
+                   
+    flareStartData = [ (0x0e90, "H"),        # Ambient wind speed
+                       (0x0e92, "H"),        # Ambient wind direction
+                       (0x0e8a, "H") ]       # Visibility
+                       
+    flareData2 = [ (0x023a, "b"),            # Seconds of time
+                   (0x0366, "H"),            # On the ground
+                   (0x02c8, "d"),            # Vertical speed
+                   (0x030c, "d"),            # Touch-down rate
+                   (0x02bc, "d"),            # IAS
+                   (0x0578, "d"),            # Pitch
+                   (0x057c, "d"),            # Bank
+                   (0x0580, "d") ]           # Heading
+
     def __init__(self, connectionListener, aircraft):
         """Construct the simulator.
         
@@ -355,7 +399,20 @@ class Simulator(object):
         - type: one of the AIRCRAFT_XXX constants from const.py
         - modelChanged(aircraftName, modelName): called when the model handling
         the aircraft has changed.
-        - handleState(aircraftState): handle the given state."""
+        - handleState(aircraftState): handle the given state.
+        - flareStarted(windSpeed, windDirection, visibility, flareStart,
+                       flareStartFS): called when the flare has
+          started. windSpeed is in knots, windDirection is in degrees and
+          visibility is in metres. flareStart and flareStartFS are two time
+          values expressed in seconds that can be used to calculate the flare
+          time. 
+       - flareFinished(flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
+                       ias, pitch, bank, heading): called when the flare has
+         finished, i.e. the aircraft is on the ground. flareEnd and flareEndFS
+         are the two time values corresponding to the touchdown time. tdRate is
+         the touch-down rate, tdRateCalculatedBySim indicates if the data comes
+         from the simulator or was calculated by the adapter. The other data
+         are self-explanatory and expressed in their 'natural' units."""
         self._aircraft = aircraft
 
         self._handler = Handler(connectionListener)
@@ -369,6 +426,11 @@ class Simulator(object):
         self._aircraftName = None
         self._aircraftModel = None
 
+        self._flareRequestID = None
+        self._flareRates = []
+        self._flareStart = None
+        self._flareStartFS = None
+        
     def connect(self):
         """Initiate a connection to the simulator."""
         self._handler.connect()
@@ -384,6 +446,27 @@ class Simulator(object):
         """Stop the periodic monitoring of the aircraft."""
         assert self._monitoringRequested 
         self._monitoringRequested = False
+
+    def startFlare(self):
+        """Start monitoring the flare time.
+
+        At present it is assumed to be called from the FSUIPC thread, hence no
+        protection."""
+        #self._aircraft.logger.debug("startFlare")
+        if self._flareRequestID is None:
+            self._flareRates = []
+            self._flareRequestID = self._handler.requestPeriodicRead(0.1,
+                                                                     Simulator.flareData1,
+                                                                     self._handleFlare1)
+
+    def cancelFlare(self):
+        """Cancel monitoring the flare time.
+
+        At present it is assumed to be called from the FSUIPC thread, hence no
+        protection."""
+        if self._flareRequestID is not None:
+            self._handler.clearPeriodic(self._flareRequestID)
+            self._flareRequestID = None
 
     def disconnect(self):
         """Disconnect from the simulator."""
@@ -484,6 +567,66 @@ class Simulator(object):
             self._handler.requestPeriodicRead(1.0, data, 
                                               self._handleNormal)
 
+    def _addFlareRate(self, data):
+        """Append a flare rate to the list of last rates."""
+        if len(self._flareRates)>=3:
+            del self._flareRates[0]
+        self._flareRates.append(Handler.fsuipc2VS(data))
+
+    def _handleFlare1(self, data, normal):
+        """Handle the first stage of flare monitoring."""
+        #self._aircraft.logger.debug("handleFlare1: " + str(data))
+        if Handler.fsuipc2radioAltitude(data[1])<=50.0:
+            self._flareStart = time.time()
+            self._flareStartFS = data[0]
+            self._handler.clearPeriodic(self._flareRequestID)
+            self._flareRequestID = \
+                self._handler.requestPeriodicRead(0.1, 
+                                                  Simulator.flareData2,
+                                                  self._handleFlare2)
+            self._handler.requestRead(Simulator.flareStartData,
+                                      self._handleFlareStart)
+                
+        self._addFlareRate(data[2])
+
+    def _handleFlareStart(self, data, extra):
+        """Handle the data need to notify the aircraft about the starting of
+        the flare."""
+        #self._aircraft.logger.debug("handleFlareStart: " + str(data))
+        if data is not None:
+            windDirection = data[1]*360.0/65536.0
+            if windDirection<0.0: windDirection += 360.0
+            self._aircraft.flareStarted(data[0], windDirection,
+                                        data[2]*1609.344/100.0,
+                                        self._flareStart, self._flareStartFS)
+
+    def _handleFlare2(self, data, normal):
+        """Handle the first stage of flare monitoring."""
+        #self._aircraft.logger.debug("handleFlare2: " + str(data))
+        if data[1]!=0:
+            flareEnd = time.time()
+            self._handler.clearPeriodic(self._flareRequestID)
+            self._flareRequestID = None
+
+            flareEndFS = data[0]
+            if flareEndFS<self._flareStartFS:
+                flareEndFS += 60
+
+            tdRate = Handler.fsuipc2VS(data[3])
+            tdRateCalculatedByFS = True
+            if tdRate==0 or tdRate>1000.0 or tdRate<-1000.0:
+                tdRate = min(self._flareRates)
+                tdRateCalculatedByFS = False
+
+            self._aircraft.flareFinished(flareEnd, flareEndFS,
+                                         tdRate, tdRateCalculatedByFS,
+                                         Handler.fsuipc2IAS(data[4]),
+                                         Handler.fsuipc2Degrees(data[5]),
+                                         Handler.fsuipc2Degrees(data[6]),
+                                         Handler.fsuipc2PositiveDegrees(data[7]))
+        else:
+            self._addFlareRate(data[2])
+                                                  
 #------------------------------------------------------------------------------
 
 class AircraftModel(object):
@@ -498,11 +641,13 @@ class AircraftModel(object):
                       ("overspeed", 0x036d, "b"),
                       ("stalled", 0x036c, "b"),
                       ("onTheGround", 0x0366, "H"),
+                      ("zfw", 0x3bfc, "d"),
                       ("grossWeight", 0x30c0, "f"),
                       ("heading", 0x0580, "d"),
                       ("pitch", 0x0578, "d"),
                       ("bank", 0x057c, "d"),
                       ("ias", 0x02bc, "d"),
+                      ("mach", 0x11c6, "H"),
                       ("groundSpeed", 0x02b4, "d"),
                       ("vs", 0x02c8, "d"),
                       ("radioAltitude", 0x31e4, "d"),
@@ -520,7 +665,10 @@ class AircraftModel(object):
                       ("altimeter", 0x0330, "H"),
                       ("nav1", 0x0350, "H"),
                       ("nav2", 0x0352, "H"),
-                      ("squawk", 0x0354, "H")]
+                      ("squawk", 0x0354, "H"),
+                      ("windSpeed", 0x0e90, "H"),
+                      ("windDirection", 0x0e92, "H")]
+
 
     specialModels = []
 
@@ -623,19 +771,21 @@ class AircraftModel(object):
         state.stalled = data[self._monidx_stalled]!=0
         state.onTheGround = data[self._monidx_onTheGround]!=0
 
+        state.zfw = data[self._monidx_zfw] * const.LBSTOKG / 256.0
         state.grossWeight = data[self._monidx_grossWeight] * const.LBSTOKG
         
-        state.heading = data[self._monidx_heading]*360.0/65536.0/65536.0
-        if state.heading<0.0: state.heading += 360.0
+        state.heading = Handler.fsuipc2PositiveDegrees(data[self._monidx_heading])
 
-        state.pitch = data[self._monidx_pitch]*360.0/65536.0/65536.0
-        state.bank = data[self._monidx_bank]*360.0/65536.0/65536.0
+        state.pitch = Handler.fsuipc2Degrees(data[self._monidx_pitch])
+        state.bank = Handler.fsuipc2Degrees(data[self._monidx_bank])
 
-        state.ias = data[self._monidx_ias]/128.0
+        state.ias = Handler.fsuipc2IAS(data[self._monidx_ias])
+        state.mach = data[self._monidx_mach] / 20480.0
         state.groundSpeed = data[self._monidx_groundSpeed]* 3600.0/65536.0/1852.0
-        state.vs = data[self._monidx_vs]*60.0/const.FEETTOMETRES/256.0
+        state.vs = Handler.fsuipc2VS(data[self._monidx_vs])
 
-        state.radioAltitude = data[self._monidx_radioAltitude]/const.FEETTOMETRES/65536.0
+        state.radioAltitude = \
+            Handler.fsuipc2radioAltitude(data[self._monidx_radioAltitude])
         state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
 
         state.gLoad = data[self._monidx_gLoad] / 625.0
@@ -686,6 +836,10 @@ class AircraftModel(object):
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
         state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
         state.squawk = AircraftModel.convertBCD(data[self._monidx_squawk], 4)
+
+        state.windSpeed = data[self._monidx_windSpeed]
+        state.windDirection = data[self._monidx_windDirection]*360.0/65536.0
+        if state.windDirection<0.0: state.windDirection += 360.0
         
         return state
 

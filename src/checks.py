@@ -65,13 +65,54 @@ class StageChecker(StateChecker):
             elif state.radioAltitude>200:
                 aircraft.cancelFlare()
             elif state.radioAltitude<150 and not state.onTheGround:
-                aircraft.flare()
+                aircraft.prepareFlare()
         elif stage==const.STAGE_TAXIAFTERLAND:
             if state.parking:
                 aircraft.setStage(state, const.STAGE_PARKING)
         elif stage==const.STAGE_PARKING:
             if aircraft.checkFlightEnd(state):
                 aircraft.setStage(state, const.STAGE_END)
+
+#---------------------------------------------------------------------------------------
+
+class TakeOffLogger(StateChecker):
+    """Logger for the cruise speed."""
+    def __init__(self):
+        """Construct the logger."""
+        self._onTheGround = True
+    
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Log the cruise speed if necessary."""
+        if flight.stage==const.STAGE_TAKEOFF and \
+           self._onTheGround and not state.onTheGround:
+            logger.message(state.timestamp,
+                           "Takeoff speed: %.0f knots" % (state.ias,))
+            logger.message(state.timestamp,
+                           "Takeoff heading: %03.0f degrees" % (state.heading,))
+            logger.message(state.timestamp,
+                           "Takeoff pitch: %.1f degrees" % (state.pitch,))
+            self._onTheGround = False
+
+#---------------------------------------------------------------------------------------
+
+class CruiseSpeedLogger(StateChecker):
+    """Logger for the cruise speed."""
+    def __init__(self):
+        """Construct the logger."""
+        self._lastTime = None
+    
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Log the cruise speed if necessary."""
+        if flight.stage==const.STAGE_CRUISE and \
+           (self._lastTime is None or \
+            (self._lastTime+800)<=state.timestamp):
+                if state.altitude>24500.0:
+                    logger.message(state.timestamp,
+                                   "Cruise speed: %.2f mach" % (state.mach,))
+                else:
+                    logger.message(state.timestamp,
+                                   "Cruise speed: %.0f knots" % (state.ias,))
+                self._lastTime = state.timestamp
 
 #---------------------------------------------------------------------------------------
 
@@ -300,7 +341,7 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
 
     def _getMessage(self, state):
         """Get the message to log on a change."""
-        return "Gears %s at %.0f knots, %f feet" % \
+        return "Gears %s at %.0f knots, %.0f feet" % \
             ("DOWN" if state.gearsDown else "UP", state.ias, state.altitude)
 
 #---------------------------------------------------------------------------------------
