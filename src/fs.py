@@ -78,7 +78,7 @@ class AircraftState(object):
     pistons)
     - reverser[]: an array of booleans indicating if the thrust reversers are
     activated on any of the engines. The number of items equals to the number
-    of engines.
+    of engines with a reverser.
     - navLightsOn: a boolean indicating if the navigation lights are on
     - antiCollisionLightsOn: a boolean indicating if the anti-collision lights are on
     - strobeLightsOn: a boolean indicating if the strobe lights are on

@@ -364,3 +364,502 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
             ("DOWN" if state.gearsDown else "UP", state.ias, state.altitude)
 
 #---------------------------------------------------------------------------------------
+
+class FaultChecker(StateChecker):
+    """Base class for checkers that look for faults."""
+    @staticmethod
+    def _appendDuring(flight, message):
+        """Append a 'during XXX' test to the given message, depending on the
+        flight stage."""
+        stageStr = const.stage2string(flight.stage)
+        return message if stageStr is None \
+               else (message + " during " + stageStr.upper())
+
+    @staticmethod
+    def _getLinearScore(minFaultValue, maxFaultValue, minScore, maxScore,
+                        value):
+        """Get the score for a faulty value where the score is calculated
+        linearly within a certain range."""
+        if value<minFaultValue:
+            return 0
+        elif value>maxFaultValue:
+            return maxScore
+        else:
+            return minScore + (maxScore-minScore) * (value-minFaultValue) / \
+                   (maxFaultValue - minFaultValue)
+
+#---------------------------------------------------------------------------------------
+
+class SimpleFaultChecker(FaultChecker):
+    """Base class for fault checkers that check for a single occurence of a
+    faulty condition.
+
+    Child classes should implement the following functions:
+    - isCondition(self, flight, aircraft, oldState, state): should return whether the
+    condition holds
+    - logFault(self, flight, aircraft, logger, oldState, state): log the fault
+    via the logger."""
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Perform the check."""
+        if self.isCondition(flight, aircraft, oldState, state):
+            self.logFault(flight, aircraft, logger, oldState, state)
+
+#---------------------------------------------------------------------------------------
+
+class PatientFaultChecker(FaultChecker):
+    """A fault checker that does not decides on a fault when the condition
+    arises immediately, but can wait some time.
+
+    Child classes should implement the following functions:
+    - isCondition(self, flight, aircraft, oldState, state): should return whether the
+    condition holds
+    - logFault(self, flight, aircraft, logger, oldState, state): log the fault
+    via the logger
+    """
+    def __init__(self, timeout = 2.0):
+        """Construct the fault checker with the given timeout."""
+        self._timeout = timeout
+        self._faultStarted = None
+
+    def getTimeout(self, flight, aircraft, oldState, state):
+        """Get the timeout.
+
+        This default implementation returns the timeout given in the
+        constructor, but child classes might want to enforce a different
+        policy."""
+        return self._timeout
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Perform the check."""
+        if self.isCondition(flight, aircraft, oldState, state):
+            if self._faultStarted is None:
+                self._faultStarted = state.timestamp
+            timeout = self.getTimeout(flight, aircraft, oldState, state)
+            if state.timestamp>=(self._faultStarted + timeout):
+                self.logFault(flight, aircraft, logger, oldState, state)
+                self._faulted = True
+                self._faultStarted = state.timestamp
+        else:
+            self._faultStarted = None
+                
+#---------------------------------------------------------------------------------------
+
+class AntiCollisionLightsChecker(PatientFaultChecker):
+    """Check for the anti-collision light being off at high N1 values."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return (flight.stage!=const.STAGE_PARKING or \
+                not flight.options.fs2Crew) and \
+                not state.antiCollisionLightsOn and \
+                max(state.n1)>5
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(AntiCollisionLightChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Anti-collision lights were off"),
+                     1)
+
+#---------------------------------------------------------------------------------------
+
+class BankChecker(SimpleFaultChecker):
+    """Check for the anti-collision light being off at high N1 values."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        if flight.stage==const.STAGE_CRUISE:
+            bankLimit = 30
+        elif flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
+                              const.STAGE_DESCENT, const.STAGE_LANDING]:
+            bankLimit = 35
+        else:
+            return False
+
+        return state.bank>bankLimit or state.bank<-bankLimit
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(BankChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Bank too steep"),
+                     2)
+
+#---------------------------------------------------------------------------------------
+
+class FlapsRetractChecker(SimpleFaultChecker):
+    """Check if the flaps are not retracted too early."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds.
+
+        FIXME: check if this really is the intention (FlapsRetractedMistake.java)"""
+        if (flight.stage==const.STAGE_TAKEOFF and not state.onTheGround) or \
+           (flight.stage==const.STAGE_LANDING and state.onTheGround):
+            if self._timeStart is None:
+                self._timeStart = state.timestamp
+
+            if state.flapsSet==0 and state.timestamp<=(self._timeStart+2.0):
+                return True
+        return False
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(FlapsRetractChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Flaps retracted"),
+                     20)
+
+#---------------------------------------------------------------------------------------
+
+class FlapsSpeedLimitChecker(SimpleFaultChecker):
+    """Check if the flaps are extended only at the right speeds."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        speedLimit = aircraft.getFlapsSpeedLimit(state.flapsSet)
+        return speedLimit is not None and state.ias>speedLimit
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(FlapsSpeedLimitChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Flap speed limit fault"),
+                     5)
+
+#---------------------------------------------------------------------------------------
+
+class GearsDownChecker(SimpleFaultChecker):
+    """Check if the gears are down at low altitudes."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.radioAltitude<10 and not state.gearsDown and \
+               flight.stage!=const.STAGE_TAKEOFF
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.noGo(GearsDownChecker, state.timestamp,
+                    "Gears not down at %.0f feet radio altitude" % \
+                    (state.radioAltitude,),
+                    "GEAR DOWN NO GO")
+
+#---------------------------------------------------------------------------------------
+
+class GearSpeedLimitChecker(PatientFaultChecker):
+    """Check if the gears not down at too high a speed."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.gearsDown and state.ias>gearSpeedLimit
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(GearSpeedLinmitChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Gear speed limit fault"),
+                     5)
+
+#---------------------------------------------------------------------------------------
+
+class GLoadChecker(SimpleFaultChecker):
+    """Check if the G-load does not exceed 2 except during flare."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.gLoad>2.0 and (flight.stage!=const.STAGE_LANDING or \
+                                    state.radioAltitude>=50)
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(GLoadChecker, state.timestamp,
+                     "G-load was %.2f" % (state.gLoad,),
+                     10)
+
+#---------------------------------------------------------------------------------------
+
+class LandingLightsChecker(PatientFaultChecker):
+    """Check if the landing lights are used properly."""
+    def getTimeout(self, flight, aircraft, oldState, state):
+        """Get the timeout.
+
+        It is the default timeout except for landing and takeoff."""
+        return 0.0 if flight.stage in [const.STAGE_TAKEOFF,
+                                       const.STAGE_LANDING] else self._timeout
+
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return (flight.stage==const.STAGE_BOARDING and \
+                state.landingLightsOn and state.onTheGround) or \
+               (flight.stage==const.STAGE_TAKEOFF and \
+                not state.landingLightsOn and not state.onTheGround) or \
+               (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
+                                 const.STAGE_DESCENT] and \
+                state.landingLightsOn and state.altitude>12500) or \
+               (flight.stage==const.STAGE_LANDING and \
+                not state.landingLightsOn and state.onTheGround) or \
+               (flight.stage==const.STAGE_PARKING and \
+                state.landingLightsOn and state.onTheGround)
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        score = 0 if flight.stage==const.STAGE_LANDING else 1
+        message = "Landing lights were %s" % (("on" if state.landingLightsOn else "off"),)
+        logger.fault(LandingLightsChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, message),
+                     score)        
+
+#---------------------------------------------------------------------------------------
+
+class WeightChecker(PatientFaultChecker):
+    """Base class for checkers that check that some limit is not exceeded."""
+    def __init__(self, name):
+        """Construct the checker."""
+        super(WeightChecker, self).__init__(timeout = 5.0)
+        self._name = name
+
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        if flight.entranceExam:
+            return False
+
+        limit = self.getLimit(flight, aircraft, state)
+        if limit is not None:
+            if flight.options.compensation is not None:
+                limit += flight.options.compensation
+            return state.grossWeight>mlw
+
+        return False
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.noGo(self.__class__, state.timestamp,
+                    "%s exceeded: %.0f kg" % (self._name, state.grossWeight),
+                    "%s NO GO" % (self._name,))
+
+#---------------------------------------------------------------------------------------
+
+class MLWChecker(WeightChecker):
+    """Checks if the MLW is not exceeded on landing."""
+    def __init__(self):
+        """Construct the checker."""
+        super(MLWChecker, self).__init__("MLW")
+
+    def getLimit(flight, aircraft, state):
+        """Get the limit if we are in the right state."""
+        return aircraft.mlw if flight.stage==const.STAGE_LANDING and \
+                               state.onTheGround else None
+
+#---------------------------------------------------------------------------------------
+
+class MTOWChecker(WeightChecker):
+    """Checks if the MTOW is not exceeded on landing."""
+    def __init__(self):
+        """Construct the checker."""
+        super(MTOWChecker, self).__init__("MTOW")
+
+    def getLimit(flight, aircraft, state):
+        """Get the limit if we are in the right state."""
+        return aircraft.mtow if flight.stage==const.STAGE_TAKEOFF else None
+
+#---------------------------------------------------------------------------------------
+
+class MZFWChecker(WeightChecker):
+    """Checks if the MTOW is not exceeded on landing."""
+    def __init__(self):
+        """Construct the checker."""
+        super(MZFWChecker, self).__init__("MZFW")
+
+    def getLimit(flight, aircraft, state):
+        """Get the limit if we are in the right state."""
+        return aircraft.mzfw
+
+#---------------------------------------------------------------------------------------
+
+class NavLightsChecker(PatientFaultChecker):
+    """Check if the navigational lights are used properly."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage!=const.STAGE_BOARDING and \
+               flight.stage!=const.STAGE_PARKING and \
+               not state.navLightsOn
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(NavLightsChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Navigation lights were off"),
+                     1)        
+
+#---------------------------------------------------------------------------------------
+
+class OverspeedChecker(PatientFaultChecker):
+    """Check if Vne has been exceeded."""
+    def __init__(self):
+        """Construct the checker."""
+        super(OverspeedChecker, self).__init__(timeout = 5.0)
+
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.overspeed
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(OverspeedChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Overspeed"),
+                     20)        
+
+#---------------------------------------------------------------------------------------
+
+class PayloadChecker(SimpleFaultChecker):
+    """Check if the payload matches the specification."""
+    TOLERANCE=550
+    
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage==const.STAGE_PUSHANDTAXI and \
+               (state.zfw < (flight.zfw - PayloadChecker.TOLERANCE) or \
+                state.zfw > (flight.zfw + PayloadChecker.TOLERANCE))
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.noGo(PayloadChecker, state.timestamp,
+                    "ZFW difference is more than %d kgs" % (PayloadChecker.TOLERANCE,),
+                    "ZFW NO GO")
+
+#---------------------------------------------------------------------------------------
+
+class PitotChecker(PatientFaultChecker):
+    """Check if pitot heat is on."""
+    def __init__(self):
+        """Construct the checker."""
+        super(PitotChecker, self).__init__(timeout = 3.0)
+
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.groundSpeed>80 and not current.pitotHeatOn
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        score = 2 if flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
+                                      const.STAGE_CRUISE, const.STAGE_DESCENT,
+                                      const.STAGE_LANDING] else 0
+        logger.fault(PitotChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Pitot heat was off"),
+                     score)        
+
+#---------------------------------------------------------------------------------------
+
+class ReverserChecker(SimpleFaultChecker):
+    """Check if the reverser is not used below 60 knots."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
+                                const.STAGE_TAXIAFTERLAND] and \
+            state.groundSpeed<80 and max(state.reverser)
+                           
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(ReverserChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Reverser used below 60 knots"),
+                     15)        
+
+#---------------------------------------------------------------------------------------
+
+class SpeedChecker(SimpleFaultChecker):
+    """Check if the speed is in the prescribed limits."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage in [const.STAGE_PUSHANDTAXI,
+                                const.STAGE_TAXIAFTERLAND] and \
+            state.groundSpeed>50
+                           
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(SpeedChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Reverser used below 60 knots"),
+                     FaultChecker._getLinearScore(50, 80, 10, 15, state.groundSpeed))
+
+#---------------------------------------------------------------------------------------
+
+class StallChecker(PatientFaultChecker):
+    """Check if stall occured."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
+                                const.STAGE_CRUISE, const.STAGE_DESCENT,
+                                const.STAGE_LANDING] and state.stalled
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        score = 40 if flight.stage in [const.STAGE_TAKEOFF,
+                                       const.STAGE_LANDING] else 30
+        logger.fault(StallChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Stalled"),
+                     score)        
+
+#---------------------------------------------------------------------------------------
+
+class StrobeLightsChecker(PatientFaultChecker):
+    """Check if the strobe lights are used properly."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return (flight.stage==const.STAGE_BOARDING and \
+                state.strobeLightsOn and state.onTheGround) or \
+               (flight.stage==const.STAGE_TAKEOFF and \
+                not state.strobeLightsOn and not state.gearsDown) or \
+               (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
+                                 const.STAGE_DESCENT] and \
+                not state.strobeLightsOn and not state.onTheGround) or \
+               (flight.stage==const.STAGE_PARKING and \
+                state.strobeLightsOn and state.onTheGround)
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        message = "Strobe lights were %s" % (("on" if state.strobeLightsOn else "off"),)
+        logger.fault(StrobeLightsChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, message),
+                     1)        
+
+#---------------------------------------------------------------------------------------
+
+class ThrustChecker(SimpleFaultChecker):
+    """Check if the thrust setting is not too high during takeoff.
+
+    FIXME: is this really so general, for all aircraft?"""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage==const.STAGE_TAKEOFF and max(state.n1)>97
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        logger.fault(LandingLightsChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, "Thrust setting was too high (>97%)"),
+                     FaultChecker._getLinearScore(97, 110, 0, 10, max(state.n1)))
+
+#---------------------------------------------------------------------------------------
+
+class VSChecker(SimpleFaultChecker):
+    """Check if the vertical speed is not too low at certain altitudes"""
+    BELOW10000 = -5000
+    BELOW5000 = -2500
+    BELOW2500 = -1500
+    BELOW500 = -1000
+    TOLERANCE = 1.2
+
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        vs = state.vs
+        altitude = state.altitude
+        return vs < -8000 or vs > 8000 or \
+               (altitude<500 and vs < (VSChecker.BELOW500 *
+                                       VSCHECKER.TOLERANCE)) or \
+               (altitude<2500 and vs < (VSChecker.BELOW2500 *
+                                        VSCHECKER.TOLERANCE)) or \
+               (altitude<5000 and vs < (VSChecker.BELOW5000 *
+                                        VSCHECKER.TOLERANCE)) or \
+               (altitude<10000 and vs < (VSChecker.BELOW10000 *
+                                         VSCHECKER.TOLERANCE))
+               
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        vs = state.vs
+
+        message = "Vertical speed was %.0f feet/min" % (vs,)
+        if vs>-8000 and vs<8000:
+            message += " at %.0f feet (exceeds company limit)" % (state.altitude,)
+
+        score = 10 if vs<-8000 or vs>8000 else 0
+
+        logger.fault(VSChecker, state.timestamp,
+                     FaultChecker._appendDuring(flight, message),
+                     score)
+
+#---------------------------------------------------------------------------------------

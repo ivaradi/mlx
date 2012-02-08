@@ -26,6 +26,8 @@ class Aircraft(object):
 
         self._checkers = []
 
+        # Loggers
+
         self._checkers.append(checks.StageChecker())
         self._checkers.append(checks.TakeOffLogger())
 
@@ -46,6 +48,38 @@ class Aircraft(object):
         self._checkers.append(checks.CruiseSpeedLogger())
         self._checkers.append(checks.SpoilerLogger())
 
+        # Fault checkers
+        
+        self._checkers.append(checks.AntiCollisionLightsChecker())
+        self._checkers.append(checks.LandingLightsChecker())
+        self._checkers.append(checks.NavLightsChecker())
+        self._checkers.append(checks.StrobeLightsChecker())
+
+        self._checkers.append(checks.BankChecker())
+
+        self._checkers.append(checks.FlapsRetractChecker())
+        self._checkers.append(checks.FlapsSpeedLimitChecker())
+
+        self._checkers.append(checks.GearsDownChecker())
+        self._checkers.append(checks.GearSpeedLimitChecker())
+
+        self._checkers.append(checks.GLoadChecker())
+
+        self._checkers.append(checks.MLWChecker())
+        self._checkers.append(checks.MTOWChecker())
+        self._checkers.append(checks.MZFWChecker())
+        self._checkers.append(checks.PayloadChecker())
+
+        self._checkers.append(checks.SpeedChecker())
+        self._checkers.append(checks.VSChecker())
+        self._checkers.append(checks.OverspeedChecker())
+        self._checkers.append(checks.StallChecker())
+
+        self._checkers.append(checks.PitotChecker())
+        
+        self._checkers.append(checks.ThrustChecker())
+        self._checkers.append(checks.ReverserChecker())
+
     @property
     def type(self):
         """Get the type of the aircraft."""
@@ -60,6 +94,11 @@ class Aircraft(object):
     def logger(self):
         """Get the logger to use for the aircraft."""
         return self._flight.logger
+
+    def getFlapsSpeedLimit(self, flaps):
+        """Get the speed limit for the given flaps setting."""
+        return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
+               else None
 
     def modelChanged(self, timestamp, aircraftName, modelName):
         """Called when the simulator's aircraft changes."""

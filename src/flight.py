@@ -8,6 +8,15 @@ import threading
 
 #---------------------------------------------------------------------------------------
 
+class Options(object):
+    """Various configuration options."""
+    def __init__(self):
+        """Construct the object with default values."""
+        self.fs2Crew = False
+        self.compensation = None        
+
+#---------------------------------------------------------------------------------------
+
 class Flight(object):
     """The object with the global flight state.
     
@@ -17,8 +26,14 @@ class Flight(object):
         """Construct the flight."""
         self._stage = None
         self.logger = logger
+
         self.cruiseAltitude = None
         self.flareTimeFromFS = False
+        self.entranceExam = False
+        self.zfw = 50000
+
+        self.options = Options()
+
         self.aircraftType = None
         self.aircraft = None
         self.simulator = None

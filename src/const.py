@@ -106,3 +106,24 @@ STAGE_GOAROUND = 11
 
 # Flight stage: end
 STAGE_END = 12
+
+#-------------------------------------------------------------------------------
+
+_stageStrings = { STAGE_BOARDING : "boarding",
+                  STAGE_PUSHANDTAXI : "pushback and taxi",
+                  STAGE_TAKEOFF : "takeoff",
+                  STAGE_RTO : "RTO",
+                  STAGE_CLIMB : "climb",
+                  STAGE_CRUISE : "cruise",
+                  STAGE_DESCENT : "descent",
+                  STAGE_LANDING : "landing",
+                  STAGE_TAXIAFTERLAND : "taxi",
+                  STAGE_PARKING : "parking",
+                  STAGE_GOAROUND : "go-around",
+                  STAGE_END : "end" }
+
+def stage2string(stage):
+    """Convert the given stage to a lower-case string."""
+    return _stageStrings[stage] if stage in _stageStrings else None
+        
+    
