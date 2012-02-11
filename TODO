@@ -1,4 +1,4 @@
 - Check how piston engines report RPM
 
 - Test:
-   - Check how pitot heat works on the Dash-8
+   - Check how pitot heat works on the Dash-8: reversed, 0 means on, 1 means off
