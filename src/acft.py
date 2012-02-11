@@ -143,7 +143,7 @@ class Aircraft(object):
                                     (aircraftState.grossWeight, self.mlw))
                 self.logger.message(aircraftState.timestamp,
                                     "Vertical speed range: %.0f..%.0f feet/min" % \
-                                    (self._maxVS, self._minVS))
+                                    (self._minVS, self._maxVS))
             elif newStage==const.STAGE_PARKING:
                 self.logger.message(aircraftState.timestamp, "Block time end")
 
