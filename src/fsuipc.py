@@ -275,7 +275,7 @@ class Handler(threading.Thread):
         """Try to connect to the flight simulator via FSUIPC"""
         while self._connectionRequested:
             try:
-                pyuipc.open(pyuipc.SIM_FS2K4)
+                pyuipc.open(pyuipc.SIM_ANY)
                 description = "(FSUIPC version: 0x%04x, library version: 0x%04x, FS version: %d)" % \
                     (pyuipc.fsuipc_version, pyuipc.lib_version, 
                      pyuipc.fs_version)
@@ -325,8 +325,7 @@ class Handler(threading.Thread):
         If an exception occurs, we try to reconnect.
         
         Returns what the request's process() function returned or None if
-        reconnection failed."""
-        
+        reconnection failed."""        
         self._requestCondition.release()
 
         try:
@@ -392,7 +391,7 @@ class Simulator(object):
                    (0x057c, "d"),            # Bank
                    (0x0580, "d") ]           # Heading
 
-    def __init__(self, connectionListener, aircraft):
+    def __init__(self, connectionListener):
         """Construct the simulator.
         
         The aircraft object passed must provide the following members:
@@ -413,7 +412,7 @@ class Simulator(object):
          the touch-down rate, tdRateCalculatedBySim indicates if the data comes
          from the simulator or was calculated by the adapter. The other data
          are self-explanatory and expressed in their 'natural' units."""
-        self._aircraft = aircraft
+        self._aircraft = None
 
         self._handler = Handler(connectionListener)
         self._handler.start()
@@ -431,8 +430,11 @@ class Simulator(object):
         self._flareStart = None
         self._flareStartFS = None
         
-    def connect(self):
+    def connect(self, aircraft):
         """Initiate a connection to the simulator."""
+        self._aircraft = aircraft
+        self._aircraftName = None
+        self._aircraftModel = None
         self._handler.connect()
         self._startDefaultNormal()
                                                             
@@ -487,6 +489,7 @@ class Simulator(object):
         assert self._normalRequestID is not None
         self._handler.clearPeriodic(self._normalRequestID)
         self._normalRequestID = None
+        self._monitoring = False
 
     def _handleNormal(self, data, extra):
         """Handle the reply to the normal request.
@@ -505,11 +508,9 @@ class Simulator(object):
         createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
         
         if self._monitoringRequested and not self._monitoring:
-            self._monitoring = True
             self._stopNormal()
             self._startMonitoring()
         elif self._monitoring and not self._monitoringRequested:
-            self._monitoring = False
             self._stopNormal()
             self._startDefaultNormal()
         elif self._monitoring and self._aircraftModel is not None and \
@@ -558,14 +559,13 @@ class Simulator(object):
             
     def _startMonitoring(self):
         """Start monitoring with the current aircraft model."""
-        assert self._monitoring
-
         data = Simulator.normalData[:]
         self._aircraftModel.addMonitoringData(data)
         
         self._normalRequestID = \
             self._handler.requestPeriodicRead(1.0, data, 
                                               self._handleNormal)
+        self._monitoring = True
 
     def _addFlareRate(self, data):
         """Append a flare rate to the list of last rates."""
@@ -801,14 +801,7 @@ class AircraftModel(object):
         state.flapsSet = self._flapsNotches[flapsIndex]
         
         flapsLeft = data[self._monidx_flapsLeft]
-        flapsIndex = flapsLeft / flapsIncrement
-        state.flaps = self._flapsNotches[flapsIndex]
-        if flapsIndex != numNotchesM1:
-            thisNotch = flapsIndex * flapsIncrement
-            nextNotch = thisNotch + flapsIncrement
-            
-            state.flaps += (self._flapsNotches[flapsIndex+1] - state.flaps) * \
-                (flapsLeft - thisNotch) / (nextNotch - thisNotch)
+        state.flaps = self._flapsNotches[-1]*flapsLeft/16383.0
         
         lights = data[self._monidx_lights]
         
@@ -890,8 +883,8 @@ class GenericAircraftModel(AircraftModel):
         if self._isN1:
             self._engineStartIndex = len(data)
             for i in range(0, self._numEngines):
-                self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "u")  # N1
-                self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "d")  # throttle lever
+                self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "H")  # N1
+                self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "h")  # throttle lever
         
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
@@ -1010,7 +1003,7 @@ class B767Model(GenericAircraftModel):
 #------------------------------------------------------------------------------
 
 class DH8DModel(GenericAircraftModel):
-    """Generic model for the Boeing 737 NG aircraft."""
+    """Generic model for the Bombardier  Dash 8-Q400 aircraft."""
     def __init__(self):
         """Construct the model."""
         super(DH8DModel, self). \
@@ -1021,8 +1014,37 @@ class DH8DModel(GenericAircraftModel):
     @property
     def name(self):
         """Get the name for this aircraft model."""
-        return "FSUIPC/Generic Bombardier Dash-8 Q400"
+        return "FSUIPC/Generic Bombardier Dash 8-Q400"
 
+#------------------------------------------------------------------------------
+
+class DreamwingsDH8DModel(DH8DModel):
+    """Model handler for the Dreamwings Dash 8-Q400."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type==const.AIRCRAFT_DH8D and \
+            (name.find("Dreamwings")!=-1 or airPath.find("Dreamwings")!=-1) and \
+            (name.find("Dash")!=-1 or airPath.find("Dash")!=-1) and \
+            (name.find("Q400")!=-1 or airPath.find("Q400")!=-1) and \
+            airPath.find("Dash8Q400")!=-1
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Dreamwings Bombardier Dash 8-Q400"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then invert the pitot heat state."""
+        state = super(DreamwingsDH8DModel, self).getAircraftState(aircraft,
+                                                                  timestamp,
+                                                                  data)
+        state.pitotHeatOn = not state.pitotHeatOn
+
+        return state
 #------------------------------------------------------------------------------
 
 class CRJ2Model(GenericAircraftModel):
@@ -1152,6 +1174,6 @@ _genericModels = { const.AIRCRAFT_B736 : B737Model,
 #------------------------------------------------------------------------------
 
 AircraftModel.registerSpecial(PMDGBoeing737NGModel)
+AircraftModel.registerSpecial(DreamwingsDH8DModel)
 
 #------------------------------------------------------------------------------
-
