@@ -24,16 +24,17 @@ class SimulatorException(Exception):
 
 #-------------------------------------------------------------------------------
 
-def createSimulator(type, connectionListener, aircraft):
+def createSimulator(type, connectionListener):
     """Create a simulator instance for the given simulator type with the given
     connection listener.
 
     The returned object should provide the following members:
     FIXME: add info
     """
-    assert type==const.SIM_MSFS9, "Only MS Flight Simulator 2004 is supported"
+    assert type in [const.SIM_MSFS9, const.SIM_MSFSX], \
+           "Only MS Flight Simulator 2004 and X are supported"
     import fsuipc
-    return fsuipc.Simulator(connectionListener, aircraft)
+    return fsuipc.Simulator(connectionListener)
 
 #-------------------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ class AircraftState(object):
     - navLightsOn: a boolean indicating if the navigation lights are on
     - antiCollisionLightsOn: a boolean indicating if the anti-collision lights are on
     - strobeLightsOn: a boolean indicating if the strobe lights are on
-    - langingLightsOn: a boolean indicating if the landing lights are on
+    - landingLightsOn: a boolean indicating if the landing lights are on
     - pitotHeatOn: a boolean indicating if the pitot heat is on
     - parking: a boolean indicating if the parking brake is set
     - gearsDown: a boolean indicating if the gears are down
@@ -93,7 +94,7 @@ class AircraftState(object):
     - altimeter: the altimeter setting in hPa (float)
     - nav1: the frequency of the NAV1 radio in MHz (string)
     - nav2: the frequency of the NAV1 radio in MHz (string)
-    - squawk: the transponder code
+    - squawk: the transponder code (string)
     - windSpeed: the speed of the wind at the aircraft in knots (float)
     - windDirection: the direction of the wind at the aircraft in degrees (float)
 
