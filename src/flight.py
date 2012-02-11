@@ -83,6 +83,6 @@ class Flight(object):
         """Wait for the flight to end."""
         with self._endCondition:
             while self._stage!=const.STAGE_END:
-                self._endCondition.wait()
+                self._endCondition.wait(1)
 
 #---------------------------------------------------------------------------------------
