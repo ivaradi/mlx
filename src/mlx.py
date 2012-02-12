@@ -54,7 +54,7 @@ class GUI(fs.ConnectionListener):
     def build(self):
         """Build the GUI."""
         win = gtk.Window()
-        win.set_title("MAVA Logger X 0.001 Test")
+        win.set_title("MAVA Logger X " + const.VERSION)
         win.connect("delete-event", gtk.main_quit)
 
         mainVBox = gtk.VBox()
@@ -585,11 +585,15 @@ class GUI(fs.ConnectionListener):
         buffer = self._logView.get_buffer()
         buffer.insert(buffer.get_end_iter(), msg)
         self._logView.scroll_mark_onscreen(buffer.get_insert())
-              
-if __name__ == "__main__":
+
+def main():
+    """The main operation of the program."""
     gobject.threads_init()
     gui = GUI()
     gui.build()
     gui.run()
+              
+if __name__ == "__main__":
+    main()
 
 
