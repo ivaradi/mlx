@@ -57,25 +57,53 @@ class Handler(threading.Thread):
             print >> sys.stderr, str(e)
             return None
 
+    NUM_READATTEMPTS = 3
+
+    @staticmethod
+    def _performRead(data, callback, extra, validator):
+        """Perform a read request.
+
+        If there is a validator, that will be called with the return values,
+        and if the values are wrong, the request is retried at most a certain
+        number of times.
+
+        Return True if the request has succeeded, False if validation has
+        failed during all attempts. An exception may also be thrown if there is
+        some lower-level communication problem."""
+        attemptsLeft = Handler.NUM_READATTEMPTS
+        while attemptsLeft>0:
+            values = pyuipc.read(data)
+            if validator is None or \
+               Handler._callSafe(lambda: validator(values, extra)):
+                Handler._callSafe(lambda: callback(values, extra))
+                return True
+            else:
+                attemptsLeft -= 1
+        return False
+
     class Request(object):
         """A simple, one-shot request."""
-        def __init__(self, forWrite, data, callback, extra):
+        def __init__(self, forWrite, data, callback, extra, validator = None):
             """Construct the request."""
             self._forWrite = forWrite
             self._data = data
             self._callback = callback
             self._extra = extra
+            self._validator = validator
             
         def process(self, time):
-            """Process the request."""            
+            """Process the request.
+
+            Return True if the request has succeeded, False if data validation
+            has failed for a reading request. An exception may also be thrown
+            if there is some lower-level communication problem."""            
             if self._forWrite:
                 pyuipc.write(self._data)
                 Handler._callSafe(lambda: self._callback(True, self._extra))
+                return True
             else:
-                values = pyuipc.read(self._data)
-                Handler._callSafe(lambda: self._callback(values, self._extra))
-
-            return True
+                return Handler._performRead(self._data, self._callback,
+                                            self._extra, self._validator)
 
         def fail(self):
             """Handle the failure of this request."""
@@ -86,7 +114,7 @@ class Handler(threading.Thread):
 
     class PeriodicRequest(object):
         """A periodic request."""
-        def __init__(self, id,  period, data, callback, extra):
+        def __init__(self, id,  period, data, callback, extra, validator):
             """Construct the periodic request."""
             self._id = id
             self._period = period
@@ -95,6 +123,7 @@ class Handler(threading.Thread):
             self._preparedData = None
             self._callback = callback
             self._extra = extra
+            self._validator = validator
             
         @property
         def id(self):
@@ -109,22 +138,28 @@ class Handler(threading.Thread):
         def process(self, time):
             """Check if this request should be executed, and if so, do so.
 
-            Return a boolean indicating if the request was executed."""
-            if time < self._nextFire: 
-                return False
+            time is the time at which the request is being executed. If this
+            function is called too early, nothing is done, and True is
+            returned.
 
+            Return True if the request has succeeded, False if data validation
+            has failed. An exception may also be thrown if there is some
+            lower-level communication problem."""
+            if time<self._nextFire:
+                return True
+            
             if self._preparedData is None:
                 self._preparedData = pyuipc.prepare_data(self._data)
                 self._data = None
-                
-            values = pyuipc.read(self._preparedData)
 
-            Handler._callSafe(lambda: self._callback(values, self._extra))
+            isOK = Handler._performRead(self._preparedData, self._callback,
+                                        self._extra, self._validator)
 
-            while self._nextFire <= time:
-                self._nextFire += self._period
+            if isOK:
+                while self._nextFire <= time:
+                    self._nextFire += self._period
             
-            return True
+            return isOK
 
         def fail(self):
             """Handle the failure of this request."""
@@ -143,6 +178,7 @@ class Handler(threading.Thread):
 
         self._requestCondition = threading.Condition()
         self._connectionRequested = False
+        self._connected = False
 
         self._requests = []
         self._nextPeriodicID = 1
@@ -150,7 +186,7 @@ class Handler(threading.Thread):
 
         self.daemon = True
 
-    def requestRead(self, data, callback, extra = None):
+    def requestRead(self, data, callback, extra = None, validator = None):
         """Request the reading of some data.
 
         data is a list of tuples of the following items:
@@ -164,7 +200,8 @@ class Handler(threading.Thread):
         It will be called in the handler's thread!
         """
         with self._requestCondition:
-            self._requests.append(Handler.Request(False, data, callback, extra))
+            self._requests.append(Handler.Request(False, data, callback, extra,
+                                                  validator))
             self._requestCondition.notify()
 
     def requestWrite(self, data, callback, extra = None):
@@ -191,33 +228,8 @@ class Handler(threading.Thread):
         with extra[0] as condition:
             condition.notify()
 
-    def read(self, data):
-        """Read the given data synchronously.
-
-        If a problem occurs, an exception is thrown."""
-        with threading.Condition() as condition:
-            extra = [condition]
-            self._requestRead(data, self._readWriteCallback, extra)
-            while len(extra)<2:
-                condition.wait()
-            if extra[1] is None:
-                raise fs.SimulatorException("reading failed")
-            else:
-                return extra[1]
-
-    def write(self, data):
-        """Write the given data synchronously.
-
-        If a problem occurs, an exception is thrown."""
-        with threading.Condition() as condition:
-            extra = [condition]
-            self._requestWrite(data, self._writeCallback, extra)
-            while len(extra)<2:
-                condition.wait()
-            if extra[1] is None:
-                raise fs.SimulatorException("writing failed")
-
-    def requestPeriodicRead(self, period, data, callback, extra = None):
+    def requestPeriodicRead(self, period, data, callback, extra = None,
+                            validator = None):
         """Request a periodic read of data.
 
         period is a floating point number with the period in seconds.
@@ -227,7 +239,8 @@ class Handler(threading.Thread):
         with self._requestCondition:
             id = self._nextPeriodicID
             self._nextPeriodicID += 1
-            request = Handler.PeriodicRequest(id, period, data, callback, extra)
+            request = Handler.PeriodicRequest(id, period, data, callback,
+                                              extra, validator)
             self._periodicRequests.append(request)
             self._requestCondition.notify()
             return id
@@ -272,7 +285,11 @@ class Handler(threading.Thread):
                 self._requestCondition.wait()
             
     def _connect(self):
-        """Try to connect to the flight simulator via FSUIPC"""
+        """Try to connect to the flight simulator via FSUIPC
+
+        Returns True if the connection has been established, False if it was
+        not due to no longer requested.
+        """
         while self._connectionRequested:
             try:
                 pyuipc.open(pyuipc.SIM_ANY)
@@ -282,6 +299,7 @@ class Handler(threading.Thread):
                 Handler._callSafe(lambda:     
                                   self._connectionListener.connected(const.SIM_MSFS9, 
                                                                      description))
+                self._connected = True
                 return True
             except Exception, e:
                 print "fsuipc.Handler._connect: connection failed: " + str(e)
@@ -293,19 +311,32 @@ class Handler(threading.Thread):
         """Handle a living connection."""
         with self._requestCondition:
             while self._connectionRequested:
-                if not self._processRequests(): 
-                    return
-                timeout = None
-                if self._periodicRequests:
-                    self._periodicRequests.sort()
-                    timeout = self._periodicRequests[0].nextFire - time.time()
-                if timeout is None or timeout > 0.0:
-                    self._requestCondition.wait(timeout)
+                self._processRequests()
+                self._waitRequest()
+
+    def _waitRequest(self):
+        """Wait for the time of the next request.
+
+        Returns also, if the connection is no longer requested.
+
+        Should be called with the request condition lock held."""
+        while self._connectionRequested:
+            timeout = None
+            if self._periodicRequests:
+                self._periodicRequests.sort()
+                timeout = self._periodicRequests[0].nextFire - time.time()
+
+            if timeout is not None and timeout <= 0.0:
+                return
+            
+            self._requestCondition.wait(timeout)
                 
     def _disconnect(self):
         """Disconnect from the flight simulator."""
-        pyuipc.close()
-        Handler._callSafe(lambda: self._connectionListener.disconnected())
+        if self._connected:
+            pyuipc.close()
+            Handler._callSafe(lambda: self._connectionListener.disconnected())
+            self._connected = False
 
     def _failRequests(self, request):
         """Fail the outstanding, single-shot requuests."""
@@ -322,21 +353,31 @@ class Handler(threading.Thread):
     def _processRequest(self, request, time):
         """Process the given request. 
 
-        If an exception occurs, we try to reconnect.
-        
-        Returns what the request's process() function returned or None if
-        reconnection failed."""        
+        If an exception occurs or invalid data is read too many times, we try
+        to reconnect.
+
+        This function returns only if the request has succeeded, or if a
+        connection is no longer requested.
+
+        This function is called with the request lock held, but is relased
+        whole processing the request and reconnecting."""
         self._requestCondition.release()
 
+        needReconnect = False
         try:
-            return request.process(time)
-        except Exception as e:
-            print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
-                str(e) + ") reconnecting."
-            self._disconnect()
-            self._failRequests(request)
-            if not self._connect(): return None
-            else: return True
+            try:
+                if not request.process(time):
+                    print "fsuipc.Handler._processRequest: FSUIPC returned invalid data too many times, reconnecting"
+                    needReconnect = True
+            except Exception as e:
+                print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
+                      str(e) + "), reconnecting."
+                needReconnect = True
+
+            if needReconnect:
+                self._disconnect()
+                self._failRequests(request)
+                self._connect()
         finally:
             self._requestCondition.acquire()
         
@@ -347,16 +388,19 @@ class Handler(threading.Thread):
         while self._connectionRequested and self._periodicRequests:
             self._periodicRequests.sort()
             request = self._periodicRequests[0]
-            result = self._processRequest(request, time.time())
-            if result is None: return False
-            elif not result: break
+
+            t = time.time()
+
+            if request.nextFire>t:
+                break
+            
+            self._processRequest(request, t)
 
         while self._connectionRequested and self._requests:
             request = self._requests[0]
             del self._requests[0]
 
-            if self._processRequest(request, None) is None:
-                return False
+            self._processRequest(request, None)
 
         return self._connectionRequested
 
@@ -480,9 +524,11 @@ class Simulator(object):
     def _startDefaultNormal(self):
         """Start the default normal periodic request."""
         assert self._normalRequestID is None
-        self._normalRequestID = self._handler.requestPeriodicRead(1.0,
-                                                                  Simulator.normalData,
-                                                                  self._handleNormal)
+        self._normalRequestID = \
+             self._handler.requestPeriodicRead(1.0,
+                                               Simulator.normalData,
+                                               self._handleNormal,
+                                               validator = self._validateNormal)
 
     def _stopNormal(self):
         """Stop the normal period request."""
@@ -490,6 +536,10 @@ class Simulator(object):
         self._handler.clearPeriodic(self._normalRequestID)
         self._normalRequestID = None
         self._monitoring = False
+
+    def _validateNormal(self, data, extra):
+        """Validate the normal data."""
+        return data[0]!=0 and data[1]!=0 and len(data[5])>0 and len(data[6])>0
 
     def _handleNormal(self, data, extra):
         """Handle the reply to the normal request.
@@ -564,7 +614,8 @@ class Simulator(object):
         
         self._normalRequestID = \
             self._handler.requestPeriodicRead(1.0, data, 
-                                              self._handleNormal)
+                                              self._handleNormal,
+                                              validator = self._validateNormal)
         self._monitoring = True
 
     def _addFlareRate(self, data):

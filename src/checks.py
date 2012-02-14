@@ -437,7 +437,6 @@ class PatientFaultChecker(FaultChecker):
             timeout = self.getTimeout(flight, aircraft, oldState, state)
             if state.timestamp>=(self._faultStarted + timeout):
                 self.logFault(flight, aircraft, logger, oldState, state)
-                self._faulted = True
                 self._faultStarted = state.timestamp
         else:
             self._faultStarted = None

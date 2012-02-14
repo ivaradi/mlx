@@ -72,7 +72,7 @@ class Logger(object):
         if score==Logger._noGoScore:
             self.message(timestamp, "%s (NO GO)" % (what))
         else:
-            self.message(timestamp, "%s (%f)" % (what, score))
+            self.message(timestamp, "%s (%.1f)" % (what, score))
 
     def noGo(self, faultID, timestamp, what, shortReason):
         """Report a No-Go fault."""
