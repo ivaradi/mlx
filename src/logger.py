@@ -36,6 +36,12 @@ class Logger(object):
     def _getTimeStr(timestamp):
         """Get the string representation of the given timestamp."""
         return time.strftime("%H:%M:%S", time.gmtime(timestamp))
+
+    def reset(self):
+        """Reset the logger.
+
+        The faults logged so far will be cleared."""
+        self._faults.clear()
                 
     def message(self, timestamp, msg):
         """Put a simple textual message into the log with the given timestamp."""
@@ -57,6 +63,11 @@ class Logger(object):
         """Report a change in the flight stage."""
         s = Logger._stages[stage] if stage in Logger._stages else "<Unknown>"
         self.message(timestamp, "--- %s ---" % (s,))
+        if stage==const.STAGE_END:
+            totalScore = 100
+            for (id, score) in self._faults.iteritems():
+                totalScore -= score
+            self.untimedMessage("Score: %.0f" % (totalScore,))
         
     def fault(self, faultID, timestamp, what, score):
         """Report a fault.

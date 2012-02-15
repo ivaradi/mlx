@@ -129,6 +129,7 @@ class GUI(fs.ConnectionListener):
     def _connectToggled(self, button):
         """Callback for the connection button."""
         if self._connectButton.get_active():
+            self._logger.reset()
             self._flight = flight.Flight(self._logger)
 
             acftListModel = self._acftList.get_model()
@@ -140,8 +141,6 @@ class GUI(fs.ConnectionListener):
             self._flight.cruiseAltitude = self._flSpinButton.get_value_as_int() * 100
 
             self._flight.zfw = self._zfwSpinButton.get_value_as_int()
-
-            print self._flight.aircraft, self._flight.cruiseAltitude, self._flight.zfw
 
             if self._simulator is None:
                 self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
@@ -356,11 +355,11 @@ class GUI(fs.ConnectionListener):
         table.attach(label, 4, 5, 2, 3)
         table.attach(self._groundSpeed, 5, 6, 2, 3)
 
-        (label, self._radioAltitude) = self._createLabeledEntry("Radio alt.:", 4)
+        (label, self._radioAltitude) = self._createLabeledEntry("Radio alt.:", 6)
         table.attach(label, 6, 7, 2, 3)
         table.attach(self._radioAltitude, 7, 8, 2, 3)
 
-        (label, self._altitude) = self._createLabeledEntry("Altitude:", 4)
+        (label, self._altitude) = self._createLabeledEntry("Altitude:", 6)
         table.attach(label, 8, 9, 2, 3)
         table.attach(self._altitude, 9, 10, 2, 3)
 
