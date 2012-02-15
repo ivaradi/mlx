@@ -934,7 +934,7 @@ class GenericAircraftModel(AircraftModel):
         if self._isN1:
             self._engineStartIndex = len(data)
             for i in range(0, self._numEngines):
-                self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "H")  # N1
+                self._addOffsetWithIndexMember(data, 0x2000 + i * 0x100, "f")  # N1
                 self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "h")  # throttle lever
         
     def getAircraftState(self, aircraft, timestamp, data):
@@ -957,7 +957,7 @@ class GenericAircraftModel(AircraftModel):
         state.reverser = []
         for i in range(self._engineStartIndex,
                        self._engineStartIndex + 2*self._numEngines, 2):
-            state.n1.append(data[i]*100.0/16384.0)
+            state.n1.append(data[i])
             state.reverser.append(data[i+1]<0)
 
         return state
