@@ -152,6 +152,10 @@ class StateChangeLogger(StateChecker):
         """
         self._logInitial = logInitial    
 
+    def _getLogTimestamp(self, state):
+        """Get the log timestamp."""
+        return state.timestamp
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Check if the state has changed, and if so, log the new state."""
         shouldLog = False
@@ -161,7 +165,7 @@ class StateChangeLogger(StateChecker):
             shouldLog = self._changed(oldState, state)
         
         if shouldLog:
-            logger.message(state.timestamp, self._getMessage(state))
+            logger.message(self._getLogTimestamp(state), self._getMessage(state))
         
 #---------------------------------------------------------------------------------------
 
@@ -196,29 +200,38 @@ class DelayedChangeMixin(object):
 
     Child classes should define the following function:
     - _getValue(state): get the value we are interested in."""
-    def __init__(self, delay = 10.0):
+    def __init__(self, minDelay = 3.0, maxDelay = 10.0):
         """Construct the mixin with the given delay in seconds."""
-        self._delay = delay
+        self._minDelay = minDelay
+        self._maxDelay = maxDelay
         self._oldValue = None
         self._firstChange = None
-
+        self._lastChangeState = None
+        
     def _changed(self, oldState, state):
         """Determine if the value has changed."""
         if self._oldValue is None:
             self._oldValue = self._getValue(oldState)
             
         newValue = self._getValue(state)
-        if newValue!=self._oldValue:
+        if self._oldValue!=newValue:
             if self._firstChange is None:
                 self._firstChange = state.timestamp
-            if state.timestamp >= (self._firstChange + self._delay):
-                self._oldValue = newValue
+            self._lastChangeState = state
+            self._oldValue = newValue
+
+        if self._firstChange is not None:
+            if state.timestamp >= min(self._lastChangeState.timestamp + self._minDelay,
+                                      self._firstChange + self._maxDelay):
                 self._firstChange = None
                 return True
-        else:
-            self._firstChange = None
-
+            
         return False
+
+    def _getLogTimestamp(self, state):
+        """Get the log timestamp."""
+        return self._lastChangeState.timestamp if \
+               self._lastChangeState is not None else state.timestamp
 
 #---------------------------------------------------------------------------------------
 
@@ -241,12 +254,15 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
                                DelayedChangeMixin, TemplateMessageMixin):
     """Base for generic state change loggers that monitor a single value in the
     state possibly with a delay and the logged message comes from a template"""
-    def __init__(self, attrName, template, logInitial = True, delay = 0.0):
+    def __init__(self, attrName, template, logInitial = True,
+                 minDelay = 0.0, maxDelay = 0.0):
         """Construct the object."""
         StateChangeLogger.__init__(self, logInitial = logInitial)
         SingleValueMixin.__init__(self, attrName)
-        DelayedChangeMixin.__init__(self, delay = delay)
+        DelayedChangeMixin.__init__(self, minDelay = minDelay, maxDelay = maxDelay)
         TemplateMessageMixin.__init__(self, template)
+        self._getLogTimestamp = lambda state: \
+                                DelayedChangeMixin._getLogTimestamp(self, state)
 
 #---------------------------------------------------------------------------------------
 
@@ -258,10 +274,15 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "altimeter")
         DelayedChangeMixin.__init__(self)
+        self._getLogTimestamp = lambda state: \
+                                DelayedChangeMixin._getLogTimestamp(self, state)
 
     def _getMessage(self, state):
         """Get the message to log on a change."""
-        return "Altimeter: %.0f hPa at %.0f feet" % (state.altimeter, state.altitude)
+        logState = self._lastChangeState if \
+                   self._lastChangeState is not None else state
+        return "Altimeter: %.0f hPa at %.0f feet" % \
+               (logState.altimeter, logState.altitude)
 
 #---------------------------------------------------------------------------------------
 
@@ -286,7 +307,7 @@ class SquawkLogger(GenericStateChangeLogger):
     def __init__(self):
         """Construct the logger."""
         super(SquawkLogger, self).__init__("squawk", "Squawk code: %s",
-                                           delay = 10.0)
+                                           minDelay = 3.0, maxDelay = 10.0)
 
 #---------------------------------------------------------------------------------------
 
