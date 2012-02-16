@@ -21,6 +21,10 @@ class StateChecker(object):
 
 class StageChecker(StateChecker):
     """Check the flight stage transitions."""
+    def __init__(self):
+        """Construct the stage checker."""
+        self._flareStarted = False
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Check the stage of the aircraft."""
         stage = flight.stage
@@ -62,9 +66,12 @@ class StageChecker(StateChecker):
                 aircraft.setStage(state, const.STAGE_TAXIAFTERLAND)
             elif not state.gearsDown:
                 aircraft.setStage(state, const.STAGE_GOAROUND)
-            elif state.radioAltitude>200:
+            elif state.radioAltitude>200 and self._flareStarted:
                 aircraft.cancelFlare()
-            elif state.radioAltitude<150 and not state.onTheGround:
+                self._flareStarted = False
+            elif state.radioAltitude<150 and not state.onTheGround and \
+                 not self._flareStarted:
+                self._flareStarted = True
                 aircraft.prepareFlare()
         elif stage==const.STAGE_TAXIAFTERLAND:
             if state.parking:
@@ -571,7 +578,7 @@ class GearSpeedLimitChecker(PatientFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(GearSpeedLinmitChecker, state.timestamp,
+        logger.fault(GearSpeedLimitChecker, state.timestamp,
                      FaultChecker._appendDuring(flight, "Gear speed limit fault"),
                      5)
 
@@ -779,7 +786,7 @@ class ReverserChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
-            state.groundSpeed<80 and max(state.reverser)
+            state.groundSpeed<60 and max(state.reverser)
                            
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
@@ -857,7 +864,7 @@ class ThrustChecker(SimpleFaultChecker):
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         print state.n1
-        logger.fault(LandingLightsChecker, state.timestamp,
+        logger.fault(ThrustChecker, state.timestamp,
                      FaultChecker._appendDuring(flight, "Thrust setting was too high (>97%)"),
                      FaultChecker._getLinearScore(97, 110, 0, 10, max(state.n1)))
 
