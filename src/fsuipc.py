@@ -11,6 +11,7 @@ import os
 import time
 import calendar
 import sys
+import codecs
 
 if os.name == "nt":
     import pyuipc
@@ -473,7 +474,9 @@ class Simulator(object):
         self._flareRates = []
         self._flareStart = None
         self._flareStartFS = None
-        
+    
+        self._latin1decoder = codecs.getdecoder("iso-8859-1")
+    
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft
@@ -591,8 +594,10 @@ class Simulator(object):
 
         if needNew:
             self._setAircraftModel(AircraftModel.create(self._aircraft, aircraftName))
+ 
         
-        self._aircraft.modelChanged(timestamp, name, self._aircraftModel.name)        
+        self._aircraft.modelChanged(timestamp, self._latin1decoder(name), 
+                                    self._aircraftModel.name)        
 
         return needNew
 

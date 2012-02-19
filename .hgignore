@@ -3,3 +3,4 @@ pyuipc.pyd
 MANIFEST
 dist/.+
 build/.+
+mlx-common.nsh

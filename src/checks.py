@@ -475,10 +475,13 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
     """Check for the anti-collision light being off at high N1 values."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
+        isTupolev = aircraft.type in [const.AIRCRAFT_T134, 
+                                      const.AIRCRAFT_T154]
         return (flight.stage!=const.STAGE_PARKING or \
                 not flight.options.fs2Crew) and \
                 not state.antiCollisionLightsOn and \
-                max(state.n1)>5
+                ((isTupolev and max(state.n1[1:])>5) or \
+                 (not isTupolev and max(state.n1)>5))
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
@@ -834,15 +837,20 @@ class StrobeLightsChecker(PatientFaultChecker):
     """Check if the strobe lights are used properly."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return (flight.stage==const.STAGE_BOARDING and \
-                state.strobeLightsOn and state.onTheGround) or \
-               (flight.stage==const.STAGE_TAKEOFF and \
-                not state.strobeLightsOn and not state.gearsDown) or \
-               (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
-                                 const.STAGE_DESCENT] and \
-                not state.strobeLightsOn and not state.onTheGround) or \
-               (flight.stage==const.STAGE_PARKING and \
-                state.strobeLightsOn and state.onTheGround)
+        if aircraft.type in [const.AIRCRAFT_T134,
+                             const.AIRCRAFT_T154,
+                             const.AIRCRAFT_YK40]:
+            return False
+        else:
+            return (flight.stage==const.STAGE_BOARDING and \
+                    state.strobeLightsOn and state.onTheGround) or \
+                   (flight.stage==const.STAGE_TAKEOFF and \
+                    not state.strobeLightsOn and not state.gearsDown) or \
+                   (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
+                                     const.STAGE_DESCENT] and \
+                   not state.strobeLightsOn and not state.onTheGround) or \
+                   (flight.stage==const.STAGE_PARKING and \
+                    state.strobeLightsOn and state.onTheGround)
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""

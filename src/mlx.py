@@ -391,7 +391,7 @@ class GUI(fs.ConnectionListener):
         table.attach(label, 10, 11, 3, 4)
         table.attach(self._nav2, 11, 12, 3, 4)
 
-        (label, self._fuel) = self._createLabeledEntry("Fuel:", 20, xalign = 0.0)
+        (label, self._fuel) = self._createLabeledEntry("Fuel:", 40, xalign = 0.0)
         table.attach(label, 0, 1, 4, 5)
         table.attach(self._fuel, 1, 4, 4, 5)
 
@@ -520,7 +520,7 @@ class GUI(fs.ConnectionListener):
             fuelStr = ""
             for fuel in aircraftState.fuel:
                 if fuelStr: fuelStr += ", "
-                fuelStr += "%.0f" % (fuel,)
+                fuelStr += "%.0f" % (fuel,)                
             self._fuel.set_text(fuelStr)
 
             if hasattr(aircraftState, "n1"):
