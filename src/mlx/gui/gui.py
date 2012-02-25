@@ -98,6 +98,34 @@ class GUI(fs.ConnectionListener):
         """Update the data."""
         gobject.idle_add(self._setData, state)
 
+    def resetFlightStatus(self):
+        """Reset the status of the flight."""
+        self._statusIcon.resetFlightStatus()
+
+    def setStage(self, stage):
+        """Set the stage of the flight."""
+        gobject.idle_add(self._setStage, stage)
+
+    def _setStage(self, stage):
+        """Set the stage of the flight."""
+        self._statusIcon.setStage(stage)
+
+    def setRating(self, rating):
+        """Set the rating of the flight."""
+        gobject.idle_add(self._setRating, rating)
+
+    def _setRating(self, rating):
+        """Set the rating of the flight."""
+        self._statusIcon.setRating(rating)
+
+    def setNoGo(self, reason):
+        """Set the rating of the flight to No-Go with the given reason."""
+        gobject.idle_add(self._setNoGo, reason)
+
+    def _setNoGo(self, reason):
+        """Set the rating of the flight."""
+        self._statusIcon.setNoGo(reason)
+
     def _handleMainWindowState(self, window, event):
         """Hande a change in the state of the window"""
         iconified = gdk.WindowState.ICONIFIED if pygobject \
@@ -176,6 +204,7 @@ class GUI(fs.ConnectionListener):
             self._simulator.connect(self._flight.aircraft)
             self._simulator.startMonitoring()
         else:
+            self.resetFlightStatus()
             self._connecting = False
             self._simulator.stopMonitoring()
             self._simulator.disconnect()

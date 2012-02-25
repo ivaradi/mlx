@@ -64,10 +64,7 @@ class Logger(object):
         s = Logger._stages[stage] if stage in Logger._stages else "<Unknown>"
         self.message(timestamp, "--- %s ---" % (s,))
         if stage==const.STAGE_END:
-            totalScore = 100
-            for (id, score) in self._faults.iteritems():
-                totalScore -= score
-            self.untimedMessage("Score: %.0f" % (totalScore,))
+            self.untimedMessage("Rating: %.0f" % (self.getRating(),))
         
     def fault(self, faultID, timestamp, what, score):
         """Report a fault.
@@ -89,8 +86,8 @@ class Logger(object):
         """Report a No-Go fault."""
         self.fault(faultID, timestamp, what, Logger.NO_GO_SCORE)
 
-    def getScore(self):
-        """Get the score of the flight so far."""
+    def getRating(self):
+        """Get the rating of the flight so far."""
         totalScore = 100
         for (id, score) in self._faults.iteritems():
             if score==Logger.NO_GO_SCORE:

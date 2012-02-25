@@ -28,6 +28,8 @@ class Flight(object):
         self.logger = logger
         self._gui = gui
 
+        gui.resetFlightStatus()
+
         self.cruiseAltitude = None
         self.flareTimeFromFS = False
         self.entranceExam = False
@@ -56,6 +58,7 @@ class Flight(object):
         if stage!=self._stage:
             self._stage = stage
             self.logger.stage(timestamp, stage)
+            self._gui.setStage(stage)
             if stage==const.STAGE_END:
                 with self._endCondition:
                     self._endCondition.notify()
@@ -71,10 +74,12 @@ class Flight(object):
         the score is greater than last time. This ID can be, e.g. the checker
         the report comes from."""
         self.logger.fault(faultID, timestamp, what, score)
+        self._gui.setRating(self.logger.getRating())
 
     def handleNoGo(self, faultID, timestamp, what, shortReason):
         """Handle a No-Go fault."""
         self.logger.noGo(faultID, timestamp, what)
+        self._gui.setNoGo(shortReason)
 
     def flareStarted(self, flareStart, flareStartFS):
         """Called when the flare time has started."""
