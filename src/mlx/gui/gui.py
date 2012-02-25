@@ -1,6 +1,7 @@
 # The main file for the GUI
 
-from common import *
+from statusicon import StatusIcon
+from mlx.gui.common import *
 
 import mlx.const as const
 import mlx.fs as fs
@@ -31,7 +32,6 @@ class GUI(fs.ConnectionListener):
     """The main GUI class."""
     def __init__(self):
         """Construct the GUI."""
-
         gobject.threads_init()
 
         self._connecting = False
@@ -40,12 +40,14 @@ class GUI(fs.ConnectionListener):
         self._flight = None
         self._simulator = None
 
-    def build(self):
+    def build(self, iconDirectory):
         """Build the GUI."""
+        
         win = gtk.Window()
         win.set_title("MAVA Logger X " + const.VERSION)
         win.set_icon_from_file("logo.ico")
-        win.connect("delete-event", gtk.main_quit)
+        win.connect("delete-event", lambda a, b: self.hideMainWindow())
+        win.connect("window-state-event", self._handleMainWindowState)
 
         mainVBox = gtk.VBox()
         win.add(mainVBox)
@@ -61,8 +63,12 @@ class GUI(fs.ConnectionListener):
         logFrame = self._buildLogFrame()
         logFrame.set_border_width(8)
         mainVBox.pack_start(logFrame, True, True, 0)
-
+        
         win.show_all()        
+
+        self._mainWindow = win
+
+        self._statusIcon = StatusIcon(iconDirectory, self)
 
     def run(self):
         """Run the GUI."""
@@ -92,6 +98,35 @@ class GUI(fs.ConnectionListener):
         """Update the data."""
         gobject.idle_add(self._setData, state)
 
+    def _handleMainWindowState(self, window, event):
+        """Hande a change in the state of the window"""
+        iconified = gdk.WindowState.ICONIFIED if pygobject \
+                    else gdk.WINDOW_STATE_ICONIFIED
+        if (event.changed_mask&iconified)!=0 and (event.new_window_state&iconified)!=0:
+            self.hideMainWindow()
+
+    def hideMainWindow(self):
+        """Hide the main window and save its position."""
+        (self._mainWindowX, self._mainWindowY) = \
+            self._mainWindow.get_window().get_root_origin()
+        self._mainWindow.hide()
+        self._statusIcon.mainWindowHidden()
+        return True
+
+    def showMainWindow(self):
+        """Show the main window at its former position."""
+        self._mainWindow.move(self._mainWindowX, self._mainWindowY)
+        self._mainWindow.deiconify()
+        self._mainWindow.show()
+        self._statusIcon.mainWindowShown()
+
+    def toggleMainWindow(self):
+        """Toggle the main window."""
+        if self._mainWindow.get_visible():
+            self.hideMainWindow()
+        else:
+            self.showMainWindow()
+            
     def _drawConnState(self, connStateArea, eventOrContext):
         """Draw the connection state."""
         context = eventOrContext if pygobject else connStateArea.window.cairo_create()
@@ -253,6 +288,15 @@ class GUI(fs.ConnectionListener):
         alignment.add(self._connStateArea)
 
         setupBox.pack_start(alignment, False, False, 8)
+
+        setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
+
+        self._quitButton = gtk.Button(label = "Quit")
+        self._quitButton.set_tooltip_text("Quit the program.")
+        
+        self._quitButton.connect("clicked", gtk.main_quit)
+
+        setupBox.pack_start(self._quitButton, False, False, 0)
 
         return setupFrame
 

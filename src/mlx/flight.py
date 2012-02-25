@@ -22,10 +22,11 @@ class Flight(object):
     
     It is also the hub for the other main objects participating in the handling of
     the flight."""
-    def __init__(self, logger):
+    def __init__(self, logger, gui):
         """Construct the flight."""
         self._stage = None
         self.logger = logger
+        self._gui = gui
 
         self.cruiseAltitude = None
         self.flareTimeFromFS = False

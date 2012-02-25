@@ -8,6 +8,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     print "Using PyGTK"
     pygobject = False
     import pygtk
+    import gtk.gdk as gdk
     import gtk
     import gobject
     try:
@@ -18,6 +19,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 else:
     print "Using PyGObject"
     pygobject = True
+    from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     from gi.repository import GObject as gobject
     from gi.repository import AppIndicator3 as appindicator

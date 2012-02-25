@@ -5,4 +5,4 @@ scriptdir=`dirname $0`
 PYTHONPATH="${scriptdir}/src:${PYTHONPATH}"
 export PYTHONPATH
 
-exec python -m mlx.mlx "$@"
+exec python -m runmlx "$@"

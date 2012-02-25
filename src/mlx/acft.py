@@ -480,8 +480,8 @@ class DC3(Aircraft):
 
         This implementation checks the RPM values to be 0."""
         for rpm in aircraftState.rpm:
-            if rpm>0: return
-        self._setStage(aircraftState, const.STAGE_END)
+            if rpm>0: return False
+        return True
 
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
