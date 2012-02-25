@@ -155,7 +155,7 @@ class GUI(fs.ConnectionListener):
         """Callback for the connection button."""
         if self._connectButton.get_active():
             self._logger.reset()
-            self._flight = flight.Flight(self._logger)
+            self._flight = flight.Flight(self._logger, self)
 
             acftListModel = self._acftList.get_model()
             self._flight.aircraftType = \

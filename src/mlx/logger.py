@@ -24,8 +24,8 @@ class Logger(object):
                 const.STAGE_PARKING : "Parking",
                 const.STAGE_GOAROUND : "Go-Around",
                 const.STAGE_END : "End" }
-
-    _noGoScore = 10000
+    
+    NO_GO_SCORE = 10000
 
     def __init__(self, output = sys.stdout):
         """Construct the logger."""
@@ -80,13 +80,23 @@ class Logger(object):
             if score<=self._faults[faultID]:
                 return
         self._faults[faultID] = score
-        if score==Logger._noGoScore:
+        if score==Logger.NO_GO_SCORE:
             self.message(timestamp, "%s (NO GO)" % (what))
         else:
             self.message(timestamp, "%s (%.1f)" % (what, score))
 
-    def noGo(self, faultID, timestamp, what, shortReason):
+    def noGo(self, faultID, timestamp, what):
         """Report a No-Go fault."""
-        self.fault(faultID, timestamp, what, Logger._noGoScore)
+        self.fault(faultID, timestamp, what, Logger.NO_GO_SCORE)
 
+    def getScore(self):
+        """Get the score of the flight so far."""
+        totalScore = 100
+        for (id, score) in self._faults.iteritems():
+            if score==Logger.NO_GO_SCORE:
+                return -score
+            else:
+                totalScore -= score
+        return totalScore
+        
 #--------------------------------------------------------------------------------------

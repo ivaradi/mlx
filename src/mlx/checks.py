@@ -485,9 +485,10 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(AntiCollisionLightsChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Anti-collision lights were off"),
-                     1)
+        flight.handleFault(AntiCollisionLightsChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight,
+                                                      "Anti-collision lights were off"),
+                           1)
 
 #---------------------------------------------------------------------------------------
 
@@ -507,9 +508,9 @@ class BankChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(BankChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Bank too steep"),
-                     2)
+        flight.handleFault(BankChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Bank too steep"),
+                           2)
 
 #---------------------------------------------------------------------------------------
 
@@ -536,9 +537,9 @@ class FlapsRetractChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(FlapsRetractChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Flaps retracted"),
-                     20)
+        flight.handleFault(FlapsRetractChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Flaps retracted"),
+                           20)
 
 #---------------------------------------------------------------------------------------
 
@@ -551,9 +552,9 @@ class FlapsSpeedLimitChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(FlapsSpeedLimitChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Flap speed limit fault"),
-                     5)
+        flight.handleFault(FlapsSpeedLimitChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Flap speed limit fault"),
+                           5)
 
 #---------------------------------------------------------------------------------------
 
@@ -566,10 +567,10 @@ class GearsDownChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.noGo(GearsDownChecker, state.timestamp,
-                    "Gears not down at %.0f feet radio altitude" % \
-                    (state.radioAltitude,),
-                    "GEAR DOWN NO GO")
+        flight.handleNoGo(GearsDownChecker, state.timestamp,
+                          "Gears not down at %.0f feet radio altitude" % \
+                          (state.radioAltitude,),
+                          "GEAR DOWN NO GO")
 
 #---------------------------------------------------------------------------------------
 
@@ -581,9 +582,9 @@ class GearSpeedLimitChecker(PatientFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(GearSpeedLimitChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Gear speed limit fault"),
-                     5)
+        flight.handleFault(GearSpeedLimitChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Gear speed limit fault"),
+                           5)
 
 #---------------------------------------------------------------------------------------
 
@@ -596,9 +597,9 @@ class GLoadChecker(SimpleFaultChecker):
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(GLoadChecker, state.timestamp,
-                     "G-load was %.2f" % (state.gLoad,),
-                     10)
+        flight.handleFault(GLoadChecker, state.timestamp,
+                           "G-load was %.2f" % (state.gLoad,),
+                           10)
 
 #---------------------------------------------------------------------------------------
 
@@ -629,9 +630,9 @@ class LandingLightsChecker(PatientFaultChecker):
         """Log the fault."""
         score = 0 if flight.stage==const.STAGE_LANDING else 1
         message = "Landing lights were %s" % (("on" if state.landingLightsOn else "off"),)
-        logger.fault(LandingLightsChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, message),
-                     score)        
+        flight.handleFault(LandingLightsChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, message),
+                           score)   
 
 #---------------------------------------------------------------------------------------
 
@@ -658,10 +659,10 @@ class WeightChecker(PatientFaultChecker):
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         mname = "M" + self._name
-        logger.noGo(self.__class__, state.timestamp,
-                    "%s exceeded: %s is %.0f kg" % \
-                    (mname, self._name, self.getWeight(state)),
-                    "%s NO GO" % (mname,))
+        flight.handleNoGo(self.__class__, state.timestamp,
+                          "%s exceeded: %s is %.0f kg" % \
+                                    (mname, self._name, self.getWeight(state)),
+                          "%s NO GO" % (mname,))
 
     def getWeight(self, state):
         """Get the weight that is interesting for us."""
@@ -720,9 +721,10 @@ class NavLightsChecker(PatientFaultChecker):
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(NavLightsChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Navigation lights were off"),
-                     1)        
+        flight.handleFault(NavLightsChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight,
+                                                      "Navigation lights were off"),
+                           1)
 
 #---------------------------------------------------------------------------------------
 
@@ -738,9 +740,9 @@ class OverspeedChecker(PatientFaultChecker):
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(OverspeedChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Overspeed"),
-                     20)        
+        flight.handleFault(OverspeedChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Overspeed"),
+                           20)        
 
 #---------------------------------------------------------------------------------------
 
@@ -756,9 +758,10 @@ class PayloadChecker(SimpleFaultChecker):
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.noGo(PayloadChecker, state.timestamp,
-                    "ZFW difference is more than %d kgs" % (PayloadChecker.TOLERANCE,),
-                    "ZFW NO GO")
+        flight.handleNoGo(PayloadChecker, state.timestamp,
+                          "ZFW difference is more than %d kgs" % \
+                          (PayloadChecker.TOLERANCE,),
+                          "ZFW NO GO")
 
 #---------------------------------------------------------------------------------------
 
@@ -777,9 +780,9 @@ class PitotChecker(PatientFaultChecker):
         score = 2 if flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
                                       const.STAGE_CRUISE, const.STAGE_DESCENT,
                                       const.STAGE_LANDING] else 0
-        logger.fault(PitotChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Pitot heat was off"),
-                     score)        
+        flight.handleFault(PitotChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Pitot heat was off"),
+                           score)   
 
 #---------------------------------------------------------------------------------------
 
@@ -793,9 +796,10 @@ class ReverserChecker(SimpleFaultChecker):
                            
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(ReverserChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Reverser used below 60 knots"),
-                     15)        
+        flight.handleFault(ReverserChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight,
+                                                      "Reverser used below 60 knots"),
+                           15)        
 
 #---------------------------------------------------------------------------------------
 
@@ -809,9 +813,11 @@ class SpeedChecker(SimpleFaultChecker):
                            
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        logger.fault(SpeedChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Taxi speed over 50 knots"),
-                     FaultChecker._getLinearScore(50, 80, 10, 15, state.groundSpeed))
+        flight.handleFault(SpeedChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight,
+                                                      "Taxi speed over 50 knots"),
+                           FaultChecker._getLinearScore(50, 80, 10, 15,
+                                                        state.groundSpeed))
 
 #---------------------------------------------------------------------------------------
 
@@ -827,9 +833,9 @@ class StallChecker(PatientFaultChecker):
         """Log the fault."""
         score = 40 if flight.stage in [const.STAGE_TAKEOFF,
                                        const.STAGE_LANDING] else 30
-        logger.fault(StallChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Stalled"),
-                     score)        
+        flight.handleFault(StallChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, "Stalled"),
+                           score)   
 
 #---------------------------------------------------------------------------------------
 
@@ -855,9 +861,9 @@ class StrobeLightsChecker(PatientFaultChecker):
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         message = "Strobe lights were %s" % (("on" if state.strobeLightsOn else "off"),)
-        logger.fault(StrobeLightsChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, message),
-                     1)        
+        flight.handleFault(StrobeLightsChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, message),
+                           1)
 
 #---------------------------------------------------------------------------------------
 
@@ -872,9 +878,10 @@ class ThrustChecker(SimpleFaultChecker):
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         print state.n1
-        logger.fault(ThrustChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, "Thrust setting was too high (>97%)"),
-                     FaultChecker._getLinearScore(97, 110, 0, 10, max(state.n1)))
+        flight.handleFault(ThrustChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight,
+                                                      "Thrust setting was too high (>97%)"),
+                           FaultChecker._getLinearScore(97, 110, 0, 10, max(state.n1)))
 
 #---------------------------------------------------------------------------------------
 
@@ -910,8 +917,8 @@ class VSChecker(SimpleFaultChecker):
 
         score = 10 if vs<-8000 or vs>8000 else 0
 
-        logger.fault(VSChecker, state.timestamp,
-                     FaultChecker._appendDuring(flight, message),
-                     score)
+        flight.handleFault(VSChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, message),
+                           score)
 
 #---------------------------------------------------------------------------------------

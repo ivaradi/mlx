@@ -1,3 +1,5 @@
+@echo off
+
 set scriptdir=%~dp0
 
 set PYTHONPATH=%scriptdir%\src;%PYTHONPATH%

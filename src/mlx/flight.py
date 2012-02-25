@@ -63,6 +63,19 @@ class Flight(object):
         else:
             return False
 
+    def handleFault(self, faultID, timestamp, what, score):
+        """Handle the given fault.
+
+        faultID as a unique ID for the given kind of fault. If another fault of
+        this ID has been reported earlier, it will be reported again only if
+        the score is greater than last time. This ID can be, e.g. the checker
+        the report comes from."""
+        self.logger.fault(faultID, timestamp, what, score)
+
+    def handleNoGo(self, faultID, timestamp, what, shortReason):
+        """Handle a No-Go fault."""
+        self.logger.noGo(faultID, timestamp, what)
+
     def flareStarted(self, flareStart, flareStartFS):
         """Called when the flare time has started."""
         self._flareStart = flareStart
