@@ -27,3 +27,39 @@ else:
 
 import cairo
 
+#------------------------------------------------------------------------------
+
+class FlightStatusHandler(object):
+    """Base class for objects that handle the flight status in some way."""
+    def __init__(self):
+        self._stage = None
+        self._rating = 100
+        self._noGoReason = None
+
+    def resetFlightStatus(self):
+        """Reset the flight status."""
+        self._stage = None
+        self._rating = 100
+        self._noGoReason = None
+        self._updateFlightStatus()
+        
+    def setStage(self, stage):
+        """Set the stage of the flight."""
+        if stage!=self._stage:
+            self._stage = stage
+            self._updateFlightStatus()
+
+    def setRating(self, rating):
+        """Set the rating to the given value."""
+        if rating!=self._rating:
+            self._rating = rating
+            if self._noGoReason is None:
+                self._updateFlightStatus()
+
+    def setNoGo(self, reason):
+        """Set a No-Go condition with the given reason."""
+        if self._noGoReason is None:
+            self._noGoReason = reason
+            self._updateFlightStatus()
+
+#------------------------------------------------------------------------------

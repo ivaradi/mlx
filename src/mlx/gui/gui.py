@@ -1,6 +1,7 @@
 # The main file for the GUI
 
 from statusicon import StatusIcon
+from statusbar import Statusbar
 from mlx.gui.common import *
 
 import mlx.const as const
@@ -9,7 +10,6 @@ import mlx.flight as flight
 import mlx.logger as logger
 import mlx.acft as acft
 
-import math
 import time
 
 acftTypes = [ ("Boeing 737-600", const.AIRCRAFT_B736),
@@ -63,7 +63,12 @@ class GUI(fs.ConnectionListener):
         logFrame = self._buildLogFrame()
         logFrame.set_border_width(8)
         mainVBox.pack_start(logFrame, True, True, 0)
-        
+
+        mainVBox.pack_start(gtk.HSeparator(), False, False, 0)
+
+        self._statusbar = Statusbar()
+        mainVBox.pack_start(self._statusbar, False, False, 0)
+
         win.show_all()        
 
         self._mainWindow = win
@@ -81,14 +86,16 @@ class GUI(fs.ConnectionListener):
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
         self._connected = True
-        self._updateConnState()
         self._logger.untimedMessage("Connected to the simulator %s" % (descriptor,))
+        gobject.idle_add(self._statusbar.updateConnection,
+                         self._connecting, self._connected)
         
     def disconnected(self):
         """Called when we have disconnected from the simulator."""
         self._connected = False
-        self._updateConnState()
         self._logger.untimedMessage("Disconnected from the simulator")
+        gobject.idle_add(self._statusbar.updateConnection,
+                         self._connecting, self._connected)
 
     def write(self, msg):
         """Write the given message to the log."""
@@ -100,6 +107,7 @@ class GUI(fs.ConnectionListener):
 
     def resetFlightStatus(self):
         """Reset the status of the flight."""
+        self._statusbar.resetFlightStatus()
         self._statusIcon.resetFlightStatus()
 
     def setStage(self, stage):
@@ -108,6 +116,7 @@ class GUI(fs.ConnectionListener):
 
     def _setStage(self, stage):
         """Set the stage of the flight."""
+        self._statusbar.setStage(stage)
         self._statusIcon.setStage(stage)
 
     def setRating(self, rating):
@@ -116,6 +125,7 @@ class GUI(fs.ConnectionListener):
 
     def _setRating(self, rating):
         """Set the rating of the flight."""
+        self._statusbar.setRating(rating)
         self._statusIcon.setRating(rating)
 
     def setNoGo(self, reason):
@@ -124,6 +134,7 @@ class GUI(fs.ConnectionListener):
 
     def _setNoGo(self, reason):
         """Set the rating of the flight."""
+        self._statusbar.setNoGo(reason)
         self._statusIcon.setNoGo(reason)
 
     def _handleMainWindowState(self, window, event):
@@ -155,30 +166,6 @@ class GUI(fs.ConnectionListener):
         else:
             self.showMainWindow()
             
-    def _drawConnState(self, connStateArea, eventOrContext):
-        """Draw the connection state."""
-        context = eventOrContext if pygobject else connStateArea.window.cairo_create()
-
-        if self._connecting:
-            if self._connected:
-                context.set_source_rgb(0.0, 1.0, 0.0)
-            else:
-                context.set_source_rgb(1.0, 0.0, 0.0)
-        else:
-            context.set_source_rgb(0.75, 0.75, 0.75)
-
-        width = connStateArea.get_allocated_width() if pygobject \
-                else connStateArea.allocation.width
-        height = connStateArea.get_allocated_height() if pygobject \
-                 else connStateArea.allocation.height
-        context.arc(width/2, height/2, 8, 0, 2*math.pi)
-
-        context.fill()
-
-    def _updateConnState(self):
-        """Initiate the updating of the connection state icon."""
-        self._connStateArea.queue_draw()
-
     def _connectToggled(self, button):
         """Callback for the connection button."""
         if self._connectButton.get_active():
@@ -210,7 +197,7 @@ class GUI(fs.ConnectionListener):
             self._simulator.disconnect()
             self._flight = None
 
-        self._updateConnState()
+        self._statusbar.updateConnection(self._connecting, self._connected)
 
     def _buildSetupFrame(self):
         """Build the setup frame."""
@@ -298,25 +285,6 @@ class GUI(fs.ConnectionListener):
         self._connectButton.connect("toggled", self._connectToggled)
 
         setupBox.pack_start(self._connectButton, False, False, 0)
-
-        setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
-
-        self._connStateArea = gtk.DrawingArea()
-        self._connStateArea.set_size_request(16, 16)
-        self._connStateArea.set_tooltip_markup('The state of the connection.\n'
-                                               '<span foreground="grey">Grey</span> means idle.\n'
-                                               '<span foreground="red">Red</span> means trying to connect.\n'
-                                               '<span foreground="green">Green</span> means connected.')
-
-        if pygobject:
-            self._connStateArea.connect("draw", self._drawConnState)
-        else:
-            self._connStateArea.connect("expose_event", self._drawConnState)
-
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5)
-        alignment.add(self._connStateArea)
-
-        setupBox.pack_start(alignment, False, False, 8)
 
         setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
 
