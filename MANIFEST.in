@@ -1,3 +1,4 @@
 include mlx.nsi
 include makeinst.bat
 include license.txt
+include runmlx.py

@@ -7,11 +7,13 @@ from distutils.core import setup
 
 sys.path.insert(0, os.path.join(os.path.dirname(sys.argv[0]), "src"))
 
-import const
+import mlx.const
 
 data_files = []
 if os.name=="nt":
     import py2exe
+
+    data_files.append(("", ["src/mlx/logo.ico"]))
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
@@ -26,7 +28,7 @@ if os.name=="nt":
         data_files.append((path, glob(os.path.join(gtkRuntimeDir, path, "*"))))
         
     with open("mlx-common.nsh", "wt") as f:
-            print >>f, '!define MLX_VERSION "%s"' % (const.VERSION)
+            print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
             f.close()
 
 long_description="""MAVA Logger X
@@ -36,16 +38,18 @@ of a pilot flying a virtual Malév flight operated
 by MAVA."""
 
 setup(name = "mlx",
-      version = const.VERSION,
+      version = mlx.const.VERSION,
       description = "MAVA Logger X",
       long_description = long_description,
       author = "István Váradi",
       author_email = "ivaradi@gmail.com",
       url = "http://mlx.varadiistvan.hu",
       package_dir = { "" : "src" },
-      packages = [""],
+      packages = ["mlx"],
+      package_data = { "mlx" : ["logo.ico", "logo_uninst.ico"] },
       requires = ["pyuipc"],
-      windows = [{ "script" : "src/runmlx.py" }],
+      windows = [{ "script" : "runmlx.py",
+                   "icon_resources" : [(1, "src/mlx/logo.ico")]}],
       options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo"} },
       data_files = data_files,
       platforms = ["Win32", "Linux"],

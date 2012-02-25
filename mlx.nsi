@@ -32,8 +32,8 @@
 ;--------------------------------
 ;Interface Settings
 
-  ;!define MUI_ICON "cflib\cfgui.ico"
-  ;!define MUI_UNICON "cflib\cfgui_uninst.ico"
+  !define MUI_ICON "src/mlx/logo.ico"
+  !define MUI_UNICON "src/mlx/logo_uninst.ico"
   !define MUI_ABORTWARNING
 
 ;--------------------------------

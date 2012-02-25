@@ -11,17 +11,26 @@ import os
 import math
 import time
 
+appIndicator = False
+
 if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     print "Using PyGTK"
     pygobject = False
     import pygtk
     import gtk
     import gobject
+    try:
+        import appindicator
+        appIndicator = True
+    except Exception, e:
+        pass
 else:
     print "Using PyGObject"
     pygobject = True
     from gi.repository import Gtk as gtk
     from gi.repository import GObject as gobject
+    from gi.repository import AppIndicator3 as appindicator
+    appIndicator = True
 
 import cairo
 
@@ -55,6 +64,7 @@ class GUI(fs.ConnectionListener):
         """Build the GUI."""
         win = gtk.Window()
         win.set_title("MAVA Logger X " + const.VERSION)
+        win.set_icon_from_file("logo.ico")
         win.connect("delete-event", gtk.main_quit)
 
         mainVBox = gtk.VBox()
@@ -585,13 +595,103 @@ class GUI(fs.ConnectionListener):
         buffer.insert(buffer.get_end_iter(), msg)
         self._logView.scroll_mark_onscreen(buffer.get_insert())
 
+class TrackerStatusIcon(gtk.StatusIcon):
+	def __init__(self):
+		gtk.StatusIcon.__init__(self)
+		menu = '''
+			<ui>
+			 <menubar name="Menubar">
+			  <menu action="Menu">
+			   <menuitem action="Search"/>
+			   <menuitem action="Preferences"/>
+			   <separator/>
+			   <menuitem action="About"/>
+			  </menu>
+			 </menubar>
+			</ui>
+		'''
+		actions = [
+			('Menu',  None, 'Menu'),
+			('Search', None, '_Search...', None, 'Search files with MetaTracker', self.on_activate),
+			('Preferences', gtk.STOCK_PREFERENCES, '_Preferences...', None, 'Change MetaTracker preferences', self.on_preferences),
+			('About', gtk.STOCK_ABOUT, '_About...', None, 'About MetaTracker', self.on_about)]
+		ag = gtk.ActionGroup('Actions')
+		ag.add_actions(actions)
+		self.manager = gtk.UIManager()
+		self.manager.insert_action_group(ag, 0)
+		self.manager.add_ui_from_string(menu)
+		self.menu = self.manager.get_widget('/Menubar/Menu/About').props.parent
+		search = self.manager.get_widget('/Menubar/Menu/Search')
+		search.get_children()[0].set_markup('<b>_Search...</b>')
+		search.get_children()[0].set_use_underline(True)
+		search.get_children()[0].set_use_markup(True)
+		#search.get_children()[1].set_from_stock(gtk.STOCK_FIND, gtk.ICON_SIZE_MENU)
+		self.set_from_stock(gtk.STOCK_FIND)
+		self.set_tooltip('Tracker Desktop Search')
+		self.set_visible(True)
+		self.connect('activate', self.on_activate)
+		self.connect('popup-menu', self.on_popup_menu)
+
+	def on_activate(self, data):
+		os.spawnlpe(os.P_NOWAIT, 'tracker-search-tool', os.environ)
+
+	def on_popup_menu(self, status, button, time):
+		self.menu.popup(None, None, None, button, time)
+
+	def on_preferences(self, data):
+		print 'preferences'
+
+	def on_about(self, data):
+		dialog = gtk.AboutDialog()
+		dialog.set_name('Tracker')
+		dialog.set_version('0.5.0')
+		dialog.set_comments('A desktop indexing and search tool')
+		dialog.set_website('www.freedesktop.org/Tracker')
+		dialog.run()
+		dialog.destroy()
+
 def main():
     """The main operation of the program."""
     gobject.threads_init()
+
+    # menu = gtk.Menu()  
+    # item = gtk.MenuItem()  
+    # item.set_label("Menu Item")  
+    # item.show()  
+    # menu.append(item)  
+
+    # menu.show()  
+
+    # if appIndicator:
+    #     if pygobject:
+    #         ind = appindicator.Indicator.new ("mava-logger-x",
+    #                                           "/home/vi/munka/repules/mlx/src/logo.ico",
+    #                                           #"indicator-messages",
+    #                                           appindicator.IndicatorCategory.APPLICATION_STATUS)
+    #         ind.set_status (appindicator.IndicatorStatus.ACTIVE)
+    #     else:
+    #         ind = appindicator.Indicator ("mava-logger-x",
+    #                                       "/home/vi/munka/repules/mlx/src/logo.ico",
+    #                                       appindicator.CATEGORY_APPLICATION_STATUS)
+    #         ind.set_status (appindicator.STATUS_ACTIVE)
+
+    #     ind.set_menu(menu)
+    #     #ind.set_icon("distributor-logo")
+    # else:
+    #     def popup_menu(status, button, time):
+    #         menu.popup(None, None, gtk.status_icon_position_menu,
+    #                    button, time, status)
+    #     statusIcon = gtk.StatusIcon()
+    #     #statusIcon.set_from_stock(gtk.STOCK_FIND)
+    #     statusIcon.set_from_file("logo.ico")
+    #     statusIcon.set_tooltip_markup("MAVA Logger X")
+    #     statusIcon.set_visible(True)
+    #     statusIcon.connect('popup-menu', popup_menu)
+
     gui = GUI()
     gui.build()
     gui.run()
-              
+
 if __name__ == "__main__":
     main()
 
