@@ -13,7 +13,7 @@ data_files = []
 if os.name=="nt":
     import py2exe
 
-    data_files.append(("", ["src/mlx/logo.ico"]))
+    data_files.append(("", ["logo.ico"]))
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
@@ -45,11 +45,10 @@ setup(name = "mlx",
       author_email = "ivaradi@gmail.com",
       url = "http://mlx.varadiistvan.hu",
       package_dir = { "" : "src" },
-      packages = ["mlx"],
-      package_data = { "mlx" : ["logo.ico", "logo_uninst.ico"] },
+      packages = ["mlx", "mlx.gui"],
       requires = ["pyuipc"],
       windows = [{ "script" : "runmlx.py",
-                   "icon_resources" : [(1, "src/mlx/logo.ico")]}],
+                   "icon_resources" : [(1, "logo.ico")]}],
       options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo"} },
       data_files = data_files,
       platforms = ["Win32", "Linux"],
