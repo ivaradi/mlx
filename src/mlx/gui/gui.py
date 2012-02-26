@@ -46,7 +46,8 @@ class GUI(fs.ConnectionListener):
         win = gtk.Window()
         win.set_title("MAVA Logger X " + const.VERSION)
         win.set_icon_from_file("logo.ico")
-        win.connect("delete-event", lambda a, b: self.hideMainWindow())
+        win.connect("delete-event",
+                    lambda a, b: self.hideMainWindow())
         win.connect("window-state-event", self._handleMainWindowState)
 
         mainVBox = gtk.VBox()
@@ -142,21 +143,27 @@ class GUI(fs.ConnectionListener):
         iconified = gdk.WindowState.ICONIFIED if pygobject \
                     else gdk.WINDOW_STATE_ICONIFIED
         if (event.changed_mask&iconified)!=0 and (event.new_window_state&iconified)!=0:
-            self.hideMainWindow()
+            self.hideMainWindow(savePosition = False)
 
-    def hideMainWindow(self):
+    def hideMainWindow(self, savePosition = True):
         """Hide the main window and save its position."""
-        (self._mainWindowX, self._mainWindowY) = \
-            self._mainWindow.get_window().get_root_origin()
+        if savePosition:
+            (self._mainWindowX, self._mainWindowY) = \
+                 self._mainWindow.get_window().get_root_origin()
+        else:
+            self._mainWindowX = self._mainWindowY = None
         self._mainWindow.hide()
         self._statusIcon.mainWindowHidden()
         return True
 
     def showMainWindow(self):
         """Show the main window at its former position."""
-        self._mainWindow.move(self._mainWindowX, self._mainWindowY)
-        self._mainWindow.deiconify()
+        if self._mainWindowX is not None and self._mainWindowY is not None:
+            self._mainWindow.move(self._mainWindowX, self._mainWindowY)
+
         self._mainWindow.show()
+        self._mainWindow.deiconify()
+            
         self._statusIcon.mainWindowShown()
 
     def toggleMainWindow(self):

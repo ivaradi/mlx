@@ -15,6 +15,7 @@ class StatusIcon(FlightStatusHandler):
         super(StatusIcon, self).__init__()
 
         self._gui = gui
+        self._selfToggling = False
 
         menu = gtk.Menu()
 
@@ -71,15 +72,21 @@ class StatusIcon(FlightStatusHandler):
 
     def mainWindowHidden(self):
         """Called when the main window is hidden."""
-        self._showHideMenuItem.set_active(False)
+        if self._showHideMenuItem.get_active():
+            self._selfToggling = True
+            self._showHideMenuItem.set_active(False)
 
     def mainWindowShown(self):
         """Called when the main window is shown."""
-        self._showHideMenuItem.set_active(True)
+        if not self._showHideMenuItem.get_active():
+            self._selfToggling = True
+            self._showHideMenuItem.set_active(True)
 
     def _showHideToggled(self, menuitem):
         """Called when the show/hide menu item is toggled."""
-        if self._showHideMenuItem.get_active():
+        if self._selfToggling:
+            self._selfToggling = False
+        elif self._showHideMenuItem.get_active():
             self._gui.showMainWindow()
         else:
             self._gui.hideMainWindow()
