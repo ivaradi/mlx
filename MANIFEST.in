@@ -2,5 +2,6 @@ include mlx.nsi
 include makeinst.bat
 include license.txt
 include runmlx.py
+include mlxupdate.py
 include logo.ico
 include logo_uninst.ico

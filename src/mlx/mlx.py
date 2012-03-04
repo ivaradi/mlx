@@ -1,19 +1,41 @@
 # The main program
 
 from .gui.gui import GUI
-from .gui.common import *
+
+from config import Config
 
 import os
+import sys
 
-def main(iconDirectory):
+#--------------------------------------------------------------------------------------
+
+class StdIOHandler(object):
+    """Handler for the standard I/O messages."""
+    def __init__(self, gui):
+        """Construct the handler."""
+        self._gui = gui
+
+    def write(self, text):
+        """Write the given text into the log."""
+        self._gui.writeStdIO(text)
+
+#--------------------------------------------------------------------------------------
+
+def main():
     """The main operation of the program."""
-    gui = GUI()
+    programDirectory = os.path.dirname(sys.argv[0])
 
-    gui.build(iconDirectory)
+    config = Config()
+    gui = GUI(programDirectory, config)
+
+    sys.stdout = StdIOHandler(gui)
+    sys.stderr = StdIOHandler(gui)
+
+    gui.build(programDirectory)
 
     gui.run()
 
+#--------------------------------------------------------------------------------------
+
 if __name__ == "__main__":
-    main(os.path.dirname(__file__))
-
-
+    main()

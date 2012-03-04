@@ -2,6 +2,7 @@
 
 from statusicon import StatusIcon
 from statusbar import Statusbar
+from update import Updater
 from mlx.gui.common import *
 
 import mlx.const as const
@@ -30,28 +31,31 @@ acftTypes = [ ("Boeing 737-600", const.AIRCRAFT_B736),
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
-    def __init__(self):
+    def __init__(self, programDirectory, config):
         """Construct the GUI."""
         gobject.threads_init()
 
+        self._programDirectory = programDirectory
+        self._config = config
         self._connecting = False
         self._connected = False
         self._logger = logger.Logger(output = self)
         self._flight = None
         self._simulator = None
+        self._stdioAfterNewLine = True
 
     def build(self, iconDirectory):
         """Build the GUI."""
         
-        win = gtk.Window()
-        win.set_title("MAVA Logger X " + const.VERSION)
-        win.set_icon_from_file("logo.ico")
-        win.connect("delete-event",
-                    lambda a, b: self.hideMainWindow())
-        win.connect("window-state-event", self._handleMainWindowState)
+        window = gtk.Window()
+        window.set_title("MAVA Logger X " + const.VERSION)
+        window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
+        window.connect("delete-event",
+                       lambda a, b: self.hideMainWindow())
+        window.connect("window-state-event", self._handleMainWindowState)
 
         mainVBox = gtk.VBox()
-        win.add(mainVBox)
+        window.add(mainVBox)
 
         setupFrame = self._buildSetupFrame()
         setupFrame.set_border_width(8)
@@ -70,15 +74,22 @@ class GUI(fs.ConnectionListener):
         self._statusbar = Statusbar()
         mainVBox.pack_start(self._statusbar, False, False, 0)
 
-        win.show_all()        
+        window.show_all()        
 
-        self._mainWindow = win
+        self._mainWindow = window
 
         self._statusIcon = StatusIcon(iconDirectory, self)
 
     def run(self):
         """Run the GUI."""
+        if self._config.autoUpdate:
+            self._updater = Updater(self._programDirectory,
+                                    self._config.updateURL,
+                                    self._mainWindow)
+            self._updater.start()
+
         gtk.main()
+
         if self._flight is not None:
             simulator = self._flight.simulator
             simulator.stopMonitoring()
@@ -172,6 +183,31 @@ class GUI(fs.ConnectionListener):
             self.hideMainWindow()
         else:
             self.showMainWindow()
+
+    def writeStdIO(self, text):
+        """Write the given text into standard I/O log."""
+        gobject.idle_add(self._writeStdIO, text)
+
+    def _writeStdIO(self, text):
+        """Perform the real writing."""
+        lines = text.splitlines()
+        if text[-1]=="\n":
+            text = ""
+        else:
+            text = lines[-1]
+            lines = lines[:-1]
+            
+        for line in lines:
+            if self._stdioAfterNewLine:
+                line = "[STDIO] " + line
+            self._writeLog(line + "\n")
+            self._stdioAfterNewLine = True
+
+        if text:
+            if self._stdioAfterNewLine:
+                text = "[STDIO] " + text
+            self._writeLog(text)
+            self._stdioAfterNewLine = False
             
     def _connectToggled(self, button):
         """Callback for the connection button."""
