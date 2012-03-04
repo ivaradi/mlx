@@ -12,6 +12,8 @@ import mlx.logger as logger
 import mlx.acft as acft
 
 import time
+import threading
+import sys
 
 acftTypes = [ ("Boeing 737-600", const.AIRCRAFT_B736),
               ("Boeing 737-700", const.AIRCRAFT_B737),
@@ -42,7 +44,12 @@ class GUI(fs.ConnectionListener):
         self._logger = logger.Logger(output = self)
         self._flight = None
         self._simulator = None
+
+        self._stdioLock = threading.Lock()
+        self._stdioText = ""
         self._stdioAfterNewLine = True
+
+        self.toRestart = False
 
     def build(self, iconDirectory):
         """Build the GUI."""
@@ -83,7 +90,8 @@ class GUI(fs.ConnectionListener):
     def run(self):
         """Run the GUI."""
         if self._config.autoUpdate:
-            self._updater = Updater(self._programDirectory,
+            self._updater = Updater(self,
+                                    self._programDirectory,
                                     self._config.updateURL,
                                     self._mainWindow)
             self._updater.start()
@@ -184,12 +192,30 @@ class GUI(fs.ConnectionListener):
         else:
             self.showMainWindow()
 
+    def restart(self):
+        """Quit and restart the application."""
+        self.toRestart = True
+        self._quit()
+
+    def flushStdIO(self):
+        """Flush any text to the standard error that could not be logged."""
+        if self._stdioText:
+            sys.__stderr__.write(self._stdioText)
+            
     def writeStdIO(self, text):
         """Write the given text into standard I/O log."""
-        gobject.idle_add(self._writeStdIO, text)
+        with self._stdioLock:
+            self._stdioText += text
 
-    def _writeStdIO(self, text):
+        gobject.idle_add(self._writeStdIO)
+
+    def _writeStdIO(self):
         """Perform the real writing."""
+        with self._stdioLock:
+            text = self._stdioText
+            self._stdioText = ""
+        if not text: return
+            
         lines = text.splitlines()
         if text[-1]=="\n":
             text = ""
@@ -334,7 +360,7 @@ class GUI(fs.ConnectionListener):
         self._quitButton = gtk.Button(label = "Quit")
         self._quitButton.set_tooltip_text("Quit the program.")
         
-        self._quitButton.connect("clicked", gtk.main_quit)
+        self._quitButton.connect("clicked", self._quit)
 
         setupBox.pack_start(self._quitButton, False, False, 0)
 
@@ -658,6 +684,11 @@ class GUI(fs.ConnectionListener):
         buffer = self._logView.get_buffer()
         buffer.insert(buffer.get_end_iter(), msg)
         self._logView.scroll_mark_onscreen(buffer.get_insert())
+
+    def _quit(self, what = None):
+        """Quit from the application."""
+        self._statusIcon.destroy()
+        return gtk.main_quit()
 
 class TrackerStatusIcon(gtk.StatusIcon):
 	def __init__(self):

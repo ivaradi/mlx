@@ -82,6 +82,16 @@ class StatusIcon(FlightStatusHandler):
             self._selfToggling = True
             self._showHideMenuItem.set_active(True)
 
+    def destroy(self):
+        """Hide and destroy the status icon."""
+        if appIndicator:
+            if pygobject:
+                self._indicator.set_status(appindicator.IndicatorStatus.PASSIVE)
+            else:
+                self._indicator.set_status(appindicator.STATUS_PASSIVE)
+        else:
+            self._statusIcon.set_visible(False)
+        
     def _showHideToggled(self, menuitem):
         """Called when the show/hide menu item is toggled."""
         if self._selfToggling:

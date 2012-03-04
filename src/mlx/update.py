@@ -12,9 +12,6 @@ import socket
 import subprocess
 import hashlib
 
-if os.name=="nt":
-    import win32api
-
 #------------------------------------------------------------------------------
 
 manifestName = "MLXMANIFEST"
@@ -498,16 +495,6 @@ def update(directory, updateURL, listener, fromGUI = False):
         updateFiles(directory, updateURL, listener, updateManifest,
                     modifiedAndNew, removed, localRemoved)
 
-#------------------------------------------------------------------------------
-
-def restart():
-    """Restart the program."""
-    programPath = os.path.join(os.path.dirname(sys.argv[0]),
-                               "runmlx.exe" if os.name=="nt" else "runmlx.sh")
-    if os.name=="nt":
-        programPath = win32api.GetShortPathName(programPath)
-    os.execl(programPath, programPath)
-        
 #------------------------------------------------------------------------------
 
 def updateProcess():

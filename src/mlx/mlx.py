@@ -7,6 +7,9 @@ from config import Config
 import os
 import sys
 
+if os.name=="nt":
+    import win32api
+
 #--------------------------------------------------------------------------------------
 
 class StdIOHandler(object):
@@ -27,13 +30,26 @@ def main():
 
     config = Config()
     gui = GUI(programDirectory, config)
-
+    
     sys.stdout = StdIOHandler(gui)
     sys.stderr = StdIOHandler(gui)
 
-    gui.build(programDirectory)
+    try:
+        gui.build(programDirectory)
+        
+        gui.run()
+    finally:
+        gui.flushStdIO()
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
-    gui.run()
+    if gui.toRestart:
+        programPath = os.path.join(os.path.dirname(sys.argv[0]),
+                                   "runmlx.exe" if os.name=="nt" else "runmlx.sh")
+        if os.name=="nt":
+            programPath = win32api.GetShortPathName(programPath)
+
+        os.execl(programPath, programPath)
 
 #--------------------------------------------------------------------------------------
 

@@ -4,7 +4,7 @@
 
 from mlx.gui.common import *
 
-from mlx.update import update, restart
+from mlx.update import update
 
 import mlx.const as const
 
@@ -95,10 +95,12 @@ class Updater(threading.Thread):
         sudoDialog.set_position(gtk.WindowPosition.CENTER_ON_PARENT if pygobject
                                 else gtk.WIN_POS_CENTER_ON_PARENT)
 
-    def __init__(self, programDirectory, updateURL, parentWindow):
+    def __init__(self, gui, programDirectory, updateURL, parentWindow):
         """Construct the updater. If not created yet, the windows used by the
         updater are also created."""
         super(Updater, self).__init__()
+
+        self._gui = gui
         
         self._programDirectory = programDirectory
         self._updateURL = updateURL
@@ -279,6 +281,6 @@ class Updater(threading.Thread):
         """Called when the OK button on the progress window is clicked."""
         self._progressWindow.hide()
         if self._restart:
-            restart()
+            self._gui.restart()
 
 #-------------------------------------------------------------------------------
