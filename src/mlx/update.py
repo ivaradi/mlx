@@ -10,6 +10,7 @@ import urllib2
 import tempfile
 import socket
 import subprocess
+import hashlib
 
 if os.name=="nt":
     import win32api
@@ -17,6 +18,7 @@ if os.name=="nt":
 #------------------------------------------------------------------------------
 
 manifestName = "MLXMANIFEST"
+toremoveName = "toremove"
 
 #------------------------------------------------------------------------------
 
@@ -42,8 +44,29 @@ class Manifest(object):
         
     def addFile(self, path, size, sum):
         """Add a file to the manifest."""
-        self._files[path] = ( size, sum)
+        self._files[path] = (size, sum)
 
+    def addFiles(self, baseDirectory, subdirectory):
+        """Add the files in the given directory and subdirectories of it to the
+        manifest."""
+        directory = baseDirectory
+        for d in subdirectory: directory = os.path.join(directory, d)
+        
+        for entry in os.listdir(directory):
+            fullPath = os.path.join(directory, entry)
+            if os.path.isfile(fullPath):
+                size = os.stat(fullPath).st_size
+                sum = hashlib.md5()
+                with open(fullPath, "rb") as f:
+                    while True:
+                        data = f.read(4096)
+                        if data: sum.update(data)
+                        else: break
+                self.addFile("/".join(subdirectory + [entry]), size,
+                             sum.hexdigest())
+            elif os.path.isdir(fullPath):
+                self.addFiles(baseDirectory, subdirectory + [entry])
+                
     def readFrom(self, file):
         """Read a manifest from the given file object."""
         for line in iter(file.readline, ""):
@@ -73,7 +96,6 @@ class Manifest(object):
                 modifiedAndNew.append((path, otherSize, otherSum))
 
         removed = [path for path in self._files if path not in other._files]
-        removed.sort(reverse = True)
         
         return (modifiedAndNew, removed)
             
@@ -101,10 +123,11 @@ class ClientListener(object):
         admin-level program :)"""
         assert False
 
-    def setTotalSize(self, numToModifyAndNew, totalSize, numToRemove):
+    def setTotalSize(self, numToModifyAndNew, totalSize, numToRemove,
+                     numToRemoveLocal):
         """Called when starting the downloading of the files."""
         self._send(["setTotalSize", str(numToModifyAndNew), str(totalSize),
-                    str(numToRemove)])
+                    str(numToRemove), str(numToRemoveLocal)])
 
     def setDownloaded(self, downloaded):
         """Called periodically after downloading a certain amount of data."""
@@ -189,6 +212,17 @@ def prepareUpdate(directory, updateURL, listener):
 
 #------------------------------------------------------------------------------
 
+def getToremoveFiles(directory):
+    """Add the files to remove from the toremove directory."""
+    toremove = []
+    toremoveDirectory = os.path.join(directory, toremoveName)
+    if os.path.isdir(toremoveDirectory):
+        for entry in os.listdir(toremoveDirectory):
+            toremove.append(os.path.join(toremoveName, entry))
+    return toremove
+
+#------------------------------------------------------------------------------
+
 def createLocalPath(directory, path):
     """Create a local path from the given manifest path."""
     localPath = directory
@@ -198,17 +232,53 @@ def createLocalPath(directory, path):
 
 #------------------------------------------------------------------------------
 
+def getToremoveDir(toremoveDir, directory):
+    """Get the path of the directory that will contain the files that are to be
+    removed."""
+    if toremoveDir is None:
+        toremoveDir = os.path.join(directory, toremoveName)
+        try:
+            os.mkdir(toremoveDir)
+        except:
+            pass
+
+    return toremoveDir
+
+#------------------------------------------------------------------------------
+
+def removeFile(toremoveDir, directory, path):
+    """Remove the file at the given path or store it in a temporary directory.
+
+    If the removal of the file fails, it will be stored in a temporary
+    directory. This is useful for files thay may be open and cannot be removed
+    right away."""
+    try:
+        os.remove(path)
+    except:
+        try:
+            sum = hashlib.md5()
+            sum.update(path)
+            toremoveDir = getToremoveDir(toremoveDir, directory)
+            os.rename(path, os.path.join(toremoveDir, sum.hexdigest()))
+        except Exception, e:
+            print "Cannot remove file " + path + ": " + str(e)    
+
+#------------------------------------------------------------------------------
+
 def updateFiles(directory, updateURL, listener,
-                manifest, modifiedAndNew, removed):
+                manifest, modifiedAndNew, removed, localRemoved):
     """Update the files according to the given information."""
     totalSize = 0
     for (path, size, sum) in modifiedAndNew:
         totalSize += size
 
-    listener.setTotalSize(len(modifiedAndNew), totalSize, len(removed))
+    listener.setTotalSize(len(modifiedAndNew), totalSize,
+                          len(removed), len(localRemoved))
 
     downloaded = 0
     fin = None
+    toremoveDir = None
+
     try:        
         updateURL += "/" + os.name
 
@@ -232,7 +302,7 @@ def updateFiles(directory, updateURL, listener,
                     listener.setDownloaded(downloaded)
                 fin.close()
                 fin = None
-
+                
         listener.startRenaming()
         count = 0
         for (path, size, sum) in modifiedAndNew:
@@ -240,28 +310,26 @@ def updateFiles(directory, updateURL, listener,
 
             downloadedFile = targetFile + "." + sum
             if os.name=="nt" and os.path.isfile(targetFile):
-                try:
-                    os.remove(targetFile)
-                except:
-                    try:
-                        os.remove(targetFile + ".tmp")
-                    except:
-                        pass
-                    os.rename(targetFile, targetFile + ".tmp")
+                removeFile(toremoveDir, directory, targetFile)
             os.rename(downloadedFile, targetFile)
             count += 1
             listener.renamed(path, count)
         
         listener.startRemoving()
         count = 0
+        removed += localRemoved
+        removed.sort(reverse = True)
         for path in removed:            
-            os.remove(path)
-            count += 1
-            pathDirectory = os.path.dirname(path)
+            removePath = createLocalPath(directory, path)
+            removeFile(toremoveDir, directory, removePath)
+
+            removeDirectory = os.path.dirname(removePath)
             try:
-                os.rmdir(pathDirectory)
+                os.removedirs(removeDirectory)
             except:
                 pass
+
+            count += 1
             listener.removed(path, count)
 
         listener.writingManifest()
@@ -315,7 +383,7 @@ def processMLXUpdate(buffer, listener):
                 listener.downloadedManifest()
             elif command=="setTotalSize":
                 listener.setTotalSize(int(words[1]), long(words[2]),
-                                      int(words[3]))
+                                      int(words[3]), int(words[4]))
             elif command=="setDownloaded":
                 listener.setDownloaded(long(words[1]))
             elif command=="startRenaming":
@@ -416,8 +484,9 @@ def update(directory, updateURL, listener, fromGUI = False):
         return
 
     (manifest, updateManifest, modifiedAndNew, removed) = result        
+    localRemoved = getToremoveFiles(directory)
 
-    if not modifiedAndNew and not removed:
+    if not modifiedAndNew and not removed and not localRemoved:
         listener.done()
         return
 
@@ -427,7 +496,7 @@ def update(directory, updateURL, listener, fromGUI = False):
                        updateManifest)
     else:
         updateFiles(directory, updateURL, listener, updateManifest,
-                    modifiedAndNew, removed)
+                    modifiedAndNew, removed, localRemoved)
 
 #------------------------------------------------------------------------------
 
@@ -457,44 +526,62 @@ def updateProcess():
         updateManifest.readFrom(f)
 
     (modifiedAndNew, removed) = manifest.compare(updateManifest)
+    localRemoved = getToremoveFiles(directory)
 
     updateFiles(directory, config.updateURL,
                 ClientListener(clientSocket),
-                updateManifest, modifiedAndNew, removed)
+                updateManifest, modifiedAndNew, removed, localRemoved)
 
 #------------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    manifest1 = Manifest()
-    manifest1.addFile("file1.exe", 3242, "40398754589435345934")
-    manifest1.addFile("dir/file2.zip", 45645, "347893245873456987")
-    manifest1.addFile("dir/file3.txt", 123, "3432434534534534")
+def buildManifest(directory):
+    """Build a manifest from the contents of the given directory, into the
+    given directory."""
 
-    with open("manifest1", "wt") as f:
-        manifest1.writeInto(f)
+    manifestPath = os.path.join(directory, manifestName)
+    try:
+        os.remove(manifestPath)
+    except:
+        pass
+    
+    manifest = Manifest()
+    manifest.addFiles(directory, [])
+    with open(manifestPath, "wt") as f:
+        manifest.writeInto(f)
 
-    manifest2 = Manifest()
-    manifest2.addFile("file1.exe", 4353, "390734659834756349876")
-    manifest2.addFile("dir/file2.zip", 45645, "347893245873456987")
-    manifest2.addFile("dir/file4.log", 2390, "56546546546546")
+#------------------------------------------------------------------------------
 
-    with open("manifest2", "wt") as f:
-        manifest2.writeInto(f)
+# if __name__ == "__main__":
+#     manifest1 = Manifest()
+#     manifest1.addFile("file1.exe", 3242, "40398754589435345934")
+#     manifest1.addFile("dir/file2.zip", 45645, "347893245873456987")
+#     manifest1.addFile("dir/file3.txt", 123, "3432434534534534")
 
-    manifest1 = Manifest()
-    with open("manifest1", "rt") as f:
-        manifest1.readFrom(f)
+#     with open("manifest1", "wt") as f:
+#         manifest1.writeInto(f)
 
-    manifest2 = Manifest()
-    with open("manifest2", "rt") as f:
-        manifest2.readFrom(f)
+#     manifest2 = Manifest()
+#     manifest2.addFile("file1.exe", 4353, "390734659834756349876")
+#     manifest2.addFile("dir/file2.zip", 45645, "347893245873456987")
+#     manifest2.addFile("dir/file4.log", 2390, "56546546546546")
 
-    (modifiedAndNew, removed) = manifest1.compare(manifest2)
+#     with open("manifest2", "wt") as f:
+#         manifest2.writeInto(f)
 
-    for (path, size, sum) in modifiedAndNew:
-        print "modified or new:", path, size, sum
+#     manifest1 = Manifest()
+#     with open("manifest1", "rt") as f:
+#         manifest1.readFrom(f)
 
-    for path in removed:
-        print "removed:", path
+#     manifest2 = Manifest()
+#     with open("manifest2", "rt") as f:
+#         manifest2.readFrom(f)
+
+#     (modifiedAndNew, removed) = manifest1.compare(manifest2)
+
+#     for (path, size, sum) in modifiedAndNew:
+#         print "modified or new:", path, size, sum
+
+#     for path in removed:
+#         print "removed:", path
 
 #------------------------------------------------------------------------------

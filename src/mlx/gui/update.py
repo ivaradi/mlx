@@ -156,19 +156,22 @@ class Updater(threading.Thread):
             self._sudoReply = result!=0
             self._sudoCondition.notify()
         
-    def setTotalSize(self, numToModifyAndNew, totalSize, numToRemove):
+    def setTotalSize(self, numToModifyAndNew, totalSize, numToRemove,
+                     numToRemoveLocal):
         """Called when the downloading of the files has started."""
         self._numToModifyAndNew = numToModifyAndNew
         self._numModifiedOrNew = 0
         self._totalSize = totalSize
         self._downloaded = 0
         self._numToRemove = numToRemove
+        self._numToRemoveLocal = numToRemoveLocal
         self._numRemoved = 0
 
         self._totalProgress = self._totalSize + \
-                              (self._numToModifyAndNew + self._numToRemove) * \
+                              (self._numToModifyAndNew + \
+                               self._numToRemove + self._numToRemoveLocal) * \
                               Updater.REMOVE2BYTES
-        self._waitAfterFinish = self._totalProgress > 0
+        self._waitAfterFinish = self._totalSize > 0 or self._numToRemove > 0
 
     def _startDownload(self):
         """Called when the download has started."""
@@ -232,7 +235,7 @@ class Updater(threading.Thread):
     def done(self):
         """Called when the update has been done."""
         gobject.idle_add(self._done)
-        self._restart = self._totalProgress>0
+        self._restart = self._waitAfterFinish
 
     def _done(self):
         """Called when the writing of the new manifest file has started."""

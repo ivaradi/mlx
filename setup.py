@@ -5,9 +5,11 @@ import os
 from glob import glob
 from distutils.core import setup
 
-sys.path.insert(0, os.path.join(os.path.dirname(sys.argv[0]), "src"))
+scriptdir=os.path.dirname(sys.argv[0])
+sys.path.insert(0, os.path.join(scriptdir, "src"))
 
 import mlx.const
+import mlx.update
 
 data_files = []
 if os.name=="nt":
@@ -22,10 +24,12 @@ if os.name=="nt":
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
         path = os.path.join("lib", "gtk-2.0", "2.10.0", "engines")
-        data_files.append((path, [os.path.join(gtkRuntimeDir, path, "libwimp.dll")]))
+        data_files.append((os.path.join("library", path),
+                           [os.path.join(gtkRuntimeDir, path, "libwimp.dll")]))
 
         path = os.path.join("share", "themes", "MS-Windows", "gtk-2.0")
-        data_files.append((path, glob(os.path.join(gtkRuntimeDir, path, "*"))))
+        data_files.append((os.path.join("library", path),
+                           glob(os.path.join(gtkRuntimeDir, path, "*"))))
         
     with open("mlx-common.nsh", "wt") as f:
             print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
@@ -51,8 +55,13 @@ setup(name = "mlx",
                    "icon_resources" : [(1, "logo.ico")]},
                  { "script" : "mlxupdate.py",
                    "uac_info" : "requireAdministrator"}],
-      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo"} },
+      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo",
+                               "skip_archive": True} },
+      zipfile = "library/.",
       data_files = data_files,
       platforms = ["Win32", "Linux"],
       license = "Public Domain"
       )
+
+if os.name=="nt":
+    mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
