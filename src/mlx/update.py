@@ -12,6 +12,9 @@ import socket
 import subprocess
 import hashlib
 
+if os.name=="nt":
+    import win32api
+
 #------------------------------------------------------------------------------
 
 manifestName = "MLXMANIFEST"
@@ -425,9 +428,14 @@ def sudoUpdate(directory, updateURL, listener, manifest):
         (_host, port) = serverSocket.getsockname()
         serverSocket.listen(1)
 
-        process = subprocess.Popen([os.path.join(directory, "mlxupdate"),
-                                    str(port), manifestFile],
-                                   shell = os.name=="nt")
+
+        if os.name=="nt":
+            win32api.ShellExecute(0, "open", os.path.join(directory, "mlxupdate"),
+                                  str(port) + " " +  manifestFile, "", 1)
+        else:
+            process = subprocess.Popen([os.path.join(directory, "mlxupdate"),
+                                        str(port), manifestFile],
+                                       shell = os.name=="nt")
 
         (mlxUpdateSocket, _) = serverSocket.accept()
         serverSocket.close()
@@ -445,7 +453,9 @@ def sudoUpdate(directory, updateURL, listener, manifest):
         mlxUpdateSocket.close()
         mlxUpdateSocket = None
 
-        process.wait()
+        if os.name!="nt":
+            process.wait()
+        
     except Exception, e:
         print >> sys.stderr, "Failed updating:", str(e)
         listener.failed(str(e))
@@ -489,8 +499,7 @@ def update(directory, updateURL, listener, fromGUI = False):
 
     if fromGUI and not isDirectoryWritable(directory):
         if listener.needSudo():
-            sudoUpdate(directory, updateURL, listener,
-                       updateManifest)
+            sudoUpdate(directory, updateURL, listener, updateManifest)
     else:
         updateFiles(directory, updateURL, listener, updateManifest,
                     modifiedAndNew, removed, localRemoved)
