@@ -29,6 +29,8 @@ def main():
     programDirectory = os.path.dirname(sys.argv[0])
 
     config = Config()
+    config.load()
+    
     gui = GUI(programDirectory, config)
     
     sys.stdout = StdIOHandler(gui)
@@ -42,6 +44,8 @@ def main():
         gui.flushStdIO()
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
+
+    config.save()
 
     if gui.toRestart:
         programPath = os.path.join(os.path.dirname(sys.argv[0]),
