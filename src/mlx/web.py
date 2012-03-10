@@ -1,0 +1,256 @@
+# Interface towards the websites used
+
+#------------------------------------------------------------------------------
+
+import const
+
+import threading
+import sys
+import urllib2
+import hashlib
+import datetime
+import codecs
+
+#---------------------------------------------------------------------------------------
+
+def readline(f):
+    """Read a line from the given file.
+
+    The line is stripped and empty lines are discarded."""
+    while True:
+        line = f.readline()
+        if not line: return ""
+        line = line.strip()
+        if line:
+            return line
+
+#---------------------------------------------------------------------------------------
+
+class BookedFlight(object):
+    """A flight that was booked."""
+    TYPECODE2TYPE = { "736" : const.AIRCRAFT_B736,
+                      "73G" : const.AIRCRAFT_B737,
+                      "738" : const.AIRCRAFT_B738,
+                      "733" : const.AIRCRAFT_B733,
+                      "734" : const.AIRCRAFT_B734,
+                      "735" : const.AIRCRAFT_B735,
+                      "DH4" : const.AIRCRAFT_DH8D,
+                      "762" : const.AIRCRAFT_B762,
+                      "763" : const.AIRCRAFT_B763,
+                      "CR2" : const.AIRCRAFT_CRJ2,
+                      "F70" : const.AIRCRAFT_F70,
+                      "LI2" : const.AIRCRAFT_DC3,
+                      "TU3" : const.AIRCRAFT_T134,
+                      "TU5" : const.AIRCRAFT_T154,
+                      "YK4" : const.AIRCRAFT_YK40 }
+
+    def __init__(self, id, f):
+        """Construct a booked flight with the given ID.
+
+        The rest of the data is read from the given file."""
+
+        self.id = id
+        self.callsign = readline(f)
+
+        date = readline(f)
+
+        self.departureICAO = readline(f)
+        self.arrivalICAO = readline(f)
+
+        self._readAircraftType(f)
+        self.tailNumber = readline(f)
+        self.numPassengers = int(readline(f))
+        self.numCrew = int(readline(f))
+        self.bagWeight = int(readline(f))
+        self.cargoWeight = int(readline(f))
+        self.mailWeight = int(readline(f))
+        self.route = readline(f)
+
+        departureTime = readline(f)
+        self.departureTime = datetime.datetime.strptime(date + " " + departureTime,
+                                                        "%Y-%m-%d %H:%M:%S")
+                                               
+        arrivalTime = readline(f)
+        self.arrivalTime = datetime.datetime.strptime(date + " " + arrivalTime,
+                                                      "%Y-%m-%d %H:%M:%S")
+
+        if not readline(f)==".NEXT.":
+            raise Exception("Invalid line in flight data")
+
+    def _readAircraftType(self, f):
+        """Read the aircraft type from the given file."""
+        line = readline(f)
+        typeCode = line[:3]
+        if typeCode in self.TYPECODE2TYPE:
+            self.aircraftType = self.TYPECODE2TYPE[typeCode]
+        else:
+            raise Exception("Invalid aircraft type code: '" + typeCode + "'")
+        
+    def __repr__(self):
+        """Get a representation of the flight."""
+        s = "<Flight: %s-%s, %s, %s-%s," % (self.departureICAO,
+                                           self.arrivalICAO,
+                                           self.route,
+                                           self.departureTime, self.arrivalTime)
+        s += " %d %s," % (self.aircraftType, self.tailNumber)
+        s += " pax=%d, crew=%d, bag=%d, cargo=%d, mail=%d" % \
+             (self.numPassengers, self.numCrew,
+              self.bagWeight, self.cargoWeight, self.mailWeight)
+        s += ">"
+        return s
+        
+#------------------------------------------------------------------------------
+
+class Result(object):
+    """A result object.
+
+    An instance of this filled with the appropriate data is passed to the
+    callback function on each request."""
+
+    def __repr__(self):
+        """Get a representation of the result."""
+        s = "<Result:"
+        for (key, value) in self.__dict__.iteritems():
+            s += " " + key + "=" + unicode(value)
+        s += ">"
+        return s
+
+#------------------------------------------------------------------------------
+
+class Request(object):
+    """Base class for requests.
+
+    It handles any exceptions and the calling of the callback.
+
+    If an exception occurs during processing, the callback is called with
+    the two parameters: a boolean value of False, and the exception object.
+
+    If no exception occurs, the callback is called with True and the return
+    value of the run() function.
+
+    If the callback function throws an exception, that is caught and logged
+    to the debug log."""
+    def __init__(self, callback):
+        """Construct the request."""
+        self._callback = callback
+
+    def perform(self):
+        """Perform the request.
+
+        The object's run() function is called. If it throws an exception,
+        the callback is called with False, and the exception. Otherwise the
+        callback is called with True and the return value of the run()
+        function. Any exceptions thrown by the callback are caught and
+        reported."""
+        try:
+            result = self.run()
+            returned = True
+        except Exception, e:
+            result = e
+            returned = False
+
+        try:
+            self._callback(returned, result)
+        except Exception, e:
+            print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + str(e)
+
+#------------------------------------------------------------------------------
+
+class Login(Request):
+    """A login request."""
+    iso88592decoder = codecs.getdecoder("iso-8859-2")
+    
+    def __init__(self, pilotID, password, callback):
+        """Construct the login request with the given pilot ID and
+        password."""
+        super(Login, self).__init__(callback)
+
+        self._pilotID = pilotID
+        self._password = password
+
+    def run(self):
+        """Perform the login request."""
+        md5 = hashlib.md5()
+        md5.update(self._pilotID)
+        pilotID = md5.hexdigest()
+        
+        md5 = hashlib.md5()
+        md5.update(self._password)
+        password = md5.hexdigest()
+
+        url = "http://www.virtualairlines.hu/leker2.php?pid=%s&psw=%s" % \
+              (pilotID, password)
+
+        result = Result()
+
+        f = urllib2.urlopen(url)
+
+        status = readline(f)
+        result.loggedIn = status == ".OK."
+
+        if result.loggedIn:
+            result.pilotName = self.iso88592decoder(readline(f))[0]
+            result.exams = readline(f)
+            result.flights = []
+
+            while True:
+                line = readline(f)
+                if not line or line == "#ENDPIREP": break
+
+                flight = BookedFlight(line, f)
+                result.flights.append(flight)
+
+        return result
+        
+#------------------------------------------------------------------------------
+
+class Handler(threading.Thread):
+    """The handler for the web services.
+
+    It can process one request at a time. The results are passed to a callback
+    function."""
+    def __init__(self):
+        """Construct the handler."""
+        super(Handler, self).__init__()
+
+        self._requests = []
+        self._requestCondition = threading.Condition()
+
+        self.daemon = True
+
+    def login(self, pilotID, password, callback):
+        """Enqueue a login request."""
+        self._addRequest(Login(pilotID, password, callback))
+
+    def run(self):
+        """Process the requests."""
+        while True:
+            with self._requestCondition:
+                while not self._requests:
+                    self._requestCondition.wait()
+                request = self._requests[0]
+                del self._requests[0]
+
+            request.perform()
+    
+    def _addRequest(self, request):
+        """Add the given request to the queue."""
+        with self._requestCondition:
+            self._requests.append(request)
+            self._requestCondition.notify()
+
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import time
+    
+    def callback(returned, result):
+        print returned, unicode(result)
+        
+    handler = Handler()
+    handler.start()
+
+    handler.login("P096", "V5fwj", callback)
+    time.sleep(3)    
+
+#------------------------------------------------------------------------------

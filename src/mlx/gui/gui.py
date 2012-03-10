@@ -10,6 +10,7 @@ import mlx.fs as fs
 import mlx.flight as flight
 import mlx.logger as logger
 import mlx.acft as acft
+import mlx.web as web
 
 import time
 import threading
@@ -48,6 +49,9 @@ class GUI(fs.ConnectionListener):
         self._stdioLock = threading.Lock()
         self._stdioText = ""
         self._stdioAfterNewLine = True
+
+        self.webHandler = web.Handler()
+        self.webHandler.start()
 
         self.toRestart = False
 
