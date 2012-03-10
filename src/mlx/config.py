@@ -3,6 +3,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import sys
 import ConfigParser
 
 #-------------------------------------------------------------------------------
@@ -104,11 +105,13 @@ class Config(object):
         config.set("update", "url", self._updateURL)
 
         try:
-            with open(configPath, "wt") as f:
+            fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,
+                         0600)
+            with os.fdopen(fd, "wt") as f:
                 config.write(f)
             self._modified = False
         except Exception, e:
-            print >> sys.stderr("Failed to update config: " + str(e))
+            print >> sys.stderr, "Failed to update config: " + str(e)
 
     def _getBoolean(self, config, section, option, default):
         """Get the given option as a boolean, if found in the given config,

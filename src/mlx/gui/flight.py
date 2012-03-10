@@ -96,6 +96,7 @@ class LoginPage(Page):
                 config = self._wizard.gui.config
                 config.pilotID = self._pilotID.get_text()
                 config.password = self._password.get_text()
+                config.save()
                 self._wizard.nextPage()
             else:
                 dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
