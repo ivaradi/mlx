@@ -19,10 +19,37 @@ class Config(object):
     def __init__(self):
         """Construct the configuration with default values."""
 
+        self._pilotID = ""
+        self._password = ""
+
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
 
         self._modified = False
+
+    @property
+    def pilotID(self):
+        """Get the pilot ID."""
+        return self._pilotID
+
+    @pilotID.setter
+    def pilotID(self, pilotID):
+        """Set the pilot ID."""
+        if pilotID!=self._pilotID:
+            self._pilotID = pilotID
+            self._modified = True
+
+    @property
+    def password(self):
+        """Get the password."""
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        """Set the password."""
+        if password!=self._password:
+            self._password = password
+            self._modified = True
 
     @property
     def autoUpdate(self):
@@ -53,6 +80,9 @@ class Config(object):
         config = ConfigParser.RawConfigParser()
         config.read(configPath)
 
+        self._pilotID = self._get(config, "login", "id", "")
+        self._password = self._get(config, "login", "password", "")
+
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
                                     Config.DEFAULT_UPDATE_URL)
@@ -64,6 +94,10 @@ class Config(object):
             return
 
         config = ConfigParser.RawConfigParser()
+
+        config.add_section("login")
+        config.set("login", "id", self._pilotID)
+        config.set("login", "password", self._password)
 
         config.add_section("update")
         config.set("update", "auto", self._autoUpdate)

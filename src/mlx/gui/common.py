@@ -16,6 +16,9 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
         appIndicator = True
     except Exception, e:
         pass
+
+    MESSAGETYPE_ERROR = gtk.MESSAGE_ERROR
+    BUTTONSTYPE_OK = gtk.BUTTONS_OK
 else:
     print "Using PyGObject"
     pygobject = True
@@ -24,6 +27,9 @@ else:
     from gi.repository import GObject as gobject
     from gi.repository import AppIndicator3 as appindicator
     appIndicator = True
+
+    MESSAGETYPE_ERROR = gtk.MessageType.ERROR
+    BUTTONSTYPE_OK = gtk.ButtonsType.OK
 
 import cairo
 

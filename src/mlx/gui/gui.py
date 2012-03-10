@@ -4,6 +4,7 @@ from statusicon import StatusIcon
 from statusbar import Statusbar
 from update import Updater
 from mlx.gui.common import *
+from mlx.gui.flight import Wizard
 
 import mlx.const as const
 import mlx.fs as fs
@@ -39,7 +40,7 @@ class GUI(fs.ConnectionListener):
         gobject.threads_init()
 
         self._programDirectory = programDirectory
-        self._config = config
+        self.config = config
         self._connecting = False
         self._connected = False
         self._logger = logger.Logger(output = self)
@@ -68,17 +69,28 @@ class GUI(fs.ConnectionListener):
         mainVBox = gtk.VBox()
         window.add(mainVBox)
 
+        notebook = gtk.Notebook()
+        mainVBox.add(notebook)
+
+        notebook.append_page(Wizard(self), gtk.Label("Flight"))
+
+        dataVBox = gtk.VBox()
+        notebook.append_page(dataVBox, gtk.Label("Data"))
+
         setupFrame = self._buildSetupFrame()
         setupFrame.set_border_width(8)
-        mainVBox.pack_start(setupFrame, False, False, 0)
+        dataVBox.pack_start(setupFrame, False, False, 0)
 
         dataFrame = self._buildDataFrame()
         dataFrame.set_border_width(8)
-        mainVBox.pack_start(dataFrame, False, False, 0)
+        dataVBox.pack_start(dataFrame, False, False, 0)
 
+        logVBox = gtk.VBox()
+        notebook.append_page(logVBox, gtk.Label("Log"))
+        
         logFrame = self._buildLogFrame()
         logFrame.set_border_width(8)
-        mainVBox.pack_start(logFrame, True, True, 0)
+        logVBox.pack_start(logFrame, True, True, 0)
 
         mainVBox.pack_start(gtk.HSeparator(), False, False, 0)
 
@@ -93,10 +105,10 @@ class GUI(fs.ConnectionListener):
 
     def run(self):
         """Run the GUI."""
-        if self._config.autoUpdate:
+        if self.config.autoUpdate:
             self._updater = Updater(self,
                                     self._programDirectory,
-                                    self._config.updateURL,
+                                    self.config.updateURL,
                                     self._mainWindow)
             self._updater.start()
 
