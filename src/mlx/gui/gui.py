@@ -72,10 +72,17 @@ class GUI(fs.ConnectionListener):
         notebook = gtk.Notebook()
         mainVBox.add(notebook)
 
-        notebook.append_page(Wizard(self), gtk.Label("Flight"))
+        self._wizard = Wizard(self)
+        label = gtk.Label("_Flight")
+        label.set_use_underline(True)
+        label.set_tooltip_text("Flight wizard")
+        notebook.append_page(self._wizard, label)
 
         dataVBox = gtk.VBox()
-        notebook.append_page(dataVBox, gtk.Label("Data"))
+        label = gtk.Label("_Data")
+        label.set_use_underline(True)
+        label.set_tooltip_text("FSUIPC data access")
+        notebook.append_page(dataVBox, label)
 
         setupFrame = self._buildSetupFrame()
         setupFrame.set_border_width(8)
@@ -86,7 +93,10 @@ class GUI(fs.ConnectionListener):
         dataVBox.pack_start(dataFrame, False, False, 0)
 
         logVBox = gtk.VBox()
-        notebook.append_page(logVBox, gtk.Label("Log"))
+        label = gtk.Label("_Log")
+        label.set_use_underline(True)
+        label.set_tooltip_text("Flight log")
+        notebook.append_page(logVBox, label)
         
         logFrame = self._buildLogFrame()
         logFrame.set_border_width(8)
@@ -97,7 +107,10 @@ class GUI(fs.ConnectionListener):
         self._statusbar = Statusbar()
         mainVBox.pack_start(self._statusbar, False, False, 0)
 
-        window.show_all()        
+        notebook.connect("switch-page", self._notebookPageSwitch)
+
+        window.show_all()
+        self._wizard.grabDefault()
 
         self._mainWindow = window
 
@@ -373,7 +386,8 @@ class GUI(fs.ConnectionListener):
 
         setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
 
-        self._quitButton = gtk.Button(label = "Quit")
+        self._quitButton = gtk.Button(label = "_Quit", use_underline = True)
+        self._quitButton.set_can_default(True)
         self._quitButton.set_tooltip_text("Quit the program.")
         
         self._quitButton.connect("clicked", self._quit)
@@ -705,6 +719,15 @@ class GUI(fs.ConnectionListener):
         """Quit from the application."""
         self._statusIcon.destroy()
         return gtk.main_quit()
+
+    def _notebookPageSwitch(self, notebook, page, page_num):
+        """Called when the current page of the notebook has changed."""
+        if page_num==0:
+            self._wizard.grabDefault()
+        elif page_num==1:
+            self._quitButton.grab_default()
+        else:
+            self._mainWindow.set_default(None)
 
 class TrackerStatusIcon(gtk.StatusIcon):
 	def __init__(self):

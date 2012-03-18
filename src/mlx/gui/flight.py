@@ -16,7 +16,6 @@ class Page(gtk.Alignment):
         frame = gtk.Frame()
         self.add(frame)
 
-        print self.get_style()
         style = self.get_style() if pygobject else self.rc_get_style()
 
         self._vbox = gtk.VBox()
@@ -55,6 +54,7 @@ class Page(gtk.Alignment):
                                     padding_left = 16, padding_right = 16)
 
         self._buttonBox = gtk.HButtonBox()
+        self._defaultButton = None
         buttonAlignment.add(self._buttonBox)
 
         self._vbox.pack_start(buttonAlignment, False, False, 0)
@@ -65,14 +65,22 @@ class Page(gtk.Alignment):
         """Set the given widget as the main one."""
         self._mainAlignment.add(widget)
 
-    def addButton(self, label):
+    def addButton(self, label, default = False):
         """Add a button with the given label.
 
         Return the button object created."""
         button = gtk.Button(label)
         self._buttonBox.add(button)
+        if default:
+            button.set_can_default(True)
+            self._defaultButton = button
         return button
 
+    def grabDefault(self):
+        """If the page has a default button, make it the default one."""
+        if self._defaultButton is not None:
+            self._defaultButton.grab_default()
+    
 #-----------------------------------------------------------------------------
 
 class LoginPage(Page):
@@ -127,7 +135,7 @@ class LoginPage(Page):
                                               "be able to read it.")
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
-        self._loginButton = self.addButton("_Login")
+        self._loginButton = self.addButton("_Login", default = True)
         self._loginButton.set_sensitive(False)
         self._loginButton.set_use_underline(True)
         self._loginButton.connect("clicked", self._loginClicked)
@@ -231,6 +239,10 @@ class Wizard(gtk.VBox):
     def nextPage(self):
         """Go to the next page."""
         self.setCurrentPage(self._currentPage + 1)
+
+    def grabDefault(self):
+        """Make the default button of the current page the default."""
+        self._pages[self._currentPage].grabDefault()
     
 #-----------------------------------------------------------------------------
 
