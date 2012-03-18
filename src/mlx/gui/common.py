@@ -11,6 +11,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     import gtk.gdk as gdk
     import gtk
     import gobject
+    import pango
     try:
         import appindicator
         appIndicator = True
@@ -26,6 +27,7 @@ else:
     from gi.repository import Gtk as gtk
     from gi.repository import GObject as gobject
     from gi.repository import AppIndicator3 as appindicator
+    from gi.repository import Pango as pango
     appIndicator = True
 
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR

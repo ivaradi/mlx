@@ -4,12 +4,74 @@ from mlx.gui.common import *
 
 #-----------------------------------------------------------------------------
 
-class Page(gtk.VBox):
+class Page(gtk.Alignment):
     """A page in the flight wizard."""
-    def __init__(self, wizard):
+    def __init__(self, wizard, title, help):
         """Construct the page."""
-        super(Page, self).__init__()
+        super(Page, self).__init__(xalign = 0.0, yalign = 0.0,
+                                   xscale = 1.0, yscale = 1.0)
+        self.set_padding(padding_top = 4, padding_bottom = 4,
+                         padding_left = 12, padding_right = 12)
+
+        frame = gtk.Frame()
+        self.add(frame)
+
+        print self.get_style()
+        style = self.get_style() if pygobject else self.rc_get_style()
+
+        self._vbox = gtk.VBox()
+        frame.add(self._vbox)
+
+        eventBox = gtk.EventBox()
+        eventBox.modify_bg(0, style.bg[3])
+
+        alignment = gtk.Alignment(xalign = 0.0, xscale = 0.0)
+        
+        label = gtk.Label(title)
+        label.modify_fg(0, style.fg[3])
+        label.modify_font(pango.FontDescription("bold 24"))
+        alignment.set_padding(padding_top = 4, padding_bottom = 4,
+                              padding_left = 6, padding_right = 0)
+                              
+        alignment.add(label)
+        eventBox.add(alignment)
+        
+        self._vbox.pack_start(eventBox, False, False, 0)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0, yscale = 0.3)
+        label = gtk.Label(help)
+        label.set_justify(gtk.Justification.CENTER if pygobject
+                          else gtk.JUSTIFY_CENTER)
+        alignment.add(label)
+        self._vbox.pack_start(alignment, True, True, 0)
+
+        self._mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                            xscale = 0, yscale = 0.0)
+        self._vbox.pack_start(self._mainAlignment, True, True, 0)
+
+        buttonAlignment =  gtk.Alignment(xalign = 1.0, xscale=0.0)
+        buttonAlignment.set_padding(padding_top = 4, padding_bottom = 10,
+                                    padding_left = 16, padding_right = 16)
+
+        self._buttonBox = gtk.HButtonBox()
+        buttonAlignment.add(self._buttonBox)
+
+        self._vbox.pack_start(buttonAlignment, False, False, 0)
+
         self._wizard = wizard
+
+    def setMainWidget(self, widget):
+        """Set the given widget as the main one."""
+        self._mainAlignment.add(widget)
+
+    def addButton(self, label):
+        """Add a button with the given label.
+
+        Return the button object created."""
+        button = gtk.Button(label)
+        self._buttonBox.add(button)
+        return button
 
 #-----------------------------------------------------------------------------
 
@@ -17,25 +79,15 @@ class LoginPage(Page):
     """The login page."""
     def __init__(self, wizard):
         """Construct the login page."""
-        super(LoginPage, self).__init__(wizard)
-
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0, yscale = 0.3)
-        label = gtk.Label("Enter your pilot's ID and password to\n"
-                          "log in to the MAVA website and download\n"
-                          "your booked flights")
-        label.set_justify(gtk.Justification.CENTER if pygobject
-                          else gtk.JUSTIFY_CENTER)
-        alignment.add(label)
-        self.pack_start(alignment, True, True, 0)
-
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0, yscale = 0.0)
+        help = "Enter your MAVA pilot's ID and password to\n" \
+        "log in to the MAVA website and download\n" \
+        "your booked flights."
+        super(LoginPage, self).__init__(wizard, "Login", help)
 
         table = gtk.Table(2, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
-        alignment.add(table)
+        self.setMainWidget(table)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         labelAlignment.add(gtk.Label("Pilot ID:"))
@@ -54,19 +106,10 @@ class LoginPage(Page):
         self._password.connect("changed", self._setLoginButton)
         table.attach(self._password, 1, 2, 1, 2)
 
-        self.pack_start(alignment, True, True, 0)
-
-        alignment = gtk.Alignment(xalign = 1.0, xscale=0.0)
-        alignment.set_padding(padding_top = 4, padding_bottom = 10,
-                              padding_left = 16, padding_right = 16)
-        
-        self._loginButton = gtk.Button("Login")
+        self._loginButton = self.addButton("Login")
         self._loginButton.set_sensitive(False)
         self._loginButton.connect("clicked", self._loginClicked)
         
-        alignment.add(self._loginButton)
-        self.pack_start(alignment, False, False, 0)
-
         config = self._wizard.gui.config
         self._pilotID.set_text(config.pilotID)
         self._password.set_text(config.password)
@@ -122,8 +165,8 @@ class FlightSelectionPage(Page):
     """The page to select the flight."""
     def __init__(self, wizard):
         """Construct the flight selection page."""
-        super(FlightSelectionPage, self).__init__(wizard)
-        self.pack_start(gtk.Label("Hello, te lo!"), False, False, 0)
+        super(FlightSelectionPage, self).__init__(wizard, "Flight selection",
+                                                  "Hello, te lo!")
 
 #-----------------------------------------------------------------------------
 
