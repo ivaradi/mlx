@@ -376,9 +376,11 @@ class GUI(fs.ConnectionListener):
 
         setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
 
-        self._connectButton = gtk.ToggleButton(label = "Connect")
+        self._connectButton = gtk.ToggleButton(label = "_Connect",
+                                               use_underline = True)
         self._connectButton.set_tooltip_text("Push to connect to Flight Simulator and start a new flight.\n"
                                              "Push again to disconnect from FS.")
+        self._connectButton.set_can_default(True)
         
         self._connectButton.connect("toggled", self._connectToggled)
 
@@ -387,7 +389,6 @@ class GUI(fs.ConnectionListener):
         setupBox.pack_start(gtk.VSeparator(), False, False, 8)    
 
         self._quitButton = gtk.Button(label = "_Quit", use_underline = True)
-        self._quitButton.set_can_default(True)
         self._quitButton.set_tooltip_text("Quit the program.")
         
         self._quitButton.connect("clicked", self._quit)
@@ -725,7 +726,7 @@ class GUI(fs.ConnectionListener):
         if page_num==0:
             self._wizard.grabDefault()
         elif page_num==1:
-            self._quitButton.grab_default()
+            self._connectButton.grab_default()
         else:
             self._mainWindow.set_default(None)
 
