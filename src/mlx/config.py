@@ -22,6 +22,7 @@ class Config(object):
 
         self._pilotID = ""
         self._password = ""
+        self._rememberPassword = False
 
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
@@ -50,6 +51,18 @@ class Config(object):
         """Set the password."""
         if password!=self._password:
             self._password = password
+            self._modified = True
+
+    @property
+    def rememberPassword(self):
+        """Get if we should remember the password."""
+        return self._rememberPassword
+
+    @rememberPassword.setter
+    def rememberPassword(self, rememberPassword):
+        """Set if we should remember the password."""
+        if rememberPassword!=self._rememberPassword:
+            self._rememberPassword = rememberPassword
             self._modified = True
 
     @property
@@ -83,6 +96,8 @@ class Config(object):
 
         self._pilotID = self._get(config, "login", "id", "")
         self._password = self._get(config, "login", "password", "")
+        self._rememberPassword = self._getBoolean(config, "login",
+                                                  "rememberPassword", False)
 
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
@@ -99,9 +114,12 @@ class Config(object):
         config.add_section("login")
         config.set("login", "id", self._pilotID)
         config.set("login", "password", self._password)
+        config.set("login", "rememberPassword",
+                   "yes" if self._rememberPassword else "no")
 
         config.add_section("update")
-        config.set("update", "auto", self._autoUpdate)
+        config.set("update", "auto",
+                   "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
 
         try:

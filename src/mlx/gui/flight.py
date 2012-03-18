@@ -84,35 +84,59 @@ class LoginPage(Page):
         "your booked flights."
         super(LoginPage, self).__init__(wizard, "Login", help)
 
-        table = gtk.Table(2, 2)
+        table = gtk.Table(2, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
         self.setMainWidget(table)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        labelAlignment.add(gtk.Label("Pilot ID:"))
+        label = gtk.Label("Pilot _ID:")
+        label.set_use_underline(True)
+        labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
         self._pilotID = gtk.Entry()
         self._pilotID.connect("changed", self._setLoginButton)
+        self._pilotID.set_tooltip_text("Enter your MAVA pilot's ID. This "
+                                       "usually starts with a "
+                                       "'P' followed by 3 digits.")
         table.attach(self._pilotID, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._pilotID)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        labelAlignment.add(gtk.Label("Password:"))
+        label = gtk.Label("_Password:")
+        label.set_use_underline(True)
+        labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
         self._password = gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed", self._setLoginButton)
+        self._password.set_tooltip_text("Enter the password for your pilot's ID")
         table.attach(self._password, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._password)
 
-        self._loginButton = self.addButton("Login")
+        self._rememberButton = gtk.CheckButton("_Remember password")
+        self._rememberButton.set_use_underline(True)
+        self._rememberButton.set_tooltip_text("If checked, your password will "
+                                              "be stored, so that you should "
+                                              "not have to enter it every time. "
+                                              "Note, however, that the password "
+                                              "is stored as text, and anybody "
+                                              "who can access your files will "
+                                              "be able to read it.")
+        table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
+
+        self._loginButton = self.addButton("_Login")
         self._loginButton.set_sensitive(False)
+        self._loginButton.set_use_underline(True)
         self._loginButton.connect("clicked", self._loginClicked)
+        self._loginButton.set_tooltip_text("Click to log in.")
         
         config = self._wizard.gui.config
         self._pilotID.set_text(config.pilotID)
         self._password.set_text(config.password)
+        self._rememberButton.set_active(config.rememberPassword)
 
     def _setLoginButton(self, entry):
         """Set the login button's sensitivity.
@@ -137,8 +161,15 @@ class LoginPage(Page):
         if returned:
             if result.loggedIn:
                 config = self._wizard.gui.config
+
                 config.pilotID = self._pilotID.get_text()
-                config.password = self._password.get_text()
+
+                rememberPassword = self._rememberButton.get_active()                
+                config.password = self._password.get_text() if rememberPassword  \
+                                  else ""
+
+                config.rememberPassword = rememberPassword
+                
                 config.save()
                 self._wizard.nextPage()
             else:
