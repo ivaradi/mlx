@@ -178,6 +178,7 @@ class LoginPage(Page):
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
+        self._wizard.gui.beginBusy("Logging in...")
         self._wizard.gui.webHandler.login(self._pilotID.get_text(),
                                           self._password.get_text(),
                                           self._loginResultCallback)
@@ -188,6 +189,7 @@ class LoginPage(Page):
 
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
+        self._wizard.gui.endBusy()
         if returned:
             if result.loggedIn:
                 config = self._wizard.gui.config

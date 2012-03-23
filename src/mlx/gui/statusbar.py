@@ -67,6 +67,12 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         
         statusBox.pack_start(self._ratingLabel, False, False, 8)
 
+        self._busyLabel = gtk.Label()
+        self._busyLabel.set_width_chars(30)
+        self._busyLabel.set_tooltip_text("The status of the background tasks.")
+        self._busyLabel.set_alignment(1.0, 0.5)
+        statusBox.pack_start(self._busyLabel, True, True, 8)
+        
         self._updateFlightStatus()
 
     def updateConnection(self, connecting, connected):
@@ -74,6 +80,10 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._connecting = connecting
         self._connected = connected
         self._connStateArea.queue_draw()
+
+    def updateBusyState(self, message):
+        """Update the busy state."""
+        self._busyLabel.set_text("" if message is None else message)
     
     def _drawConnState(self, connStateArea, eventOrContext):
         """Draw the connection state."""

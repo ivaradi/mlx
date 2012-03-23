@@ -116,6 +116,9 @@ class GUI(fs.ConnectionListener):
 
         self._statusIcon = StatusIcon(iconDirectory, self)
 
+        self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH if pygobject
+                                      else gdk.WATCH)
+
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:
@@ -237,6 +240,17 @@ class GUI(fs.ConnectionListener):
             self._stdioText += text
 
         gobject.idle_add(self._writeStdIO)
+
+    def beginBusy(self, message):
+        """Begin a period of background processing."""
+        print dir(self._mainWindow)
+        self._mainWindow.get_window().set_cursor(self._busyCursor)
+        self._statusbar.updateBusyState(message)
+
+    def endBusy(self):
+        """End a period of background processing."""
+        self._mainWindow.get_window().set_cursor(None)
+        self._statusbar.updateBusyState(None)
 
     def _writeStdIO(self):
         """Perform the real writing."""
