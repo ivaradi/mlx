@@ -724,9 +724,9 @@ class GUI(fs.ConnectionListener):
     def _notebookPageSwitch(self, notebook, page, page_num):
         """Called when the current page of the notebook has changed."""
         if page_num==0:
-            self._wizard.grabDefault()
+            gobject.idle_add(self._wizard.grabDefault)
         elif page_num==1:
-            self._connectButton.grab_default()
+            gobject.idle_add(self._connectButton.grab_default)
         else:
             self._mainWindow.set_default(None)
 

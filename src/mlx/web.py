@@ -200,6 +200,10 @@ class Login(Request):
                 flight = BookedFlight(line, f)
                 result.flights.append(flight)
 
+            result.flights.sort(cmp = lambda flight1, flight2:
+                                cmp(flight1.departureTime,
+                                    flight2.departureTime))
+
         return result
         
 #------------------------------------------------------------------------------
