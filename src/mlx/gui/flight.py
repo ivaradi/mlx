@@ -50,6 +50,8 @@ class Page(gtk.Alignment):
         
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                   xscale = 0, yscale = 0.0)
+        alignment.set_padding(padding_top = 0, padding_bottom = 16,
+                              padding_left = 0, padding_right = 0)
 
         label = gtk.Label(help)
         label.set_justify(gtk.Justification.CENTER if pygobject

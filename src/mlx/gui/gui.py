@@ -78,11 +78,18 @@ class GUI(fs.ConnectionListener):
         label.set_tooltip_text("Flight wizard")
         notebook.append_page(self._wizard, label)
 
+
         dataVBox = gtk.VBox()
         label = gtk.Label("_Data")
         label.set_use_underline(True)
         label.set_tooltip_text("FSUIPC data access")
-        notebook.append_page(dataVBox, label)
+
+        if "USE_SCROLLEDDATA" in os.environ:
+            dataScrolledWindow = gtk.ScrolledWindow()
+            dataScrolledWindow.add_with_viewport(dataVBox)
+            notebook.append_page(dataScrolledWindow, label)
+        else:
+            notebook.append_page(dataVBox, label)
 
         setupFrame = self._buildSetupFrame()
         setupFrame.set_border_width(8)
