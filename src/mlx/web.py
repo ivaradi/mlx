@@ -6,6 +6,7 @@ import const
 
 import threading
 import sys
+import urllib
 import urllib2
 import hashlib
 import datetime
@@ -101,6 +102,91 @@ class BookedFlight(object):
         
 #------------------------------------------------------------------------------
 
+class Plane(object):
+    """Information about an airplane in the fleet."""
+    def __init__(self, s):
+        """Build a plane info based on the given string.
+
+        The string consists of three, space-separated fields.
+        The first field is the tail number, the second field is the gate
+        number, the third field is the plane's status as a character."""
+        try:
+            words = s.split(" ")
+            tailNumber = words[0]
+            self.tailNumber = tailNumber
+
+            status = words[2] if len(words)>2 else None
+            self.status = const.PLANE_HOME if status=="H" else \
+                          const.PLANE_AWAY if status=="A" else \
+                          const.PLANE_PARKING if status=="P" else \
+                          const.PLANE_UNKNOWN
+
+            gateNumber = words[1] if len(words)>1 else ""
+            self.gateNumber = gateNumber if gateNumber else None
+
+        except:
+            print >> sys.stderr, "Plane string is invalid: '" + s + "'"
+            self.tailNumber = None
+
+    def __repr__(self):
+        """Get the representation of the plane object."""
+        s = "<Plane: %s %s" % (self.tailNumber, 
+                               "home" if self.status==const.PLANE_HOME else \
+                               "away" if self.status==const.PLANE_AWAY else \
+                               "parking" if self.status==const.PLANE_PARKING \
+                               else "unknown")
+        if self.gateNumber is not None:
+            s += " (gate " + self.gateNumber + ")"
+        s += ">"
+        return s
+        
+
+#------------------------------------------------------------------------------
+
+class Fleet(object):
+    """Information about the whole fleet."""
+    def __init__(self, f):
+        """Construct the fleet information by reading the given file object."""
+        self._planes = {}
+        while True:
+            line = readline(f)
+            if not line or line == "#END": break
+
+            plane = Plane(line)
+            if plane.tailNumber is not None:
+                self._planes[plane.tailNumber] = plane        
+
+    def isGateConflicting(self, plane):
+        """Check if the gate of the given plane conflicts with another plane's
+        position."""
+        for p in self._planes.itervalues():
+            if p.tailNumber!=plane.tailNumber and \
+               p.status==const.PLANE_HOME and \
+               p.gateNumber==plane.gateNumber:
+                return True
+
+        return False
+
+    def getOccupiedGateNumbers(self):
+        """Get a set containing the numbers of the gates occupied by planes."""
+        gateNumbers = set()
+        for p in self._planes.itervalues():
+            if p.status==const.PLANE_HOME and p.gateNumber:
+                gateNumbers.add(p.gateNumber)
+        return gateNumbers
+        
+    def __getitem__(self, tailNumber):
+        """Get the plane with the given tail number.
+
+        If the plane is not in the fleet, None is returned."""
+        return self._planes[tailNumber] if tailNumber in self._planes else None
+
+    def __repr__(self):
+        """Get the representation of the fleet object."""
+        return self._planes.__repr__()
+        
+#------------------------------------------------------------------------------
+
 class Result(object):
     """A result object.
 
@@ -160,7 +246,7 @@ class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
     
-    def __init__(self, pilotID, password, callback):
+    def __init__(self, callback, pilotID, password):
         """Construct the login request with the given pilot ID and
         password."""
         super(Login, self).__init__(callback)
@@ -204,8 +290,63 @@ class Login(Request):
                                 cmp(flight1.departureTime,
                                     flight2.departureTime))
 
+        f.close()
+
         return result
         
+#------------------------------------------------------------------------------
+
+class GetFleet(Request):
+    """Request to get the fleet from the website."""
+    
+    def __init__(self, callback):
+        """Construct the fleet request."""
+        super(GetFleet, self).__init__(callback)
+
+    def run(self):
+        """Perform the login request."""
+        url = "http://www.virtualairlines.hu/onlinegates_get.php"
+
+        f = urllib2.urlopen(url)
+        result = Result()
+        result.fleet = Fleet(f)
+        f.close()
+        
+        return result
+
+#------------------------------------------------------------------------------
+
+class UpdatePlane(Request):
+    """Update the status of one of the planes in the fleet."""
+    def __init__(self, callback, tailNumber, status, gateNumber = None):
+        """Construct the request."""
+        super(UpdatePlane, self).__init__(callback)
+        self._tailNumber = tailNumber
+        self._status = status
+        self._gateNumber = gateNumber
+
+    def run(self):
+        """Perform the plane update."""
+        url = "http://www.virtualairlines.hu/onlinegates_set.php"
+
+        status = "H" if self._status==const.PLANE_HOME else \
+                 "A" if self._status==const.PLANE_AWAY else \
+                 "P" if self._status==const.PLANE_PARKING else ""
+
+        gateNumber = self._gateNumber if self._gateNumber else ""
+
+        data = urllib.urlencode([("lajstrom", self._tailNumber),
+                                 ("status", status),
+                                 ("kapu", gateNumber)])
+        
+        f = urllib2.urlopen(url, data)
+        line = readline(f)
+        
+        result = Result()
+        result.success = line == "OK"
+
+        return result
+            
 #------------------------------------------------------------------------------
 
 class Handler(threading.Thread):
@@ -222,10 +363,18 @@ class Handler(threading.Thread):
 
         self.daemon = True
 
-    def login(self, pilotID, password, callback):
+    def login(self, callback, pilotID, password):
         """Enqueue a login request."""
-        self._addRequest(Login(pilotID, password, callback))
+        self._addRequest(Login(callback, pilotID, password))
 
+    def getFleet(self, callback):
+        """Enqueue a fleet retrieval request."""
+        self._addRequest(GetFleet(callback))
+        
+    def updatePlane(self, callback, tailNumber, status, gateNumber = None):
+        """Update the status of the given plane."""        
+        self._addRequest(UpdatePlane(callback, tailNumber, status, gateNumber))
+        
     def run(self):
         """Process the requests."""
         while True:
@@ -254,7 +403,12 @@ if __name__ == "__main__":
     handler = Handler()
     handler.start()
 
-    handler.login("P096", "V5fwj", callback)
+    #handler.login(callback, "P096", "V5fwj")
+    #handler.getFleet(callback)
+    # Plane: HA-LEG home (gate 67)
+    handler.updatePlane(callback, "HA-LQC", const.PLANE_AWAY, "72")
+    time.sleep(3)    
+    handler.getFleet(callback)
     time.sleep(3)    
 
 #------------------------------------------------------------------------------

@@ -250,7 +250,6 @@ class GUI(fs.ConnectionListener):
 
     def beginBusy(self, message):
         """Begin a period of background processing."""
-        print dir(self._mainWindow)
         self._mainWindow.get_window().set_cursor(self._busyCursor)
         self._statusbar.updateBusyState(message)
 
@@ -284,7 +283,7 @@ class GUI(fs.ConnectionListener):
                 text = "[STDIO] " + text
             self._writeLog(text)
             self._stdioAfterNewLine = False
-            
+
     def _connectToggled(self, button):
         """Callback for the connection button."""
         if self._connectButton.get_active():

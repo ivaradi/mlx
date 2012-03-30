@@ -16,7 +16,7 @@ import codecs
 if os.name == "nt":
     import pyuipc
 else:
-    import pyuipc_emu as pyuipc
+    import pyuipc_sim as pyuipc
 
 #------------------------------------------------------------------------------
 

@@ -114,6 +114,44 @@ STAGE_END = 12
 
 #-------------------------------------------------------------------------------
 
+# Plane status: unknown
+PLANE_UNKNOWN = 0
+
+# Plane status: at home, i.e. LHBP
+PLANE_HOME = 1
+
+# Plane status: away
+PLANE_AWAY = 2
+
+# Plane status: parking
+PLANE_PARKING = 3
+
+#-------------------------------------------------------------------------------
+
+# The available gates at LHBP
+lhbpGateNumbers = []
+
+for i in range(1, 7):
+    lhbpGateNumbers.append(str(i))
+
+for i in range(10, 19):
+    lhbpGateNumbers.append(str(i))
+
+for i in range(24, 28):
+    lhbpGateNumbers.append(str(i))
+
+for i in range(31, 39):
+    lhbpGateNumbers.append(str(i))
+
+for i in range(42, 47):
+    lhbpGateNumbers.append(str(i))
+
+for i in range(60, 84):
+    if i!=70 and i!=80:
+        lhbpGateNumbers.append(str(i))
+
+#-------------------------------------------------------------------------------
+
 _stageStrings = { STAGE_BOARDING : "boarding",
                   STAGE_PUSHANDTAXI : "pushback and taxi",
                   STAGE_TAKEOFF : "takeoff",
