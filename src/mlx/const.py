@@ -10,6 +10,9 @@ VERSION="0.004"
 # The ratio between lbs and kg
 LBSTOKG=0.4536
 
+# The ratio between kgs and lbs
+KGSTOLB=1/LBSTOKG
+
 # The ratio between feet and metre
 FEETTOMETRES=0.3048
 

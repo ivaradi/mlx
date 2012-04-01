@@ -461,7 +461,7 @@ class DC3(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: left, right, left aux, right aix
+    - fuel: left, right, left aux, right aux
     - rpm: left, right
     - reverser: left, right."""
     def __init__(self, flight):
