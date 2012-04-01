@@ -3,7 +3,13 @@
 
 import const
 
+import cmd
+import threading
+import socket
 import time
+import sys
+import struct
+import cPickle
 
 #------------------------------------------------------------------------------
 
@@ -135,14 +141,14 @@ class Values(object):
     @staticmethod
     def _convertFrequency(frequency):
         """Convert the given frequency into BCD."""
-        return Values._convertBCD(int(frequency-100.0)*100)
+        return Values._convertBCD(int(frequency*100.0))
 
     @staticmethod
     def _convertBCD(value):
         """Convert the given value into BCD format."""
         bcd = (value/1000) % 10
         bcd <<= 4
-        bcd |= (value/100) & 10
+        bcd |= (value/100) % 10
         bcd <<= 4
         bcd |= (value/10) % 10
         bcd <<= 4
@@ -295,13 +301,13 @@ class Values(object):
         elif offset==0x0b90:       # Left tip tank capacity
             return self._getFuelCapacity(self.FUEL_LEFT_TIP)
         elif offset==0x0b94:       # Right aux tank level
-            return self._getFuelLevel(self.FUEL_RIGHT_AUX)
-        elif offset==0x0b98:       # Right aux tank capacity
-            return self._getFuelCapacity(self.FUEL_RIGHT_AUX)
-        elif offset==0x0b9c:       # Right tank level
             return self._getFuelLevel(self.FUEL_RIGHT)
-        elif offset==0x0ba0:       # Right tank capacity
+        elif offset==0x0b98:       # Right aux tank capacity
             return self._getFuelCapacity(self.FUEL_RIGHT)
+        elif offset==0x0b9c:       # Right tank level
+            return self._getFuelLevel(self.FUEL_RIGHT_AUX)
+        elif offset==0x0ba0:       # Right tank capacity
+            return self._getFuelCapacity(self.FUEL_RIGHT_AUX)
         elif offset==0x0ba4:       # Right tip tank level
             return self._getFuelLevel(self.FUEL_RIGHT_TIP)
         elif offset==0x0ba8:       # Right tip tank capacity
@@ -366,7 +372,7 @@ class Values(object):
         elif offset==0x2200:       # Engine #3 N1
             return self.n1[self.ENGINE_3]
         elif offset==0x30c0:       # Grossweight
-            return (self.zfw + sum(self.fuelWeights)) * const.KGSTOLB
+            return int((self.zfw + sum(self.fuelWeights)) * const.KGSTOLB)
         elif offset==0x31e4:       # Radio altitude
             # FIXME: if self.radioAltitude is None, calculate from the 
             # altitude with some, perhaps random, ground altitude
@@ -377,7 +383,7 @@ class Values(object):
         elif offset==0x3364:       # Frozen
             return 1 if self.frozen else 0
         elif offset==0x3bfc:       # ZFW
-            return int(self.zfw) * 256.0 * const.KGSTOLB
+            return int(self.zfw * 256.0 * const.KGSTOLB)
         elif offset==0x3c00:       # Path of the current AIR file
             return self.airPath
         elif offset==0x3d00:       # Name of the current aircraft
@@ -436,5 +442,160 @@ def read(data):
 def close():
     """Close the connection."""
     pass
+
+#------------------------------------------------------------------------------
+
+PORT=15015
+
+CALL_READ=1
+CALL_WRITE=2
+CALL_CLOSE=3
+
+RESULT_RETURNED=1
+RESULT_EXCEPTION=2
+
+#------------------------------------------------------------------------------
+
+class Server(threading.Thread):
+    """The server thread."""
+    def __init__(self):
+        """Construct the thread."""
+        super(Server, self).__init__()
+        self.daemon = True
+
+    def run(self):
+        """Perform the server's operation."""
+        serverSocket = socket.socket()
+
+        serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        serverSocket.bind(("", PORT))
+    
+        serverSocket.listen(5)
+    
+        while True:
+            (clientSocket, clientAddress) = serverSocket.accept()
+            thread = threading.Thread(target = self._process, args=(clientSocket,))
+            thread.start()
+
+    def _process(self, clientSocket):
+        """Process the commands arriving on the given socket."""
+        socketFile = clientSocket.makefile()
+        try:
+            while True:                
+                (length,) = struct.unpack("I", clientSocket.recv(4))
+                data = clientSocket.recv(length)
+                (call, args) = cPickle.loads(data)
+                exception = None
+                
+                try:
+                    if call==CALL_READ:
+                        result = read(args[0])
+                    elif call==CALL_WRITE:
+                        result = write(args[0])
+                    else:
+                        break
+                except Exception, e:
+                    exception = e
+
+                if exception is None:
+                    data = cPickle.dumps((RESULT_RETURNED, result))
+                else:
+                    data = cPickle.dumps((RESULT_EXCEPTION, exception))
+                clientSocket.send(struct.pack("I", len(data)) + data)
+        except Exception, e:
+            print >> sys.stderr, "pyuipc_sim.Server._process: failed with exception:", str(e)
+        finally:
+            try:
+                socketFile.close()
+            except:
+                pass
+            clientSocket.close()
+                   
+#------------------------------------------------------------------------------
+
+class Client(object):
+    """Client to the server."""
+    def __init__(self, serverHost):
+        """Construct the client and connect to the given server
+        host."""
+        self._socket = socket.socket()
+        self._socket.connect((serverHost, PORT))
+
+        self._socketFile = self._socket.makefile()
+
+    def read(self, data):
+        """Read the given data."""
+        data = cPickle.dumps((CALL_READ, [data]))
+        self._socket.send(struct.pack("I", len(data)) + data)
+        (length,) = struct.unpack("I", self._socket.recv(4))
+        data = self._socket.recv(length)
+        (resultCode, result) = cPickle.loads(data)
+        if resultCode==RESULT_RETURNED:
+            return result
+        else:
+            raise result
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+# FIXME: implement proper completion and history
+class CLI(threading.Thread, cmd.Cmd):
+    """The command-line interpreter."""
+    def __init__(self, clientSocket):
+        """Construct the CLI."""
+        self._socket = clientSocket
+        self._socketFile = clientSocket.makefile("rwb")
+        
+        threading.Thread.__init__(self)
+        cmd.Cmd.__init__(self,
+                         stdin = self._socketFile, stdout = self._socketFile)
+        
+        self.use_rawinput = False
+        self.intro = "\nPyUIPC simulator command prompt\n"
+        self.prompt = "PyUIPC> "
+
+        self.daemon = True
+
+    def run(self):
+        """Execute the thread."""
+        try:
+            self.cmdloop()
+        except Exception, e:
+            print "pyuipc_sim.CLI.run: command loop terminated abnormally: " + str(e)
+            
+        try:
+            self._socketFile.close()
+        except:
+            pass
+        
+        self._socket.close()
+
+    def do_set(self, args):
+        """Handle the set command."""
+        words = args.split()
+        if len(words)==2:
+            variable = words[0]
+            if variable in ["zfw"]:
+                values.__setattr__(variable, float(words[1]))
+            else:
+                print >> self._socketFile, "Unhandled variable: " + variable
+        return False
+
+    def help_set(self):
+        """Print help for the set command."""
+        print >> self._socketFile, "set <variable> <value>"
+
+    def do_quit(self, args):
+        """Handle the quit command."""
+        return True
+
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    client = Client("127.0.0.1")
+    print client.read([(0x3bfc, "d")])
+else:
+    server = Server()
+    server.start()    
 
 #------------------------------------------------------------------------------
