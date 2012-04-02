@@ -7,6 +7,7 @@ import cmd
 import threading
 import socket
 import time
+import calendar
 import sys
 import struct
 import cPickle
@@ -139,12 +140,12 @@ class Values(object):
     ENGINE_3 = 2
 
     @staticmethod
-    def _convertFrequency(frequency):
+    def _readFrequency(frequency):
         """Convert the given frequency into BCD."""
-        return Values._convertBCD(int(frequency*100.0))
+        return Values._readBCD(int(frequency*100.0))
 
     @staticmethod
-    def _convertBCD(value):
+    def _readBCD(value):
         """Convert the given value into BCD format."""
         bcd = (value/1000) % 10
         bcd <<= 4
@@ -153,6 +154,24 @@ class Values(object):
         bcd |= (value/10) % 10
         bcd <<= 4
         bcd |= value % 10
+        return bcd
+        
+    @staticmethod
+    def _writeFrequency(value):
+        """Convert the given value into a frequency."""
+        return (Values._writeBCD(value) + 10000) / 100.0
+
+    @staticmethod
+    def _writeBCD(value):
+        """Convert the given BCD value into a real value."""
+        bcd = (value>>24) & 0xf
+        bcd *= 10
+        bcd += (value>>16) & 0xf
+        bcd *= 10
+        bcd += (value>>8) & 0xf
+        bcd *= 10
+        bcd += (value>>0) & 0xf
+
         return bcd
         
     def __init__(self):
@@ -253,13 +272,13 @@ class Values(object):
         elif offset==0x0330:       # Altimeter
             return int(self.altimeter * 16.0)
         elif offset==0x0350:       # NAV1
-            return Values._convertFrequency(self.nav1)
+            return Values._readFrequency(self.nav1)
         elif offset==0x0352:       # NAV2
-            return Values._convertFrequency(self.nav2)
+            return Values._readFrequency(self.nav2)
         elif offset==0x0354:       # Squawk
-            return Values._convertBCD(self.squawk)
-        elif offset==0x0366:       # Stalled
-            return 1 if self.stalled else 0
+            return Values._readBCD(self.squawk)
+        elif offset==0x0366:       # On the ground
+            return 1 if self.onTheGround else 0
         elif offset==0x036c:       # Stalled
             return 1 if self.stalled else 0
         elif offset==0x036d:       # Overspeed
@@ -391,6 +410,171 @@ class Values(object):
         else:
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
+
+    def write(self, offset, value):
+        """Write the value at the given offset."""
+        try:
+            return self._write(offset, value)
+        except Exception, e:
+            print "failed to write offset %04x: %s" % (offset, str(e))
+            raise FSUIPCException(ERR_DATA)
+
+    def _write(self, offset, value):
+        """Write the given value at the given offset."""
+        if offset==0x023a:         # Second of time
+            self._updateTimeOffset(5, value)
+        elif offset==0x023b:       # Hour of Zulu time
+            self._updateTimeOffset(3, value)
+        elif offset==0x023c:       # Minute of Zulu time
+            self._updateTimeOffset(4, value)
+        elif offset==0x023e:       # Day number in the year
+            self._updateTimeOffset(7, value)
+        elif offset==0x0240:       # Year in FS
+            self._updateTimeOffset(0, value)
+        elif offset==0x0264:       # Paused
+            self.paused = value!=0
+        elif offset==0x029c:       # Pitot
+            self.pitot = value!=0
+        elif offset==0x02b4:       # Ground speed
+            # FIXME: calculate TAS using the heading and the wind, and
+            # then IAS based on the altitude
+            self.ias = value * 3600.0 / 65536.0 / 1852.0
+        elif offset==0x02bc:       # IAS
+            self.ias = value / 128.0
+        elif offset==0x02c8:       # VS
+            self.vs = value * 60.0 / const.FEETTOMETRES / 256.0
+        elif offset==0x0330:       # Altimeter
+            self.altimeter = value / 16.0
+        elif offset==0x0350:       # NAV1
+            self.nav1 = Values._writeFrequency(value)
+        elif offset==0x0352:       # NAV2
+            self.nav2 = Values._writeFrequency(value)
+        elif offset==0x0354:       # Squawk
+            self.squawk = Values._writeBCD(value)
+        elif offset==0x0366:       # Stalled
+            self.onTheGround = value!=0
+        elif offset==0x036c:       # Stalled
+            self.stalled = value!=0
+        elif offset==0x036d:       # Overspeed
+            self.overspeed = value!=0
+        elif offset==0x0570:       # Altitude
+            self.altitude = value / const.FEETTOMETRES / 65536.0 / 65536.0
+        elif offset==0x0578:       # Pitch
+            self.pitch = value * 360.0 / 65536.0 / 65536.0
+        elif offset==0x057c:       # Bank
+            self.bank = value * 360.0 / 65536.0 / 65536.0
+        elif offset==0x0580:       # Heading
+            self.heading = value * 360.0 / 65536.0 / 65536.0
+        elif offset==0x05dc:       # Slew
+            self.slew = value!=0
+        elif offset==0x0628:       # Replay
+            self.replay = value!=0
+        elif offset==0x088c:       # Engine #1 throttle
+            self._setThrottle(self.ENGINE_1, value)
+        elif offset==0x0924:       # Engine #2 throttle
+            self._setThrottle(self.ENGINE_2, value)
+        elif offset==0x09bc:       # Engine #3 throttle
+            self._setThrottle(self.ENGINE_3, value)
+        elif offset==0x0af4:       # Fuel weight
+            self.fuelWeight = value / 256.0
+        elif offset==0x0b74:       # Centre tank level
+            self._setFuelLevel(self.FUEL_CENTRE, value)
+        elif offset==0x0b78:       # Centre tank capacity
+            self._setFuelCapacity(self.FUEL_CENTRE, value)
+        elif offset==0x0b7c:       # Left tank level
+            self._setFuelLevel(self.FUEL_LEFT, value)
+        elif offset==0x0b80:       # Left tank capacity
+            self._setFuelCapacity(self.FUEL_LEFT, value)
+        elif offset==0x0b84:       # Left aux tank level
+            self._setFuelLevel(self.FUEL_LEFT_AUX, value)
+        elif offset==0x0b88:       # Left aux tank capacity
+            self._setFuelCapacity(self.FUEL_LEFT_AUX, value)
+        elif offset==0x0b8c:       # Left tip tank level
+            self._setFuelLevel(self.FUEL_LEFT_TIP, value)
+        elif offset==0x0b90:       # Left tip tank capacity
+            self._setFuelCapacity(self.FUEL_LEFT_TIP, value)
+        elif offset==0x0b94:       # Right aux tank level
+            self._setFuelLevel(self.FUEL_RIGHT, value)
+        elif offset==0x0b98:       # Right aux tank capacity
+            self._setFuelCapacity(self.FUEL_RIGHT, value)
+        elif offset==0x0b9c:       # Right tank level
+            self._setFuelLevel(self.FUEL_RIGHT_AUX, value)
+        elif offset==0x0ba0:       # Right tank capacity
+            self._setFuelCapacity(self.FUEL_RIGHT_AUX, value)
+        elif offset==0x0ba4:       # Right tip tank level
+            self._setFuelLevel(self.FUEL_RIGHT_TIP, value)
+        elif offset==0x0ba8:       # Right tip tank capacity
+            self._setFuelCapacity(self.FUEL_RIGHT_TIP, value)
+        elif offset==0x0bc8:       # Parking
+            self.parking = value!=0
+        elif offset==0x0bcc:       # Spoilers armed
+            self.spoilersArmed = value!=0
+        elif offset==0x0bd0:       # Spoilers
+            self.spoilters = 0 if value==0 \
+                             else (value - 4800) / (16383 - 4800)
+        elif offset==0x0bdc:       # Flaps control
+            numNotchesM1 = len(self.flapsNotches) - 1
+            flapsIncrement = 16383.0 / numNotchesM1
+            index = value / flapsIncrement
+            if index>=numNotchesM1:
+                self.flapsControl = self.flapsNotches[-1]
+            else:
+                self.flapsControl = self.flapsNotches[index]
+                self.flapsControl += value * \
+                    (self.flapsNotches[index+1] - self.flapsNotches[index]) / \
+                    flapsIncrement
+        elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
+            self.flaps = value * self.flapsNotches[-1] / 16383.0
+        elif offset==0x0bec:       # Nose gear
+            self.noseGear = value / 16383.0
+        elif offset==0x0d0c:       # Lights
+            self.navLightsOn = (lights&0x01)!=0
+            self.antiCollisionLightsOn = (lights&0x02)!=0
+            self.landingLightsOn = (lights&0x04)!=0 
+            self.strobeLightsOn = (lights&0x10)!=0 
+        elif offset==0x0e90:       # Wind speed
+            self.windSpeed = value
+        elif offset==0x0e92:       # Wind direction
+            self.windDirection = value * 360.0 / 65536.0
+        elif offset==0x11ba:       # G-Load
+            self.gLoad = value / 625.0
+        elif offset==0x11c6:       # Mach
+            # FIXME: calculate IAS using the altitude and QNH
+            self.ias = value / 0.05 / 20480
+        elif offset==0x1244:       # Centre 2 tank level
+            self._setFuelLevel(self.FUEL_CENTRE_2, value)
+        elif offset==0x1248:       # Centre 2 tank capacity
+            self._setFuelCapacity(self.FUEL_CENTRE_2, value)
+        elif offset==0x1254:       # External 1 tank level
+            self._setFuelLevel(self.FUEL_EXTERNAL_1, value)
+        elif offset==0x1258:       # External 1 tank capacity
+            self._setFuelCapacity(self.FUEL_EXTERNAL_1, value)
+        elif offset==0x125c:       # External 2 tank level
+            self._setFuelLevel(self.FUEL_EXTERNAL_2, value)
+        elif offset==0x1260:       # External 2 tank capacity
+            self._setFuelCapacity(self.FUEL_EXTERNAL_2, value)
+        elif offset==0x2000:       # Engine #1 N1
+            self.n1[self.ENGINE_1] = value
+        elif offset==0x2100:       # Engine #2 N1
+            self.n1[self.ENGINE_2] = value
+        elif offset==0x2200:       # Engine #3 N1
+            self.n1[self.ENGINE_3] = value
+        elif offset==0x30c0:       # Grossweight
+            raise FSUIPCException(ERR_DATA)
+        elif offset==0x31e4:       # Radio altitude
+            raise FSUIPCException(ERR_DATA)
+        elif offset==0x3364:       # Frozen
+            self.frozen = value!=0
+        elif offset==0x3bfc:       # ZFW
+            self.zfw = value * const.LBSTOKG / 256.0
+            print "ZFW:", self.zfw
+        elif offset==0x3c00:       # Path of the current AIR file
+            self.airPath = value
+        elif offset==0x3d00:       # Name of the current aircraft
+            self.aircraftName = value
+        else:
+            print "Unhandled offset: %04x" % (offset,)
+            raise FSUIPCException(ERR_DATA)
         
     def _readUTC(self):
         """Read the UTC time.
@@ -401,20 +585,38 @@ class Values(object):
     def _getFuelLevel(self, index):
         """Get the fuel level for the fuel tank with the given
         index."""
-        # FIXME: check if the constants are correct
         return 0 if self.fuelCapacities[index]==0.0 else \
-            int(self.fuelWeights[index] * 65536.0 / self.fuelCapacities[index])
+            int(self.fuelWeights[index] * 65536.0 * 128.0 / self.fuelCapacities[index])
     
     def _getFuelCapacity(self, index):
         """Get the capacity of the fuel tank with the given index."""
-        # FIXME: check if the constants are correct
-        return int(self.fuelCapacities[index] * const.KGSTOLB * 128.0 /
-                   self.fuelWeight)
+        return int(self.fuelCapacities[index] * const.KGSTOLB  / self.fuelWeight)
 
     def _getThrottle(self, index):
         """Get the throttle value for the given index."""
         return int(self.throttles[index] * 16383.0)
+
+    def _updateTimeOffset(self, index, value):
+        """Update the time offset if the value in the tm structure is replaced
+        by the given value."""
+        tm = self._readUTC()
+        tm1 = tm[:index] + (value,) + tm[(index+1):]
+        self._timeOffset += calendar.timegm(tm1) - calendar.timegm(tm)
     
+    def _setThrottle(self, index, value):
+        """Set the throttle value for the given index."""
+        self.throttles[index] = value / 16383.0
+
+    def _setFuelLevel(self, index, value):
+        """Set the fuel level for the fuel tank with the given index."""
+        self.fuelWeights[index] = self.fuelCapacities[index] * float(value) / \
+                                  65536.0 / 128.0
+    
+    def _setFuelCapacity(self, index, value):
+        """Set the capacity of the fuel tank with the given index."""
+        self.fuelCapacities[index] = value * self.fuelWeight * const.LBSTOKG
+
+
 #------------------------------------------------------------------------------
 
 values = Values()
@@ -436,6 +638,13 @@ def prepare_data(pattern, forRead = True):
 def read(data):
     """Read the given data."""
     return [values.read(offset) for (offset, type) in data]
+            
+#------------------------------------------------------------------------------
+
+def write(data):
+    """Write the given data."""
+    for (offset, type, value) in data:
+        values.write(offset, value)
             
 #------------------------------------------------------------------------------
 
@@ -525,7 +734,15 @@ class Client(object):
 
     def read(self, data):
         """Read the given data."""
-        data = cPickle.dumps((CALL_READ, [data]))
+        return self._call(CALL_READ, data)
+
+    def write(self, data):
+        """Write the given data."""
+        return self._call(CALL_WRITE, data)
+
+    def _call(self, command, data):
+        """Perform a call with the given command and data."""
+        data = cPickle.dumps((command, [data]))
         self._socket.send(struct.pack("I", len(data)) + data)
         (length,) = struct.unpack("I", self._socket.recv(4))
         data = self._socket.recv(length)
@@ -533,7 +750,7 @@ class Client(object):
         if resultCode==RESULT_RETURNED:
             return result
         else:
-            raise result
+            raise result        
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -593,7 +810,10 @@ class CLI(threading.Thread, cmd.Cmd):
 
 if __name__ == "__main__":
     client = Client("127.0.0.1")
-    print client.read([(0x3bfc, "d")])
+    # print client.write([(0x3bfc, "d", 1000 * 256.0 * const.KGSTOLB)])
+    # print client.read([(0x3bfc, "d")])
+    print client.write([(0x023c, "d", 30)])
+    print client.read([(0x023c, "d")])
 else:
     server = Server()
     server.start()    
