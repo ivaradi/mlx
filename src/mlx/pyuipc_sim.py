@@ -11,6 +11,7 @@ import calendar
 import sys
 import struct
 import cPickle
+import math
 
 #------------------------------------------------------------------------------
 
@@ -265,6 +266,8 @@ class Values(object):
             # FIXME: calculate TAS first, then from the heading and
             # wind the GS
             return int(self.ias * 65536.0 * 1852.0 / 3600.0)
+        elif offset==0x02b8:       # TAS
+            return int(self._getTAS() * 128.0)
         elif offset==0x02bc:       # IAS
             return int(self.ias * 128.0)
         elif offset==0x02c8:       # VS
@@ -616,6 +619,16 @@ class Values(object):
         """Set the capacity of the fuel tank with the given index."""
         self.fuelCapacities[index] = value * self.fuelWeight * const.LBSTOKG
 
+    def _getTAS(self):
+        """Calculate the true airspeed."""
+        pressure = 101325 * math.pow(1 - 2.25577e-5 * self.altitude *
+                                      const.FEETTOMETRES,
+                                      5.25588)
+        temperature = 15 - self.altitude * 6.5 * const.FEETTOMETRES / 1000.0 
+        temperature += 273.15  # Celsius -> Kelvin
+        airDensity = pressure / (temperature * 287.05)
+        print "pressure:", pressure, "temperature:", temperature, "airDensity:", airDensity
+        return self.ias * math.sqrt(1.225 / airDensity)
 
 #------------------------------------------------------------------------------
 
@@ -865,6 +878,9 @@ class CLI(cmd.Cmd):
                                      lambda value: value * 3600.0 / 65536.0 / 1852.0,
                                      lambda word: int(float(word) * 65536.0 *
                                                       1852.0 / 3600))
+        self._valueHandlers["tas"] = (0x02b8, "d",
+                                     lambda value: value / 128.0,
+                                     lambda word: None)
         self._valueHandlers["vs"] = (0x02c8, "d",
                                      lambda value: value * 60 /                                     
                                      const.FEETTOMETRES / 256.0,
