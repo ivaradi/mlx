@@ -194,8 +194,8 @@ class Values(object):
         self.zfw = 50000.0
         
         self.fuelWeights = [0.0, 3000.0, 3000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        # FIXME: check for realistic values
-        self.fuelWeight = 3.5
+        # Wikipedia: "Jet fuel", Jet A-1 density at 15*C .804kg/l -> 6.7 pounds/gallon
+        self.fuelWeight = 6.70970518
 
         self.heading = 220.0
         self.pitch = 0.0
@@ -777,6 +777,36 @@ class CLI(cmd.Cmd):
     def pyuipc2degree(value):
         """Convert the given PyUIPC value into a degree."""
         return valie * 360.0 / 65536.0 / 65536.0
+
+    @staticmethod
+    def fuelLevel2pyuipc(level):
+        """Convert the given percentage value (as a string) into a PyUIPC value."""
+        return int(float(level) * 128.0 * 65536.0 / 100.0)
+        
+    @staticmethod
+    def pyuipc2fuelLevel(value):
+        """Convert the PyUIPC value into a percentage value."""
+        return value * 100.0 / 128.0 / 65536.0
+        
+    @staticmethod
+    def fuelCapacity2pyuipc(capacity):
+        """Convert the given capacity value (as a string) into a PyUIPC value."""
+        return int(capacity)
+        
+    @staticmethod
+    def pyuipc2fuelCapacity(value):
+        """Convert the given capacity value into a PyUIPC value."""
+        return value
+        
+    @staticmethod
+    def throttle2pyuipc(throttle):
+        """Convert the given throttle value (as a string) into a PyUIPC value."""
+        return int(float(throttle) * 16384.0 / 100.0)
+        
+    @staticmethod
+    def pyuipc2throttle(value):
+        """Convert the given PyUIPC value into a throttle value."""
+        return value * 100.0 / 16384.0
         
     def __init__(self):
         """Construct the CLI."""
@@ -900,6 +930,78 @@ class CLI(cmd.Cmd):
                                                 lambda value: value * 360.0 / 65536.0,
                                                 lambda word: int(int(word) *
                                                                  65536.0 / 360.0))
+        self._valueHandlers["fuelWeight"] = (0x0af4, "H",
+                                             lambda value: value / 256.0,
+                                             lambda word: int(float(word)*256.0))
+
+
+        self._valueHandlers["centreLevel"] = (0x0b74, "d", CLI.pyuipc2fuelLevel,
+                                              CLI.fuelLevel2pyuipc)
+        self._valueHandlers["centreCapacity"] = (0x0b78, "d",
+                                                 CLI.pyuipc2fuelCapacity,
+                                                 CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["leftMainLevel"] = (0x0b7c, "d", CLI.pyuipc2fuelLevel,
+                                              CLI.fuelLevel2pyuipc)
+        self._valueHandlers["leftMainCapacity"] = (0x0b80, "d",
+                                                   CLI.pyuipc2fuelCapacity,
+                                                   CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["leftAuxLevel"] = (0x0b84, "d", CLI.pyuipc2fuelLevel,
+                                               CLI.fuelLevel2pyuipc)
+        self._valueHandlers["leftAuxCapacity"] = (0x0b88, "d",
+                                                   CLI.pyuipc2fuelCapacity,
+                                                  CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["leftTipLevel"] = (0x0b8c, "d", CLI.pyuipc2fuelLevel,
+                                              CLI.fuelLevel2pyuipc)
+        self._valueHandlers["leftTipCapacity"] = (0x0b90, "d",
+                                                  CLI.pyuipc2fuelCapacity,
+                                                  CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["rightMainLevel"] = (0x0b94, "d", CLI.pyuipc2fuelLevel,
+                                                 CLI.fuelLevel2pyuipc)
+        self._valueHandlers["rightMainCapacity"] = (0x0b98, "d",
+                                                    CLI.pyuipc2fuelCapacity,
+                                                    CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["rightAuxLevel"] = (0x0b9c, "d", CLI.pyuipc2fuelLevel,
+                                                CLI.fuelLevel2pyuipc)
+        self._valueHandlers["rightAuxCapacity"] = (0x0ba0, "d",
+                                                   CLI.pyuipc2fuelCapacity,
+                                                   CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["rightTipLevel"] = (0x0ba4, "d", CLI.pyuipc2fuelLevel,
+                                                CLI.fuelLevel2pyuipc)
+        self._valueHandlers["rightTipCapacity"] = (0x0ba8, "d",
+                                                   CLI.pyuipc2fuelCapacity,
+                                                   CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["centre2Level"] = (0x1244, "d", CLI.pyuipc2fuelLevel,
+                                               CLI.fuelLevel2pyuipc)
+        self._valueHandlers["centre2Capacity"] = (0x1248, "d",
+                                                  CLI.pyuipc2fuelCapacity,
+                                                  CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["external1Level"] = (0x1254, "d", CLI.pyuipc2fuelLevel,
+                                                 CLI.fuelLevel2pyuipc)
+        self._valueHandlers["external1Capacity"] = (0x1258, "d",
+                                                    CLI.pyuipc2fuelCapacity,
+                                                    CLI.fuelCapacity2pyuipc)
+        self._valueHandlers["external2Level"] = (0x125c, "d", CLI.pyuipc2fuelLevel,
+                                                 CLI.fuelLevel2pyuipc)
+        self._valueHandlers["external2Capacity"] = (0x1260, "d",
+                                                    CLI.pyuipc2fuelCapacity,
+                                                    CLI.fuelCapacity2pyuipc)
+
+        self._valueHandlers["n1_1"] = (0x2000, "f", lambda value: value,
+                                       lambda word: float(word))
+        self._valueHandlers["n1_2"] = (0x2100, "f", lambda value: value,
+                                       lambda word: float(word))
+        self._valueHandlers["n1_3"] = (0x2200, "f", lambda value: value,
+                                       lambda word: float(word))
+
+        self._valueHandlers["throttle_1"] = (0x088c, "H",
+                                             CLI.pyuipc2throttle,
+                                             CLI.throttle2pyuipc)
+        self._valueHandlers["throttle_2"] = (0x0924, "H",
+                                             CLI.pyuipc2throttle,
+                                             CLI.throttle2pyuipc)
+        self._valueHandlers["throttle_3"] = (0x09bc, "H",
+                                             CLI.pyuipc2throttle,
+                                             CLI.throttle2pyuipc)
                                                             
     def default(self, line):
         """Handle unhandle commands."""
