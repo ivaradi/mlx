@@ -164,13 +164,13 @@ class Values(object):
     @staticmethod
     def _writeBCD(value):
         """Convert the given BCD value into a real value."""
-        bcd = (value>>24) & 0xf
+        bcd = (value>>12) & 0x0f
         bcd *= 10
-        bcd += (value>>16) & 0xf
+        bcd += (value>>8) & 0x0f
         bcd *= 10
-        bcd += (value>>8) & 0xf
+        bcd += (value>>4) & 0x0f
         bcd *= 10
-        bcd += (value>>0) & 0xf
+        bcd += (value>>0) & 0x0f
 
         return bcd
         
@@ -390,8 +390,8 @@ class Values(object):
             return self.n1[self.ENGINE_2]
         elif offset==0x2200:       # Engine #3 N1
             return self.n1[self.ENGINE_3]
-        elif offset==0x30c0:       # Grossweight
-            return int((self.zfw + sum(self.fuelWeights)) * const.KGSTOLB)
+        elif offset==0x30c0:       # Gross weight
+            return (self.zfw + sum(self.fuelWeights)) * const.KGSTOLB
         elif offset==0x31e4:       # Radio altitude
             # FIXME: if self.radioAltitude is None, calculate from the 
             # altitude with some, perhaps random, ground altitude
@@ -559,7 +559,7 @@ class Values(object):
             self.n1[self.ENGINE_2] = value
         elif offset==0x2200:       # Engine #3 N1
             self.n1[self.ENGINE_3] = value
-        elif offset==0x30c0:       # Grossweight
+        elif offset==0x30c0:       # Gross weight
             raise FSUIPCException(ERR_DATA)
         elif offset==0x31e4:       # Radio altitude
             raise FSUIPCException(ERR_DATA)
@@ -756,51 +756,232 @@ class Client(object):
 #------------------------------------------------------------------------------
 
 # FIXME: implement proper completion and history
-class CLI(threading.Thread, cmd.Cmd):
+class CLI(cmd.Cmd):
     """The command-line interpreter."""
-    def __init__(self, clientSocket):
+    @staticmethod
+    def str2bool(s):
+        """Convert the given string to a PyUIPC boolean value (i.e. 0 or 1)."""
+        return 1 if s in ["yes", "true", "on"] else 0
+    
+    @staticmethod
+    def bool2str(value):
+        """Convert the PyUIPC boolean value (i.e. 0 or 1) into a string."""
+        return "no" if value==0 else "yes"
+
+    @staticmethod
+    def degree2pyuipc(degree):
+        """Convert the given degree (as a string) into a PyUIPC value."""
+        return int(float(degree) * 65536.0 * 65536.0 / 360.0)
+        
+    @staticmethod
+    def pyuipc2degree(value):
+        """Convert the given PyUIPC value into a degree."""
+        return valie * 360.0 / 65536.0 / 65536.0
+        
+    def __init__(self):
         """Construct the CLI."""
-        self._socket = clientSocket
-        self._socketFile = clientSocket.makefile("rwb")
+        cmd.Cmd.__init__(self)
         
-        threading.Thread.__init__(self)
-        cmd.Cmd.__init__(self,
-                         stdin = self._socketFile, stdout = self._socketFile)
-        
-        self.use_rawinput = False
+        self.use_rawinput = True
         self.intro = "\nPyUIPC simulator command prompt\n"
         self.prompt = "PyUIPC> "
 
         self.daemon = True
 
-    def run(self):
-        """Execute the thread."""
+        self._client = Client("localhost")
+
+        self._valueHandlers = {}
+        self._valueHandlers["year"] = (0x0240, "H",  lambda value: value,
+                                      lambda word: int(word))
+        self._valueHandlers["yday"] = (0x023e, "H",  lambda value: value,
+                                       lambda word: int(word))
+        self._valueHandlers["hour"] = (0x023b, "b",  lambda value: value,
+                                       lambda word: int(word))
+        self._valueHandlers["min"] = (0x023c, "b",  lambda value: value,
+                                      lambda word: int(word))
+        self._valueHandlers["sec"] = (0x023a, "b",  lambda value: value,
+                                      lambda word: int(word))
+        self._valueHandlers["acftName"] = (0x3d00, -256,  lambda value: value,
+                                           lambda word: word)
+        self._valueHandlers["airPath"] = (0x3c00, -256,  lambda value: value,
+                                          lambda word: word)
+        self._valueHandlers["paused"] = (0x0264, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["frozen"] = (0x3364, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["replay"] = (0x0628, "d", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["slew"] = (0x05dc, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["overspeed"] = (0x036d, "b", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["stalled"] = (0x036c, "b", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["onTheGround"] = (0x0366, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["zfw"] = (0x3bfc, "d",
+                                      lambda value: value * const.LBSTOKG / 256.0,
+                                      lambda word: int(float(word) * 256.0 *
+                                                       const.KGSTOLB))
+        self._valueHandlers["grossWeight"] = (0x30c0, "f",
+                                              lambda value: value * const.LBSTOKG,
+                                              lambda word: None)
+        self._valueHandlers["heading"] = (0x0580, "d",
+                                          CLI.pyuipc2degree, CLI.degree2pyuipc)
+        self._valueHandlers["pitch"] = (0x0578, "d",
+                                        CLI.pyuipc2degree, CLI.degree2pyuipc)
+        self._valueHandlers["bank"] = (0x057c, "d",
+                                       CLI.pyuipc2degree, CLI.degree2pyuipc)
+        self._valueHandlers["ias"] = (0x02bc, "d",
+                                      lambda value: value / 128.0,
+                                      lambda word: int(float(word) * 128.0))
+        self._valueHandlers["mach"] = (0x11c6, "H",
+                                       lambda value: value / 20480.0,
+                                       lambda word: int(float(word) * 20480.0))
+        self._valueHandlers["gs"] = (0x02b4, "d",
+                                     lambda value: value * 3600.0 / 65536.0 / 1852.0,
+                                     lambda word: int(float(word) * 65536.0 *
+                                                      1852.0 / 3600))
+        self._valueHandlers["vs"] = (0x02c8, "d",
+                                     lambda value: value * 60 /                                     
+                                     const.FEETTOMETRES / 256.0,
+                                     lambda word: int(float(word) *
+                                                      const.FEETTOMETRES *
+                                                      256.0 / 60.0))
+        self._valueHandlers["radioAltitude"] = (0x31e4, "d",
+                                                lambda value: value /
+                                                const.FEETTOMETRES /
+                                                65536.0,
+                                                lambda word: int(float(word) *
+                                                                 const.FEETTOMETRES *
+                                                                 65536.0))
+        self._valueHandlers["altitude"] = (0x0570, "l",
+                                           lambda value: value /
+                                           const.FEETTOMETRES / 65536.0 /
+                                           65536.0,
+                                           lambda word: long(float(word) *
+                                                             const.FEETTOMETRES *
+                                                             65536.0 * 65536.0))
+        self._valueHandlers["gLoad"] = (0x11ba, "H",
+                                        lambda value: value / 625.0,
+                                        lambda word: int(float(word) * 625.0))
+
+        self._valueHandlers["flapsControl"] = (0x0bdc, "d",
+                                               lambda value: value * 100.0 / 16383.0,
+                                               lambda word: int(float(word) *
+                                                                16383.0 / 100.0))
+        self._valueHandlers["flaps"] = (0x0be0, "d",
+                                        lambda value: value * 100.0 / 16383.0,
+                                        lambda word: int(float(word) *
+                                                         16383.0 / 100.0))
+        self._valueHandlers["lights"] = (0x0d0c, "H",
+                                        lambda value: value,
+                                        lambda word: int(word))
+        self._valueHandlers["pitot"] = (0x029c, "b", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["parking"] = (0x0bc8, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["noseGear"] = (0x0bec, "d",
+                                           lambda value: value * 100.0 / 16383.0,
+                                           lambda word: int(float(word) *
+                                                            16383.0 / 100.0))
+        self._valueHandlers["spoilersArmed"] = (0x0bcc, "d",
+                                                CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["spoilers"] = (0x0bd0, "d",
+                                           lambda value: value,
+                                           lambda word: int(word))
+        self._valueHandlers["qnh"] = (0x0330, "H",
+                                      lambda value: value / 16.0,
+                                      lambda word: int(float(word)*16.0))
+        self._valueHandlers["nav1"] = (0x0350, "H",
+                                       Values._writeFrequency,
+                                       lambda word: Values._readFrequency(float(word)))
+        self._valueHandlers["nav2"] = (0x0352, "H",
+                                       Values._writeFrequency,
+                                       lambda word: Values._readFrequency(float(word)))
+        self._valueHandlers["squawk"] = (0x0354, "H",
+                                       Values._writeBCD,
+                                       lambda word: Values._readBCD(int(word)))
+        self._valueHandlers["windSpeed"] = (0x0e90, "H",
+                                            lambda value: value,
+                                            lambda word: int(word))
+        self._valueHandlers["windDirection"] = (0x0e92, "H",
+                                                lambda value: value * 360.0 / 65536.0,
+                                                lambda word: int(int(word) *
+                                                                 65536.0 / 360.0))
+                                                            
+    def default(self, line):
+        """Handle unhandle commands."""
+        if line=="EOF":
+            print
+            return True
+        else:
+            return super(CLI, self).default(line)
+
+    def do_get(self, args):
+        """Handle the get command."""
+        names = args.split()
+        data = []        
+        for name in names:
+            if name not in self._valueHandlers:
+                print >> sys.stderr, "Unknown variable: " + name
+                return False
+            valueHandler = self._valueHandlers[name]
+            data.append((valueHandler[0], valueHandler[1]))
+
         try:
-            self.cmdloop()
+            result = self._client.read(data)
+            for i in range(0, len(result)):
+                name = names[i]
+                valueHandler = self._valueHandlers[name]
+                print name + "=" + str(valueHandler[2](result[i]))
         except Exception, e:
-            print "pyuipc_sim.CLI.run: command loop terminated abnormally: " + str(e)
-            
-        try:
-            self._socketFile.close()
-        except:
-            pass
-        
-        self._socket.close()
+            print >> sys.stderr, "Failed to read data: " + str(e)                        
+
+        return False
+
+    def help_get(self):
+        """Print help for the get command."""
+        print "get <variable> [<variable>...]"
+
+    def complete_get(self, text, line, begidx, endidx):
+        """Try to complete the get command."""
+        return [key for key in self._valueHandlers if key.startswith(text)]
 
     def do_set(self, args):
         """Handle the set command."""
-        words = args.split()
-        if len(words)==2:
-            variable = words[0]
-            if variable in ["zfw"]:
-                values.__setattr__(variable, float(words[1]))
-            else:
-                print >> self._socketFile, "Unhandled variable: " + variable
+        arguments = args.split()
+        names = []
+        data = []
+        for argument in arguments:
+            words = argument.split("=")
+            if len(words)!=2:
+                print >> sys.stderr, "Invalid argument: " + argument
+                return False
+
+            (name, value) = words
+            if name not in self._valueHandlers:
+                print >> sys.stderr, "Unknown variable: " + name
+                return False
+
+            valueHandler = self._valueHandlers[name]
+            try:
+                value = valueHandler[3](value)
+                data.append((valueHandler[0], valueHandler[1], value))
+            except Exception, e:
+                print >> sys.stderr, "Invalid value '%s' for variable %s: %s" % \
+                      (value, name, str(e))
+                return False
+                
+        try:
+            self._client.write(data)
+            print "Data written"
+        except Exception, e:
+            print >> sys.stderr, "Failed to write data: " + str(e)
+
         return False
 
     def help_set(self):
         """Print help for the set command."""
-        print >> self._socketFile, "set <variable> <value>"
+        print "set <variable>=<value> [<variable>=<value>...]"
+
+    def complete_set(self, text, line, begidx, endidx):
+        """Try to complete the set command."""
+        if not text and begidx>0 and line[begidx-1]=="=":
+            return []
+        else:
+            return [key + "=" for key in self._valueHandlers if key.startswith(text)]
 
     def do_quit(self, args):
         """Handle the quit command."""
@@ -809,11 +990,7 @@ class CLI(threading.Thread, cmd.Cmd):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    client = Client("127.0.0.1")
-    # print client.write([(0x3bfc, "d", 1000 * 256.0 * const.KGSTOLB)])
-    # print client.read([(0x3bfc, "d")])
-    print client.write([(0x023c, "d", 30)])
-    print client.read([(0x023c, "d")])
+    CLI().cmdloop()
 else:
     server = Server()
     server.start()    
