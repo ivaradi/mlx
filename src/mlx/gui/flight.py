@@ -398,10 +398,11 @@ class GateSelectionPage(Page):
 
         self._wizard._departureGate = gateNumber
 
-        self._wizard._updatePlane(self._planeUpdated,
-                                  self._wizard._bookedFlight.tailNumber,
-                                  const.PLANE_HOME,
-                                  gateNumber)
+        #self._wizard._updatePlane(self._planeUpdated,
+        #                          self._wizard._bookedFlight.tailNumber,
+        #                          const.PLANE_HOME,
+        #                          gateNumber)
+        self._wizard.nextPage()
 
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
