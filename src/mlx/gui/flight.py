@@ -272,6 +272,8 @@ class FlightSelectionPage(Page):
                                   else gtk.POLICY_AUTOMATIC,
                                   gtk.PolicyType.ALWAYS if pygobject
                                   else gtk.POLICY_ALWAYS)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                       else gtk.SHADOW_IN)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
         alignment.add(scrolledWindow)
@@ -368,6 +370,8 @@ class GateSelectionPage(Page):
                                   else gtk.POLICY_AUTOMATIC,
                                   gtk.PolicyType.ALWAYS if pygobject
                                   else gtk.POLICY_ALWAYS)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                       else gtk.SHADOW_IN)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
         alignment.add(scrolledWindow)
@@ -758,6 +762,105 @@ class TimePage(Page):
         
 #-----------------------------------------------------------------------------
 
+class RoutePage(Page):
+    """The page containing the route and the flight level."""
+    def __init__(self, wizard):
+        help = "Set your cruise flight level below, and\n" \
+               "if necessary, edit the flight plan."
+               
+        super(RoutePage, self).__init__(wizard, "Route", help)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        mainBox = gtk.VBox()
+        alignment.add(mainBox)
+        self.setMainWidget(alignment)
+
+        levelBox = gtk.HBox()
+
+        label = gtk.Label("_Cruise level")
+        label.set_use_underline(True)
+        levelBox.pack_start(label, True, True, 0)
+
+        self._cruiseLevel = gtk.SpinButton()
+        self._cruiseLevel.set_increments(step = 10, page = 100)
+        self._cruiseLevel.set_range(min = 50, max = 500)
+        self._cruiseLevel.set_value(240)
+        self._cruiseLevel.set_tooltip_text("The cruise flight level.")
+        self._cruiseLevel.set_numeric(True)
+        self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
+        label.set_mnemonic_widget(self._cruiseLevel)        
+
+        levelBox.pack_start(self._cruiseLevel, False, False, 8)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(levelBox)
+
+        mainBox.pack_start(alignment, False, False, 0)
+
+
+        routeBox = gtk.VBox()
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        label = gtk.Label("_Route")
+        label.set_use_underline(True)
+        alignment.add(label)
+        routeBox.pack_start(alignment, True, True, 0)
+
+        routeWindow = gtk.ScrolledWindow()
+        routeWindow.set_size_request(400, 80)
+        routeWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                    else gtk.SHADOW_IN)
+
+        self._route = gtk.TextView()
+        self._route.set_tooltip_text("The planned flight route.")
+        self._route.get_buffer().connect("changed", self._routeChanged)
+        routeWindow.add(self._route)
+
+        label.set_mnemonic_widget(self._route)
+        routeBox.pack_start(routeWindow, True, True, 0)        
+
+        mainBox.pack_start(routeBox, True, True, 8)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Setup the route from the booked flight."""
+        self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
+        self._updateForwardButton()
+
+    def _getRoute(self):
+        """Get the text of the route."""
+        buffer = self._route.get_buffer()
+        return buffer.get_text(buffer.get_start_iter(),
+                               buffer.get_end_iter(), True)
+
+    def _updateForwardButton(self):
+        """Update the sensitivity of the forward button."""
+        self._button.set_sensitive(self._cruiseLevel.get_value_as_int()>=50 and \
+                                   self._getRoute())
+                                   
+    def _cruiseLevelChanged(self, spinButton):
+        """Called when the cruise level has changed."""
+        self._updateForwardButton()
+
+    def _routeChanged(self, textBuffer):
+        """Called when the route has changed."""
+        self._updateForwardButton()
+
+    def _forwardClicked(self, button):
+        """Called when the Forward button is clicked."""
+        self._wizard._cruiseAltitude = self._cruiseLevel.get_value_as_int() * 100
+        self._wizard._route = self._getRoute()
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
 class Wizard(gtk.VBox):
     """The flight wizard."""
     def __init__(self, gui):
@@ -775,6 +878,7 @@ class Wizard(gtk.VBox):
         self._pages.append(ConnectPage(self))
         self._pages.append(PayloadPage(self))
         self._pages.append(TimePage(self))
+        self._pages.append(RoutePage(self))
 
         maxWidth = 0
         maxHeight = 0
@@ -843,7 +947,9 @@ class Wizard(gtk.VBox):
         self._bookedFlight = None
         self._departureGate = "-"
         self._zfw = None
-
+        self._cruiseAltitude = None
+        self._route = None
+        
         self.setCurrentPage(0)
         
     def _getFleet(self, callback, force = False):
