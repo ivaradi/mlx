@@ -33,7 +33,7 @@ class Flight(object):
         self.cruiseAltitude = None
         self.flareTimeFromFS = False
         self.entranceExam = False
-        self.zfw = 50000
+        self.zfw = None
 
         self.options = Options()
 

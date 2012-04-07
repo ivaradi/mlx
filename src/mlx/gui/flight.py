@@ -493,6 +493,29 @@ class ConnectPage(Page):
 
 #-----------------------------------------------------------------------------
 
+class PayloadPage(Page):
+    """Page to allow setting up the payload."""
+    def __init__(self, wizard):
+        """Construct the page."""
+        help = "The briefing contains the weights below.\n" \
+               "Setup the cargo weight and check if the simulator\n" \
+               "reports the expected Zero Fuel Weight."
+        super(PayloadPage, self).__init__(wizard, "Payload", help)
+
+        button = gtk.Button("_Query ZFW")
+        button.connect("clicked", self._zfwRequested)
+        self.setMainWidget(button)
+
+    def _zfwRequested(self, button):
+        """Called when the ZFW is requested from the simulator."""
+        self._wizard.gui.simulator.requestZFW(self._handleZFW)
+
+    def _handleZFW(self, zfw):
+        """Called when the ZFW value is retrieved."""
+        print "ZFW", zfw
+
+#-----------------------------------------------------------------------------
+
 class Wizard(gtk.VBox):
     """The flight wizard."""
     def __init__(self, gui):
@@ -508,6 +531,7 @@ class Wizard(gtk.VBox):
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
         self._pages.append(ConnectPage(self))
+        self._pages.append(PayloadPage(self))
 
         maxWidth = 0
         maxHeight = 0
@@ -522,19 +546,7 @@ class Wizard(gtk.VBox):
         maxHeight += 32
         self.set_size_request(maxWidth, maxHeight)
 
-        self._fleet = None
-        self._fleetCallback = None
-        self._updatePlaneCallback = None
-        
-        self._loginResult = None
-        self._bookedFlight = None
-        self._departureGate = "-"
-
-        self._logger = Logger(output = gui)
-        self._flight = None
-        self._simulator = None
-        
-        self.setCurrentPage(0)
+        self._initialize()
         
     @property
     def loginResult(self):
@@ -566,6 +578,30 @@ class Wizard(gtk.VBox):
         """Make the default button of the current page the default."""
         self._pages[self._currentPage].grabDefault()
 
+    def connected(self, fsType, descriptor):
+        """Called when the connection could be made to the simulator."""
+        self.nextPage()
+
+    def connectionFailed(self):
+        """Called when the connection could not be made to the simulator."""
+        self._initialize()
+
+    def disconnected(self):
+        """Called when we have disconnected from the simulator."""
+        self._initialize()
+
+    def _initialize(self):
+        """Initialize the wizard."""
+        self._fleet = None
+        self._fleetCallback = None
+        self._updatePlaneCallback = None
+        
+        self._loginResult = None
+        self._bookedFlight = None
+        self._departureGate = "-"
+
+        self.setCurrentPage(0)
+        
     def _getFleet(self, callback, force = False):
         """Get the fleet, if needed.
 
@@ -633,22 +669,7 @@ class Wizard(gtk.VBox):
 
     def _connectSimulator(self):
         """Connect to the simulator."""
-        self._logger.reset()
-        self._flight = Flight(self.gui._logger, self.gui)
-
-        self._flight.aircraftType = self._bookedFlight.aircraftType
-        aircraft = self._flight.aircraft = Aircraft.create(self._flight)
-        self._flight.aircraft._checkers.append(self.gui)
-        
-        self._flight.cruiseAltitude = -1        
-        self._flight.zfw = -1
-
-        if self._simulator is None:
-            self._simulator = fs.createSimulator(const.SIM_MSFS9, self.gui)
-
-        self._flight.simulator = self._simulator 
-        self._simulator.connect(aircraft)
-        #self._simulator.startMonitoring()
+        self.gui.connectSimulator(self._bookedFlight.aircraftType)
     
 #-----------------------------------------------------------------------------
 

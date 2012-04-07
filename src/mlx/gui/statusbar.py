@@ -86,7 +86,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._busyLabel.set_text("" if message is None else message)
     
     def _drawConnState(self, connStateArea, eventOrContext):
-        """Draw the connection state."""
+        """Draw the connection state."""        
         context = eventOrContext if pygobject else connStateArea.window.cairo_create()
 
         if self._connecting:

@@ -58,7 +58,14 @@ class Handler(threading.Thread):
             print >> sys.stderr, str(e)
             return None
 
+    # The number of times a read is attempted
     NUM_READATTEMPTS = 3
+
+    # The number of connection attempts
+    NUM_CONNECTATTEMPTS = 3
+
+    # The interval between successive connect attempts
+    CONNECT_INTERVAL = 0.25
 
     @staticmethod
     def _performRead(data, callback, extra, validator):
@@ -171,15 +178,18 @@ class Handler(threading.Thread):
             firing times."""
             return cmp(self._nextFire, other._nextFire)
 
-    def __init__(self, connectionListener):
+    def __init__(self, connectionListener,
+                 connectAttempts = -1, connectInterval = 0.2):
         """Construct the handler with the given connection listener."""
         threading.Thread.__init__(self)
 
         self._connectionListener = connectionListener
+        self._connectAttempts = connectAttempts
+        self._connectInterval = connectInterval
 
         self._requestCondition = threading.Condition()
         self._connectionRequested = False
-        self._connected = False
+        self._connected = False        
 
         self._requests = []
         self._nextPeriodicID = 1
@@ -265,9 +275,15 @@ class Handler(threading.Thread):
     def disconnect(self):
         """Disconnect from the flight simulator."""
         with self._requestCondition:
+            self._requests = []
             if self._connectionRequested:
-                self._connectionRequested = False
+                self._connectionRequested = False                
                 self._requestCondition.notify()
+
+    def clearRequests(self):
+        """Clear the outstanding one-shot requests."""
+        with self._requestCondition:
+            self._requests = []
 
     def run(self):
         """Perform the operation of the thread."""
@@ -285,26 +301,38 @@ class Handler(threading.Thread):
             while not self._connectionRequested:
                 self._requestCondition.wait()
             
-    def _connect(self):
+    def _connect(self, autoReconnection = False):
         """Try to connect to the flight simulator via FSUIPC
 
         Returns True if the connection has been established, False if it was
         not due to no longer requested.
         """
+        attempts = 0
         while self._connectionRequested:
             try:
+                attempts += 1
                 pyuipc.open(pyuipc.SIM_ANY)
                 description = "(FSUIPC version: 0x%04x, library version: 0x%04x, FS version: %d)" % \
                     (pyuipc.fsuipc_version, pyuipc.lib_version, 
                      pyuipc.fs_version)
-                Handler._callSafe(lambda:     
-                                  self._connectionListener.connected(const.SIM_MSFS9, 
-                                                                     description))
+                if not autoReconnection:
+                    Handler._callSafe(lambda:     
+                                      self._connectionListener.connected(const.SIM_MSFS9, 
+                                                                         description))
                 self._connected = True
                 return True
             except Exception, e:
                 print "fsuipc.Handler._connect: connection failed: " + str(e)
-                time.sleep(0.1)
+                if attempts<self.NUM_CONNECTATTEMPTS:
+                    time.sleep(self.CONNECT_INTERVAL)
+                else:
+                    self._connectionRequested = False
+                    if autoReconnection:
+                        Handler._callSafe(lambda:     
+                                          self._connectionListener.disconnected())
+                    else:
+                        Handler._callSafe(lambda:     
+                                          self._connectionListener.connectionFailed())
 
         return False
                 
@@ -336,21 +364,8 @@ class Handler(threading.Thread):
         """Disconnect from the flight simulator."""
         if self._connected:
             pyuipc.close()
-            Handler._callSafe(lambda: self._connectionListener.disconnected())
             self._connected = False
-
-    def _failRequests(self, request):
-        """Fail the outstanding, single-shot requuests."""
-        request.fail()
-        with self._requestCondition:
-            for request in self._requests:
-                try:
-                    self._requestCondition.release()
-                    request.fail()
-                finally:
-                    self._requestCondition.acquire()
-            self._requests = []        
-
+            
     def _processRequest(self, request, time):
         """Process the given request. 
 
@@ -376,9 +391,10 @@ class Handler(threading.Thread):
                 needReconnect = True
 
             if needReconnect:
+                with self._requestCondition:
+                    self._requests.insert(0, request)
                 self._disconnect()
-                self._failRequests(request)
-                self._connect()
+                self._connect(autoReconnection = True)
         finally:
             self._requestCondition.acquire()
         
@@ -436,7 +452,8 @@ class Simulator(object):
                    (0x057c, "d"),            # Bank
                    (0x0580, "d") ]           # Heading
 
-    def __init__(self, connectionListener):
+    def __init__(self, connectionListener, connectAttempts = -1,
+                 connectInterval = 0.2):
         """Construct the simulator.
         
         The aircraft object passed must provide the following members:
@@ -459,7 +476,9 @@ class Simulator(object):
          are self-explanatory and expressed in their 'natural' units."""
         self._aircraft = None
 
-        self._handler = Handler(connectionListener)
+        self._handler = Handler(connectionListener,
+                                connectAttempts = connectAttempts,
+                                connectInterval = connectInterval)
         self._handler.start()
 
         self._normalRequestID = None
@@ -483,7 +502,19 @@ class Simulator(object):
         self._aircraftName = None
         self._aircraftModel = None
         self._handler.connect()
-        self._startDefaultNormal()
+        if self._normalRequestID is None:
+            self._startDefaultNormal()
+
+    def reconnect(self):
+        """Initiate a reconnection to the simulator.
+
+        It does not reset already set up data, just calls connect() on the
+        handler."""
+        self._handler.connect()
+
+    def requestZFW(self, callback):
+        """Send a request for the ZFW."""
+        self._handler.requestRead([(0x3bfc, "d")], self._handleZFW, extra = callback)
                                                             
     def startMonitoring(self):
         """Start the periodic monitoring of the aircraft and pass the resulting
@@ -682,6 +713,11 @@ class Simulator(object):
                                          Handler.fsuipc2PositiveDegrees(data[7]))
         else:
             self._addFlareRate(data[2])
+
+    def _handleZFW(self, data, callback):
+        """Callback for a ZFW retrieval request."""
+        zfw = data[0] * const.LBSTOKG / 256.0
+        callback(zfw)
                                                   
 #------------------------------------------------------------------------------
 

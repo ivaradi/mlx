@@ -4,6 +4,8 @@
 
 import const
 
+import fsuipc
+
 #-------------------------------------------------------------------------------
 
 class ConnectionListener(object):
@@ -12,6 +14,10 @@ class ConnectionListener(object):
         """Called when a connection has been established to the flight
         simulator of the given type."""
         print "fs.ConnectionListener.connected, fsType:", fsType, ", descriptor:", descriptor
+
+    def connectionFailed(self):
+        """Called when the connection could not be established."""
+        print "fs.ConnectionListener.connectionFailed"        
 
     def disconnected(self):
         """Called when a connection to the flight simulator has been broken."""
@@ -33,8 +39,7 @@ def createSimulator(type, connectionListener):
     """
     assert type in [const.SIM_MSFS9, const.SIM_MSFSX], \
            "Only MS Flight Simulator 2004 and X are supported"
-    import fsuipc
-    return fsuipc.Simulator(connectionListener)
+    return fsuipc.Simulator(connectionListener, connectAttempts = 3)
 
 #-------------------------------------------------------------------------------
 

@@ -636,34 +636,59 @@ values = Values()
 
 #------------------------------------------------------------------------------
 
+failOpen = False
+
+opened = False
+
+#------------------------------------------------------------------------------
+
 def open(request):
     """Open the connection."""
-    return True
+    global opened
+    if failOpen:
+        raise FSUIPCException(ERR_NOFS)
+    elif opened:
+        raise FSUIPCException(ERR_OPEN)
+    else:
+        time.sleep(0.5)
+        opened = True
+        return True
 
 #------------------------------------------------------------------------------
 
 def prepare_data(pattern, forRead = True):
     """Prepare the given pattern for reading and/or writing."""
-    return pattern
-
+    if opened:
+        return pattern
+    else:
+        raise FSUIPCException(ERR_OPEN)
+        
 #------------------------------------------------------------------------------
 
 def read(data):
     """Read the given data."""
-    return [values.read(offset) for (offset, type) in data]
+    print "opened", opened
+    if opened:
+        return [values.read(offset) for (offset, type) in data]
+    else:
+        raise FSUIPCException(ERR_OPEN)
             
 #------------------------------------------------------------------------------
 
 def write(data):
     """Write the given data."""
-    for (offset, type, value) in data:
-        values.write(offset, value)
+    if opened:
+        for (offset, type, value) in data:
+            values.write(offset, value)
+    else:
+        raise FSUIPCException(ERR_OPEN)
             
 #------------------------------------------------------------------------------
 
 def close():
     """Close the connection."""
-    pass
+    global opened
+    opened = False
 
 #------------------------------------------------------------------------------
 
@@ -672,6 +697,8 @@ PORT=15015
 CALL_READ=1
 CALL_WRITE=2
 CALL_CLOSE=3
+CALL_FAILOPEN=4
+CALL_QUIT = 99
 
 RESULT_RETURNED=1
 RESULT_EXCEPTION=2
@@ -714,6 +741,14 @@ class Server(threading.Thread):
                         result = read(args[0])
                     elif call==CALL_WRITE:
                         result = write(args[0])
+                    elif call==CALL_CLOSE:
+                        global opened
+                        opened = False
+                        result = None
+                    elif call==CALL_FAILOPEN:
+                        global failOpen
+                        failOpen = args[0]
+                        result = None
                     else:
                         break
                 except Exception, e:
@@ -752,6 +787,19 @@ class Client(object):
     def write(self, data):
         """Write the given data."""
         return self._call(CALL_WRITE, data)
+
+    def close(self):
+        """Close the connection currently opened in the simulator."""
+        return self._call(CALL_CLOSE, None)
+
+    def failOpen(self, really):
+        """Enable/disable open failure in the simulator."""
+        return self._call(CALL_FAILOPEN, really)
+
+    def quit(self):
+        """Quit from the simulator."""
+        data = cPickle.dumps((CALL_QUIT, None))
+        self._socket.send(struct.pack("I", len(data)) + data)        
 
     def _call(self, command, data):
         """Perform a call with the given command and data."""
@@ -1023,7 +1071,7 @@ class CLI(cmd.Cmd):
         """Handle unhandle commands."""
         if line=="EOF":
             print
-            return True
+            return self.do_quit("")
         else:
             return super(CLI, self).default(line)
 
@@ -1101,8 +1149,39 @@ class CLI(cmd.Cmd):
         else:
             return [key + "=" for key in self._valueHandlers if key.startswith(text)]
 
+    def do_close(self, args):
+        """Close an existing connection so that FS will fail."""
+        try:
+            self._client.close()
+            print "Connection closed"
+        except Exception, e:
+            print >> sys.stderr, "Failed to close the connection: " + str(e)        
+        
+    def do_failopen(self, args):
+        """Enable/disable the failing of opens."""
+        try:
+            value = self.str2bool(args)
+            self._client.failOpen(value)
+            print "Opening will%s fail" % ("" if value else " not",)
+        except Exception, e:
+            print >> sys.stderr, "Failed to set open failure: " + str(e)        
+
+    def help_failopen(self, usage = False):
+        """Help for the failopen close"""
+        if usage: print "Usage:",
+        print "failopen yes|no"
+
+    def complete_failopen(self, text, line, begidx, endidx):
+        if text:
+            if "yes".startswith(text): return ["yes"]
+            elif "no".startswith(text): return ["no"]
+            else: return []
+        else:
+            return ["yes", "no"]
+        
     def do_quit(self, args):
         """Handle the quit command."""
+        self._client.quit()
         return True
 
 #------------------------------------------------------------------------------

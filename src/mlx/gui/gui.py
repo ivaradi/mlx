@@ -42,10 +42,12 @@ class GUI(fs.ConnectionListener):
         self._programDirectory = programDirectory
         self.config = config
         self._connecting = False
+        self._reconnecting = False
         self._connected = False
         self._logger = logger.Logger(output = self)
         self._flight = None
         self._simulator = None
+        self._monitoring = False
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
@@ -126,6 +128,11 @@ class GUI(fs.ConnectionListener):
         self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH if pygobject
                                       else gdk.WATCH)
 
+    @property
+    def simulator(self):
+        """Get the simulator used by us."""
+        return self._simulator
+        
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:
@@ -139,22 +146,94 @@ class GUI(fs.ConnectionListener):
 
         if self._flight is not None:
             simulator = self._flight.simulator
-            simulator.stopMonitoring()
-            simulator.disconnect()            
+            if self._monitoring:
+                simulator.stopMonitoring()
+                self._monitoring = False
+            simulator.disconnect()                        
 
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
         self._connected = True
         self._logger.untimedMessage("Connected to the simulator %s" % (descriptor,))
-        gobject.idle_add(self._statusbar.updateConnection,
-                         self._connecting, self._connected)
+        gobject.idle_add(self._handleConnected, fsType, descriptor)
+
+    def _handleConnected(self, fsType, descriptor):
+        """Called when the connection to the simulator has succeeded."""
+        self._statusbar.updateConnection(self._connecting, self._connected)
+        self.endBusy()
+        if not self._reconnecting:
+            self._wizard.connected(fsType, descriptor)
+        self._reconnecting = False
+
+    def connectionFailed(self):
+        """Called when the connection failed."""
+        self._logger.untimedMessage("Connection to the simulator failed")
+        gobject.idle_add(self._connectionFailed)
+
+    def _connectionFailed(self):
+        """Called when the connection failed."""
+        self.endBusy()
+        self._statusbar.updateConnection(self._connecting, self._connected)
+
+        dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+                                   message_format =
+                                   "Cannot connect to the simulator.",
+                                   parent = self._mainWindow)
+        dialog.format_secondary_markup("Rectify the situation, and press <b>Try again</b> "
+                                       "to try the connection again, " 
+                                       "or <b>Cancel</b> to cancel the flight.")
+        
+        dialog.add_button("_Cancel", 0)
+        dialog.add_button("_Try again", 1)
+        dialog.set_default_response(1)
+        
+        result = dialog.run()
+        dialog.hide()
+        if result == 1:
+            self.beginBusy("Connecting to the simulator.")
+            self._simulator.reconnect()
+        else:
+            self._connecting = False
+            self._reconnecting = False
+            self._statusbar.updateConnection(self._connecting, self._connected)
+            self._wizard.connectionFailed()
         
     def disconnected(self):
         """Called when we have disconnected from the simulator."""
         self._connected = False
         self._logger.untimedMessage("Disconnected from the simulator")
-        gobject.idle_add(self._statusbar.updateConnection,
-                         self._connecting, self._connected)
+
+        gobject.idle_add(self._disconnected)
+
+    def _disconnected(self):
+        """Called when we have disconnected from the simulator unexpectedly."""        
+        self._statusbar.updateConnection(self._connecting, self._connected)
+
+        dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+                                   message_format =
+                                   "The connection to the simulator failed unexpectedly.",
+                                   parent = self._mainWindow)
+        dialog.format_secondary_markup("If the simulator has crashed, restart it "
+                                       "and restore your flight as much as possible "
+                                       "to the state it was in before the crash.\n"
+                                       "Then press <b>Reconnect</b> to reconnect.\n\n"
+                                       "If you want to cancel the flight, press <b>Cancel</b>.")
+
+        dialog.add_button("_Cancel", 0)
+        dialog.add_button("_Reconnect", 1)
+        dialog.set_default_response(1)
+
+        result = dialog.run()
+        dialog.hide()
+        if result == 1:
+            self.beginBusy("Connecting to the simulator.")
+            self._reconnecting = True
+            self._simulator.reconnect()
+        else:
+            self._connecting = False
+            self._reconnecting = False
+            self._statusbar.updateConnection(self._connecting, self._connected)
+            self._wizard.disconnected()
 
     def write(self, msg):
         """Write the given message to the log."""
@@ -284,34 +363,46 @@ class GUI(fs.ConnectionListener):
             self._writeLog(text)
             self._stdioAfterNewLine = False
 
+    def connectSimulator(self, aircraftType):
+        """Connect to the simulator for the first time."""
+        self._logger.reset()
+
+        self._flight = flight.Flight(self._logger, self)
+        self._flight.aircraftType = aircraftType
+        self._flight.aircraft = acft.Aircraft.create(self._flight)
+        self._flight.aircraft._checkers.append(self)
+        
+        if self._simulator is None:
+            self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
+
+        self._flight.simulator = self._simulator
+
+        self.beginBusy("Connecting to the simulator...")
+        self._statusbar.updateConnection(self._connecting, self._connected)
+
+        self._connecting = True
+        self._simulator.connect(self._flight.aircraft)        
+
     def _connectToggled(self, button):
         """Callback for the connection button."""
         if self._connectButton.get_active():
-            self._logger.reset()
-            self._flight = flight.Flight(self._logger, self)
-
             acftListModel = self._acftList.get_model()
-            self._flight.aircraftType = \
-                acftListModel[self._acftList.get_active()][1]
-            self._flight.aircraft = acft.Aircraft.create(self._flight)
-            self._flight.aircraft._checkers.append(self)
-
+            self.connectSimulator(acftListModel[self._acftList.get_active()][1])
+            
             self._flight.cruiseAltitude = self._flSpinButton.get_value_as_int() * 100
 
             self._flight.zfw = self._zfwSpinButton.get_value_as_int()
-
-            if self._simulator is None:
-                self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
-
-            self._flight.simulator = self._simulator
-
-            self._connecting = True
-            self._simulator.connect(self._flight.aircraft)
+            
             self._simulator.startMonitoring()
+            self._monitoring = True
         else:
             self.resetFlightStatus()
             self._connecting = False
+            self._connected = False
+
             self._simulator.stopMonitoring()
+            self._monitoring = False
+
             self._simulator.disconnect()
             self._flight = None
 
