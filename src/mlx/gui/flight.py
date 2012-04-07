@@ -4,9 +4,7 @@ from mlx.gui.common import *
 
 import mlx.const as const
 import mlx.fs as fs
-from mlx.logger import Logger
-from mlx.flight import Flight
-from mlx.acft import Aircraft
+from mlx.checks import PayloadChecker
 
 #-----------------------------------------------------------------------------
 
@@ -462,7 +460,6 @@ class ConnectPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label("Gate:")
-        label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
@@ -473,13 +470,12 @@ class ConnectPage(Page):
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 1, 2)
 
-
         self._button = self.addButton("_Connect", default = True)
         self._button.set_use_underline(True)
         self._button.connect("clicked", self._connectClicked)
 
     def activate(self):
-        """Setup the deprature information."""
+        """Setup the departure information."""
         icao = self._wizard._bookedFlight.departureICAO
         self._departureICAO.set_markup("<b>" + icao + "</b>")
         gate = self._wizard._departureGate
@@ -498,22 +494,170 @@ class PayloadPage(Page):
     def __init__(self, wizard):
         """Construct the page."""
         help = "The briefing contains the weights below.\n" \
-               "Setup the cargo weight and check if the simulator\n" \
-               "reports the expected Zero Fuel Weight."
+               "Setup the cargo weight here and the payload weight in the simulator.\n\n" \
+               "You can also check here what the simulator reports as ZFW."
+               
         super(PayloadPage, self).__init__(wizard, "Payload", help)
 
-        button = gtk.Button("_Query ZFW")
-        button.connect("clicked", self._zfwRequested)
-        self.setMainWidget(button)
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
 
+        table = gtk.Table(7, 3)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        label = gtk.Label("Crew:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._numCrew = gtk.Label()
+        self._numCrew.set_width_chars(6)
+        self._numCrew.set_alignment(1.0, 0.5)
+        table.attach(self._numCrew, 1, 2, 0, 1)
+        
+        label = gtk.Label("Passengers:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._numPassengers = gtk.Label()
+        self._numPassengers.set_width_chars(6)
+        self._numPassengers.set_alignment(1.0, 0.5)
+        table.attach(self._numPassengers, 1, 2, 1, 2)
+        
+        label = gtk.Label("Baggage:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 2, 3)
+
+        self._bagWeight = gtk.Label()
+        self._bagWeight.set_width_chars(6)
+        self._bagWeight.set_alignment(1.0, 0.5)
+        table.attach(self._bagWeight, 1, 2, 2, 3)
+
+        table.attach(gtk.Label("kg"), 2, 3, 2, 3)
+        
+        label = gtk.Label("_Cargo:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 3, 4)
+
+        self._cargoWeight = gtk.Entry()
+        self._cargoWeight.set_width_chars(6)
+        self._cargoWeight.set_alignment(1.0)
+        self._cargoWeight.connect("changed", self._cargoWeightChanged)
+        self._cargoWeight.set_tooltip_text("The weight of the cargo for your flight.")
+        table.attach(self._cargoWeight, 1, 2, 3, 4)
+        self._cargoWeightValue = 0        
+        label.set_mnemonic_widget(self._cargoWeight)
+
+        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
+        
+        label = gtk.Label("Mail:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 4, 5)
+
+        self._mailWeight = gtk.Label()
+        self._mailWeight.set_width_chars(6)
+        self._mailWeight.set_alignment(1.0, 0.5)
+        table.attach(self._mailWeight, 1, 2, 4, 5)
+
+        table.attach(gtk.Label("kg"), 2, 3, 4, 5)
+        
+        label = gtk.Label("<b>Calculated ZFW:</b>")
+        label.set_alignment(0.0, 0.5)
+        label.set_use_markup(True)
+        table.attach(label, 0, 1, 5, 6)
+
+        self._calculatedZFW = gtk.Label()
+        self._calculatedZFW.set_width_chars(6)
+        self._calculatedZFW.set_alignment(1.0, 0.5)
+        table.attach(self._calculatedZFW, 1, 2, 5, 6)
+
+        table.attach(gtk.Label("kg"), 2, 3, 5, 6)
+
+        button = gtk.Button("_ZFW from FS:")
+        button.set_use_underline(True)
+        button.connect("clicked", self._zfwRequested)
+        table.attach(button, 0, 1, 6, 7)
+
+        self._simulatorZFW = gtk.Label("-")
+        self._simulatorZFW.set_width_chars(6)
+        self._simulatorZFW.set_alignment(1.0, 0.5)
+        table.attach(self._simulatorZFW, 1, 2, 6, 7)
+        self._simulatorZFWValue = None
+
+        table.attach(gtk.Label("kg"), 2, 3, 6, 7)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Setup the information."""
+        bookedFlight = self._wizard._bookedFlight
+        self._numCrew.set_text(str(bookedFlight.numCrew))
+        self._numPassengers.set_text(str(bookedFlight.numPassengers))
+        self._bagWeight.set_text(str(bookedFlight.bagWeight))
+        self._cargoWeightValue = bookedFlight.cargoWeight
+        self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
+        self._mailWeight.set_text(str(bookedFlight.mailWeight))
+        self._updateCalculatedZFW()
+
+    def _calculateZFW(self):
+        """Calculate the ZFW value."""
+        zfw = self._wizard.gui._flight.aircraft.dow
+        bookedFlight = self._wizard._bookedFlight
+        zfw += (bookedFlight.numCrew + bookedFlight.numPassengers) * 82
+        zfw += bookedFlight.bagWeight
+        zfw += self._cargoWeightValue
+        zfw += bookedFlight.mailWeight
+        return zfw
+        
+    def _updateCalculatedZFW(self):
+        """Update the calculated ZFW"""
+        zfw = self._calculateZFW()
+
+        markupBegin = "<b>"
+        markupEnd = "</b>"
+        if self._simulatorZFWValue is not None and \
+           PayloadChecker.isZFWFaulty(self._simulatorZFWValue, zfw):
+            markupBegin += '<span foreground="red">'
+            markupEnd = "</span>" + markupEnd
+        self._calculatedZFW.set_markup(markupBegin + str(zfw) + markupEnd)
+
+    def _cargoWeightChanged(self, entry):
+        """Called when the cargo weight has changed."""
+        text = self._cargoWeight.get_text()
+        if text=="":
+            self._cargoWeightValue = 0
+        else:
+            try:
+                self._cargoWeightValue = int(text)
+            except:
+                self._cargoWeight.set_text(str(self._cargoWeightValue))
+        self._updateCalculatedZFW()
+            
     def _zfwRequested(self, button):
         """Called when the ZFW is requested from the simulator."""
         self._wizard.gui.simulator.requestZFW(self._handleZFW)
 
     def _handleZFW(self, zfw):
         """Called when the ZFW value is retrieved."""
-        print "ZFW", zfw
+        gobject.idle_add(self._processZFW, zfw)
 
+    def _processZFW(self, zfw):
+        """Process the given ZFW value received from the simulator."""
+        self._simulatorZFWValue = zfw
+        self._simulatorZFW.set_text("%.0f" % (zfw,))
+        self._updateCalculatedZFW()
+
+    def _forwardClicked(self, button):
+        """Called when the forward button is clicked."""
+        self._wizard._zfw = self._calculateZFW()
+        self._wizard.nextPage()
+        
 #-----------------------------------------------------------------------------
 
 class Wizard(gtk.VBox):
@@ -599,6 +743,7 @@ class Wizard(gtk.VBox):
         self._loginResult = None
         self._bookedFlight = None
         self._departureGate = "-"
+        self._zfw = None
 
         self.setCurrentPage(0)
         

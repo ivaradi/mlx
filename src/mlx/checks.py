@@ -696,7 +696,7 @@ class MTOWChecker(WeightChecker):
 #---------------------------------------------------------------------------------------
 
 class MZFWChecker(WeightChecker):
-    """Checks if the MTOW is not exceeded on landing."""
+    """Checks if the MZFW is not exceeded on landing."""
     def __init__(self):
         """Construct the checker."""
         super(MZFWChecker, self).__init__("ZFW")
@@ -749,12 +749,17 @@ class OverspeedChecker(PatientFaultChecker):
 class PayloadChecker(SimpleFaultChecker):
     """Check if the payload matches the specification."""
     TOLERANCE=550
+
+    @staticmethod
+    def isZFWFaulty(aircraftZFW, flightZFW):
+        """Check if the given aircraft's ZFW is outside of the limits."""
+        return aircraftZFW < (flightZFW - PayloadChecker.TOLERANCE) or \
+               aircraftZFW > (flightZFW + PayloadChecker.TOLERANCE)        
     
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return flight.stage==const.STAGE_PUSHANDTAXI and \
-               (state.zfw < (flight.zfw - PayloadChecker.TOLERANCE) or \
-                state.zfw > (flight.zfw + PayloadChecker.TOLERANCE))
+               PayloadChecker.isZFWFaulty(state.zfw, flight.zfw)
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
