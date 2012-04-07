@@ -427,12 +427,14 @@ class Simulator(object):
     """The simulator class representing the interface to the flight simulator
     via FSUIPC."""
     # The basic data that should be queried all the time once we are connected
-    normalData = [ (0x0240, "H"),            # Year
-                   (0x023e, "H"),            # Number of day in year
-                   (0x023b, "b"),            # UTC hour
-                   (0x023c, "b"),            # UTC minute
-                   (0x023a, "b"),            # seconds
-                   (0x3d00, -256),           # The name of the current aircraft
+    timeData = [ (0x0240, "H"),            # Year
+                 (0x023e, "H"),            # Number of day in year
+                 (0x023b, "b"),            # UTC hour
+                 (0x023c, "b"),            # UTC minute
+                 (0x023a, "b") ]           # seconds
+    
+    normalData = timeData + \
+                 [ (0x3d00, -256),           # The name of the current aircraft
                    (0x3c00, -256) ]          # The path of the current AIR file
 
     flareData1 = [ (0x023a, "b"),            # Seconds of time
@@ -451,6 +453,18 @@ class Simulator(object):
                    (0x0578, "d"),            # Pitch
                    (0x057c, "d"),            # Bank
                    (0x0580, "d") ]           # Heading
+
+    @staticmethod
+    def _getTimestamp(data):
+        """Convert the given data into a timestamp."""
+        timestamp = calendar.timegm(time.struct_time([data[0],
+                                                      1, 1, 0, 0, 0, -1, 1, 0]))
+        timestamp += data[1] * 24 * 3600
+        timestamp += data[2] * 3600
+        timestamp += data[3] * 60
+        timestamp += data[4]        
+
+        return timestamp
 
     def __init__(self, connectionListener, connectAttempts = -1,
                  connectInterval = 0.2):
@@ -515,6 +529,11 @@ class Simulator(object):
     def requestZFW(self, callback):
         """Send a request for the ZFW."""
         self._handler.requestRead([(0x3bfc, "d")], self._handleZFW, extra = callback)
+
+    def requestTime(self, callback):
+        """Request the time from the simulator."""
+        self._handler.requestRead(Simulator.timeData, self._handleTime,
+                                  extra = callback)
                                                             
     def startMonitoring(self):
         """Start the periodic monitoring of the aircraft and pass the resulting
@@ -582,12 +601,7 @@ class Simulator(object):
         monitoring is started, it contains the result also for the
         aircraft-specific values.
         """
-        timestamp = calendar.timegm(time.struct_time([data[0],
-                                                      1, 1, 0, 0, 0, -1, 1, 0]))
-        timestamp += data[1] * 24 * 3600
-        timestamp += data[2] * 3600
-        timestamp += data[3] * 60
-        timestamp += data[4]        
+        timestamp = Simulator._getTimestamp(data)
 
         createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
         
@@ -718,6 +732,10 @@ class Simulator(object):
         """Callback for a ZFW retrieval request."""
         zfw = data[0] * const.LBSTOKG / 256.0
         callback(zfw)
+                                                  
+    def _handleTime(self, data, callback):
+        """Callback for a time retrieval request."""
+        callback(Simulator._getTimestamp(data))
                                                   
 #------------------------------------------------------------------------------
 

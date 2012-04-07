@@ -6,6 +6,9 @@ import mlx.const as const
 import mlx.fs as fs
 from mlx.checks import PayloadChecker
 
+import datetime
+import time
+
 #-----------------------------------------------------------------------------
 
 class Page(gtk.Alignment):
@@ -641,6 +644,7 @@ class PayloadPage(Page):
             
     def _zfwRequested(self, button):
         """Called when the ZFW is requested from the simulator."""
+        self._wizard.gui.beginBusy("Querying ZFW...")
         self._wizard.gui.simulator.requestZFW(self._handleZFW)
 
     def _handleZFW(self, zfw):
@@ -649,6 +653,7 @@ class PayloadPage(Page):
 
     def _processZFW(self, zfw):
         """Process the given ZFW value received from the simulator."""
+        self._wizard.gui.endBusy()
         self._simulatorZFWValue = zfw
         self._simulatorZFW.set_text("%.0f" % (zfw,))
         self._updateCalculatedZFW()
@@ -656,6 +661,99 @@ class PayloadPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard._zfw = self._calculateZFW()
+        self._wizard.nextPage()
+        
+#-----------------------------------------------------------------------------
+
+class TimePage(Page):
+    """Page displaying the departure and arrival times and allows querying the
+    current time from the flight simulator."""
+    def __init__(self, wizard):
+        help = "The departure and arrival times are displayed below in UTC.\n\n" \
+               "You can also query the current UTC time from the simulator.\n" \
+               "Ensure that you have enough time to properly prepare for the flight."
+               
+        super(TimePage, self).__init__(wizard, "Time", help)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(3, 2)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        label = gtk.Label("Departure:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._departure = gtk.Label()
+        self._departure.set_alignment(0.0, 0.5)
+        table.attach(self._departure, 1, 2, 0, 1)
+        
+        label = gtk.Label("Arrival:")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._arrival = gtk.Label()
+        self._arrival.set_alignment(0.0, 0.5)
+        table.attach(self._arrival, 1, 2, 1, 2)
+
+        button = gtk.Button("_Time from FS:")
+        button.set_use_underline(True)
+        button.connect("clicked", self._timeRequested)
+        table.attach(button, 0, 1, 2, 3)
+
+        self._simulatorTime = gtk.Label("-")
+        self._simulatorTime.set_alignment(0.0, 0.5)
+        table.attach(self._simulatorTime, 1, 2, 2, 3)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Activate the page."""
+        bookedFlight = self._wizard._bookedFlight
+        self._departure.set_text(str(bookedFlight.departureTime.time()))
+        self._arrival.set_text(str(bookedFlight.arrivalTime.time()))
+
+    def _timeRequested(self, button):
+        """Request the time from the simulator."""
+        self._wizard.gui.beginBusy("Querying time...")
+        self._wizard.gui.simulator.requestTime(self._handleTime)
+
+    def _handleTime(self, timestamp):
+        """Handle the result of a time retrieval."""
+        gobject.idle_add(self._processTime, timestamp)
+
+    def _processTime(self, timestamp):
+        """Process the given time."""
+        self._wizard.gui.endBusy()
+        tm = time.gmtime(timestamp)
+        t = datetime.time(tm.tm_hour, tm.tm_min, tm.tm_sec)
+        self._simulatorTime.set_text(str(t))
+
+        ts = tm.tm_hour * 3600 + tm.tm_min * 60 + tm.tm_sec
+        dt = self._wizard._bookedFlight.departureTime.time()
+        dts = dt.hour * 3600 + dt.minute * 60 + dt.second
+        diff = dts-ts
+
+        markupBegin = ""
+        markupEnd = ""
+        if diff < 0:
+            markupBegin = '<b><span foreground="red">'
+            markupEnd = '</span></b>'
+        elif diff < 3*60 or diff > 30*60:
+            markupBegin = '<b><span foreground="orange">'
+            markupEnd = '</span></b>'
+
+        self._departure.set_markup(markupBegin + str(dt) + markupEnd)
+
+    def _forwardClicked(self, button):
+        """Called when the forward button is clicked."""
         self._wizard.nextPage()
         
 #-----------------------------------------------------------------------------
@@ -676,6 +774,7 @@ class Wizard(gtk.VBox):
         self._pages.append(GateSelectionPage(self))
         self._pages.append(ConnectPage(self))
         self._pages.append(PayloadPage(self))
+        self._pages.append(TimePage(self))
 
         maxWidth = 0
         maxHeight = 0

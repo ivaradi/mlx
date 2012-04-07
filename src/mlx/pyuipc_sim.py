@@ -667,7 +667,6 @@ def prepare_data(pattern, forRead = True):
 
 def read(data):
     """Read the given data."""
-    print "opened", opened
     if opened:
         return [values.read(offset) for (offset, type) in data]
     else:
