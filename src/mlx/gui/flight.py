@@ -857,7 +857,120 @@ class RoutePage(Page):
         """Called when the Forward button is clicked."""
         self._wizard._cruiseAltitude = self._cruiseLevel.get_value_as_int() * 100
         self._wizard._route = self._getRoute()
+
+        bookedFlight = self._wizard._bookedFlight
+        self._wizard.gui.beginBusy("Downloading NOTAMs...")
+        self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
+                                              bookedFlight.departureICAO,
+                                              bookedFlight.arrivalICAO)
+
+    def _notamsCallback(self, returned, result):
+        """Callback for the NOTAMs."""
+        gobject.idle_add(self._handleNOTAMs, returned, result)
+
+    def _handleNOTAMs(self, returned, result):
+        """Handle the NOTAMs."""
+        self._wizard.gui.endBusy()
+        if returned:
+            self._wizard._departureNOTAMs = result.departureNOTAMs
+            self._wizard._arrivalNOTAMs = result.arrivalNOTAMs
+
         self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
+class NOTAMPage(Page):
+    """Page for the NOTAMs."""
+    def __init__(self, wizard):
+        help = "Read carefully the NOTAMs below."
+               
+        super(NOTAMPage, self).__init__(wizard, "NOTAMs", help)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 1.0, yscale = 1.0)
+
+        mainBox = gtk.VBox()
+        alignment.add(mainBox)
+        self.setMainWidget(alignment)
+
+        self._departureNOTAMsFrame = gtk.Frame()
+        self._departureNOTAMsFrame.set_label("LHBP NOTAMs")
+        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow.set_size_request(-1, 80)
+        self._departureNOTAMs = gtk.TextView()
+        self._departureNOTAMs.set_wrap_mode(gtk.WrapMode.WORD if pygobject else
+                                            gtk.WRAP_WORD)
+        scrolledWindow.add(self._departureNOTAMs)
+        self._departureNOTAMsFrame.add(scrolledWindow)
+        mainBox.pack_start(self._departureNOTAMsFrame, True, True, 4)
+        
+        self._arrivalNOTAMsFrame = gtk.Frame()
+        self._arrivalNOTAMsFrame.set_label("LIRF NOTAMs")
+        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow.set_size_request(-1, 80)
+        self._arrivalNOTAMs = gtk.TextView()
+        self._arrivalNOTAMs.set_wrap_mode(gtk.WrapMode.WORD if pygobject else
+                                          gtk.WRAP_WORD)
+        scrolledWindow.add(self._arrivalNOTAMs)
+        self._arrivalNOTAMsFrame.add(scrolledWindow)
+        mainBox.pack_start(self._arrivalNOTAMsFrame, True, True, 4)
+
+        # metarBox = gtk.HBox()
+
+        # departureMETARFrame = gtk.Frame()
+        # departureMETARFrame.set_label("LHBP METAR")
+        # scrolledWindow = gtk.ScrolledWindow()
+        # self._departureMETAR = gtk.TextView()
+        # scrolledWindow.add(self._departureMETAR)
+        # departureMETARFrame.add(scrolledWindow)
+        # metarBox.pack_start(departureMETARFrame, True, True, 4)
+
+        # arrivalMETARFrame = gtk.Frame()
+        # arrivalMETARFrame.set_label("EPWA METAR")
+        # scrolledWindow = gtk.ScrolledWindow()
+        # self._arrivalMETAR = gtk.TextView()
+        # scrolledWindow.add(self._arrivalMETAR)
+        # arrivalMETARFrame.add(scrolledWindow)
+        # metarBox.pack_start(arrivalMETARFrame, True, True, 4)
+
+        # mainBox.pack_start(metarBox, True, True, 4)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Activate the page."""
+        bookedFlight = self._wizard._bookedFlight
+        self._setupNOTAMs(self._departureNOTAMsFrame, self._departureNOTAMs,
+                          bookedFlight.departureICAO, self._wizard._departureNOTAMs)
+        self._setupNOTAMs(self._arrivalNOTAMsFrame, self._arrivalNOTAMs,
+                          bookedFlight.arrivalICAO, self._wizard._arrivalNOTAMs)
+
+    def _setupNOTAMs(self, frame, textView, icao, notams):
+        """Setup the NOTAMs."""
+        frame.set_label(icao + " NOTAMs")
+        buffer = textView.get_buffer()
+        if notams is None:
+            buffer.set_text("Could not download NOTAMs")
+        else:
+            s = ""
+            for notam in notams:
+                s += str(notam.begin)
+                if notam.end is not None:
+                    s += " - " + str(notam.end)
+                elif notam.permanent:
+                    s += " - PERMANENT"
+                s += "\n"
+                if notam.repeatCycle:
+                    s += "Repeat cycle: " + notam.repeatCycle + "\n"
+                s += notam.notice + "\n"
+                s += "-------------------- * --------------------\n"
+            buffer.set_text(s)
+        
+
+    def _forwardClicked(self):
+        """Called when the forward button is clicked."""
 
 #-----------------------------------------------------------------------------
 
@@ -879,6 +992,7 @@ class Wizard(gtk.VBox):
         self._pages.append(PayloadPage(self))
         self._pages.append(TimePage(self))
         self._pages.append(RoutePage(self))
+        self._pages.append(NOTAMPage(self))
 
         maxWidth = 0
         maxHeight = 0
@@ -949,6 +1063,8 @@ class Wizard(gtk.VBox):
         self._zfw = None
         self._cruiseAltitude = None
         self._route = None
+        self._departureNOTAMs = None
+        self._arrivalNOTAMs = None
         
         self.setCurrentPage(0)
         
