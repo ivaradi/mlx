@@ -11,6 +11,7 @@ import urllib2
 import hashlib
 import datetime
 import codecs
+import xml.sax
 
 #---------------------------------------------------------------------------------------
 
@@ -187,6 +188,71 @@ class Fleet(object):
         
 #------------------------------------------------------------------------------
 
+class NOTAM(object):
+    """A NOTAM for an airport."""
+    def __init__(self, begin, notice, end = None, permanent = False,
+                 repeatCycle = None):
+        """Construct the NOTAM."""
+        self.begin = begin
+        self.notice = notice
+        self.end = end
+        self.permanent = permanent
+        self.repeatCycle = None
+
+    def __repr__(self):
+        """Get the representation of the NOTAM."""
+        s = "<NOTAM " + str(self.begin)
+        if self.end:
+            s += " - " + str(self.end)
+        elif self.permanent:
+            s += " - PERMANENT"
+        if self.repeatCycle:
+            s += " (" + self.repeatCycle + ")"
+        s += ": " + self.notice
+        s += ">"
+        return s
+    
+#------------------------------------------------------------------------------
+
+class NOTAMHandler(xml.sax.handler.ContentHandler):
+    """A handler for the NOTAM database."""
+    def __init__(self, airportICAOs):
+        """Construct the handler for the airports with the given ICAO code."""
+        self._notams = {}
+        for icao in airportICAOs:
+            self._notams[icao] = []
+
+    def startElement(self, name, attrs):
+        """Start an element."""
+        if name!="notam" or \
+           "A" not in attrs or not attrs["A"] or \
+           "B" not in attrs or not attrs["B"] or \
+           "E" not in attrs or not attrs["E"]:
+            return
+        
+        icao = attrs["A"]
+        if icao not in self._notams:
+            return
+        
+        begin = datetime.datetime.strptime(attrs["B"], "%Y-%m-%d %H:%M:%S")
+
+        c = attrs["C"] if "C" in attrs else None
+        end = datetime.datetime.strptime(c, "%Y-%m-%d %H:%M:%S") if c else None
+        
+        permanent = attrs["C_flag"]=="PERM" if "C_flag" in attrs else False
+        
+        repeatCycle = attrs["D"] if "D" in attrs else None
+
+        self._notams[icao].append(NOTAM(begin, attrs["E"], end = end,
+                                        permanent = permanent,
+                                        repeatCycle = repeatCycle))
+
+    def get(self, icao):
+        """Get the NOTAMs for the given ICAO code."""
+        return self._notams[icao] if icao in self._notams else []
+
+#------------------------------------------------------------------------------
+
 class Result(object):
     """A result object.
 
@@ -349,6 +415,37 @@ class UpdatePlane(Request):
             
 #------------------------------------------------------------------------------
 
+class GetNOTAMs(Request):
+    """Get the NOTAMs from EURoutePro and select the ones we are interested
+    in."""
+    def __init__(self, callback, departureICAO, arrivalICAO):
+        """Construct the request for the given airports."""
+        super(GetNOTAMs, self).__init__(callback)
+        self._departureICAO = departureICAO
+        self._arrivalICAO = arrivalICAO
+
+    def run(self):
+        """Perform the plane update."""
+        xmlParser = xml.sax.make_parser()
+        notamHandler = NOTAMHandler([self._departureICAO, self._arrivalICAO])
+        xmlParser.setContentHandler(notamHandler)
+
+        url = "http://notams.euroutepro.com/notams.xml"
+
+        f = urllib2.urlopen(url)
+        try:
+            xmlParser.parse(f)
+        finally:
+            f.close()
+
+        result = Result()
+        result.departureNOTAMs = notamHandler.get(self._departureICAO)
+        result.arrivalNOTAMs = notamHandler.get(self._arrivalICAO)
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -374,6 +471,10 @@ class Handler(threading.Thread):
     def updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the status of the given plane."""        
         self._addRequest(UpdatePlane(callback, tailNumber, status, gateNumber))
+
+    def getNOTAMs(self, callback, departureICAO, arrivalICAO):
+        """Get the NOTAMs for the given two airports."""
+        self._addRequest(GetNOTAMs(callback, departureICAO, arrivalICAO))
         
     def run(self):
         """Process the requests."""
@@ -406,9 +507,13 @@ if __name__ == "__main__":
     #handler.login(callback, "P096", "V5fwj")
     #handler.getFleet(callback)
     # Plane: HA-LEG home (gate 67)
-    handler.updatePlane(callback, "HA-LQC", const.PLANE_AWAY, "72")
-    time.sleep(3)    
-    handler.getFleet(callback)
-    time.sleep(3)    
+    #handler.updatePlane(callback, "HA-LQC", const.PLANE_AWAY, "72")
+    #time.sleep(3)    
+    #handler.getFleet(callback)
+    #time.sleep(3)
+
+    handler.getNOTAMs(callback, "LHBP", "EPWA")
+    time.sleep(3)
+    
 
 #------------------------------------------------------------------------------
