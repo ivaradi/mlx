@@ -274,8 +274,8 @@ class FlightSelectionPage(Page):
         scrolledWindow.set_size_request(400, -1)
         scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
                                   else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.ALWAYS if pygobject
-                                  else gtk.POLICY_ALWAYS)
+                                  gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC)
         scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
                                        else gtk.SHADOW_IN)
 
@@ -372,8 +372,8 @@ class GateSelectionPage(Page):
         scrolledWindow.set_size_request(50, -1)
         scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
                                   else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.ALWAYS if pygobject
-                                  else gtk.POLICY_ALWAYS)
+                                  gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC)
         scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
                                        else gtk.SHADOW_IN)
 
@@ -818,6 +818,10 @@ class RoutePage(Page):
         routeWindow.set_size_request(400, 80)
         routeWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
                                     else gtk.SHADOW_IN)
+        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC,
+                               gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC)
 
         self._route = gtk.TextView()
         self._route.set_tooltip_text("The planned flight route.")
@@ -914,9 +918,9 @@ class BriefingPage(Page):
         self._departure = departure
         self._activated = False
         
-        title = "Briefing (%d/2): %s airport" % (1 if departure else 2,
-                                                 "departure" if departure
-                                                 else "arrival")
+        title = "Briefing (%d/2): %s" % (1 if departure else 2,
+                                        "departure" if departure
+                                         else "arrival")
                                                                 
         help = "Read carefully the NOTAMs and METAR below."
 
@@ -933,6 +937,10 @@ class BriefingPage(Page):
         self._notamsFrame.set_label("LHBP NOTAMs")
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 128)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC)
         self._notams = gtk.TextView()
         self._notams.set_editable(False)
         self._notams.set_accepts_tab(False)
@@ -950,6 +958,10 @@ class BriefingPage(Page):
         self._metarFrame.set_label("LHBP METAR")
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 32)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC if pygobject
+                                  else gtk.POLICY_AUTOMATIC)
         self._metar = gtk.TextView()
         self._metar.set_editable(False)
         self._metar.set_accepts_tab(False)
