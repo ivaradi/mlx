@@ -74,13 +74,17 @@ class Page(gtk.Alignment):
         buttonAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                     padding_left = 16, padding_right = 16)
 
-        self._buttonBox = gtk.HButtonBox()
+        self._buttonBox = gtk.HBox()
+        self._buttonBox.set_homogeneous(False)
         self._defaultButton = None
         buttonAlignment.add(self._buttonBox)
 
         self._vbox.pack_start(buttonAlignment, False, False, 0)
 
         self._wizard = wizard
+
+        self._finalized = False
+        self._fromPage = None
 
     def setMainWidget(self, widget):
         """Set the given widget as the main one."""
@@ -91,7 +95,7 @@ class Page(gtk.Alignment):
 
         Return the button object created."""
         button = gtk.Button(label)
-        self._buttonBox.add(button)
+        self._buttonBox.pack_start(button, False, False, 4)
         button.set_use_underline(True)
         if default:
             button.set_can_default(True)
@@ -104,6 +108,10 @@ class Page(gtk.Alignment):
         This default implementation does nothing."""
         pass
 
+    def finalize(self):
+        """Called when the page is finalized."""
+        pass
+
     def grabDefault(self):
         """If the page has a default button, make it the default one."""
         if self._defaultButton is not None:
@@ -111,7 +119,14 @@ class Page(gtk.Alignment):
 
     def reset(self):
         """Reset the page if the wizard is reset."""
-        pass
+        self._finalized = False
+        self._fromPage = None
+
+    def goBack(self):
+        """Go to the page we were invoked from."""
+        assert self._fromPage is not None
+        
+        self._wizard.setCurrentPage(self._fromPage, finalize = False)
     
 #-----------------------------------------------------------------------------
 
@@ -191,10 +206,12 @@ class LoginPage(Page):
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
-        self._wizard.gui.beginBusy("Logging in...")
-        self._wizard.gui.webHandler.login(self._loginResultCallback,
-                                          self._pilotID.get_text(),
-                                          self._password.get_text())
+        self._loginButton.set_sensitive(False)
+        gui = self._wizard.gui
+        gui.beginBusy("Logging in...")
+        gui.webHandler.login(self._loginResultCallback,
+                            self._pilotID.get_text(),
+                            self._password.get_text())
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""
@@ -203,6 +220,7 @@ class LoginPage(Page):
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
         self._wizard.gui.endBusy()
+        self._loginButton.set_sensitive(True)
         if returned:
             if result.loggedIn:
                 config = self._wizard.gui.config
@@ -289,17 +307,19 @@ class FlightSelectionPage(Page):
         self._button.set_sensitive(False)
         self._button.connect("clicked", self._forwardClicked)
 
-        self._activated = False
-
     def activate(self):
         """Fill the flight list."""
-        if not self._activated:
-            for flight in self._wizard.loginResult.flights:
-                self._listStore.append([str(flight.departureTime),
-                                        flight.callsign,
-                                        flight.departureICAO,
-                                        flight.arrivalICAO])
-            self._activated = True
+        self._flightList.set_sensitive(True)
+        self._listStore.clear()
+        for flight in self._wizard.loginResult.flights:
+            self._listStore.append([str(flight.departureTime),
+                                    flight.callsign,
+                                    flight.departureICAO,
+                                    flight.arrivalICAO])
+
+    def finalize(self):
+        """Finalize the page."""
+        self._flightList.set_sensitive(False)
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
@@ -307,15 +327,18 @@ class FlightSelectionPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button was clicked."""
-        selection = self._flightList.get_selection()
-        (listStore, iter) = selection.get_selected()
-        path = listStore.get_path(iter)
-        [index] = path.get_indices() if pygobject else path
+        if self._finalized:
+            self._wizard.jumpPage(self._nextDistance, finalize = False)
+        else:
+            selection = self._flightList.get_selection()
+            (listStore, iter) = selection.get_selected()
+            path = listStore.get_path(iter)
+            [index] = path.get_indices() if pygobject else path
 
-        flight = self._wizard.loginResult.flights[index]
-        self._wizard._bookedFlight = flight
+            flight = self._wizard.loginResult.flights[index]
+            self._wizard._bookedFlight = flight
 
-        self._updateDepartureGate()
+            self._updateDepartureGate()
         
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
@@ -323,22 +346,26 @@ class FlightSelectionPage(Page):
         if flight.departureICAO=="LHBP":
             self._wizard._getFleet(self._fleetRetrieved)
         else:
+            self._nextDistance = 2
             self._wizard.jumpPage(2)
 
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
+            self._nextDistance = 2
             self._wizard.jumpPage(2)
         else:
             plane = fleet[self._wizard._bookedFlight.tailNumber]
             if plane is None:
+                self._nextDistance = 2
                 self._wizard.jumpPage(2)
-            
-            if plane.gateNumber is not None and \
-               not fleet.isGateConflicting(plane):
+            elif plane.gateNumber is not None and \
+                 not fleet.isGateConflicting(plane):
                 self._wizard._departureGate = plane.gateNumber
+                self._nextDistance = 2
                 self._wizard.jumpPage(2)
             else:
+                self._nextDistance = 1
                 self._wizard.nextPage()
         
 #-----------------------------------------------------------------------------
@@ -390,10 +417,15 @@ class GateSelectionPage(Page):
     def activate(self):
         """Fill the gate list."""
         self._listStore.clear()
+        self._gateList.set_sensitive(True)
         occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
         for gateNumber in const.lhbpGateNumbers:
             if gateNumber not in occupiedGateNumbers:
                 self._listStore.append([gateNumber])
+
+    def finalize(self):
+        """Finalize the page."""
+        self._gateList.set_sensitive(False)
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
@@ -401,16 +433,18 @@ class GateSelectionPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        selection = self._gateList.get_selection()
-        (listStore, iter) = selection.get_selected()
-        (gateNumber,) = listStore.get(iter, 0)
+        if not self._finalized:
+            selection = self._gateList.get_selection()
+            (listStore, iter) = selection.get_selected()
+            (gateNumber,) = listStore.get(iter, 0)
 
-        self._wizard._departureGate = gateNumber
+            self._wizard._departureGate = gateNumber
 
-        #self._wizard._updatePlane(self._planeUpdated,
-        #                          self._wizard._bookedFlight.tailNumber,
-        #                          const.PLANE_HOME,
-        #                          gateNumber)
+            #self._wizard._updatePlane(self._planeUpdated,
+            #                          self._wizard._bookedFlight.tailNumber,
+            #                          const.PLANE_HOME,
+            #                          gateNumber)
+        
         self._wizard.nextPage()
 
     def _planeUpdated(self, success):
@@ -481,12 +515,21 @@ class ConnectPage(Page):
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 1, 2)
 
+        button = self.addButton(gtk.STOCK_GO_BACK)
+        button.set_use_stock(True)
+        button.connect("clicked", self._backClicked)
+
         self._button = self.addButton("_Connect", default = True)
         self._button.set_use_underline(True)
-        self._button.connect("clicked", self._connectClicked)
+        self._clickedID = self._button.connect("clicked", self._connectClicked)
 
     def activate(self):
         """Setup the departure information."""
+        self._button.set_label("_Connect")
+        self._button.set_use_underline(True)
+        self._button.disconnect(self._clickedID)
+        self._clickedID = self._button.connect("clicked", self._connectClicked)
+        
         icao = self._wizard._bookedFlight.departureICAO
         self._departureICAO.set_markup("<b>" + icao + "</b>")
         gate = self._wizard._departureGate
@@ -494,9 +537,24 @@ class ConnectPage(Page):
             gate = "<b>" + gate + "</b>"
         self._departureGate.set_markup(gate)
 
+    def finalize(self):
+        """Finalize the page."""
+        self._button.set_label(gtk.STOCK_GO_FORWARD)
+        self._button.set_use_stock(True)
+        self._button.disconnect(self._clickedID)
+        self._clickedID = self._button.connect("clicked", self._forwardClicked)
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+
     def _connectClicked(self, button):
         """Called when the Connect button is pressed."""
         self._wizard._connectSimulator()
+
+    def _forwardClicked(self, button):
+        """Called when the Forward button is pressed."""
+        self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
 
@@ -588,10 +646,10 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 5, 6)
 
-        button = gtk.Button("_ZFW from FS:")
-        button.set_use_underline(True)
-        button.connect("clicked", self._zfwRequested)
-        table.attach(button, 0, 1, 6, 7)
+        self._zfwButton = gtk.Button("_ZFW from FS:")
+        self._zfwButton.set_use_underline(True)
+        self._zfwButton.connect("clicked", self._zfwRequested)
+        table.attach(self._zfwButton, 0, 1, 6, 7)
 
         self._simulatorZFW = gtk.Label("-")
         self._simulatorZFW.set_width_chars(6)
@@ -600,6 +658,10 @@ class PayloadPage(Page):
         self._simulatorZFWValue = None
 
         table.attach(gtk.Label("kg"), 2, 3, 6, 7)
+
+        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
+        self._backButton.set_use_stock(True)
+        self._backButton.connect("clicked", self._backClicked)
 
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
@@ -613,8 +675,15 @@ class PayloadPage(Page):
         self._bagWeight.set_text(str(bookedFlight.bagWeight))
         self._cargoWeightValue = bookedFlight.cargoWeight
         self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
+        self._cargoWeight.set_sensitive(True)
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
+        self._zfwButton.set_sensitive(True)
         self._updateCalculatedZFW()
+
+    def finalize(self):
+        """Finalize the payload page."""
+        self._cargoWeight.set_sensitive(False)
+        self._zfwButton.set_sensitive(False)
 
     def _calculateZFW(self):
         """Calculate the ZFW value."""
@@ -652,8 +721,12 @@ class PayloadPage(Page):
             
     def _zfwRequested(self, button):
         """Called when the ZFW is requested from the simulator."""
-        self._wizard.gui.beginBusy("Querying ZFW...")
-        self._wizard.gui.simulator.requestZFW(self._handleZFW)
+        self._zfwButton.set_sensitive(False)
+        self._backButton.set_sensitive(False)
+        self._button.set_sensitive(False)
+        gui = self._wizard.gui
+        gui.beginBusy("Querying ZFW...")
+        gui.simulator.requestZFW(self._handleZFW)
 
     def _handleZFW(self, zfw):
         """Called when the ZFW value is retrieved."""
@@ -662,14 +735,22 @@ class PayloadPage(Page):
     def _processZFW(self, zfw):
         """Process the given ZFW value received from the simulator."""
         self._wizard.gui.endBusy()
+        self._zfwButton.set_sensitive(True)
+        self._backButton.set_sensitive(True)
+        self._button.set_sensitive(True)
         self._simulatorZFWValue = zfw
         self._simulatorZFW.set_text("%.0f" % (zfw,))
         self._updateCalculatedZFW()
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        self._wizard._zfw = self._calculateZFW()
+        if not self._finalized:
+            self._wizard._zfw = self._calculateZFW()
         self._wizard.nextPage()
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
         
 #-----------------------------------------------------------------------------
 
@@ -709,14 +790,18 @@ class TimePage(Page):
         self._arrival.set_alignment(0.0, 0.5)
         table.attach(self._arrival, 1, 2, 1, 2)
 
-        button = gtk.Button("_Time from FS:")
-        button.set_use_underline(True)
-        button.connect("clicked", self._timeRequested)
-        table.attach(button, 0, 1, 2, 3)
+        self._timeButton = gtk.Button("_Time from FS:")
+        self._timeButton.set_use_underline(True)
+        self._timeButton.connect("clicked", self._timeRequested)
+        table.attach(self._timeButton, 0, 1, 2, 3)
 
         self._simulatorTime = gtk.Label("-")
         self._simulatorTime.set_alignment(0.0, 0.5)
         table.attach(self._simulatorTime, 1, 2, 2, 3)
+
+        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
+        self._backButton.set_use_stock(True)
+        self._backButton.connect("clicked", self._backClicked)
 
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
@@ -724,12 +809,20 @@ class TimePage(Page):
 
     def activate(self):
         """Activate the page."""
+        self._timeButton.set_sensitive(True)
         bookedFlight = self._wizard._bookedFlight
         self._departure.set_text(str(bookedFlight.departureTime.time()))
         self._arrival.set_text(str(bookedFlight.arrivalTime.time()))
 
+    def finalize(self):
+        """Finalize the page."""
+        self._timeButton.set_sensitive(False)
+
     def _timeRequested(self, button):
         """Request the time from the simulator."""
+        self._timeButton.set_sensitive(False)
+        self._backButton.set_sensitive(False)
+        self._button.set_sensitive(False)
         self._wizard.gui.beginBusy("Querying time...")
         self._wizard.gui.simulator.requestTime(self._handleTime)
 
@@ -740,6 +833,9 @@ class TimePage(Page):
     def _processTime(self, timestamp):
         """Process the given time."""
         self._wizard.gui.endBusy()
+        self._timeButton.set_sensitive(True)
+        self._backButton.set_sensitive(True)
+        self._button.set_sensitive(True)
         tm = time.gmtime(timestamp)
         t = datetime.time(tm.tm_hour, tm.tm_min, tm.tm_sec)
         self._simulatorTime.set_text(str(t))
@@ -760,6 +856,10 @@ class TimePage(Page):
 
         self._departure.set_markup(markupBegin + str(dt) + markupEnd)
 
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard.nextPage()
@@ -833,14 +933,25 @@ class RoutePage(Page):
 
         mainBox.pack_start(routeBox, True, True, 8)
 
+        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
+        self._backButton.set_use_stock(True)
+        self._backButton.connect("clicked", self._backClicked)
+
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
 
     def activate(self):
         """Setup the route from the booked flight."""
+        self._route.set_sensitive(True)
+        self._cruiseLevel.set_sensitive(True)
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
         self._updateForwardButton()
+
+    def finalize(self):
+        """Finalize the page."""
+        self._route.set_sensitive(False)
+        self._cruiseLevel.set_sensitive(False)
 
     def _getRoute(self):
         """Get the text of the route."""
@@ -861,16 +972,28 @@ class RoutePage(Page):
         """Called when the route has changed."""
         self._updateForwardButton()
 
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
     def _forwardClicked(self, button):
         """Called when the Forward button is clicked."""
-        self._wizard._cruiseAltitude = self._cruiseLevel.get_value_as_int() * 100
-        self._wizard._route = self._getRoute()
+        if self._finalized:
+            self._wizard.nextPage()
+        else:
+            self._wizard._cruiseAltitude = self._cruiseLevel.get_value_as_int() * 100
+            self._wizard._route = self._getRoute()
 
-        bookedFlight = self._wizard._bookedFlight
-        self._wizard.gui.beginBusy("Downloading NOTAMs...")
-        self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
-                                              bookedFlight.departureICAO,
-                                              bookedFlight.arrivalICAO)
+            self._backButton.set_sensitive(False)
+            self._button.set_sensitive(False)
+            self._cruiseLevel.set_sensitive(False)
+            self._route.set_sensitive(False)
+
+            bookedFlight = self._wizard._bookedFlight
+            self._wizard.gui.beginBusy("Downloading NOTAMs...")
+            self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
+                                                  bookedFlight.departureICAO,
+                                                  bookedFlight.arrivalICAO)
 
     def _notamsCallback(self, returned, result):
         """Callback for the NOTAMs."""
@@ -907,6 +1030,8 @@ class RoutePage(Page):
                 self._wizard._arrivalMETAR = result.metars[bookedFlight.arrivalICAO]
 
         self._wizard.gui.endBusy()
+        self._backButton.set_sensitive(True)
+        self._button.set_sensitive(True)
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -916,7 +1041,6 @@ class BriefingPage(Page):
     def __init__(self, wizard, departure):
         """Construct the briefing page."""
         self._departure = departure
-        self._activated = False
         
         title = "Briefing (%d/2): %s" % (1 if departure else 2,
                                         "departure" if departure
@@ -975,66 +1099,74 @@ class BriefingPage(Page):
         self._metarFrame.add(alignment)
         mainBox.pack_start(self._metarFrame, True, True, 4)
 
+        button = self.addButton(gtk.STOCK_GO_BACK)
+        button.set_use_stock(True)
+        button.connect("clicked", self._backClicked)
+
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
 
     def activate(self):
         """Activate the page."""
-        if self._activated:
-            if not self._departure:
-                self._button.set_label(gtk.STOCK_GO_FORWARD)
-                self._button.set_use_stock(True)
+        if not self._departure:
+            self._button.set_label("I have read the briefing and am ready to fly!")
+            self._button.set_use_stock(False)
+
+        bookedFlight = self._wizard._bookedFlight
+
+        icao = bookedFlight.departureICAO if self._departure \
+               else bookedFlight.arrivalICAO
+        notams = self._wizard._departureNOTAMs if self._departure \
+                 else self._wizard._arrivalNOTAMs
+        metar = self._wizard._departureMETAR if self._departure \
+                 else self._wizard._arrivalMETAR
+
+        self._notamsFrame.set_label(icao + " NOTAMs")
+        buffer = self._notams.get_buffer()
+        if notams is None:
+            buffer.set_text("Could not download NOTAMs")
         else:
-            if not self._departure:
-                self._button.set_label("I have read the briefing and am ready to fly!")
-                self._button.set_use_stock(False)
+            s = ""
+            for notam in notams:
+                s += str(notam.begin)
+                if notam.end is not None:
+                    s += " - " + str(notam.end)
+                elif notam.permanent:
+                    s += " - PERMANENT"
+                s += "\n"
+                if notam.repeatCycle:
+                    s += "Repeat cycle: " + notam.repeatCycle + "\n"
+                s += notam.notice + "\n"
+                s += "-------------------- * --------------------\n"
+            buffer.set_text(s)
 
-            bookedFlight = self._wizard._bookedFlight
+        self._metarFrame.set_label(icao + " METAR")
+        buffer = self._metar.get_buffer()
+        if metar is None:
+            buffer.set_text("Could not download METAR")
+        else:
+            buffer.set_text(metar)
 
-            icao = bookedFlight.departureICAO if self._departure \
-                   else bookedFlight.arrivalICAO
-            notams = self._wizard._departureNOTAMs if self._departure \
-                     else self._wizard._arrivalNOTAMs
-            metar = self._wizard._departureMETAR if self._departure \
-                     else self._wizard._arrivalMETAR
+    def finalize(self):
+        """Finalize the page."""
+        if not self._departure:
+            self._button.set_use_stock(True)
+            self._button.set_label(gtk.STOCK_GO_FORWARD)
 
-            self._notamsFrame.set_label(icao + " NOTAMs")
-            buffer = self._notams.get_buffer()
-            if notams is None:
-                buffer.set_text("Could not download NOTAMs")
-            else:
-                s = ""
-                for notam in notams:
-                    s += str(notam.begin)
-                    if notam.end is not None:
-                        s += " - " + str(notam.end)
-                    elif notam.permanent:
-                        s += " - PERMANENT"
-                    s += "\n"
-                    if notam.repeatCycle:
-                        s += "Repeat cycle: " + notam.repeatCycle + "\n"
-                    s += notam.notice + "\n"
-                    s += "-------------------- * --------------------\n"
-                buffer.set_text(s)
-
-            self._metarFrame.set_label(icao + " METAR")
-            buffer = self._metar.get_buffer()
-            if metar is None:
-                buffer.set_text("Could not download METAR")
-            else:
-                buffer.set_text(metar)
-
-            self._activated = True
-
-    def reset(self):
-        """Reset the page if the wizard is reset."""
-        super(BriefingPage, self).reset()
-        self._activated = False
-
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        self._wizard.nextPage()
+        if not self._departure:
+            if not self._finalized:
+                self._wizard.gui.startMonitoring()
+                self.finalize()
+                self._finalized = True
+        else:
+            self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
 
@@ -1079,26 +1211,34 @@ class Wizard(gtk.VBox):
         """Get the login result."""
         return self._loginResult
 
-    def setCurrentPage(self, index):
+    def setCurrentPage(self, index, finalize = False):
         """Set the current page to the one with the given index."""
         assert index < len(self._pages)
-        
-        if self._currentPage is not None:
-            self.remove(self._pages[self._currentPage])
+
+        fromPage = self._currentPage
+        if fromPage is not None:
+            page = self._pages[fromPage]
+            if finalize and not page._finalized:
+                page.finalize()
+                page._finalized = True
+            self.remove(page)
 
         self._currentPage = index
-        self.add(self._pages[index])
-        self._pages[index].activate()
+        page = self._pages[index]
+        self.add(page)
+        if page._fromPage is None:
+            page._fromPage = fromPage
+            page.activate()
+        self.grabDefault()
         self.show_all()
 
-    def nextPage(self):
+    def nextPage(self, finalize = True):
         """Go to the next page."""
-        self.jumpPage(1)
+        self.jumpPage(1, finalize)
 
-    def jumpPage(self, count):
+    def jumpPage(self, count, finalize = True):
         """Go to the page which is 'count' pages after the current one."""
-        self.setCurrentPage(self._currentPage + count)
-        self.grabDefault()
+        self.setCurrentPage(self._currentPage + count, finalize = finalize)
 
     def grabDefault(self):
         """Make the default button of the current page the default."""

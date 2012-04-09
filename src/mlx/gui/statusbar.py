@@ -61,7 +61,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         statusBox.pack_start(gtk.VSeparator(), False, False, 8)
 
         self._ratingLabel = gtk.Label()
-        self._ratingLabel.set_width_chars(10)
+        self._ratingLabel.set_width_chars(12)
         self._ratingLabel.set_tooltip_text("The flight rating")
         self._ratingLabel.set_alignment(0.0, 0.5)
         
@@ -84,7 +84,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
     def updateBusyState(self, message):
         """Update the busy state."""
         self._busyLabel.set_text("" if message is None else message)
-    
+
     def _drawConnState(self, connStateArea, eventOrContext):
         """Draw the connection state."""        
         context = eventOrContext if pygobject else connStateArea.window.cairo_create()

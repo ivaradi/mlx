@@ -393,8 +393,7 @@ class GUI(fs.ConnectionListener):
 
             self._flight.zfw = self._zfwSpinButton.get_value_as_int()
             
-            self._simulator.startMonitoring()
-            self._monitoring = True
+            self.startMonitoring()
         else:
             self.resetFlightStatus()
             self._connecting = False
@@ -407,6 +406,16 @@ class GUI(fs.ConnectionListener):
             self._flight = None
 
         self._statusbar.updateConnection(self._connecting, self._connected)
+
+    def startMonitoring(self):
+        """Start monitoring."""
+        self._simulator.startMonitoring()
+        self._monitoring = True
+
+    def stopMonitoring(self):
+        """Stop monitoring."""
+        self._simulator.stoptMonitoring()
+        self._monitoring = False
 
     def _buildSetupFrame(self):
         """Build the setup frame."""
