@@ -12,7 +12,6 @@ import hashlib
 import time
 import datetime
 import codecs
-import re
 import xml.sax
 
 #---------------------------------------------------------------------------------------
@@ -450,9 +449,6 @@ class GetNOTAMs(Request):
 
 class GetMETARs(Request):
     """Get the METARs from the NOAA website for certain airport ICAOs."""    
-
-    # Regular expression matching a METAR line
-    metarLine = re.compile("^[A-Z0-9]{4} ")
 
     def __init__(self, callback, airports):
         """Construct the request for the given airports."""
