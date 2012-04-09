@@ -9,8 +9,10 @@ import sys
 import urllib
 import urllib2
 import hashlib
+import time
 import datetime
 import codecs
+import re
 import xml.sax
 
 #---------------------------------------------------------------------------------------
@@ -425,7 +427,7 @@ class GetNOTAMs(Request):
         self._arrivalICAO = arrivalICAO
 
     def run(self):
-        """Perform the plane update."""
+        """Perform the retrieval of the NOTAMs."""
         xmlParser = xml.sax.make_parser()
         notamHandler = NOTAMHandler([self._departureICAO, self._arrivalICAO])
         xmlParser.setContentHandler(notamHandler)
@@ -441,6 +443,38 @@ class GetNOTAMs(Request):
         result = Result()
         result.departureNOTAMs = notamHandler.get(self._departureICAO)
         result.arrivalNOTAMs = notamHandler.get(self._arrivalICAO)
+
+        return result
+
+#------------------------------------------------------------------------------
+
+class GetMETARs(Request):
+    """Get the METARs from the NOAA website for certain airport ICAOs."""    
+
+    # Regular expression matching a METAR line
+    metarLine = re.compile("^[A-Z0-9]{4} ")
+
+    def __init__(self, callback, airports):
+        """Construct the request for the given airports."""
+        super(GetMETARs, self).__init__(callback)
+        self._airports = airports
+
+    def run(self):
+        """Perform the retrieval opf the METARs."""
+        tm = time.gmtime()
+        url = "http://weather.noaa.gov/pub/data/observations/metar/cycles/%02dZ.TXT" % \
+              (tm.tm_hour,)
+        f = urllib2.urlopen(url)
+        try:
+            result = Result()
+            result.metars = {}
+            for line in iter(f.readline, ""):
+                if len(line)>5 and line[4]==' ':
+                    icao = line[0:4]
+                    if icao in self._airports:
+                        result.metars[icao] = line.strip()
+        finally:
+            f.close()
 
         return result
 
@@ -475,6 +509,10 @@ class Handler(threading.Thread):
     def getNOTAMs(self, callback, departureICAO, arrivalICAO):
         """Get the NOTAMs for the given two airports."""
         self._addRequest(GetNOTAMs(callback, departureICAO, arrivalICAO))
+        
+    def getMETARs(self, callback, airports):
+        """Get the METARs for the given airports."""
+        self._addRequest(GetMETARs(callback, airports))
         
     def run(self):
         """Process the requests."""
@@ -512,8 +550,9 @@ if __name__ == "__main__":
     #handler.getFleet(callback)
     #time.sleep(3)
 
-    handler.getNOTAMs(callback, "LHBP", "EPWA")
-    time.sleep(3)
+    #handler.getNOTAMs(callback, "LHBP", "EPWA")
+    handler.getMETARs(callback, ["LHBP", "EPWA"])
+    time.sleep(5)
     
 
 #------------------------------------------------------------------------------
