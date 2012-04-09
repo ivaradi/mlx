@@ -46,7 +46,7 @@ class Page(gtk.Alignment):
         self._vbox.pack_start(eventBox, False, False, 0)
 
         table = gtk.Table(3, 1)
-        table.set_homogeneous(True)
+        table.set_homogeneous(False)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)        
@@ -966,8 +966,7 @@ class NOTAMPage(Page):
                     s += "Repeat cycle: " + notam.repeatCycle + "\n"
                 s += notam.notice + "\n"
                 s += "-------------------- * --------------------\n"
-            buffer.set_text(s)
-        
+            buffer.set_text(s)        
 
     def _forwardClicked(self):
         """Called when the forward button is clicked."""
