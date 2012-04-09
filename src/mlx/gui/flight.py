@@ -847,7 +847,7 @@ class RoutePage(Page):
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
         self._button.set_sensitive(self._cruiseLevel.get_value_as_int()>=50 and \
-                                   self._getRoute())
+                                   self._getRoute()!="")
                                    
     def _cruiseLevelChanged(self, spinButton):
         """Called when the cruise level has changed."""
