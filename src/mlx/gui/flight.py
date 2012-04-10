@@ -1165,8 +1165,138 @@ class BriefingPage(Page):
                 self._wizard.gui.startMonitoring()
                 self.finalize()
                 self._finalized = True
-        else:
-            self._wizard.nextPage()
+
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
+class TakeoffPage(Page):
+    """Page for entering the takeoff data."""
+    def __init__(self, wizard):
+        """Construct the takeoff page."""
+        help = "Enter the runway and SID used, as well as the speeds."
+
+        super(TakeoffPage, self).__init__(wizard, "Takeoff", help)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(5, 3)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        label = gtk.Label("Run_way:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._runway = gtk.Entry()
+        self._runway.set_width_chars(10)
+        self._runway.set_tooltip_text("The runway the takeoff is performed from.")
+        table.attach(self._runway, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._runway)
+        
+        label = gtk.Label("_SID:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._sid = gtk.Entry()
+        self._sid.set_width_chars(10)
+        self._sid.set_tooltip_text("The Standard Instrument Deparature procedure followed.")
+        table.attach(self._sid, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._sid)
+        
+        label = gtk.Label("V<sub>_1</sub>:")
+        label.set_use_markup(True)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 2, 3)
+
+        self._v1 = gtk.SpinButton()
+        self._v1.set_increments(step = 1, page = 10)
+        self._v1.set_range(min = 50, max = 300)
+        self._v1.set_value(100)
+        self._v1.set_numeric(True)
+        self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
+        table.attach(self._v1, 1, 2, 2, 3)
+        label.set_mnemonic_widget(self._v1)
+        
+        table.attach(gtk.Label("knots"), 2, 3, 2, 3)
+        
+        label = gtk.Label("V<sub>_r</sub>:")
+        label.set_use_markup(True)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 3, 4)
+
+        self._vr = gtk.SpinButton()
+        self._vr.set_increments(step = 1, page = 10)
+        self._vr.set_range(min = 50, max = 300)
+        self._vr.set_value(110)
+        self._vr.set_numeric(True)
+        self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
+        table.attach(self._vr, 1, 2, 3, 4)
+        label.set_mnemonic_widget(self._vr)
+        
+        table.attach(gtk.Label("knots"), 2, 3, 3, 4)
+        
+        label = gtk.Label("V<sub>_2</sub>:")
+        label.set_use_markup(True)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 4, 5)
+
+        self._v2 = gtk.SpinButton()
+        self._v2.set_increments(step = 1, page = 10)
+        self._v2.set_range(min = 50, max = 300)
+        self._v2.set_value(120)
+        self._v2.set_numeric(True)
+        self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
+        table.attach(self._v2, 1, 2, 4, 5)
+        label.set_mnemonic_widget(self._v2)
+        
+        table.attach(gtk.Label("knots"), 2, 3, 4, 5)
+        
+        button = self.addButton(gtk.STOCK_GO_BACK)
+        button.set_use_stock(True)
+        button.connect("clicked", self._backClicked)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Activate the page."""
+        self._runway.set_sensitive(True)
+        self._sid.set_sensitive(True)
+        self._v1.set_sensitive(True)
+        self._vr.set_sensitive(True)
+        self._v2.set_sensitive(True)
+        
+    def finalize(self):
+        """Finalize the page."""
+        self._runway.set_sensitive(False)
+        self._sid.set_sensitive(False)
+        self._v1.set_sensitive(False)
+        self._vr.set_sensitive(False)
+        self._v2.set_sensitive(False)
+
+        flight = self._wizard.gui.flight
+        flight.v1 = self._v1.get_value_as_int()
+        flight.vr = self._vr.get_value_as_int()
+        flight.v2 = self._v2.get_value_as_int()
+        
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
+    def _forwardClicked(self, button):
+        """Called when the forward button is clicked."""
+        #self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
 
@@ -1190,6 +1320,7 @@ class Wizard(gtk.VBox):
         self._pages.append(RoutePage(self))
         self._pages.append(BriefingPage(self, True))
         self._pages.append(BriefingPage(self, False))
+        self._pages.append(TakeoffPage(self))
         
         maxWidth = 0
         maxHeight = 0

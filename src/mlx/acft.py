@@ -135,6 +135,14 @@ class Aircraft(object):
                                     "Wind %03.0f degrees at %.0f knots" % \
                                     (aircraftState.windDirection, 
                                      aircraftState.windSpeed))
+                self.logger.message(aircraftState.timestamp,
+                                    "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
+                                    ("-" if self._flight.v1 is None
+                                     else str(self._flight.v1),
+                                     "-" if self._flight.vr is None
+                                     else str(self._flight.vr),
+                                     "-" if self._flight.v2 is None
+                                     else str(self._flight.v2)))
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 self.logger.message(aircraftState.timestamp, "Flight time end")
                 self.logFuel(aircraftState)

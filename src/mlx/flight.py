@@ -43,6 +43,10 @@ class Flight(object):
 
         self._endCondition = threading.Condition()
 
+        self.v1 = None
+        self.vr = None
+        self.v2 = None
+
         self._flareStart = None
         self._flareStartFS = None
 

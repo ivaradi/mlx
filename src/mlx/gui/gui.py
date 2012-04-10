@@ -80,7 +80,6 @@ class GUI(fs.ConnectionListener):
         label.set_tooltip_text("Flight wizard")
         notebook.append_page(self._wizard, label)
 
-
         dataVBox = gtk.VBox()
         label = gtk.Label("_Data")
         label.set_use_underline(True)
@@ -132,6 +131,11 @@ class GUI(fs.ConnectionListener):
     def simulator(self):
         """Get the simulator used by us."""
         return self._simulator
+        
+    @property
+    def flight(self):
+        """Get the flight being performed."""
+        return self._flight
         
     def run(self):
         """Run the GUI."""
