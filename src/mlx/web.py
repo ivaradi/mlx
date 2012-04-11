@@ -457,9 +457,14 @@ class GetMETARs(Request):
 
     def run(self):
         """Perform the retrieval opf the METARs."""
-        tm = time.gmtime()
-        url = "http://weather.noaa.gov/pub/data/observations/metar/cycles/%02dZ.TXT" % \
-              (tm.tm_hour,)
+        url = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?"
+        data = urllib.urlencode([ ("dataSource" , "metars"),
+                                  ("requestType",  "retrieve"), 
+                                  ("format", "csv"),
+                                  ("stationString", " ".join(self._airports)),
+                                  ("hoursBeforeNow", "24"),
+                                  ("mostRecentForEachStation", "constraint")])
+        url += data
         f = urllib2.urlopen(url)
         try:
             result = Result()
@@ -467,8 +472,8 @@ class GetMETARs(Request):
             for line in iter(f.readline, ""):
                 if len(line)>5 and line[4]==' ':
                     icao = line[0:4]
-                    if icao in self._airports:
-                        result.metars[icao] = line.strip()
+                    if icao in self._airports:                        
+                        result.metars[icao] = line.strip().split(",")[0]
         finally:
             f.close()
 
