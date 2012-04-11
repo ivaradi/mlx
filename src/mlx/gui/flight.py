@@ -1196,6 +1196,7 @@ class TakeoffPage(Page):
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text("The runway the takeoff is performed from.")
+        self._runway.connect("changed", self._updateForwardButton)
         table.attach(self._runway, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._runway)
         
@@ -1207,6 +1208,7 @@ class TakeoffPage(Page):
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
         self._sid.set_tooltip_text("The Standard Instrument Deparature procedure followed.")
+        self._sid.connect("changed", self._updateForwardButton)
         table.attach(self._sid, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._sid)
         
@@ -1222,6 +1224,7 @@ class TakeoffPage(Page):
         self._v1.set_value(100)
         self._v1.set_numeric(True)
         self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
+        self._v1.connect("changed", self._updateForwardButton)
         table.attach(self._v1, 1, 2, 2, 3)
         label.set_mnemonic_widget(self._v1)
         
@@ -1239,6 +1242,7 @@ class TakeoffPage(Page):
         self._vr.set_value(110)
         self._vr.set_numeric(True)
         self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
+        self._vr.connect("changed", self._updateForwardButton)
         table.attach(self._vr, 1, 2, 3, 4)
         label.set_mnemonic_widget(self._vr)
         
@@ -1256,6 +1260,7 @@ class TakeoffPage(Page):
         self._v2.set_value(120)
         self._v2.set_numeric(True)
         self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
+        self._v2.connect("changed", self._updateForwardButton)
         table.attach(self._v2, 1, 2, 4, 5)
         label.set_mnemonic_widget(self._v2)
         
@@ -1271,11 +1276,14 @@ class TakeoffPage(Page):
 
     def activate(self):
         """Activate the page."""
+        self._runway.set_text("")
         self._runway.set_sensitive(True)
+        self._sid.set_text("")
         self._sid.set_sensitive(True)
         self._v1.set_sensitive(True)
         self._vr.set_sensitive(True)
         self._v2.set_sensitive(True)
+        self._updateForwardButton()
         
     def finalize(self):
         """Finalize the page."""
@@ -1289,7 +1297,14 @@ class TakeoffPage(Page):
         flight.v1 = self._v1.get_value_as_int()
         flight.vr = self._vr.get_value_as_int()
         flight.v2 = self._v2.get_value_as_int()
-        
+
+    def _updateForwardButton(self, widget = None):
+        """Update the Forward buttons sensitivity."""
+        self._button.set_sensitive(self._runway.get_text()!="" and
+                                   self._sid.get_text()!="" and
+                                   self._v1.get_value_as_int()<=self._vr.get_value_as_int() and 
+                                   self._vr.get_value_as_int()<=self._v2.get_value_as_int())
+
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
@@ -1360,8 +1375,9 @@ class Wizard(gtk.VBox):
         if page._fromPage is None:
             page._fromPage = fromPage
             page.activate()
-        self.grabDefault()
         self.show_all()
+        if fromPage is not None:
+            self.grabDefault()
 
     def nextPage(self, finalize = True):
         """Go to the next page."""
