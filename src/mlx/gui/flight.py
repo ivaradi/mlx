@@ -409,6 +409,10 @@ class GateSelectionPage(Page):
 
         self.setMainWidget(alignment)        
 
+        button = self.addButton(gtk.STOCK_GO_BACK)
+        button.set_use_stock(True)
+        button.connect("clicked", self._backClicked)
+        
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.set_sensitive(False)
@@ -430,6 +434,10 @@ class GateSelectionPage(Page):
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
         self._button.set_sensitive(selection.count_selected_rows()==1)
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
