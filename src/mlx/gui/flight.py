@@ -548,7 +548,7 @@ class ConnectPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._tailNumber = gtk.Label()
-        self._tailNumber.set_width_chars(6)
+        self._tailNumber.set_width_chars(10)
         self._tailNumber.set_alignment(0.0, 0.5)
         labelAlignment.add(self._tailNumber)
         table.attach(labelAlignment, 1, 2, 2, 3)
@@ -560,7 +560,7 @@ class ConnectPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._departureICAO = gtk.Label()
-        self._departureICAO.set_width_chars(5)
+        self._departureICAO.set_width_chars(6)
         self._departureICAO.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureICAO)
         table.attach(labelAlignment, 1, 2, 3, 4)

@@ -7,6 +7,7 @@ from common import *
 import mlx.const as const
 
 import math
+import time
 
 #-------------------------------------------------------------------------------
 
@@ -60,6 +61,15 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
 
         statusBox.pack_start(gtk.VSeparator(), False, False, 8)
 
+        self._timeLabel = gtk.Label("--:--:--")
+        self._timeLabel.set_width_chars(8)
+        self._timeLabel.set_tooltip_text("The simulator time in UTC")
+        self._timeLabel.set_alignment(1.0, 0.5)
+        
+        statusBox.pack_start(self._timeLabel, False, False, 8)
+
+        statusBox.pack_start(gtk.VSeparator(), False, False, 8)
+
         self._ratingLabel = gtk.Label()
         self._ratingLabel.set_width_chars(12)
         self._ratingLabel.set_tooltip_text("The flight rating")
@@ -74,6 +84,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         statusBox.pack_start(self._busyLabel, True, True, 8)
         
         self._updateFlightStatus()
+        self.updateTime()
 
     def updateConnection(self, connecting, connected):
         """Update the connection status."""
@@ -84,6 +95,13 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
     def updateBusyState(self, message):
         """Update the busy state."""
         self._busyLabel.set_text("" if message is None else message)
+
+    def updateTime(self, t = None):
+        """Update the time"""
+        timeStr = "--:--:--" if t is None \
+                  else time.strftime("%H:%M:%S", time.gmtime(t))
+        
+        self._timeLabel.set_text(timeStr)
 
     def _drawConnState(self, connStateArea, eventOrContext):
         """Draw the connection state."""        

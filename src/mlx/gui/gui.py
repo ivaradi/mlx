@@ -217,10 +217,12 @@ class GUI(fs.ConnectionListener):
     def check(self, flight, aircraft, logger, oldState, state):
         """Update the data."""
         gobject.idle_add(self._monitorWindow.setData, state)
+        gobject.idle_add(self._statusbar.updateTime, state.timestamp)
 
     def resetFlightStatus(self):
         """Reset the status of the flight."""
         self._statusbar.resetFlightStatus()
+        self._statusbar.updateTime()
         self._statusIcon.resetFlightStatus()
 
     def setStage(self, stage):
