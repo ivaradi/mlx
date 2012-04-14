@@ -308,7 +308,7 @@ class GUI(fs.ConnectionListener):
     def restart(self):
         """Quit and restart the application."""
         self.toRestart = True
-        self._quit()
+        self._quit(force = True)
 
     def flushStdIO(self):
         """Flush any text to the standard error that could not be logged."""
@@ -418,14 +418,17 @@ class GUI(fs.ConnectionListener):
         buffer.insert(buffer.get_end_iter(), msg)
         self._logView.scroll_mark_onscreen(buffer.get_insert())
 
-    def _quit(self, what = None):
+    def _quit(self, what = None, force = False):
         """Quit from the application."""
-        dialog = gtk.MessageDialog(type = MESSAGETYPE_QUESTION,
-                                   buttons = BUTTONSTYPE_YES_NO,
-                                   message_format =
-                                   "Are you sure to quit the logger?")
-        result = dialog.run()
-        dialog.hide()
+        if force:
+            result=RESPONSETYPE_YES
+        else:
+            dialog = gtk.MessageDialog(type = MESSAGETYPE_QUESTION,
+                                       buttons = BUTTONSTYPE_YES_NO,
+                                       message_format =
+                                       "Are you sure to quit the logger?")
+            result = dialog.run()
+            dialog.hide()
         
         if result==RESPONSETYPE_YES:
             self._statusIcon.destroy()
