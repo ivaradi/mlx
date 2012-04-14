@@ -63,14 +63,13 @@ class Page(gtk.Alignment):
         
         self._vbox.pack_start(eventBox, False, False, 0)
 
-        table = gtk.Table(3, 1)
-        table.set_homogeneous(False)
+        mainBox = gtk.VBox()        
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)        
         alignment.set_padding(padding_top = 16, padding_bottom = 16,
                               padding_left = 16, padding_right = 16)
-        alignment.add(table)
+        alignment.add(mainBox)
         self._vbox.pack_start(alignment, True, True, 0)
         
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
@@ -83,11 +82,11 @@ class Page(gtk.Alignment):
                           else gtk.JUSTIFY_CENTER)
         label.set_use_markup(True)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 0, 1)
+        mainBox.pack_start(alignment, False, False, 0)
 
         self._mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                             xscale = 1.0, yscale = 1.0)
-        table.attach(self._mainAlignment, 0, 1, 1, 3)
+        mainBox.pack_start(self._mainAlignment, True, True, 0)
                                             
         buttonAlignment =  gtk.Alignment(xalign = 1.0, xscale=0.0, yscale = 0.0)
         buttonAlignment.set_padding(padding_top = 4, padding_bottom = 10,
