@@ -20,24 +20,6 @@ import sys
 
 #------------------------------------------------------------------------------
 
-acftTypes = [ ("Boeing 737-600", const.AIRCRAFT_B736),
-              ("Boeing 737-700", const.AIRCRAFT_B737),
-              ("Boeing 737-800", const.AIRCRAFT_B738),
-              ("Bombardier Dash 8-Q400", const.AIRCRAFT_DH8D),
-              ("Boeing 737-300", const.AIRCRAFT_B733),
-              ("Boeing 737-400", const.AIRCRAFT_B734),
-              ("Boeing 737-500", const.AIRCRAFT_B735),
-              ("Boeing 767-200", const.AIRCRAFT_B762),
-              ("Boeing 767-300", const.AIRCRAFT_B763),
-              ("Bombardier CRJ200", const.AIRCRAFT_CRJ2),
-              ("Fokker 70", const.AIRCRAFT_F70),
-              ("Lisunov Li-2", const.AIRCRAFT_DC3),
-              ("Tupolev Tu-134", const.AIRCRAFT_T134),
-              ("Tupolev Tu-154", const.AIRCRAFT_T154),
-              ("Yakovlev Yak-40", const.AIRCRAFT_YK40) ]
-
-#------------------------------------------------------------------------------
-
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
     def __init__(self, programDirectory, config):

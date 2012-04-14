@@ -9,6 +9,24 @@ from mlx.checks import PayloadChecker
 import datetime
 import time
 
+#------------------------------------------------------------------------------
+
+acftTypeNames = { const.AIRCRAFT_B736: "Boeing 737-600",
+                  const.AIRCRAFT_B737: "Boeing 737-700",
+                  const.AIRCRAFT_B738: "Boeing 737-800",
+                  const.AIRCRAFT_DH8D: "Bombardier Dash 8-Q400",
+                  const.AIRCRAFT_B733: "Boeing 737-300",
+                  const.AIRCRAFT_B734: "Boeing 737-400",
+                  const.AIRCRAFT_B735: "Boeing 737-500",
+                  const.AIRCRAFT_B762: "Boeing 767-200",
+                  const.AIRCRAFT_B763: "Boeing 767-300",
+                  const.AIRCRAFT_CRJ2: "Bombardier CRJ200",
+                  const.AIRCRAFT_F70:  "Fokker 70",
+                  const.AIRCRAFT_DC3:  "Lisunov Li-2",
+                  const.AIRCRAFT_T134: "Tupolev Tu-134",
+                  const.AIRCRAFT_T154: "Tupolev Tu-154",
+                  const.AIRCRAFT_YK40: "Yakovlev Yak-40" }
+
 #-----------------------------------------------------------------------------
 
 class Page(gtk.Alignment):
@@ -483,8 +501,8 @@ class ConnectPage(Page):
     """Page which displays the departure airport and gate (if at LHBP)."""
     def __init__(self, wizard):
         """Construct the connect page."""
-        help = "The flight begins at the airport given below.\n" \
-               "Park your aircraft there, at the gate below, if given.\n\n" \
+        help = "Load the aircraft below into the simulator and park it\n" \
+               "at the given airport, at the gate below, if present.\n\n" \
                "Then press the Connect button to connect to the simulator."
         super(ConnectPage, self).__init__(wizard,
                                           "Connect to the simulator",
@@ -493,7 +511,7 @@ class ConnectPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(2, 2)
+        table = gtk.Table(5, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(True)
@@ -501,28 +519,64 @@ class ConnectPage(Page):
         self.setMainWidget(alignment)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("ICAO code:")
+        label = gtk.Label("Flight number:")
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightNumber = gtk.Label()
+        self._flightNumber.set_width_chars(6)
+        self._flightNumber.set_alignment(0.0, 0.5)
+        labelAlignment.add(self._flightNumber)
+        table.attach(labelAlignment, 1, 2, 0, 1)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Aircraft:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 1, 2)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._aircraft = gtk.Label()
+        self._aircraft.set_width_chars(25)
+        self._aircraft.set_alignment(0.0, 0.5)
+        labelAlignment.add(self._aircraft)
+        table.attach(labelAlignment, 1, 2, 1, 2)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Tail number:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 2, 3)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._tailNumber = gtk.Label()
+        self._tailNumber.set_width_chars(6)
+        self._tailNumber.set_alignment(0.0, 0.5)
+        labelAlignment.add(self._tailNumber)
+        table.attach(labelAlignment, 1, 2, 2, 3)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Airport:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 3, 4)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._departureICAO = gtk.Label()
         self._departureICAO.set_width_chars(5)
         self._departureICAO.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureICAO)
-        table.attach(labelAlignment, 1, 2, 0, 1)
+        table.attach(labelAlignment, 1, 2, 3, 4)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label("Gate:")
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 1, 2)
+        table.attach(labelAlignment, 0, 1, 4, 5)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._departureGate = gtk.Label()
         self._departureGate.set_width_chars(5)
         self._departureGate.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureGate)
-        table.attach(labelAlignment, 1, 2, 1, 2)
+        table.attach(labelAlignment, 1, 2, 4, 5)
 
         button = self.addButton(gtk.STOCK_GO_BACK)
         button.set_use_stock(True)
@@ -538,8 +592,17 @@ class ConnectPage(Page):
         self._button.set_use_underline(True)
         self._button.disconnect(self._clickedID)
         self._clickedID = self._button.connect("clicked", self._connectClicked)
+
+        bookedFlight = self._wizard._bookedFlight
+
+        self._flightNumber.set_markup("<b>" + bookedFlight.callsign + "</b>")
+
+        aircraftType = acftTypeNames[bookedFlight.aircraftType]
+        self._aircraft.set_markup("<b>" + aircraftType + "</b>")
         
-        icao = self._wizard._bookedFlight.departureICAO
+        self._tailNumber.set_markup("<b>" + bookedFlight.tailNumber + "</b>")
+
+        icao = bookedFlight.departureICAO
         self._departureICAO.set_markup("<b>" + icao + "</b>")
         gate = self._wizard._departureGate
         if gate!="-":
