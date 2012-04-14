@@ -19,7 +19,10 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
         pass
 
     MESSAGETYPE_ERROR = gtk.MESSAGE_ERROR
+    MESSAGETYPE_QUESTION = gtk.MESSAGE_QUESTION
     BUTTONSTYPE_OK = gtk.BUTTONS_OK
+    BUTTONSTYPE_YES_NO = gtk.BUTTONS_YES_NO
+    RESPONSETYPE_YES = gtk.RESPONSE_YES
 else:
     print "Using PyGObject"
     pygobject = True
@@ -29,9 +32,12 @@ else:
     from gi.repository import AppIndicator3 as appindicator
     from gi.repository import Pango as pango
     appIndicator = True
-
+    
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR
+    MESSAGETYPE_QUESTION = gtk.MessageType.QUESTION
     BUTTONSTYPE_OK = gtk.ButtonsType.OK
+    BUTTONSTYPE_YES_NO = gtk.ButtonsType.YES_NO
+    RESPONSETYPE_YES = gtk.ResponseType.YES
 
 import cairo
 

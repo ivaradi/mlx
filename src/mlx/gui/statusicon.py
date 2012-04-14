@@ -39,6 +39,12 @@ class StatusIcon(FlightStatusHandler):
         self._showHideMenuItem.show()  
         menu.append(self._showHideMenuItem)  
 
+        self._quitMenuItem = gtk.MenuItem()  
+        self._quitMenuItem.set_label("Quit")  
+        self._quitMenuItem.show()  
+        self._quitMenuItem.connect("activate", self._gui._quit)
+        menu.append(self._quitMenuItem)  
+
         menu.show()  
 
         iconFile = os.path.join(iconDirectory, "logo.ico")

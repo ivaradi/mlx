@@ -1345,7 +1345,6 @@ class LandingPage(Page):
 
         self._starButton = gtk.CheckButton()
         self._starButton.connect("clicked", self._starButtonClicked)
-        self._starButton.set_active(True)
         table.attach(self._starButton, 0, 1, 0, 1)
 
         label = gtk.Label("_STAR:")
@@ -1363,7 +1362,6 @@ class LandingPage(Page):
 
         self._transitionButton = gtk.CheckButton()
         self._transitionButton.connect("clicked", self._transitionButtonClicked)
-        self._transitionButton.set_active(True)
         table.attach(self._transitionButton, 0, 1, 1, 2)
 
         label = gtk.Label("_Transition:")
@@ -1399,7 +1397,7 @@ class LandingPage(Page):
         self._approachType = gtk.Entry()
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text("The type of the approach, e.g. ILS or VISUAL.")
-        self._runway.connect("changed", self._updateForwardButton)
+        self._approachType.connect("changed", self._updateForwardButton)
         table.attach(self._approachType, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._approachType)
 
@@ -1427,6 +1425,10 @@ class LandingPage(Page):
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
+
+        # These are needed for correct size calculations
+        self._starButton.set_active(True)
+        self._transitionButton.set_active(True)
 
     def activate(self):
         """Called when the page is activated."""

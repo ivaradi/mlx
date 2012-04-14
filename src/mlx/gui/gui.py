@@ -842,8 +842,16 @@ class GUI(fs.ConnectionListener):
 
     def _quit(self, what = None):
         """Quit from the application."""
-        self._statusIcon.destroy()
-        return gtk.main_quit()
+        dialog = gtk.MessageDialog(type = MESSAGETYPE_QUESTION,
+                                   buttons = BUTTONSTYPE_YES_NO,
+                                   message_format =
+                                   "Are you sure to quit the logger?")
+        result = dialog.run()
+        dialog.hide()
+        
+        if result==RESPONSETYPE_YES:
+            self._statusIcon.destroy()
+            return gtk.main_quit()
 
     def _notebookPageSwitch(self, notebook, page, page_num):
         """Called when the current page of the notebook has changed."""
