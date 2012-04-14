@@ -39,6 +39,17 @@ class StatusIcon(FlightStatusHandler):
         self._showHideMenuItem.show()  
         menu.append(self._showHideMenuItem)  
 
+        self._showMonitorMenuItem = gtk.CheckMenuItem()  
+        self._showMonitorMenuItem.set_label("Show monitor window")  
+        self._showMonitorMenuItem.set_active(False)
+        self._showMonitorMenuItem.connect("toggled", self._showMonitorToggled)
+        self._showMonitorMenuItem.show()  
+        menu.append(self._showMonitorMenuItem)  
+
+        separator = gtk.SeparatorMenuItem()
+        separator.show()
+        menu.append(separator)
+
         self._quitMenuItem = gtk.MenuItem()  
         self._quitMenuItem.set_label("Quit")  
         self._quitMenuItem.show()  
@@ -88,6 +99,18 @@ class StatusIcon(FlightStatusHandler):
             self._selfToggling = True
             self._showHideMenuItem.set_active(True)
 
+    def monitorWindowHidden(self):
+        """Called when the monitor window is hidden."""
+        if self._showMonitorMenuItem.get_active():
+            self._selfToggling = True
+            self._showMonitorMenuItem.set_active(False)
+
+    def monitorWindowShown(self):
+        """Called when the monitor window is shown."""
+        if not self._showMonitorMenuItem.get_active():
+            self._selfToggling = True
+            self._showMonitorMenuItem.set_active(True)
+
     def destroy(self):
         """Hide and destroy the status icon."""
         if appIndicator:
@@ -106,6 +129,15 @@ class StatusIcon(FlightStatusHandler):
             self._gui.showMainWindow()
         else:
             self._gui.hideMainWindow()
+
+    def _showMonitorToggled(self, menuitem):
+        """Called when the show/hide monitor window menu item is toggled."""
+        if self._selfToggling:
+            self._selfToggling = False
+        elif self._showMonitorMenuItem.get_active():
+            self._gui.showMonitorWindow()
+        else:
+            self._gui.hideMonitorWindow()
 
     def _updateFlightStatus(self):
         """Update the flight status."""
