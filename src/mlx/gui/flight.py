@@ -524,7 +524,7 @@ class ConnectPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._flightNumber = gtk.Label()
-        self._flightNumber.set_width_chars(6)
+        self._flightNumber.set_width_chars(7)
         self._flightNumber.set_alignment(0.0, 0.5)
         labelAlignment.add(self._flightNumber)
         table.attach(labelAlignment, 1, 2, 0, 1)
