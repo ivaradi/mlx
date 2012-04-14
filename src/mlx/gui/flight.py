@@ -63,6 +63,7 @@ class Page(gtk.Alignment):
         label = gtk.Label(help)
         label.set_justify(gtk.Justification.CENTER if pygobject
                           else gtk.JUSTIFY_CENTER)
+        label.set_use_markup(True)
         alignment.add(label)
         table.attach(alignment, 0, 1, 0, 1)
 
@@ -1215,7 +1216,7 @@ class TakeoffPage(Page):
 
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
-        self._sid.set_tooltip_text("The Standard Instrument Deparature procedure followed.")
+        self._sid.set_tooltip_text("The name of the Standard Instrument Deparature procedure followed.")
         self._sid.connect("changed", self._updateForwardButton)
         table.attach(self._sid, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._sid)
@@ -1319,7 +1320,185 @@ class TakeoffPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
+class LandingPage(Page):
+    """Page for entering landing data."""
+    def __init__(self, wizard):
+        """Construct the landing page."""
+        help = "Enter the STAR and/or transition, runway,\n" \
+               "approach type and V<sub>ref</sub> used."
+
+        super(LandingPage, self).__init__(wizard, "Landing", help)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(5, 4)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        self._starButton = gtk.CheckButton()
+        self._starButton.connect("clicked", self._starButtonClicked)
+        self._starButton.set_active(True)
+        table.attach(self._starButton, 0, 1, 0, 1)
+
+        label = gtk.Label("_STAR:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 1, 2, 0, 1)
+
+        self._star = gtk.Entry()
+        self._star.set_width_chars(10)
+        self._star.set_tooltip_text("The name of Standard Terminal Arrival Route followed.")
+        self._star.connect("changed", self._updateForwardButton)
+        self._star.set_sensitive(False)
+        table.attach(self._star, 2, 3, 0, 1)
+        label.set_mnemonic_widget(self._starButton)
+
+        self._transitionButton = gtk.CheckButton()
+        self._transitionButton.connect("clicked", self._transitionButtonClicked)
+        self._transitionButton.set_active(True)
+        table.attach(self._transitionButton, 0, 1, 1, 2)
+
+        label = gtk.Label("_Transition:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 1, 2, 1, 2)
+
+        self._transition = gtk.Entry()
+        self._transition.set_width_chars(10)
+        self._transition.set_tooltip_text("The name of transition executed or VECTORS if vectored by ATC.")
+        self._transition.connect("changed", self._updateForwardButton)
+        self._transition.set_sensitive(False)
+        table.attach(self._transition, 2, 3, 1, 2)
+        label.set_mnemonic_widget(self._transitionButton)
+
+        label = gtk.Label("Run_way:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 1, 2, 2, 3)
+
+        self._runway = gtk.Entry()
+        self._runway.set_width_chars(10)
+        self._runway.set_tooltip_text("The runway the landing is performed on.")
+        self._runway.connect("changed", self._updateForwardButton)
+        table.attach(self._runway, 2, 3, 2, 3)
+        label.set_mnemonic_widget(self._runway)
+
+        label = gtk.Label("_Approach type:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 1, 2, 3, 4)
+
+        self._approachType = gtk.Entry()
+        self._approachType.set_width_chars(10)
+        self._approachType.set_tooltip_text("The type of the approach, e.g. ILS or VISUAL.")
+        self._runway.connect("changed", self._updateForwardButton)
+        table.attach(self._approachType, 2, 3, 3, 4)
+        label.set_mnemonic_widget(self._approachType)
+
+        label = gtk.Label("V<sub>_ref</sub>:")
+        label.set_use_markup(True)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 1, 2, 5, 6)
+
+        self._vref = gtk.SpinButton()
+        self._vref.set_increments(step = 1, page = 10)
+        self._vref.set_range(min = 50, max = 300)
+        self._vref.set_value(140)
+        self._vref.set_numeric(True)
+        self._vref.set_tooltip_markup("The approach reference speed in knots.")
+        table.attach(self._vref, 2, 3, 5, 6)
+        label.set_mnemonic_widget(self._vref)
+        
+        table.attach(gtk.Label("knots"), 3, 4, 5, 6)
+        
+        button = self.addButton(gtk.STOCK_GO_BACK)
+        button.set_use_stock(True)
+        button.connect("clicked", self._backClicked)
+
+        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
+        self._button.set_use_stock(True)
+        self._button.connect("clicked", self._forwardClicked)
+
+    def activate(self):
+        """Called when the page is activated."""
+        self._starButton.set_sensitive(True)
+        self._starButton.set_active(False)
+        self._star.set_text("")
+
+        self._transitionButton.set_sensitive(True)
+        self._transitionButton.set_active(False)
+        self._transition.set_text("")
+
+        self._runway.set_text("")
+        self._runway.set_sensitive(True)
+
+        self._approachType.set_text("")
+        self._approachType.set_sensitive(True)
+
+        self._vref.set_value(140)
+        self._vref.set_sensitive(True)
+
+        self._updateForwardButton()
+
+    def finalize(self):
+        """Finalize the page."""
+        self._starButton.set_sensitive(False)
+        self._star.set_sensitive(False)
+
+        self._transitionButton.set_sensitive(False)
+        self._transition.set_sensitive(False)
+
+        self._runway.set_sensitive(False)
+
+        self._approachType.set_sensitive(False)
+
+        self._vref.set_sensitive(False)
+
+    def _starButtonClicked(self, button):
+        """Called when the STAR button is clicked."""
+        active = button.get_active()
+        self._star.set_sensitive(active)
+        if active:
+            self._star.grab_focus()
+        self._updateForwardButton()
+
+    def _transitionButtonClicked(self, button):
+        """Called when the Transition button is clicked."""
+        active = button.get_active()
+        self._transition.set_sensitive(active)
+        if active:
+            self._transition.grab_focus()        
+        self._updateForwardButton()
+
+    def _updateForwardButton(self, widget = None):
+        """Update the sensitivity of the forward button."""
+        sensitive = (self._starButton.get_active() or \
+                     self._transitionButton.get_active()) and \
+                    (self._star.get_text()!="" or
+                     not self._starButton.get_active()) and \
+                    (self._transition.get_text()!="" or
+                     not self._transitionButton.get_active()) and \
+                    self._runway.get_text()!="" and \
+                    self._approachType.get_text()!=""
+        self._button.set_sensitive(sensitive)
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
+    def _forwardClicked(self, button):
+        """Called when the forward button is clicked."""
         #self._wizard.nextPage()
+        self.finalize()
 
 #-----------------------------------------------------------------------------
 
@@ -1344,6 +1523,7 @@ class Wizard(gtk.VBox):
         self._pages.append(BriefingPage(self, True))
         self._pages.append(BriefingPage(self, False))
         self._pages.append(TakeoffPage(self))
+        self._pages.append(LandingPage(self))
         
         maxWidth = 0
         maxHeight = 0
