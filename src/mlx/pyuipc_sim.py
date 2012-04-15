@@ -531,10 +531,10 @@ class Values(object):
         elif offset==0x0bec:       # Nose gear
             self.noseGear = value / 16383.0
         elif offset==0x0d0c:       # Lights
-            self.navLightsOn = (lights&0x01)!=0
-            self.antiCollisionLightsOn = (lights&0x02)!=0
-            self.landingLightsOn = (lights&0x04)!=0 
-            self.strobeLightsOn = (lights&0x10)!=0 
+            self.navLightsOn = (value&0x01)!=0
+            self.antiCollisionLightsOn = (value&0x02)!=0
+            self.landingLightsOn = (value&0x04)!=0 
+            self.strobeLightsOn = (value&0x10)!=0 
         elif offset==0x0e90:       # Wind speed
             self.windSpeed = value
         elif offset==0x0e92:       # Wind direction
@@ -961,8 +961,8 @@ class CLI(cmd.Cmd):
                                         lambda word: int(float(word) *
                                                          16383.0 / 100.0))
         self._valueHandlers["lights"] = (0x0d0c, "H",
-                                        lambda value: value,
-                                        lambda word: int(word))
+                                         lambda value: value,
+                                         lambda word: int(word))
         self._valueHandlers["pitot"] = (0x029c, "b", CLI.bool2str, CLI.str2bool)
         self._valueHandlers["parking"] = (0x0bc8, "H", CLI.bool2str, CLI.str2bool)
         self._valueHandlers["noseGear"] = (0x0bec, "d",
