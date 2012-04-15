@@ -133,6 +133,11 @@ class GUI(fs.ConnectionListener):
         """Get the V2 speed calculated for the flight."""
         return self._wizard.v2
         
+    @property
+    def vref(self):
+        """Get the Vref speed calculated for the flight."""
+        return self._wizard.vref
+        
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:

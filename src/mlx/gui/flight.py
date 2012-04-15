@@ -685,7 +685,6 @@ class PayloadPage(Page):
 
         self._cargoWeight = IntegerEntry(defaultValue = 0)
         self._cargoWeight.set_width_chars(6)
-        self._cargoWeight.set_alignment(1.0)
         self._cargoWeight.connect("integer-changed", self._cargoWeightChanged)
         self._cargoWeight.set_tooltip_text("The weight of the cargo for your flight.")
         table.attach(self._cargoWeight, 1, 2, 3, 4)
@@ -1209,12 +1208,6 @@ class BriefingPage(Page):
         else:
             buffer.set_text(metar)
 
-    def finalize(self):
-        """Finalize the page."""
-        if not self._departure:
-            self._button.set_use_stock(True)
-            self._button.set_label(gtk.STOCK_GO_FORWARD)
-
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
@@ -1224,6 +1217,8 @@ class BriefingPage(Page):
         if not self._departure:
             if not self._finalized:
                 self._wizard.gui.startMonitoring()
+                self._button.set_use_stock(True)
+                self._button.set_label(gtk.STOCK_GO_FORWARD)
                 self._finalized = True
 
         self._wizard.nextPage()
@@ -1277,21 +1272,21 @@ class TakeoffPage(Page):
         table.attach(label, 0, 1, 2, 3)
 
         self._v1 = IntegerEntry()
-        self._v1.set_width_chars(1)
+        self._v1.set_width_chars(4)
         self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
         table.attach(self._v1, 2, 3, 2, 3)
         label.set_mnemonic_widget(self._v1)
         
         table.attach(gtk.Label("knots"), 3, 4, 2, 3)
         
-        label = gtk.Label("V<sub>_r</sub>:")
+        label = gtk.Label("V<sub>_R</sub>:")
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
 
         self._vr = IntegerEntry()
-        self._vr.set_width_chars(1)
+        self._vr.set_width_chars(4)
         self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
         table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
@@ -1305,7 +1300,7 @@ class TakeoffPage(Page):
         table.attach(label, 0, 1, 4, 5)
 
         self._v2 = IntegerEntry()
-        self._v2.set_width_chars(1)
+        self._v2.set_width_chars(4)
         self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
         table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
@@ -1343,7 +1338,9 @@ class TakeoffPage(Page):
         self._sid.set_sensitive(True)
         self._v1.set_int(None)
         self._v1.set_sensitive(True)
+        self._vr.set_int(None)
         self._vr.set_sensitive(True)
+        self._v2.set_int(None)
         self._v2.set_sensitive(True)
         self._button.set_sensitive(False)
         
@@ -1371,14 +1368,14 @@ class LandingPage(Page):
     def __init__(self, wizard):
         """Construct the landing page."""
         help = "Enter the STAR and/or transition, runway,\n" \
-               "approach type and V<sub>ref</sub> used."
+               "approach type and V<sub>Ref</sub> used."
 
         super(LandingPage, self).__init__(wizard, "Landing", help)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 4)
+        table = gtk.Table(5, 5)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -1399,7 +1396,7 @@ class LandingPage(Page):
         self._star.set_tooltip_text("The name of Standard Terminal Arrival Route followed.")
         self._star.connect("changed", self._updateForwardButton)
         self._star.set_sensitive(False)
-        table.attach(self._star, 2, 3, 0, 1)
+        table.attach(self._star, 2, 4, 0, 1)
         label.set_mnemonic_widget(self._starButton)
 
         self._transitionButton = gtk.CheckButton()
@@ -1416,7 +1413,7 @@ class LandingPage(Page):
         self._transition.set_tooltip_text("The name of transition executed or VECTORS if vectored by ATC.")
         self._transition.connect("changed", self._updateForwardButton)
         self._transition.set_sensitive(False)
-        table.attach(self._transition, 2, 3, 1, 2)
+        table.attach(self._transition, 2, 4, 1, 2)
         label.set_mnemonic_widget(self._transitionButton)
 
         label = gtk.Label("Run_way:")
@@ -1428,7 +1425,7 @@ class LandingPage(Page):
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text("The runway the landing is performed on.")
         self._runway.connect("changed", self._updateForwardButton)
-        table.attach(self._runway, 2, 3, 2, 3)
+        table.attach(self._runway, 2, 4, 2, 3)
         label.set_mnemonic_widget(self._runway)
 
         label = gtk.Label("_Approach type:")
@@ -1440,25 +1437,23 @@ class LandingPage(Page):
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text("The type of the approach, e.g. ILS or VISUAL.")
         self._approachType.connect("changed", self._updateForwardButton)
-        table.attach(self._approachType, 2, 3, 3, 4)
+        table.attach(self._approachType, 2, 4, 3, 4)
         label.set_mnemonic_widget(self._approachType)
 
-        label = gtk.Label("V<sub>_ref</sub>:")
+        label = gtk.Label("V<sub>_Ref</sub>:")
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, 5, 6)
 
-        self._vref = gtk.SpinButton()
-        self._vref.set_increments(step = 1, page = 10)
-        self._vref.set_range(min = 50, max = 300)
-        self._vref.set_value(140)
-        self._vref.set_numeric(True)
+        self._vref = IntegerEntry()
+        self._vref.set_width_chars(5)
         self._vref.set_tooltip_markup("The approach reference speed in knots.")
-        table.attach(self._vref, 2, 3, 5, 6)
+        self._vref.connect("integer-changed", self._vrefChanged)
+        table.attach(self._vref, 3, 4, 5, 6)
         label.set_mnemonic_widget(self._vref)
         
-        table.attach(gtk.Label("knots"), 3, 4, 5, 6)
+        table.attach(gtk.Label("knots"), 4, 5, 5, 6)
         
         button = self.addButton(gtk.STOCK_GO_BACK)
         button.set_use_stock(True)
@@ -1471,6 +1466,11 @@ class LandingPage(Page):
         # These are needed for correct size calculations
         self._starButton.set_active(True)
         self._transitionButton.set_active(True)
+
+    @property
+    def vref(self):
+        """Return the landing reference speed."""
+        return self._vref.get_int()
 
     def activate(self):
         """Called when the page is activated."""
@@ -1488,7 +1488,7 @@ class LandingPage(Page):
         self._approachType.set_text("")
         self._approachType.set_sensitive(True)
 
-        self._vref.set_value(140)
+        self._vref.set_int(None)
         self._vref.set_sensitive(True)
 
         self._updateForwardButton()
@@ -1521,7 +1521,7 @@ class LandingPage(Page):
         self._transition.set_sensitive(active)
         if active:
             self._transition.grab_focus()        
-        self._updateForwardButton()
+        self._updateForwardButton()    
 
     def _updateForwardButton(self, widget = None):
         """Update the sensitivity of the forward button."""
@@ -1532,8 +1532,13 @@ class LandingPage(Page):
                     (self._transition.get_text()!="" or
                      not self._transitionButton.get_active()) and \
                     self._runway.get_text()!="" and \
-                    self._approachType.get_text()!=""
+                    self._approachType.get_text()!="" and \
+                    self.vref is not None
         self._button.set_sensitive(sensitive)
+
+    def _vrefChanged(self, widget, value):
+        """Called when the Vref has changed."""
+        self._updateForwardButton()
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -1570,7 +1575,8 @@ class Wizard(gtk.VBox):
         self._pages.append(BriefingPage(self, False))
         self._takeoffPage = TakeoffPage(self) 
         self._pages.append(self._takeoffPage)
-        self._pages.append(LandingPage(self))
+        self._landingPage = LandingPage(self) 
+        self._pages.append(self._landingPage)
         
         maxWidth = 0
         maxHeight = 0
@@ -1628,17 +1634,22 @@ class Wizard(gtk.VBox):
     @property
     def v1(self):
         """Get the V1 speed."""
-        return None if self._bookedFlight is None else self._takeoffPage.v1
+        return self._takeoffPage.v1
 
     @property
     def vr(self):
         """Get the Vr speed."""
-        return None if self._bookedFlight is None else self._takeoffPage.vr
+        return self._takeoffPage.vr
 
     @property
     def v2(self):
         """Get the V2 speed."""
-        return None if self._bookedFlight is None else self._takeoffPage.v2
+        return self._takeoffPage.v2
+
+    @property
+    def vref(self):
+        """Get the Vref speed."""
+        return self._landingPage.vref
 
     def nextPage(self, finalize = True):
         """Go to the next page."""

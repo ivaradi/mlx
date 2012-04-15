@@ -174,6 +174,10 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Altimeter setting: %.0f hPa" % \
                             (self._aircraftState.altimeter,))
+        self.logger.message(self._aircraftState.timestamp,
+                            "VRef speed calculated by the pilot: %s" % \
+                            ("-" if self._flight.vref is None
+                             else str(self._flight.vref)))
         self.flight.flareStarted(flareStart, flareStartFS)
          
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,

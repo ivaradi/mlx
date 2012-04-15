@@ -84,6 +84,8 @@ class IntegerEntry(gtk.Entry):
         """Construct the entry."""
         gtk.Entry.__init__(self)
 
+        self.set_alignment(1.0)
+
         self._defaultValue = defaultValue
         self._currentInteger = defaultValue
         self._selfSetting = False

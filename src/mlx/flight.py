@@ -74,6 +74,11 @@ class Flight(object):
         """Get the V2 speed of the flight."""
         return self._gui.v2
 
+    @property
+    def vref(self):
+        """Get the VRef speed of the flight."""
+        return self._gui.vref
+
     def setStage(self, timestamp, stage):
         """Set the flight stage.
 
