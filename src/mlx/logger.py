@@ -47,16 +47,13 @@ class Logger(object):
         """Put a simple textual message into the log with the given timestamp."""
         timeStr = Logger._getTimeStr(timestamp)
         print >> self._output, timeStr + ":", msg
-        print timeStr + ":", msg        
 
     def untimedMessage(self, msg):
         """Put an untimed message into the log."""
         print >> self._output, msg
-        print msg        
 
     def debug(self, msg):
         """Log a debug message."""
-        print >> self._output, "[DEBUG]", msg
         print "[DEBUG]", msg
 
     def stage(self, timestamp, stage):
