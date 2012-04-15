@@ -204,6 +204,7 @@ class Values(object):
 
         self.ias = 0.0
         self.vs = 0.0
+        self.tdRate = 0.0
 
         self.radioAltitude = None
         self.altitude = 513.0
@@ -234,6 +235,7 @@ class Values(object):
 
         self.windSpeed = 8.0
         self.windDirection = 300.0
+        self.visibility = 10000
         
         self.n1 = [0.0, 0.0, 0.0]
         self.throttles = [0.0, 0.0, 0.0]
@@ -272,6 +274,8 @@ class Values(object):
             return int(self.ias * 128.0)
         elif offset==0x02c8:       # VS
             return int(self.vs * const.FEETTOMETRES * 256.0 / 60.0)
+        elif offset==0x030c:       # TD rate
+            return int(self.tdRate * const.FEETTOMETRES * 256.0 / 60.0)
         elif offset==0x0330:       # Altimeter
             return int(self.altimeter * 16.0)
         elif offset==0x0350:       # NAV1
@@ -366,6 +370,8 @@ class Values(object):
             if self.landingLightsOn: lights |= 0x04
             if self.strobeLightsOn: lights |= 0x10
             return lights
+        elif offset==0x0e8a:       # Visibility
+            return int(self.visibility * 100.0 / 1609.344)
         elif offset==0x0e90:       # Wind speed
             return int(self.windSpeed)
         elif offset==0x0e92:       # Wind direction
@@ -446,6 +452,8 @@ class Values(object):
             self.ias = value / 128.0
         elif offset==0x02c8:       # VS
             self.vs = value * 60.0 / const.FEETTOMETRES / 256.0
+            if not self.onTheGround:
+                self.tdRate = self.vs
         elif offset==0x0330:       # Altimeter
             self.altimeter = value / 16.0
         elif offset==0x0350:       # NAV1
@@ -454,8 +462,10 @@ class Values(object):
             self.nav2 = Values._writeFrequency(value)
         elif offset==0x0354:       # Squawk
             self.squawk = Values._writeBCD(value)
-        elif offset==0x0366:       # Stalled
+        elif offset==0x0366:       # On the groud
             self.onTheGround = value!=0
+            if not self.onTheGround:
+                self.tdRate = self.vs
         elif offset==0x036c:       # Stalled
             self.stalled = value!=0
         elif offset==0x036d:       # Overspeed
@@ -535,6 +545,8 @@ class Values(object):
             self.antiCollisionLightsOn = (value&0x02)!=0
             self.landingLightsOn = (value&0x04)!=0 
             self.strobeLightsOn = (value&0x10)!=0 
+        elif offset==0x0e8a:       # Visibility
+            self.visibility = value * 1609.344 / 100.0
         elif offset==0x0e90:       # Wind speed
             self.windSpeed = value
         elif offset==0x0e92:       # Wind direction
@@ -934,6 +946,12 @@ class CLI(cmd.Cmd):
                                      lambda word: int(float(word) *
                                                       const.FEETTOMETRES *
                                                       256.0 / 60.0))
+        self._valueHandlers["tdRate"] = (0x030c, "d",
+                                         lambda value: value * 60 /                                     
+                                         const.FEETTOMETRES / 256.0,
+                                         lambda word: int(float(word) *
+                                                          const.FEETTOMETRES *
+                                                          256.0 / 60.0))
         self._valueHandlers["radioAltitude"] = (0x31e4, "d",
                                                 lambda value: value /
                                                 const.FEETTOMETRES /
@@ -1065,6 +1083,11 @@ class CLI(cmd.Cmd):
         self._valueHandlers["throttle_3"] = (0x09bc, "H",
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
+                                                            
+        self._valueHandlers["visibility"] = (0x0e8a, "H",
+                                             lambda value: value*1609.344/100.0,
+                                             lambda word: int(float(word)*
+                                                              100.0/1609.344))
                                                             
     def default(self, line):
         """Handle unhandle commands."""
