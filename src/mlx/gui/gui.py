@@ -107,6 +107,31 @@ class GUI(fs.ConnectionListener):
     def flight(self):
         """Get the flight being performed."""
         return self._flight
+
+    @property
+    def zfw(self):
+        """Get Zero-Fuel Weight calculated for the current flight."""
+        return self._wizard.zfw
+        
+    @property
+    def cruiseAltitude(self):
+        """Get cruise altitude calculated for the current flight."""
+        return self._wizard.cruiseAltitude
+        
+    @property
+    def v1(self):
+        """Get the V1 speed calculated for the flight."""
+        return self._wizard.v1
+        
+    @property
+    def vr(self):
+        """Get the Vr speed calculated for the flight."""
+        return self._wizard.vr
+        
+    @property
+    def v2(self):
+        """Get the V2 speed calculated for the flight."""
+        return self._wizard.v2
         
     def run(self):
         """Run the GUI."""
@@ -233,6 +258,7 @@ class GUI(fs.ConnectionListener):
         """Set the stage of the flight."""
         self._statusbar.setStage(stage)
         self._statusIcon.setStage(stage)
+        self._wizard.setStage(stage)
 
     def setRating(self, rating):
         """Set the rating of the flight."""

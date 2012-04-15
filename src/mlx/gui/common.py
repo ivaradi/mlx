@@ -77,3 +77,54 @@ class FlightStatusHandler(object):
             self._updateFlightStatus()
 
 #------------------------------------------------------------------------------
+
+class IntegerEntry(gtk.Entry):
+    """An entry that allows only either an empty value, or an integer."""
+    def __init__(self, defaultValue = None):
+        """Construct the entry."""
+        gtk.Entry.__init__(self)
+
+        self._defaultValue = defaultValue
+        self._currentInteger = defaultValue
+        self._selfSetting = False
+        self._set_text()
+
+        self.connect("changed", self._handle_changed)
+
+    def get_int(self):
+        """Get the integer."""
+        return self._currentInteger
+
+    def set_int(self, value):
+        """Set the integer."""
+        if value!=self._currentInteger:
+            self._currentInteger = value
+            self.emit("integer-changed", self._currentInteger)
+        self._set_text()
+    
+    def _handle_changed(self, widget):
+        """Handle the changed signal."""
+        if self._selfSetting:
+            return
+        text = self.get_text()
+        if text=="":
+            self.set_int(self._defaultValue)
+        else:
+            try:
+                self.set_int(int(text))
+            except:
+                self._set_text()
+
+    def _set_text(self):
+        """Set the text value from the current integer."""
+        self._selfSetting = True
+        self.set_text("" if self._currentInteger is None
+                      else str(self._currentInteger))
+        self._selfSetting = False
+                
+#------------------------------------------------------------------------------
+
+gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
+                   None, (object,))
+
+#------------------------------------------------------------------------------

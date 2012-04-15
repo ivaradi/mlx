@@ -30,10 +30,8 @@ class Flight(object):
 
         gui.resetFlightStatus()
 
-        self.cruiseAltitude = None
         self.flareTimeFromFS = False
         self.entranceExam = False
-        self.zfw = None
 
         self.options = Options()
 
@@ -43,10 +41,6 @@ class Flight(object):
 
         self._endCondition = threading.Condition()
 
-        self.v1 = None
-        self.vr = None
-        self.v2 = None
-
         self._flareStart = None
         self._flareStartFS = None
 
@@ -55,14 +49,39 @@ class Flight(object):
         """Get the flight stage."""
         return self._stage
 
+    @property
+    def zfw(self):
+        """Get the Zero-Fuel Weight of the flight."""
+        return self._gui.zfw
+
+    @property
+    def cruiseAltitude(self):
+        """Get the cruise altitude of the flight."""
+        return self._gui.cruiseAltitude
+
+    @property
+    def v1(self):
+        """Get the V1 speed of the flight."""
+        return self._gui.v1
+
+    @property
+    def vr(self):
+        """Get the Vr speed of the flight."""
+        return self._gui.vr
+
+    @property
+    def v2(self):
+        """Get the V2 speed of the flight."""
+        return self._gui.v2
+
     def setStage(self, timestamp, stage):
         """Set the flight stage.
 
         Returns if the stage has really changed."""
         if stage!=self._stage:
             self._stage = stage
-            self.logger.stage(timestamp, stage)
             self._gui.setStage(stage)
+            self.logger.stage(timestamp, stage)
             if stage==const.STAGE_END:
                 with self._endCondition:
                     self._endCondition.notify()

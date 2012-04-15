@@ -683,13 +683,12 @@ class PayloadPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
 
-        self._cargoWeight = gtk.Entry()
+        self._cargoWeight = IntegerEntry(defaultValue = 0)
         self._cargoWeight.set_width_chars(6)
         self._cargoWeight.set_alignment(1.0)
-        self._cargoWeight.connect("changed", self._cargoWeightChanged)
+        self._cargoWeight.connect("integer-changed", self._cargoWeightChanged)
         self._cargoWeight.set_tooltip_text("The weight of the cargo for your flight.")
         table.attach(self._cargoWeight, 1, 2, 3, 4)
-        self._cargoWeightValue = 0        
         label.set_mnemonic_widget(self._cargoWeight)
 
         table.attach(gtk.Label("kg"), 2, 3, 3, 4)
@@ -744,8 +743,7 @@ class PayloadPage(Page):
         self._numCrew.set_text(str(bookedFlight.numCrew))
         self._numPassengers.set_text(str(bookedFlight.numPassengers))
         self._bagWeight.set_text(str(bookedFlight.bagWeight))
-        self._cargoWeightValue = bookedFlight.cargoWeight
-        self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
+        self._cargoWeight.set_int(bookedFlight.cargoWeight)
         self._cargoWeight.set_sensitive(True)
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
         self._zfwButton.set_sensitive(True)
@@ -756,19 +754,19 @@ class PayloadPage(Page):
         self._cargoWeight.set_sensitive(False)
         self._zfwButton.set_sensitive(False)
 
-    def _calculateZFW(self):
+    def calculateZFW(self):
         """Calculate the ZFW value."""
         zfw = self._wizard.gui._flight.aircraft.dow
         bookedFlight = self._wizard._bookedFlight
         zfw += (bookedFlight.numCrew + bookedFlight.numPassengers) * 82
         zfw += bookedFlight.bagWeight
-        zfw += self._cargoWeightValue
+        zfw += self._cargoWeight.get_int()
         zfw += bookedFlight.mailWeight
         return zfw
         
     def _updateCalculatedZFW(self):
         """Update the calculated ZFW"""
-        zfw = self._calculateZFW()
+        zfw = self.calculateZFW()
 
         markupBegin = "<b>"
         markupEnd = "</b>"
@@ -778,16 +776,8 @@ class PayloadPage(Page):
             markupEnd = "</span>" + markupEnd
         self._calculatedZFW.set_markup(markupBegin + str(zfw) + markupEnd)
 
-    def _cargoWeightChanged(self, entry):
+    def _cargoWeightChanged(self, entry, weight):
         """Called when the cargo weight has changed."""
-        text = self._cargoWeight.get_text()
-        if text=="":
-            self._cargoWeightValue = 0
-        else:
-            try:
-                self._cargoWeightValue = int(text)
-            except:
-                self._cargoWeight.set_text(str(self._cargoWeightValue))
         self._updateCalculatedZFW()
             
     def _zfwRequested(self, button):
@@ -815,8 +805,6 @@ class PayloadPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        if not self._finalized:
-            self._wizard._zfw = self._calculateZFW()
         self._wizard.nextPage()
 
     def _backClicked(self, button):
@@ -1012,6 +1000,11 @@ class RoutePage(Page):
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
 
+    @property
+    def cruiseLevel(self):
+        """Get the cruise level."""
+        return self._cruiseLevel.get_value_as_int()
+
     def activate(self):
         """Setup the route from the booked flight."""
         self._route.set_sensitive(True)
@@ -1052,9 +1045,6 @@ class RoutePage(Page):
         if self._finalized:
             self._wizard.nextPage()
         else:
-            self._wizard._cruiseAltitude = self._cruiseLevel.get_value_as_int() * 100
-            self._wizard._route = self._getRoute()
-
             self._backButton.set_sensitive(False)
             self._button.set_sensitive(False)
             self._cruiseLevel.set_sensitive(False)
@@ -1234,7 +1224,6 @@ class BriefingPage(Page):
         if not self._departure:
             if not self._finalized:
                 self._wizard.gui.startMonitoring()
-                self.finalize()
                 self._finalized = True
 
         self._wizard.nextPage()
@@ -1252,7 +1241,7 @@ class TakeoffPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 3)
+        table = gtk.Table(5, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -1267,8 +1256,7 @@ class TakeoffPage(Page):
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text("The runway the takeoff is performed from.")
-        self._runway.connect("changed", self._updateForwardButton)
-        table.attach(self._runway, 1, 2, 0, 1)
+        table.attach(self._runway, 1, 3, 0, 1)
         label.set_mnemonic_widget(self._runway)
         
         label = gtk.Label("_SID:")
@@ -1279,8 +1267,7 @@ class TakeoffPage(Page):
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
         self._sid.set_tooltip_text("The name of the Standard Instrument Deparature procedure followed.")
-        self._sid.connect("changed", self._updateForwardButton)
-        table.attach(self._sid, 1, 2, 1, 2)
+        table.attach(self._sid, 1, 3, 1, 2)
         label.set_mnemonic_widget(self._sid)
         
         label = gtk.Label("V<sub>_1</sub>:")
@@ -1289,17 +1276,13 @@ class TakeoffPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 2, 3)
 
-        self._v1 = gtk.SpinButton()
-        self._v1.set_increments(step = 1, page = 10)
-        self._v1.set_range(min = 50, max = 300)
-        self._v1.set_value(100)
-        self._v1.set_numeric(True)
+        self._v1 = IntegerEntry()
+        self._v1.set_width_chars(1)
         self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
-        self._v1.connect("changed", self._updateForwardButton)
-        table.attach(self._v1, 1, 2, 2, 3)
+        table.attach(self._v1, 2, 3, 2, 3)
         label.set_mnemonic_widget(self._v1)
         
-        table.attach(gtk.Label("knots"), 2, 3, 2, 3)
+        table.attach(gtk.Label("knots"), 3, 4, 2, 3)
         
         label = gtk.Label("V<sub>_r</sub>:")
         label.set_use_markup(True)
@@ -1307,17 +1290,13 @@ class TakeoffPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
 
-        self._vr = gtk.SpinButton()
-        self._vr.set_increments(step = 1, page = 10)
-        self._vr.set_range(min = 50, max = 300)
-        self._vr.set_value(110)
-        self._vr.set_numeric(True)
+        self._vr = IntegerEntry()
+        self._vr.set_width_chars(1)
         self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
-        self._vr.connect("changed", self._updateForwardButton)
-        table.attach(self._vr, 1, 2, 3, 4)
+        table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
         
-        table.attach(gtk.Label("knots"), 2, 3, 3, 4)
+        table.attach(gtk.Label("knots"), 3, 4, 3, 4)
         
         label = gtk.Label("V<sub>_2</sub>:")
         label.set_use_markup(True)
@@ -1325,17 +1304,13 @@ class TakeoffPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 4, 5)
 
-        self._v2 = gtk.SpinButton()
-        self._v2.set_increments(step = 1, page = 10)
-        self._v2.set_range(min = 50, max = 300)
-        self._v2.set_value(120)
-        self._v2.set_numeric(True)
+        self._v2 = IntegerEntry()
+        self._v2.set_width_chars(1)
         self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
-        self._v2.connect("changed", self._updateForwardButton)
-        table.attach(self._v2, 1, 2, 4, 5)
+        table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
         
-        table.attach(gtk.Label("knots"), 2, 3, 4, 5)
+        table.attach(gtk.Label("knots"), 3, 4, 4, 5)
         
         button = self.addButton(gtk.STOCK_GO_BACK)
         button.set_use_stock(True)
@@ -1345,37 +1320,42 @@ class TakeoffPage(Page):
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
 
+    @property
+    def v1(self):
+        """Get the v1 speed."""
+        return self._v1.get_int()
+
+    @property
+    def vr(self):
+        """Get the vr speed."""
+        return self._vr.get_int()
+
+    @property
+    def v2(self):
+        """Get the v2 speed."""
+        return self._v2.get_int()
+
     def activate(self):
         """Activate the page."""
         self._runway.set_text("")
         self._runway.set_sensitive(True)
         self._sid.set_text("")
         self._sid.set_sensitive(True)
+        self._v1.set_int(None)
         self._v1.set_sensitive(True)
         self._vr.set_sensitive(True)
         self._v2.set_sensitive(True)
-        self._updateForwardButton()
+        self._button.set_sensitive(False)
         
-    def finalize(self):
-        """Finalize the page."""
+    def freezeValues(self):
+        """Freeze the values on the page, and enable the forward button."""
         self._runway.set_sensitive(False)
         self._sid.set_sensitive(False)
         self._v1.set_sensitive(False)
         self._vr.set_sensitive(False)
         self._v2.set_sensitive(False)
-
-        flight = self._wizard.gui.flight
-        flight.v1 = self._v1.get_value_as_int()
-        flight.vr = self._vr.get_value_as_int()
-        flight.v2 = self._v2.get_value_as_int()
-
-    def _updateForwardButton(self, widget = None):
-        """Update the Forward buttons sensitivity."""
-        self._button.set_sensitive(self._runway.get_text()!="" and
-                                   self._sid.get_text()!="" and
-                                   self._v1.get_value_as_int()<=self._vr.get_value_as_int() and 
-                                   self._vr.get_value_as_int()<=self._v2.get_value_as_int())
-
+        self._button.set_sensitive(True)
+        
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
@@ -1581,12 +1561,15 @@ class Wizard(gtk.VBox):
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
         self._pages.append(ConnectPage(self))
-        self._pages.append(PayloadPage(self))
+        self._payloadPage = PayloadPage(self) 
+        self._pages.append(self._payloadPage)
         self._pages.append(TimePage(self))
-        self._pages.append(RoutePage(self))
+        self._routePage = RoutePage(self)
+        self._pages.append(self._routePage)
         self._pages.append(BriefingPage(self, True))
         self._pages.append(BriefingPage(self, False))
-        self._pages.append(TakeoffPage(self))
+        self._takeoffPage = TakeoffPage(self) 
+        self._pages.append(self._takeoffPage)
         self._pages.append(LandingPage(self))
         
         maxWidth = 0
@@ -1631,6 +1614,32 @@ class Wizard(gtk.VBox):
         if fromPage is not None:
             self.grabDefault()
 
+    @property
+    def zfw(self):
+        """Get the calculated ZFW value."""
+        return 0 if self._bookedFlight is None \
+               else self._payloadPage.calculateZFW()
+
+    @property
+    def cruiseAltitude(self):
+        """Get the cruise altitude."""
+        return self._routePage.cruiseLevel * 100
+
+    @property
+    def v1(self):
+        """Get the V1 speed."""
+        return None if self._bookedFlight is None else self._takeoffPage.v1
+
+    @property
+    def vr(self):
+        """Get the Vr speed."""
+        return None if self._bookedFlight is None else self._takeoffPage.vr
+
+    @property
+    def v2(self):
+        """Get the V2 speed."""
+        return None if self._bookedFlight is None else self._takeoffPage.v2
+
     def nextPage(self, finalize = True):
         """Go to the next page."""
         self.jumpPage(1, finalize)
@@ -1655,6 +1664,11 @@ class Wizard(gtk.VBox):
         """Called when we have disconnected from the simulator."""
         self._initialize()
 
+    def setStage(self, stage):
+        """Set the flight stage to the given one."""
+        if stage==const.STAGE_TAKEOFF:
+            self._takeoffPage.freezeValues()
+
     def _initialize(self):
         """Initialize the wizard."""
         self._fleet = None
@@ -1664,9 +1678,6 @@ class Wizard(gtk.VBox):
         self._loginResult = None
         self._bookedFlight = None
         self._departureGate = "-"
-        self._zfw = None
-        self._cruiseAltitude = None
-        self._route = None
         self._departureNOTAMs = None
         self._departureMETAR = None
         self._arrivalNOTAMs = None
