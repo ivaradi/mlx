@@ -350,14 +350,15 @@ class Values(object):
             flapsIncrement = 16383.0 / numNotchesM1
             index = 0
             while index<numNotchesM1 and \
-                  self.flapsControl<self.flapsNotches[index]:
+                  self.flapsControl>self.flapsNotches[index]:
                 index += 1
-                
+
             if index==numNotchesM1:
                 return 16383
             else:
-                return int((self.flapsControl-self.flapsNotches[index]) * \
-                           flapsIncrement / \
+                return int(index * flapsIncrement +
+                           (self.flapsControl-self.flapsNotches[index]) *
+                           flapsIncrement /
                            (self.flapsNotches[index+1] - self.flapsNotches[index]))
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
             return self.flaps * 16383.0 / self.flapsNotches[-1]        
@@ -528,12 +529,12 @@ class Values(object):
         elif offset==0x0bdc:       # Flaps control
             numNotchesM1 = len(self.flapsNotches) - 1
             flapsIncrement = 16383.0 / numNotchesM1
-            index = value / flapsIncrement
+            index = int(value / flapsIncrement)
             if index>=numNotchesM1:
                 self.flapsControl = self.flapsNotches[-1]
             else:
                 self.flapsControl = self.flapsNotches[index]
-                self.flapsControl += value * \
+                self.flapsControl += (value - index * flapsIncrement) * \
                     (self.flapsNotches[index+1] - self.flapsNotches[index]) / \
                     flapsIncrement
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
@@ -582,7 +583,6 @@ class Values(object):
             self.frozen = value!=0
         elif offset==0x3bfc:       # ZFW
             self.zfw = value * const.LBSTOKG / 256.0
-            print "ZFW:", self.zfw
         elif offset==0x3c00:       # Path of the current AIR file
             self.airPath = value
         elif offset==0x3d00:       # Name of the current aircraft
@@ -639,7 +639,7 @@ class Values(object):
         temperature = 15 - self.altitude * 6.5 * const.FEETTOMETRES / 1000.0 
         temperature += 273.15  # Celsius -> Kelvin
         airDensity = pressure / (temperature * 287.05)
-        print "pressure:", pressure, "temperature:", temperature, "airDensity:", airDensity
+        #print "pressure:", pressure, "temperature:", temperature, "airDensity:", airDensity
         return self.ias * math.sqrt(1.225 / airDensity)
 
 #------------------------------------------------------------------------------

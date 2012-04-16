@@ -149,12 +149,9 @@ class GUI(fs.ConnectionListener):
 
         gtk.main()
 
-        if self._flight is not None:
-            simulator = self._flight.simulator
-            if self._monitoring:
-                simulator.stopMonitoring()
-                self._monitoring = False
-            simulator.disconnect()                        
+        if self._flight is not None and self._connected:
+            self.stopMonitoring()
+            self._flight.simulator.disconnect()                        
 
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
@@ -264,6 +261,12 @@ class GUI(fs.ConnectionListener):
         self._statusbar.setStage(stage)
         self._statusIcon.setStage(stage)
         self._wizard.setStage(stage)
+        if stage==const.STAGE_END:
+            self.stopMonitoring()
+            self.simulator.disconnect()
+            self._connecting = False
+            self._connected = False
+            self._statusbar.updateConnection(self._connecting, self._connected)
 
     def setRating(self, rating):
         """Set the rating of the flight."""
@@ -411,13 +414,15 @@ class GUI(fs.ConnectionListener):
 
     def startMonitoring(self):
         """Start monitoring."""
-        self._simulator.startMonitoring()
-        self._monitoring = True
+        if not self._monitoring:
+            self.simulator.startMonitoring()
+            self._monitoring = True
 
     def stopMonitoring(self):
         """Stop monitoring."""
-        self._simulator.stoptMonitoring()
-        self._monitoring = False
+        if self._monitoring:
+            self.simulator.stopMonitoring()
+            self._monitoring = False
 
     def _buildLogFrame(self):
         """Build the frame for the log."""

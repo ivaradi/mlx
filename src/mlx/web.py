@@ -336,7 +336,7 @@ class Login(Request):
 
         result = Result()
 
-        f = urllib2.urlopen(url)
+        f = urllib2.urlopen(url, timeout = 10.0)
 
         status = readline(f)
         result.loggedIn = status == ".OK."
@@ -374,7 +374,7 @@ class GetFleet(Request):
         """Perform the login request."""
         url = "http://www.virtualairlines.hu/onlinegates_get.php"
 
-        f = urllib2.urlopen(url)
+        f = urllib2.urlopen(url, timeout = 10.0)
         result = Result()
         result.fleet = Fleet(f)
         f.close()
@@ -406,7 +406,7 @@ class UpdatePlane(Request):
                                  ("status", status),
                                  ("kapu", gateNumber)])
         
-        f = urllib2.urlopen(url, data)
+        f = urllib2.urlopen(url, data, timeout = 10.0)
         line = readline(f)
         
         result = Result()
@@ -433,7 +433,7 @@ class GetNOTAMs(Request):
 
         url = "http://notams.euroutepro.com/notams.xml"
 
-        f = urllib2.urlopen(url)
+        f = urllib2.urlopen(url, timeout = 10.0)
         try:
             xmlParser.parse(f)
         finally:
@@ -465,7 +465,7 @@ class GetMETARs(Request):
                                   ("hoursBeforeNow", "24"),
                                   ("mostRecentForEachStation", "constraint")])
         url += data
-        f = urllib2.urlopen(url)
+        f = urllib2.urlopen(url, timeout = 10.0)
         try:
             result = Result()
             result.metars = {}

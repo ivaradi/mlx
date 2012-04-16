@@ -1372,6 +1372,8 @@ class LandingPage(Page):
 
         super(LandingPage, self).__init__(wizard, "Landing", help)
 
+        self._flightEnded = False
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
@@ -1474,6 +1476,8 @@ class LandingPage(Page):
 
     def activate(self):
         """Called when the page is activated."""
+        self._flightEnded = False
+        
         self._starButton.set_sensitive(True)
         self._starButton.set_active(False)
         self._star.set_text("")
@@ -1491,6 +1495,11 @@ class LandingPage(Page):
         self._vref.set_int(None)
         self._vref.set_sensitive(True)
 
+        self._updateForwardButton()
+
+    def flightEnded(self):
+        """Called when the flight has ended."""
+        self._flightEnded = True
         self._updateForwardButton()
 
     def finalize(self):
@@ -1525,7 +1534,8 @@ class LandingPage(Page):
 
     def _updateForwardButton(self, widget = None):
         """Update the sensitivity of the forward button."""
-        sensitive = (self._starButton.get_active() or \
+        sensitive = self._flightEnded and \
+                    (self._starButton.get_active() or \
                      self._transitionButton.get_active()) and \
                     (self._star.get_text()!="" or
                      not self._starButton.get_active()) and \
@@ -1679,6 +1689,8 @@ class Wizard(gtk.VBox):
         """Set the flight stage to the given one."""
         if stage==const.STAGE_TAKEOFF:
             self._takeoffPage.freezeValues()
+        elif stage==const.STAGE_END:
+            self._landingPage.flightEnded()
 
     def _initialize(self):
         """Initialize the wizard."""
