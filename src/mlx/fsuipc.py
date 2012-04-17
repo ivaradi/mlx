@@ -745,6 +745,8 @@ class AircraftModel(object):
     Aircraft models handle the data arriving from FSUIPC and turn it into an
     object describing the aircraft's state."""
     monitoringData = [("paused", 0x0264, "H"),
+                      ("latitude", 0x0560, "l"),
+                      ("longitude", 0x0568, "l"),
                       ("frozen", 0x3364, "H"),
                       ("replay", 0x0628, "d"),
                       ("slew", 0x05dc, "H"),
@@ -871,6 +873,13 @@ class AircraftModel(object):
         state = fs.AircraftState()
         
         state.timestamp = timestamp
+
+        state.latitude = data[self._monidx_latitude] * \
+                         90.0 / 10001750.0 / 65536.0 / 65536.0
+
+        state.longitude = data[self._monidx_longitude] * \
+                          360.0 / 65536.0 / 65536.0 / 65536.0 / 65536.0
+        if state.longitude>180.0: state.longitude = 360.0 - state.longitude
         
         state.paused = data[self._monidx_paused]!=0 or \
             data[self._monidx_frozen]!=0 or \

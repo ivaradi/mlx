@@ -4,6 +4,7 @@
 
 import const
 import checks
+import util
 
 import time
 
@@ -112,6 +113,8 @@ class Aircraft(object):
             checker.check(self._flight, self, self._flight.logger,
                           self._aircraftState, aircraftState)
 
+        self._flight.handleState(self._aircraftState, aircraftState)
+
         self._maxVS = max(self._maxVS, aircraftState.vs)
         self._minVS = min(self._minVS, aircraftState.vs)
 
@@ -154,6 +157,18 @@ class Aircraft(object):
                                     (self._minVS, self._maxVS))
             elif newStage==const.STAGE_PARKING:
                 self.logger.message(aircraftState.timestamp, "Block time end")
+            elif newStage==const.STAGE_END:
+                flightLength = self._flight.flightTimeEnd - self._flight.flightTimeStart
+                self.logger.message(aircraftState.timestamp,
+                                    "Flight time: " +
+                                    util.getTimeIntervalString(flightLength))
+                self.logger.message(aircraftState.timestamp,
+                                    "Flown distance: %.2f NM" % \
+                                    (self._flight.flownDistance,))                
+                blockLength = self._flight.blockTimeEnd - self._flight.blockTimeStart
+                self.logger.message(aircraftState.timestamp,
+                                    "Block time: " +
+                                    util.getTimeIntervalString(blockLength))
 
     def prepareFlare(self):
         """Called when it is detected that we will soon flare.

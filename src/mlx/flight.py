@@ -3,6 +3,7 @@
 #---------------------------------------------------------------------------------------
 
 import const
+import util
 
 import threading
 
@@ -38,6 +39,19 @@ class Flight(object):
         self.aircraftType = None
         self.aircraft = None
         self.simulator = None
+
+        self.blockTimeStart = None
+        self.flightTimeStart = None
+        self.flightTimeEnd = None
+        self.blockTimeEnd = None
+
+        self._lastDistanceTime = None
+        self._previousLatitude = None
+        self._previousLongitude = None
+        self.flownDistance = 0.0
+
+        self.startFuel = None
+        self.endFuel = None
 
         self._endCondition = threading.Condition()
 
@@ -79,6 +93,14 @@ class Flight(object):
         """Get the VRef speed of the flight."""
         return self._gui.vref
 
+    def handleState(self, oldState, currentState):
+        """Handle a new state information."""
+        self._updateFlownDistance(currentState)
+        
+        self.endFuel = sum(currentState.fuel)
+        if self.startFuel is None:
+            self.startFuel = self.endFuel
+
     def setStage(self, timestamp, stage):
         """Set the flight stage.
 
@@ -87,7 +109,15 @@ class Flight(object):
             self._stage = stage
             self._gui.setStage(stage)
             self.logger.stage(timestamp, stage)
-            if stage==const.STAGE_END:
+            if stage==const.STAGE_PUSHANDTAXI:
+                self.blockTimeStart = timestamp
+            elif stage==const.STAGE_TAKEOFF:
+                self.flightTimeStart = timestamp
+            elif stage==const.STAGE_TAXIAFTERLAND:
+                self.flightTimeEnd = timestamp
+            elif stage==const.STAGE_PARKING:
+                self.blockTimeEnd = timestamp
+            elif stage==const.STAGE_END:
                 with self._endCondition:
                     self._endCondition.notify()
             return True
@@ -131,5 +161,34 @@ class Flight(object):
         with self._endCondition:
             while self._stage!=const.STAGE_END:
                 self._endCondition.wait(1)
+
+    def _updateFlownDistance(self, currentState):
+        """Update the flown distance."""
+        if not currentState.onTheGround:
+            updateData = False
+            if self._lastDistanceTime is None or \
+               self._previousLatitude is None or \
+               self._previousLongitude is None:
+                updateData = True
+            elif currentState.timestamp >= (self._lastDistanceTime + 30.0):
+                updateData = True
+                self.flownDistance += self._getDistance(currentState)
+
+            if updateData:
+                self._previousLatitude = currentState.latitude
+                self._previousLongitude = currentState.longitude
+                self._lastDistanceTime = currentState.timestamp
+        else:
+            if self._lastDistanceTime is not None and \
+               self._previousLatitude is not None and \
+               self._previousLongitude is not None:
+                self.flownDistance += self._getDistance(currentState)
+                
+            self._lastDistanceTime = None
+
+    def _getDistance(self, currentState):
+        """Get the distance between the previous and the current state."""
+        return util.getDistCourse(self._previousLatitude, self._previousLongitude,
+                                  currentState.latitude, currentState.longitude)[0]
 
 #---------------------------------------------------------------------------------------

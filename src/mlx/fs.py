@@ -50,6 +50,8 @@ class AircraftState(object):
     The following data members should be provided at least:
     - timestamp: the simulator time of the measurement in seconds since the
     epoch (float)
+    - latitude (in degrees, North is positive)
+    - longitude (in degrees, East is positive)
     - paused: a boolean indicating if the flight simulator is paused for
     whatever reason (it could be a pause mode, or a menu, a dialog, or a
     replay, etc.)
@@ -57,7 +59,7 @@ class AircraftState(object):
     MSFS) is activated
     - overspeed: a boolean indicating if the aircraft is in overspeed
     - stalled: a boolean indicating if the aircraft is stalled
-    - onTheGround: a boolean indicating if the aircraft is on the ground
+    - onTheGround: a boolean indicating if the aircraft is on the ground    
     - zfw: the zero-fuel weight in kilograms (float)
     - grossWeight: the gross weight in kilograms (float)
     - heading: the heading of the aircraft in degrees (float)

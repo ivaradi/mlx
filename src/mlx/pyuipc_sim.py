@@ -183,6 +183,9 @@ class Values(object):
         self.aircraftName = "Cessna 172SP"
         self.flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40]
         self.fuelCapacities = [10000.0, 5000.0, 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        self.latitude = 47.5
+        self.longitude = 19.05
         
         self.paused = False
         self.frozen = False
@@ -290,6 +293,10 @@ class Values(object):
             return 1 if self.stalled else 0
         elif offset==0x036d:       # Overspeed
             return 1 if self.overspeed else 0
+        elif offset==0x0560:       # Latitude
+            return long(self.latitude * 10001750.0 * 65536.0 * 65536.0 / 90.0)
+        elif offset==0x0568:       # Longitude
+            return long(self.longitude * 65536.0 * 65536.0 * 65536.0 * 65536.0 / 360.0)
         elif offset==0x0570:       # Altitude
             return long(self.altitude * const.FEETTOMETRES * 65536.0 * 65536.0)
         elif offset==0x0578:       # Pitch
@@ -471,6 +478,10 @@ class Values(object):
             self.stalled = value!=0
         elif offset==0x036d:       # Overspeed
             self.overspeed = value!=0
+        elif offset==0x0560:       # Latitude
+            self.latitude = value * 90.0 / 10001750.0 / 65536.0 / 65536.0
+        elif offset==0x0568:       # Longitude
+            self.longitude = value * 360.0 / 65536.0 / 65536.0 / 65536.0 / 65536.0
         elif offset==0x0570:       # Altitude
             self.altitude = value / const.FEETTOMETRES / 65536.0 / 65536.0
         elif offset==0x0578:       # Pitch
@@ -907,6 +918,19 @@ class CLI(cmd.Cmd):
                                            lambda word: word)
         self._valueHandlers["airPath"] = (0x3c00, -256,  lambda value: value,
                                           lambda word: word)
+        self._valueHandlers["latitude"] = (0x0560, "l",
+                                           lambda value: value * 90.0 /
+                                           10001750.0 / 65536.0 / 65536.0,
+                                           lambda word: long(float(word) *
+                                                             10001750.0 *
+                                                             65536.0 * 65536.0 / 90.0))
+        self._valueHandlers["longitude"] = (0x0568, "l",
+                                            lambda value: value * 360.0 /
+                                            65536.0 / 65536.0 / 65536.0 / 65536.0,
+                                            lambda word: long(float(word) *
+                                                              65536.0 * 65536.0 *
+                                                              65536.0 * 65536.0 /
+                                                              360.0))
         self._valueHandlers["paused"] = (0x0264, "H", CLI.bool2str, CLI.str2bool)
         self._valueHandlers["frozen"] = (0x3364, "H", CLI.bool2str, CLI.str2bool)
         self._valueHandlers["replay"] = (0x0628, "d", CLI.bool2str, CLI.str2bool)

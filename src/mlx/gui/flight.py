@@ -5,6 +5,7 @@ from mlx.gui.common import *
 import mlx.const as const
 import mlx.fs as fs
 from mlx.checks import PayloadChecker
+import mlx.util as util
 
 import datetime
 import time
@@ -1476,8 +1477,6 @@ class LandingPage(Page):
 
     def activate(self):
         """Called when the page is activated."""
-        self._flightEnded = False
-        
         self._starButton.set_sensitive(True)
         self._starButton.set_active(False)
         self._star.set_text("")
@@ -1515,6 +1514,9 @@ class LandingPage(Page):
         self._approachType.set_sensitive(False)
 
         self._vref.set_sensitive(False)
+        # FIXME: Perhaps a separate initialize() call which would set up
+        # defaults?
+        self._flightEnded = False
 
     def _starButtonClicked(self, button):
         """Called when the STAR button is clicked."""
@@ -1556,8 +1558,125 @@ class LandingPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        #self._wizard.nextPage()
-        self.finalize()
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
+class FinishPage(Page):
+    """Flight finish page."""
+    def __init__(self, wizard):
+        """Construct the finish page."""
+        help = "There are some statistics about your flight below.\n\n" \
+               "Review the data, also on earlier pages, and if you are\n" \
+               "satisfied, you can save or send your PIREP."
+
+        super(FinishPage, self).__init__(wizard, "Finish", help)
+        
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(5, 2)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(True)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Flight rating:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 0, 1)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightRating = gtk.Label()
+        self._flightRating.set_width_chars(7)
+        self._flightRating.set_alignment(0.0, 0.5)
+        self._flightRating.set_use_markup(True)
+        labelAlignment.add(self._flightRating)
+        table.attach(labelAlignment, 1, 2, 0, 1)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Flight time:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 1, 2)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightTime = gtk.Label()
+        self._flightTime.set_width_chars(10)
+        self._flightTime.set_alignment(0.0, 0.5)
+        self._flightTime.set_use_markup(True)
+        labelAlignment.add(self._flightTime)
+        table.attach(labelAlignment, 1, 2, 1, 2)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Block time:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 2, 3)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._blockTime = gtk.Label()
+        self._blockTime.set_width_chars(10)
+        self._blockTime.set_alignment(0.0, 0.5)
+        self._blockTime.set_use_markup(True)
+        labelAlignment.add(self._blockTime)
+        table.attach(labelAlignment, 1, 2, 2, 3)
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Distance flown:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 3, 4)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._distanceFlown = gtk.Label()
+        self._distanceFlown.set_width_chars(10)
+        self._distanceFlown.set_alignment(0.0, 0.5)
+        self._distanceFlown.set_use_markup(True)
+        labelAlignment.add(self._distanceFlown)
+        table.attach(labelAlignment, 1, 2, 3, 4)
+        
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("Fuel used:")
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 4, 5)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._fuelUsed = gtk.Label()
+        self._fuelUsed.set_width_chars(10)
+        self._fuelUsed.set_alignment(0.0, 0.5)
+        self._fuelUsed.set_use_markup(True)
+        labelAlignment.add(self._fuelUsed)
+        table.attach(labelAlignment, 1, 2, 4, 5)
+
+        self._saveButton = self.addButton("S_ave PIREP...")
+        self._saveButton.set_use_underline(True)
+        #self._saveButton.connect("clicked", self._saveClicked)
+        
+        self._sendButton = self.addButton("_Send PIREP...", True)
+        self._sendButton.set_use_underline(True)
+        #self._sendButton.connect("clicked", self._sendClicked)
+
+    def activate(self):
+        """Activate the page."""
+        flight = self._wizard.gui._flight
+        rating = flight.logger.getRating()
+        if rating<0:
+            self._flightRating.set_markup('<b><span foreground="red">NO GO</span></b>')
+        else:
+            self._flightRating.set_markup("<b>%.1f %%</b>" % (rating,))
+
+        flightLength = flight.flightTimeEnd - flight.flightTimeStart
+        self._flightTime.set_markup("<b>%s</b>" % \
+                                    (util.getTimeIntervalString(flightLength),))
+        
+        blockLength = flight.blockTimeEnd - flight.blockTimeStart
+        self._blockTime.set_markup("<b>%s</b>" % \
+                                   (util.getTimeIntervalString(blockLength),))
+
+        self._distanceFlown.set_markup("<b>%.2f NM</b>" % \
+                                       (flight.flownDistance,))
+        
+        self._fuelUsed.set_markup("<b>%.0f kg</b>" % \
+                                  (flight.endFuel - flight.startFuel,))
 
 #-----------------------------------------------------------------------------
 
@@ -1587,6 +1706,7 @@ class Wizard(gtk.VBox):
         self._pages.append(self._takeoffPage)
         self._landingPage = LandingPage(self) 
         self._pages.append(self._landingPage)
+        self._pages.append(FinishPage(self))
         
         maxWidth = 0
         maxHeight = 0

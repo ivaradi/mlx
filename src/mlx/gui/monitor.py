@@ -3,6 +3,7 @@
 from mlx.gui.common import *
 
 import mlx.const as const
+import mlx.util as util
 
 import time
 
@@ -170,6 +171,10 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 4, 5, 6, 7)
         table.attach(self._windDirection, 5, 6, 6, 7)
 
+        (label, self._position) = self._createLabeledEntry("Position:", 25)
+        table.attach(label, 6, 7, 6, 7)
+        table.attach(self._position, 7, 10, 6, 7)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -239,6 +244,7 @@ class MonitorWindow(gtk.Window):
             self._spoilersExtension.set_text("-")
             self._windSpeed.set_text("-")
             self._windDirection.set_text("-")
+            self._position.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -303,5 +309,7 @@ class MonitorWindow(gtk.Window):
             self._spoilersExtension.set_text("%.0f" % (aircraftState.spoilersExtension,))
             self._windSpeed.set_text("%.0f" % (aircraftState.windSpeed,))
             self._windDirection.set_text("%03.0f" % (aircraftState.windDirection,))
+            self._position.set_text(util.getCoordinateString((aircraftState.latitude,
+                                                              aircraftState.longitude)))
 
 #------------------------------------------------------------------------------
