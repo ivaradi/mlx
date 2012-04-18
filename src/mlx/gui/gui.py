@@ -2,6 +2,7 @@
 
 from statusicon import StatusIcon
 from statusbar import Statusbar
+from info import FlightInfo
 from update import Updater
 from mlx.gui.common import *
 from mlx.gui.flight import Wizard
@@ -62,10 +63,16 @@ class GUI(fs.ConnectionListener):
         mainVBox.add(notebook)
 
         self._wizard = Wizard(self)
-        label = gtk.Label("_Flight")
+        label = gtk.Label("Fligh_t")
         label.set_use_underline(True)
         label.set_tooltip_text("Flight wizard")
         notebook.append_page(self._wizard, label)
+
+        self._flightInfo = FlightInfo(self)
+        label = gtk.Label("Flight _info")
+        label.set_use_underline(True)
+        label.set_tooltip_text("Flight information")
+        notebook.append_page(self._flightInfo, label)
 
         logVBox = gtk.VBox()
         label = gtk.Label("_Log")
@@ -199,6 +206,7 @@ class GUI(fs.ConnectionListener):
             self._reconnecting = False
             self._statusbar.updateConnection(self._connecting, self._connected)
             self._wizard.connectionFailed()
+            self._flightInfo.reset()
         
     def disconnected(self):
         """Called when we have disconnected from the simulator."""
@@ -236,6 +244,7 @@ class GUI(fs.ConnectionListener):
             self._reconnecting = False
             self._statusbar.updateConnection(self._connecting, self._connected)
             self._wizard.disconnected()
+            self._flightInfo.reset()
 
     def write(self, msg):
         """Write the given message to the log."""
