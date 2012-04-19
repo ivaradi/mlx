@@ -208,8 +208,10 @@ class LoginPage(Page):
         self._loginButton = self.addButton("_Login", default = True)
         self._loginButton.set_sensitive(False)
         self._loginButton.connect("clicked", self._loginClicked)
-        self._loginButton.set_tooltip_text("Click to log in.")
-        
+        self._loginButton.set_tooltip_text("Click to log in.")        
+
+    def activate(self):
+        """Activate the page."""
         config = self._wizard.gui.config
         self._pilotID.set_text(config.pilotID)
         self._password.set_text(config.password)
@@ -746,6 +748,8 @@ class PayloadPage(Page):
         self._cargoWeight.set_int(bookedFlight.cargoWeight)
         self._cargoWeight.set_sensitive(True)
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
+        self._simulatorZFW.set_text("-")
+        self._simulatorZFWValue = None
         self._zfwButton.set_sensitive(True)
         self._updateCalculatedZFW()
 
@@ -872,6 +876,7 @@ class TimePage(Page):
         bookedFlight = self._wizard._bookedFlight
         self._departure.set_text(str(bookedFlight.departureTime.time()))
         self._arrival.set_text(str(bookedFlight.arrivalTime.time()))
+        self._simulatorTime.set_text("-")
 
     def finalize(self):
         """Finalize the page."""
@@ -949,7 +954,6 @@ class RoutePage(Page):
         self._cruiseLevel = gtk.SpinButton()
         self._cruiseLevel.set_increments(step = 10, page = 100)
         self._cruiseLevel.set_range(min = 50, max = 500)
-        self._cruiseLevel.set_value(240)
         self._cruiseLevel.set_tooltip_text("The cruise flight level.")
         self._cruiseLevel.set_numeric(True)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
@@ -1008,6 +1012,7 @@ class RoutePage(Page):
     def activate(self):
         """Setup the route from the booked flight."""
         self._route.set_sensitive(True)
+        self._cruiseLevel.set_value(240)
         self._cruiseLevel.set_sensitive(True)
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
         self._updateForwardButton()
@@ -1187,6 +1192,8 @@ class BriefingPage(Page):
         buffer = self._notams.get_buffer()
         if notams is None:
             buffer.set_text("Could not download NOTAMs")
+        elif not notams:
+            buffer.set_text("Could not download NOTAM for this airport")
         else:
             s = ""
             for notam in notams:

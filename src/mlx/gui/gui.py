@@ -59,26 +59,26 @@ class GUI(fs.ConnectionListener):
         mainVBox = gtk.VBox()
         window.add(mainVBox)
 
-        notebook = gtk.Notebook()
-        mainVBox.add(notebook)
+        self._notebook = gtk.Notebook()
+        mainVBox.add(self._notebook)
 
         self._wizard = Wizard(self)
         label = gtk.Label("Fligh_t")
         label.set_use_underline(True)
         label.set_tooltip_text("Flight wizard")
-        notebook.append_page(self._wizard, label)
+        self._notebook.append_page(self._wizard, label)
 
         self._flightInfo = FlightInfo(self)
         label = gtk.Label("Flight _info")
         label.set_use_underline(True)
         label.set_tooltip_text("Flight information")
-        notebook.append_page(self._flightInfo, label)
+        self._notebook.append_page(self._flightInfo, label)
 
         logVBox = gtk.VBox()
         label = gtk.Label("_Log")
         label.set_use_underline(True)
         label.set_tooltip_text("Flight log")
-        notebook.append_page(logVBox, label)
+        self._notebook.append_page(logVBox, label)
         
         logFrame = self._buildLogFrame()
         logFrame.set_border_width(8)
@@ -89,7 +89,7 @@ class GUI(fs.ConnectionListener):
         self._statusbar = Statusbar()
         mainVBox.pack_start(self._statusbar, False, False, 0)
 
-        notebook.connect("switch-page", self._notebookPageSwitch)
+        self._notebook.connect("switch-page", self._notebookPageSwitch)
 
         self._monitorWindow = MonitorWindow(self, iconDirectory)
         self._monitorWindowX = None
@@ -239,14 +239,20 @@ class GUI(fs.ConnectionListener):
     def reset(self):
         """Reset the GUI."""
         self._disconnect()
-        self._wizard.reset()
+
         self._flightInfo.reset()
         self.resetFlightStatus()
 
+        self._wizard.reset()
+        self._notebook.set_current_page(0)
+
+        self._logView.get_buffer().set_text("")
+
     def _disconnect(self):
         """Disconnect from the simulator if connected."""
+        self.stopMonitoring()
+
         if self._connected:
-            self.stopMonitoring()
             self._flight.simulator.disconnect()
             self._connected = False
 
