@@ -358,6 +358,9 @@ class FlightSelectionPage(Page):
 
             flight = self._wizard.loginResult.flights[index]
             self._wizard._bookedFlight = flight
+            # FIXME: with PyGObject this call causes error messages to
+            # appear on the standard output
+            self._wizard.gui.enableFlightInfo()
 
             self._updateDepartureGate()
         

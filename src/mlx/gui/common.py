@@ -23,6 +23,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     BUTTONSTYPE_OK = gtk.BUTTONS_OK
     BUTTONSTYPE_YES_NO = gtk.BUTTONS_YES_NO
     RESPONSETYPE_YES = gtk.RESPONSE_YES
+    ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
+    CONTROL_MASK = gdk.CONTROL_MASK
 else:
     print "Using PyGObject"
     pygobject = True
@@ -38,6 +40,8 @@ else:
     BUTTONSTYPE_OK = gtk.ButtonsType.OK
     BUTTONSTYPE_YES_NO = gtk.ButtonsType.YES_NO
     RESPONSETYPE_YES = gtk.ResponseType.YES
+    ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
+    CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
 
 import cairo
 

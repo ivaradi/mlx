@@ -39,7 +39,6 @@ class GUI(fs.ConnectionListener):
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
-        self._stdioAfterNewLine = True
 
         self.webHandler = web.Handler()
         self.webHandler.start()
@@ -55,12 +54,17 @@ class GUI(fs.ConnectionListener):
         window.connect("delete-event",
                        lambda a, b: self.hideMainWindow())
         window.connect("window-state-event", self._handleMainWindowState)
+        accelGroup = gtk.AccelGroup()
+        window.add_accel_group(accelGroup)
 
         mainVBox = gtk.VBox()
         window.add(mainVBox)
 
+        menuBar = self._buildMenuBar(accelGroup)
+        mainVBox.pack_start(menuBar, False, False, 0)
+
         self._notebook = gtk.Notebook()
-        mainVBox.add(self._notebook)
+        mainVBox.pack_start(self._notebook, True, True, 4)
 
         self._wizard = Wizard(self)
         label = gtk.Label("Fligh_t")
@@ -73,16 +77,16 @@ class GUI(fs.ConnectionListener):
         label.set_use_underline(True)
         label.set_tooltip_text("Flight information")
         self._notebook.append_page(self._flightInfo, label)
+        self._flightInfo.disable()
 
-        logVBox = gtk.VBox()
+        (logWidget, self._logView)  = self._buildLogWidget()
         label = gtk.Label("_Log")
         label.set_use_underline(True)
-        label.set_tooltip_text("Flight log")
-        self._notebook.append_page(logVBox, label)
-        
-        logFrame = self._buildLogFrame()
-        logFrame.set_border_width(8)
-        logVBox.pack_start(logFrame, True, True, 0)
+        label.set_tooltip_text("The log of your flight that will be sent to the MAVA website")
+        self._notebook.append_page(logWidget, label)
+
+        (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
+        self._debugLogWidget.show_all()
 
         mainVBox.pack_start(gtk.HSeparator(), False, False, 0)
 
@@ -92,8 +96,10 @@ class GUI(fs.ConnectionListener):
         self._notebook.connect("switch-page", self._notebookPageSwitch)
 
         self._monitorWindow = MonitorWindow(self, iconDirectory)
+        self._monitorWindow.add_accel_group(accelGroup)
         self._monitorWindowX = None
         self._monitorWindowY = None
+        self._selfToggling = False
 
         window.show_all()
         self._wizard.grabDefault()
@@ -236,11 +242,16 @@ class GUI(fs.ConnectionListener):
         else:
             self.reset()
 
+    def enableFlightInfo(self):
+        """Enable the flight info tab."""
+        self._flightInfo.enable()
+
     def reset(self):
         """Reset the GUI."""
         self._disconnect()
 
         self._flightInfo.reset()
+        self._flightInfo.disable()
         self.resetFlightStatus()
 
         self._wizard.reset()
@@ -262,7 +273,7 @@ class GUI(fs.ConnectionListener):
             
     def write(self, msg):
         """Write the given message to the log."""
-        gobject.idle_add(self._writeLog, msg)
+        gobject.idle_add(self._writeLog, msg, self._logView)
         
     def check(self, flight, aircraft, logger, oldState, state):
         """Update the data."""
@@ -349,6 +360,9 @@ class GUI(fs.ConnectionListener):
             self._monitorWindowX = self._monitorWindowY = None
         self._monitorWindow.hide()
         self._statusIcon.monitorWindowHidden()
+        if self._showMonitorMenuItem.get_active():
+            self._selfToggling = True
+            self._showMonitorMenuItem.set_active(False)
         return True
 
     def showMonitorWindow(self):
@@ -357,6 +371,17 @@ class GUI(fs.ConnectionListener):
             self._monitorWindow.move(self._monitorWindowX, self._monitorWindowY)
         self._monitorWindow.show_all()
         self._statusIcon.monitorWindowShown()
+        if not self._showMonitorMenuItem.get_active():
+            self._selfToggling = True
+            self._showMonitorMenuItem.set_active(True)
+
+    def _toggleMonitorWindow(self, menuItem):
+        if self._selfToggling:
+            self._selfToggling = False
+        elif self._monitorWindow.get_visible():
+            self.hideMonitorWindow()
+        else:
+            self.showMonitorWindow()
 
     def restart(self):
         """Quit and restart the application."""
@@ -377,12 +402,14 @@ class GUI(fs.ConnectionListener):
 
     def beginBusy(self, message):
         """Begin a period of background processing."""
+        self._wizard.set_sensitive(False)
         self._mainWindow.get_window().set_cursor(self._busyCursor)
         self._statusbar.updateBusyState(message)
 
     def endBusy(self):
         """End a period of background processing."""
         self._mainWindow.get_window().set_cursor(None)
+        self._wizard.set_sensitive(True)
         self._statusbar.updateBusyState(None)
 
     def _writeStdIO(self):
@@ -400,16 +427,12 @@ class GUI(fs.ConnectionListener):
             lines = lines[:-1]
             
         for line in lines:
-            if self._stdioAfterNewLine:
-                line = "[STDIO] " + line
-            self._writeLog(line + "\n")
-            self._stdioAfterNewLine = True
+            print >> sys.__stdout__, line
+            self._writeLog(line + "\n", self._debugLogView)
 
         if text:
-            if self._stdioAfterNewLine:
-                text = "[STDIO] " + text
-            self._writeLog(text)
-            self._stdioAfterNewLine = False
+            print >> sys.__stdout__, line,
+            self._writeLog(text, self._debugLogView)
 
     def connectSimulator(self, aircraftType):
         """Connect to the simulator for the first time."""
@@ -443,35 +466,94 @@ class GUI(fs.ConnectionListener):
             self.simulator.stopMonitoring()
             self._monitoring = False
 
-    def _buildLogFrame(self):
-        """Build the frame for the log."""
-        logFrame = gtk.Frame(label = "Log")
+    def _buildMenuBar(self, accelGroup):
+        """Build the main menu bar."""
+        menuBar = gtk.MenuBar()
+        
+        fileMenuItem = gtk.MenuItem("File")
+        fileMenu = gtk.Menu()
+        fileMenuItem.set_submenu(fileMenu)
+        menuBar.append(fileMenuItem)
 
-        frameAlignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        quitMenuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+        quitMenuItem.set_use_stock(True)
+        quitMenuItem.add_accelerator("activate", accelGroup,
+                                     ord("q"), CONTROL_MASK,
+                                     ACCEL_VISIBLE)
+        quitMenuItem.connect("activate", self._quit)
+        fileMenu.append(quitMenuItem)
 
-        frameAlignment.set_padding(padding_top = 4, padding_bottom = 10,
-                                   padding_left = 16, padding_right = 16)
 
-        logFrame.add(frameAlignment)
+        viewMenuItem = gtk.MenuItem("View")
+        viewMenu = gtk.Menu()
+        viewMenuItem.set_submenu(viewMenu)
+        menuBar.append(viewMenuItem)
+
+        self._showMonitorMenuItem = gtk.CheckMenuItem()
+        self._showMonitorMenuItem.set_label("Show _monitor window")
+        self._showMonitorMenuItem.set_use_underline(True)
+        self._showMonitorMenuItem.set_active(False)
+        self._showMonitorMenuItem.add_accelerator("activate", accelGroup,
+                                                  ord("m"), CONTROL_MASK,
+                                                  ACCEL_VISIBLE)
+        self._showMonitorMenuItem.connect("toggled", self._toggleMonitorWindow)
+        viewMenu.append(self._showMonitorMenuItem)
+
+        showDebugMenuItem = gtk.CheckMenuItem()
+        showDebugMenuItem.set_label("Show _debug log")
+        showDebugMenuItem.set_use_underline(True)
+        showDebugMenuItem.set_active(False)
+        showDebugMenuItem.add_accelerator("activate", accelGroup,
+                                          ord("d"), CONTROL_MASK,
+                                          ACCEL_VISIBLE)
+        showDebugMenuItem.connect("toggled", self._toggleDebugLog)
+        viewMenu.append(showDebugMenuItem)
+
+        return menuBar
+
+    def _toggleDebugLog(self, menuItem):
+        """Toggle the debug log."""
+        if menuItem.get_active():
+            label = gtk.Label("_Debug log")
+            label.set_use_underline(True)
+            label.set_tooltip_text("Log with debugging information.")        
+            self._debugLogPage = self._notebook.append_page(self._debugLogWidget, label)
+            self._notebook.set_current_page(self._debugLogPage)
+        else:
+            self._notebook.remove_page(self._debugLogPage)
+
+    def _buildLogWidget(self):
+        """Build the widget for the log."""
+        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+
+        alignment.set_padding(padding_top = 8, padding_bottom = 8,
+                              padding_left = 16, padding_right = 16)
 
         logScroller = gtk.ScrolledWindow()
-        self._logView = gtk.TextView()
-        self._logView.set_editable(False)
-        logScroller.add(self._logView)
+        # FIXME: these should be constants in common
+        logScroller.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC,
+                               gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC)
+        logScroller.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                    else gtk.SHADOW_IN)
+        logView = gtk.TextView()
+        logView.set_editable(False)
+        logScroller.add(logView)
 
         logBox = gtk.VBox()
         logBox.pack_start(logScroller, True, True, 0)
         logBox.set_size_request(-1, 200)
 
-        frameAlignment.add(logBox)
+        alignment.add(logBox)
 
-        return logFrame
+        return (alignment, logView)
 
-    def _writeLog(self, msg):
+    def _writeLog(self, msg, logView):
         """Write the given message to the log."""
-        buffer = self._logView.get_buffer()
+        buffer = logView.get_buffer()
         buffer.insert(buffer.get_end_iter(), msg)
-        self._logView.scroll_mark_onscreen(buffer.get_insert())
+        logView.scroll_mark_onscreen(buffer.get_insert())
 
     def _quit(self, what = None, force = False):
         """Quit from the application."""

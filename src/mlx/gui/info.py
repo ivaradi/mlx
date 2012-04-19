@@ -42,6 +42,8 @@ class FlightInfo(gtk.VBox):
         super(FlightInfo, self).__init__()
         self._gui = gui
 
+        self._commentsAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                                xscale = 1.0, yscale = 1.0)
         commentsBox = gtk.HBox()
 
         (frame, self._comments) = FlightInfo._createCommentArea("_Comments")
@@ -50,7 +52,8 @@ class FlightInfo(gtk.VBox):
         (frame, self._flightDefects) = FlightInfo._createCommentArea("Flight _defects")
         commentsBox.pack_start(frame, True, True, 8)
 
-        self.pack_start(commentsBox, True, True, 8)
+        self._commentsAlignment.add(commentsBox)
+        self.pack_start(self._commentsAlignment, True, True, 8)
 
         frame = gtk.Frame(label = "Delay codes")
         label = frame.get_label_widget()
@@ -107,11 +110,23 @@ class FlightInfo(gtk.VBox):
         alignment.add(table)
         frame.add(alignment)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0.0, yscale = 0.0)
-        alignment.add(frame)
+        self._delayAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                             xscale = 0.0, yscale = 0.0)
+        self._delayAlignment.add(frame)
 
-        self.pack_start(alignment, False, False, 8)
+        self.pack_start(self._delayAlignment, False, False, 8)
+
+    def enable(self):
+        """Enable the flight info tab."""
+        #gobject.idle_add(self.set_sensitive, True)
+        self._commentsAlignment.set_sensitive(True)
+        self._delayAlignment.set_sensitive(True)
+        
+    def disable(self):
+        """Enable the flight info tab."""
+        #gobject.idle_add(self.set_sensitive, False)
+        self._commentsAlignment.set_sensitive(False)
+        self._delayAlignment.set_sensitive(False)
 
     def reset(self):
         """Reset the flight info tab."""
