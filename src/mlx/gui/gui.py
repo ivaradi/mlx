@@ -156,9 +156,7 @@ class GUI(fs.ConnectionListener):
 
         gtk.main()
 
-        if self._flight is not None and self._connected:
-            self.stopMonitoring()
-            self._flight.simulator.disconnect()                        
+        self._disconnect()
 
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
@@ -202,11 +200,7 @@ class GUI(fs.ConnectionListener):
             self.beginBusy("Connecting to the simulator.")
             self._simulator.reconnect()
         else:
-            self._connecting = False
-            self._reconnecting = False
-            self._statusbar.updateConnection(self._connecting, self._connected)
-            self._wizard.connectionFailed()
-            self._flightInfo.reset()
+            self.reset()
         
     def disconnected(self):
         """Called when we have disconnected from the simulator."""
@@ -240,12 +234,26 @@ class GUI(fs.ConnectionListener):
             self._reconnecting = True
             self._simulator.reconnect()
         else:
-            self._connecting = False
-            self._reconnecting = False
-            self._statusbar.updateConnection(self._connecting, self._connected)
-            self._wizard.disconnected()
-            self._flightInfo.reset()
+            self.reset()
 
+    def reset(self):
+        """Reset the GUI."""
+        self._disconnect()
+        self._wizard.reset()
+        self._flightInfo.reset()
+        self.resetFlightStatus()
+
+    def _disconnect(self):
+        """Disconnect from the simulator if connected."""
+        if self._connected:
+            self.stopMonitoring()
+            self._flight.simulator.disconnect()
+            self._connected = False
+
+        self._connecting = False
+        self._reconnecting = False
+        self._statusbar.updateConnection(False, False)
+            
     def write(self, msg):
         """Write the given message to the log."""
         gobject.idle_add(self._writeLog, msg)
@@ -271,11 +279,7 @@ class GUI(fs.ConnectionListener):
         self._statusIcon.setStage(stage)
         self._wizard.setStage(stage)
         if stage==const.STAGE_END:
-            self.stopMonitoring()
-            self.simulator.disconnect()
-            self._connecting = False
-            self._connected = False
-            self._statusbar.updateConnection(self._connecting, self._connected)
+            self._disconnect()
 
     def setRating(self, rating):
         """Set the rating of the flight."""

@@ -1797,12 +1797,8 @@ class Wizard(gtk.VBox):
         """Called when the connection could be made to the simulator."""
         self.nextPage()
 
-    def connectionFailed(self):
-        """Called when the connection could not be made to the simulator."""
-        self._initialize()
-
-    def disconnected(self):
-        """Called when we have disconnected from the simulator."""
+    def reset(self):
+        """Resets the wizard to go back to the login page."""
         self._initialize()
 
     def setStage(self, stage):
