@@ -22,6 +22,7 @@ class FlightInfo(gtk.VBox):
                               padding_left = 8, padding_right = 8)
         
         scroller = gtk.ScrolledWindow()
+        # FIXME: these should be constants
         scroller.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
                             else gtk.POLICY_AUTOMATIC,
                             gtk.PolicyType.AUTOMATIC if pygobject
@@ -116,6 +117,20 @@ class FlightInfo(gtk.VBox):
 
         self.pack_start(self._delayAlignment, False, False, 8)
 
+    @property
+    def comments(self):
+        """Get the comments."""
+        buffer = self._comments.get_buffer()
+        return text2unicode(buffer.get_text(buffer.get_start_iter(),
+                                            buffer.get_end_iter(), True))
+    
+    @property
+    def flightDefects(self):
+        """Get the flight defects."""
+        buffer = self._flightDefects.get_buffer()
+        return text2unicode(buffer.get_text(buffer.get_start_iter(),
+                                            buffer.get_end_iter(), True))
+
     def enable(self):
         """Enable the flight info tab."""
         #gobject.idle_add(self.set_sensitive, True)
@@ -143,4 +158,3 @@ class FlightInfo(gtk.VBox):
         self._apronProblem.set_active(False)
         self._weatherProblems.set_active(False)
         self._personalReasons.set_active(False)
-

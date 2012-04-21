@@ -3,6 +3,7 @@
 #--------------------------------------------------------------------------------------
 
 import const
+import util
 
 import sys
 import time
@@ -31,12 +32,19 @@ class Logger(object):
         """Construct the logger."""
         self._lines = []
         self._faults = {}
+        self._faultLineIndexes = []
         self._output = output
 
-    @staticmethod
-    def _getTimeStr(timestamp):
-        """Get the string representation of the given timestamp."""
-        return time.strftime("%H:%M:%S", time.gmtime(timestamp))
+    @property
+    def lines(self):
+        """Get the lines of the log."""
+        return self._lines
+
+    @property
+    def faultLineIndexes(self):
+        """Get the array of the indexes of the log line that contains a
+        fault."""
+        return self._faultLineIndexes
 
     def reset(self):
         """Reset the logger.
@@ -44,10 +52,11 @@ class Logger(object):
         The faults logged so far will be cleared."""
         self._lines = []
         self._faults.clear()
+        self._faultLineIndexes = []
                 
     def message(self, timestamp, msg):
         """Put a simple textual message into the log with the given timestamp."""
-        timeStr = Logger._getTimeStr(timestamp)
+        timeStr = util.getTimestampString(timestamp)
         return self._logLine(msg, timeStr)
 
     def untimedMessage(self, msg):
@@ -77,9 +86,10 @@ class Logger(object):
                 return
         self._faults[faultID] = score
         if score==Logger.NO_GO_SCORE:
-            self.message(timestamp, "%s (NO GO)" % (what))
+            lineIndex = self.message(timestamp, "%s (NO GO)" % (what))
         else:
-            self.message(timestamp, "%s (%.1f)" % (what, score))
+            lineIndex = self.message(timestamp, "%s (%.1f)" % (what, score))
+        self._faultLineIndexes.append(lineIndex)
 
     def noGo(self, faultID, timestamp, what):
         """Report a No-Go fault."""

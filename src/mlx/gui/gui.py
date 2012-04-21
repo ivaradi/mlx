@@ -119,6 +119,11 @@ class GUI(fs.ConnectionListener):
                                       else gdk.WATCH)
 
     @property
+    def logger(self):
+        """Get the logger used by us."""
+        return self._logger
+        
+    @property
     def simulator(self):
         """Get the simulator used by us."""
         return self._simulator
@@ -129,15 +134,55 @@ class GUI(fs.ConnectionListener):
         return self._flight
 
     @property
+    def bookedFlight(self):
+        """Get the booked flight selected, if any."""
+        return self._wizard.bookedFlight
+
+    @property
+    def cargoWeight(self):
+        """Get the cargo weight."""
+        return self._wizard.cargoWeight
+
+    @property
     def zfw(self):
         """Get Zero-Fuel Weight calculated for the current flight."""
         return self._wizard.zfw
         
     @property
-    def cruiseAltitude(self):
-        """Get cruise altitude calculated for the current flight."""
-        return self._wizard.cruiseAltitude
+    def filedCruiseAltitude(self):
+        """Get cruise altitude filed for the current flight."""
+        return self._wizard.filedCruiseAltitude
         
+    @property
+    def cruiseAltitude(self):
+        """Get cruise altitude set for the current flight."""
+        return self._wizard.cruiseAltitude
+
+    @property
+    def route(self):
+        """Get the flight route."""
+        return self._wizard.route
+
+    @property
+    def departureMETAR(self):
+        """Get the METAR of the deprature airport."""
+        return self._wizard.departureMETAR
+        
+    @property
+    def arrivalMETAR(self):
+        """Get the METAR of the deprature airport."""
+        return self._wizard.arrivalMETAR
+
+    @property
+    def departureRunway(self):
+        """Get the name of the departure runway."""
+        return self._wizard.departureRunway
+        
+    @property
+    def sid(self):
+        """Get the SID."""
+        return self._wizard.sid
+
     @property
     def v1(self):
         """Get the V1 speed calculated for the flight."""
@@ -154,10 +199,50 @@ class GUI(fs.ConnectionListener):
         return self._wizard.v2
         
     @property
+    def arrivalRunway(self):
+        """Get the arrival runway."""
+        return self._wizard.arrivalRunway
+
+    @property
+    def star(self):
+        """Get the STAR."""
+        return self._wizard.star
+
+    @property
+    def transition(self):
+        """Get the transition."""
+        return self._wizard.transition
+
+    @property
+    def approachType(self):
+        """Get the approach type."""
+        return self._wizard.approachType
+
+    @property
     def vref(self):
         """Get the Vref speed calculated for the flight."""
         return self._wizard.vref
         
+    @property
+    def flightType(self):
+        """Get the flight type."""
+        return self._wizard.flightType
+
+    @property
+    def online(self):
+        """Get whether the flight was online or not."""
+        return self._wizard.online
+
+    @property
+    def comments(self):
+        """Get the comments."""
+        return self._flightInfo.comments
+
+    @property
+    def flightDefects(self):
+        """Get the flight defects."""
+        return self._flightInfo.flightDefects
+
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:

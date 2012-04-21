@@ -131,6 +131,20 @@ PLANE_PARKING = 3
 
 #-------------------------------------------------------------------------------
 
+# Flight type: scheduled
+FLIGHTTYPE_SCHEDULED = 0
+
+# Flight type: old-timer
+FLIGHTTYPE_OLDTIMER = 1
+
+# Flight type: VIP
+FLIGHTTYPE_VIP = 2
+
+# Flight type: charter
+FLIGHTTYPE_CHARTER = 3
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 

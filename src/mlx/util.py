@@ -1,6 +1,7 @@
 # Various utilities
 
 import math
+import time
 
 #------------------------------------------------------------------------------
 
@@ -74,13 +75,19 @@ def getDegreeString(degree, prefixes):
 
 #------------------------------------------------------------------------------
 
+def getTimestampString(timestamp):
+    """Get the string representation of the given timestamp."""
+    return time.strftime("%H:%M:%S", time.gmtime(timestamp))
+
+#------------------------------------------------------------------------------
+
 def getTimeIntervalString(seconds):
     """Get a more human-friendly representation of the given time interval
     expressed in seconds."""
     hours = int(seconds / 3600)
     minutes = int((seconds / 60) % 60)
     seconds = int(seconds % 60)
-    return "%d:%02d:%02d" % (hours, minutes, seconds)
+    return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
 #------------------------------------------------------------------------------
 

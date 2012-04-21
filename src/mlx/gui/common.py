@@ -20,11 +20,16 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     MESSAGETYPE_ERROR = gtk.MESSAGE_ERROR
     MESSAGETYPE_QUESTION = gtk.MESSAGE_QUESTION
+    MESSAGETYPE_INFO = gtk.MESSAGE_INFO
     BUTTONSTYPE_OK = gtk.BUTTONS_OK
     BUTTONSTYPE_YES_NO = gtk.BUTTONS_YES_NO
     RESPONSETYPE_YES = gtk.RESPONSE_YES
     ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
     CONTROL_MASK = gdk.CONTROL_MASK
+
+    def text2unicode(text):
+        """Convert the given text, returned by a Gtk widget, to Unicode."""
+        return unicode(text)
 else:
     print "Using PyGObject"
     pygobject = True
@@ -37,11 +42,19 @@ else:
     
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR
     MESSAGETYPE_QUESTION = gtk.MessageType.QUESTION
+    MESSAGETYPE_INFO = gtk.MessageType.INFO
     BUTTONSTYPE_OK = gtk.ButtonsType.OK
     BUTTONSTYPE_YES_NO = gtk.ButtonsType.YES_NO
     RESPONSETYPE_YES = gtk.ResponseType.YES
     ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
     CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
+
+    import codecs
+    _utf8Decoder = codecs.getdecoder("utf-8")
+    
+    def text2unicode(str):
+        """Convert the given text, returned by a Gtk widget, to Unicode."""
+        return _utf8Decoder(str)[0]
 
 import cairo
 

@@ -6,6 +6,7 @@ import mlx.const as const
 import mlx.fs as fs
 from mlx.checks import PayloadChecker
 import mlx.util as util
+from mlx.pirep import PIREP
 
 import datetime
 import time
@@ -776,6 +777,11 @@ class PayloadPage(Page):
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
 
+    @property
+    def cargoWeight(self):
+        """Get the cargo weight entered."""
+        return self._cargoWeight.get_int()
+
     def activate(self):
         """Setup the information."""
         bookedFlight = self._wizard._bookedFlight
@@ -995,7 +1001,8 @@ class RoutePage(Page):
         self._cruiseLevel.set_tooltip_text("The cruise flight level.")
         self._cruiseLevel.set_numeric(True)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
-        label.set_mnemonic_widget(self._cruiseLevel)        
+        label.set_mnemonic_widget(self._cruiseLevel)
+        self._filedCruiseLevel = 240
 
         levelBox.pack_start(self._cruiseLevel, False, False, 8)
 
@@ -1043,13 +1050,24 @@ class RoutePage(Page):
         self._button.connect("clicked", self._forwardClicked)
 
     @property
+    def filedCruiseLevel(self):
+        """Get the filed cruise level."""
+        return self._filedCruiseLevel
+
+    @property
     def cruiseLevel(self):
         """Get the cruise level."""
         return self._cruiseLevel.get_value_as_int()
 
+    @property
+    def route(self):
+        """Get the route."""
+        return self._getRoute()
+
     def activate(self):
         """Setup the route from the booked flight."""
         self._cruiseLevel.set_value(240)
+        self._filedCruiseLevel = 240
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
         self._updateForwardButton()
 
@@ -1082,6 +1100,7 @@ class RoutePage(Page):
             self._wizard.nextPage()
         else:
             bookedFlight = self._wizard._bookedFlight
+            self._filedCruiseLevel = self.cruiseLevel
             self._wizard.gui.beginBusy("Downloading NOTAMs...")
             self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
                                                   bookedFlight.departureICAO,
@@ -1202,6 +1221,13 @@ class BriefingPage(Page):
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
+
+    @property
+    def metar(self):
+        """Get the METAR on the page."""
+        buffer = self._metar.get_buffer()
+        return buffer.get_text(buffer.get_start_iter(),
+                               buffer.get_end_iter(), True)        
 
     def activate(self):
         """Activate the page."""
@@ -1354,6 +1380,16 @@ class TakeoffPage(Page):
         self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
         self._button.set_use_stock(True)
         self._button.connect("clicked", self._forwardClicked)
+
+    @property
+    def runway(self):
+        """Get the runway."""
+        return self._runway.get_text()
+
+    @property
+    def sid(self):
+        """Get the SID."""
+        return self._sid.get_text()
 
     @property
     def v1(self):
@@ -1513,6 +1549,27 @@ class LandingPage(Page):
         self._transitionButton.set_active(True)
 
     @property
+    def star(self):
+        """Get the STAR or None if none entered."""
+        return self._star.get_text() if self._starButton.get_active() else None
+
+    @property
+    def transition(self):
+        """Get the transition or None if none entered."""
+        return self._transition.get_text() \
+               if self._transitionButton.get_active() else None
+
+    @property
+    def approachType(self):
+        """Get the approach type."""
+        return self._approachType.get_text()
+
+    @property
+    def runway(self):
+        """Get the runway."""
+        return self._runway.get_text()
+
+    @property
     def vref(self):
         """Return the landing reference speed."""
         return self._vref.get_int()
@@ -1607,6 +1664,11 @@ class LandingPage(Page):
 
 class FinishPage(Page):
     """Flight finish page."""
+    _flightTypes = [ ("scheduled", const.FLIGHTTYPE_SCHEDULED),
+                     ("old-timer", const.FLIGHTTYPE_OLDTIMER),
+                     ("VIP", const.FLIGHTTYPE_VIP),
+                     ("charter", const.FLIGHTTYPE_CHARTER) ]
+    
     def __init__(self, wizard):
         """Construct the finish page."""
         help = "There are some statistics about your flight below.\n\n" \
@@ -1697,10 +1759,8 @@ class FinishPage(Page):
         table.attach(labelAlignment, 0, 1, 5, 6)
 
         flightTypeModel = gtk.ListStore(str, int)
-        index = 1
-        for type in ["scheduled", "old-timer", "VIP", "charter"]:
-            flightTypeModel.append([type, index])
-            index += 1
+        for (name, type) in FinishPage._flightTypes:
+            flightTypeModel.append([name, type])
 
         self._flightType = gtk.ComboBox(model = flightTypeModel)
         renderer = gtk.CellRendererText()
@@ -1733,7 +1793,18 @@ class FinishPage(Page):
         self._sendButton = self.addButton("_Send PIREP...", True)
         self._sendButton.set_use_underline(True)
         self._sendButton.set_sensitive(False)
-        #self._sendButton.connect("clicked", self._sendClicked)
+        self._sendButton.connect("clicked", self._sendClicked)
+        
+    @property
+    def flightType(self):
+        """Get the flight type."""
+        index = self._flightType.get_active()
+        return None if index<0 else self._flightType.get_model()[index][1]
+
+    @property
+    def online(self):
+        """Get whether the flight was an online flight or not."""
+        return self._onlineFlight.get_active()
 
     def activate(self):
         """Activate the page."""
@@ -1769,8 +1840,52 @@ class FinishPage(Page):
         """Called when the flight type has changed."""
         index = self._flightType.get_active()
         flightTypeIsValid = index>=0
-        self._saveButton.set_sensitive(flightTypeIsValid)
+        #self._saveButton.set_sensitive(flightTypeIsValid)
         self._sendButton.set_sensitive(flightTypeIsValid)
+
+    def _sendClicked(self, button):
+        """Called when the Send button is clicked."""
+        pirep = PIREP(self._wizard.gui)
+        gui = self._wizard.gui
+        gui.beginBusy("Sending PIREP...")
+        gui.webHandler.sendPIREP(self._pirepSentCallback, pirep)
+
+    def _pirepSentCallback(self, returned, result):
+        """Callback for the PIREP sending result."""
+        gobject.idle_add(self._handlePIREPSent, returned, result)
+
+    def _handlePIREPSent(self, returned, result):
+        """Callback for the PIREP sending result."""
+        self._wizard.gui.endBusy()
+        secondaryMarkup = None
+        type = MESSAGETYPE_ERROR
+        if returned:
+            if result.success:
+                type = MESSAGETYPE_INFO
+                messageFormat = "The PIREP was sent successfully."
+                secondaryMarkup = "Await the thorough scrutiny from our PIREP correctors! :)"
+            elif result.alreadyFlown:
+                messageFormat = "The PIREP for this flight has already been sent!"
+                secondaryMarkup = "You may clear the old PIREP on the MAVA website."
+            elif result.notAvailable:
+                messageFormat = "This flight is not available anymore!"
+            else:
+                messageFormat = "The MAVA website returned with an unknown error."
+                secondaryMarkup = "See the debug log for more information."
+        else:
+            print "PIREP sending failed", result
+            messageFormat = "Could not send the PIREP to the MAVA website."
+            secondaryMarkup = "This can be a network problem, in which case\n" \
+                              "you may try again later. Or it can be a bug;\n" \
+                              "see the debug log for more information."
+        
+        dialog = gtk.MessageDialog(type = type, buttons = BUTTONSTYPE_OK,
+                                   message_format = messageFormat)
+        if secondaryMarkup is not None:
+            dialog.format_secondary_markup(secondaryMarkup)
+
+        dialog.run()
+        dialog.hide()
         
 #-----------------------------------------------------------------------------
 
@@ -1794,13 +1909,16 @@ class Wizard(gtk.VBox):
         self._pages.append(TimePage(self))
         self._routePage = RoutePage(self)
         self._pages.append(self._routePage)
-        self._pages.append(BriefingPage(self, True))
-        self._pages.append(BriefingPage(self, False))
+        self._departureBriefingPage = BriefingPage(self, True)
+        self._pages.append(self._departureBriefingPage)
+        self._arrivalBriefingPage = BriefingPage(self, False)
+        self._pages.append(self._arrivalBriefingPage)
         self._takeoffPage = TakeoffPage(self) 
         self._pages.append(self._takeoffPage)
         self._landingPage = LandingPage(self) 
         self._pages.append(self._landingPage)
-        self._pages.append(FinishPage(self))
+        self._finishPage = FinishPage(self)
+        self._pages.append(self._finishPage)
         
         maxWidth = 0
         maxHeight = 0
@@ -1844,15 +1962,55 @@ class Wizard(gtk.VBox):
             self.grabDefault()
 
     @property
+    def bookedFlight(self):
+        """Get the booked flight selected."""
+        return self._bookedFlight
+
+    @property
+    def cargoWeight(self):
+        """Get the calculated ZFW value."""
+        return self._payloadPage.cargoWeight
+
+    @property
     def zfw(self):
         """Get the calculated ZFW value."""
         return 0 if self._bookedFlight is None \
                else self._payloadPage.calculateZFW()
 
     @property
+    def filedCruiseAltitude(self):
+        """Get the filed cruise altitude."""
+        return self._routePage.filedCruiseLevel * 100
+
+    @property
     def cruiseAltitude(self):
         """Get the cruise altitude."""
         return self._routePage.cruiseLevel * 100
+
+    @property
+    def route(self):
+        """Get the route."""
+        return self._routePage.route
+
+    @property
+    def departureMETAR(self):
+        """Get the METAR of the departure airport."""
+        return self._departureBriefingPage.metar
+
+    @property
+    def arrivalMETAR(self):
+        """Get the METAR of the arrival airport."""
+        return self._arrivalBriefingPage.metar
+
+    @property
+    def departureRunway(self):
+        """Get the departure runway."""
+        return self._takeoffPage.runway
+
+    @property
+    def sid(self):
+        """Get the SID."""
+        return self._takeoffPage.sid
 
     @property
     def v1(self):
@@ -1870,9 +2028,39 @@ class Wizard(gtk.VBox):
         return self._takeoffPage.v2
 
     @property
+    def arrivalRunway(self):
+        """Get the arrival runway."""
+        return self._landingPage.runway
+
+    @property
+    def star(self):
+        """Get the STAR."""
+        return self._landingPage.star
+
+    @property
+    def transition(self):
+        """Get the transition."""
+        return self._landingPage.transition
+
+    @property
+    def approachType(self):
+        """Get the approach type."""
+        return self._landingPage.approachType
+
+    @property
     def vref(self):
         """Get the Vref speed."""
         return self._landingPage.vref
+
+    @property
+    def flightType(self):
+        """Get the flight type."""
+        return self._finishPage.flightType
+
+    @property
+    def online(self):
+        """Get whether the flight was online or not."""
+        return self._finishPage.online
 
     def nextPage(self, finalize = True):
         """Go to the next page."""

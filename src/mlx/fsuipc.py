@@ -641,7 +641,7 @@ class Simulator(object):
             self._setAircraftModel(AircraftModel.create(self._aircraft, aircraftName))
  
         
-        self._aircraft.modelChanged(timestamp, self._latin1decoder(name), 
+        self._aircraft.modelChanged(timestamp, self._latin1decoder(name)[0],
                                     self._aircraftModel.name)        
 
         return needNew
