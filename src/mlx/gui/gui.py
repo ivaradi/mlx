@@ -243,6 +243,11 @@ class GUI(fs.ConnectionListener):
         """Get the flight defects."""
         return self._flightInfo.flightDefects
 
+    @property
+    def delayCodes(self):
+        """Get the delay codes."""
+        return self._flightInfo.delayCodes
+
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:

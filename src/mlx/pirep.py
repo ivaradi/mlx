@@ -8,6 +8,17 @@ import const
 
 class PIREP(object):
     """A pilot's report of a flight."""
+    _delayCodeNames = { const.DELAYCODE_LOADING : "Loading Problems",
+                        const.DELAYCODE_NETWORK : "Net Problems",
+                        const.DELAYCODE_SYSTEM : "System Crash/Freezing",
+                        const.DELAYCODE_TRAFFIC : "Traffic Problems",
+                        const.DELAYCODE_WEATHER : "Weather Problems",
+                        const.DELAYCODE_VATSIM : "VATSIM Problem",
+                        const.DELAYCODE_CONTROLLER : "Controller's Fault",
+                        const.DELAYCODE_NAVIGATION : "Navigation Problem",
+                        const.DELAYCODE_APRON : "Apron Navigation Problems",
+                        const.DELAYCODE_PERSONAL : "Personal Reasons" }
+
     @staticmethod
     def _formatLine(timeStr, line):
         """Format the given time string and line as needed for the ACARS and
@@ -39,6 +50,7 @@ class PIREP(object):
 
         self.comments = gui.comments
         self.flightDefects = gui.flightDefects
+        self.delayCodes = gui.delayCodes
         
         flight = gui.flight
         self.blockTimeStart = flight.blockTimeStart
@@ -85,8 +97,14 @@ class PIREP(object):
         """Get the time comment.
 
         This is basically a collection of the delay codes, if any."""
-        # FIXME: implement the proper delay codes
-        return "UTC"
+        if not self.delayCodes:
+            return "UTC"
+        else:
+            s = ""
+            for code in self.delayCodes:
+                if s: s += ", "
+                s += PIREP._delayCodeNames[code]
+            return s
 
     def getSTAR(self):
         """Get the STAR and/or the transition."""

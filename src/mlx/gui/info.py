@@ -119,6 +119,15 @@ class FlightInfo(gtk.VBox):
         return text2unicode(buffer.get_text(buffer.get_start_iter(),
                                             buffer.get_end_iter(), True))
 
+    @property
+    def delayCodes(self):
+        """Get the list of delay codes checked by the user."""
+        codes =  []
+        for index in range(0, len(FlightInfo._delayCodes)):
+            if self._delayCodeWidgets[index].get_active():
+                codes.append(FlightInfo._delayCodes[index][0])
+        return codes
+            
     def enable(self):
         """Enable the flight info tab."""
         #gobject.idle_add(self.set_sensitive, True)
