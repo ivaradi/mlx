@@ -25,6 +25,7 @@ class Aircraft(object):
         self._maxVS = -10000.0
         self._minVS = 10000.0
 
+        self._v1r2LineIndex = None
         self._vrefLineIndex = None
 
         self._checkers = []
@@ -139,14 +140,7 @@ class Aircraft(object):
                                     "Wind %03.0f degrees at %.0f knots" % \
                                     (aircraftState.windDirection, 
                                      aircraftState.windSpeed))
-                self.logger.message(aircraftState.timestamp,
-                                    "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
-                                    ("-" if self._flight.v1 is None
-                                     else str(self._flight.v1),
-                                     "-" if self._flight.vr is None
-                                     else str(self._flight.vr),
-                                     "-" if self._flight.v2 is None
-                                     else str(self._flight.v2)))
+                self._logV1R2()
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 self.logger.message(aircraftState.timestamp, "Flight time end")
                 self.logFuel(aircraftState)
@@ -190,11 +184,7 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Altimeter setting: %.0f hPa" % \
                             (self._aircraftState.altimeter,))
-        self._vrefLineIndex = \
-            self.logger.message(self._aircraftState.timestamp,
-                                "VRef speed calculated by the pilot: %s" % \
-                                ("-" if self._flight.vref is None
-                                 else str(self._flight.vref)))
+        self._logVRef()
         self.flight.flareStarted(flareStart, flareStartFS)
          
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
@@ -232,6 +222,29 @@ class Aircraft(object):
         for n1 in aircraftState.n1:
             if n1>=0.5: return False
         return True
+
+    def updateV1R2(self):
+        """Update the V1, Vr and V2 values from the flight, if the these values
+        have already been logged."""
+        if self._v1r2LineIndex is not None:
+            self._logV1R2()
+
+    def _logV1R2(self):
+        """Log the V1, Vr and V2 value either newly, or by updating the
+        corresponding line."""
+        message = "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
+                  ("-" if self._flight.v1 is None
+                   else str(self._flight.v1),
+                   "-" if self._flight.vr is None
+                   else str(self._flight.vr),
+                   "-" if self._flight.v2 is None
+                   else str(self._flight.v2))
+
+        if self._v1r2LineIndex is None:
+            self._v1r2LineIndex = \
+                self.logger.message(self._aircraftState.timestamp, message)
+        else:
+            self.logger.updateLine(self._v1r2LineIndex, message)
 
     def updateVRef(self):
         """Update the Vref value from the flight, if the Vref value has already

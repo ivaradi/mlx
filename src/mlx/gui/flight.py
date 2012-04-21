@@ -1299,6 +1299,8 @@ class TakeoffPage(Page):
         super(TakeoffPage, self).__init__(wizard, "Takeoff", help,
                                           completedHelp = completedHelp)
 
+        self._forwardAllowed = False
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
@@ -1317,6 +1319,7 @@ class TakeoffPage(Page):
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text("The runway the takeoff is performed from.")
+        self._runway.connect("changed", self._valueChanged)
         table.attach(self._runway, 1, 3, 0, 1)
         label.set_mnemonic_widget(self._runway)
         
@@ -1328,6 +1331,7 @@ class TakeoffPage(Page):
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
         self._sid.set_tooltip_text("The name of the Standard Instrument Deparature procedure followed.")
+        self._sid.connect("changed", self._valueChanged)
         table.attach(self._sid, 1, 3, 1, 2)
         label.set_mnemonic_widget(self._sid)
         
@@ -1340,6 +1344,7 @@ class TakeoffPage(Page):
         self._v1 = IntegerEntry()
         self._v1.set_width_chars(4)
         self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
+        self._v1.connect("integer-changed", self._valueChanged)
         table.attach(self._v1, 2, 3, 2, 3)
         label.set_mnemonic_widget(self._v1)
         
@@ -1354,6 +1359,7 @@ class TakeoffPage(Page):
         self._vr = IntegerEntry()
         self._vr.set_width_chars(4)
         self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
+        self._vr.connect("integer-changed", self._valueChanged)
         table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
         
@@ -1368,6 +1374,7 @@ class TakeoffPage(Page):
         self._v2 = IntegerEntry()
         self._v2.set_width_chars(4)
         self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
+        self._v2.connect("integer-changed", self._valueChanged)
         table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
         
@@ -1420,14 +1427,35 @@ class TakeoffPage(Page):
         self._v2.set_sensitive(True)
         self._button.set_sensitive(False)
         
-    def freezeValues(self):
-        """Freeze the values on the page, and enable the forward button."""
+    def finalize(self):
+        """Finalize the page."""
         self._runway.set_sensitive(False)
         self._sid.set_sensitive(False)
         self._v1.set_sensitive(False)
         self._vr.set_sensitive(False)
         self._v2.set_sensitive(False)
-        self._button.set_sensitive(True)
+        self._wizard.gui.flight.aircraft.updateV1R2()
+
+    def allowForward(self):
+        """Allow going to the next page."""
+        self._forwardAllowed = True
+        self._updateForwardButton()
+
+    def _updateForwardButton(self):
+        """Update the sensitivity of the forward button based on some conditions."""
+        sensitive = self._forwardAllowed and \
+                    self._runway.get_text()!="" and \
+                    self._sid.get_text()!="" and \
+                    self.v1 is not None and \
+                    self.vr is not None and \
+                    self.v2 is not None and \
+                    self.v1 <= self.vr and \
+                    self.vr <= self.v2
+        self._button.set_sensitive(sensitive)
+
+    def _valueChanged(self, widget, arg = None):
+        """Called when the value of some widget has changed."""
+        self._updateForwardButton()
         
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -2085,7 +2113,7 @@ class Wizard(gtk.VBox):
     def setStage(self, stage):
         """Set the flight stage to the given one."""
         if stage==const.STAGE_TAKEOFF:
-            self._takeoffPage.freezeValues()
+            self._takeoffPage.allowForward()
         elif stage==const.STAGE_END:
             self._landingPage.flightEnded()
 
