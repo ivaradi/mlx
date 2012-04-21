@@ -1,0 +1,19 @@
+- flight types: scheduler, VIP, charter, OT
+  Online flight checkbox
+
+- Flight Info
+  Comments, Flight defects
+  Delay codes:
+  - Loading problems
+  - Net problems
+  - System crash/freezing
+  - Traffic problems
+  - Weather problems
+  - VATSIM problem
+  - Controllers fault
+  - Navigation problem
+  - Apron navigation problem
+  - Personal reasons
+
+- Saved PIREP: can only be sent with a separate program
+
