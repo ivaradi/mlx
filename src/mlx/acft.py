@@ -25,6 +25,8 @@ class Aircraft(object):
         self._maxVS = -10000.0
         self._minVS = 10000.0
 
+        self._vrefLineIndex = None
+
         self._checkers = []
 
         # Loggers
@@ -188,10 +190,11 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Altimeter setting: %.0f hPa" % \
                             (self._aircraftState.altimeter,))
-        self.logger.message(self._aircraftState.timestamp,
-                            "VRef speed calculated by the pilot: %s" % \
-                            ("-" if self._flight.vref is None
-                             else str(self._flight.vref)))
+        self._vrefLineIndex = \
+            self.logger.message(self._aircraftState.timestamp,
+                                "VRef speed calculated by the pilot: %s" % \
+                                ("-" if self._flight.vref is None
+                                 else str(self._flight.vref)))
         self.flight.flareStarted(flareStart, flareStartFS)
          
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
@@ -229,6 +232,23 @@ class Aircraft(object):
         for n1 in aircraftState.n1:
             if n1>=0.5: return False
         return True
+
+    def updateVRef(self):
+        """Update the Vref value from the flight, if the Vref value has already
+        been logged."""
+        if self._vrefLineIndex is not None:
+            self._logVRef()
+
+    def _logVRef(self):
+        """Log the Vref value either newly, or by updating the corresponding
+        line."""
+        message = "VRef speed calculated by the pilot: %s" % \
+                  ("-" if self._flight.vref is None else str(self._flight.vref))
+        if self._vrefLineIndex is None:
+            self._vrefLineIndex = \
+                self.logger.message(self._aircraftState.timestamp, message)
+        else:
+            self.logger.updateLine(self._vrefLineIndex, message)
 
 #---------------------------------------------------------------------------------------
 

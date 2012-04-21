@@ -1556,8 +1556,9 @@ class LandingPage(Page):
         self._approachType.set_sensitive(False)
 
         self._vref.set_sensitive(False)
+        self._wizard.gui.flight.aircraft.updateVRef()
         # FIXME: Perhaps a separate initialize() call which would set up
-        # defaults?
+        # defaults? -> use reset()
         self._flightEnded = False
 
     def _starButtonClicked(self, button):
@@ -1617,10 +1618,10 @@ class FinishPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 2)
+        table = gtk.Table(7, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
-        table.set_homogeneous(True)
+        table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
@@ -1689,6 +1690,37 @@ class FinishPage(Page):
         labelAlignment.add(self._fuelUsed)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label("_Type:")
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 5, 6)
+
+        flightTypeModel = gtk.ListStore(str, int)
+        index = 1
+        for type in ["scheduled", "old-timer", "VIP", "charter"]:
+            flightTypeModel.append([type, index])
+            index += 1
+
+        self._flightType = gtk.ComboBox(model = flightTypeModel)
+        renderer = gtk.CellRendererText()
+        self._flightType.pack_start(renderer, True)
+        self._flightType.add_attribute(renderer, "text", 0)
+        self._flightType.set_tooltip_text("Select the type of the flight.")
+        self._flightType.set_active(0)
+        self._flightType.connect("changed", self._flightTypeChanged)
+        flightTypeAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        flightTypeAlignment.add(self._flightType)
+        table.attach(flightTypeAlignment, 1, 2, 5, 6)
+        label.set_mnemonic_widget(self._flightType)        
+
+        self._onlineFlight = gtk.CheckButton("_Online flight")
+        self._onlineFlight.set_use_underline(True)
+        self._onlineFlight.set_tooltip_text("Check if your flight was online, uncheck otherwise.")
+        onlineFlightAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        onlineFlightAlignment.add(self._onlineFlight)
+        table.attach(onlineFlightAlignment, 1, 2, 6, 7)
+
         button = self.addButton(gtk.STOCK_GO_BACK)
         button.set_use_stock(True)
         button.connect("clicked", self._backClicked)
@@ -1726,9 +1758,19 @@ class FinishPage(Page):
         self._fuelUsed.set_markup("<b>%.0f kg</b>" % \
                                   (flight.endFuel - flight.startFuel,))
 
+        self._flightType.set_active(-1)
+        self._onlineFlight.set_active(True)
+
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
+
+    def _flightTypeChanged(self, comboBox):
+        """Called when the flight type has changed."""
+        index = self._flightType.get_active()
+        flightTypeIsValid = index>=0
+        self._saveButton.set_sensitive(flightTypeIsValid)
+        self._sendButton.set_sensitive(flightTypeIsValid)
         
 #-----------------------------------------------------------------------------
 

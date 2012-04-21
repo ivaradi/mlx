@@ -27,8 +27,9 @@ class Logger(object):
     
     NO_GO_SCORE = 10000
 
-    def __init__(self, output = sys.stdout):
+    def __init__(self, output):
         """Construct the logger."""
+        self._lines = []
         self._faults = {}
         self._output = output
 
@@ -41,16 +42,17 @@ class Logger(object):
         """Reset the logger.
 
         The faults logged so far will be cleared."""
+        self._lines = []
         self._faults.clear()
                 
     def message(self, timestamp, msg):
         """Put a simple textual message into the log with the given timestamp."""
         timeStr = Logger._getTimeStr(timestamp)
-        print >> self._output, timeStr + ":", msg
+        return self._logLine(msg, timeStr)
 
     def untimedMessage(self, msg):
         """Put an untimed message into the log."""
-        print >> self._output, msg
+        return self._logLine(msg)
 
     def debug(self, msg):
         """Log a debug message."""
@@ -92,5 +94,18 @@ class Logger(object):
             else:
                 totalScore -= score
         return totalScore
+
+    def updateLine(self, index, line):
+        """Update the line at the given index with the given string."""
+        (timeStr, _line) = self._lines[index]
+        self._lines[index] = (timeStr, line)
+        self._output.updateFlightLogLine(index, timeStr, line)
+
+    def _logLine(self, line, timeStr = None):
+        """Log the given line."""
+        index = len(self._lines)
+        self._lines.append((timeStr, line))
+        self._output.addFlightLogLine(timeStr, line)
+        return index
         
 #--------------------------------------------------------------------------------------

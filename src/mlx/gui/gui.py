@@ -23,6 +23,13 @@ import sys
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
+    @staticmethod
+    def _formatFlightLogLine(timeStr, line):
+        """Format the given line for flight logging."""
+        if timeStr is not None:
+            line = timeStr + ": " + line
+        return line + "\n"
+        
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
         gobject.threads_init()
@@ -32,7 +39,7 @@ class GUI(fs.ConnectionListener):
         self._connecting = False
         self._reconnecting = False
         self._connected = False
-        self._logger = logger.Logger(output = self)
+        self._logger = logger.Logger(self)
         self._flight = None
         self._simulator = None
         self._monitoring = False
@@ -271,10 +278,26 @@ class GUI(fs.ConnectionListener):
         self._reconnecting = False
         self._statusbar.updateConnection(False, False)
             
-    def write(self, msg):
-        """Write the given message to the log."""
-        gobject.idle_add(self._writeLog, msg, self._logView)
-        
+    def addFlightLogLine(self, timeStr, line):
+        """Write the given message line to the log."""
+        gobject.idle_add(self._writeLog,
+                         GUI._formatFlightLogLine(timeStr, line),
+                         self._logView)
+
+    def updateFlightLogLine(self, index, timeStr, line):
+        """Update the line with the given index."""
+        gobject.idle_add(self._updateFlightLogLine, index,
+                         GUI._formatFlightLogLine(timeStr, line))
+
+    def _updateFlightLogLine(self, index, line):
+        """Replace the contents of the given line in the log."""
+        buffer = self._logView.get_buffer()
+        startIter = buffer.get_iter_at_line(index)
+        endIter = buffer.get_iter_at_line(index + 1)
+        buffer.delete(startIter, endIter)
+        buffer.insert(startIter, line)
+        self._logView.scroll_mark_onscreen(buffer.get_insert())
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Update the data."""
         gobject.idle_add(self._monitorWindow.setData, state)
@@ -427,11 +450,11 @@ class GUI(fs.ConnectionListener):
             lines = lines[:-1]
             
         for line in lines:
-            print >> sys.__stdout__, line
+            #print >> sys.__stdout__, line
             self._writeLog(line + "\n", self._debugLogView)
 
         if text:
-            print >> sys.__stdout__, line,
+            #print >> sys.__stdout__, text,
             self._writeLog(text, self._debugLogView)
 
     def connectSimulator(self, aircraftType):
