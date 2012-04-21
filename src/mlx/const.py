@@ -145,6 +145,38 @@ FLIGHTTYPE_CHARTER = 3
 
 #-------------------------------------------------------------------------------
 
+# Delay code: loading problems
+DELAYCODE_LOADING = 0
+
+# Delay code: VATSIM problem
+DELAYCODE_VATSIM = 1
+
+# Delay code: network problems
+DELAYCODE_NETWORK = 2
+
+# Delay code: controller's fault
+DELAYCODE_CONTROLLER = 3
+
+# Delay code: system crash or freeze
+DELAYCODE_SYSTEM = 4
+
+# Delay code: navigation problem
+DELAYCODE_NAVIGATION = 5
+
+# Delay code: traffic problems
+DELAYCODE_TRAFFIC = 6
+
+# Delay code: apron navigation
+DELAYCODE_APRON = 7
+
+# Delay code: weather problems
+DELAYCODE_WEATHER = 8
+
+# Delay code: personal reasons
+DELAYCODE_PERSONAL = 9
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 

@@ -2,8 +2,21 @@
 
 from common import *
 
+import mlx.const as const
+
 class FlightInfo(gtk.VBox):
     """The flight info tab."""
+    _delayCodes = [ (const.DELAYCODE_LOADING, "L_oading problems"),
+                    (const.DELAYCODE_VATSIM, "_VATSIM problem"),
+                    (const.DELAYCODE_NETWORK, "_Net problems"),
+                    (const.DELAYCODE_CONTROLLER, "Controller's _fault"),
+                    (const.DELAYCODE_SYSTEM, "S_ystem crash/freeze"),
+                    (const.DELAYCODE_NAVIGATION, "Navi_gation problem"),
+                    (const.DELAYCODE_TRAFFIC, "T_raffic problems"),
+                    (const.DELAYCODE_APRON, "_Apron navigation problem"),
+                    (const.DELAYCODE_WEATHER, "_Weather problems"),
+                    (const.DELAYCODE_PERSONAL, "_Personal reasons") ]
+    
     @staticmethod
     def _createCommentArea(label):
         """Create a comment area.
@@ -68,45 +81,20 @@ class FlightInfo(gtk.VBox):
         table = gtk.Table(5, 2)
         table.set_col_spacings(16)
 
-        self._loadingProblems = gtk.CheckButton("L_oading problems")
-        self._loadingProblems.set_use_underline(True)
-        table.attach(self._loadingProblems, 0, 1, 0, 1)
+        row = 0
+        column = 0
 
-        self._vatsimProblem = gtk.CheckButton("_VATSIM problem")
-        self._vatsimProblem.set_use_underline(True)
-        table.attach(self._vatsimProblem, 1, 2, 0, 1)
-
-        self._netProblems = gtk.CheckButton("_Net problems")
-        self._netProblems.set_use_underline(True)
-        table.attach(self._netProblems, 0, 1, 1, 2)
-
-        self._controllersFault = gtk.CheckButton("Controllers _fault")
-        self._controllersFault.set_use_underline(True)
-        table.attach(self._controllersFault, 1, 2, 1, 2)
-
-        self._systemCrash = gtk.CheckButton("S_ystem crash/freeze")
-        self._systemCrash.set_use_underline(True)
-        table.attach(self._systemCrash, 0, 1, 2, 3)
-
-        self._navigationProblem = gtk.CheckButton("Navi_gation problem")
-        self._navigationProblem.set_use_underline(True)
-        table.attach(self._navigationProblem, 1, 2, 2, 3)
-
-        self._trafficProblems = gtk.CheckButton("T_raffic problems")
-        self._trafficProblems.set_use_underline(True)
-        table.attach(self._trafficProblems, 0, 1, 3, 4)
-
-        self._apronProblem = gtk.CheckButton("_Apron navigation problem")
-        self._apronProblem.set_use_underline(True)
-        table.attach(self._apronProblem, 1, 2, 3, 4)
-
-        self._weatherProblems = gtk.CheckButton("_Weather problems")
-        self._weatherProblems.set_use_underline(True)
-        table.attach(self._weatherProblems, 0, 1, 4, 5)
-
-        self._personalReasons = gtk.CheckButton("_Personal reasons")
-        self._personalReasons.set_use_underline(True)
-        table.attach(self._personalReasons, 1, 2, 4, 5)
+        self._delayCodeWidgets = []
+        for (_code, label) in FlightInfo._delayCodes:
+            button = gtk.CheckButton(label)
+            button.set_use_underline(True)
+            table.attach(button, column, column + 1, row, row + 1)
+            self._delayCodeWidgets.append(button)
+            if column==0:
+                column += 1
+            else:
+                row += 1
+                column = 0
 
         alignment.add(table)
         frame.add(alignment)
