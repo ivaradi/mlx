@@ -145,13 +145,5 @@ class FlightInfo(gtk.VBox):
         self._comments.get_buffer().set_text("")
         self._flightDefects.get_buffer().set_text("")
 
-        self._loadingProblems.set_active(False)
-        self._vatsimProblem.set_active(False)
-        self._netProblems.set_active(False)
-        self._controllersFault.set_active(False)
-        self._systemCrash.set_active(False)
-        self._navigationProblem.set_active(False)
-        self._trafficProblems.set_active(False)
-        self._apronProblem.set_active(False)
-        self._weatherProblems.set_active(False)
-        self._personalReasons.set_active(False)
+        for widget in self._delayCodeWidgets:
+            widget.set_active(False)

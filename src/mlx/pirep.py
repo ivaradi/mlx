@@ -58,7 +58,7 @@ class PIREP(object):
         self.flightTimeEnd = flight.flightTimeEnd
         self.blockTimeEnd = flight.blockTimeEnd
         self.flownDistance = flight.flownDistance
-        self.fuelUsed = flight.endFuel - flight.startFuel
+        self.fuelUsed = flight.startFuel - flight.endFuel
 
         logger = gui.logger
         self.rating = logger.getRating()

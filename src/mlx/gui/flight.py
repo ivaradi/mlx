@@ -1855,7 +1855,7 @@ class FinishPage(Page):
                                        (flight.flownDistance,))
         
         self._fuelUsed.set_markup("<b>%.0f kg</b>" % \
-                                  (flight.endFuel - flight.startFuel,))
+                                  (flight.startFuel - flight.endFuel,))
 
         self._flightType.set_active(-1)
         self._onlineFlight.set_active(True)
