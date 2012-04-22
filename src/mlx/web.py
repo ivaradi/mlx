@@ -13,6 +13,7 @@ import hashlib
 import time
 import datetime
 import codecs
+import traceback
 import xml.sax
 
 #---------------------------------------------------------------------------------------
@@ -300,6 +301,7 @@ class Request(object):
             result = self.run()
             returned = True
         except Exception, e:
+            traceback.print_exc()
             result = e
             returned = False
 
@@ -307,6 +309,7 @@ class Request(object):
             self._callback(returned, result)
         except Exception, e:
             print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + str(e)
+            traceback.print_exc()
 
 #------------------------------------------------------------------------------
 

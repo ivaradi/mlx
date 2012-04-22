@@ -1211,6 +1211,7 @@ class BriefingPage(Page):
         self._metar = gtk.TextView()
         self._metar.set_accepts_tab(False)
         self._metar.set_wrap_mode(gtk.WrapMode.WORD if pygobject else gtk.WRAP_WORD)
+        self._metar.get_buffer().connect("changed", self._metarChanged)
         scrolledWindow.add(self._metar)
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
@@ -1219,6 +1220,7 @@ class BriefingPage(Page):
         alignment.add(scrolledWindow)
         self._metarFrame.add(alignment)
         mainBox.pack_start(self._metarFrame, True, True, 4)
+        self.metarEdited = False
 
         button = self.addButton(gtk.STOCK_GO_BACK)
         button.set_use_stock(True)
@@ -1234,6 +1236,11 @@ class BriefingPage(Page):
         buffer = self._metar.get_buffer()
         return buffer.get_text(buffer.get_start_iter(),
                                buffer.get_end_iter(), True)        
+
+    def setMETAR(self, metar):
+        """Set the metar."""
+        self._metar.get_buffer().set_text(metar)
+        self.metarEdited = False
 
     def activate(self):
         """Activate the page."""
@@ -1278,6 +1285,8 @@ class BriefingPage(Page):
         else:
             buffer.set_text(metar)
 
+        self.metarEdited = False
+
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
@@ -1292,6 +1301,13 @@ class BriefingPage(Page):
                 self.complete()
 
         self._wizard.nextPage()
+
+    def _metarChanged(self, buffer):
+        """Called when the METAR has changed."""
+        self.metarEdited = True
+        self._button.set_sensitive(buffer.get_text(buffer.get_start_iter(),
+                                                   buffer.get_end_iter(),
+                                                   True)!="")
 
 #-----------------------------------------------------------------------------
 
@@ -2122,6 +2138,13 @@ class Wizard(gtk.VBox):
         """Set the flight stage to the given one."""
         if stage==const.STAGE_TAKEOFF:
             self._takeoffPage.allowForward()
+        elif stage==const.STAGE_LANDING:
+            if not self._arrivalBriefingPage.metarEdited:
+                print "Downloading arrival METAR again"
+                self.gui.webHandler.getMETARs(self._arrivalMETARCallback,
+                                              [self._bookedFlight.arrivalICAO])
+            
+            self._takeoffPage.allowForward()
         elif stage==const.STAGE_END:
             self._landingPage.flightEnded()
 
@@ -2216,6 +2239,18 @@ class Wizard(gtk.VBox):
     def _connectSimulator(self):
         """Connect to the simulator."""
         self.gui.connectSimulator(self._bookedFlight.aircraftType)
+
+    def _arrivalMETARCallback(self, returned, result):
+        """Called when the METAR of the arrival airport is retrieved."""
+        gobject.idle_add(self._handleArrivalMETAR, returned, result)
+    
+    def _handleArrivalMETAR(self, returned, result):
+        """Called when the METAR of the arrival airport is retrieved."""
+        icao = self._bookedFlight.arrivalICAO
+        if returned and icao in result.metars:
+            metar = result.metars[icao]
+            if metar!="":
+                self._arrivalBriefingPage.setMETAR(metar)
     
 #-----------------------------------------------------------------------------
 
