@@ -38,7 +38,7 @@ class Updater(threading.Thread):
             return
 
         Updater._progressWindow = window = gtk.Window()
-        window.set_title("MAVA Logger X " + const.VERSION + " Update")
+        window.set_title(WINDOW_TITLE_BASE + " Update")
         window.set_transient_for(parentWindow)
         #win.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.set_size_request(400, -1)
@@ -71,7 +71,7 @@ class Updater(threading.Thread):
         mainVBox.pack_start(buttonAlignment, True, True, 4)
 
         Updater._sudoDialog = sudoDialog = \
-            gtk.Dialog("MAVA Logger X " + const.VERSION + " Update",
+            gtk.Dialog(WINDOW_TITLE_BASE + " Update",
                        parentWindow,
                        gtk.DialogFlags.MODAL if pygobject else gtk.DIALOG_MODAL,
                        (gtk.STOCK_CANCEL, 0,

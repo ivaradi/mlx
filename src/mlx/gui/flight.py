@@ -288,19 +288,23 @@ class LoginPage(Page):
                 self._wizard._loginResult = result
                 self._wizard.nextPage()
             else:
-                dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                           type = MESSAGETYPE_ERROR,
                                            buttons = BUTTONSTYPE_OK,
                                            message_format =
                                            "Invalid pilot's ID or password.")
+                dialog.set_title(WINDOW_TITLE_BASE)
                 dialog.format_secondary_markup("Check the ID and try to reenter"
                                                " the password.")
                 dialog.run()
                 dialog.hide()
         else:
-            dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format = 
                                        "Failed to connect to the MAVA website.")
+            dialog.set_title(WINDOW_TITLE_BASE)
             dialog.format_secondary_markup("Try again in a few minutes.")
             dialog.run()
             dialog.hide()
@@ -515,9 +519,11 @@ class GateSelectionPage(Page):
         if success is None or success:
             self._wizard.nextPage()
         else:
-            dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format = "Gate conflict detected again")
+            dialog.set_title(WINDOW_TITLE_BASE)
             dialog.format_secondary_markup("Try to select a different gate.")
             dialog.run()
             dialog.hide()
@@ -1891,7 +1897,7 @@ class FinishPage(Page):
             if result.success:
                 type = MESSAGETYPE_INFO
                 messageFormat = "The PIREP was sent successfully."
-                secondaryMarkup = "Await the thorough scrutiny from our PIREP correctors! :)"
+                secondaryMarkup = "Await the thorough scrutiny by our fearless PIREP correctors! :)"
             elif result.alreadyFlown:
                 messageFormat = "The PIREP for this flight has already been sent!"
                 secondaryMarkup = "You may clear the old PIREP on the MAVA website."
@@ -1907,8 +1913,10 @@ class FinishPage(Page):
                               "you may try again later. Or it can be a bug;\n" \
                               "see the debug log for more information."
         
-        dialog = gtk.MessageDialog(type = type, buttons = BUTTONSTYPE_OK,
+        dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                   type = type, buttons = BUTTONSTYPE_OK,
                                    message_format = messageFormat)
+        dialog.set_title(WINDOW_TITLE_BASE)
         if secondaryMarkup is not None:
             dialog.format_secondary_markup(secondaryMarkup)
 
@@ -2162,11 +2170,13 @@ class Wizard(gtk.VBox):
         else:
             self._fleet = None
 
-            dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format =
                                        "Failed to retrieve the information on "
                                        "the fleet.")
+            dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
 
@@ -2191,11 +2201,13 @@ class Wizard(gtk.VBox):
         else:
             success = None
 
-            dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format =
                                        "Failed to update the statuis of "
                                        "the airplane.")
+            dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
 

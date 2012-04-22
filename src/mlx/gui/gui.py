@@ -56,7 +56,7 @@ class GUI(fs.ConnectionListener):
         """Build the GUI."""
         
         window = gtk.Window()
-        window.set_title("MAVA Logger X " + const.VERSION)
+        window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.connect("delete-event",
                        lambda a, b: self.hideMainWindow())
@@ -118,6 +118,11 @@ class GUI(fs.ConnectionListener):
         self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH if pygobject
                                       else gdk.WATCH)
 
+    @property
+    def mainWindow(self):
+        """Get the main window of the GUI."""
+        return self._mainWindow
+        
     @property
     def logger(self):
         """Get the logger used by us."""
@@ -285,10 +290,11 @@ class GUI(fs.ConnectionListener):
         self.endBusy()
         self._statusbar.updateConnection(self._connecting, self._connected)
 
-        dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+        dialog = gtk.MessageDialog(parent = self._mainWindow,
+                                   type = MESSAGETYPE_ERROR,
                                    message_format =
-                                   "Cannot connect to the simulator.",
-                                   parent = self._mainWindow)
+                                   "Cannot connect to the simulator.")
+        dialog.set_title(WINDOW_TITLE_BASE)
         dialog.format_secondary_markup("Rectify the situation, and press <b>Try again</b> "
                                        "to try the connection again, " 
                                        "or <b>Cancel</b> to cancel the flight.")
@@ -320,9 +326,10 @@ class GUI(fs.ConnectionListener):
                                    message_format =
                                    "The connection to the simulator failed unexpectedly.",
                                    parent = self._mainWindow)
+        dialog.set_title(WINDOW_TITLE_BASE)
         dialog.format_secondary_markup("If the simulator has crashed, restart it "
                                        "and restore your flight as much as possible "
-                                       "to the state it was in before the crash.\n"
+                                       "to the state it was in before the crash. "
                                        "Then press <b>Reconnect</b> to reconnect.\n\n"
                                        "If you want to cancel the flight, press <b>Cancel</b>.")
 
@@ -673,10 +680,12 @@ class GUI(fs.ConnectionListener):
         if force:
             result=RESPONSETYPE_YES
         else:
-            dialog = gtk.MessageDialog(type = MESSAGETYPE_QUESTION,
+            dialog = gtk.MessageDialog(parent = self._mainWindow,
+                                       type = MESSAGETYPE_QUESTION,
                                        buttons = BUTTONSTYPE_YES_NO,
                                        message_format =
                                        "Are you sure to quit the logger?")
+            dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()
             dialog.hide()
         

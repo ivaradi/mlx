@@ -1,5 +1,7 @@
 # Common things for the GUI
 
+import mlx.const as _const
+
 import os
 
 appIndicator = False
@@ -145,5 +147,9 @@ class IntegerEntry(gtk.Entry):
 
 gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
                    None, (object,))
+
+#------------------------------------------------------------------------------
+
+WINDOW_TITLE_BASE = "MAVA Logger X " + _const.VERSION
 
 #------------------------------------------------------------------------------
