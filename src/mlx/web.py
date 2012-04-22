@@ -546,7 +546,7 @@ class SendPIREP(Request):
         data["comment"] = SendPIREP._latin2Encoder(pirep.comments)[0]
         data["flightdefect"] = SendPIREP._latin2Encoder(pirep.flightDefects)[0]
         data["kritika"] = pirep.getRatingText()
-        data["flightRating"] = "%.1f" % (max(0.0, pirep.rating),)
+        data["flightrating"] = "%.1f" % (max(0.0, pirep.rating),)
         data["distance"] = "%.3f" % (pirep.flownDistance,)
         data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
 
