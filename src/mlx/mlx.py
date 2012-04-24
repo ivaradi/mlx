@@ -3,6 +3,7 @@
 from .gui.gui import GUI
 
 from config import Config
+from i18n import setLanguage
 
 import os
 import sys
@@ -30,6 +31,8 @@ def main():
 
     config = Config()
     config.load()
+
+    setLanguage(config.getLanguage())
     
     gui = GUI(programDirectory, config)
     

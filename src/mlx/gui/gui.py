@@ -14,6 +14,7 @@ import mlx.flight as flight
 import mlx.logger as logger
 import mlx.acft as acft
 import mlx.web as web
+from  mlx.i18n import xstr
 
 import time
 import threading
@@ -74,20 +75,20 @@ class GUI(fs.ConnectionListener):
         mainVBox.pack_start(self._notebook, True, True, 4)
 
         self._wizard = Wizard(self)
-        label = gtk.Label("Fligh_t")
+        label = gtk.Label(xstr("tab_flight"))
         label.set_use_underline(True)
         label.set_tooltip_text("Flight wizard")
         self._notebook.append_page(self._wizard, label)
 
         self._flightInfo = FlightInfo(self)
-        label = gtk.Label("Flight _info")
+        label = gtk.Label(xstr("tab_flight_info"))
         label.set_use_underline(True)
         label.set_tooltip_text("Flight information")
         self._notebook.append_page(self._flightInfo, label)
         self._flightInfo.disable()
 
         (logWidget, self._logView)  = self._buildLogWidget()
-        label = gtk.Label("_Log")
+        label = gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text("The log of your flight that will be sent to the MAVA website")
         self._notebook.append_page(logWidget, label)
@@ -306,7 +307,7 @@ class GUI(fs.ConnectionListener):
         result = dialog.run()
         dialog.hide()
         if result == 1:
-            self.beginBusy("Connecting to the simulator.")
+            self.beginBusy(xstr("connect_busy"))
             self._simulator.reconnect()
         else:
             self.reset()
@@ -568,7 +569,7 @@ class GUI(fs.ConnectionListener):
 
         self._flight.simulator = self._simulator
 
-        self.beginBusy("Connecting to the simulator...")
+        self.beginBusy(xstr("connect_busy"))
         self._statusbar.updateConnection(self._connecting, self._connected)
 
         self._connecting = True
@@ -634,7 +635,7 @@ class GUI(fs.ConnectionListener):
     def _toggleDebugLog(self, menuItem):
         """Toggle the debug log."""
         if menuItem.get_active():
-            label = gtk.Label("_Debug log")
+            label = gtk.Label(xstr("tab_debug_log"))
             label.set_use_underline(True)
             label.set_tooltip_text("Log with debugging information.")        
             self._debugLogPage = self._notebook.append_page(self._debugLogWidget, label)

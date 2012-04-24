@@ -29,6 +29,8 @@ class Config(object):
 
         self._modified = False
 
+        self._language = ""
+
     @property
     def pilotID(self):
         """Get the pilot ID."""
@@ -102,6 +104,9 @@ class Config(object):
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
                                     Config.DEFAULT_UPDATE_URL)
+
+        self._language = self._get(config, "general", "language", "")
+        
         self._modified = False
 
     def save(self):
@@ -122,6 +127,10 @@ class Config(object):
                    "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
 
+        config.add_section("general")
+        if self._language:
+            config.set("general", "language", self._language)
+        
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,
                          0600)
@@ -144,5 +153,13 @@ class Config(object):
         return config.get(section, option) \
                if config.has_option(section, option) \
                else default
+
+    def getLanguage(self):
+        """Get the language to be used."""
+        if self._language:
+            return self._language
+        else:
+            import locale
+            return locale.getdefaultlocale()[0]
 
 #-------------------------------------------------------------------------------

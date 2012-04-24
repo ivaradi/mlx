@@ -17,3 +17,26 @@
 
 - Saved PIREP: can only be sent with a separate program
 
+-------------------------------------------------------------------------------
+
+- Alt combinations: 
+  Fixed: 
+  
+     English: D, F, G, H, I, L
+
+         Alt+F: Flight Tab
+         Alt+I: Flight info 
+         Alt+L: Log
+         Alt+D: Debug Log   
+         Alt+H: Help
+         Alt+G: Gates
+     
+     Magyar: D, I, J, K, N, S
+
+        Alt+J: Járat
+        Alt+I: Járat info
+        Alt+N: Napló
+        Alt+D: Debug Napló
+        Alt+S: Segítség
+        Alt+K: Kapuk
+        

@@ -7,6 +7,7 @@ import mlx.fs as fs
 from mlx.checks import PayloadChecker
 import mlx.util as util
 from mlx.pirep import PIREP
+from mlx.i18n import xstr
 
 import datetime
 import time
@@ -120,7 +121,8 @@ class Page(gtk.Alignment):
         """Set the given widget as the main one."""
         self._mainAlignment.add(widget)
 
-    def addButton(self, label, default = False):
+    def addButton(self, label, default = False, sensitive = True,
+                  tooltip = None, clicked = None):
         """Add a button with the given label.
 
         Return the button object created."""
@@ -130,7 +132,28 @@ class Page(gtk.Alignment):
         if default:
             button.set_can_default(True)
             self._defaultButton = button
+        button.set_sensitive(sensitive)
+        if tooltip is not None:
+            button.set_tooltip_text(tooltip)
+        if clicked is not None:
+            button.connect("clicked", clicked)
         return button
+
+    def addPreviousButton(self, sensitive = True, clicked = None):
+        """Add the 'Next' button to the page."""
+        return self.addButton(xstr("button_previous"),
+                              sensitive = sensitive,
+                              tooltip = xstr("button_previous_tooltip"),
+                              clicked = clicked)
+
+    def addNextButton(self, default = True, sensitive = True,
+                      clicked = None):
+        """Add the 'Next' button to the page."""
+        return self.addButton(xstr("button_next"),
+                              default = default,
+                              sensitive = sensitive,
+                              tooltip = xstr("button_next_tooltip"),
+                              clicked = clicked)
 
     def initialize(self):
         """Initialize the page.
@@ -183,10 +206,8 @@ class LoginPage(Page):
     """The login page."""
     def __init__(self, wizard):
         """Construct the login page."""
-        help = "Enter your MAVA pilot's ID and password to\n" \
-        "log in to the MAVA website and download\n" \
-        "your booked flights."
-        super(LoginPage, self).__init__(wizard, "Login", help)
+        super(LoginPage, self).__init__(wizard, xstr("login"),
+                                        xstr("loginHelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -197,22 +218,22 @@ class LoginPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Pilot _ID:")
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("label_pilotID"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
         self._pilotID = gtk.Entry()
         self._pilotID.connect("changed", self._setLoginButton)
-        self._pilotID.set_tooltip_text("Enter your MAVA pilot's ID. This "
-                                       "usually starts with a "
-                                       "'P' followed by 3 digits.")
+        self._pilotID.set_tooltip_text(xstr("login_pilotID_tooltip"))
         table.attach(self._pilotID, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._pilotID)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("_Password:")
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("label_password"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
@@ -220,25 +241,19 @@ class LoginPage(Page):
         self._password = gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed", self._setLoginButton)
-        self._password.set_tooltip_text("Enter the password for your pilot's ID")
+        self._password.set_tooltip_text(xstr("login_password_tooltip"))
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
-        self._rememberButton = gtk.CheckButton("_Remember password")
+        self._rememberButton = gtk.CheckButton(xstr("remember_password"))
         self._rememberButton.set_use_underline(True)
-        self._rememberButton.set_tooltip_text("If checked, your password will "
-                                              "be stored, so that you should "
-                                              "not have to enter it every time. "
-                                              "Note, however, that the password "
-                                              "is stored as text, and anybody "
-                                              "who can access your files will "
-                                              "be able to read it.")
+        self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
-        self._loginButton = self.addButton("_Login", default = True)
+        self._loginButton = self.addButton(xstr("button_login"), default = True)
         self._loginButton.set_sensitive(False)
         self._loginButton.connect("clicked", self._loginClicked)
-        self._loginButton.set_tooltip_text("Click to log in.")        
+        self._loginButton.set_tooltip_text(xstr("login_button_tooltip"))        
 
     def activate(self):
         """Activate the page."""
@@ -259,7 +274,7 @@ class LoginPage(Page):
         """Called when the login button was clicked."""
         self._loginButton.set_sensitive(False)
         gui = self._wizard.gui
-        gui.beginBusy("Logging in...")
+        gui.beginBusy(xstr("login_busy"))
         gui.webHandler.login(self._loginResultCallback,
                             self._pilotID.get_text(),
                             self._password.get_text())
@@ -291,21 +306,19 @@ class LoginPage(Page):
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            buttons = BUTTONSTYPE_OK,
-                                           message_format =
-                                           "Invalid pilot's ID or password.")
+                                           message_format = xstr("login_invalid"))
                 dialog.set_title(WINDOW_TITLE_BASE)
-                dialog.format_secondary_markup("Check the ID and try to reenter"
-                                               " the password.")
+                dialog.format_secondary_markup(xstr("login_invalid_sec"))
                 dialog.run()
                 dialog.hide()
         else:
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
-                                       message_format = 
-                                       "Failed to connect to the MAVA website.")
+                                       message_format = xstr("login_failconn"))
             dialog.set_title(WINDOW_TITLE_BASE)
-            dialog.format_secondary_markup("Try again in a few minutes.")
+            dialog.format_secondary_markup(xstr("login_failconn_sec"))
+            
             dialog.run()
             dialog.hide()
 
@@ -315,27 +328,27 @@ class FlightSelectionPage(Page):
     """The page to select the flight."""
     def __init__(self, wizard):
         """Construct the flight selection page."""
-        help = "Select the flight you want to perform."
-        completedHelp = "You have selected the flight highlighted below."
-        super(FlightSelectionPage, self).__init__(wizard, "Flight selection",
+        help = xstr("flightsel_help") 
+        completedHelp = xstr("flightsel_chelp")
+        super(FlightSelectionPage, self).__init__(wizard, xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
 
         self._listStore = gtk.ListStore(str, str, str, str)
         self._flightList = gtk.TreeView(self._listStore)
-        column = gtk.TreeViewColumn("Flight no.", gtk.CellRendererText(),
+        column = gtk.TreeViewColumn(xstr("flightsel_no"), gtk.CellRendererText(),
                                     text = 1)
         column.set_expand(True)
         self._flightList.append_column(column)
-        column = gtk.TreeViewColumn("Departure time [UTC]", gtk.CellRendererText(),
+        column = gtk.TreeViewColumn(xstr("flightsel_deptime"), gtk.CellRendererText(),
                                     text = 0)
         column.set_expand(True)
         self._flightList.append_column(column)
-        column = gtk.TreeViewColumn("From", gtk.CellRendererText(),
+        column = gtk.TreeViewColumn(xstr("flightsel_from"), gtk.CellRendererText(),
                                     text = 2)
         column.set_expand(True)
         self._flightList.append_column(column)
-        column = gtk.TreeViewColumn("To", gtk.CellRendererText(),
+        column = gtk.TreeViewColumn(xstr("flightsel_to"), gtk.CellRendererText(),
                                     text = 3)
         column.set_expand(True)
         self._flightList.append_column(column)
@@ -358,10 +371,8 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(alignment)
 
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.set_sensitive(False)
-        self._button.connect("clicked", self._forwardClicked)
+        self._button = self.addNextButton(sensitive = False,
+                                          clicked =  self._forwardClicked)
 
     def activate(self):
         """Fill the flight list."""
@@ -431,17 +442,12 @@ class FlightSelectionPage(Page):
 
 class GateSelectionPage(Page):
     """Page to select a free gate at LHBP.
-
     This page should be displayed only if we have fleet information!."""
     def __init__(self, wizard):
         """Construct the gate selection page."""
-        help = "The airplane's gate position is invalid.\n\n" \
-               "Select the gate from which you\n" \
-               "would like to begin the flight."
-        super(GateSelectionPage, self).__init__(wizard,
-                                                "LHBP gate selection",
-                                                help)
-
+        super(GateSelectionPage, self).__init__(wizard, xstr("gatesel_title"),
+                                                xstr("gatesel_help"))
+        
         self._listStore = gtk.ListStore(str)
         self._gateList = gtk.TreeView(self._listStore)
         column = gtk.TreeViewColumn(None, gtk.CellRendererText(),
@@ -468,14 +474,10 @@ class GateSelectionPage(Page):
 
         self.setMainWidget(alignment)        
 
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
+        self.addPreviousButton(clicked = self._backClicked)
         
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.set_sensitive(False)
-        self._button.connect("clicked", self._forwardClicked)
+        self._button = self.addNextButton(sensitive = False,
+                                          clicked = self._forwardClicked)
 
     def activate(self):
         """Fill the gate list."""
@@ -522,9 +524,9 @@ class GateSelectionPage(Page):
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
-                                       message_format = "Gate conflict detected again")
+                                       message_format = xstr("gatesel_conflict"))
             dialog.set_title(WINDOW_TITLE_BASE)
-            dialog.format_secondary_markup("Try to select a different gate.")
+            dialog.format_secondary_markup(xstr("gatesel_conflict_sec"))
             dialog.run()
             dialog.hide()
 
@@ -547,9 +549,9 @@ class ConnectPage(Page):
                "at the given airport, at the gate below, if present.\n\n" \
                "Then press the Connect button to connect to the simulator."
         completedHelp = "The basic data of your flight can be read below."
-        super(ConnectPage, self).__init__(wizard,
-                                          "Connect to the simulator",
-                                          help, completedHelp = completedHelp)
+        super(ConnectPage, self).__init__(wizard, xstr("connect_title"),
+                                          xstr("connect_help"),
+                                          completedHelp = xstr("connect_chelp"))
         
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -562,7 +564,7 @@ class ConnectPage(Page):
         self.setMainWidget(alignment)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Flight number:")
+        label = gtk.Label(xstr("connect_flightno"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
@@ -574,7 +576,7 @@ class ConnectPage(Page):
         table.attach(labelAlignment, 1, 2, 0, 1)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Aircraft:")
+        label = gtk.Label(xstr("connect_acft"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
@@ -586,7 +588,7 @@ class ConnectPage(Page):
         table.attach(labelAlignment, 1, 2, 1, 2)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Tail number:")
+        label = gtk.Label(xstr("connect_tailno"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 2, 3)
 
@@ -598,7 +600,7 @@ class ConnectPage(Page):
         table.attach(labelAlignment, 1, 2, 2, 3)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Airport:")
+        label = gtk.Label(xstr("connect_airport"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 3, 4)
 
@@ -610,7 +612,7 @@ class ConnectPage(Page):
         table.attach(labelAlignment, 1, 2, 3, 4)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Gate:")
+        label = gtk.Label(xstr("connect_gate"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 4, 5)
 
@@ -621,18 +623,17 @@ class ConnectPage(Page):
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
+        self.addPreviousButton(clicked = self._backClicked)
 
-        self._button = self.addButton("_Connect", default = True)
-        self._button.set_use_underline(True)
+        self._button = self.addButton(xstr("button_connect"), default = True,
+                                      tooltip = xstr("button_connect_tooltip"))
         self._clickedID = self._button.connect("clicked", self._connectClicked)
 
     def activate(self):
         """Setup the departure information."""
-        self._button.set_label("_Connect")
+        self._button.set_label(xstr("button_connect"))
         self._button.set_use_underline(True)
+        self._button.set_tooltip_text(xstr("button_connect_tooltip"))
         self._button.disconnect(self._clickedID)
         self._clickedID = self._button.connect("clicked", self._connectClicked)
 
@@ -654,8 +655,9 @@ class ConnectPage(Page):
 
     def finalize(self):
         """Finalize the page."""
-        self._button.set_label(gtk.STOCK_GO_FORWARD)
-        self._button.set_use_stock(True)
+        self._button.set_label(xstr("button_next"))
+        self._button.set_use_underline(True)
+        self._button.set_tooltip_text(xstr("button_next_tooltip"))
         self._button.disconnect(self._clickedID)
         self._clickedID = self._button.connect("clicked", self._forwardClicked)
 
@@ -677,14 +679,9 @@ class PayloadPage(Page):
     """Page to allow setting up the payload."""
     def __init__(self, wizard):
         """Construct the page."""
-        help = "The briefing contains the weights below.\n" \
-               "Setup the cargo weight here and the payload weight in the simulator.\n\n" \
-               "You can also check here what the simulator reports as ZFW."
-        completedHelp = "You can see the weights in the briefing\n" \
-                        "and the cargo weight you have selected below.\n\n" \
-                        "You can also query the ZFW reported by the simulator."
-        super(PayloadPage, self).__init__(wizard, "Payload", help,
-                                          completedHelp = completedHelp)
+        super(PayloadPage, self).__init__(wizard, xstr("payload_title"),
+                                          xstr("payload_help"),
+                                          completedHelp = xstr("payload_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -696,7 +693,7 @@ class PayloadPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label("Crew:")
+        label = gtk.Label(xstr("payload_crew"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
@@ -705,7 +702,7 @@ class PayloadPage(Page):
         self._numCrew.set_alignment(1.0, 0.5)
         table.attach(self._numCrew, 1, 2, 0, 1)
         
-        label = gtk.Label("Passengers:")
+        label = gtk.Label(xstr("payload_pax"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
@@ -714,7 +711,7 @@ class PayloadPage(Page):
         self._numPassengers.set_alignment(1.0, 0.5)
         table.attach(self._numPassengers, 1, 2, 1, 2)
         
-        label = gtk.Label("Baggage:")
+        label = gtk.Label(xstr("payload_bag"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 2, 3)
 
@@ -725,7 +722,7 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 2, 3)
         
-        label = gtk.Label("_Cargo:")
+        label = gtk.Label(xstr("payload_cargo"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
@@ -733,13 +730,13 @@ class PayloadPage(Page):
         self._cargoWeight = IntegerEntry(defaultValue = 0)
         self._cargoWeight.set_width_chars(6)
         self._cargoWeight.connect("integer-changed", self._cargoWeightChanged)
-        self._cargoWeight.set_tooltip_text("The weight of the cargo for your flight.")
+        self._cargoWeight.set_tooltip_text(xstr("payload_cargo_tooltip"))
         table.attach(self._cargoWeight, 1, 2, 3, 4)
         label.set_mnemonic_widget(self._cargoWeight)
 
         table.attach(gtk.Label("kg"), 2, 3, 3, 4)
         
-        label = gtk.Label("Mail:")
+        label = gtk.Label(xstr("payload_mail"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 4, 5)
 
@@ -750,7 +747,7 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 4, 5)
         
-        label = gtk.Label("<b>Calculated ZFW:</b>")
+        label = gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
         label.set_alignment(0.0, 0.5)
         label.set_use_markup(True)
         table.attach(label, 0, 1, 5, 6)
@@ -762,9 +759,10 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 5, 6)
 
-        self._zfwButton = gtk.Button("_ZFW from FS:")
+        self._zfwButton = gtk.Button(xstr("payload_fszfw"))
         self._zfwButton.set_use_underline(True)
         self._zfwButton.connect("clicked", self._zfwRequested)
+        self._zfwButton.set_tooltip_text(xstr("payload_fszfw_tooltip"))
         table.attach(self._zfwButton, 0, 1, 6, 7)
 
         self._simulatorZFW = gtk.Label("-")
@@ -775,13 +773,8 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 6, 7)
 
-        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
-        self._backButton.set_use_stock(True)
-        self._backButton.connect("clicked", self._backClicked)
-
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
     def cargoWeight(self):
@@ -838,7 +831,7 @@ class PayloadPage(Page):
         self._backButton.set_sensitive(False)
         self._button.set_sensitive(False)
         gui = self._wizard.gui
-        gui.beginBusy("Querying ZFW...")
+        gui.beginBusy(xstr("payload_zfw_busy"))
         gui.simulator.requestZFW(self._handleZFW)
 
     def _handleZFW(self, zfw):
@@ -869,13 +862,9 @@ class TimePage(Page):
     """Page displaying the departure and arrival times and allows querying the
     current time from the flight simulator."""
     def __init__(self, wizard):
-        help = "The departure and arrival times are displayed below in UTC.\n\n" \
-               "You can also query the current UTC time from the simulator.\n" \
-               "Ensure that you have enough time to properly prepare for the flight."
-        completedHelp = "The departure and arrival times are displayed below in UTC.\n\n" \
-                        "You can also query the current UTC time from the simulator.\n"
-        super(TimePage, self).__init__(wizard, "Time", help,
-                                       completedHelp = completedHelp)
+        super(TimePage, self).__init__(wizard, xstr("time_title"),
+                                       xstr("time_help"),
+                                       completedHelp = xstr("time_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -887,7 +876,7 @@ class TimePage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label("Departure:")
+        label = gtk.Label(xstr("time_departure"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
@@ -895,7 +884,7 @@ class TimePage(Page):
         self._departure.set_alignment(0.0, 0.5)
         table.attach(self._departure, 1, 2, 0, 1)
         
-        label = gtk.Label("Arrival:")
+        label = gtk.Label(xstr("time_arrival"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
@@ -903,8 +892,9 @@ class TimePage(Page):
         self._arrival.set_alignment(0.0, 0.5)
         table.attach(self._arrival, 1, 2, 1, 2)
 
-        self._timeButton = gtk.Button("_Time from FS:")
+        self._timeButton = gtk.Button(xstr("time_fs"))
         self._timeButton.set_use_underline(True)
+        self._timeButton.set_tooltip_text(xstr("time_fs_tooltip"))
         self._timeButton.connect("clicked", self._timeRequested)
         table.attach(self._timeButton, 0, 1, 2, 3)
 
@@ -912,13 +902,8 @@ class TimePage(Page):
         self._simulatorTime.set_alignment(0.0, 0.5)
         table.attach(self._simulatorTime, 1, 2, 2, 3)
 
-        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
-        self._backButton.set_use_stock(True)
-        self._backButton.connect("clicked", self._backClicked)
-
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
     def activate(self):
         """Activate the page."""
@@ -933,7 +918,7 @@ class TimePage(Page):
         self._timeButton.set_sensitive(False)
         self._backButton.set_sensitive(False)
         self._button.set_sensitive(False)
-        self._wizard.gui.beginBusy("Querying time...")
+        self._wizard.gui.beginBusy(xstr("time_busy"))
         self._wizard.gui.simulator.requestTime(self._handleTime)
 
     def _handleTime(self, timestamp):
@@ -979,14 +964,9 @@ class TimePage(Page):
 class RoutePage(Page):
     """The page containing the route and the flight level."""
     def __init__(self, wizard):
-        help = "Set your cruise flight level below, and\n" \
-               "if necessary, edit the flight plan."
-        completedHelp = "If necessary, you can modify the cruise level and\n" \
-                        "the flight plan below during flight.\n" \
-                        "If so, please, add a comment on why " \
-                        "the modification became necessary."
-        super(RoutePage, self).__init__(wizard, "Route", help,
-                                        completedHelp = completedHelp)
+        super(RoutePage, self).__init__(wizard, xstr("route_title"),
+                                        xstr("route_help"),
+                                        completedHelp = xstr("route_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -997,14 +977,14 @@ class RoutePage(Page):
 
         levelBox = gtk.HBox()
 
-        label = gtk.Label("_Cruise level")
+        label = gtk.Label(xstr("route_level"))
         label.set_use_underline(True)
         levelBox.pack_start(label, True, True, 0)
 
         self._cruiseLevel = gtk.SpinButton()
         self._cruiseLevel.set_increments(step = 10, page = 100)
         self._cruiseLevel.set_range(min = 50, max = 500)
-        self._cruiseLevel.set_tooltip_text("The cruise flight level.")
+        self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
         self._cruiseLevel.set_numeric(True)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
         label.set_mnemonic_widget(self._cruiseLevel)
@@ -1023,7 +1003,7 @@ class RoutePage(Page):
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        label = gtk.Label("_Route")
+        label = gtk.Label(xstr("route_route"))
         label.set_use_underline(True)
         alignment.add(label)
         routeBox.pack_start(alignment, True, True, 0)
@@ -1038,7 +1018,7 @@ class RoutePage(Page):
                                else gtk.POLICY_AUTOMATIC)
 
         self._route = gtk.TextView()
-        self._route.set_tooltip_text("The planned flight route.")
+        self._route.set_tooltip_text(xstr("route_route_tooltip"))
         self._route.get_buffer().connect("changed", self._routeChanged)
         routeWindow.add(self._route)
 
@@ -1047,13 +1027,8 @@ class RoutePage(Page):
 
         mainBox.pack_start(routeBox, True, True, 8)
 
-        self._backButton = self.addButton(gtk.STOCK_GO_BACK)
-        self._backButton.set_use_stock(True)
-        self._backButton.connect("clicked", self._backClicked)
-
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)        
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
     def filedCruiseLevel(self):
@@ -1107,7 +1082,7 @@ class RoutePage(Page):
         else:
             bookedFlight = self._wizard._bookedFlight
             self._filedCruiseLevel = self.cruiseLevel
-            self._wizard.gui.beginBusy("Downloading NOTAMs...")
+            self._wizard.gui.beginBusy(xstr("route_down_notams"))
             self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
                                                   bookedFlight.departureICAO,
                                                   bookedFlight.arrivalICAO)
@@ -1126,7 +1101,7 @@ class RoutePage(Page):
             self._wizard._arrivalNOTAMs = None
 
         bookedFlight = self._wizard._bookedFlight
-        self._wizard.gui.beginBusy("Downloading METARs...")
+        self._wizard.gui.beginBusy(xstr("route_down_metars"))
         self._wizard.gui.webHandler.getMETARs(self._metarsCallback,
                                               [bookedFlight.departureICAO,
                                                bookedFlight.arrivalICAO])
@@ -1159,17 +1134,12 @@ class BriefingPage(Page):
         """Construct the briefing page."""
         self._departure = departure
         
-        title = "Briefing (%d/2): %s" % (1 if departure else 2,
-                                        "departure" if departure
-                                         else "arrival")
-                                                                
-        help = "Read carefully the NOTAMs and METAR below.\n\n" \
-               "You can edit the METAR if your simulator or network\n" \
-               "provides different weather."
-        completedHelp = "If your simulator or network provides a different\n" \
-                        "weather, you can edit the METAR below."
-        super(BriefingPage, self).__init__(wizard, title, help,
-                                           completedHelp = completedHelp)
+        title = xstr("briefing_title") % (1 if departure else 2,
+                                          xstr("briefing_departure")
+                                          if departure
+                                          else xstr("briefing_arrival"))
+        super(BriefingPage, self).__init__(wizard, title, xstr("briefing_help"),
+                                           completedHelp = xstr("briefing_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
@@ -1179,7 +1149,7 @@ class BriefingPage(Page):
         self.setMainWidget(alignment)
 
         self._notamsFrame = gtk.Frame()
-        self._notamsFrame.set_label("LHBP NOTAMs")
+        self._notamsFrame.set_label(xstr("briefing_notams_init"))
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 128)
         # FIXME: these constants should be in common
@@ -1201,7 +1171,7 @@ class BriefingPage(Page):
         mainBox.pack_start(self._notamsFrame, True, True, 4)
         
         self._metarFrame = gtk.Frame()
-        self._metarFrame.set_label("LHBP METAR")
+        self._metarFrame.set_label(xstr("briefing_metar_init"))
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 32)
         scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
@@ -1222,13 +1192,8 @@ class BriefingPage(Page):
         mainBox.pack_start(self._metarFrame, True, True, 4)
         self.metarEdited = False
 
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
-
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
     def metar(self):
@@ -1245,7 +1210,8 @@ class BriefingPage(Page):
     def activate(self):
         """Activate the page."""
         if not self._departure:
-            self._button.set_label("I have read the briefing and am ready to fly!")
+            self._button.set_label(xstr("briefing_button"))
+            self._button.set_has_tooltip(False)
             self._button.set_use_stock(False)
 
         bookedFlight = self._wizard._bookedFlight
@@ -1257,12 +1223,12 @@ class BriefingPage(Page):
         metar = self._wizard._departureMETAR if self._departure \
                  else self._wizard._arrivalMETAR
 
-        self._notamsFrame.set_label(icao + " NOTAMs")
+        self._notamsFrame.set_label(xstr("briefing_notams_template") % (icao,))
         buffer = self._notams.get_buffer()
         if notams is None:
-            buffer.set_text("Could not download NOTAMs")
+            buffer.set_text(xstr("briefing_notams_failed"))
         elif not notams:
-            buffer.set_text("Could not download NOTAM for this airport")
+            buffer.set_text(xstr("briefing_notams_missing"))
         else:
             s = ""
             for notam in notams:
@@ -1278,12 +1244,16 @@ class BriefingPage(Page):
                 s += "-------------------- * --------------------\n"
             buffer.set_text(s)
 
-        self._metarFrame.set_label(icao + " METAR")
+        self._metarFrame.set_label(xstr("briefing_metar_template") % (icao,))
         buffer = self._metar.get_buffer()
         if metar is None:
-            buffer.set_text("Could not download METAR")
+            buffer.set_text(xstr("briefing_metar_failed"))
         else:
             buffer.set_text(metar)
+
+        label = self._metarFrame.get_label_widget()
+        label.set_use_underline(True)
+        label.set_mnemonic_widget(self._metar)
 
         self.metarEdited = False
 
@@ -1296,8 +1266,8 @@ class BriefingPage(Page):
         if not self._departure:
             if not self._completed:
                 self._wizard.gui.startMonitoring()
-                self._button.set_use_stock(True)
-                self._button.set_label(gtk.STOCK_GO_FORWARD)
+                self._button.set_label(xstr("button_next"))
+                self._button.set_tooltip_text(xstr("button_next_tooltip"))
                 self.complete()
 
         self._wizard.nextPage()
@@ -1315,11 +1285,9 @@ class TakeoffPage(Page):
     """Page for entering the takeoff data."""
     def __init__(self, wizard):
         """Construct the takeoff page."""
-        help = "Enter the runway and SID used, as well as the speeds."
-        completedHelp = "The runway, SID and takeoff speeds logged can be seen below."
-
-        super(TakeoffPage, self).__init__(wizard, "Takeoff", help,
-                                          completedHelp = completedHelp)
+        super(TakeoffPage, self).__init__(wizard, xstr("takeoff_title"),
+                                          xstr("takeoff_help"),
+                                          completedHelp = xstr("takeoff_chelp"))
 
         self._forwardAllowed = False
 
@@ -1333,31 +1301,31 @@ class TakeoffPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label("Run_way:")
+        label = gtk.Label(xstr("takeoff_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
-        self._runway.set_tooltip_text("The runway the takeoff is performed from.")
+        self._runway.set_tooltip_text(xstr("takeoff_runway_tooltip"))
         self._runway.connect("changed", self._valueChanged)
         table.attach(self._runway, 1, 3, 0, 1)
         label.set_mnemonic_widget(self._runway)
         
-        label = gtk.Label("_SID:")
+        label = gtk.Label(xstr("takeoff_sid"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
-        self._sid.set_tooltip_text("The name of the Standard Instrument Deparature procedure followed.")
+        self._sid.set_tooltip_text(xstr("takeoff_sid_tooltip"))
         self._sid.connect("changed", self._valueChanged)
         table.attach(self._sid, 1, 3, 1, 2)
         label.set_mnemonic_widget(self._sid)
         
-        label = gtk.Label("V<sub>_1</sub>:")
+        label = gtk.Label(xstr("takeoff_v1"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1365,14 +1333,14 @@ class TakeoffPage(Page):
 
         self._v1 = IntegerEntry()
         self._v1.set_width_chars(4)
-        self._v1.set_tooltip_markup("The takeoff decision speed in knots.")
+        self._v1.set_tooltip_markup(xstr("takeoff_v1_tooltip"))
         self._v1.connect("integer-changed", self._valueChanged)
         table.attach(self._v1, 2, 3, 2, 3)
         label.set_mnemonic_widget(self._v1)
         
-        table.attach(gtk.Label("knots"), 3, 4, 2, 3)
+        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 2, 3)
         
-        label = gtk.Label("V<sub>_R</sub>:")
+        label = gtk.Label(xstr("takeoff_vr"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1380,14 +1348,14 @@ class TakeoffPage(Page):
 
         self._vr = IntegerEntry()
         self._vr.set_width_chars(4)
-        self._vr.set_tooltip_markup("The takeoff rotation speed in knots.")
+        self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip"))
         self._vr.connect("integer-changed", self._valueChanged)
         table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
         
-        table.attach(gtk.Label("knots"), 3, 4, 3, 4)
+        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 3, 4)
         
-        label = gtk.Label("V<sub>_2</sub>:")
+        label = gtk.Label(xstr("takeoff_v2"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1395,20 +1363,16 @@ class TakeoffPage(Page):
 
         self._v2 = IntegerEntry()
         self._v2.set_width_chars(4)
-        self._v2.set_tooltip_markup("The takeoff safety speed in knots.")
+        self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip"))
         self._v2.connect("integer-changed", self._valueChanged)
         table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
         
-        table.attach(gtk.Label("knots"), 3, 4, 4, 5)
-        
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
+        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 4, 5)
 
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self.addPreviousButton(clicked = self._backClicked)
+
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
     def runway(self):
@@ -1493,13 +1457,9 @@ class LandingPage(Page):
     """Page for entering landing data."""
     def __init__(self, wizard):
         """Construct the landing page."""
-        help = "Enter the STAR and/or transition, runway,\n" \
-               "approach type and V<sub>Ref</sub> used."
-        completedHelp = "The STAR and/or transition, runway, approach\n" \
-                        "type and V<sub>Ref</sub> logged can be seen below."
-
-        super(LandingPage, self).__init__(wizard, "Landing", help,
-                                          completedHelp = completedHelp)
+        super(LandingPage, self).__init__(wizard, xstr("landing_title"),
+                                          xstr("landing_help"),
+                                          completedHelp = xstr("landing_chelp"))
 
         self._flightEnded = False
 
@@ -1517,14 +1477,14 @@ class LandingPage(Page):
         self._starButton.connect("clicked", self._starButtonClicked)
         table.attach(self._starButton, 0, 1, 0, 1)
 
-        label = gtk.Label("_STAR:")
+        label = gtk.Label(xstr("landing_star"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, 0, 1)
 
         self._star = gtk.Entry()
         self._star.set_width_chars(10)
-        self._star.set_tooltip_text("The name of Standard Terminal Arrival Route followed.")
+        self._star.set_tooltip_text(xstr("landing_star_tooltip"))
         self._star.connect("changed", self._updateForwardButton)
         self._star.set_sensitive(False)
         table.attach(self._star, 2, 4, 0, 1)
@@ -1534,44 +1494,44 @@ class LandingPage(Page):
         self._transitionButton.connect("clicked", self._transitionButtonClicked)
         table.attach(self._transitionButton, 0, 1, 1, 2)
 
-        label = gtk.Label("_Transition:")
+        label = gtk.Label(xstr("landing_transition"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, 1, 2)
 
         self._transition = gtk.Entry()
         self._transition.set_width_chars(10)
-        self._transition.set_tooltip_text("The name of transition executed or VECTORS if vectored by ATC.")
+        self._transition.set_tooltip_text(xstr("landing_transition_tooltip"))
         self._transition.connect("changed", self._updateForwardButton)
         self._transition.set_sensitive(False)
         table.attach(self._transition, 2, 4, 1, 2)
         label.set_mnemonic_widget(self._transitionButton)
 
-        label = gtk.Label("Run_way:")
+        label = gtk.Label(xstr("landing_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, 2, 3)
 
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
-        self._runway.set_tooltip_text("The runway the landing is performed on.")
+        self._runway.set_tooltip_text(xstr("landing_runway_tooltip"))
         self._runway.connect("changed", self._updateForwardButton)
         table.attach(self._runway, 2, 4, 2, 3)
         label.set_mnemonic_widget(self._runway)
 
-        label = gtk.Label("_Approach type:")
+        label = gtk.Label(xstr("landing_approach"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, 3, 4)
 
         self._approachType = gtk.Entry()
         self._approachType.set_width_chars(10)
-        self._approachType.set_tooltip_text("The type of the approach, e.g. ILS or VISUAL.")
+        self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
         self._approachType.connect("changed", self._updateForwardButton)
         table.attach(self._approachType, 2, 4, 3, 4)
         label.set_mnemonic_widget(self._approachType)
 
-        label = gtk.Label("V<sub>_Ref</sub>:")
+        label = gtk.Label(xstr("landing_vref"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1579,20 +1539,16 @@ class LandingPage(Page):
 
         self._vref = IntegerEntry()
         self._vref.set_width_chars(5)
-        self._vref.set_tooltip_markup("The approach reference speed in knots.")
+        self._vref.set_tooltip_markup(xstr("landing_vref_tooltip"))
         self._vref.connect("integer-changed", self._vrefChanged)
         table.attach(self._vref, 3, 4, 5, 6)
         label.set_mnemonic_widget(self._vref)
         
-        table.attach(gtk.Label("knots"), 4, 5, 5, 6)
-        
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
+        table.attach(gtk.Label(xstr("label_knots")), 4, 5, 5, 6)
 
-        self._button = self.addButton(gtk.STOCK_GO_FORWARD, default = True)
-        self._button.set_use_stock(True)
-        self._button.connect("clicked", self._forwardClicked)
+        self.addPreviousButton(clicked = self._backClicked)
+
+        self._button = self.addNextButton(clicked = self._forwardClicked)
 
         # These are needed for correct size calculations
         self._starButton.set_active(True)
@@ -1714,18 +1670,15 @@ class LandingPage(Page):
 
 class FinishPage(Page):
     """Flight finish page."""
-    _flightTypes = [ ("scheduled", const.FLIGHTTYPE_SCHEDULED),
-                     ("old-timer", const.FLIGHTTYPE_OLDTIMER),
-                     ("VIP", const.FLIGHTTYPE_VIP),
-                     ("charter", const.FLIGHTTYPE_CHARTER) ]
+    _flightTypes = [ ("flighttype_scheduled", const.FLIGHTTYPE_SCHEDULED),
+                     ("flighttype_ot", const.FLIGHTTYPE_OLDTIMER),
+                     ("flighttype_vip", const.FLIGHTTYPE_VIP),
+                     ("flighttype_charter", const.FLIGHTTYPE_CHARTER) ]
     
     def __init__(self, wizard):
         """Construct the finish page."""
-        help = "There are some statistics about your flight below.\n\n" \
-               "Review the data, also on earlier pages, and if you are\n" \
-               "satisfied, you can save or send your PIREP."
-
-        super(FinishPage, self).__init__(wizard, "Finish", help)
+        super(FinishPage, self).__init__(wizard, xstr("finish_title"),
+                                         xstr("finish_help"))
         
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -1738,7 +1691,7 @@ class FinishPage(Page):
         self.setMainWidget(alignment)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Flight rating:")
+        label = gtk.Label(xstr("finish_rating"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
@@ -1751,7 +1704,7 @@ class FinishPage(Page):
         table.attach(labelAlignment, 1, 2, 0, 1)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Flight time:")
+        label = gtk.Label(xstr("finish_flight_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
@@ -1764,7 +1717,7 @@ class FinishPage(Page):
         table.attach(labelAlignment, 1, 2, 1, 2)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Block time:")
+        label = gtk.Label(xstr("finish_block_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 2, 3)
 
@@ -1777,7 +1730,7 @@ class FinishPage(Page):
         table.attach(labelAlignment, 1, 2, 2, 3)
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Distance flown:")
+        label = gtk.Label(xstr("finish_distance"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 3, 4)
 
@@ -1790,7 +1743,7 @@ class FinishPage(Page):
         table.attach(labelAlignment, 1, 2, 3, 4)
         
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("Fuel used:")
+        label = gtk.Label(xstr("finish_fuel"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 4, 5)
 
@@ -1802,21 +1755,22 @@ class FinishPage(Page):
         labelAlignment.add(self._fuelUsed)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label("_Type:")
+        labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
+                                       yalign = 0.5, yscale = 0.0)
+        label = gtk.Label(xstr("finish_type"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 5, 6)
 
         flightTypeModel = gtk.ListStore(str, int)
         for (name, type) in FinishPage._flightTypes:
-            flightTypeModel.append([name, type])
+            flightTypeModel.append([xstr(name), type])
 
         self._flightType = gtk.ComboBox(model = flightTypeModel)
         renderer = gtk.CellRendererText()
         self._flightType.pack_start(renderer, True)
         self._flightType.add_attribute(renderer, "text", 0)
-        self._flightType.set_tooltip_text("Select the type of the flight.")
+        self._flightType.set_tooltip_text(xstr("finish_type_tooltip"))
         self._flightType.set_active(0)
         self._flightType.connect("changed", self._flightTypeChanged)
         flightTypeAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
@@ -1824,26 +1778,23 @@ class FinishPage(Page):
         table.attach(flightTypeAlignment, 1, 2, 5, 6)
         label.set_mnemonic_widget(self._flightType)        
 
-        self._onlineFlight = gtk.CheckButton("_Online flight")
+        self._onlineFlight = gtk.CheckButton(xstr("finish_online"))
         self._onlineFlight.set_use_underline(True)
-        self._onlineFlight.set_tooltip_text("Check if your flight was online, uncheck otherwise.")
+        self._onlineFlight.set_tooltip_text(xstr("finish_online_tooltip"))
         onlineFlightAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         onlineFlightAlignment.add(self._onlineFlight)
         table.attach(onlineFlightAlignment, 1, 2, 6, 7)
 
-        button = self.addButton(gtk.STOCK_GO_BACK)
-        button.set_use_stock(True)
-        button.connect("clicked", self._backClicked)
+        self.addPreviousButton(clicked = self._backClicked)
 
-        self._saveButton = self.addButton("S_ave PIREP...")
-        self._saveButton.set_use_underline(True)
-        self._saveButton.set_sensitive(False)
-        #self._saveButton.connect("clicked", self._saveClicked)
+        self._saveButton = self.addButton(xstr("finish_save"),
+                                          sensitive = False,
+                                          tooltip = xstr("finish_send_tooltip"))
         
-        self._sendButton = self.addButton("_Send PIREP...", True)
-        self._sendButton.set_use_underline(True)
-        self._sendButton.set_sensitive(False)
-        self._sendButton.connect("clicked", self._sendClicked)
+        self._sendButton = self.addButton(xstr("finish_send"), default = True,
+                                          sensitive = False,
+                                          clicked = self._sendClicked,
+                                          tooltip = xstr("finish_send_tooltip"))
         
     @property
     def flightType(self):
@@ -1897,7 +1848,7 @@ class FinishPage(Page):
         """Called when the Send button is clicked."""
         pirep = PIREP(self._wizard.gui)
         gui = self._wizard.gui
-        gui.beginBusy("Sending PIREP...")
+        gui.beginBusy(xstr("finish_send_busy"))
         gui.webHandler.sendPIREP(self._pirepSentCallback, pirep)
 
     def _pirepSentCallback(self, returned, result):
@@ -1912,22 +1863,20 @@ class FinishPage(Page):
         if returned:
             if result.success:
                 type = MESSAGETYPE_INFO
-                messageFormat = "The PIREP was sent successfully."
-                secondaryMarkup = "Await the thorough scrutiny by our fearless PIREP correctors! :)"
+                messageFormat = xstr("finish_send_success")
+                secondaryMarkup = xstr("finish_send_success_sec")
             elif result.alreadyFlown:
-                messageFormat = "The PIREP for this flight has already been sent!"
-                secondaryMarkup = "You may clear the old PIREP on the MAVA website."
+                messageFormat = xstr("finish_send_already")
+                secondaryMarkup = xstr("finish_send_already_sec")
             elif result.notAvailable:
-                messageFormat = "This flight is not available anymore!"
+                messageFormat = xstr("finish_send_notavail")
             else:
-                messageFormat = "The MAVA website returned with an unknown error."
-                secondaryMarkup = "See the debug log for more information."
+                messageFormat = xstr("finish_send_unknown")
+                secondaryMarkup = xstr("finish_send_unknown_sec")
         else:
             print "PIREP sending failed", result
-            messageFormat = "Could not send the PIREP to the MAVA website."
-            secondaryMarkup = "This can be a network problem, in which case\n" \
-                              "you may try again later. Or it can be a bug;\n" \
-                              "see the debug log for more information."
+            messageFormat = xstr("finish_send_failed")
+            secondaryMarkup = xstr("finish_send_failed_sec")
         
         dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                    type = type, buttons = BUTTONSTYPE_OK,
@@ -2177,7 +2126,7 @@ class Wizard(gtk.VBox):
         if self._fleet is not None and not force:
             callback(self._fleet)
 
-        self.gui.beginBusy("Retrieving fleet...")
+        self.gui.beginBusy(xstr("fleet_busy"))
         self._fleetCallback = callback
         self.gui.webHandler.getFleet(self._fleetResultCallback)
 
@@ -2196,9 +2145,7 @@ class Wizard(gtk.VBox):
             dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
-                                       message_format =
-                                       "Failed to retrieve the information on "
-                                       "the fleet.")
+                                       message_format = xstr("fleet_failed"))
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -2207,7 +2154,7 @@ class Wizard(gtk.VBox):
 
     def _updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the given plane's gate information."""
-        self.gui.beginBusy("Updating plane status...")
+        self.gui.beginBusy(xstr("fleet_update_busy"))
         self._updatePlaneCallback = callback
         self.gui.webHandler.updatePlane(self._updatePlaneResultCallback,
                                         tailNumber, status, gateNumber)
@@ -2228,8 +2175,7 @@ class Wizard(gtk.VBox):
                                        type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format =
-                                       "Failed to update the statuis of "
-                                       "the airplane.")
+                                       xstr("fleet_update_failed"))
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
