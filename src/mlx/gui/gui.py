@@ -77,20 +77,20 @@ class GUI(fs.ConnectionListener):
         self._wizard = Wizard(self)
         label = gtk.Label(xstr("tab_flight"))
         label.set_use_underline(True)
-        label.set_tooltip_text("Flight wizard")
+        label.set_tooltip_text(xstr("tab_flight_tooltip"))
         self._notebook.append_page(self._wizard, label)
 
         self._flightInfo = FlightInfo(self)
         label = gtk.Label(xstr("tab_flight_info"))
         label.set_use_underline(True)
-        label.set_tooltip_text("Flight information")
+        label.set_tooltip_text(xstr("tab_flight_info_tooltip"))
         self._notebook.append_page(self._flightInfo, label)
         self._flightInfo.disable()
 
         (logWidget, self._logView)  = self._buildLogWidget()
         label = gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
-        label.set_tooltip_text("The log of your flight that will be sent to the MAVA website")
+        label.set_tooltip_text(xstr("tab_log_tooltip"))
         self._notebook.append_page(logWidget, label)
 
         (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
@@ -293,15 +293,13 @@ class GUI(fs.ConnectionListener):
 
         dialog = gtk.MessageDialog(parent = self._mainWindow,
                                    type = MESSAGETYPE_ERROR,
-                                   message_format =
-                                   "Cannot connect to the simulator.")
+                                   message_format = xstr("conn_failed"))
+    
         dialog.set_title(WINDOW_TITLE_BASE)
-        dialog.format_secondary_markup("Rectify the situation, and press <b>Try again</b> "
-                                       "to try the connection again, " 
-                                       "or <b>Cancel</b> to cancel the flight.")
+        dialog.format_secondary_markup(xstr("conn_failed_sec"))
         
-        dialog.add_button("_Cancel", 0)
-        dialog.add_button("_Try again", 1)
+        dialog.add_button(xstr("button_cancel"), 0)
+        dialog.add_button(xstr("button_tryagain"), 1)
         dialog.set_default_response(1)
         
         result = dialog.run()
@@ -324,24 +322,19 @@ class GUI(fs.ConnectionListener):
         self._statusbar.updateConnection(self._connecting, self._connected)
 
         dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
-                                   message_format =
-                                   "The connection to the simulator failed unexpectedly.",
+                                   message_format = xstr("conn_broken"),
                                    parent = self._mainWindow)
         dialog.set_title(WINDOW_TITLE_BASE)
-        dialog.format_secondary_markup("If the simulator has crashed, restart it "
-                                       "and restore your flight as much as possible "
-                                       "to the state it was in before the crash. "
-                                       "Then press <b>Reconnect</b> to reconnect.\n\n"
-                                       "If you want to cancel the flight, press <b>Cancel</b>.")
+        dialog.format_secondary_markup(xstr("conn_broken_sec"))
 
-        dialog.add_button("_Cancel", 0)
-        dialog.add_button("_Reconnect", 1)
+        dialog.add_button(xstr("button_cancel"), 0)
+        dialog.add_button(xstr("button_reconnect"), 1)
         dialog.set_default_response(1)
 
         result = dialog.run()
         dialog.hide()
         if result == 1:
-            self.beginBusy("Connecting to the simulator.")
+            self.beginBusy(xstr("connect_busy"))
             self._reconnecting = True
             self._simulator.reconnect()
         else:

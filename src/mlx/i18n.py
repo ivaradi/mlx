@@ -124,11 +124,32 @@ class _English(_Strings):
     def initialize(self):
         """Initialize the strings."""
         self.add("tab_flight", "_Flight")
+        self.add("tab_flight_tooltip", "Flight wizard")
         self.add("tab_flight_info", "Flight _info")
+        self.add("tab_flight_info_tooltip", "Further information regarding the flight")
         self.add("tab_log", "_Log")
+        self.add("tab_log_tooltip",
+                 "The log of your flight that will be sent to the MAVA website")
         self.add("tab_debug_log", "_Debug log")
         self.add("tab_help", "_Help")
         self.add("tab_gates", "_Gates")
+
+        self.add("conn_failed", "Cannot connect to the simulator.")
+        self.add("conn_failed_sec",
+                 "Rectify the situation, and press <b>Try again</b> "
+                 "to try the connection again, " 
+                 "or <b>Cancel</b> to cancel the flight.")
+        self.add("conn_broken",
+                 "The connection to the simulator failed unexpectedly.")
+        self.add("conn_broken_sec",
+                 "If the simulator has crashed, restart it "
+                 "and restore your flight as much as possible "
+                 "to the state it was in before the crash. "
+                 "Then press <b>Reconnect</b> to reconnect.\n\n"
+                 "If you want to cancel the flight, press <b>Cancel</b>.")
+        self.add("button_cancel", "_Cancel")
+        self.add("button_tryagain", "_Try again")
+        self.add("button_reconnect", "_Reconnect")
         
         self.add("login", "Login")
         self.add("loginHelp",
@@ -383,12 +404,35 @@ class _Hungarian(_Strings):
     def initialize(self):
         """Initialize the strings."""
         self.add("tab_flight", "_Járat")
+        self.add("tab_flight_tooltip", "Járat varázsló")
         self.add("tab_flight_info", "Járat _info")
+        self.add("tab_flight_info_tooltip", "Egyéb információk a járat teljesítésével kapcsolatban")
         self.add("tab_log", "_Napló")
+        self.add("tab_log_tooltip",
+                 "A járat naplója, amit majd el lehet küldeni a MAVA szerverére")
         self.add("tab_debug_log", "_Debug napló")
         self.add("tab_help", "_Segítség")
         self.add("tab_gates", "_Kapuk")        
 
+        self.add("conn_failed", "Nem tudtam kapcsolódni a szimulátorhoz.")
+        self.add("conn_failed_sec",
+                 "Korrigáld a problémát, majd nyomd meg az "
+                 "<b>Próbáld újra</b> gombot a újrakapcsolódáshoz, "
+                 "vagy a <b>Mégse</b> gombot a járat megszakításához.")
+        self.add("conn_broken",
+                 "A szimulátorral való kapcsolat váratlanul megszakadt.")
+        self.add("conn_broken_sec",
+                 "Ha a szimulátor elszállt, indítsd újra "
+                 "és állítsd vissza a repülésed elszállás előtti "
+                 "állapotát amennyire csak lehet. "
+                 "Ezután nyomd meg az <b>Újrakapcsolódás</b> gombot "
+                 "a kapcsolat ismételt felvételéhez.\n\n"
+                 "Ha meg akarod szakítani a repülést, nyomd meg a "
+                 "<b>Mégse</b> gombot.")
+        self.add("button_cancel", "_Mégse")
+        self.add("button_tryagain", "_Próbáld újra")
+        self.add("button_reconnect", "Újra_kapcsolódás")
+        
         self.add("login", "Bejelentkezés")
         self.add("loginHelp",
                  "Írd be a MAVA pilóta azonosítódat és a\n" \
