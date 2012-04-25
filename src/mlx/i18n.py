@@ -123,6 +123,17 @@ class _English(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("menu_file", "File")
+        self.add("menu_file_quit", "_Quit")
+        self.add("menu_file_quit_key", "q")
+        self.add("quit_question", "Are you sure to quit the logger?")
+
+        self.add("menu_view", "View")
+        self.add("menu_view_monitor", "Show _monitor window")
+        self.add("menu_view_monitor_key", "m")
+        self.add("menu_view_debug", "Show _debug log")
+        self.add("menu_view_debug_key", "d")
+        
         self.add("tab_flight", "_Flight")
         self.add("tab_flight_tooltip", "Flight wizard")
         self.add("tab_flight_info", "Flight _info")
@@ -131,6 +142,7 @@ class _English(_Strings):
         self.add("tab_log_tooltip",
                  "The log of your flight that will be sent to the MAVA website")
         self.add("tab_debug_log", "_Debug log")
+        self.add("tab_debug_log_tooltip", "Log with debugging information.")
         self.add("tab_help", "_Help")
         self.add("tab_gates", "_Gates")
 
@@ -403,6 +415,17 @@ class _Hungarian(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("menu_file", "Fájl")
+        self.add("menu_file_quit", "_Kilépés")
+        self.add("menu_file_quit_key", "k")
+        self.add("quit_question", "Biztosan ki akarsz lépni?")
+
+        self.add("menu_view", "Nézet")
+        self.add("menu_view_monitor", "Mutasd a _monitor ablakot")
+        self.add("menu_view_monitor_key", "m")
+        self.add("menu_view_debug", "Mutasd a _debug naplót")
+        self.add("menu_view_debug_key", "d")
+        
         self.add("tab_flight", "_Járat")
         self.add("tab_flight_tooltip", "Járat varázsló")
         self.add("tab_flight_info", "Járat _info")
@@ -411,6 +434,8 @@ class _Hungarian(_Strings):
         self.add("tab_log_tooltip",
                  "A járat naplója, amit majd el lehet küldeni a MAVA szerverére")
         self.add("tab_debug_log", "_Debug napló")
+        self.add("tab_debug_log_tooltip",
+                 "Hibakereséshez használható információkat tartalmazó napló.")
         self.add("tab_help", "_Segítség")
         self.add("tab_gates", "_Kapuk")        
 

@@ -584,42 +584,43 @@ class GUI(fs.ConnectionListener):
         """Build the main menu bar."""
         menuBar = gtk.MenuBar()
         
-        fileMenuItem = gtk.MenuItem("File")
+        fileMenuItem = gtk.MenuItem(xstr("menu_file"))
         fileMenu = gtk.Menu()
         fileMenuItem.set_submenu(fileMenu)
         menuBar.append(fileMenuItem)
 
         quitMenuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
         quitMenuItem.set_use_stock(True)
+        quitMenuItem.set_label(xstr("menu_file_quit"))
         quitMenuItem.add_accelerator("activate", accelGroup,
-                                     ord("q"), CONTROL_MASK,
-                                     ACCEL_VISIBLE)
+                                     ord(xstr("menu_file_quit_key")),
+                                     CONTROL_MASK, ACCEL_VISIBLE)
         quitMenuItem.connect("activate", self._quit)
         fileMenu.append(quitMenuItem)
 
 
-        viewMenuItem = gtk.MenuItem("View")
+        viewMenuItem = gtk.MenuItem(xstr("menu_view"))
         viewMenu = gtk.Menu()
         viewMenuItem.set_submenu(viewMenu)
         menuBar.append(viewMenuItem)
 
         self._showMonitorMenuItem = gtk.CheckMenuItem()
-        self._showMonitorMenuItem.set_label("Show _monitor window")
+        self._showMonitorMenuItem.set_label(xstr("menu_view_monitor"))
         self._showMonitorMenuItem.set_use_underline(True)
         self._showMonitorMenuItem.set_active(False)
         self._showMonitorMenuItem.add_accelerator("activate", accelGroup,
-                                                  ord("m"), CONTROL_MASK,
-                                                  ACCEL_VISIBLE)
+                                                  ord(xstr("menu_view_monitor_key")),
+                                                  CONTROL_MASK, ACCEL_VISIBLE)
         self._showMonitorMenuItem.connect("toggled", self._toggleMonitorWindow)
         viewMenu.append(self._showMonitorMenuItem)
 
         showDebugMenuItem = gtk.CheckMenuItem()
-        showDebugMenuItem.set_label("Show _debug log")
+        showDebugMenuItem.set_label(xstr("menu_view_debug"))
         showDebugMenuItem.set_use_underline(True)
         showDebugMenuItem.set_active(False)
         showDebugMenuItem.add_accelerator("activate", accelGroup,
-                                          ord("d"), CONTROL_MASK,
-                                          ACCEL_VISIBLE)
+                                          ord(xstr("menu_view_debug_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
         showDebugMenuItem.connect("toggled", self._toggleDebugLog)
         viewMenu.append(showDebugMenuItem)
 
@@ -630,7 +631,7 @@ class GUI(fs.ConnectionListener):
         if menuItem.get_active():
             label = gtk.Label(xstr("tab_debug_log"))
             label.set_use_underline(True)
-            label.set_tooltip_text("Log with debugging information.")        
+            label.set_tooltip_text(xstr("tab_debug_log_tooltip"))        
             self._debugLogPage = self._notebook.append_page(self._debugLogWidget, label)
             self._notebook.set_current_page(self._debugLogPage)
         else:
@@ -677,8 +678,8 @@ class GUI(fs.ConnectionListener):
             dialog = gtk.MessageDialog(parent = self._mainWindow,
                                        type = MESSAGETYPE_QUESTION,
                                        buttons = BUTTONSTYPE_YES_NO,
-                                       message_format =
-                                       "Are you sure to quit the logger?")
+                                       message_format = xstr("quit_question"))
+
             dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()
             dialog.hide()
