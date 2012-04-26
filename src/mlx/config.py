@@ -1,4 +1,5 @@
 # Configuration and related stuff
+# -*- encoding: utf-8 -*-
 
 #-------------------------------------------------------------------------------
 
@@ -156,10 +157,13 @@ class Config(object):
 
     def getLanguage(self):
         """Get the language to be used."""
+        import locale
         if self._language:
+            locale.setlocale(locale.LC_ALL, (self._language,
+                                             locale.getpreferredencoding()))
             return self._language
         else:
-            import locale
+            locale.setlocale(locale.LC_ALL, "")
             return locale.getdefaultlocale()[0]
 
 #-------------------------------------------------------------------------------
