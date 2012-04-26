@@ -5,6 +5,7 @@
 from common import *
 
 import mlx.const as const
+from mlx.i18n import xstr
 
 import math
 import time
@@ -35,10 +36,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
 
         self._connStateArea = gtk.DrawingArea()
         self._connStateArea.set_size_request(16, 16)
-        self._connStateArea.set_tooltip_markup('The state of the connection.\n'
-                                               '<span foreground="grey">Grey</span> means idle.\n'
-                                               '<span foreground="red">Red</span> means trying to connect.\n'
-                                               '<span foreground="green">Green</span> means connected.')
+        self._connStateArea.set_tooltip_markup(xstr("statusbar_conn_tooltip"))
 
         if pygobject:
             self._connStateArea.connect("draw", self._drawConnState)
@@ -53,8 +51,11 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         statusBox.pack_start(gtk.VSeparator(), False, False, 8)
 
         self._stageLabel = gtk.Label()
-        self._stageLabel.set_width_chars(20)
-        self._stageLabel.set_tooltip_text("The flight stage")
+        longestStage = xstr("flight_stage_" +
+                            const.stage2string(const.STAGE_PUSHANDTAXI))
+        print len(longestStage)
+        self._stageLabel.set_width_chars(len(longestStage) + 3)
+        self._stageLabel.set_tooltip_text(xstr("statusbar_stage_tooltip"))
         self._stageLabel.set_alignment(0.0, 0.5)
         
         statusBox.pack_start(self._stageLabel, False, False, 8)
@@ -63,7 +64,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
 
         self._timeLabel = gtk.Label("--:--:--")
         self._timeLabel.set_width_chars(8)
-        self._timeLabel.set_tooltip_text("The simulator time in UTC")
+        self._timeLabel.set_tooltip_text(xstr("statusbar_time_tooltip"))
         self._timeLabel.set_alignment(1.0, 0.5)
         
         statusBox.pack_start(self._timeLabel, False, False, 8)
@@ -72,14 +73,14 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
 
         self._ratingLabel = gtk.Label()
         self._ratingLabel.set_width_chars(12)
-        self._ratingLabel.set_tooltip_text("The flight rating")
+        self._ratingLabel.set_tooltip_text(xstr("statusbar_rating_tooltip"))
         self._ratingLabel.set_alignment(0.0, 0.5)
         
         statusBox.pack_start(self._ratingLabel, False, False, 8)
 
         self._busyLabel = gtk.Label()
         self._busyLabel.set_width_chars(30)
-        self._busyLabel.set_tooltip_text("The status of the background tasks.")
+        self._busyLabel.set_tooltip_text(xstr("statusbar_busy_tooltip"))
         self._busyLabel.set_alignment(1.0, 0.5)
         statusBox.pack_start(self._busyLabel, True, True, 8)
         
@@ -125,8 +126,11 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
 
     def _updateFlightStatus(self):
         """Update the flight status information."""
-        self._stageLabel.set_text("-" if self._stage is None
-                                  else const.stage2string(self._stage).upper())
+        if self._stage is None:
+            text = "-"
+        else:
+            text = xstr("flight_stage_" + const.stage2string(self._stage)).upper()
+        self._stageLabel.set_text(text)
     
         if self._noGoReason is None:
             rating = "%.0f%%" % (self._rating,)

@@ -423,6 +423,29 @@ class _English(_Strings):
         self.add("info_delay_apron", "_Apron navigation problem")
         self.add("info_delay_weather", "_Weather problems")
         self.add("info_delay_personal", "_Personal reasons")
+
+        self.add("statusbar_conn_tooltip",
+                 'The state of the connection.\n'
+                 '<span foreground="grey">Grey</span> means idle.\n'
+                 '<span foreground="red">Red</span> means trying to connect.\n'
+                 '<span foreground="green">Green</span> means connected.')
+        self.add("statusbar_stage_tooltip", "The flight stage")
+        self.add("statusbar_time_tooltip", "The simulator time in UTC")
+        self.add("statusbar_rating_tooltip", "The flight rating")
+        self.add("statusbar_busy_tooltip", "The status of the background tasks.")
+
+        self.add("flight_stage_boarding", "boarding")
+        self.add("flight_stage_pushback and taxi", "pushback and taxi")
+        self.add("flight_stage_takeoff", "takeoff")
+        self.add("flight_stage_RTO", "RTO")
+        self.add("flight_stage_climb", "climb")
+        self.add("flight_stage_cruise", "cruise")
+        self.add("flight_stage_descent", "descent")
+        self.add("flight_stage_landing", "landing")
+        self.add("flight_stage_taxi", "taxi")
+        self.add("flight_stage_parking", "parking")
+        self.add("flight_stage_go-around", "go-around")
+        self.add("flight_stage_end", "end")
                  
 #------------------------------------------------------------------------------
 
@@ -739,6 +762,29 @@ class _Hungarian(_Strings):
         self.add("info_delay_apron", "_Előtér navigációs probléma")
         self.add("info_delay_weather", "Időjárási _problémák")
         self.add("info_delay_personal", "S_zemélyes okok")
+                 
+        self.add("statusbar_conn_tooltip",
+                 'A kapcsolat állapota.\n'
+                 '<span foreground="grey">Szürke</span>: nincs kapcsolat.\n'
+                 '<span foreground="red">Piros</span>: kapcsolódás folyamatban.\n'
+                 '<span foreground="green">Zöld</span>: a kapcsolat él.')
+        self.add("statusbar_stage_tooltip", "A repülés fázisa")
+        self.add("statusbar_time_tooltip", "A szimulátor ideje UTC-ben")
+        self.add("statusbar_rating_tooltip", "A repülés pontszáma")
+        self.add("statusbar_busy_tooltip", "A háttérfolyamatok állapota.")
+
+        self.add("flight_stage_boarding", u"beszállás")
+        self.add("flight_stage_pushback and taxi", u"hátratolás és kigurulás")
+        self.add("flight_stage_takeoff", u"felszállás")
+        self.add("flight_stage_RTO", u"megszakított felszállás")
+        self.add("flight_stage_climb", u"emelkedés")
+        self.add("flight_stage_cruise", u"utazó")
+        self.add("flight_stage_descent", u"süllyedés")
+        self.add("flight_stage_landing", u"leszállás")
+        self.add("flight_stage_taxi", u"begurulás")
+        self.add("flight_stage_parking", u"parkolás")
+        self.add("flight_stage_go-around", u"átstartolás")
+        self.add("flight_stage_end", u"kész")
                  
 #------------------------------------------------------------------------------
 
