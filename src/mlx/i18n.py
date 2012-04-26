@@ -404,6 +404,25 @@ class _English(_Strings):
                  "This can be a network problem, in which case\n" \
                  "you may try again later. Or it can be a bug;\n" \
                  "see the debug log for more information.")
+
+        # C D
+        
+        self.add("info_comments", "_Comments")
+        self.add("info_defects", "Flight _defects")
+        self.add("info_delay", "Delay codes")
+
+        # O V N E Y T R A W P
+        
+        self.add("info_delay_loading", "L_oading problems")
+        self.add("info_delay_vatsim", "_VATSIM problem")
+        self.add("info_delay_net", "_Net problems")
+        self.add("info_delay_atc", "Controll_er's fault")
+        self.add("info_delay_system", "S_ystem crash/freeze")
+        self.add("info_delay_nav", "Naviga_tion problem")
+        self.add("info_delay_traffic", "T_raffic problems")
+        self.add("info_delay_apron", "_Apron navigation problem")
+        self.add("info_delay_weather", "_Weather problems")
+        self.add("info_delay_personal", "_Personal reasons")
                  
 #------------------------------------------------------------------------------
 
@@ -701,6 +720,25 @@ class _Hungarian(_Strings):
                  "Lehet, hogy hálózati probléma áll fenn, amely esetben később\n" \
                  "újra próbálkozhatsz. Lehet azonban hiba is a loggerben:\n" \
                  "részletesebb információt találhatsz a debug naplóban.")
+
+        # M A 
+
+        self.add("info_comments", "_Megjegyzések")
+        self.add("info_defects", "Hib_ajelenségek")
+        self.add("info_delay", "Késés kódok")
+
+        # B V H Y R G F E P Z
+                 
+        self.add("info_delay_loading", "_Betöltési problémák")
+        self.add("info_delay_vatsim", "_VATSIM probléma")
+        self.add("info_delay_net", "_Hálózati problémák")
+        self.add("info_delay_atc", "Irán_yító hibája")
+        self.add("info_delay_system", "_Rendszer elszállás/fagyás")
+        self.add("info_delay_nav", "Navi_gációs probléma")
+        self.add("info_delay_traffic", "_Forgalmi problémák")
+        self.add("info_delay_apron", "_Előtér navigációs probléma")
+        self.add("info_delay_weather", "Időjárási _problémák")
+        self.add("info_delay_personal", "S_zemélyes okok")
                  
 #------------------------------------------------------------------------------
 

@@ -2,20 +2,24 @@
 
 from common import *
 
+from mlx.i18n import xstr
 import mlx.const as const
 
 class FlightInfo(gtk.VBox):
     """The flight info tab."""
-    _delayCodes = [ (const.DELAYCODE_LOADING, "L_oading problems"),
-                    (const.DELAYCODE_VATSIM, "_VATSIM problem"),
-                    (const.DELAYCODE_NETWORK, "_Net problems"),
-                    (const.DELAYCODE_CONTROLLER, "Controller's _fault"),
-                    (const.DELAYCODE_SYSTEM, "S_ystem crash/freeze"),
-                    (const.DELAYCODE_NAVIGATION, "Navi_gation problem"),
-                    (const.DELAYCODE_TRAFFIC, "T_raffic problems"),
-                    (const.DELAYCODE_APRON, "_Apron navigation problem"),
-                    (const.DELAYCODE_WEATHER, "_Weather problems"),
-                    (const.DELAYCODE_PERSONAL, "_Personal reasons") ]
+    @staticmethod
+    def _delayCodes():
+        """Get an array of delay codes."""
+        return [ (const.DELAYCODE_LOADING, xstr("info_delay_loading")),
+                 (const.DELAYCODE_VATSIM, xstr("info_delay_vatsim")),
+                 (const.DELAYCODE_NETWORK, xstr("info_delay_net")),
+                 (const.DELAYCODE_CONTROLLER, xstr("info_delay_atc")),
+                 (const.DELAYCODE_SYSTEM, xstr("info_delay_system")),
+                 (const.DELAYCODE_NAVIGATION, xstr("info_delay_nav")),
+                 (const.DELAYCODE_TRAFFIC, xstr("info_delay_traffic")),
+                 (const.DELAYCODE_APRON, xstr("info_delay_apron")),
+                 (const.DELAYCODE_WEATHER, xstr("info_delay_weather")),
+                 (const.DELAYCODE_PERSONAL, xstr("info_delay_personal")) ]
     
     @staticmethod
     def _createCommentArea(label):
@@ -60,16 +64,17 @@ class FlightInfo(gtk.VBox):
                                                 xscale = 1.0, yscale = 1.0)
         commentsBox = gtk.HBox()
 
-        (frame, self._comments) = FlightInfo._createCommentArea("_Comments")
+        (frame, self._comments) = FlightInfo._createCommentArea(xstr("info_comments"))
         commentsBox.pack_start(frame, True, True, 8)
 
-        (frame, self._flightDefects) = FlightInfo._createCommentArea("Flight _defects")
+        (frame, self._flightDefects) = \
+             FlightInfo._createCommentArea(xstr("info_defects"))
         commentsBox.pack_start(frame, True, True, 8)
 
         self._commentsAlignment.add(commentsBox)
         self.pack_start(self._commentsAlignment, True, True, 8)
 
-        frame = gtk.Frame(label = "Delay codes")
+        frame = gtk.Frame(label = xstr("info_delay"))
         label = frame.get_label_widget()
         label.set_use_underline(True)
 
@@ -85,7 +90,7 @@ class FlightInfo(gtk.VBox):
         column = 0
 
         self._delayCodeWidgets = []
-        for (_code, label) in FlightInfo._delayCodes:
+        for (_code, label) in FlightInfo._delayCodes():
             button = gtk.CheckButton(label)
             button.set_use_underline(True)
             table.attach(button, column, column + 1, row, row + 1)
