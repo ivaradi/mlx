@@ -53,7 +53,6 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._stageLabel = gtk.Label()
         longestStage = xstr("flight_stage_" +
                             const.stage2string(const.STAGE_PUSHANDTAXI))
-        print len(longestStage)
         self._stageLabel.set_width_chars(len(longestStage) + 3)
         self._stageLabel.set_tooltip_text(xstr("statusbar_stage_tooltip"))
         self._stageLabel.set_alignment(0.0, 0.5)
