@@ -446,6 +446,12 @@ class _English(_Strings):
         self.add("flight_stage_parking", "parking")
         self.add("flight_stage_go-around", "go-around")
         self.add("flight_stage_end", "end")
+
+        self.add("statusicon_showmain", "Show main window")
+        self.add("statusicon_showmonitor", "Show monitor window")
+        self.add("statusicon_quit", "Quit")
+        self.add("statusicon_stage", "Stage:")
+        self.add("statusicon_rating", "Rating:")
                  
 #------------------------------------------------------------------------------
 
@@ -785,7 +791,13 @@ class _Hungarian(_Strings):
         self.add("flight_stage_parking", u"parkolás")
         self.add("flight_stage_go-around", u"átstartolás")
         self.add("flight_stage_end", u"kész")
-                 
+
+        self.add("statusicon_showmain", "Mutasd a főablakot")
+        self.add("statusicon_showmonitor", "Mutasd a monitor ablakot")
+        self.add("statusicon_quit", "Kilépés")
+        self.add("statusicon_stage", "Fázis:")
+        self.add("statusicon_rating", "Pontszám:")
+
 #------------------------------------------------------------------------------
 
 # The fallback language is English

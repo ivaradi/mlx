@@ -5,6 +5,7 @@
 from common import *
 
 import mlx.const as const
+from mlx.i18n import xstr
 
 #-------------------------------------------------------------------------------
 
@@ -33,14 +34,14 @@ class StatusIcon(FlightStatusHandler):
             menu.append(separator)
 
         self._showHideMenuItem = gtk.CheckMenuItem()  
-        self._showHideMenuItem.set_label("Show main window")  
+        self._showHideMenuItem.set_label(xstr("statusicon_showmain"))  
         self._showHideMenuItem.set_active(True)
         self._showHideMenuItem.connect("toggled", self._showHideToggled)
         self._showHideMenuItem.show()  
         menu.append(self._showHideMenuItem)  
 
         self._showMonitorMenuItem = gtk.CheckMenuItem()  
-        self._showMonitorMenuItem.set_label("Show monitor window")  
+        self._showMonitorMenuItem.set_label(xstr("statusicon_showmonitor"))  
         self._showMonitorMenuItem.set_active(False)
         self._showMonitorMenuItem.connect("toggled", self._showMonitorToggled)
         self._showMonitorMenuItem.show()  
@@ -51,7 +52,7 @@ class StatusIcon(FlightStatusHandler):
         menu.append(separator)
 
         self._quitMenuItem = gtk.MenuItem()  
-        self._quitMenuItem.set_label("Quit")  
+        self._quitMenuItem.set_label(xstr("statusicon_quit"))  
         self._quitMenuItem.show()  
         self._quitMenuItem.connect("activate", self._gui._quit)
         menu.append(self._quitMenuItem)  
@@ -141,7 +142,8 @@ class StatusIcon(FlightStatusHandler):
 
     def _updateFlightStatus(self):
         """Update the flight status."""
-        stage = "-" if self._stage is None else const.stage2string(self._stage)
+        stage = "-" if self._stage is None \
+                else xstr("flight_stage_" + const.stage2string(self._stage))
         
         if self._noGoReason is None:
             rating = "%.0f%%" % (self._rating,)
@@ -149,11 +151,13 @@ class StatusIcon(FlightStatusHandler):
             rating = self._noGoReason
 
         if appIndicator:
-            self._stageMenuItem.set_label("Stage: %s" % (stage,))
-            self._ratingMenuItem.set_label("Rating: %s" % (rating,))
+            self._stageMenuItem.set_label("%s %s" % (xstr("statusicon_stage"), stage))
+            self._ratingMenuItem.set_label("%s: %s" %
+                                           (xstr("statusicon_rating"), rating))
         else:
             if self._noGoReason is not None:
                 rating = '<span foreground="red">' + rating + '</span>'
-            markup = "MAVA Logger X %s\n\nStage: %s\nRating: %s" %\
-                     (const.VERSION, stage, rating)
+            markup = "MAVA Logger X %s\n\n%s: %s\n%s: %s" %\
+                     (const.VERSION, xstr("statusicon_stage"), stage,
+                      xstr("statusicon_rating"), rating)
             self._statusIcon.set_tooltip_markup(markup)
