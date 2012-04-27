@@ -424,6 +424,7 @@ def sudoUpdate(directory, updateURL, listener, manifest):
             manifestFD = None
 
         serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         serverSocket.bind(("127.0.0.1", 0))
         (_host, port) = serverSocket.getsockname()
         serverSocket.listen(1)

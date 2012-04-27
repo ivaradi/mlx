@@ -452,6 +452,28 @@ class _English(_Strings):
         self.add("statusicon_quit", "Quit")
         self.add("statusicon_stage", "Stage:")
         self.add("statusicon_rating", "Rating:")
+
+        self.add("update_title", "Update")
+        self.add("update_needsudo",
+                 "There is an update available, but the program cannot write\n"
+                 "its directory due to insufficient privileges.\n\n"
+                 "Click OK, if you want to run a helper program\n"
+                 "with administrator privileges "
+                 "to complete the update,\n"
+                 "Cancel otherwise.")
+        self.add("update_manifest_progress", "Downloading manifest...")
+        self.add("update_manifest_done", "Downloaded manifest...")
+        self.add("update_files_progress", "Downloading files...")
+        self.add("update_files_bytes", "Downloaded %d of %d bytes")
+        self.add("update_renaming", "Renaming downloaded files...")
+        self.add("update_renamed", "Renamed %s")
+        self.add("update_removing", "Removing files...")
+        self.add("update_removed", "Removed %s")
+        self.add("update_writing_manifest", "Writing the new manifest")
+        self.add("update_finished",
+                 "Finished updating. Press OK to restart the program.")
+        self.add("update_nothing", "There was nothing to update")
+        self.add("update_failed", "Failed, see the debug log for details.")
                  
 #------------------------------------------------------------------------------
 
@@ -797,6 +819,27 @@ class _Hungarian(_Strings):
         self.add("statusicon_quit", "Kilépés")
         self.add("statusicon_stage", "Fázis:")
         self.add("statusicon_rating", "Pontszám:")
+
+        self.add("update_title", "Frissítés")
+        self.add("update_needsudo",
+                 "Lenne mit frissíteni, de a program hozzáférési jogok\n"
+                 "hiányában nem tud írni a saját könyvtárába.\n\n"
+                 "Kattints az OK gombra, ha el szeretnél indítani egy\n"
+                 "segédprogramot adminisztrátori jogokkal, amely\n"
+                 "befejezné a frissítést, egyébként a Mégse gombra.")
+        self.add("update_manifest_progress", "A manifesztum letöltése...")
+        self.add("update_manifest_done", "A manifesztum letöltve...")
+        self.add("update_files_progress", "Fájlok letöltése...")
+        self.add("update_files_bytes", "%d bájtot töltöttem le %d bájtból")
+        self.add("update_renaming", "A letöltött fájlok átnevezése...")
+        self.add("update_renamed", "Átneveztem a(z) %s fájlt")
+        self.add("update_removing", "Fájlok törlése...")
+        self.add("update_removed", "Letöröltem a(z) %s fájlt")
+        self.add("update_writing_manifest", "Az új manifesztum írása")
+        self.add("update_finished",
+                 "A frissítés sikerült. Kattints az OK-ra a program újraindításához.")
+        self.add("update_nothing", "Nem volt mit frissíteni")
+        self.add("update_failed", "Nem sikerült, a részleteket lásd a debug naplóban.")
 
 #------------------------------------------------------------------------------
 

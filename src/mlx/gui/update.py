@@ -5,6 +5,7 @@
 from mlx.gui.common import *
 
 from mlx.update import update
+from mlx.i18n import xstr
 
 import mlx.const as const
 
@@ -38,7 +39,7 @@ class Updater(threading.Thread):
             return
 
         Updater._progressWindow = window = gtk.Window()
-        window.set_title(WINDOW_TITLE_BASE + " Update")
+        window.set_title(WINDOW_TITLE_BASE + " " + xstr("update_title"))
         window.set_transient_for(parentWindow)
         #win.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.set_size_request(400, -1)
@@ -71,7 +72,7 @@ class Updater(threading.Thread):
         mainVBox.pack_start(buttonAlignment, True, True, 4)
 
         Updater._sudoDialog = sudoDialog = \
-            gtk.Dialog(WINDOW_TITLE_BASE + " Update",
+            gtk.Dialog(WINDOW_TITLE_BASE + " " + xstr("update_title"),
                        parentWindow,
                        gtk.DialogFlags.MODAL if pygobject else gtk.DIALOG_MODAL,
                        (gtk.STOCK_CANCEL, 0,
@@ -81,12 +82,7 @@ class Updater(threading.Thread):
         infoLabelAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                        padding_left = 16, padding_right = 16)
 
-        infoLabel = gtk.Label("There is an update available, but the program cannot write\n"
-                              "its directory due to insufficient privileges.\n\n"
-                              "Click OK, if you want to run a helper program\n"
-                              "with administrator privileges "
-                              "to complete the update,\n"
-                              "Cancel otherwise.")
+        infoLabel = gtk.Label(xstr("update_needsudo"))
         infoLabel.set_justify(gtk.Justification.CENTER if pygobject
                               else gtk.JUSTIFY_CENTER)
         infoLabelAlignment.add(infoLabel)
@@ -127,7 +123,7 @@ class Updater(threading.Thread):
 
     def _downloadingManifest(self):
         """Called when the downloading of the manifest has started."""
-        self._progressLabel.set_text("Downloading manifest...")
+        self._progressLabel.set_text(xstr("update_manifest_progress"))
         self._progressBar.set_fraction(0)
 
     def downloadedManifest(self):
@@ -136,7 +132,7 @@ class Updater(threading.Thread):
 
     def _downloadedManifest(self):
         """Called when the downloading of the manifest has finished."""
-        self._progressLabel.set_text("Downloaded manifest...")
+        self._progressLabel.set_text(xstr("update_manifest_done"))
         self._progressBar.set_fraction(0.05)
 
     def needSudo(self):
@@ -177,7 +173,7 @@ class Updater(threading.Thread):
 
     def _startDownload(self):
         """Called when the download has started."""
-        self._progressLabel.set_text("Downloading files...")
+        self._progressLabel.set_text(xstr("update_files_progress"))
 
     def setDownloaded(self, downloaded):
         """Called when a certain number of bytes are downloaded."""
@@ -186,7 +182,7 @@ class Updater(threading.Thread):
 
     def _setDownloaded(self, downloaded):
         """Called when a certain number of bytes are downloaded."""
-        self._progressLabel.set_text("Downloaded %d of %d" % \
+        self._progressLabel.set_text(xstr("update_files_bytes") % \
                                      (downloaded, self._totalSize))
         self._setProgress()
 
@@ -196,7 +192,7 @@ class Updater(threading.Thread):
 
     def _startRenaming(self):
         """Called when the renaming of files has started."""
-        self._progressLabel.set_text("Renaming downloaded files...")
+        self._progressLabel.set_text(xstr("update_renaming"))
 
     def renamed(self, path, count):
         """Called when a file has been renamed."""
@@ -205,7 +201,7 @@ class Updater(threading.Thread):
 
     def _renamed(self, path, count):
         """Called when a file has been renamed."""
-        self._progressLabel.set_text("Renamed %s" % (path,))
+        self._progressLabel.set_text(xstr("update_renamed") % (path,))
         self._setProgress()
 
     def startRemoving(self):
@@ -214,7 +210,7 @@ class Updater(threading.Thread):
 
     def _startRemoving(self):
         """Called when the removing of files has started."""
-        self._progressLabel.set_text("Removing files...")
+        self._progressLabel.set_text(xstr("update_removing"))
 
     def removed(self, path, count):
         """Called when a file has been removed."""
@@ -223,7 +219,7 @@ class Updater(threading.Thread):
 
     def _removed(self, path, count):
         """Called when a file has been removed."""
-        self._progressLabel.set_text("Removed %s" % (path,))
+        self._progressLabel.set_text(xstr("update_removed") % (path,))
         self._setProgress()
 
     def writingManifest(self):
@@ -232,7 +228,7 @@ class Updater(threading.Thread):
 
     def _writingManifest(self):
         """Called when the writing of the new manifest file has started."""
-        self._progressLabel.set_text("Writing the new manifest")
+        self._progressLabel.set_text(xstr("update_writing_manifest"))
         
     def done(self):
         """Called when the update has been done."""
@@ -243,10 +239,10 @@ class Updater(threading.Thread):
         """Called when the writing of the new manifest file has started."""
         self._progressBar.set_fraction(1)
         if self._totalProgress>0:
-            self._progressLabel.set_text("Finished updating. Press OK to restart the program.")
+            self._progressLabel.set_text(xstr("update_finished"))
             self._progressOKButton.set_sensitive(True)
         else:
-            self._progressLabel.set_text("There was nothing to update")
+            self._progressLabel.set_text(xstr("update_nothing"))
         
     def _setProgress(self):
         """Set the progress bar based on the current stage."""
@@ -263,7 +259,7 @@ class Updater(threading.Thread):
 
     def _failed(self, what):
         """Called when the downloading has failed."""        
-        self._progressLabel.set_text("Failed, see the debug log for details.")
+        self._progressLabel.set_text(xstr("update_failed"))
         self._progressBar.set_fraction(1)
         self._progressOKButton.set_sensitive(True)
 
