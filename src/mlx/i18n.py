@@ -138,13 +138,14 @@ class _English(_Strings):
         self.add("tab_flight_tooltip", "Flight wizard")
         self.add("tab_flight_info", "Flight _info")
         self.add("tab_flight_info_tooltip", "Further information regarding the flight")
+        self.add("tab_weight_help", "_Help")
+        self.add("tab_weight_help_tooltip", "Help to calculate the weights")
         self.add("tab_log", "_Log")
         self.add("tab_log_tooltip",
                  "The log of your flight that will be sent to the MAVA website")
+        self.add("tab_gates", "_Gates")        
         self.add("tab_debug_log", "_Debug log")
         self.add("tab_debug_log_tooltip", "Log with debugging information.")
-        self.add("tab_help", "_Help")
-        self.add("tab_gates", "_Gates")
 
         self.add("conn_failed", "Cannot connect to the simulator.")
         self.add("conn_failed_sec",
@@ -474,6 +475,36 @@ class _English(_Strings):
                  "Finished updating. Press OK to restart the program.")
         self.add("update_nothing", "There was nothing to update")
         self.add("update_failed", "Failed, see the debug log for details.")
+
+        self.add("weighthelp_usinghelp", "_Using help")
+        self.add("weighthelp_usinghelp_tooltip",
+                 "If you check this, some help will be displayed on how "
+                 "to calculate the payload weight for your flight. "
+                 "Note, that the usage of this facility will be logged.")
+        self.add("weighthelp_header_calculated", "Requested/\ncalculated")
+        self.add("weighthelp_header_simulator", "Simulator\ndata")
+        self.add("weighthelp_header_simulator_tooltip",
+                 "Click this button to retrieve the weight values from the "
+                 "simulator, which will be displayed below. If a value is "
+                 "within 10% of the tolerance, it is displayed in "
+                 '<b><span foreground="darkgreen">green</span></b>, '
+                 "if it is out of the tolerance, it is displayed in "
+                 '<b><span foreground="red">red</span></b>, '
+                 "otherwise in"
+                 '<b><span foreground="orange">yellow</span></b>.')
+        self.add("weighthelp_crew", "Crew (%s):")
+        self.add("weighthelp_pax", "Passengers (%s):")
+        self.add("weighthelp_baggage", "Baggage:")
+        self.add("weighthelp_cargo", "Cargo:")
+        self.add("weighthelp_mail", "Mail:")
+        self.add("weighthelp_payload", "Payload:")
+        self.add("weighthelp_dow", "DOW:")
+        self.add("weighthelp_zfw", "ZFW:")
+        self.add("weighthelp_gross", "Gross weight:")
+        self.add("weighthelp_mzfw", "MZFW:")
+        self.add("weighthelp_mtow", "MTOW:")
+        self.add("weighthelp_mlw", "MLW:")
+        self.add("weighthelp_busy", "Querying weight data...")
                  
 #------------------------------------------------------------------------------
 
@@ -500,13 +531,14 @@ class _Hungarian(_Strings):
         self.add("tab_flight_tooltip", "Járat varázsló")
         self.add("tab_flight_info", "Járat _info")
         self.add("tab_flight_info_tooltip", "Egyéb információk a járat teljesítésével kapcsolatban")
+        self.add("tab_weight_help", "_Segítség")
+        self.add("tab_weight_help_tooltip", "Segítség a súlyszámításhoz")
         self.add("tab_log", "_Napló")
         self.add("tab_log_tooltip",
                  "A járat naplója, amit majd el lehet küldeni a MAVA szerverére")
         self.add("tab_debug_log", "_Debug napló")
         self.add("tab_debug_log_tooltip",
                  "Hibakereséshez használható információkat tartalmazó napló.")
-        self.add("tab_help", "_Segítség")
         self.add("tab_gates", "_Kapuk")        
 
         self.add("conn_failed", "Nem tudtam kapcsolódni a szimulátorhoz.")
@@ -840,6 +872,38 @@ class _Hungarian(_Strings):
                  "A frissítés sikerült. Kattints az OK-ra a program újraindításához.")
         self.add("update_nothing", "Nem volt mit frissíteni")
         self.add("update_failed", "Nem sikerült, a részleteket lásd a debug naplóban.")
+
+        self.add("weighthelp_usinghelp", "_Használom a segítséget")
+        self.add("weighthelp_usinghelp_tooltip",
+                 "Ha bejelölöd, az alábbiakban kapsz egy kis segítséget "
+                 "a járathoz szükséges hasznos teher megállapításához. "
+                 "Ha igénybe veszed ezt a szolgáltatást, ez a tény "
+                 "a naplóba bekerül.")
+        self.add("weighthelp_header_calculated", "Elvárt/\nszámított")
+        self.add("weighthelp_header_simulator", "Szimulátor\nadatok")
+        self.add("weighthelp_header_simulator_tooltip",
+                 "Kattints erre a gombra a súlyadatoknak a szimulátortól "
+                 "való lekérdezéséhez. Az értékek lent jelennek meg. Ha "
+                 "egy érték a tűrés 10%-án belül van, akkor az "
+                 '<b><span foreground="darkgreen">zöld</span></b> '
+                 "színnel jelenik meg. Ha nem fér bele a tűrésbe, akkor "
+                 '<b><span foreground="red">piros</span></b>, '
+                 "egyébként "
+                 '<b><span foreground="orange">sárga</span></b> '
+                 "színben olvasható.")
+        self.add("weighthelp_crew", "Legénység (%s):")
+        self.add("weighthelp_pax", "Utasok (%s):")
+        self.add("weighthelp_baggage", "Poggyász:")
+        self.add("weighthelp_cargo", "Teher:")
+        self.add("weighthelp_mail", "Posta:")
+        self.add("weighthelp_payload", "Hasznos teher:")
+        self.add("weighthelp_dow", "DOW:")
+        self.add("weighthelp_zfw", "ZFW:")
+        self.add("weighthelp_gross", "Teljes tömeg:")
+        self.add("weighthelp_mzfw", "MZFW:")
+        self.add("weighthelp_mtow", "MTOW:")
+        self.add("weighthelp_mlw", "MLW:")
+        self.add("weighthelp_busy", "A tömegadatok lekérdezése...")
 
 #------------------------------------------------------------------------------
 

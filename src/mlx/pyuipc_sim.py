@@ -243,6 +243,10 @@ class Values(object):
         self.n1 = [0.0, 0.0, 0.0]
         self.throttles = [0.0, 0.0, 0.0]
 
+        self.payloadCount = 1
+        self.payload = []
+        for i in range(0, 61): self.payload.append(0.0)
+
     def read(self, offset):
         """Read the value at the given offset."""
         try:
@@ -401,6 +405,11 @@ class Values(object):
             return self._getFuelLevel(self.FUEL_EXTERNAL_2)
         elif offset==0x1260:       # External 2 tank capacity
             return self._getFuelCapacity(self.FUEL_EXTERNAL_2)
+        elif offset==0x13fc:       # The number of the payload stations
+            return self.payloadCount
+        elif offset>=0x1400 and offset<=0x1f40 and \
+             ((offset-0x1400)%48)==0: # Payload
+            return self.payload[ (offset - 0x1400) / 48 ]
         elif offset==0x2000:       # Engine #1 N1
             return self.n1[self.ENGINE_1]
         elif offset==0x2100:       # Engine #2 N1
@@ -580,6 +589,11 @@ class Values(object):
             self._setFuelLevel(self.FUEL_EXTERNAL_2, value)
         elif offset==0x1260:       # External 2 tank capacity
             self._setFuelCapacity(self.FUEL_EXTERNAL_2, value)
+        elif offset==0x13fc:       # The number of the payload stations
+            self.payloadCount = int(value)
+        elif offset>=0x1400 and offset<=0x1f40 and \
+             ((offset-0x1400)%48)==0: # Payload
+            self.payload[ (offset - 0x1400) / 48 ] = value
         elif offset==0x2000:       # Engine #1 N1
             self.n1[self.ENGINE_1] = value
         elif offset==0x2100:       # Engine #2 N1
@@ -1112,6 +1126,16 @@ class CLI(cmd.Cmd):
                                              lambda value: value*1609.344/100.0,
                                              lambda word: int(float(word)*
                                                               100.0/1609.344))
+                                                            
+        self._valueHandlers["payloadCount"] = (0x13fc, "d",
+                                               lambda value: value,
+                                               lambda word: int(word))
+        for i in range(0, 61):
+            self._valueHandlers["payload%d" % (i,)] = (0x1400 + i * 48, "f",
+                                                       lambda value:
+                                                       value * const.LBSTOKG,
+                                                       lambda word:
+                                                       float(word)*const.KGSTOLB)
                                                             
     def default(self, line):
         """Handle unhandle commands."""

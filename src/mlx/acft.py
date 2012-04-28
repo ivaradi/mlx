@@ -28,6 +28,8 @@ class Aircraft(object):
         self._v1r2LineIndex = None
         self._vrefLineIndex = None
 
+        self.humanWeight = 82.0
+
         self._checkers = []
 
         # Loggers

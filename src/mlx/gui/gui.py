@@ -7,6 +7,7 @@ from update import Updater
 from mlx.gui.common import *
 from mlx.gui.flight import Wizard
 from mlx.gui.monitor import MonitorWindow
+from mlx.gui.weighthelp import WeightHelp
 
 import mlx.const as const
 import mlx.fs as fs
@@ -87,6 +88,12 @@ class GUI(fs.ConnectionListener):
         self._notebook.append_page(self._flightInfo, label)
         self._flightInfo.disable()
 
+        self._weightHelp = WeightHelp(self)
+        label = gtk.Label(xstr("tab_weight_help"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("tab_weight_help_tooltip"))
+        self._notebook.append_page(self._weightHelp, label)
+        
         (logWidget, self._logView)  = self._buildLogWidget()
         label = gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
@@ -111,6 +118,8 @@ class GUI(fs.ConnectionListener):
 
         window.show_all()
         self._wizard.grabDefault()
+        self._weightHelp.reset()
+        self._weightHelp.disable()
 
         self._mainWindow = window
 
@@ -352,6 +361,8 @@ class GUI(fs.ConnectionListener):
         self._flightInfo.disable()
         self.resetFlightStatus()
 
+        self._weightHelp.reset()
+        self._weightHelp.disable()
         self._wizard.reset()
         self._notebook.set_current_page(0)
 
@@ -517,14 +528,21 @@ class GUI(fs.ConnectionListener):
     def beginBusy(self, message):
         """Begin a period of background processing."""
         self._wizard.set_sensitive(False)
+        self._weightHelp.set_sensitive(False)
         self._mainWindow.get_window().set_cursor(self._busyCursor)
         self._statusbar.updateBusyState(message)
 
     def endBusy(self):
         """End a period of background processing."""
         self._mainWindow.get_window().set_cursor(None)
+        self._weightHelp.set_sensitive(True)
         self._wizard.set_sensitive(True)
         self._statusbar.updateBusyState(None)
+
+    def initializeWeightHelp(self):
+        """Initialize the weight help tab."""
+        self._weightHelp.reset()
+        self._weightHelp.enable()
 
     def _writeStdIO(self):
         """Perform the real writing."""

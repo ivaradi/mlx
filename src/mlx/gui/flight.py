@@ -798,6 +798,7 @@ class PayloadPage(Page):
     def finalize(self):
         """Finalize the payload page."""
         self._cargoWeight.set_sensitive(False)
+        self._wizard.gui.initializeWeightHelp()
 
     def calculateZFW(self):
         """Calculate the ZFW value."""
@@ -1907,6 +1908,7 @@ class Wizard(gtk.VBox):
         self._pages.append(ConnectPage(self))
         self._payloadPage = PayloadPage(self) 
         self._pages.append(self._payloadPage)
+        self._payloadIndex = len(self._pages)
         self._pages.append(TimePage(self))
         self._routePage = RoutePage(self)
         self._pages.append(self._routePage)
@@ -1914,6 +1916,7 @@ class Wizard(gtk.VBox):
         self._pages.append(self._departureBriefingPage)
         self._arrivalBriefingPage = BriefingPage(self, False)
         self._pages.append(self._arrivalBriefingPage)
+        self._arrivalBriefingIndex = len(self._pages)
         self._takeoffPage = TakeoffPage(self) 
         self._pages.append(self._takeoffPage)
         self._landingPage = LandingPage(self) 
