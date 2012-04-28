@@ -26,10 +26,10 @@ class FleetGateStatus(gtk.VBox):
         self._mainBox = mainBox = gtk.VBox()
         mainAlignment.add(mainBox)
     
-        statusBox = gtk.HBox()
+        self._statusBox = statusBox = gtk.HBox()
         mainBox.pack_start(statusBox, True, True, 4)
 
-        self._fleetFrame = fleetFrame = gtk.Frame(label = xstr("gates_fleet_title"))
+        fleetFrame = gtk.Frame(label = xstr("gates_fleet_title"))
         fleetLabel = fleetFrame.get_label_widget()
         fleetLabel.set_use_underline(True)
         statusBox.pack_start(fleetFrame, False, False, 4)
@@ -62,8 +62,9 @@ class FleetGateStatus(gtk.VBox):
                                        else gtk.SHADOW_IN)
 
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
-                                  xscale = 0.0, yscale = 1.0)
+        self._fleetAlignment =  alignment = \
+                               gtk.Alignment(xalign = 0.5, yalign = 0.0,
+                                             xscale = 0.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
         alignment.add(scrolledWindow)
@@ -72,7 +73,7 @@ class FleetGateStatus(gtk.VBox):
         self._gatesFrame = gatesFrame = gtk.Frame(label = xstr("gates_gates_title"))
         statusBox.pack_start(gatesFrame, True, True, 4)        
 
-        table = gtk.Table(14, 4)
+        self._gatesTable = table = gtk.Table(14, 4)
         table.set_tooltip_markup(xstr("gates_gates_tooltip"))
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
@@ -110,8 +111,8 @@ class FleetGateStatus(gtk.VBox):
         alignment.add(button)
         mainBox.pack_start(alignment, False, False, 4)
 
-        self._fleetFrame.set_sensitive(False)
-        self._gatesFrame.set_sensitive(False)
+        self._fleetList.set_sensitive(False)
+        self._gatesTable.set_sensitive(False)
         
     def disable(self):
         """Disable the widget."""
@@ -165,8 +166,7 @@ class FleetGateStatus(gtk.VBox):
                 markup = '<b>' + markup + '</b>'
                 self._gateLabels[gateNumber].set_markup(markup)
             
-        self._fleetFrame.set_sensitive(fleet is not None)
-        self._gatesFrame.set_sensitive(fleet is not None)
-
+        self._fleetList.set_sensitive(fleet is not None)
+        self._gatesTable.set_sensitive(fleet is not None)
 
 #----------------------------------------------------------------------------
