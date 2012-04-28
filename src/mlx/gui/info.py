@@ -83,7 +83,7 @@ class FlightInfo(gtk.VBox):
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
-        table = gtk.Table(5, 2)
+        self._delayTable = table = gtk.Table(5, 2)
         table.set_col_spacings(16)
 
         row = 0
@@ -135,15 +135,15 @@ class FlightInfo(gtk.VBox):
             
     def enable(self):
         """Enable the flight info tab."""
-        #gobject.idle_add(self.set_sensitive, True)
-        self._commentsAlignment.set_sensitive(True)
-        self._delayAlignment.set_sensitive(True)
+        self._comments.set_sensitive(True)
+        self._flightDefects.set_sensitive(True)
+        self._delayTable.set_sensitive(True)
         
     def disable(self):
         """Enable the flight info tab."""
-        #gobject.idle_add(self.set_sensitive, False)
-        self._commentsAlignment.set_sensitive(False)
-        self._delayAlignment.set_sensitive(False)
+        self._comments.set_sensitive(False)
+        self._flightDefects.set_sensitive(False)
+        self._delayTable.set_sensitive(False)
 
     def reset(self):
         """Reset the flight info tab."""
