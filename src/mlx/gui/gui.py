@@ -577,7 +577,7 @@ class GUI(fs.ConnectionListener):
         else:
             self._fleet = None
 
-            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+            dialog = gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("fleet_failed"))
