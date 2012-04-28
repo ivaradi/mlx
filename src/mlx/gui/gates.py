@@ -123,20 +123,17 @@ class FleetGateStatus(gtk.VBox):
 
     def _refreshClicked(self, button):
         """Called when the Refresh data button is clicked."""
-        self._gui.beginBusy(xstr("fleet_busy"))
-        # FIXME: put this into the GUI, where it refreshes everything
-        self._gui.webHandler.getFleet(self._fleetCallback)
+        self._gui.getFleet(force = True)
 
-    def _fleetCallback(self, returned, result):
-        """Callback for the fleet retrieval."""
-        gobject.idle_add(self._handleFleet, returned, result)
+    def handleFleet(self, fleet):
+        """Handle new fleet information.
 
-    def _handleFleet(self, returned, result):
-        """Callback for the fleet retrieval."""
-        self._gui.endBusy()
-        if returned:
-            self._fleetStore.clear()
-            fleet = result.fleet
+        If fleet is None, the data will be cleared."""
+        self._fleetStore.clear()
+        if fleet is None:
+            for (gateNumber, label) in self._gateLabels.iteritems():
+                label.set_markup("<b>" + gateNumber + "</b>")
+        else:        
             for plane in fleet:
                 conflicting = False
                 tailNumber = plane.tailNumber
@@ -168,8 +165,8 @@ class FleetGateStatus(gtk.VBox):
                 markup = '<b>' + markup + '</b>'
                 self._gateLabels[gateNumber].set_markup(markup)
             
-        self._fleetFrame.set_sensitive(True)
-        self._gatesFrame.set_sensitive(True)
+        self._fleetFrame.set_sensitive(fleet is not None)
+        self._gatesFrame.set_sensitive(fleet is not None)
 
 
 #----------------------------------------------------------------------------

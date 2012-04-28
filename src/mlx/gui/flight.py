@@ -415,7 +415,7 @@ class FlightSelectionPage(Page):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
         if flight.departureICAO=="LHBP":
-            self._wizard._getFleet(self._fleetRetrieved)
+            self._wizard.gui.getFleet(self._fleetRetrieved)
         else:
             self._nextDistance = 2
             self._wizard.jumpPage(2)
@@ -531,7 +531,7 @@ class GateSelectionPage(Page):
             dialog.run()
             dialog.hide()
 
-            self._wizard._getFleet(self._fleetRetrieved)
+            self._wizard.gui.getFleet(self._fleetRetrieved)
 
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
@@ -2120,42 +2120,6 @@ class Wizard(gtk.VBox):
         
         self.setCurrentPage(0)
         
-    def _getFleet(self, callback, force = False):
-        """Get the fleet, if needed.
-
-        callback is function that will be called, when the feet is retrieved,
-        or the retrieval fails. It should have a single argument that will
-        receive the fleet object on success, None otherwise.
-        """
-        if self._fleet is not None and not force:
-            callback(self._fleet)
-
-        self.gui.beginBusy(xstr("fleet_busy"))
-        self._fleetCallback = callback
-        self.gui.webHandler.getFleet(self._fleetResultCallback)
-
-    def _fleetResultCallback(self, returned, result):
-        """Called when the fleet has been queried."""
-        gobject.idle_add(self._handleFleetResult, returned, result)
-
-    def _handleFleetResult(self, returned, result):
-        """Handle the fleet result."""
-        self.gui.endBusy()
-        if returned:
-            self._fleet = result.fleet
-        else:
-            self._fleet = None
-
-            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
-                                       buttons = BUTTONSTYPE_OK,
-                                       message_format = xstr("fleet_failed"))
-            dialog.set_title(WINDOW_TITLE_BASE)
-            dialog.run()
-            dialog.hide()
-
-        self._fleetCallback(self._fleet)
-
     def _updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the given plane's gate information."""
         self.gui.beginBusy(xstr("fleet_update_busy"))

@@ -46,6 +46,8 @@ class GUI(fs.ConnectionListener):
         self._flight = None
         self._simulator = None
         self._monitoring = False
+        self._fleet = None
+        self._fleetCallback = None
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
@@ -550,6 +552,43 @@ class GUI(fs.ConnectionListener):
         """Initialize the weight help tab."""
         self._weightHelp.reset()
         self._weightHelp.enable()
+
+    def getFleet(self, callback = None, force = False):
+        """Get the fleet.
+
+        If force is False, and we already have a fleet retrieved,
+        that one will be used."""
+        if self._fleet is None or force:
+            self._fleetCallback = callback
+            self.beginBusy(xstr("fleet_busy"))
+            self.webHandler.getFleet(self._fleetResultCallback)
+        else:
+            callback(self._fleet)
+
+    def _fleetResultCallback(self, returned, result):
+        """Called when the fleet has been queried."""
+        gobject.idle_add(self._handleFleetResult, returned, result)
+
+    def _handleFleetResult(self, returned, result):
+        """Handle the fleet result."""
+        self.endBusy()
+        if returned:
+            self._fleet = result.fleet
+        else:
+            self._fleet = None
+
+            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       buttons = BUTTONSTYPE_OK,
+                                       message_format = xstr("fleet_failed"))
+            dialog.set_title(WINDOW_TITLE_BASE)
+            dialog.run()
+            dialog.hide()
+
+        if self._fleetCallback is not None:
+            self._fleetCallback(self._fleet)
+            self._fleetCallback = None
+        self._fleetGateStatus.handleFleet(self._fleet)
 
     def _writeStdIO(self):
         """Perform the real writing."""
