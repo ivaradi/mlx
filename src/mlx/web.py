@@ -158,7 +158,7 @@ class Fleet(object):
 
             plane = Plane(line)
             if plane.tailNumber is not None:
-                self._planes[plane.tailNumber] = plane        
+                self._planes[plane.tailNumber] = plane
 
     def isGateConflicting(self, plane):
         """Check if the gate of the given plane conflicts with another plane's
@@ -178,6 +178,11 @@ class Fleet(object):
             if p.status==const.PLANE_HOME and p.gateNumber:
                 gateNumbers.add(p.gateNumber)
         return gateNumbers
+
+    def __iter__(self):
+        """Get an iterator over the planes."""
+        for plane in self._planes.itervalues():
+            yield plane
         
     def __getitem__(self, tailNumber):
         """Get the plane with the given tail number.

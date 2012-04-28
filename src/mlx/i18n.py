@@ -144,6 +144,7 @@ class _English(_Strings):
         self.add("tab_log_tooltip",
                  "The log of your flight that will be sent to the MAVA website")
         self.add("tab_gates", "_Gates")        
+        self.add("tab_gates_tooltip", "The status of the MAVA fleet and the gates at LHBP")        
         self.add("tab_debug_log", "_Debug log")
         self.add("tab_debug_log_tooltip", "Log with debugging information.")
 
@@ -505,6 +506,27 @@ class _English(_Strings):
         self.add("weighthelp_mtow", "MTOW:")
         self.add("weighthelp_mlw", "MLW:")
         self.add("weighthelp_busy", "Querying weight data...")
+
+        self.add("gates_fleet_title", "Fl_eet")
+        self.add("gates_gates_title", "LHBP gates")
+        self.add("gates_tailno", "Tail nr.")
+        self.add("gates_planestatus", "Status")
+        self.add("gates_refresh", "_Refresh data")
+        self.add("gates_refresh_tooltip",
+                 "Click this button to refresh the status data above")
+        self.add("gates_planes_tooltip",
+                 "This table lists all the planes in the MAVA fleet and their "
+                 "last known location. If a plane is conflicting with another "
+                 "because of occupying the same gate its data is displayed in "
+                 "<b><span foreground=\"red\">red</span></b>.")
+        self.add("gates_gates_tooltip",
+                 "The numbers of the gates occupied by MAVA planes are "
+                 "displayed in "
+                 '<b><span foreground="orange">yellow</span></b>, '
+                 "while available gates in black.")
+        self.add("gates_plane_away", "AWAY")
+        self.add("gates_plane_parking", "PARKING")
+        self.add("gates_plane_unknown", "UNKNOWN")
                  
 #------------------------------------------------------------------------------
 
@@ -536,10 +558,11 @@ class _Hungarian(_Strings):
         self.add("tab_log", "_Napló")
         self.add("tab_log_tooltip",
                  "A járat naplója, amit majd el lehet küldeni a MAVA szerverére")
+        self.add("tab_gates", "_Kapuk")        
+        self.add("tab_gates_tooltip", "A MAVA flotta és LHBP kapuinak állapota")        
         self.add("tab_debug_log", "_Debug napló")
         self.add("tab_debug_log_tooltip",
                  "Hibakereséshez használható információkat tartalmazó napló.")
-        self.add("tab_gates", "_Kapuk")        
 
         self.add("conn_failed", "Nem tudtam kapcsolódni a szimulátorhoz.")
         self.add("conn_failed_sec",
@@ -905,6 +928,28 @@ class _Hungarian(_Strings):
         self.add("weighthelp_mlw", "MLW:")
         self.add("weighthelp_busy", "A tömegadatok lekérdezése...")
 
+        self.add("gates_fleet_title", "_Flotta")
+        self.add("gates_gates_title", "LHBP kapuk")
+        self.add("gates_tailno", "Lajstromjel")
+        self.add("gates_planestatus", "Állapot")
+        self.add("gates_refresh", "_Adatok frissítése")
+        self.add("gates_refresh_tooltip",
+                 "Kattints erre a gombra a fenti adatok frissítéséhez")
+        self.add("gates_planes_tooltip",
+                 "Ez a táblázat tartalmazza a MAVA flottája összes "
+                 "repülőgépének lajstromjelét és utolsó ismert helyét. "
+                 "Ha egy repülőgép olyan kapun áll, amelyet másik gép is "
+                 "elfoglal, akkor annak a repülőgépnek az adatai "
+                 "<b><span foreground=\"red\">piros</span></b> "
+                 "színnel jelennek meg.")
+        self.add("gates_gates_tooltip",
+                 "A MAVA repülőgépei által elfoglalt kapuk száma "
+                 '<b><span foreground="orange">sárga</span></b> színnel,'
+                 "a többié feketén jelenik meg.")
+        self.add("gates_plane_away", "TÁVOL")
+        self.add("gates_plane_parking", "PARKOL")
+        self.add("gates_plane_unknown", "ISMERETLEN")
+                 
 #------------------------------------------------------------------------------
 
 # The fallback language is English

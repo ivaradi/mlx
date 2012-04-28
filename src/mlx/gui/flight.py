@@ -359,6 +359,7 @@ class FlightSelectionPage(Page):
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._flightList)
         scrolledWindow.set_size_request(400, -1)
+        # FIXME: these should be constants in common.py
         scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
                                   else gtk.POLICY_AUTOMATIC,
                                   gtk.PolicyType.AUTOMATIC if pygobject

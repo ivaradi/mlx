@@ -8,6 +8,7 @@ from mlx.gui.common import *
 from mlx.gui.flight import Wizard
 from mlx.gui.monitor import MonitorWindow
 from mlx.gui.weighthelp import WeightHelp
+from mlx.gui.gates import FleetGateStatus
 
 import mlx.const as const
 import mlx.fs as fs
@@ -100,6 +101,12 @@ class GUI(fs.ConnectionListener):
         label.set_tooltip_text(xstr("tab_log_tooltip"))
         self._notebook.append_page(logWidget, label)
 
+        self._fleetGateStatus = FleetGateStatus(self)
+        label = gtk.Label(xstr("tab_gates"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("tab_gates_tooltip"))
+        self._notebook.append_page(self._fleetGateStatus, label)
+        
         (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
         self._debugLogWidget.show_all()
 
