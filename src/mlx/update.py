@@ -513,6 +513,7 @@ def updateProcess():
     clientSocket.connect(("127.0.0.1", int(sys.argv[1])))
 
     config = Config()
+    config.load()
 
     directory = os.path.dirname(sys.argv[0])
 

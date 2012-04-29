@@ -296,7 +296,7 @@ library/freetype6.dll	538324	fe5ec4b2a07d2c20a4cd3aa09ce0c571
 library/encodings/cp1251.pyc	2673	cb5ce7a7207c53f1d9e7cae48b3fb258
 library/encodings/koi8_u.pyc	2686	b7e5a52eaaaf6b340075b40dc7596f42
 library/atk.pyd	208384	ebe7f0929eac23a3205d17d69906e172
-library/mlx/update.pyc	16193	3aa71919116919bbf5888565d92abf32
+library/mlx/update.pyc	16214	b36c195163e122e597d25e8caae9ffd5
 library/subprocess.pyc	38648	c9f749db06dfc9fb32079de51d6efd01
 library/encodings/utf_16_le.pyc	1854	dfa68705c26fd303adfc7ce3322166f2
 library/_socket.pyd	38400	5d273be76603399e88cf57f2605004bf
