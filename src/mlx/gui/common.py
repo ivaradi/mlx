@@ -26,8 +26,11 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     BUTTONSTYPE_OK = gtk.BUTTONS_OK
     BUTTONSTYPE_YES_NO = gtk.BUTTONS_YES_NO
     RESPONSETYPE_YES = gtk.RESPONSE_YES
+    RESPONSETYPE_ACCEPT = gtk.RESPONSE_ACCEPT
+    RESPONSETYPE_REJECT = gtk.RESPONSE_REJECT
     ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
     CONTROL_MASK = gdk.CONTROL_MASK
+    DIALOG_MODAL = gtk.DIALOG_MODAL
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
@@ -48,8 +51,11 @@ else:
     BUTTONSTYPE_OK = gtk.ButtonsType.OK
     BUTTONSTYPE_YES_NO = gtk.ButtonsType.YES_NO
     RESPONSETYPE_YES = gtk.ResponseType.YES
+    RESPONSETYPE_ACCEPT = gtk.ResponseType.ACCEPT
+    RESPONSETYPE_REJECT = gtk.ResponseType.REJECT
     ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
     CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
+    DIALOG_MODAL = gtk.DialogFlags.MODAL
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")

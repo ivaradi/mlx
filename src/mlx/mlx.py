@@ -1,7 +1,5 @@
 # The main program
 
-from .gui.gui import GUI
-
 from config import Config
 from i18n import setLanguage
 
@@ -34,6 +32,7 @@ def main():
 
     setLanguage(config.getLanguage())
     
+    from .gui.gui import GUI
     gui = GUI(programDirectory, config)
     
     sys.stdout = StdIOHandler(gui)

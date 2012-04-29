@@ -9,6 +9,7 @@ from mlx.gui.flight import Wizard
 from mlx.gui.monitor import MonitorWindow
 from mlx.gui.weighthelp import WeightHelp
 from mlx.gui.gates import FleetGateStatus
+from mlx.gui.prefs import Preferences
 
 import mlx.const as const
 import mlx.fs as fs
@@ -60,7 +61,7 @@ class GUI(fs.ConnectionListener):
     def build(self, iconDirectory):
         """Build the GUI."""
         
-        window = gtk.Window()
+        self._mainWindow = window = gtk.Window()
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.connect("delete-event",
@@ -71,6 +72,8 @@ class GUI(fs.ConnectionListener):
 
         mainVBox = gtk.VBox()
         window.add(mainVBox)
+
+        self._preferences = Preferences(self)
 
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
@@ -129,8 +132,6 @@ class GUI(fs.ConnectionListener):
         self._wizard.grabDefault()
         self._weightHelp.reset()
         self._weightHelp.disable()
-
-        self._mainWindow = window
 
         self._statusIcon = StatusIcon(iconDirectory, self)
 
@@ -662,6 +663,19 @@ class GUI(fs.ConnectionListener):
         quitMenuItem.connect("activate", self._quit)
         fileMenu.append(quitMenuItem)
 
+        toolsMenuItem = gtk.MenuItem(xstr("menu_tools"))
+        toolsMenu = gtk.Menu()
+        toolsMenuItem.set_submenu(toolsMenu)
+        menuBar.append(toolsMenuItem)
+
+        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        prefsMenuItem.set_use_stock(True)
+        prefsMenuItem.set_label(xstr("menu_tools_prefs"))
+        prefsMenuItem.add_accelerator("activate", accelGroup,
+                                      ord(xstr("menu_tools_prefs_key")),
+                                      CONTROL_MASK, ACCEL_VISIBLE)
+        prefsMenuItem.connect("activate", self._editPreferences)
+        toolsMenu.append(prefsMenuItem)
 
         viewMenuItem = gtk.MenuItem(xstr("menu_view"))
         viewMenu = gtk.Menu()
@@ -758,3 +772,7 @@ class GUI(fs.ConnectionListener):
             gobject.idle_add(self._wizard.grabDefault)
         else:
             self._mainWindow.set_default(None)
+
+    def _editPreferences(self, menuItem):
+        """Callback for editing the preferences."""
+        self._preferences.run(self.config)

@@ -28,9 +28,9 @@ class Config(object):
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
 
-        self._modified = False
-
         self._language = ""
+
+        self._modified = False
 
     @property
     def pilotID(self):
@@ -66,6 +66,18 @@ class Config(object):
         """Set if we should remember the password."""
         if rememberPassword!=self._rememberPassword:
             self._rememberPassword = rememberPassword
+            self._modified = True
+
+    @property
+    def language(self):
+        """Get the language to use."""
+        return self._language
+
+    @language.setter
+    def language(self, language):
+        """Set the language to use."""
+        if language!=self._language:
+            self._language = language
             self._modified = True
 
     @property
@@ -159,6 +171,12 @@ class Config(object):
         """Get the language to be used."""
         import locale
         if self._language:
+            os.environ["LANGUAGE"] = self._language
+            os.environ["LANG"] = self._language + ".UTF-8"
+            os.environ["LC_MESSAGES"] = self._language + ".UTF-8"
+            os.environ["LC_COLLATE"] = self._language + ".UTF-8"
+            os.environ["LC_CTYPE"] = self._language + ".UTF-8"
+
             locale.setlocale(locale.LC_ALL, (self._language,
                                              locale.getpreferredencoding()))
             return self._language

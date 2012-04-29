@@ -128,6 +128,10 @@ class _English(_Strings):
         self.add("menu_file_quit_key", "q")
         self.add("quit_question", "Are you sure to quit the logger?")
 
+        self.add("menu_tools", "Tools")
+        self.add("menu_tools_prefs", "_Preferences")
+        self.add("menu_tools_prefs_key", "p")
+
         self.add("menu_view", "View")
         self.add("menu_view_monitor", "Show _monitor window")
         self.add("menu_view_monitor_key", "m")
@@ -527,7 +531,40 @@ class _English(_Strings):
         self.add("gates_plane_away", "AWAY")
         self.add("gates_plane_parking", "PARKING")
         self.add("gates_plane_unknown", "UNKNOWN")
-                 
+
+        self.add("prefs_title", "Preferences")
+        self.add("prefs_tab_general", "_General")
+        self.add("prefs_tab_general_tooltip", "General preferences")
+        self.add("prefs_tab_advanced", "_Advanced")
+        self.add("prefs_tab_advanced_tooltip",
+                 "Advanced preferences, edit with care!")
+        self.add("prefs_language", "_Language:")
+        self.add("prefs_language_tooltip",
+                 "The language of the program")
+        self.add("prefs_restart",
+                 "Restart needed")
+        self.add("prefs_language_restart_sec",
+                 "If you change the language, the program should be restarted "
+                 "so that the change has an effect.")
+        self.add("prefs_lang_$system", "system default")
+        self.add("prefs_lang_en_GB", "English")
+        self.add("prefs_lang_hu_HU", "Hungarian")
+        self.add("prefs_update_auto", "Update the program auto_matically")
+        self.add("prefs_update_auto_tooltip",
+                 "If checked the program will look for updates when "
+                 "it is starting, and if new updates are found, they "
+                 "will be downloaded and installed. This ensures that "
+                 "the PIREP you send will always conform to the latest "
+                 "expectations of the airline.")
+        self.add("prefs_update_auto_warning",
+                 "Disabling automatic updates may result in "
+                 "your version of the program becoming out of date "
+                 "and your PIREPs not being accepted.")
+        self.add("prefs_update_url", "Update _URL:")
+        self.add("prefs_update_url_tooltip",
+                 "The URL from which to download the updates. Change this "
+                 "only if you know what you are doing!")
+
 #------------------------------------------------------------------------------
 
 class _Hungarian(_Strings):
@@ -542,6 +579,10 @@ class _Hungarian(_Strings):
         self.add("menu_file_quit", "_Kilépés")
         self.add("menu_file_quit_key", "k")
         self.add("quit_question", "Biztosan ki akarsz lépni?")
+
+        self.add("menu_tools", "Eszközök")
+        self.add("menu_tools_prefs", "_Beállítások")
+        self.add("menu_tools_prefs_key", "b")
 
         self.add("menu_view", "Nézet")
         self.add("menu_view_monitor", "Mutasd a _monitor ablakot")
@@ -950,6 +991,39 @@ class _Hungarian(_Strings):
         self.add("gates_plane_parking", "PARKOL")
         self.add("gates_plane_unknown", "ISMERETLEN")
                  
+        self.add("prefs_title", "Beállítások")
+        self.add("prefs_tab_general", "_Általános")
+        self.add("prefs_tab_general_tooltip", "Általános beállítások")
+        self.add("prefs_tab_advanced", "_Haladó")
+        self.add("prefs_tab_advanced_tooltip",
+                 "Haladó beállítások: óvatosan módosítsd őket!")
+        self.add("prefs_language", "_Nyelv:")
+        self.add("prefs_language_tooltip",
+                 "A program által használt nyelv")
+        self.add("prefs_restart",
+                 "Újraindítás szükséges")
+        self.add("prefs_language_restart_sec",
+                 "A program nyelvének megváltoztatása csak egy újraindítást "
+                 "követően jut érvényre.")
+        self.add("prefs_lang_$system", "alapértelmezett")
+        self.add("prefs_lang_en_GB", "angol")
+        self.add("prefs_lang_hu_HU", "magyar")
+        self.add("prefs_update_auto",
+                 "Frissítsd a programot _automatikusan")
+        self.add("prefs_update_auto_tooltip",
+                 "Ha ez be van jelölve, a program induláskor frissítést "
+                 "keres, és ha talál, azokat letölti és telepíti. Ez "
+                 "biztosítja, hogy az elküldött PIREP minden megfelel "
+                 "a legújabb elvárásoknak.")
+        self.add("prefs_update_auto_warning",
+                 "Az automatikus frissítés kikapcsolása azt okozhatja, "
+                 "hogy a program Nálad lévő verziója elavulttá válik, "
+                 "és a PIREP-jeidet így nem fogadják el.")
+        self.add("prefs_update_url", "Frissítés _URL-je:")
+        self.add("prefs_update_url_tooltip",
+                 "Az URL, ahol a frissítéseket keresi a program. Csak akkor "
+                 "változtasd meg, ha biztos vagy a dolgodban!")
+
 #------------------------------------------------------------------------------
 
 # The fallback language is English

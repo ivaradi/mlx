@@ -5,6 +5,8 @@ from common import *
 from mlx.i18n import xstr
 import mlx.const as const
 
+#------------------------------------------------------------------------------
+
 class FlightInfo(gtk.VBox):
     """The flight info tab."""
     @staticmethod

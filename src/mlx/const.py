@@ -218,4 +218,6 @@ def stage2string(stage):
     """Convert the given stage to a lower-case string."""
     return _stageStrings[stage] if stage in _stageStrings else None
         
-    
+#-------------------------------------------------------------------------------
+
+languages = ["$system", "en_GB", "hu_HU"]
