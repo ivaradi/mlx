@@ -413,7 +413,7 @@ class FlightSelectionPage(Page):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
         if flight.departureICAO=="LHBP":
-            self._wizard.gui.getFleet(self._fleetRetrieved)
+            self._wizard.getFleet(self._fleetRetrieved)
         else:
             self._nextDistance = 2
             self._wizard.jumpPage(2)
@@ -529,7 +529,7 @@ class GateSelectionPage(Page):
             dialog.run()
             dialog.hide()
 
-            self._wizard.gui.getFleet(self._fleetRetrieved)
+            self._wizard.getFleet(self._fleetRetrieved)
 
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
@@ -2117,6 +2117,18 @@ class Wizard(gtk.VBox):
             page.reset()
         
         self.setCurrentPage(0)
+
+    def getFleet(self, callback):
+        """Get the fleet via the GUI and call the given callback."""
+        self._fleetCallback = callback
+        self.gui.getFleet(self._fleetRetrieved)
+
+    def _fleetRetrieved(self, fleet):
+        """Callback for the fleet retrieval."""
+        self._fleet = fleet
+        if self._fleetCallback is not None:
+            self._fleetCallback(fleet)
+        self._fleetCallback = None
         
     def _updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the given plane's gate information."""
