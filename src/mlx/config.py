@@ -14,6 +14,12 @@ configPath = os.path.join(os.path.expanduser("~"),
 
 #-------------------------------------------------------------------------------
 
+if os.name=="nt":
+    _languageMap = { "en_GB" : "eng",
+                     "hu_HU" : "hun" }
+
+#-------------------------------------------------------------------------------
+
 class Config(object):
     """Our configuration."""
     DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
@@ -171,14 +177,14 @@ class Config(object):
         """Get the language to be used."""
         import locale
         if self._language:
-            os.environ["LANGUAGE"] = self._language
-            os.environ["LANG"] = self._language + ".UTF-8"
-            os.environ["LC_MESSAGES"] = self._language + ".UTF-8"
-            os.environ["LC_COLLATE"] = self._language + ".UTF-8"
-            os.environ["LC_CTYPE"] = self._language + ".UTF-8"
-
-            locale.setlocale(locale.LC_ALL, (self._language,
-                                             locale.getpreferredencoding()))
+            if os.name=="nt":
+                if self._language in _languageMap:
+                    locale.setlocale(locale.LC_ALL, _languageMap[self._language])
+                else:
+                    locale.setlocale(locale.LC_ALL, "")
+            else:
+                locale.setlocale(locale.LC_ALL, (self._language,
+                                                 locale.getpreferredencoding()))
             return self._language
         else:
             locale.setlocale(locale.LC_ALL, "")

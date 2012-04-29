@@ -580,8 +580,8 @@ class GUI(fs.ConnectionListener):
 
             dialog = gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("fleet_failed"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -755,8 +755,10 @@ class GUI(fs.ConnectionListener):
         else:
             dialog = gtk.MessageDialog(parent = self._mainWindow,
                                        type = MESSAGETYPE_QUESTION,
-                                       buttons = BUTTONSTYPE_YES_NO,
                                        message_format = xstr("quit_question"))
+
+            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
 
             dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()

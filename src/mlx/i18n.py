@@ -123,6 +123,11 @@ class _English(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("button_ok", "_OK")
+        self.add("button_cancel", "_Cancel")
+        self.add("button_yes", "_Yes")
+        self.add("button_no", "_No")
+        
         self.add("menu_file", "File")
         self.add("menu_file_quit", "_Quit")
         self.add("menu_file_quit_key", "q")
@@ -165,10 +170,9 @@ class _English(_Strings):
                  "to the state it was in before the crash. "
                  "Then press <b>Reconnect</b> to reconnect.\n\n"
                  "If you want to cancel the flight, press <b>Cancel</b>.")
-        self.add("button_cancel", "_Cancel")
         self.add("button_tryagain", "_Try again")
         self.add("button_reconnect", "_Reconnect")
-        
+
         self.add("login", "Login")
         self.add("loginHelp",
                  "Enter your MAVA pilot's ID and password to\n" \
@@ -575,6 +579,11 @@ class _Hungarian(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("button_ok", "_OK")
+        self.add("button_cancel", "_Mégse")
+        self.add("button_yes", "_Igen")
+        self.add("button_no", "_Nem")
+        
         self.add("menu_file", "Fájl")
         self.add("menu_file_quit", "_Kilépés")
         self.add("menu_file_quit_key", "k")
@@ -620,10 +629,9 @@ class _Hungarian(_Strings):
                  "a kapcsolat ismételt felvételéhez.\n\n"
                  "Ha meg akarod szakítani a repülést, nyomd meg a "
                  "<b>Mégse</b> gombot.")
-        self.add("button_cancel", "_Mégse")
         self.add("button_tryagain", "_Próbáld újra")
         self.add("button_reconnect", "Újra_kapcsolódás")
-        
+
         self.add("login", "Bejelentkezés")
         self.add("loginHelp",
                  "Írd be a MAVA pilóta azonosítódat és a\n" \

@@ -18,11 +18,11 @@ class Preferences(gtk.Dialog):
         super(Preferences, self).__init__(WINDOW_TITLE_BASE + " " +
                                           xstr("prefs_title"),
                                           gui.mainWindow,
-                                          DIALOG_MODAL,
-                                          (gtk.STOCK_CANCEL,
-                                           RESPONSETYPE_REJECT,
-                                           gtk.STOCK_OK,
-                                           RESPONSETYPE_ACCEPT))
+                                          DIALOG_MODAL)
+
+        self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
+        self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+        
         self._gui = gui
 
         contentArea = self.get_content_area()
@@ -138,8 +138,8 @@ class Preferences(gtk.Dialog):
         if not self._changingLanguage and not self._warnedRestartNeeded:
             dialog = gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("prefs_restart"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(self.get_title())
             dialog.format_secondary_markup(xstr("prefs_language_restart_sec"))
             dialog.run()
@@ -198,8 +198,8 @@ class Preferences(gtk.Dialog):
            not self._autoUpdate.get_active():
             dialog = gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("prefs_update_auto_warning"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(self.get_title())
             dialog.run()
             dialog.hide()

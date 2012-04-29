@@ -305,8 +305,8 @@ class LoginPage(Page):
             else:
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
-                                           buttons = BUTTONSTYPE_OK,
                                            message_format = xstr("login_invalid"))
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 dialog.format_secondary_markup(xstr("login_invalid_sec"))
                 dialog.run()
@@ -314,8 +314,8 @@ class LoginPage(Page):
         else:
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("login_failconn"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.format_secondary_markup(xstr("login_failconn_sec"))
             
@@ -522,8 +522,8 @@ class GateSelectionPage(Page):
         else:
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format = xstr("gatesel_conflict"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.format_secondary_markup(xstr("gatesel_conflict_sec"))
             dialog.run()
@@ -1879,8 +1879,8 @@ class FinishPage(Page):
             secondaryMarkup = xstr("finish_send_failed_sec")
         
         dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                   type = type, buttons = BUTTONSTYPE_OK,
-                                   message_format = messageFormat)
+                                   type = type, message_format = messageFormat)
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         if secondaryMarkup is not None:
             dialog.format_secondary_markup(secondaryMarkup)
@@ -2139,9 +2139,9 @@ class Wizard(gtk.VBox):
 
             dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
-                                       buttons = BUTTONSTYPE_OK,
                                        message_format =
                                        xstr("fleet_update_failed"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()

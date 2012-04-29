@@ -74,10 +74,10 @@ class Updater(threading.Thread):
         Updater._sudoDialog = sudoDialog = \
             gtk.Dialog(WINDOW_TITLE_BASE + " " + xstr("update_title"),
                        parentWindow,
-                       gtk.DialogFlags.MODAL if pygobject else gtk.DIALOG_MODAL,
-                       (gtk.STOCK_CANCEL, 0,
-                        gtk.STOCK_OK, 1))
-
+                       gtk.DialogFlags.MODAL if pygobject else gtk.DIALOG_MODAL)
+        sudoDialog.add_button(xstr("button_cancel"), 0)
+        sudoDialog.add_button(xstr("button_ok"), 1)
+                       
         infoLabelAlignment = gtk.Alignment(xalign = 0.5, xscale = 0.1)
         infoLabelAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                        padding_left = 16, padding_right = 16)
