@@ -31,6 +31,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
     CONTROL_MASK = gdk.CONTROL_MASK
     DIALOG_MODAL = gtk.DIALOG_MODAL
+    WRAP_WORD = gtk.WRAP_WORD
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
@@ -56,6 +57,7 @@ else:
     ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
     CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
     DIALOG_MODAL = gtk.DialogFlags.MODAL
+    WRAP_WORD = gtk.WrapMode.WORD
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")

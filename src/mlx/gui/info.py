@@ -49,6 +49,7 @@ class FlightInfo(gtk.VBox):
         scroller.set_shadow_type(gtk.ShadowType.IN if pygobject
                                  else gtk.SHADOW_IN)
         comments = gtk.TextView()
+        comments.set_wrap_mode(WRAP_WORD)
         scroller.add(comments)
         alignment.add(scroller)
         frame.add(alignment)
