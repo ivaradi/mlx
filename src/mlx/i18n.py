@@ -460,8 +460,8 @@ class _English(_Strings):
         self.add("statusicon_showmain", "Show main window")
         self.add("statusicon_showmonitor", "Show monitor window")
         self.add("statusicon_quit", "Quit")
-        self.add("statusicon_stage", "Stage:")
-        self.add("statusicon_rating", "Rating:")
+        self.add("statusicon_stage", "Stage")
+        self.add("statusicon_rating", "Rating")
 
         self.add("update_title", "Update")
         self.add("update_needsudo",
@@ -921,8 +921,8 @@ class _Hungarian(_Strings):
         self.add("statusicon_showmain", "Mutasd a főablakot")
         self.add("statusicon_showmonitor", "Mutasd a monitor ablakot")
         self.add("statusicon_quit", "Kilépés")
-        self.add("statusicon_stage", "Fázis:")
-        self.add("statusicon_rating", "Pontszám:")
+        self.add("statusicon_stage", u"Fázis")
+        self.add("statusicon_rating", u"Pontszám")
 
         self.add("update_title", "Frissítés")
         self.add("update_needsudo",

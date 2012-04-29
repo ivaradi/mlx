@@ -142,7 +142,7 @@ class StatusIcon(FlightStatusHandler):
 
     def _updateFlightStatus(self):
         """Update the flight status."""
-        stage = "-" if self._stage is None \
+        stage = u"-" if self._stage is None \
                 else xstr("flight_stage_" + const.stage2string(self._stage))
         
         if self._noGoReason is None:
@@ -151,13 +151,16 @@ class StatusIcon(FlightStatusHandler):
             rating = self._noGoReason
 
         if appIndicator:
-            self._stageMenuItem.set_label("%s %s" % (xstr("statusicon_stage"), stage))
-            self._ratingMenuItem.set_label("%s: %s" %
-                                           (xstr("statusicon_rating"), rating))
+            self._stageMenuItem.set_label("%s: %s" % \
+                                          (xstr("statusicon_stage"),
+                                           stage))
+            self._ratingMenuItem.set_label("%s: %s" % \
+                                           (xstr("statusicon_rating"),
+                                            rating))
         else:
             if self._noGoReason is not None:
                 rating = '<span foreground="red">' + rating + '</span>'
-            markup = "MAVA Logger X %s\n\n%s: %s\n%s: %s" %\
+            markup = u"MAVA Logger X %s\n\n%s: %s\n%s: %s" %\
                      (const.VERSION, xstr("statusicon_stage"), stage,
                       xstr("statusicon_rating"), rating)
             self._statusIcon.set_tooltip_markup(markup)

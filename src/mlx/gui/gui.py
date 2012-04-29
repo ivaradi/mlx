@@ -389,6 +389,7 @@ class GUI(fs.ConnectionListener):
         self._connecting = False
         self._reconnecting = False
         self._statusbar.updateConnection(False, False)
+        self._weightHelp.disable()
             
     def addFlightLogLine(self, timeStr, line):
         """Write the given message line to the log."""
