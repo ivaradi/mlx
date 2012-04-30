@@ -198,6 +198,7 @@ class AircraftState(object):
     - squawk: the transponder code (string)
     - windSpeed: the speed of the wind at the aircraft in knots (float)
     - windDirection: the direction of the wind at the aircraft in degrees (float)
+    - visibility: the visibility in metres (float)
 
     FIXME: needed when taxiing only:
     - payload weight

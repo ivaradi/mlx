@@ -4,6 +4,7 @@
 
 import const
 import checks
+import fs
 import util
 
 import time
@@ -53,6 +54,9 @@ class Aircraft(object):
         self._checkers.append(checks.GearsLogger())
         self._checkers.append(checks.CruiseSpeedLogger())
         self._checkers.append(checks.SpoilerLogger())
+
+        if flight.config.isMessageTypeFS(const.MESSAGETYPE_VISIBILITY):
+            self._checkers.append(checks.VisibilityChecker())
 
         # Fault checkers
         
@@ -133,6 +137,11 @@ class Aircraft(object):
                 self.logFuel(aircraftState)
                 self.logger.message(aircraftState.timestamp, 
                                     "Zero-fuel weight: %.0f kg" % (aircraftState.zfw))
+                flight = self._flight
+                if flight.v1 is None or flight.vr is None or flight.v2 is None:
+                    fs.sendMessage(const.MESSAGETYPE_HELP,
+                                   "Don't forget to set the takeoff V-speeds!",
+                                   5)
             elif newStage==const.STAGE_TAKEOFF:
                 self.logger.message(aircraftState.timestamp, "Flight time start")
                 self.logger.message(aircraftState.timestamp, 
@@ -144,6 +153,11 @@ class Aircraft(object):
                                      aircraftState.windSpeed))
                 self._logV1R2()
             elif newStage==const.STAGE_TAXIAFTERLAND:
+                bookedFlight = self._flight.bookedFlight
+                if bookedFlight.arrivalICAO=="LHBP" and \
+                   self._flight.config.isMessageTypeFS(const.MESSAGETYPE_GATE_SYSTEM):
+                    self._flight.getFleet(callback = self._fleetRetrieved,
+                                          force = True)
                 self.logger.message(aircraftState.timestamp, "Flight time end")
                 self.logFuel(aircraftState)
                 self.logger.message(aircraftState.timestamp,
@@ -166,6 +180,12 @@ class Aircraft(object):
                 self.logger.message(aircraftState.timestamp,
                                     "Block time: " +
                                     util.getTimeIntervalString(blockLength))
+                bookedFlight = self._flight.bookedFlight
+                # FIXME: translate the ICAO into an airport name
+                fs.sendMessage(const.MESSAGETYPE_ENVIRONMENT,
+                               "Flight plan closed. Welcome to %s" % \
+                               (bookedFlight.arrivalICAO,),
+                               5)
 
     def prepareFlare(self):
         """Called when it is detected that we will soon flare.
@@ -188,6 +208,7 @@ class Aircraft(object):
                             (self._aircraftState.altimeter,))
         self._logVRef()
         self.flight.flareStarted(flareStart, flareStartFS)
+        fs.sendMessage(const.MESSAGETYPE_INFORMATION, "Flare-time", 3)
          
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
                       ias, pitch, bank, heading):
@@ -264,6 +285,19 @@ class Aircraft(object):
                 self.logger.message(self._aircraftState.timestamp, message)
         else:
             self.logger.updateLine(self._vrefLineIndex, message)
+
+    def _fleetRetrieved(self, fleet):
+        """Callback for the fleet retrieval result."""
+        if fleet is not None:
+            gateList = ""
+            occupiedGateNumbers = fleet.getOccupiedGateNumbers()
+            for gateNumber in const.lhbpGateNumbers:
+                if gateNumber not in occupiedGateNumbers:
+                    if gateList: gateList += ", "
+                    gateList += gateNumber
+            fs.sendMessage(const.MESSAGETYPE_GATE_SYSTEM,
+                           "Free gates: " + gateList, 20)
+        
 
 #---------------------------------------------------------------------------------------
 

@@ -829,7 +829,8 @@ class AircraftModel(object):
                       ("nav2", 0x0352, "H"),
                       ("squawk", 0x0354, "H"),
                       ("windSpeed", 0x0e90, "H"),
-                      ("windDirection", 0x0e92, "H")]
+                      ("windDirection", 0x0e92, "H"),
+                      ("visibility", 0x0e8a, "H")]
 
 
     specialModels = []
@@ -1002,6 +1003,8 @@ class AircraftModel(object):
         state.windSpeed = data[self._monidx_windSpeed]
         state.windDirection = data[self._monidx_windDirection]*360.0/65536.0
         if state.windDirection<0.0: state.windDirection += 360.0
+
+        state.visibility = data[self._monidx_visibility]*1609.344/100.0
         
         return state
 

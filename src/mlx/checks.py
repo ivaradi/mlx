@@ -2,7 +2,9 @@
 
 #---------------------------------------------------------------------------------------
 
+import fs
 import const
+import util
 
 #---------------------------------------------------------------------------------------
 
@@ -139,6 +141,32 @@ class SpoilerLogger(StateChecker):
                     self._logged = True
             else:
                 self._spoilersExtension = state.spoilersExtension
+
+#---------------------------------------------------------------------------------------
+
+class VisibilityChecker(StateChecker):
+    """Inform the pilot of the visibility once when descending below 2000 ft,
+    then when descending below 1000 ft."""
+    def __init__(self):
+        """Construct the visibility checker."""
+        self._informedBelow2000 = False
+        self._informedBelow1000 = False
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Check if we need to inform the pilot of the visibility."""
+        if flight.stage==const.STAGE_DESCENT or \
+           flight.stage==const.STAGE_LANDING:
+            if (state.radioAltitude<2000 and not self._informedBelow2000) or \
+               (state.radioAltitude<1000 and not self._informedBelow1000):
+                visibilityString = util.visibility2String(state.visibility)
+                fs.sendMessage(const.MESSAGETYPE_VISIBILITY,
+                               "Current visibility: " + visibilityString,
+                               5)
+                logger.message(state.timestamp,
+                               "Pilot was informed about the visibility: " +
+                               visibilityString)
+                self._informedBelow2000 = True
+                self._informedBelow1000 = state.radioAltitude<1000
 
 #---------------------------------------------------------------------------------------
 

@@ -74,7 +74,8 @@ class Logger(object):
         self.message(timestamp, "--- %s ---" % (s,))
         if stage==const.STAGE_END:
             self.untimedMessage("Rating: %.0f" % (self.getRating(),))
-        sendMessage(const.MESSAGETYPE_INFORMATION, "Flight stage: " + s, 3)
+        else:
+            sendMessage(const.MESSAGETYPE_INFORMATION, "Flight stage: " + s, 3)
         
     def fault(self, faultID, timestamp, what, score):
         """Report a fault.

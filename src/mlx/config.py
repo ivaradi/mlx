@@ -113,6 +113,13 @@ class Config(object):
                if messageType in self._messageTypeLevels \
                else const.MESSAGELEVEL_NONE
 
+    def isMessageTypeFS(self, messageType):
+        """Determine if the given message type is displayed in the
+        simulator."""
+        level = self.getMessageTypeLevel(messageType)
+        return level==const.MESSAGELEVEL_FS or \
+               level==const.MESSAGELEVEL_BOTH
+        
     def setMessageTypeLevel(self, messageType, level):
         """Set the level of the given message type."""
         if messageType not in self._messageTypeLevels or \

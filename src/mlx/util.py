@@ -148,3 +148,9 @@ def getDistCourse(latitude1, longitude1, latitude2, longitude2):
 
     return (radians2nm(d), math.degrees(tc))
 
+#------------------------------------------------------------------------------
+
+def visibility2String(visibility):
+    """Convert the given visibility expressed in metres into a string."""
+    return "%.0f metres" % (visibility,) if visibility<10000 \
+           else "%.1f kilometres" % (visibility/1000.0,)

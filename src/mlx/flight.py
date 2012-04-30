@@ -59,9 +59,19 @@ class Flight(object):
         self._flareStartFS = None
 
     @property
+    def config(self):
+        """Get the configuration."""
+        return self._gui.config
+
+    @property
     def stage(self):
         """Get the flight stage."""
         return self._stage
+
+    @property
+    def bookedFlight(self):
+        """Get the booked flight."""
+        return self._gui.bookedFlight
 
     @property
     def zfw(self):
@@ -161,6 +171,10 @@ class Flight(object):
         with self._endCondition:
             while self._stage!=const.STAGE_END:
                 self._endCondition.wait(1)
+
+    def getFleet(self, callback, force = False):
+        """Get the fleet and call the given callback."""
+        self._gui.getFleetAsync(callback = callback, force = force)
 
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""

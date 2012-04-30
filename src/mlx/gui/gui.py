@@ -399,6 +399,8 @@ class GUI(fs.ConnectionListener):
         self._reconnecting = False
         self._statusbar.updateConnection(False, False)
         self._weightHelp.disable()
+
+        return True
             
     def addFlightLogLine(self, timeStr, line):
         """Write the given message line to the log."""
@@ -441,7 +443,10 @@ class GUI(fs.ConnectionListener):
         self._statusIcon.setStage(stage)
         self._wizard.setStage(stage)
         if stage==const.STAGE_END:
-            self._disconnect()
+            # FIXME: perhaps a more elegant method, e.g.
+            # the simulator should provide a function disconnect
+            # with a final message
+            gobject.timeout_add(1.0, self._disconnect)
 
     def setRating(self, rating):
         """Set the rating of the flight."""
@@ -563,6 +568,10 @@ class GUI(fs.ConnectionListener):
         """Initialize the weight help tab."""
         self._weightHelp.reset()
         self._weightHelp.enable()
+
+    def getFleetAsync(self, callback = None, force = None):
+        """Get the fleet asynchronously."""
+        gobject.idle_add(self.getFleet, callback, force)
 
     def getFleet(self, callback = None, force = False):
         """Get the fleet.
