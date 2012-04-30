@@ -435,7 +435,8 @@ class Simulator(object):
     
     normalData = timeData + \
                  [ (0x3d00, -256),           # The name of the current aircraft
-                   (0x3c00, -256) ]          # The path of the current AIR file
+                   (0x3c00, -256),           # The path of the current AIR file
+                   (0x1274, "h") ]           # Text display mode
 
     flareData1 = [ (0x023a, "b"),            # Seconds of time
                    (0x31e4, "d"),            # Radio altitude
@@ -494,6 +495,8 @@ class Simulator(object):
                                 connectAttempts = connectAttempts,
                                 connectInterval = connectInterval)
         self._handler.start()
+
+        self._scroll = False
 
         self._normalRequestID = None
 
@@ -575,6 +578,21 @@ class Simulator(object):
             self._handler.clearPeriodic(self._flareRequestID)
             self._flareRequestID = None
 
+    def sendMessage(self, message, duration = 3):
+        """Send a message to the pilot via the simulator.
+
+        duration is the number of seconds to keep the message displayed."""
+        
+        if self._scroll:
+            if duration==0: duration = -1
+            elif duration == 1: duration = -2
+            else: duration = -duration
+
+        data = [(0x3380, -1 - len(message), message),
+                (0x32fa, 'h', duration)]
+
+        self._handler.requestWrite(data, self._handleMessageSent)
+            
     def disconnect(self):
         """Disconnect from the simulator."""
         assert not self._monitoringRequested 
@@ -612,6 +630,8 @@ class Simulator(object):
         timestamp = Simulator._getTimestamp(data)
 
         createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
+
+        self._scroll = data[7]!=0
         
         if self._monitoringRequested and not self._monitoring:
             self._stopNormal()
@@ -762,6 +782,10 @@ class Simulator(object):
         payload = sum(data[2:]) * const.LBSTOKG
         dow = zfw - payload
         callback(dow, payload, zfw, grossWeight)
+
+    def _handleMessageSent(self, success, extra):
+        """Callback for a message sending request."""
+        pass
                                                   
 #------------------------------------------------------------------------------
 

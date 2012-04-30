@@ -3,8 +3,11 @@
 #-------------------------------------------------------------------------------
 
 import const
+from sound import startSound
 
 import fsuipc
+import threading
+import time
 
 #-------------------------------------------------------------------------------
 
@@ -40,6 +43,97 @@ def createSimulator(type, connectionListener):
     assert type in [const.SIM_MSFS9, const.SIM_MSFSX], \
            "Only MS Flight Simulator 2004 and X are supported"
     return fsuipc.Simulator(connectionListener, connectAttempts = 3)
+
+#-------------------------------------------------------------------------------
+
+class MessageThread(threading.Thread):
+    """Thread to handle messages."""
+    def __init__(self, config, simulator):
+        """Initialize the message thread with the given configuration and
+        simulator."""
+        super(MessageThread, self).__init__()
+
+        self._config = config
+        self._simulator = simulator
+
+        self._requestCondition = threading.Condition()
+        self._messages = []
+        self._nextMessageTime = None
+        self._toQuit = False
+
+        self.daemon = True
+
+    def add(self, messageType, text, duration):
+        """Add the given message to the requested messages."""
+        with self._requestCondition:
+            self._messages.append((messageType, text, duration))
+            self._requestCondition.notify()
+
+    def quit(self):
+        """Quit the thread."""
+        with self._requestCondition:
+            self._toQuit = True
+            self._requestCondition.notifty()
+        self.join()
+
+    def run(self):
+        """Perform the thread's operation."""
+        while True:
+            (messageType, text, duration) = (None, None, None)
+            with self._requestCondition:
+                now = time.time()
+                while not self._toQuit and \
+                      ((self._nextMessageTime is not None and \
+                        self._nextMessageTime>now) or \
+                       not self._messages):
+                    self._requestCondition.wait(1)
+                    now = time.time()
+
+                if self._toQuit: return
+                if self._nextMessageTime is None or \
+                   self._nextMessageTime<=now:
+                    self._nextMessageTime = None
+
+                    if self._messages:
+                        (messageType, text, duration) = self._messages[0]
+                        del self._messages[0]
+
+            if text is not None:        
+                self._sendMessage(messageType, text, duration)
+
+    def _sendMessage(self, messageType, text, duration):
+        """Send the message and setup the next message time."""
+        messageLevel = self._config.getMessageTypeLevel(messageType)
+        if messageLevel==const.MESSAGELEVEL_SOUND or \
+           messageLevel==const.MESSAGELEVEL_BOTH:
+            startSound(const.SOUND_DING)
+        if (messageLevel==const.MESSAGELEVEL_FS or \
+            messageLevel==const.MESSAGELEVEL_BOTH):
+            self._simulator.sendMessage("[MLX] " + text, duration = duration)
+        self._nextMessageTime = time.time() + duration
+
+#-------------------------------------------------------------------------------
+
+_messageThread = None
+
+#-------------------------------------------------------------------------------
+
+def setupMessageSending(config, simulator):
+    """Setup message sending with the given config and simulator."""
+    global _messageThread
+    if _messageThread is not None:
+        _messageThread.quit()
+    _messageThread = MessageThread(config, simulator)
+    _messageThread.start()
+
+#-------------------------------------------------------------------------------
+
+def sendMessage(messageType, text, duration = 3):
+    """Send the given message of the given type into the simulator and/or play
+    a corresponding sound."""
+    global _messageThread
+    if _messageThread is not None:
+        _messageThread.add(messageType, text, duration)
 
 #-------------------------------------------------------------------------------
 

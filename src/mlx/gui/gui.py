@@ -297,6 +297,8 @@ class GUI(fs.ConnectionListener):
         """Called when we have connected to the simulator."""
         self._connected = True
         self._logger.untimedMessage("Connected to the simulator %s" % (descriptor,))
+        fs.sendMessage(const.MESSAGETYPE_INFORMATION,
+                       "Welcome to MAVA Logger X " + const.VERSION)
         gobject.idle_add(self._handleConnected, fsType, descriptor)
 
     def _handleConnected(self, fsType, descriptor):
@@ -679,6 +681,7 @@ class GUI(fs.ConnectionListener):
         
         if self._simulator is None:
             self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
+            fs.setupMessageSending(self.config, self._simulator)
 
         self._flight.simulator = self._simulator
 

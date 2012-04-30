@@ -247,6 +247,10 @@ class Values(object):
         self.payload = []
         for i in range(0, 61): self.payload.append(0.0)
 
+        self.textScrolling = False
+        self.message = ""
+        self.messageDuration = 0
+
     def read(self, offset):
         """Read the value at the given offset."""
         try:
@@ -405,6 +409,8 @@ class Values(object):
             return self._getFuelLevel(self.FUEL_EXTERNAL_2)
         elif offset==0x1260:       # External 2 tank capacity
             return self._getFuelCapacity(self.FUEL_EXTERNAL_2)
+        elif offset==0x1274:       # Text display mode
+            return 1 if self.textScrolling else 0
         elif offset==0x13fc:       # The number of the payload stations
             return self.payloadCount
         elif offset>=0x1400 and offset<=0x1f40 and \
@@ -425,6 +431,10 @@ class Values(object):
             radioAltitude = (self.altitude - 517) \
                 if self.radioAltitude is None else self.radioAltitude
             return (radioAltitude * const.FEETTOMETRES * 65536.0)
+        elif offset==0x32fa:       # Message duration
+            return self.messageDuration
+        elif offset==0x3380:       # Message
+            return self.message
         elif offset==0x3364:       # Frozen
             return 1 if self.frozen else 0
         elif offset==0x3bfc:       # ZFW
@@ -589,6 +599,8 @@ class Values(object):
             self._setFuelLevel(self.FUEL_EXTERNAL_2, value)
         elif offset==0x1260:       # External 2 tank capacity
             self._setFuelCapacity(self.FUEL_EXTERNAL_2, value)
+        elif offset==0x1274:       # Text display mode
+            textScrolling = value!=0
         elif offset==0x13fc:       # The number of the payload stations
             self.payloadCount = int(value)
         elif offset>=0x1400 and offset<=0x1f40 and \
@@ -604,6 +616,10 @@ class Values(object):
             raise FSUIPCException(ERR_DATA)
         elif offset==0x31e4:       # Radio altitude
             raise FSUIPCException(ERR_DATA)
+        elif offset==0x32fa:       # Message duration
+            self.messageDuration = value
+        elif offset==0x3380:       # Message
+            self.message = value
         elif offset==0x3364:       # Frozen
             self.frozen = value!=0
         elif offset==0x3bfc:       # ZFW
@@ -1136,7 +1152,15 @@ class CLI(cmd.Cmd):
                                                        value * const.LBSTOKG,
                                                        lambda word:
                                                        float(word)*const.KGSTOLB)
+        self._valueHandlers["textScrolling"] = (0x1274, "h",
+                                                CLI.bool2str, CLI.str2bool)
                                                             
+        self._valueHandlers["messageDuration"] = (0x32fa, "h",
+                                                  lambda value: value,
+                                                  lambda word: int(word))
+        self._valueHandlers["message"] = (0x3380, -128,
+                                          lambda value: value,
+                                          lambda word: word)
     def default(self, line):
         """Handle unhandle commands."""
         if line=="EOF":

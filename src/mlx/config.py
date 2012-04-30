@@ -231,8 +231,14 @@ class Config(object):
         if config.has_option(Config._messageTypesSection, option):
             value = config.get(Config._messageTypesSection, option)
             return const.string2messageLevel(value)
+        elif messageType in [const.MESSAGETYPE_LOGGER_ERROR,
+                             const.MESSAGETYPE_FAULT,
+                             const.MESSAGETYPE_NOGO,
+                             const.MESSAGETYPE_GATE_SYSTEM,
+                             const.MESSAGETYPE_HELP]:            
+            return const.MESSAGELEVEL_BOTH
         else:
-            return const.MESSAGELEVEL_NONE
+            return const.MESSAGELEVEL_FS
 
     def _getMessageTypeLevelOptionName(self, messageType):
         """Get the option name for the given message type level."""

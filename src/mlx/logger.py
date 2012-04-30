@@ -2,6 +2,7 @@
 
 #--------------------------------------------------------------------------------------
 
+from fs import sendMessage
 import const
 import util
 
@@ -73,6 +74,7 @@ class Logger(object):
         self.message(timestamp, "--- %s ---" % (s,))
         if stage==const.STAGE_END:
             self.untimedMessage("Rating: %.0f" % (self.getRating(),))
+        sendMessage(const.MESSAGETYPE_INFORMATION, "Flight stage: " + s, 3)
         
     def fault(self, faultID, timestamp, what, score):
         """Report a fault.
@@ -86,10 +88,15 @@ class Logger(object):
                 return
         self._faults[faultID] = score
         if score==Logger.NO_GO_SCORE:
-            lineIndex = self.message(timestamp, "%s (NO GO)" % (what))
+            text = "%s (NO GO)" % (what)
         else:
-            lineIndex = self.message(timestamp, "%s (%.1f)" % (what, score))
+            text = "%s (%.1f)" % (what, score)
+        lineIndex = self.message(timestamp, "%s (NO GO)" % (what))
         self._faultLineIndexes.append(lineIndex)
+        (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
+                                  if score==Logger.NO_GO_SCORE \
+                                  else (const.MESSAGETYPE_FAULT, 5)
+        sendMessage(messageType, text, duration)            
 
     def noGo(self, faultID, timestamp, what):
         """Report a No-Go fault."""

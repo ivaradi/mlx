@@ -197,9 +197,11 @@ DELAYCODE_PERSONAL = 9
 #-------------------------------------------------------------------------------
 
 # Message type: logger error
+# FIXME: cannot set the hotkey
 MESSAGETYPE_LOGGER_ERROR = 1
 
 # Message type: information
+# FIXME: flare time begin (3 sec)
 MESSAGETYPE_INFORMATION = 2
 
 # Message type: fault messages
@@ -209,15 +211,19 @@ MESSAGETYPE_FAULT = 3
 MESSAGETYPE_NOGO = 4
 
 # Message type: gate system messages
+# FIXME: the available gates when arriving to LHBP (10 sec)
 MESSAGETYPE_GATE_SYSTEM = 5
 
 # Message type: environment messages
+# FIXME: flight plan closed (5 sec)
 MESSAGETYPE_ENVIRONMENT = 6
 
 # Message type: help messages
+# FIXME: don't forget V speeds when stage is PUSHANDTAXI (5 sec)
 MESSAGETYPE_HELP = 7
 
 # Message type: visibility messages
+# FIXME: the visibility, once when below 2000 RA, then when below 1000 RA (5 sec)
 MESSAGETYPE_VISIBILITY = 8
 
 #-------------------------------------------------------------------------------
@@ -289,6 +295,11 @@ def string2messageLevel(str):
 
 #-------------------------------------------------------------------------------
 
+# Sound: ding
+SOUND_DING = "ding.wav"
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 
@@ -314,4 +325,6 @@ for i in range(60, 84):
 #-------------------------------------------------------------------------------
 
 languages = ["$system", "en_GB", "hu_HU"]
+
+#-------------------------------------------------------------------------------
 

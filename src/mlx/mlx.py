@@ -2,6 +2,7 @@
 
 from config import Config
 from i18n import setLanguage
+from sound import initializeSound
 
 import os
 import sys
@@ -37,6 +38,8 @@ def main():
     
     sys.stdout = StdIOHandler(gui)
     sys.stderr = StdIOHandler(gui)
+
+    initializeSound(os.path.join(programDirectory, "sounds"))
 
     try:
         gui.build(programDirectory)
