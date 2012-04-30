@@ -386,6 +386,9 @@ class _English(_Strings):
         self.add("finish_online", "_Online flight")
         self.add("finish_online_tooltip",
                  "Check if your flight was online, uncheck otherwise.")
+        self.add("finish_gate", "_Arrival gate:")
+        self.add("finish_gate_tooltip",
+                 "Select the gate or stand at which you have arrived to LHBP.")
         self.add("finish_save", "S_ave PIREP...")
         self.add("finish_save_tooltip",
                  "Click to save the PIREP into a file on your computer. " \
@@ -847,6 +850,9 @@ class _Hungarian(_Strings):
         self.add("finish_online_tooltip",
                  "Jelöld be, ha a repülésed a hálózaton történt, egyébként " \
                  "szűntesd meg a kijelölést.")
+        self.add("finish_gate", "_Érkezési kapu:")
+        self.add("finish_gate_tooltip",
+                 "Válaszd ki azt a kaput vagy állóhelyet, ahová érkeztél LHBP-n.")
         self.add("finish_save", "PIREP _mentése...")
         self.add("finish_save_tooltip",
                  "Kattints ide, hogy elmenthesd a PIREP-et egy fájlba a számítógépeden. " \

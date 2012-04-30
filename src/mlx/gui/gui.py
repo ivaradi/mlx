@@ -47,8 +47,15 @@ class GUI(fs.ConnectionListener):
         self._flight = None
         self._simulator = None
         self._monitoring = False
+
         self._fleet = None
+
         self._fleetCallback = None
+
+        self._updatePlaneCallback = None
+        self._updatePlaneTailNumber = None
+        self._updatePlaneStatus = None
+        self._updatePlaneGateNumber = None
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
@@ -582,15 +589,61 @@ class GUI(fs.ConnectionListener):
             dialog = gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("fleet_failed"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            dialog.run()
+            dialog.hide()
+
+        callback = self._fleetCallback
+        self._fleetCallback = None
+        if  callback is not None:
+            callback(self._fleet)
+        self._fleetGateStatus.handleFleet(self._fleet)
+
+    def updatePlane(self, tailNumber, status,
+                    gateNumber = None, callback = None):
+        """Update the status of the given plane."""
+        self.beginBusy(xstr("fleet_update_busy"))
+
+        self._updatePlaneCallback = callback
+
+        self._updatePlaneTailNumber = tailNumber
+        self._updatePlaneStatus = status
+        self._updatePlaneGateNumber = gateNumber
+        
+        self.webHandler.updatePlane(self._updatePlaneResultCallback,
+                                    tailNumber, status, gateNumber)
+
+    def _updatePlaneResultCallback(self, returned, result):
+        """Called when the status of a plane has been updated."""
+        gobject.idle_add(self._handleUpdatePlaneResult, returned, result)
+
+    def _handleUpdatePlaneResult(self, returned, result):
+        """Handle the plane update result."""
+        self.endBusy()
+        if returned:
+            success = result.success
+            if success:
+                if self._fleet is not None:
+                    self._fleet.updatePlane(self._updatePlaneTailNumber,
+                                            self._updatePlaneStatus,
+                                            self._updatePlaneGateNumber)
+                    self._fleetGateStatus.handleFleet(self._fleet)
+        else:
+            dialog = gtk.MessageDialog(parent = self.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       message_format = xstr("fleet_update_failed"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
 
-        if self._fleetCallback is not None:
-            self._fleetCallback(self._fleet)
-            self._fleetCallback = None
-        self._fleetGateStatus.handleFleet(self._fleet)
+            success = None
+
+        callback = self._updatePlaneCallback
+        self._updatePlaneCallback = None
+        if callback is not None:
+            callback(success)
 
     def _writeStdIO(self):
         """Perform the real writing."""

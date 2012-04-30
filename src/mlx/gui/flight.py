@@ -415,9 +415,9 @@ class FlightSelectionPage(Page):
         if flight.departureICAO=="LHBP":
             self._wizard.getFleet(self._fleetRetrieved)
         else:
-            self._nextDistance = 2
-            self._wizard.jumpPage(2)
-
+            self._wizard.updatePlane(self._planeUpdated,
+                                     flight.tailNumber,
+                                     const.PLANE_AWAY)
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
@@ -436,6 +436,11 @@ class FlightSelectionPage(Page):
             else:
                 self._nextDistance = 1
                 self._wizard.nextPage()
+
+    def _planeUpdated(self, success):
+        """Callback for the plane updating."""
+        self._nextDistance = 2
+        self._wizard.jumpPage(2)
         
 #-----------------------------------------------------------------------------
 
@@ -508,12 +513,11 @@ class GateSelectionPage(Page):
 
             self._wizard._departureGate = gateNumber
 
-            #self._wizard._updatePlane(self._planeUpdated,
-            #                          self._wizard._bookedFlight.tailNumber,
-            #                          const.PLANE_HOME,
-            #                          gateNumber)
-        
-        self._wizard.nextPage()
+            self._wizard.updatePlane(self._planeUpdated,
+                                     self._wizard._bookedFlight.tailNumber,
+                                     const.PLANE_HOME, gateNumber)
+        else:
+            self._wizard.nextPage()
 
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
@@ -1664,6 +1668,15 @@ class LandingPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
+        if not self._completed and \
+           self._wizard.bookedFlight.arrivalICAO=="LHBP":
+            self._wizard.getFleet(callback = self._fleetRetrieved,
+                                  force = True)
+        else:
+            self._wizard.nextPage()
+
+    def _fleetRetrieved(self, fleet):
+        """Callback for the fleet retrieval."""
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -1683,7 +1696,7 @@ class FinishPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 2)
+        table = gtk.Table(8, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -1785,6 +1798,26 @@ class FinishPage(Page):
         onlineFlightAlignment.add(self._onlineFlight)
         table.attach(onlineFlightAlignment, 1, 2, 6, 7)
 
+        labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
+                                       yalign = 0.5, yscale = 0.0)
+        self._gateLabel = gtk.Label(xstr("finish_gate"))
+        self._gateLabel.set_use_underline(True)
+        labelAlignment.add(self._gateLabel)
+        table.attach(labelAlignment, 0, 1, 7, 8)
+
+        self._gatesModel = gtk.ListStore(str)
+
+        self._gate = gtk.ComboBox(model = self._gatesModel)
+        renderer = gtk.CellRendererText()
+        self._gate.pack_start(renderer, True)
+        self._gate.add_attribute(renderer, "text", 0)
+        self._gate.set_tooltip_text(xstr("finish_gate_tooltip"))
+        self._gate.connect("changed", self._gateChanged)               
+        gateAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+        gateAlignment.add(self._gate)
+        table.attach(gateAlignment, 1, 2, 7, 8)
+        self._gateLabel.set_mnemonic_widget(self._gate)
+
         self.addPreviousButton(clicked = self._backClicked)
 
         self._saveButton = self.addButton(xstr("finish_save"),
@@ -1833,16 +1866,39 @@ class FinishPage(Page):
         self._flightType.set_active(-1)
         self._onlineFlight.set_active(True)
 
+        self._gatesModel.clear()
+        if self._wizard.bookedFlight.arrivalICAO=="LHBP":
+            occupiedGates = self._wizard._fleet.getOccupiedGateNumbers()
+            for gateNumber in const.lhbpGateNumbers:
+                if gateNumber not in occupiedGates:
+                    self._gatesModel.append([gateNumber])
+            self._gateLabel.set_sensitive(True)
+            self._gate.set_sensitive(True)
+            self._gate.set_active(-1)
+        else:
+            self._gateLabel.set_sensitive(False)
+            self._gate.set_sensitive(False)
+
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
 
+    def _updateButtons(self):
+        """Update the sensitivity state of the buttons."""
+        sensitive = self._flightType.get_active()>=0 and \
+                    (self._gatesModel.get_iter_first() is None or
+                     self._gate.get_active()>=0)
+        
+        #self._saveButton.set_sensitive(sensitive)
+        self._sendButton.set_sensitive(sensitive)        
+
     def _flightTypeChanged(self, comboBox):
         """Called when the flight type has changed."""
-        index = self._flightType.get_active()
-        flightTypeIsValid = index>=0
-        #self._saveButton.set_sensitive(flightTypeIsValid)
-        self._sendButton.set_sensitive(flightTypeIsValid)
+        self._updateButtons()
+
+    def _gateChanged(self, comboBox):
+        """Called when the arrival gate has changed."""
+        self._updateButtons()
 
     def _sendClicked(self, button):
         """Called when the Send button is clicked."""
@@ -1887,6 +1943,27 @@ class FinishPage(Page):
 
         dialog.run()
         dialog.hide()
+
+        if returned and result.success:
+            bookedFlight = self._wizard.bookedFlight
+            if bookedFlight.arrivalICAO=="LHBP":
+                iter = self._gate.get_active_iter()                
+                gateNumber = None if iter is None \
+                             else self._gatesModel.get_value(iter, 0)
+                
+                status = const.PLANE_PARKING if gateNumber is None \
+                         else const.PLANE_HOME
+            else:
+                gateNumber = None
+                status = const.PLANE_AWAY
+
+            self._wizard.updatePlane(self._planeUpdated,
+                                     bookedFlight.tailNumber,
+                                     status, gateNumber = gateNumber)
+
+    def _planeUpdated(self, success):
+        """Callback for the plane updating."""
+        pass
         
 #-----------------------------------------------------------------------------
 
@@ -2095,7 +2172,6 @@ class Wizard(gtk.VBox):
                 self.gui.webHandler.getMETARs(self._arrivalMETARCallback,
                                               [self._bookedFlight.arrivalICAO])
             
-            self._takeoffPage.allowForward()
         elif stage==const.STAGE_END:
             self._landingPage.flightEnded()
 
@@ -2103,7 +2179,6 @@ class Wizard(gtk.VBox):
         """Initialize the wizard."""
         self._fleet = None
         self._fleetCallback = None
-        self._updatePlaneCallback = None
         
         self._loginResult = None
         self._bookedFlight = None
@@ -2118,10 +2193,10 @@ class Wizard(gtk.VBox):
         
         self.setCurrentPage(0)
 
-    def getFleet(self, callback):
+    def getFleet(self, callback, force = False):
         """Get the fleet via the GUI and call the given callback."""
         self._fleetCallback = callback
-        self.gui.getFleet(self._fleetRetrieved)
+        self.gui.getFleet(callback = self._fleetRetrieved, force = force)
 
     def _fleetRetrieved(self, fleet):
         """Callback for the fleet retrieval."""
@@ -2130,35 +2205,10 @@ class Wizard(gtk.VBox):
             self._fleetCallback(fleet)
         self._fleetCallback = None
         
-    def _updatePlane(self, callback, tailNumber, status, gateNumber = None):
+    def updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the given plane's gate information."""
-        self.gui.beginBusy(xstr("fleet_update_busy"))
-        self._updatePlaneCallback = callback
-        self.gui.webHandler.updatePlane(self._updatePlaneResultCallback,
-                                        tailNumber, status, gateNumber)
-
-    def _updatePlaneResultCallback(self, returned, result):
-        """Callback for the plane updating operation."""
-        gobject.idle_add(self._handleUpdatePlaneResult, returned, result)
-
-    def _handleUpdatePlaneResult(self, returned, result):
-        """Handle the result of a plane update operation."""
-        self.gui.endBusy()
-        if returned:
-            success = result.success
-        else:
-            success = None
-
-            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
-                                       message_format =
-                                       xstr("fleet_update_failed"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-            dialog.set_title(WINDOW_TITLE_BASE)
-            dialog.run()
-            dialog.hide()
-
-        self._updatePlaneCallback(success)
+        self.gui.updatePlane(tailNumber, status, gateNumber = gateNumber,
+                             callback = callback)
 
     def _connectSimulator(self):
         """Connect to the simulator."""

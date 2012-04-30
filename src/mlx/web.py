@@ -178,7 +178,14 @@ class Fleet(object):
             if p.status==const.PLANE_HOME and p.gateNumber:
                 gateNumbers.add(p.gateNumber)
         return gateNumbers
-
+    
+    def updatePlane(self, tailNumber, status, gateNumber = None):
+        """Update the status of the given plane."""
+        if tailNumber in self._planes:
+            plane = self._planes[tailNumber]
+            plane.status = status
+            plane.gateNumber = gateNumber
+    
     def __iter__(self):
         """Get an iterator over the planes."""
         for plane in self._planes.itervalues():
