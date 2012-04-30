@@ -60,6 +60,7 @@ class Preferences(gtk.Dialog):
     def _fromConfig(self, config):
         """Setup the dialog from the given configuration."""
         self._setLanguage(config.language)
+        self._flareTimeFromFS.set_active(config.flareTimeFromFS)
 
         self._togglingAutoUpdate = True
         self._autoUpdate.set_active(config.autoUpdate)
@@ -72,6 +73,7 @@ class Preferences(gtk.Dialog):
     def _toConfig(self, config):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
+        config.flareTimeFromFS = self._flareTimeFromFS.get_active()
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
 
@@ -106,10 +108,16 @@ class Preferences(gtk.Dialog):
         languageComboBox.connect("changed", self._languageChanged)
         languageBox.pack_start(languageComboBox, False, False, 4)
 
+        label.set_mnemonic_widget(languageComboBox)
+
         self._changingLanguage = False
         self._warnedRestartNeeded = False
 
-        label.set_mnemonic_widget(languageComboBox)
+        self._flareTimeFromFS = gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
+        self._flareTimeFromFS.set_use_underline(True)
+        self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
+
+        mainBox.pack_start(self._flareTimeFromFS, False, False, 4)
                                        
         return mainAlignment
 

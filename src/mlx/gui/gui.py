@@ -672,6 +672,7 @@ class GUI(fs.ConnectionListener):
         self._logger.reset()
 
         self._flight = flight.Flight(self._logger, self)
+        self._flight.flareTimeFromFS = self.config.flareTimeFromFS
         self._flight.aircraftType = aircraftType
         self._flight.aircraft = acft.Aircraft.create(self._flight)
         self._flight.aircraft._checkers.append(self)

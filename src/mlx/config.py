@@ -33,8 +33,9 @@ class Config(object):
 
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
-
+        
         self._language = ""
+        self._flareTimeFromFS = False
 
         self._modified = False
 
@@ -87,6 +88,20 @@ class Config(object):
             self._modified = True
 
     @property
+    def flareTimeFromFS(self):
+        """Get whether the flare time should be calculated from the time values
+        returned by the simulator."""
+        return self._flareTimeFromFS
+
+    @flareTimeFromFS.setter
+    def flareTimeFromFS(self, flareTimeFromFS):
+        """Set whether the flare time should be calculated from the time values
+        returned by the simulator."""
+        if flareTimeFromFS!=self._flareTimeFromFS:
+            self._flareTimeFromFS = flareTimeFromFS
+            self._modified = True
+
+    @property
     def autoUpdate(self):
         """Get if an automatic update is needed."""
         return self._autoUpdate
@@ -125,6 +140,9 @@ class Config(object):
                                     Config.DEFAULT_UPDATE_URL)
 
         self._language = self._get(config, "general", "language", "")
+        self._flareTimeFromFS = self._getBoolean(config, "general",
+                                                 "flareTimeFromFS",
+                                                 False)
         
         self._modified = False
 
@@ -149,6 +167,8 @@ class Config(object):
         config.add_section("general")
         if self._language:
             config.set("general", "language", self._language)
+        config.set("general", "flareTimeFromFS",
+                   "yes" if self._flareTimeFromFS else "no")
         
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,

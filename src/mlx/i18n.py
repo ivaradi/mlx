@@ -556,6 +556,11 @@ class _English(_Strings):
         self.add("prefs_lang_$system", "system default")
         self.add("prefs_lang_en_GB", "English")
         self.add("prefs_lang_hu_HU", "Hungarian")
+        self.add("prefs_flaretimeFromFS",
+                 "Take flare _time from the simulator")
+        self.add("prefs_flaretimeFromFS_tooltip",
+                 "If this is checked, the time of the flare will be calculated "
+                 "from timestamps returned by the simulator.")
         self.add("prefs_update_auto", "Update the program auto_matically")
         self.add("prefs_update_auto_tooltip",
                  "If checked the program will look for updates when "
@@ -1022,6 +1027,11 @@ class _Hungarian(_Strings):
         self.add("prefs_lang_$system", "alapértelmezett")
         self.add("prefs_lang_en_GB", "angol")
         self.add("prefs_lang_hu_HU", "magyar")
+        self.add("prefs_flaretimeFromFS",
+                 "A ki_lebegtetés idejét vedd a szimulátorból")
+        self.add("prefs_flaretimeFromFS_tooltip",
+                 "Ha ezt bejelölöd, a kilebegtetés idejét a szimulátor "
+                 "által visszaadott időbélyegek alapján számolja a program.")
         self.add("prefs_update_auto",
                  "Frissítsd a programot _automatikusan")
         self.add("prefs_update_auto_tooltip",
