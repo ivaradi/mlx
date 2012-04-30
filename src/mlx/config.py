@@ -36,6 +36,7 @@ class Config(object):
         self._rememberPassword = False
 
         self._language = ""
+        self._onlineGateSystem = True
         self._flareTimeFromFS = False
         
         self._autoUpdate = True        
@@ -91,6 +92,18 @@ class Config(object):
         """Set the language to use."""
         if language!=self._language:
             self._language = language
+            self._modified = True
+
+    @property
+    def onlineGateSystem(self):
+        """Get whether the online gate system should be used."""
+        return self._onlineGateSystem
+
+    @onlineGateSystem.setter
+    def onlineGateSystem(self, onlineGateSystem):
+        """Set whether the online gate system should be used."""
+        if onlineGateSystem!=self._onlineGateSystem:
+            self._onlineGateSystem = onlineGateSystem
             self._modified = True
 
     @property
@@ -162,6 +175,9 @@ class Config(object):
                                                   "rememberPassword", False)
 
         self._language = self._get(config, "general", "language", "")
+        self._onlineGateSystem = self._getBoolean(config, "general",
+                                                  "onlineGateSystem",
+                                                  True)
         self._flareTimeFromFS = self._getBoolean(config, "general",
                                                  "flareTimeFromFS",
                                                  False)
@@ -193,6 +209,8 @@ class Config(object):
         config.add_section("general")
         if self._language:
             config.set("general", "language", self._language)
+        config.set("general", "onlineGateSystem",
+                   "yes" if self._onlineGateSystem else "no")
         config.set("general", "flareTimeFromFS",
                    "yes" if self._flareTimeFromFS else "no")
 

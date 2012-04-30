@@ -412,12 +412,17 @@ class FlightSelectionPage(Page):
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
-        if flight.departureICAO=="LHBP":
-            self._wizard.getFleet(self._fleetRetrieved)
+        if self._wizard.gui.config.onlineGateSystem:
+            if flight.departureICAO=="LHBP":
+                self._wizard.getFleet(self._fleetRetrieved)
+            else:
+                self._wizard.updatePlane(self._planeUpdated,
+                                         flight.tailNumber,
+                                         const.PLANE_AWAY)
         else:
-            self._wizard.updatePlane(self._planeUpdated,
-                                     flight.tailNumber,
-                                     const.PLANE_AWAY)
+            self._nextDistance = 2
+            self._wizard.jumpPage(2)
+            
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
@@ -1668,7 +1673,8 @@ class LandingPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        if not self._completed and \
+        if self._wizard.gui.config.onlineGateSystem and \
+           not self._completed and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP":
             self._wizard.getFleet(callback = self._fleetRetrieved,
                                   force = True)
@@ -1867,7 +1873,8 @@ class FinishPage(Page):
         self._onlineFlight.set_active(True)
 
         self._gatesModel.clear()
-        if self._wizard.bookedFlight.arrivalICAO=="LHBP":
+        if self._wizard.gui.config.onlineGateSystem and \
+           self._wizard.bookedFlight.arrivalICAO=="LHBP":
             occupiedGates = self._wizard._fleet.getOccupiedGateNumbers()
             for gateNumber in const.lhbpGateNumbers:
                 if gateNumber not in occupiedGates:
@@ -1944,7 +1951,7 @@ class FinishPage(Page):
         dialog.run()
         dialog.hide()
 
-        if returned and result.success:
+        if self._wizard.gui.config.onlineGateSystem and returned and result.success:
             bookedFlight = self._wizard.bookedFlight
             if bookedFlight.arrivalICAO=="LHBP":
                 iter = self._gate.get_active_iter()                

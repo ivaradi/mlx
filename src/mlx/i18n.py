@@ -559,6 +559,11 @@ class _English(_Strings):
         self.add("prefs_lang_$system", "system default")
         self.add("prefs_lang_en_GB", "English")
         self.add("prefs_lang_hu_HU", "Hungarian")
+        self.add("prefs_onlineGateSystem",
+                 "_Use the Online Gate System")
+        self.add("prefs_onlineGateSystem_tooltip",
+                 "If this is checked, the logger will query and update the "
+                 "LHBP Online Gate System.")
         self.add("prefs_flaretimeFromFS",
                  "Take flare _time from the simulator")
         self.add("prefs_flaretimeFromFS_tooltip",
@@ -1054,6 +1059,11 @@ class _Hungarian(_Strings):
         self.add("prefs_lang_$system", "alapértelmezett")
         self.add("prefs_lang_en_GB", "angol")
         self.add("prefs_lang_hu_HU", "magyar")
+        self.add("prefs_onlineGateSystem",
+                 "Az Online _Gate System használata")
+        self.add("prefs_onlineGateSystem_tooltip",
+                 "Ha ezt bejelölöd, a logger lekérdezi és frissíti az "
+                 "LHBP Online Gate System adatait.")
         self.add("prefs_flaretimeFromFS",
                  "A ki_lebegtetés idejét vedd a szimulátorból")
         self.add("prefs_flaretimeFromFS_tooltip",

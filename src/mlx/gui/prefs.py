@@ -66,6 +66,7 @@ class Preferences(gtk.Dialog):
     def _fromConfig(self, config):
         """Setup the dialog from the given configuration."""
         self._setLanguage(config.language)
+        self._onlineGateSystem.set_active(config.onlineGateSystem)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
 
         for messageType in const.messageTypes:
@@ -88,6 +89,7 @@ class Preferences(gtk.Dialog):
     def _toConfig(self, config):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
+        config.onlineGateSystem = self._onlineGateSystem.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
 
         for messageType in const.messageTypes:
@@ -141,10 +143,14 @@ class Preferences(gtk.Dialog):
         self._changingLanguage = False
         self._warnedRestartNeeded = False
 
+        self._onlineGateSystem = gtk.CheckButton(xstr("prefs_onlineGateSystem"))
+        self._onlineGateSystem.set_use_underline(True)
+        self._onlineGateSystem.set_tooltip_text(xstr("prefs_onlineGateSystem_tooltip"))
+        mainBox.pack_start(self._onlineGateSystem, False, False, 4)
+
         self._flareTimeFromFS = gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
         self._flareTimeFromFS.set_use_underline(True)
         self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
-
         mainBox.pack_start(self._flareTimeFromFS, False, False, 4)
                                        
         return mainAlignment

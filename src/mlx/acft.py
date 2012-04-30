@@ -154,8 +154,10 @@ class Aircraft(object):
                 self._logV1R2()
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 bookedFlight = self._flight.bookedFlight
-                if bookedFlight.arrivalICAO=="LHBP" and \
-                   self._flight.config.isMessageTypeFS(const.MESSAGETYPE_GATE_SYSTEM):
+                config = self._flight.config
+                if config.onlineGateSystem and \
+                   bookedFlight.arrivalICAO=="LHBP" and \
+                   config.isMessageTypeFS(const.MESSAGETYPE_GATE_SYSTEM):
                     self._flight.getFleet(callback = self._fleetRetrieved,
                                           force = True)
                 self.logger.message(aircraftState.timestamp, "Flight time end")
