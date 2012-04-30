@@ -117,6 +117,25 @@ STAGE_END = 12
 
 #-------------------------------------------------------------------------------
 
+_stageStrings = { STAGE_BOARDING : "boarding",
+                  STAGE_PUSHANDTAXI : "pushback and taxi",
+                  STAGE_TAKEOFF : "takeoff",
+                  STAGE_RTO : "RTO",
+                  STAGE_CLIMB : "climb",
+                  STAGE_CRUISE : "cruise",
+                  STAGE_DESCENT : "descent",
+                  STAGE_LANDING : "landing",
+                  STAGE_TAXIAFTERLAND : "taxi",
+                  STAGE_PARKING : "parking",
+                  STAGE_GOAROUND : "go-around",
+                  STAGE_END : "end" }
+
+def stage2string(stage):
+    """Convert the given stage to a lower-case string."""
+    return _stageStrings[stage] if stage in _stageStrings else None
+        
+#-------------------------------------------------------------------------------
+
 # Plane status: unknown
 PLANE_UNKNOWN = 0
 
@@ -177,6 +196,99 @@ DELAYCODE_PERSONAL = 9
 
 #-------------------------------------------------------------------------------
 
+# Message type: logger error
+MESSAGETYPE_LOGGER_ERROR = 1
+
+# Message type: information
+MESSAGETYPE_INFORMATION = 2
+
+# Message type: fault messages
+MESSAGETYPE_FAULT = 3
+
+# Message type: NO-GO fault messages
+MESSAGETYPE_NOGO = 4
+
+# Message type: gate system messages
+MESSAGETYPE_GATE_SYSTEM = 5
+
+# Message type: environment messages
+MESSAGETYPE_ENVIRONMENT = 6
+
+# Message type: help messages
+MESSAGETYPE_HELP = 7
+
+# Message type: visibility messages
+MESSAGETYPE_VISIBILITY = 8
+
+#-------------------------------------------------------------------------------
+
+messageTypes = [ MESSAGETYPE_LOGGER_ERROR,
+                 MESSAGETYPE_INFORMATION,
+                 MESSAGETYPE_FAULT,
+                 MESSAGETYPE_NOGO,
+                 MESSAGETYPE_GATE_SYSTEM,
+                 MESSAGETYPE_ENVIRONMENT,
+                 MESSAGETYPE_HELP,
+                 MESSAGETYPE_VISIBILITY ]
+
+#-------------------------------------------------------------------------------
+
+_messageTypeStrings = { MESSAGETYPE_LOGGER_ERROR : "loggerError",
+                        MESSAGETYPE_INFORMATION : "information",
+                        MESSAGETYPE_FAULT : "fault",
+                        MESSAGETYPE_NOGO : "nogo",
+                        MESSAGETYPE_GATE_SYSTEM : "gateSystem",
+                        MESSAGETYPE_ENVIRONMENT : "environment",
+                        MESSAGETYPE_HELP : "help",
+                        MESSAGETYPE_VISIBILITY : "visibility" }
+
+def messageType2string(messageType):
+    """Get the string equivalent of the given message type."""
+    return _messageTypeStrings[messageType] \
+           if messageType in _messageTypeStrings else None    
+
+#-------------------------------------------------------------------------------
+
+# Message display level: none
+MESSAGELEVEL_NONE = 0
+
+# Message display level: only message in the simulator
+MESSAGELEVEL_FS = 1
+
+# Message display level: only sound
+MESSAGELEVEL_SOUND = 2
+
+# Message display level: both
+MESSAGELEVEL_BOTH = 3
+
+#-------------------------------------------------------------------------------
+
+messageLevels = [ MESSAGELEVEL_NONE,
+                  MESSAGELEVEL_FS,
+                  MESSAGELEVEL_SOUND,
+                  MESSAGELEVEL_BOTH ]
+
+#-------------------------------------------------------------------------------
+
+_messageLevelStrings = { MESSAGELEVEL_NONE : "none",
+                         MESSAGELEVEL_FS : "fs",
+                         MESSAGELEVEL_SOUND : "sound",
+                         MESSAGELEVEL_BOTH : "both" }
+
+def messageLevel2string(messageLevel):
+    """Get the string equivalent of the given message level."""
+    return _messageLevelStrings[messageLevel] \
+           if messageLevel in _messageLevelStrings else None    
+
+def string2messageLevel(str):
+    """Get the message level for the given string."""
+    for (value, s) in _messageLevelStrings.iteritems():
+        if str==s:
+            return value
+    return MESSAGELEVEL_NONE
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 
@@ -201,23 +313,5 @@ for i in range(60, 84):
 
 #-------------------------------------------------------------------------------
 
-_stageStrings = { STAGE_BOARDING : "boarding",
-                  STAGE_PUSHANDTAXI : "pushback and taxi",
-                  STAGE_TAKEOFF : "takeoff",
-                  STAGE_RTO : "RTO",
-                  STAGE_CLIMB : "climb",
-                  STAGE_CRUISE : "cruise",
-                  STAGE_DESCENT : "descent",
-                  STAGE_LANDING : "landing",
-                  STAGE_TAXIAFTERLAND : "taxi",
-                  STAGE_PARKING : "parking",
-                  STAGE_GOAROUND : "go-around",
-                  STAGE_END : "end" }
-
-def stage2string(stage):
-    """Convert the given stage to a lower-case string."""
-    return _stageStrings[stage] if stage in _stageStrings else None
-        
-#-------------------------------------------------------------------------------
-
 languages = ["$system", "en_GB", "hu_HU"]
+

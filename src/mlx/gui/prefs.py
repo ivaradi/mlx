@@ -36,6 +36,12 @@ class Preferences(gtk.Dialog):
         label.set_tooltip_text(xstr("prefs_tab_general_tooltip"))
         notebook.append_page(general, label)
 
+        messages = self._buildMessages()
+        label = gtk.Label(xstr("prefs_tab_messages"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("prefs_tab_message_tooltip"))
+        notebook.append_page(messages, label)
+
         advanced = self._buildAdvanced()
         label = gtk.Label(xstr("prefs_tab_advanced"))
         label.set_use_underline(True)
@@ -62,6 +68,15 @@ class Preferences(gtk.Dialog):
         self._setLanguage(config.language)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
 
+        for messageType in const.messageTypes:
+            level = config.getMessageTypeLevel(messageType)
+            button = self._msgFSCheckButtons[messageType]
+            button.set_active(level == const.MESSAGELEVEL_FS or
+                              level == const.MESSAGELEVEL_BOTH)
+            button = self._msgSoundCheckButtons[messageType]
+            button.set_active(level == const.MESSAGELEVEL_SOUND or
+                              level == const.MESSAGELEVEL_BOTH)
+
         self._togglingAutoUpdate = True
         self._autoUpdate.set_active(config.autoUpdate)
         self._togglingAutoUpdate = False
@@ -74,6 +89,19 @@ class Preferences(gtk.Dialog):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
+
+        for messageType in const.messageTypes:
+            fsButtonActive = self._msgFSCheckButtons[messageType].get_active()
+            soundButtonActive = self._msgSoundCheckButtons[messageType].get_active()
+            if fsButtonActive:
+                level = const.MESSAGELEVEL_BOTH if soundButtonActive \
+                        else const.MESSAGELEVEL_FS
+            elif soundButtonActive:
+                level = const.MESSAGELEVEL_SOUND
+            else:
+                level = const.MESSAGELEVEL_NONE
+            config.setMessageTypeLevel(messageType, level)
+
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
 
@@ -154,6 +182,84 @@ class Preferences(gtk.Dialog):
             dialog.hide()
             self._warnedRestartNeeded = True
 
+    def _buildMessages(self):
+        """Build the page for the message settings."""
+
+        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                      xscale = 0.0, yscale = 0.0)
+        mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
+                                  padding_left = 4, padding_right = 4)
+        mainBox = gtk.VBox()
+        mainAlignment.add(mainBox)
+
+        table = gtk.Table(len(const.messageTypes) + 1, 3)
+        table.set_row_spacings(8)
+        table.set_col_spacings(32)
+        table.set_homogeneous(False)
+        mainBox.pack_start(table, False, False, 4)
+        
+        label = gtk.Label(xstr("prefs_msgs_fs"))
+        label.set_justify(JUSTIFY_CENTER)
+        label.set_alignment(0.5, 1.0)
+        table.attach(label, 1, 2, 0, 1)
+        
+        label = gtk.Label(xstr("prefs_msgs_sound"))
+        label.set_justify(JUSTIFY_CENTER)
+        label.set_alignment(0.5, 1.0)
+        table.attach(label, 2, 3, 0, 1)
+
+        self._msgFSCheckButtons = {}
+        self._msgSoundCheckButtons = {}        
+        row = 1
+        for messageType in const.messageTypes:
+            messageTypeStr = const.messageType2string(messageType)
+            label = gtk.Label(xstr("prefs_msgs_type_" + messageTypeStr))
+            label.set_justify(JUSTIFY_CENTER)
+            label.set_use_underline(True)
+            label.set_alignment(0.5, 0.5)
+            table.attach(label, 0, 1, row, row+1)
+
+            fsCheckButton = gtk.CheckButton()
+            alignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+                                      xalign = 0.5, yalign = 0.5)
+            alignment.add(fsCheckButton)
+            table.attach(alignment, 1, 2, row, row+1)
+            self._msgFSCheckButtons[messageType] = fsCheckButton
+            
+            soundCheckButton = gtk.CheckButton()
+            alignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+                                      xalign = 0.5, yalign = 0.5)
+            alignment.add(soundCheckButton)
+            table.attach(alignment, 2, 3, row, row+1)            
+            self._msgSoundCheckButtons[messageType] = soundCheckButton
+
+            mnemonicWidget = gtk.Label("")
+            table.attach(mnemonicWidget, 3, 4, row, row+1)
+            label.set_mnemonic_widget(mnemonicWidget)
+            mnemonicWidget.connect("mnemonic-activate",
+                                   self._msgLabelActivated,
+                                   messageType)
+
+            row += 1
+
+        return mainAlignment
+
+    def _msgLabelActivated(self, button, cycle_group, messageType):
+        """Called when the mnemonic of a label is activated.
+
+        It cycles the corresponding options."""
+        fsCheckButton = self._msgFSCheckButtons[messageType]
+        soundCheckButton = self._msgSoundCheckButtons[messageType]
+
+        num = 1 if fsCheckButton.get_active() else 0
+        num += 2 if soundCheckButton.get_active() else 0
+        num += 1
+
+        fsCheckButton.set_active((num&0x01)==0x01)
+        soundCheckButton.set_active((num&0x02)==0x02)
+
+        return True
+            
     def _buildAdvanced(self):
         """Build the page for the advanced settings."""
 

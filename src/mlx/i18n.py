@@ -542,6 +542,9 @@ class _English(_Strings):
         self.add("prefs_title", "Preferences")
         self.add("prefs_tab_general", "_General")
         self.add("prefs_tab_general_tooltip", "General preferences")
+        self.add("prefs_tab_messages", "_Messages")
+        self.add("prefs_tab_message_tooltip",
+                 "Enable/disable message notifications in FS and/or by sound")
         self.add("prefs_tab_advanced", "_Advanced")
         self.add("prefs_tab_advanced_tooltip",
                  "Advanced preferences, edit with care!")
@@ -576,6 +579,26 @@ class _English(_Strings):
         self.add("prefs_update_url_tooltip",
                  "The URL from which to download the updates. Change this "
                  "only if you know what you are doing!")
+
+        # A C G M O S
+        
+        self.add("prefs_msgs_fs", "Displayed in FS")
+        self.add("prefs_msgs_sound", "Sound alert")
+        self.add("prefs_msgs_type_loggerError", "Logger _Error Messages")
+        self.add("prefs_msgs_type_information",
+                 "_Information Messages\n(e.g. flight status)")
+        self.add("prefs_msgs_type_fault",
+                 "_Fault Messages\n(e.g. strobe light fault)")
+        self.add("prefs_msgs_type_nogo",
+                 "_NOGO Fault messages\n(e.g. MTOW NOGO)")
+        self.add("prefs_msgs_type_gateSystem",
+                 "Ga_te System Messages\n(e.g. available gates)")
+        self.add("prefs_msgs_type_environment",
+                 "Envi_ronment Messages\n(e.g. \"welcome to XY aiport\")")
+        self.add("prefs_msgs_type_help",
+                 "_Help Messages\n(e.g. \"don't forget to set VREF\")")
+        self.add("prefs_msgs_type_visibility",
+                 "_Visibility Messages")
 
 #------------------------------------------------------------------------------
 
@@ -1013,7 +1036,11 @@ class _Hungarian(_Strings):
         self.add("prefs_title", "Beállítások")
         self.add("prefs_tab_general", "_Általános")
         self.add("prefs_tab_general_tooltip", "Általános beállítások")
-        self.add("prefs_tab_advanced", "_Haladó")
+        self.add("prefs_tab_messages", "_Üzenetek")
+        self.add("prefs_tab_message_tooltip",
+                 "A szimulátorba és/vagy hangjelzés általi üzenetküldés be- "
+                 "és kikapcsolása")
+        self.add("prefs_tab_advanced", "H_aladó")
         self.add("prefs_tab_advanced_tooltip",
                  "Haladó beállítások: óvatosan módosítsd őket!")
         self.add("prefs_language", "_Nyelv:")
@@ -1047,6 +1074,26 @@ class _Hungarian(_Strings):
         self.add("prefs_update_url_tooltip",
                  "Az URL, ahol a frissítéseket keresi a program. Csak akkor "
                  "változtasd meg, ha biztos vagy a dolgodban!")
+
+        # A Á H M O Ü
+
+        self.add("prefs_msgs_fs", "Szimulátorban\nmegjelenítés")
+        self.add("prefs_msgs_sound", "Hangjelzés")
+        self.add("prefs_msgs_type_loggerError", "_Logger hibaüzenetek")
+        self.add("prefs_msgs_type_information",
+                 "_Információs üzenetek\n(pl. a repülés fázisa)")
+        self.add("prefs_msgs_type_fault",
+                 "Hi_baüzenetek\n(pl. a villogó fény hiba)")
+        self.add("prefs_msgs_type_nogo",
+                 "_NOGO hibaüzenetek\n(pl. MTOW NOGO)")
+        self.add("prefs_msgs_type_gateSystem",
+                 "_Kapukezelő rendszer üzenetei\n(pl. a szabad kapuk listája)")
+        self.add("prefs_msgs_type_environment",
+                 "Kö_rnyezeti üzenetek\n(pl. \"welcome to XY aiport\")")
+        self.add("prefs_msgs_type_help",
+                 "_Segítő üzenetek\n(pl. \"don't forget to set VREF\")")
+        self.add("prefs_msgs_type_visibility",
+                 "Lá_tótávolság üzenetek")
 
 #------------------------------------------------------------------------------
 

@@ -3,6 +3,8 @@
 
 #-------------------------------------------------------------------------------
 
+import const
+
 import os
 import sys
 import ConfigParser
@@ -23,6 +25,8 @@ if os.name=="nt":
 class Config(object):
     """Our configuration."""
     DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
+
+    _messageTypesSection = "messageTypes"
     
     def __init__(self):
         """Construct the configuration with default values."""
@@ -31,12 +35,14 @@ class Config(object):
         self._password = ""
         self._rememberPassword = False
 
-        self._autoUpdate = True        
-        self._updateURL = Config.DEFAULT_UPDATE_URL
-        
         self._language = ""
         self._flareTimeFromFS = False
+        
+        self._autoUpdate = True        
+        self._updateURL = Config.DEFAULT_UPDATE_URL
 
+        self._messageTypeLevels = {}
+        
         self._modified = False
 
     @property
@@ -101,6 +107,19 @@ class Config(object):
             self._flareTimeFromFS = flareTimeFromFS
             self._modified = True
 
+    def getMessageTypeLevel(self, messageType):
+        """Get the level for the given message type."""
+        return self._messageTypeLevels[messageType] \
+               if messageType in self._messageTypeLevels \
+               else const.MESSAGELEVEL_NONE
+
+    def setMessageTypeLevel(self, messageType, level):
+        """Set the level of the given message type."""
+        if messageType not in self._messageTypeLevels or \
+           self._messageTypeLevels[messageType]!=level:
+            self._messageTypeLevels[messageType] = level
+            self._modified = True
+
     @property
     def autoUpdate(self):
         """Get if an automatic update is needed."""
@@ -135,15 +154,20 @@ class Config(object):
         self._rememberPassword = self._getBoolean(config, "login",
                                                   "rememberPassword", False)
 
-        self._autoUpdate = self._getBoolean(config, "update", "auto", True)
-        self._updateURL = self._get(config, "update", "url",
-                                    Config.DEFAULT_UPDATE_URL)
-
         self._language = self._get(config, "general", "language", "")
         self._flareTimeFromFS = self._getBoolean(config, "general",
                                                  "flareTimeFromFS",
                                                  False)
-        
+
+        self._messageTypeLevels = {}
+        for messageType in const.messageTypes:
+            self._messageTypeLevels[messageType] = \
+                self._getMessageTypeLevel(config, messageType)
+            
+        self._autoUpdate = self._getBoolean(config, "update", "auto", True)
+        self._updateURL = self._get(config, "update", "url",
+                                    Config.DEFAULT_UPDATE_URL)
+
         self._modified = False
 
     def save(self):
@@ -159,17 +183,25 @@ class Config(object):
         config.set("login", "rememberPassword",
                    "yes" if self._rememberPassword else "no")
 
-        config.add_section("update")
-        config.set("update", "auto",
-                   "yes" if self._autoUpdate else "no")
-        config.set("update", "url", self._updateURL)
-
         config.add_section("general")
         if self._language:
             config.set("general", "language", self._language)
         config.set("general", "flareTimeFromFS",
                    "yes" if self._flareTimeFromFS else "no")
+
+        config.add_section(Config._messageTypesSection)
+        for messageType in const.messageTypes:
+            if messageType in self._messageTypeLevels:
+                option = self._getMessageTypeLevelOptionName(messageType)
+                level = self._messageTypeLevels[messageType]                
+                config.set(Config._messageTypesSection, option,
+                           const.messageLevel2string(level))
         
+        config.add_section("update")
+        config.set("update", "auto",
+                   "yes" if self._autoUpdate else "no")
+        config.set("update", "url", self._updateURL)
+
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,
                          0600)
@@ -193,6 +225,19 @@ class Config(object):
                if config.has_option(section, option) \
                else default
 
+    def _getMessageTypeLevel(self, config, messageType):
+        """Get the message type level for the given message type."""
+        option = self._getMessageTypeLevelOptionName(messageType)
+        if config.has_option(Config._messageTypesSection, option):
+            value = config.get(Config._messageTypesSection, option)
+            return const.string2messageLevel(value)
+        else:
+            return const.MESSAGELEVEL_NONE
+
+    def _getMessageTypeLevelOptionName(self, messageType):
+        """Get the option name for the given message type level."""
+        return const.messageType2string(messageType)
+        
     def getLanguage(self):
         """Get the language to be used."""
         import locale
