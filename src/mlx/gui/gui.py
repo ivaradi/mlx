@@ -446,7 +446,7 @@ class GUI(fs.ConnectionListener):
             # FIXME: perhaps a more elegant method, e.g.
             # the simulator should provide a function disconnect
             # with a final message
-            gobject.timeout_add(1.0, self._disconnect)
+            gobject.timeout_add(1000, self._disconnect)
 
     def setRating(self, rating):
         """Set the rating of the flight."""
