@@ -1001,6 +1001,7 @@ class FuelTank(gtk.VBox):
 
         label = gtk.Label("<b>" + name + "</b>")
         label.set_use_markup(True)
+        label.set_use_underline(True)
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
         self.pack_start(label, False, False, 4)
@@ -1032,6 +1033,8 @@ class FuelTank(gtk.VBox):
         self._expectedButton.set_alignment(1.0)
         self._expectedButton.set_width_chars(5)
         self._expectedButton.connect("value-changed", self._expectedChanged)
+
+        label.set_mnemonic_widget(self._expectedButton)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
@@ -1185,12 +1188,12 @@ class FuelPage(Page):
 
         self._pumpIndex = 0
 
-    # def activate(self):
-    #     """Activate the page."""
-    #     gui = self._wizard.gui
+    def activate(self):
+        """Activate the page."""
+        gui = self._wizard.gui
 
-    #     self._setupTanks(gui.flight.aircraft.fuelTanks,
-    #                      self._wizard._fuelData)
+        self._setupTanks(gui.flight.aircraft.fuelTanks,
+                         self._wizard._fuelData)
 
     def finalize(self):
         """Finalize the page."""
@@ -2552,7 +2555,7 @@ class Wizard(gtk.VBox):
         for page in self._pages:
             page.reset()
         
-        self.setCurrentPage(6)
+        self.setCurrentPage(0)
 
     def getFleet(self, callback, force = False):
         """Get the fleet via the GUI and call the given callback."""

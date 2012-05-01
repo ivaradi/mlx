@@ -293,16 +293,17 @@ class _English(_Strings):
         self.add("fuel_chelp",
                  "The amount of fuel tanked into your aircraft at the\n"
                  "beginning of the flight can be seen below.")
-        self.add("fuel_tank_centre", "Centre\n")
-        self.add("fuel_tank_left", "Left\n")
-        self.add("fuel_tank_right", "Right\n")
-        self.add("fuel_tank_left_aux", "Left\nAux")
-        self.add("fuel_tank_right_aux", "Right\nAux")
-        self.add("fuel_tank_left_tip", "Left\nTip")
+
+        self.add("fuel_tank_centre", "_Centre\n")
+        self.add("fuel_tank_left", "L_eft\n")
+        self.add("fuel_tank_right", "_Right\n")
+        self.add("fuel_tank_left_aux", "Left\nA_ux")
+        self.add("fuel_tank_right_aux", "Right\nAu_x")
+        self.add("fuel_tank_left_tip", "Left\n_Tip")
         self.add("fuel_tank_right_tip", "Right\nTip")
-        self.add("fuel_tank_external1", "External\n1")
-        self.add("fuel_tank_external2", "External\n2")
-        self.add("fuel_tank_centre2", "Centre\n2")
+        self.add("fuel_tank_external1", "External\n_1")
+        self.add("fuel_tank_external2", "External\n_2")
+        self.add("fuel_tank_centre2", "Ce_ntre\n2")
         self.add("fuel_get_busy", "Querying fuel information...")
         self.add("fuel_pump_busy", "Pumping fuel...")
         self.add("fuel_tank_tooltip",
@@ -830,16 +831,19 @@ class _Hungarian(_Strings):
         self.add("fuel_chelp",
                  "A repülés elején az egyes tartályokba tankolt\n"
                  "üzemanyag mennyisége lent látható.")
-        self.add("fuel_tank_centre", "Középső\n")
-        self.add("fuel_tank_left", "Bal\n")
-        self.add("fuel_tank_right", "Jobb\n")
-        self.add("fuel_tank_left_aux", "Bal\nkiegészítő")
-        self.add("fuel_tank_right_aux", "Jobb\nkiegészítő")
-        self.add("fuel_tank_left_tip", "Bal\nszárnyvég")
-        self.add("fuel_tank_right_tip", "Jobb\nszárnyvég")
-        self.add("fuel_tank_external1", "Külső\n1")
-        self.add("fuel_tank_external2", "Külső\n2")
-        self.add("fuel_tank_centre2", "Középső\n2")
+
+        # A B D E I G J K N O P S T V Y Z
+        
+        self.add("fuel_tank_centre", "Kö_zépső\n")
+        self.add("fuel_tank_left", "_Bal\n")
+        self.add("fuel_tank_right", "J_obb\n")
+        self.add("fuel_tank_left_aux", "Bal\nkie_gészítő")
+        self.add("fuel_tank_right_aux", "Jobb\nkiegészí_tő")
+        self.add("fuel_tank_left_tip", "B_al\nszárnyvég")
+        self.add("fuel_tank_right_tip", "Jobb\nszárn_yvég")
+        self.add("fuel_tank_external1", "Külső\n_1")
+        self.add("fuel_tank_external2", "Külső\n_2")
+        self.add("fuel_tank_centre2", "Közé_pső\n2")
         self.add("fuel_get_busy", "Az üzemanyag lekérdezése...")
         self.add("fuel_pump_busy", "Az üzemanyag pumpálása...")
         self.add("fuel_tank_tooltip",
