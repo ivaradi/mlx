@@ -809,6 +809,28 @@ class _Hungarian(_Strings):
                  "Kattings ide, hogy frissítsd a szimulátor aktuális UTC szerint idejét.")
         self.add("time_busy", "Idő lekérdezése...")
 
+        self.add("fuel_title", "Üzemanyag")
+        self.add("fuel_help",
+                 "Írd be az egyes tartályokba szükséges üzemanyag "
+                 "mennyiségét kilogrammban.\n\n"
+                 "Ha megnyomod az <b>Előre</b> gombot, a megadott mennyiségű\n"
+                 "üzemanyag bekerül a tartályokba.")
+        self.add("fuel_chelp",
+                 "A repülés elején az egyes tartályokba tankolt\n"
+                 "üzemanyag mennyisége lent látható.")
+        self.add("fuel_tank_centre", "Középső\n")
+        self.add("fuel_tank_left", "Bal\n")
+        self.add("fuel_tank_right", "Jobb\n")
+        self.add("fuel_tank_left_aux", "Bal\nkiegészítő")
+        self.add("fuel_tank_right_aux", "Jobb\nkiegészítő")
+        self.add("fuel_tank_left_tip", "Bal\nszárnyvég")
+        self.add("fuel_tank_right_tip", "Jobb\nszárnyvég")
+        self.add("fuel_tank_external1", "Külső\n1")
+        self.add("fuel_tank_external2", "Külső\n2")
+        self.add("fuel_tank_centre2", "Középső\n2")
+        self.add("fuel_get_busy", "Az üzemanyag lekérdezése...")
+        self.add("fuel_pump_busy", "Az üzemanyag pumpálása...")
+
         self.add("route_title", "Útvonal")
         self.add("route_help",
                  "Állítsd be az utazószintet lent, és ha szükséges,\n" \
