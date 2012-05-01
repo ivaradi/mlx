@@ -1026,9 +1026,13 @@ class RoutePage(Page):
                                gtk.PolicyType.AUTOMATIC if pygobject
                                else gtk.POLICY_AUTOMATIC)
 
+        self._uppercasingRoute = False
+
         self._route = gtk.TextView()
         self._route.set_tooltip_text(xstr("route_route_tooltip"))
+        self._route.set_wrap_mode(WRAP_WORD)
         self._route.get_buffer().connect("changed", self._routeChanged)
+        self._route.get_buffer().connect_after("insert-text", self._routeInserted)
         routeWindow.add(self._route)
 
         label.set_mnemonic_widget(self._route)
@@ -1078,7 +1082,23 @@ class RoutePage(Page):
 
     def _routeChanged(self, textBuffer):
         """Called when the route has changed."""
-        self._updateForwardButton()
+        if not self._uppercasingRoute:
+            self._updateForwardButton()
+
+    def _routeInserted(self, textBuffer, iter, text, length):
+        """Called when new characters are inserted into the route.
+
+        It uppercases all characters."""
+        if not self._uppercasingRoute:
+            self._uppercasingRoute = True
+
+            iter1 = iter.copy()
+            iter1.backward_chars(length)
+            textBuffer.delete(iter, iter1)
+
+            textBuffer.insert(iter, text.upper())
+
+            self._uppercasingRoute = False
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -1187,10 +1207,14 @@ class BriefingPage(Page):
                                   else gtk.POLICY_AUTOMATIC,
                                   gtk.PolicyType.AUTOMATIC if pygobject
                                   else gtk.POLICY_AUTOMATIC)
+
+        self._uppercasingMETAR = False
+
         self._metar = gtk.TextView()
         self._metar.set_accepts_tab(False)
         self._metar.set_wrap_mode(gtk.WrapMode.WORD if pygobject else gtk.WRAP_WORD)
         self._metar.get_buffer().connect("changed", self._metarChanged)
+        self._metar.get_buffer().connect_after("insert-text", self._metarInserted)
         scrolledWindow.add(self._metar)
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
@@ -1283,10 +1307,26 @@ class BriefingPage(Page):
 
     def _metarChanged(self, buffer):
         """Called when the METAR has changed."""
-        self.metarEdited = True
-        self._button.set_sensitive(buffer.get_text(buffer.get_start_iter(),
-                                                   buffer.get_end_iter(),
-                                                   True)!="")
+        if not self._uppercasingMETAR:
+            self.metarEdited = True
+            self._button.set_sensitive(buffer.get_text(buffer.get_start_iter(),
+                                                       buffer.get_end_iter(),
+                                                       True)!="")
+
+    def _metarInserted(self, textBuffer, iter, text, length):
+        """Called when new characters are inserted into the METAR.
+
+        It uppercases all characters."""
+        if not self._uppercasingMETAR:
+            self._uppercasingMETAR = True
+
+            iter1 = iter.copy()
+            iter1.backward_chars(length)
+            textBuffer.delete(iter, iter1)
+
+            textBuffer.insert(iter, text.upper())
+
+            self._uppercasingMETAR = False
 
 #-----------------------------------------------------------------------------
 
@@ -1318,7 +1358,7 @@ class TakeoffPage(Page):
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("takeoff_runway_tooltip"))
-        self._runway.connect("changed", self._valueChanged)
+        self._runway.connect("changed", self._upperChanged)
         table.attach(self._runway, 1, 3, 0, 1)
         label.set_mnemonic_widget(self._runway)
         
@@ -1330,7 +1370,7 @@ class TakeoffPage(Page):
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
         self._sid.set_tooltip_text(xstr("takeoff_sid_tooltip"))
-        self._sid.connect("changed", self._valueChanged)
+        self._sid.connect("changed", self._upperChanged)
         table.attach(self._sid, 1, 3, 1, 2)
         label.set_mnemonic_widget(self._sid)
         
@@ -1452,6 +1492,12 @@ class TakeoffPage(Page):
         """Called when the value of some widget has changed."""
         self._updateForwardButton()
         
+    def _upperChanged(self, entry, arg = None):
+        """Called when the value of some entry widget has changed and the value
+        should be converted to uppercase."""
+        entry.set_text(entry.get_text().upper())
+        self._valueChanged(entry, arg)
+        
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
@@ -1494,7 +1540,7 @@ class LandingPage(Page):
         self._star = gtk.Entry()
         self._star.set_width_chars(10)
         self._star.set_tooltip_text(xstr("landing_star_tooltip"))
-        self._star.connect("changed", self._updateForwardButton)
+        self._star.connect("changed", self._upperChanged)
         self._star.set_sensitive(False)
         table.attach(self._star, 2, 4, 0, 1)
         label.set_mnemonic_widget(self._starButton)
@@ -1511,7 +1557,7 @@ class LandingPage(Page):
         self._transition = gtk.Entry()
         self._transition.set_width_chars(10)
         self._transition.set_tooltip_text(xstr("landing_transition_tooltip"))
-        self._transition.connect("changed", self._updateForwardButton)
+        self._transition.connect("changed", self._upperChanged)
         self._transition.set_sensitive(False)
         table.attach(self._transition, 2, 4, 1, 2)
         label.set_mnemonic_widget(self._transitionButton)
@@ -1524,7 +1570,7 @@ class LandingPage(Page):
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("landing_runway_tooltip"))
-        self._runway.connect("changed", self._updateForwardButton)
+        self._runway.connect("changed", self._upperChanged)
         table.attach(self._runway, 2, 4, 2, 3)
         label.set_mnemonic_widget(self._runway)
 
@@ -1536,7 +1582,7 @@ class LandingPage(Page):
         self._approachType = gtk.Entry()
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
-        self._approachType.connect("changed", self._updateForwardButton)
+        self._approachType.connect("changed", self._upperChanged)
         table.attach(self._approachType, 2, 4, 3, 4)
         label.set_mnemonic_widget(self._approachType)
 
@@ -1649,7 +1695,7 @@ class LandingPage(Page):
             self._transition.grab_focus()        
         self._updateForwardButton()    
 
-    def _updateForwardButton(self, widget = None):
+    def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
         sensitive = self._flightEnded and \
                     (self._starButton.get_active() or \
@@ -1662,6 +1708,11 @@ class LandingPage(Page):
                     self._approachType.get_text()!="" and \
                     self.vref is not None
         self._button.set_sensitive(sensitive)
+
+    def _upperChanged(self, entry):
+        """Called for entry widgets that must be converted to uppercase."""
+        entry.set_text(entry.get_text().upper())
+        self._updateForwardButton()
 
     def _vrefChanged(self, widget, value):
         """Called when the Vref has changed."""
