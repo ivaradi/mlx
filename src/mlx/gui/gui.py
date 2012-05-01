@@ -166,6 +166,11 @@ class GUI(fs.ConnectionListener):
         return self._flight
 
     @property
+    def loginResult(self):
+        """Get the result of the login."""
+        return self._wizard.loginResult
+
+    @property
     def bookedFlight(self):
         """Get the booked flight selected, if any."""
         return self._wizard.bookedFlight

@@ -5,6 +5,9 @@
 import fs
 import const
 import util
+from acars import ACARS
+
+import time
 
 #---------------------------------------------------------------------------------------
 
@@ -82,6 +85,41 @@ class StageChecker(StateChecker):
             if aircraft.checkFlightEnd(state):
                 aircraft.setStage(state, const.STAGE_END)
 
+#---------------------------------------------------------------------------------------
+
+class ACARSSender(StateChecker):
+    """Sender of online ACARS.
+
+    It sends the ACARS every 3 minutes to the MAVA website."""
+
+    # The interval at which ACARS is sent
+    INTERVAL = 3*60.0
+    
+    def __init__(self, gui):
+        """Construct the ACARS sender."""
+        self._gui = gui
+        self._lastSent = None
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """If the time has come to send the ACARS, send it."""
+        now = time.time()
+        
+        if self._lastSent is not None and \
+           (self._lastSent + ACARSSender.INTERVAL)>now:
+            return 
+
+        acars = ACARS(self._gui, state)
+        self._gui.webHandler.sendACARS(self._acarsCallback, acars)
+
+    def _acarsCallback(self, returned, result):
+        """Callback for ACARS sending."""
+        if returned:
+            print "Sent online ACARS"
+            self._lastSent = time.time() if self._lastSent is None \
+                             else self._lastSent + ACARSSender.INTERVAL
+        else:
+            print "Failed to send the ACARS"
+        
 #---------------------------------------------------------------------------------------
 
 class TakeOffLogger(StateChecker):

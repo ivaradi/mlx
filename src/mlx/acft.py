@@ -7,7 +7,9 @@ import checks
 import fs
 import util
 
+import sys
 import time
+import traceback
 
 #---------------------------------------------------------------------------------------
 
@@ -58,6 +60,14 @@ class Aircraft(object):
         if flight.config.isMessageTypeFS(const.MESSAGETYPE_VISIBILITY):
             self._checkers.append(checks.VisibilityChecker())
 
+        # FIXME: we should have a central data model object, and not collect
+        # the data from the GUI. However, some pieces of data (e.g. V-speeds,
+        # etc. that is entered into the GUI) *should* be a part of the GUI and
+        # queried from it, so the model should have a reference to the GUI as
+        # well and access such data via the GUI!
+        if flight.config.onlineACARS:
+            self._checkers.append(checks.ACARSSender(flight._gui))
+
         # Fault checkers
         
         self._checkers.append(checks.AntiCollisionLightsChecker())
@@ -104,6 +114,11 @@ class Aircraft(object):
         """Get the logger to use for the aircraft."""
         return self._flight.logger
 
+    @property
+    def state(self):
+        """Get the current aircraft state."""
+        return self._aircraftState
+    
     def getFlapsSpeedLimit(self, flaps):
         """Get the speed limit for the given flaps setting."""
         return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
@@ -118,8 +133,12 @@ class Aircraft(object):
     def handleState(self, aircraftState):
         """Called when the state of the aircraft changes."""
         for checker in self._checkers:
-            checker.check(self._flight, self, self._flight.logger,
-                          self._aircraftState, aircraftState)
+            try:
+                checker.check(self._flight, self, self._flight.logger,
+                              self._aircraftState, aircraftState)
+            except:
+                print >> sys.stderr, "Checker", checker, "failed"
+                traceback.print_exc()
 
         self._flight.handleState(self._aircraftState, aircraftState)
 

@@ -564,6 +564,11 @@ class _English(_Strings):
         self.add("prefs_onlineGateSystem_tooltip",
                  "If this is checked, the logger will query and update the "
                  "LHBP Online Gate System.")
+        self.add("prefs_onlineACARS",
+                 "Use the Online ACA_RS System")
+        self.add("prefs_onlineACARS_tooltip",
+                 "If this is checked, the logger will continuously update "
+                 "the MAVA Online ACARS System with your flight's data.")
         self.add("prefs_flaretimeFromFS",
                  "Take flare _time from the simulator")
         self.add("prefs_flaretimeFromFS_tooltip",
@@ -1064,6 +1069,11 @@ class _Hungarian(_Strings):
         self.add("prefs_onlineGateSystem_tooltip",
                  "Ha ezt bejelölöd, a logger lekérdezi és frissíti az "
                  "LHBP Online Gate System adatait.")
+        self.add("prefs_onlineACARS",
+                 "Az Online ACA_RS rendszer használata")
+        self.add("prefs_onlineACARS_tooltip",
+                 "Ha ezt bejölöd, a logger folyamatosan közli a repülésed "
+                 "adatait a MAVA Online ACARS rendszerrel.")
         self.add("prefs_flaretimeFromFS",
                  "A ki_lebegtetés idejét vedd a szimulátorból")
         self.add("prefs_flaretimeFromFS_tooltip",

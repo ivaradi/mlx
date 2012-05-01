@@ -67,6 +67,7 @@ class Preferences(gtk.Dialog):
         """Setup the dialog from the given configuration."""
         self._setLanguage(config.language)
         self._onlineGateSystem.set_active(config.onlineGateSystem)
+        self._onlineACARS.set_active(config.onlineACARS)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
 
         for messageType in const.messageTypes:
@@ -90,6 +91,7 @@ class Preferences(gtk.Dialog):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
         config.onlineGateSystem = self._onlineGateSystem.get_active()
+        config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
 
         for messageType in const.messageTypes:
@@ -147,6 +149,11 @@ class Preferences(gtk.Dialog):
         self._onlineGateSystem.set_use_underline(True)
         self._onlineGateSystem.set_tooltip_text(xstr("prefs_onlineGateSystem_tooltip"))
         mainBox.pack_start(self._onlineGateSystem, False, False, 4)
+
+        self._onlineACARS = gtk.CheckButton(xstr("prefs_onlineACARS"))
+        self._onlineACARS.set_use_underline(True)
+        self._onlineACARS.set_tooltip_text(xstr("prefs_onlineACARS_tooltip"))
+        mainBox.pack_start(self._onlineACARS, False, False, 4)
 
         self._flareTimeFromFS = gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
         self._flareTimeFromFS.set_use_underline(True)

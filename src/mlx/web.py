@@ -49,6 +49,22 @@ class BookedFlight(object):
                       "TU5" : const.AIRCRAFT_T154,
                       "YK4" : const.AIRCRAFT_YK40 }
 
+    TYPE2TYPECODE = { const.AIRCRAFT_B736 : "736",
+                      const.AIRCRAFT_B737 : "73G",
+                      const.AIRCRAFT_B738 : "738",
+                      const.AIRCRAFT_B733 : "733",
+                      const.AIRCRAFT_B734 : "734",
+                      const.AIRCRAFT_B735 : "735",
+                      const.AIRCRAFT_DH8D : "DH4",
+                      const.AIRCRAFT_B762 : "762",
+                      const.AIRCRAFT_B763 : "763",
+                      const.AIRCRAFT_CRJ2 : "CR2",
+                      const.AIRCRAFT_F70  : "F70",
+                      const.AIRCRAFT_DC3  : "LI2",
+                      const.AIRCRAFT_T134 : "TU3",
+                      const.AIRCRAFT_T154 : "TU5",
+                      const.AIRCRAFT_YK40 : "YK4" }
+    
     def __init__(self, id, f):
         """Construct a booked flight with the given ID.
 
@@ -580,6 +596,134 @@ class SendPIREP(Request):
 
 #------------------------------------------------------------------------------
 
+class SendPIREP(Request):
+    """A request to send a PIREP to the MAVA website."""
+    _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
+                     const.FLIGHTTYPE_OLDTIMER : "OT",
+                     const.FLIGHTTYPE_VIP : "VIP",
+                     const.FLIGHTTYPE_CHARTER : "CHARTER" }
+
+    _latin2Encoder = codecs.getencoder("iso-8859-2")
+
+    def __init__(self, callback, pirep):
+        """Construct the request for the given PIREP."""
+        super(SendPIREP, self).__init__(callback)
+        self._pirep = pirep
+
+    def run(self):
+        """Perform the sending of the PIREP."""
+        url = "http://www.virtualairlines.hu/malevacars.php"
+
+        pirep = self._pirep
+
+        data = {}
+        data["acarsdata"] = pirep.getACARSText()
+
+        bookedFlight = pirep.bookedFlight
+        data["foglalas_id"] = bookedFlight.id
+        data["repdate"] = bookedFlight.departureTime.date().strftime("%Y-%m-%d")
+        data["fltnum"] = bookedFlight.callsign
+        data["depap"] = bookedFlight.departureICAO
+        data["arrap"] = bookedFlight.arrivalICAO
+        data["pass"] = str(bookedFlight.numPassengers)
+        data["crew"] = str(bookedFlight.numCrew)
+        data["cargo"] = str(pirep.cargoWeight)
+        data["bag"] = str(bookedFlight.bagWeight)
+        data["mail"] = str(bookedFlight.mailWeight)
+        
+        data["flttype"] = SendPIREP._flightTypes[pirep.flightType]
+        data["onoff"] = "1" if pirep.online else "0"
+        data["bt_dep"] = util.getTimestampString(pirep.blockTimeStart)
+        data["bt_arr"] = util.getTimestampString(pirep.blockTimeEnd)
+        data["bt_dur"] = util.getTimeIntervalString(pirep.blockTimeEnd -
+                                                    pirep.blockTimeStart)
+        data["ft_dep"] = util.getTimestampString(pirep.flightTimeStart)
+        data["ft_arr"] = util.getTimestampString(pirep.flightTimeEnd)
+        data["ft_dur"] = util.getTimeIntervalString(pirep.flightTimeEnd -
+                                                    pirep.flightTimeStart)
+        data["timecomm"] = pirep.getTimeComment()
+        data["fuel"] = "%.0f" % (pirep.fuelUsed,)
+        data["dep_rwy"] = pirep.departureRunway
+        data["arr_rwy"] = pirep.arrivalRunway
+        data["wea_dep"] = pirep.departureMETAR
+        data["wea_arr"] = pirep.arrivalMETAR
+        data["alt"] = "FL%.0f" % (pirep.filedCruiseAltitude/100.0,)
+        if pirep.filedCruiseAltitude!=pirep.cruiseAltitude:
+            data["mod_alt"] = "FL%.0f" % (pirep.cruiseAltitude/100.0,)
+        else:
+            data["mod_alt"] = ""
+        data["sid"] = pirep.sid
+        data["navroute"] = pirep.route
+        data["star"] = pirep.getSTAR()
+        data["aprtype"] = pirep.approachType
+        data["diff"] = "2"
+        data["comment"] = SendPIREP._latin2Encoder(pirep.comments)[0]
+        data["flightdefect"] = SendPIREP._latin2Encoder(pirep.flightDefects)[0]
+        data["kritika"] = pirep.getRatingText()
+        data["flightrating"] = "%.1f" % (max(0.0, pirep.rating),)
+        data["distance"] = "%.3f" % (pirep.flownDistance,)
+        data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
+
+        f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
+        try:
+            result = Result()
+            line = f.readline().strip()
+            print "PIREP result from website:", line
+            result.success = line=="OK"
+            result.alreadyFlown = line=="MARVOLT"
+            result.notAvailable = line=="NOMORE"
+        finally:
+            f.close()
+
+        return result    
+
+#------------------------------------------------------------------------------
+
+class SendACARS(Request):
+    """A request to send an ACARS to the MAVA website."""
+    _latin2Encoder = codecs.getencoder("iso-8859-2")
+
+    def __init__(self, callback, acars):
+        """Construct the request for the given PIREP."""
+        super(SendACARS, self).__init__(callback)
+        self._acars = acars
+
+    def run(self):
+        """Perform the sending of the ACARS."""
+        url = "http://www.virtualairlines.hu/acars2/acarsonline.php"
+
+        acars = self._acars
+        bookedFlight = acars.bookedFlight
+
+        data = {}
+        data["pid"] = acars.pid
+        data["pilot"] = SendACARS._latin2Encoder(acars.pilotName)[0]
+    
+        data["pass"] = str(bookedFlight.numPassengers)
+        data["callsign"] = bookedFlight.callsign
+        data["airplane"] = BookedFlight.TYPE2TYPECODE[bookedFlight.aircraftType]
+        data["from"] = bookedFlight.departureICAO
+        data["to"] = bookedFlight.arrivalICAO        
+        data["lajstrom"] = bookedFlight.tailNumber
+
+        data["block_time"] = acars.getBlockTimeText()
+        data["longitude"] = str(acars.state.longitude)
+        data["latitude"] = str(acars.state.latitude)
+        data["altitude"] = str(acars.state.altitude)
+        data["speed"] = str(acars.state.groundSpeed)
+        
+        data["event"] = acars.getEventText()
+
+        f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
+        try:
+            result = Result()
+        finally:
+            f.close()
+
+        return result    
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -617,6 +761,10 @@ class Handler(threading.Thread):
     def sendPIREP(self, callback, pirep):
         """Send the given PIREP."""
         self._addRequest(SendPIREP(callback, pirep))
+
+    def sendACARS(self, callback, acars):
+        """Send the given ACARS"""
+        self._addRequest(SendACARS(callback, acars))
         
     def run(self):
         """Process the requests."""

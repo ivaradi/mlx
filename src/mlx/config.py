@@ -37,6 +37,7 @@ class Config(object):
 
         self._language = ""
         self._onlineGateSystem = True
+        self._onlineACARS = True
         self._flareTimeFromFS = False
         
         self._autoUpdate = True        
@@ -104,6 +105,18 @@ class Config(object):
         """Set whether the online gate system should be used."""
         if onlineGateSystem!=self._onlineGateSystem:
             self._onlineGateSystem = onlineGateSystem
+            self._modified = True
+
+    @property
+    def onlineACARS(self):
+        """Get whether the online ACARS system should be used."""
+        return self._onlineACARS
+
+    @onlineACARS.setter
+    def onlineACARS(self, onlineACARS):
+        """Set whether the online ACARS system should be used."""
+        if onlineACARS!=self._onlineACARS:
+            self._onlineACARS = onlineACARS
             self._modified = True
 
     @property
@@ -178,6 +191,8 @@ class Config(object):
         self._onlineGateSystem = self._getBoolean(config, "general",
                                                   "onlineGateSystem",
                                                   True)
+        self._onlineACARS = self._getBoolean(config, "general",
+                                             "onlineACARS", True)
         self._flareTimeFromFS = self._getBoolean(config, "general",
                                                  "flareTimeFromFS",
                                                  False)
@@ -211,6 +226,8 @@ class Config(object):
             config.set("general", "language", self._language)
         config.set("general", "onlineGateSystem",
                    "yes" if self._onlineGateSystem else "no")
+        config.set("general", "onlineACARS",
+                   "yes" if self._onlineACARS else "no")
         config.set("general", "flareTimeFromFS",
                    "yes" if self._flareTimeFromFS else "no")
 

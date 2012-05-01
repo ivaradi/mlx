@@ -211,7 +211,7 @@ class LoginPage(Page):
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        
+
         table = gtk.Table(2, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
