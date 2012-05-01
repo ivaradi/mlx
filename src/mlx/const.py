@@ -296,6 +296,38 @@ SOUND_DING = "ding.wav"
 
 #-------------------------------------------------------------------------------
 
+# Fuel tank: centre
+FUELTANK_CENTRE = 1
+
+# Fuel tank: left
+FUELTANK_LEFT = 2
+
+# Fuel tank: right
+FUELTANK_RIGHT = 3
+
+# Fuel tank: left aux
+FUELTANK_LEFT_AUX = 4
+
+# Fuel tank: right aux
+FUELTANK_RIGHT_AUX = 5
+
+# Fuel tank: left tip
+FUELTANK_LEFT_TIP = 6
+
+# Fuel tank: right tip
+FUELTANK_RIGHT_TIP = 7
+
+# Fuel tank: external 1
+FUELTANK_EXTERNAL1 = 8
+
+# Fuel tank: external 2
+FUELTANK_EXTERNAL2 = 9
+
+# Fuel tank: centre2
+FUELTANK_CENTRE2 = 10
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 

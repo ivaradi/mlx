@@ -5,6 +5,7 @@
 import fs
 import const
 import util
+import acft
 
 import threading
 import os
@@ -17,6 +18,20 @@ if os.name == "nt":
     import pyuipc
 else:
     import pyuipc_sim as pyuipc
+
+#------------------------------------------------------------------------------
+
+# The mapping of tank types to FSUIPC offsets
+_tank2offset = { const.FUELTANK_CENTRE : 0x0b74,
+                 const.FUELTANK_LEFT : 0x0b7c,
+                 const.FUELTANK_RIGHT : 0x0b94,
+                 const.FUELTANK_LEFT_AUX : 0x0b84,
+                 const.FUELTANK_RIGHT_AUX : 0x0b9c,
+                 const.FUELTANK_LEFT_TIP : 0x0b8c,
+                 const.FUELTANK_RIGHT_TIP : 0x0ba4,
+                 const.FUELTANK_EXTERNAL1 : 0x1254,
+                 const.FUELTANK_EXTERNAL2 : 0x125c,
+                 const.FUELTANK_CENTRE2 : 0x1244 }
 
 #------------------------------------------------------------------------------
 
@@ -1013,15 +1028,15 @@ class AircraftModel(object):
 class GenericAircraftModel(AircraftModel):
     """A generic aircraft model that can handle the fuel levels, the N1 or RPM
     values and some other common parameters in a generic way."""
-    def __init__(self, flapsNotches, fuelInfo, numEngines, isN1 = True):
+    
+    def __init__(self, flapsNotches, fuelTanks, numEngines, isN1 = True):
         """Construct the generic aircraft model with the given data.
 
         flapsNotches is an array of how much degrees the individual flaps
         notches mean.
 
-        fuelInfo is an array of FSUIPC offsets for the levels of the fuel
-        tanks. It is assumed to be a 4-byte value, followed by another 4-byte
-        value, which is the fuel tank capacity.
+        fuelTanks is an array of const.FUELTANK_XXX constants about the
+        aircraft's fuel tanks. They will be converted to offsets.
 
         numEngines is the number of engines the aircraft has.
 
@@ -1029,7 +1044,7 @@ class GenericAircraftModel(AircraftModel):
         (e.g. pistons)."""
         super(GenericAircraftModel, self).__init__(flapsNotches = flapsNotches)
 
-        self._fuelInfo = fuelInfo
+        self._fuelTanks = fuelTanks
         self._fuelStartIndex = None
         self._numEngines = numEngines
         self._engineStartIndex = None
@@ -1048,7 +1063,8 @@ class GenericAircraftModel(AircraftModel):
         self._addOffsetWithIndexMember(data, 0x0af4, "H", "_monidx_fuelWeight")
 
         self._fuelStartIndex = len(data)
-        for offset in self._fuelInfo:
+        for tank in self._fuelTanks:
+            offset = _tank2offset[tank]
             self._addOffsetWithIndexMember(data, offset, "u")    # tank level
             self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
 
@@ -1070,7 +1086,7 @@ class GenericAircraftModel(AircraftModel):
         fuelWeight = data[self._monidx_fuelWeight]/256.0
         state.fuel = []
         for i in range(self._fuelStartIndex, 
-                       self._fuelStartIndex + 2*len(self._fuelInfo), 2):
+                       self._fuelStartIndex + 2*len(self._fuelTanks), 2):
             fuel = data[i+1]*data[i]*fuelWeight*const.LBSTOKG/128.0/65536.0
             state.fuel.append(fuel)
 
@@ -1091,7 +1107,7 @@ class GenericModel(GenericAircraftModel):
         """Construct the model."""
         super(GenericModel, self). \
             __init__(flapsNotches = [0, 10, 20, 30],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT],
                      numEngines = 2)
 
     @property
@@ -1107,7 +1123,7 @@ class B737Model(GenericAircraftModel):
         """Construct the model."""
         super(B737Model, self). \
             __init__(flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = acft.Boeing737.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1164,7 +1180,7 @@ class B767Model(GenericAircraftModel):
         """Construct the model."""
         super(B767Model, self). \
             __init__(flapsNotches = [0, 1, 5, 15, 20, 25, 30],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = acft.Boeing767.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1180,7 +1196,7 @@ class DH8DModel(GenericAircraftModel):
         """Construct the model."""
         super(DH8DModel, self). \
             __init__(flapsNotches = [0, 5, 10, 15, 35],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = acft.DH8D.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1225,7 +1241,7 @@ class CRJ2Model(GenericAircraftModel):
         """Construct the model."""
         super(CRJ2Model, self). \
             __init__(flapsNotches = [0, 8, 20, 30, 45],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = acft.CRJ2.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1241,7 +1257,7 @@ class F70Model(GenericAircraftModel):
         """Construct the model."""
         super(F70Model, self). \
             __init__(flapsNotches = [0, 8, 15, 25, 42],
-                     fuelInfo = [0x0b74, 0x0b7c, 0xb94], 
+                     fuelTanks = acft.F70.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1257,7 +1273,7 @@ class DC3Model(GenericAircraftModel):
         """Construct the model."""
         super(DC3Model, self). \
             __init__(flapsNotches = [0, 15, 30, 45],
-                     fuelInfo = [0x0b7c, 0x0b84, 0x0b94, 0x0b9c], 
+                     fuelTanks = acft.DC3.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1273,10 +1289,7 @@ class T134Model(GenericAircraftModel):
         """Construct the model."""
         super(T134Model, self). \
             __init__(flapsNotches = [0, 10, 20, 30],
-                     fuelInfo = [0x0b74, 
-                                 0x0b8c, 0x0b84, 
-                                 0x0ba4, 0x0b9c,
-                                 0x1254, 0x125c], 
+                     fuelTanks = acft.T134.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1292,8 +1305,7 @@ class T154Model(GenericAircraftModel):
         """Construct the model."""
         super(T154Model, self). \
             __init__(flapsNotches = [0, 15, 28, 45],
-                     fuelInfo = [0x0b74, 0x0b7c, 0x0b94, 
-                                 0x1244, 0x0b84, 0x0b9c],
+                     fuelTanks = acft.T154.fuelTanks,
                      numEngines = 3)
 
     @property
@@ -1317,7 +1329,7 @@ class YK40Model(GenericAircraftModel):
         """Construct the model."""
         super(YK40Model, self). \
             __init__(flapsNotches = [0, 20, 35],
-                     fuelInfo = [0x0b7c, 0x0b94],
+                     fuelTanks = acft.YK40.fuelTanks,
                      numEngines = 2)
 
     @property

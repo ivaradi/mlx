@@ -327,9 +327,11 @@ class Boeing737(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right
+    - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right"""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    
     def __init__(self, flight):
         super(Boeing737, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -434,9 +436,11 @@ class DH8D(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right
+    - fuel: left, right
     - n1: left, right
     - reverser: left, right."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]    
+
     def __init__(self, flight):
         super(DH8D, self).__init__(flight)
         self.dow = 17185
@@ -465,9 +469,11 @@ class Boeing767(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right
+    - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right"""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self, flight):
         super(Boeing767, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -517,9 +523,11 @@ class CRJ2(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right
+    - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self, flight):
         super(CRJ2, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -549,9 +557,11 @@ class F70(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right
+    - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self, flight):
         super(F70, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -582,9 +592,12 @@ class DC3(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: left, right, left aux, right aux
+    - fuel: left aux, left, right, right aux
     - rpm: left, right
     - reverser: left, right."""
+    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
+                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
+
     def __init__(self, flight):
         super(DC3, self).__init__(flight)
         self.dow = 8627
@@ -620,10 +633,15 @@ class T134(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left tip, left aux, right tip, right aux, external 1,
+    - fuel: left tip, left aux, centre, right aux, right tip, external 1,
     external 2
     - n1: left, right
     - reverser: left, right."""
+    fuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_LEFT_AUX,
+                 const.FUELTANK_CENTRE,
+                 const.FUELTANK_RIGHT_AUX, const.FUELTANK_RIGHT_TIP,
+                 const.FUELTANK_EXTERNAL1, const.FUELTANK_EXTERNAL2]
+
     def __init__(self, flight):
         super(T134, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -654,9 +672,12 @@ class T154(Aircraft):
 
     The aircraft type-specific values in the aircraft state have the following
     structure:
-    - fuel: centre, left, right, centre 2, left aux, right aux
+    - fuel: left aux, left, centre, centre 2, right, right aux
     - n1: left, centre, right
     - reverser: left, right"""
+    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
+                 const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
+                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
     def __init__(self, flight):
         super(T154, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -690,6 +711,8 @@ class YK40(Aircraft):
     - fuel: left, right
     - n1: left, right
     - reverser: left, right"""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
+    
     def __init__(self, flight):
         super(YK40, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
