@@ -87,7 +87,7 @@ class GUI(fs.ConnectionListener):
 
         self._notebook = gtk.Notebook()
         mainVBox.pack_start(self._notebook, True, True, 4)
-
+        
         self._wizard = Wizard(self)
         label = gtk.Label(xstr("tab_flight"))
         label.set_use_underline(True)

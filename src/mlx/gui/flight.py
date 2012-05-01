@@ -1005,8 +1005,9 @@ class FuelTank(gtk.VBox):
         label.set_alignment(0.5, 1.0)
         self.pack_start(label, False, False, 4)
 
-        self._tankFigure = gtk.DrawingArea()
+        self._tankFigure = gtk.EventBox()
         self._tankFigure.set_size_request(38, -1)
+        self._tankFigure.set_visible_window(False)
 
         if pygobject:
             self._tankFigure.connect("draw", self._drawTankFigure)
@@ -1015,7 +1016,7 @@ class FuelTank(gtk.VBox):
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
-        alignment.add(self._tankFigure) 
+        alignment.add(self._tankFigure)
 
         self.pack_start(alignment, True, True, 4)
 
@@ -1050,16 +1051,18 @@ class FuelTank(gtk.VBox):
         """Redraw the tank figure."""
         self._tankFigure.queue_draw()
 
-    def _drawTankFigure(self, connStateArea, eventOrContext):
+    def _drawTankFigure(self, tankFigure, eventOrContext):
         """Draw the tank figure."""
         triangleSize = 5
-        
-        context = eventOrContext if pygobject else connStateArea.window.cairo_create()
 
-        width = connStateArea.get_allocated_width() if pygobject \
-                else connStateArea.allocation.width
-        height = connStateArea.get_allocated_height() if pygobject \
-                 else connStateArea.allocation.height
+        context = eventOrContext if pygobject else tankFigure.window.cairo_create()
+        (xOffset, yOffset) = (0, 0) if pygobject \
+                             else (tankFigure.allocation.x, tankFigure.allocation.y)
+        
+        width = tankFigure.get_allocated_width() if pygobject \
+                else tankFigure.allocation.width
+        height = tankFigure.get_allocated_height() if pygobject \
+                 else tankFigure.allocation.height
 
         rectangleX0 = triangleSize
         rectangleY0 = triangleSize
@@ -1069,8 +1072,8 @@ class FuelTank(gtk.VBox):
 
         context.set_source_rgb(0.0, 0.0, 0.0)
         context.set_line_width(rectangleLineWidth)
-        context.rectangle(rectangleX0 + rectangleLineWidth/2,
-                          rectangleY0 + rectangleLineWidth/2,
+        context.rectangle(xOffset + rectangleX0 + rectangleLineWidth/2,
+                          yOffset + rectangleY0 + rectangleLineWidth/2,
                           rectangleX1 - rectangleX0 - rectangleLineWidth,
                           rectangleY1 - rectangleY0 - rectangleLineWidth)
         context.stroke()
@@ -1086,8 +1089,9 @@ class FuelTank(gtk.VBox):
         context.set_source_rgb(1.0, 0.9, 0.6)
         currentHeight = self.currentWeight * rectangleInnerHeight / self.capacity
         currentX = rectangleInnerTop + rectangleInnerHeight - currentHeight
-        context.rectangle(rectangleInnerLeft,
-                          rectangleInnerTop + rectangleInnerHeight - currentHeight,
+        context.rectangle(xOffset + rectangleInnerLeft,
+                          yOffset + rectangleInnerTop +
+                          rectangleInnerHeight - currentHeight,
                           rectangleInnerWidth, currentHeight)
         context.fill()
 
@@ -1096,23 +1100,25 @@ class FuelTank(gtk.VBox):
 
         context.set_line_width(1.5)
         context.set_source_rgb(0.0, 0.85, 0.85)
-        context.move_to(rectangleX0, expectedY)
-        context.line_to(rectangleX1, expectedY)
+        context.move_to(xOffset + rectangleX0, yOffset + expectedY)
+        context.line_to(xOffset + rectangleX1, yOffset + expectedY)
         context.stroke()
 
         context.set_line_width(0.0)
-        context.move_to(0, expectedY - triangleSize)
-        context.line_to(0, expectedY + triangleSize)
-        context.line_to(rectangleX0 + 1, expectedY)
-        context.line_to(0, expectedY - triangleSize)
+        context.move_to(xOffset + 0, yOffset + expectedY - triangleSize)
+        context.line_to(xOffset + 0, yOffset + expectedY + triangleSize)
+        context.line_to(xOffset + rectangleX0 + 1, yOffset + expectedY)
+        context.line_to(xOffset + 0, yOffset + expectedY - triangleSize)
         context.fill()
 
         context.set_line_width(0.0)
-        context.move_to(width, expectedY - triangleSize)
-        context.line_to(width, expectedY + triangleSize)
-        context.line_to(rectangleX1 - 1, expectedY)
-        context.line_to(width, expectedY - triangleSize)
+        context.move_to(xOffset + width, yOffset + expectedY - triangleSize)
+        context.line_to(xOffset + width, yOffset + expectedY + triangleSize)
+        context.line_to(xOffset + rectangleX1 - 1, yOffset + expectedY)
+        context.line_to(xOffset + width, yOffset + expectedY - triangleSize)
         context.fill()
+
+        return True
 
     def _expectedChanged(self, spinButton):
         """Called when the expected value has changed."""
