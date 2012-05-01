@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(scriptdir, "src"))
 import mlx.const
 import mlx.update
 
-data_files = []
+data_files = [("sounds", glob(os.path.join("sounds", "*.*")))]
 if os.name=="nt":
     import py2exe
 
