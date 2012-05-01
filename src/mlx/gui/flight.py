@@ -4,6 +4,7 @@ from mlx.gui.common import *
 
 import mlx.const as const
 import mlx.fs as fs
+import mlx.acft as acft
 from mlx.checks import PayloadChecker
 import mlx.util as util
 from mlx.pirep import PIREP
@@ -966,13 +967,274 @@ class TimePage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
+        if not self._completed:
+            gui = self._wizard.gui
+            gui.beginBusy(xstr("fuel_get_busy"))
+            
+            gui.simulator.getFuel(gui.flight.aircraft.fuelTanks,
+                                  self._handleFuel)
+        else:
+            self._wizard.nextPage()
+
+    def _handleFuel(self, fuelData):
+        """Callback for the fuel query operation."""
+        gobject.idle_add(self._processFuel, fuelData)
+
+    def _processFuel(self, fuelData):
+        """Process the given fuel data."""
+        self._wizard.gui.endBusy()
+        self._wizard._fuelData = fuelData
         self._wizard.nextPage()
+        
+#-----------------------------------------------------------------------------
+
+class FuelTank(gtk.VBox):
+    """Widget for the fuel tank."""
+    def __init__(self, fuelTank, name, capacity, currentWeight):
+        """Construct the widget for the tank with the given name."""
+        super(FuelTank, self).__init__()
+
+        self.fuelTank = fuelTank
+        self.capacity = capacity
+        self.currentWeight = currentWeight
+        self.expectedWeight = currentWeight
+
+        label = gtk.Label("<b>" + name + "</b>")
+        label.set_use_markup(True)
+        label.set_justify(JUSTIFY_CENTER)
+        label.set_alignment(0.5, 1.0)
+        self.pack_start(label, False, False, 4)
+
+        self._tankFigure = gtk.DrawingArea()
+        self._tankFigure.set_size_request(38, -1)
+
+        if pygobject:
+            self._tankFigure.connect("draw", self._drawTankFigure)
+        else:
+            self._tankFigure.connect("expose_event", self._drawTankFigure)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 1.0)
+        alignment.add(self._tankFigure) 
+
+        self.pack_start(alignment, True, True, 4)
+
+        self._expectedButton = gtk.SpinButton()
+        self._expectedButton.set_numeric(True)
+        self._expectedButton.set_range(0, self.capacity)
+        self._expectedButton.set_increments(10, 100)
+        self._expectedButton.set_value(currentWeight)
+        self._expectedButton.set_alignment(1.0)
+        self._expectedButton.set_width_chars(5)
+        self._expectedButton.connect("value-changed", self._expectedChanged)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 1.0)
+        alignment.add(self._expectedButton) 
+        self.pack_start(alignment, False, False, 4)
+
+    def setCurrent(self, currentWeight):
+        """Set the current weight."""
+        self.currentWeight = currentWeight
+        self._redraw()
+
+    def isCorrect(self):
+        """Determine if the contents of the fuel tank are as expected"""
+        return abs(self.expectedWeight - self.currentWeight)<=1
+
+    def disable(self):
+        """Disable the fuel tank."""
+        self._expectedButton.set_sensitive(False)
+
+    def _redraw(self):
+        """Redraw the tank figure."""
+        self._tankFigure.queue_draw()
+
+    def _drawTankFigure(self, connStateArea, eventOrContext):
+        """Draw the tank figure."""
+        triangleSize = 5
+        
+        context = eventOrContext if pygobject else connStateArea.window.cairo_create()
+
+        width = connStateArea.get_allocated_width() if pygobject \
+                else connStateArea.allocation.width
+        height = connStateArea.get_allocated_height() if pygobject \
+                 else connStateArea.allocation.height
+
+        rectangleX0 = triangleSize
+        rectangleY0 = triangleSize
+        rectangleX1 = width - 1 - triangleSize
+        rectangleY1 = height - 1 - triangleSize
+        rectangleLineWidth = 2.0
+
+        context.set_source_rgb(0.0, 0.0, 0.0)
+        context.set_line_width(rectangleLineWidth)
+        context.rectangle(rectangleX0 + rectangleLineWidth/2,
+                          rectangleY0 + rectangleLineWidth/2,
+                          rectangleX1 - rectangleX0 - rectangleLineWidth,
+                          rectangleY1 - rectangleY0 - rectangleLineWidth)
+        context.stroke()
+
+        rectangleInnerLeft   = rectangleX0 + rectangleLineWidth
+        rectangleInnerRight  = rectangleX1 - rectangleLineWidth
+        rectangleInnerTop    = rectangleY0 + rectangleLineWidth
+        rectangleInnerBottom = rectangleY1 - rectangleLineWidth
+
+        rectangleInnerWidth = rectangleInnerRight - rectangleInnerLeft
+        rectangleInnerHeight = rectangleInnerBottom - rectangleInnerTop
+
+        context.set_source_rgb(1.0, 0.9, 0.6)
+        currentHeight = self.currentWeight * rectangleInnerHeight / self.capacity
+        currentX = rectangleInnerTop + rectangleInnerHeight - currentHeight
+        context.rectangle(rectangleInnerLeft,
+                          rectangleInnerTop + rectangleInnerHeight - currentHeight,
+                          rectangleInnerWidth, currentHeight)
+        context.fill()
+
+        expectedHeight = self.expectedWeight * rectangleInnerHeight / self.capacity
+        expectedY = rectangleInnerTop + rectangleInnerHeight - expectedHeight
+
+        context.set_line_width(1.5)
+        context.set_source_rgb(0.0, 0.85, 0.85)
+        context.move_to(rectangleX0, expectedY)
+        context.line_to(rectangleX1, expectedY)
+        context.stroke()
+
+        context.set_line_width(0.0)
+        context.move_to(0, expectedY - triangleSize)
+        context.line_to(0, expectedY + triangleSize)
+        context.line_to(rectangleX0 + 1, expectedY)
+        context.line_to(0, expectedY - triangleSize)
+        context.fill()
+
+        context.set_line_width(0.0)
+        context.move_to(width, expectedY - triangleSize)
+        context.line_to(width, expectedY + triangleSize)
+        context.line_to(rectangleX1 - 1, expectedY)
+        context.line_to(width, expectedY - triangleSize)
+        context.fill()
+
+    def _expectedChanged(self, spinButton):
+        """Called when the expected value has changed."""
+        self.expectedWeight = spinButton.get_value_as_int()
+        self._redraw()        
+
+#-----------------------------------------------------------------------------
+
+class FuelPage(Page):
+    """The page containing the fuel tank filling."""
+    _pumpStep = 0.02
+    
+    def __init__(self, wizard):
+        """Construct the page."""
+        super(FuelPage, self).__init__(wizard, xstr("fuel_title"),
+                                       xstr("fuel_help"),
+                                       completedHelp = xstr("fuel_chelp"))
+
+        self._fuelTanks = []
+        self._fuelTable = None
+        self._fuelAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                            xscale = 0.0, yscale = 1.0)
+        self.setMainWidget(self._fuelAlignment)
+
+        tanks = acft.MostFuelTankAircraft.fuelTanks
+        tankData = ((2500, 3900),) * len(tanks)
+        self._setupTanks(tanks, tankData)
+
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
+
+        self._pumpIndex = 0
+
+    def activate(self):
+        """Activate the page."""
+        gui = self._wizard.gui
+
+        self._setupTanks(gui.flight.aircraft.fuelTanks,
+                         self._wizard._fuelData)
+
+    def finalize(self):
+        """Finalize the page."""
+        for fuelTank in self._fuelTanks:
+            fuelTank.disable()
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+        
+    def _forwardClicked(self, button):
+        """Called when the forward button is clicked."""
+        if not self._completed:
+            self._pumpIndex = 0
+            self._wizard.gui.beginBusy(xstr("fuel_pump_busy"))
+            self._pump()
+        else:
+            self._wizard.nextPage()        
+
+    def _setupTanks(self, tanks, tankData):
+        """Setup the tanks for the given data."""
+        numTanks = len(tanks)
+        if self._fuelTable is not None:
+            self._fuelAlignment.remove(self._fuelTable)
+
+        self._fuelTanks = []
+        self._fuelTable = gtk.Table(numTanks, 1)
+        self._fuelTable.set_col_spacings(16)
+        for i in range(0, numTanks):
+            tank = tanks[i]
+            (current, capacity) = tankData[i]
+
+            fuelTank = FuelTank(tank,
+                                xstr("fuel_tank_" +
+                                     const.fuelTank2string(tank)),
+                                capacity, current)
+            self._fuelTable.attach(fuelTank, i, i+1, 0, 1)
+            self._fuelTanks.append(fuelTank)
+            
+        self._fuelAlignment.add(self._fuelTable)
+        self.show_all()
+
+    def _pump(self):
+        """Perform one step of pumping.
+
+        It is checked, if the current tank's contents are of the right
+        quantity. If not, it is filled one step further to the desired
+        contents. Otherwise the next tank is started. If all tanks are are
+        filled, the next page is selected."""
+        numTanks = len(self._fuelTanks)
+
+        fuelTank = None
+        while self._pumpIndex < numTanks:
+            fuelTank = self._fuelTanks[self._pumpIndex]
+            if fuelTank.isCorrect():
+                self._pumpIndex += 1
+                fuelTank = None
+            else:
+                break
+
+        if fuelTank is None:
+            self._wizard.gui.endBusy()
+            self._wizard.nextPage()
+        else:
+            currentLevel = fuelTank.currentWeight / fuelTank.capacity
+            expectedLevel = fuelTank.expectedWeight / fuelTank.capacity
+            if currentLevel<expectedLevel:
+                currentLevel += FuelPage._pumpStep
+                if currentLevel>expectedLevel: currentLevel = expectedLevel
+            else:
+                currentLevel -= FuelPage._pumpStep
+                if currentLevel<expectedLevel: currentLevel = expectedLevel
+            fuelTank.setCurrent(currentLevel * fuelTank.capacity)
+            self._wizard.gui.simulator.setFuelLevel([(fuelTank.fuelTank,
+                                                      currentLevel)])
+            gobject.timeout_add(50, self._pump)
         
 #-----------------------------------------------------------------------------
 
 class RoutePage(Page):
     """The page containing the route and the flight level."""
     def __init__(self, wizard):
+        """Construct the page."""
         super(RoutePage, self).__init__(wizard, xstr("route_title"),
                                         xstr("route_help"),
                                         completedHelp = xstr("route_chelp"))
@@ -2044,6 +2306,7 @@ class Wizard(gtk.VBox):
         self._pages.append(self._payloadPage)
         self._payloadIndex = len(self._pages)
         self._pages.append(TimePage(self))
+        self._pages.append(FuelPage(self))
         self._routePage = RoutePage(self)
         self._pages.append(self._routePage)
         self._departureBriefingPage = BriefingPage(self, True)
@@ -2241,6 +2504,7 @@ class Wizard(gtk.VBox):
         self._loginResult = None
         self._bookedFlight = None
         self._departureGate = "-"
+        self._fuelData = None
         self._departureNOTAMs = None
         self._departureMETAR = None
         self._arrivalNOTAMs = None

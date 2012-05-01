@@ -527,7 +527,7 @@ class Simulator(object):
         self._flareStartFS = None
     
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
-    
+
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft
@@ -607,6 +607,36 @@ class Simulator(object):
                 (0x32fa, 'h', duration)]
 
         self._handler.requestWrite(data, self._handleMessageSent)
+
+    def getFuel(self, tanks, callback):
+        """Get the fuel from the given tanks.
+
+        The callback will be called with a list of two-tuples, where the tuples
+        have the following items:
+        - the current weight of the fuel in the tank (in kgs)
+        - the current total capacity of the tank (in kgs)."""
+        data = [(0x0af4, "H")]     # Fuel weight
+        for tank in tanks:
+            offset = _tank2offset[tank]
+            data.append( (offset, "u") )     # tank level
+            data.append( (offset+4, "u") )   # tank capacity
+
+        self._handler.requestRead(data, self._handleFuelRetrieved,
+                                  extra = callback)
+
+    def setFuelLevel(self, levels):
+        """Set the fuel level to the given ones.
+
+        levels is an array of two-tuples, where each tuple consists of the
+        following:
+        - the const.FUELTANK_XXX constant denoting the tank that must be set,
+        - the requested level of the fuel as a floating-point value between 0.0
+        and 1.0."""
+        data = []
+        for (tank, level) in levels:
+            offset = _tank2offset[tank]
+            data.append( (offset, "u", long(level * 128.8 * 65536.0)) )
+        self._handler.requestWrite(data, self._handleFuelWritten)
             
     def disconnect(self):
         """Disconnect from the simulator."""
@@ -800,6 +830,21 @@ class Simulator(object):
 
     def _handleMessageSent(self, success, extra):
         """Callback for a message sending request."""
+        pass
+
+    def _handleFuelRetrieved(self, data, callback):
+        """Callback for a fuel retrieval request."""
+        fuelWeight = data[0] / 256.0
+        result = []
+        for i in range(1, len(data), 2):
+            capacity = data[i+1] * fuelWeight * const.LBSTOKG
+            amount = data[i] * capacity / 128.0 / 65536.0
+            result.append( (amount, capacity) )
+
+        callback(result)
+                                                  
+    def _handleFuelWritten(self, success, extra):
+        """Callback for a fuel setting request."""
         pass
                                                   
 #------------------------------------------------------------------------------

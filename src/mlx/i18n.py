@@ -284,6 +284,28 @@ class _English(_Strings):
                  "Click here to query the current UTC time from the simulator.")
         self.add("time_busy", "Querying time...")
 
+        self.add("fuel_title", "Fuel")
+        self.add("fuel_help",
+                 "Enter the amount of fuel in kilograms that need to be "
+                 "present in each tank below.\n\n"
+                 "When you press <b>Next</b>, the necessary amount of fuel\n"
+                 "will be pumped into or out of the tanks.")
+        self.add("fuel_chelp",
+                 "The amount of fuel tanked into your aircraft at the\n"
+                 "beginning of the flight can be seen below.")
+        self.add("fuel_tank_centre", "Centre\n")
+        self.add("fuel_tank_left", "Left\n")
+        self.add("fuel_tank_right", "Right\n")
+        self.add("fuel_tank_left_aux", "Left\nAux")
+        self.add("fuel_tank_right_aux", "Right\nAux")
+        self.add("fuel_tank_left_tip", "Left\nTip")
+        self.add("fuel_tank_right_tip", "Right\nTip")
+        self.add("fuel_tank_external1", "External\n1")
+        self.add("fuel_tank_external2", "External\n2")
+        self.add("fuel_tank_centre2", "Centre\n2")
+        self.add("fuel_get_busy", "Querying fuel information...")
+        self.add("fuel_pump_busy", "Pumping fuel...")
+
         self.add("route_title", "Route")
         self.add("route_help",
                  "Set your cruise flight level below, and\n" \

@@ -328,6 +328,37 @@ FUELTANK_CENTRE2 = 10
 
 #-------------------------------------------------------------------------------
 
+fuelTanks = [ FUELTANK_CENTRE,
+              FUELTANK_LEFT,
+              FUELTANK_RIGHT,
+              FUELTANK_LEFT_AUX,
+              FUELTANK_RIGHT_AUX,
+              FUELTANK_LEFT_TIP,
+              FUELTANK_RIGHT_TIP,
+              FUELTANK_EXTERNAL1,
+              FUELTANK_EXTERNAL2,
+              FUELTANK_CENTRE2 ]
+
+#-------------------------------------------------------------------------------
+
+_fuelTankStrings = { FUELTANK_CENTRE : "centre",
+                     FUELTANK_LEFT : "left",
+                     FUELTANK_RIGHT : "right",
+                     FUELTANK_LEFT_AUX : "left_aux",
+                     FUELTANK_RIGHT_AUX : "right_aux",
+                     FUELTANK_LEFT_TIP : "left_tip",
+                     FUELTANK_RIGHT_TIP : "right_tip",
+                     FUELTANK_EXTERNAL1 : "external1",
+                     FUELTANK_EXTERNAL2 : "external2",
+                     FUELTANK_CENTRE2 : "centre2" }
+
+def fuelTank2string(fuelTank):
+    """Get the string equivalent of the given fuelTank."""
+    return _fuelTankStrings[fuelTank] \
+           if fuelTank in _fuelTankStrings else None    
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 
