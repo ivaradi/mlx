@@ -994,6 +994,7 @@ class FuelTank(gtk.VBox):
         """Construct the widget for the tank with the given name."""
         super(FuelTank, self).__init__()
 
+        self._enabled = True
         self.fuelTank = fuelTank
         self.capacity = capacity
         self.currentWeight = currentWeight
@@ -1053,6 +1054,7 @@ class FuelTank(gtk.VBox):
     def disable(self):
         """Disable the fuel tank."""
         self._expectedButton.set_sensitive(False)
+        self._enabled = False
 
     def _redraw(self):
         """Redraw the tank figure."""
@@ -1138,23 +1140,24 @@ class FuelTank(gtk.VBox):
         """Called when a button is pressed in the figure.
 
         The expected level will be set there."""
-        if event.button==1:
+        if self._enabled and event.button==1:
             self._setExpectedFromY(event.y)
         
     def _motionNotify(self, tankFigure, event):
         """Called when the mouse pointer moves within the area of a tank figure."""
-        if event.state==BUTTON1_MASK:            
+        if self._enabled and event.state==BUTTON1_MASK:            
             self._setExpectedFromY(event.y)
 
     def _scrolled(self, tankFigure, event):
         """Called when a scroll event is received."""
-        increment = 1 if event.state==CONTROL_MASK \
-                    else 100 if event.state==SHIFT_MASK \
-                    else 10 if event.state==0 else 0
-        if increment!=0:
-            if event.direction==SCROLL_DOWN:
-                increment *= -1
-            self._expectedButton.spin(SPIN_USER_DEFINED, increment)
+        if self._enabled:
+            increment = 1 if event.state==CONTROL_MASK \
+                        else 100 if event.state==SHIFT_MASK \
+                        else 10 if event.state==0 else 0
+            if increment!=0:
+                if event.direction==SCROLL_DOWN:
+                    increment *= -1
+                self._expectedButton.spin(SPIN_USER_DEFINED, increment)
         
     def _expectedChanged(self, spinButton):
         """Called when the expected value has changed."""
