@@ -305,6 +305,18 @@ class _English(_Strings):
         self.add("fuel_tank_centre2", "Centre\n2")
         self.add("fuel_get_busy", "Querying fuel information...")
         self.add("fuel_pump_busy", "Pumping fuel...")
+        self.add("fuel_tank_tooltip",
+                 "This part displays the current level of the fuel in the "
+                 "compared to its capacity. The "
+                 '<span color="turquoise">turquoise</span> '
+                 "slider shows the level that should be loaded into the tank "
+                 "for the flight. You can click anywhere in the widget to "
+                 "move the slider there. Or you can grab it by holding down "
+                 "the left button of your mouse, and move the pointer up or "
+                 "down. The scroll wheel on your mouse also increments or "
+                 "decrements the amount of fuel by 10. If you hold down "
+                 "the <b>Shift</b> key while scrolling, the steps will be "
+                 "100, or with the <b>Control</b> key, 1.")
 
         self.add("route_title", "Route")
         self.add("route_help",
@@ -830,6 +842,18 @@ class _Hungarian(_Strings):
         self.add("fuel_tank_centre2", "Középső\n2")
         self.add("fuel_get_busy", "Az üzemanyag lekérdezése...")
         self.add("fuel_pump_busy", "Az üzemanyag pumpálása...")
+        self.add("fuel_tank_tooltip",
+                 "Ez mutatja az üzemanyag szintjét a tartályban annak "
+                 "kapacitásához mérve. A "
+                 '<span color="turquoise">türkizkék</span> '
+                 "csúszka mutatja a repüléshez kívánt szintet. "
+                 "Ha a bal gombbal bárhová kattintasz az ábrán, a csúszka "
+                 "odaugrik. Ha a gombot lenyomva tartod, és az egérmutatót "
+                 "föl-le mozgatod, a csúszka követi azt. Az egered görgőjével "
+                 "is kezelheted a csúszkát. Alaphelyzetben az üzemanyag "
+                 "mennyisége 10-zel nő, illetve csökken a görgetés irányától "
+                 "függően. Ha a <b>Shift</b> billentyűt lenyomva tartod, "
+                 "növekmény 100, a <b>Control</b> billentyűvel pedig 1 lesz.")
 
         self.add("route_title", "Útvonal")
         self.add("route_help",

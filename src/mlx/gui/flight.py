@@ -1008,12 +1008,16 @@ class FuelTank(gtk.VBox):
         self._tankFigure = gtk.EventBox()
         self._tankFigure.set_size_request(38, -1)
         self._tankFigure.set_visible_window(False)
+        self._tankFigure.set_tooltip_markup(xstr("fuel_tank_tooltip"))
 
         if pygobject:
             self._tankFigure.connect("draw", self._drawTankFigure)
         else:
             self._tankFigure.connect("expose_event", self._drawTankFigure)
-
+        self._tankFigure.connect("button_press_event", self._buttonPressed)
+        self._tankFigure.connect("motion_notify_event", self._motionNotify)
+        self._tankFigure.connect("scroll-event", self._scrolled)
+        
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
         alignment.add(self._tankFigure)
@@ -1080,8 +1084,8 @@ class FuelTank(gtk.VBox):
 
         rectangleInnerLeft   = rectangleX0 + rectangleLineWidth
         rectangleInnerRight  = rectangleX1 - rectangleLineWidth
-        rectangleInnerTop    = rectangleY0 + rectangleLineWidth
-        rectangleInnerBottom = rectangleY1 - rectangleLineWidth
+        self._rectangleInnerTop = rectangleInnerTop = rectangleY0 + rectangleLineWidth
+        self._rectangleInnerBottom = rectangleInnerBottom = rectangleY1 - rectangleLineWidth
 
         rectangleInnerWidth = rectangleInnerRight - rectangleInnerLeft
         rectangleInnerHeight = rectangleInnerBottom - rectangleInnerTop
@@ -1120,6 +1124,35 @@ class FuelTank(gtk.VBox):
 
         return True
 
+    def _setExpectedFromY(self, y):
+        """Set the expected weight from the given Y-coordinate."""
+        level = (self._rectangleInnerBottom - y) / \
+                (self._rectangleInnerBottom - self._rectangleInnerTop)
+        level = min(1.0, max(0.0, level))
+        self._expectedButton.set_value(level * self.capacity)
+        
+    def _buttonPressed(self, tankFigure, event):
+        """Called when a button is pressed in the figure.
+
+        The expected level will be set there."""
+        if event.button==1:
+            self._setExpectedFromY(event.y)
+        
+    def _motionNotify(self, tankFigure, event):
+        """Called when the mouse pointer moves within the area of a tank figure."""
+        if event.state==BUTTON1_MASK:            
+            self._setExpectedFromY(event.y)
+
+    def _scrolled(self, tankFigure, event):
+        """Called when a scroll event is received."""
+        increment = 1 if event.state==CONTROL_MASK \
+                    else 100 if event.state==SHIFT_MASK \
+                    else 10 if event.state==0 else 0
+        if increment!=0:
+            if event.direction==SCROLL_DOWN:
+                increment *= -1
+            self._expectedButton.spin(SPIN_USER_DEFINED, increment)
+        
     def _expectedChanged(self, spinButton):
         """Called when the expected value has changed."""
         self.expectedWeight = spinButton.get_value_as_int()
@@ -1152,12 +1185,12 @@ class FuelPage(Page):
 
         self._pumpIndex = 0
 
-    def activate(self):
-        """Activate the page."""
-        gui = self._wizard.gui
+    # def activate(self):
+    #     """Activate the page."""
+    #     gui = self._wizard.gui
 
-        self._setupTanks(gui.flight.aircraft.fuelTanks,
-                         self._wizard._fuelData)
+    #     self._setupTanks(gui.flight.aircraft.fuelTanks,
+    #                      self._wizard._fuelData)
 
     def finalize(self):
         """Finalize the page."""
@@ -2519,7 +2552,7 @@ class Wizard(gtk.VBox):
         for page in self._pages:
             page.reset()
         
-        self.setCurrentPage(0)
+        self.setCurrentPage(6)
 
     def getFleet(self, callback, force = False):
         """Get the fleet via the GUI and call the given callback."""

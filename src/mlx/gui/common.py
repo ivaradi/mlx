@@ -34,6 +34,15 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     WRAP_WORD = gtk.WRAP_WORD
     JUSTIFY_CENTER = gtk.JUSTIFY_CENTER
 
+    CONTROL_MASK = gdk.CONTROL_MASK
+    SHIFT_MASK = gdk.SHIFT_MASK
+    BUTTON1_MASK = gdk.BUTTON1_MASK
+
+    SCROLL_UP = gdk.SCROLL_UP
+    SCROLL_DOWN = gdk.SCROLL_DOWN
+
+    SPIN_USER_DEFINED = gtk.SPIN_USER_DEFINED
+
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return unicode(text)
@@ -60,6 +69,15 @@ else:
     DIALOG_MODAL = gtk.DialogFlags.MODAL
     WRAP_WORD = gtk.WrapMode.WORD
     JUSTIFY_CENTER = gtk.Justification.CENTER
+
+    CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
+    SHIFT_MASK = gdk.ModifierType.SHIFT_MASK
+    BUTTON1_MASK = gdk.ModifierType.BUTTON1_MASK
+
+    SCROLL_UP = gdk.ScrollDirection.UP
+    SCROLL_DOWN = gdk.ScrollDirection.DOWN
+
+    SPIN_USER_DEFINED = gtk.SpinType.USER_DEFINED
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
