@@ -36,6 +36,7 @@ class Config(object):
         self._rememberPassword = False
 
         self._language = ""
+        self._hideMinimizedWindow = True
         self._onlineGateSystem = True
         self._onlineACARS = True
         self._flareTimeFromFS = False
@@ -95,6 +96,18 @@ class Config(object):
             self._language = language
             self._modified = True
 
+    @property
+    def hideMinimizedWindow(self):
+        """Get whether a minimized window should be hidden."""
+        return self._hideMinimizedWindow
+
+    @hideMinimizedWindow.setter
+    def hideMinimizedWindow(self, hideMinimizedWindow):
+        """Set whether a minimized window should be hidden."""
+        if hideMinimizedWindow!=self._hideMinimizedWindow:
+            self._hideMinimizedWindow = hideMinimizedWindow
+            self._modified = True
+    
     @property
     def onlineGateSystem(self):
         """Get whether the online gate system should be used."""
@@ -188,6 +201,9 @@ class Config(object):
                                                   "rememberPassword", False)
 
         self._language = self._get(config, "general", "language", "")
+        self._hideMinimizedWindow = self._getBoolean(config, "general",
+                                                     "hideMinimizedWindow",
+                                                     True)
         self._onlineGateSystem = self._getBoolean(config, "general",
                                                   "onlineGateSystem",
                                                   True)
@@ -224,6 +240,8 @@ class Config(object):
         config.add_section("general")
         if self._language:
             config.set("general", "language", self._language)
+        config.set("general", "hideMinimizedWindow",
+                   "yes" if self._hideMinimizedWindow else "no")
         config.set("general", "onlineGateSystem",
                    "yes" if self._onlineGateSystem else "no")
         config.set("general", "onlineACARS",

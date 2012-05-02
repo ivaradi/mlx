@@ -66,6 +66,7 @@ class Preferences(gtk.Dialog):
     def _fromConfig(self, config):
         """Setup the dialog from the given configuration."""
         self._setLanguage(config.language)
+        self._hideMinimizedWindow.set_active(config.hideMinimizedWindow)
         self._onlineGateSystem.set_active(config.onlineGateSystem)
         self._onlineACARS.set_active(config.onlineACARS)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
@@ -90,6 +91,7 @@ class Preferences(gtk.Dialog):
     def _toConfig(self, config):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
+        config.hideMinimizedWindow = self._hideMinimizedWindow.get_active()
         config.onlineGateSystem = self._onlineGateSystem.get_active()
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
@@ -144,6 +146,11 @@ class Preferences(gtk.Dialog):
 
         self._changingLanguage = False
         self._warnedRestartNeeded = False
+
+        self._hideMinimizedWindow = gtk.CheckButton(xstr("prefs_hideMinimizedWindow"))
+        self._hideMinimizedWindow.set_use_underline(True)
+        self._hideMinimizedWindow.set_tooltip_text(xstr("prefs_hideMinimizedWindow_tooltip"))
+        mainBox.pack_start(self._hideMinimizedWindow, False, False, 4)
 
         self._onlineGateSystem = gtk.CheckButton(xstr("prefs_onlineGateSystem"))
         self._onlineGateSystem.set_use_underline(True)

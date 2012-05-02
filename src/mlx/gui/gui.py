@@ -475,7 +475,9 @@ class GUI(fs.ConnectionListener):
         """Hande a change in the state of the window"""
         iconified = gdk.WindowState.ICONIFIED if pygobject \
                     else gdk.WINDOW_STATE_ICONIFIED
-        if (event.changed_mask&iconified)!=0 and (event.new_window_state&iconified)!=0:
+        if self.config.hideMinimizedWindow and \
+           (event.changed_mask&iconified)!=0 and \
+           (event.new_window_state&iconified)!=0:
             self.hideMainWindow(savePosition = False)
 
     def hideMainWindow(self, savePosition = True):

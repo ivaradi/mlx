@@ -594,6 +594,12 @@ class _English(_Strings):
         self.add("prefs_lang_$system", "system default")
         self.add("prefs_lang_en_GB", "English")
         self.add("prefs_lang_hu_HU", "Hungarian")
+        self.add("prefs_hideMinimizedWindow",
+                 "_Hide the main window when minimized")
+        self.add("prefs_hideMinimizedWindow_tooltip",
+                 "If checked, the main window will be hidden completely "
+                 "when minimized. You can still make it appear by "
+                 "clicking on the status icon or using its popup menu.")
         self.add("prefs_onlineGateSystem",
                  "_Use the Online Gate System")
         self.add("prefs_onlineGateSystem_tooltip",
@@ -1136,6 +1142,12 @@ class _Hungarian(_Strings):
         self.add("prefs_lang_$system", "alapértelmezett")
         self.add("prefs_lang_en_GB", "angol")
         self.add("prefs_lang_hu_HU", "magyar")
+        self.add("prefs_hideMinimizedWindow",
+                 "A főablak _eltüntetése minimalizáláskor")
+        self.add("prefs_hideMinimizedWindow_tooltip",
+                 "Ha ezt kijelölöd, a főablak teljesen eltűnik, "
+                 "ha minimalizálod. A státuszikonra kattintással vagy annak "
+                 "menüje segítségével újra meg tudod jeleníteni.")
         self.add("prefs_onlineGateSystem",
                  "Az Online _Gate System használata")
         self.add("prefs_onlineGateSystem_tooltip",
