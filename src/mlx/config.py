@@ -40,6 +40,7 @@ class Config(object):
         self._onlineGateSystem = True
         self._onlineACARS = True
         self._flareTimeFromFS = False
+        self._syncFSTime = False
         
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
@@ -146,6 +147,20 @@ class Config(object):
             self._flareTimeFromFS = flareTimeFromFS
             self._modified = True
 
+    @property
+    def syncFSTime(self):
+        """Get whether the simulator's time should be synchronized with the
+        machine's clock."""
+        return self._syncFSTime
+
+    @syncFSTime.setter
+    def syncFSTime(self, syncFSTime):
+        """Set whether the simulator's time should be synchronized with the
+        machine's clock."""
+        if syncFSTime!=self._syncFSTime:
+            self._syncFSTime = syncFSTime
+            self._modified = True
+
     def getMessageTypeLevel(self, messageType):
         """Get the level for the given message type."""
         return self._messageTypeLevels[messageType] \
@@ -212,6 +227,9 @@ class Config(object):
         self._flareTimeFromFS = self._getBoolean(config, "general",
                                                  "flareTimeFromFS",
                                                  False)
+        self._syncFSTime = self._getBoolean(config, "general",
+                                            "syncFSTime",
+                                            False)
 
         self._messageTypeLevels = {}
         for messageType in const.messageTypes:
@@ -248,6 +266,8 @@ class Config(object):
                    "yes" if self._onlineACARS else "no")
         config.set("general", "flareTimeFromFS",
                    "yes" if self._flareTimeFromFS else "no")
+        config.set("general", "syncFSTime",
+                   "yes" if self._syncFSTime else "no")
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:

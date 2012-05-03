@@ -70,6 +70,7 @@ class Preferences(gtk.Dialog):
         self._onlineGateSystem.set_active(config.onlineGateSystem)
         self._onlineACARS.set_active(config.onlineACARS)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
+        self._syncFSTime.set_active(config.syncFSTime)
 
         for messageType in const.messageTypes:
             level = config.getMessageTypeLevel(messageType)
@@ -95,6 +96,7 @@ class Preferences(gtk.Dialog):
         config.onlineGateSystem = self._onlineGateSystem.get_active()
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
+        config.syncFSTime = self._syncFSTime.get_active()
 
         for messageType in const.messageTypes:
             fsButtonActive = self._msgFSCheckButtons[messageType].get_active()
@@ -166,6 +168,11 @@ class Preferences(gtk.Dialog):
         self._flareTimeFromFS.set_use_underline(True)
         self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
         mainBox.pack_start(self._flareTimeFromFS, False, False, 4)
+                                       
+        self._syncFSTime = gtk.CheckButton(xstr("prefs_syncFSTime"))
+        self._syncFSTime.set_use_underline(True)
+        self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
+        mainBox.pack_start(self._syncFSTime, False, False, 4)
                                        
         return mainAlignment
 

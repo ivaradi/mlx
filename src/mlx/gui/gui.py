@@ -698,7 +698,8 @@ class GUI(fs.ConnectionListener):
         if self._simulator is None:
             self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
             fs.setupMessageSending(self.config, self._simulator)
-
+            self._setupTimeSync()
+        
         self._flight.simulator = self._simulator
 
         self.beginBusy(xstr("connect_busy"))
@@ -852,3 +853,14 @@ class GUI(fs.ConnectionListener):
     def _editPreferences(self, menuItem):
         """Callback for editing the preferences."""
         self._preferences.run(self.config)
+        self._setupTimeSync()
+
+    def _setupTimeSync(self):
+        """Enable or disable the simulator time synchronization based on the
+        configuration."""
+        simulator = self._simulator
+        if simulator is not None:
+            if self.config.syncFSTime:
+                simulator.enableTimeSync()
+            else:
+                simulator.disableTimeSync()

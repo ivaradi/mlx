@@ -615,6 +615,11 @@ class _English(_Strings):
         self.add("prefs_flaretimeFromFS_tooltip",
                  "If this is checked, the time of the flare will be calculated "
                  "from timestamps returned by the simulator.")
+        self.add("prefs_syncFSTime",
+                 "_Synchronize the time in FS with the computer's clock")
+        self.add("prefs_syncFSTime_tooltip",
+                 "If this is checked the flight simulator's internal clock "
+                 "will always be synchronized to the computer's clock.")
         self.add("prefs_update_auto", "Update the program auto_matically")
         self.add("prefs_update_auto_tooltip",
                  "If checked the program will look for updates when "
@@ -1163,6 +1168,11 @@ class _Hungarian(_Strings):
         self.add("prefs_flaretimeFromFS_tooltip",
                  "Ha ezt bejelölöd, a kilebegtetés idejét a szimulátor "
                  "által visszaadott időbélyegek alapján számolja a program.")
+        self.add("prefs_syncFSTime",
+                 "_Szinkronizáld a szimulátor idéjét a számítógépével")
+        self.add("prefs_syncFSTime_tooltip",
+                 "Ha ez bejelölöd, a szimulátor belső óráját a program "
+                 "szinkronban tartja a számítógép órájával.")
         self.add("prefs_update_auto",
                  "Frissítsd a programot _automatikusan")
         self.add("prefs_update_auto_tooltip",

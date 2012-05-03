@@ -470,6 +470,8 @@ class Simulator(object):
                    (0x057c, "d"),            # Bank
                    (0x0580, "d") ]           # Heading
 
+    TIME_SYNC_INTERVAL = 3.0
+
     @staticmethod
     def _getTimestamp(data):
         """Convert the given data into a timestamp."""
@@ -513,6 +515,9 @@ class Simulator(object):
 
         self._scroll = False
 
+        self._syncTime = False
+        self._nextSyncTime = -1
+        
         self._normalRequestID = None
 
         self._monitoringRequested = False
@@ -535,6 +540,7 @@ class Simulator(object):
         self._aircraftModel = None
         self._handler.connect()
         if self._normalRequestID is None:
+            self._nextSyncTime = -1
             self._startDefaultNormal()
 
     def reconnect(self):
@@ -637,6 +643,16 @@ class Simulator(object):
             offset = _tank2offset[tank]
             data.append( (offset, "u", long(level * 128.8 * 65536.0)) )
         self._handler.requestWrite(data, self._handleFuelWritten)
+
+    def enableTimeSync(self):
+        """Enable the time synchronization."""
+        self._nextSyncTime = -1
+        self._syncTime = True
+            
+    def disableTimeSync(self):
+        """Enable the time synchronization."""
+        self._syncTime = False
+        self._nextSyncTime = -1
             
     def disconnect(self):
         """Disconnect from the simulator."""
@@ -677,6 +693,8 @@ class Simulator(object):
         createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
 
         self._scroll = data[7]!=0
+
+        self._checkTimeSync()
         
         if self._monitoringRequested and not self._monitoring:
             self._stopNormal()
@@ -690,6 +708,33 @@ class Simulator(object):
                                                                  timestamp, data)
             self._aircraft.handleState(aircraftState)
 
+    def _checkTimeSync(self):
+        """Check if we need to synchronize the FS time."""
+        if not self._syncTime: return
+
+        now = time.time()
+        seconds = time.gmtime(now).tm_sec
+
+        if seconds>30 and seconds<59:
+            if self._nextSyncTime > (now - 0.49):
+                return
+            
+            self._handler.requestWrite([(0x023a, "b", int(seconds))],
+                                       self._handleTimeSynced)
+            
+            #print "Set the seconds to ", seconds
+
+            if self._nextSyncTime<0:
+                self._nextSyncTime = now
+                
+            self._nextSyncTime += Simulator.TIME_SYNC_INTERVAL
+        else:
+            self._nextSyncTime = -1
+
+    def _handleTimeSynced(self, success, extra):
+        """Callback for the time sync result."""
+        pass
+        
     def _setAircraftName(self, timestamp, name, airPath):
         """Set the name of the aicraft and if it is different from the
         previous, create a new model for it.
