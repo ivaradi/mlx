@@ -127,6 +127,7 @@ class _English(_Strings):
         self.add("button_cancel", "_Cancel")
         self.add("button_yes", "_Yes")
         self.add("button_no", "_No")
+        self.add("button_browse", "Browse...")
         
         self.add("menu_file", "File")
         self.add("menu_file_quit", "_Quit")
@@ -620,6 +621,13 @@ class _English(_Strings):
         self.add("prefs_syncFSTime_tooltip",
                  "If this is checked the flight simulator's internal clock "
                  "will always be synchronized to the computer's clock.")
+        self.add("prefs_pirepDirectory",
+                 "_PIREP directory:")
+        self.add("prefs_pirepDirectory_tooltip",
+                 "The directory that will be offered by default when "
+                 "saving a PIREP.")
+        self.add("prefs_pirepDirectory_browser_title",
+                 "Select PIREP directory")
         self.add("prefs_update_auto", "Update the program auto_matically")
         self.add("prefs_update_auto_tooltip",
                  "If checked the program will look for updates when "
@@ -670,6 +678,7 @@ class _Hungarian(_Strings):
         self.add("button_cancel", "_Mégse")
         self.add("button_yes", "_Igen")
         self.add("button_no", "_Nem")
+        self.add("button_browse", "Keresés...")
         
         self.add("menu_file", "Fájl")
         self.add("menu_file_quit", "_Kilépés")
@@ -1173,6 +1182,13 @@ class _Hungarian(_Strings):
         self.add("prefs_syncFSTime_tooltip",
                  "Ha ez bejelölöd, a szimulátor belső óráját a program "
                  "szinkronban tartja a számítógép órájával.")
+        self.add("prefs_pirepDirectory",
+                 "_PIREP-ek könyvtára:")
+        self.add("prefs_pirepDirectory_tooltip",
+                 "Az itt megadott könyvtárt ajánlja majd fel a program "
+                 "a PIREP-ek mentésekor.")
+        self.add("prefs_pirepDirectory_browser_title",
+                 "Válaszd ki a PIREP-ek könyvtárát")
         self.add("prefs_update_auto",
                  "Frissítsd a programot _automatikusan")
         self.add("prefs_update_auto_tooltip",

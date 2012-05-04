@@ -28,6 +28,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     RESPONSETYPE_NO = gtk.RESPONSE_NO
     RESPONSETYPE_ACCEPT = gtk.RESPONSE_ACCEPT
     RESPONSETYPE_REJECT = gtk.RESPONSE_REJECT
+    RESPONSETYPE_CANCEL = gtk.RESPONSE_CANCEL
     ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
     CONTROL_MASK = gdk.CONTROL_MASK
     DIALOG_MODAL = gtk.DIALOG_MODAL
@@ -42,6 +43,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SCROLL_DOWN = gdk.SCROLL_DOWN
 
     SPIN_USER_DEFINED = gtk.SPIN_USER_DEFINED
+
+    FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
@@ -64,6 +67,7 @@ else:
     RESPONSETYPE_NO = gtk.ResponseType.NO
     RESPONSETYPE_ACCEPT = gtk.ResponseType.ACCEPT
     RESPONSETYPE_REJECT = gtk.ResponseType.REJECT
+    RESPONSETYPE_CANCEL = gtk.ResponseType.CANCEL
     ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
     CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
     DIALOG_MODAL = gtk.DialogFlags.MODAL
@@ -78,6 +82,8 @@ else:
     SCROLL_DOWN = gdk.ScrollDirection.DOWN
 
     SPIN_USER_DEFINED = gtk.SpinType.USER_DEFINED
+
+    FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FileChooserAction.SELECT_FOLDER
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")

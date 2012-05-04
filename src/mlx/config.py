@@ -41,6 +41,8 @@ class Config(object):
         self._onlineACARS = True
         self._flareTimeFromFS = False
         self._syncFSTime = False
+
+        self._pirepDirectory = None
         
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
@@ -161,6 +163,20 @@ class Config(object):
             self._syncFSTime = syncFSTime
             self._modified = True
 
+    @property
+    def pirepDirectory(self):
+        """Get the directory offered by default when saving a PIREP."""
+        return self._pirepDirectory
+
+    @pirepDirectory.setter
+    def pirepDirectory(self, pirepDirectory):
+        """Get the directory offered by default when saving a PIREP."""
+        if pirepDirectory!=self._pirepDirectory and \
+           (pirepDirectory!="" or self._pirepDirectory is not None):
+            self._pirepDirectory = None if pirepDirectory=="" \
+                                   else pirepDirectory
+            self._modified = True
+
     def getMessageTypeLevel(self, messageType):
         """Get the level for the given message type."""
         return self._messageTypeLevels[messageType] \
@@ -230,6 +246,8 @@ class Config(object):
         self._syncFSTime = self._getBoolean(config, "general",
                                             "syncFSTime",
                                             False)
+        self._pirepDirectory = self._get(config, "general",
+                                         "pirepDirectory", None)
 
         self._messageTypeLevels = {}
         for messageType in const.messageTypes:
@@ -268,6 +286,9 @@ class Config(object):
                    "yes" if self._flareTimeFromFS else "no")
         config.set("general", "syncFSTime",
                    "yes" if self._syncFSTime else "no")
+
+        if self._pirepDirectory is not None:
+            config.set("general", "pirepDirectory", self._pirepDirectory)
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:

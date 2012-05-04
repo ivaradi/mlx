@@ -72,6 +72,10 @@ class Preferences(gtk.Dialog):
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
         self._syncFSTime.set_active(config.syncFSTime)
 
+        pirepDirectory = config.pirepDirectory
+        self._pirepDirectory.set_text("" if pirepDirectory is None
+                                      else pirepDirectory)
+
         for messageType in const.messageTypes:
             level = config.getMessageTypeLevel(messageType)
             button = self._msgFSCheckButtons[messageType]
@@ -97,6 +101,7 @@ class Preferences(gtk.Dialog):
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
         config.syncFSTime = self._syncFSTime.get_active()
+        config.pirepDirectory = self._pirepDirectory.get_text()
 
         for messageType in const.messageTypes:
             fsButtonActive = self._msgFSCheckButtons[messageType].get_active()
@@ -116,9 +121,9 @@ class Preferences(gtk.Dialog):
     def _buildGeneral(self):
         """Build the page for the general settings."""
         mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
-                                      xscale = 0.0, yscale = 0.0)
-        mainAlignment.set_padding(padding_top = 16, padding_bottom = 32,
-                                  padding_left = 4, padding_right = 48)
+                                      xscale = 1.0, yscale = 0.0)
+        mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
+                                  padding_left = 4, padding_right = 4)
         mainBox = gtk.VBox()
         mainAlignment.add(mainBox)
 
@@ -173,7 +178,24 @@ class Preferences(gtk.Dialog):
         self._syncFSTime.set_use_underline(True)
         self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
         mainBox.pack_start(self._syncFSTime, False, False, 4)
-                                       
+
+        pirepBox = gtk.HBox()
+        mainBox.pack_start(pirepBox, False, False, 4)
+
+        label = gtk.Label(xstr("prefs_pirepDirectory"))
+        label.set_use_underline(True)
+        pirepBox.pack_start(label, False, False, 4)
+
+        self._pirepDirectory = gtk.Entry()
+        self._pirepDirectory.set_tooltip_text(xstr("prefs_pirepDirectory_tooltip"))
+        label.set_mnemonic_widget(self._pirepDirectory)
+        pirepBox.pack_start(self._pirepDirectory, True, True, 4)
+
+        self._pirepDirectoryButton = gtk.Button(xstr("button_browse"))
+        self._pirepDirectoryButton.connect("clicked",
+                                           self._pirepDirectoryButtonClicked)
+        pirepBox.pack_start(self._pirepDirectoryButton, False, False, 4)
+        
         return mainAlignment
 
     def _setLanguage(self, language):
@@ -208,7 +230,25 @@ class Preferences(gtk.Dialog):
             dialog.run()
             dialog.hide()
             self._warnedRestartNeeded = True
+       
+    def _pirepDirectoryButtonClicked(self, button):
+        """Called when the PIREP directory button is clicked."""
+        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                       xstr("prefs_pirepDirectory_browser_title"),
+                                       action = FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                       buttons = (gtk.STOCK_CANCEL, RESPONSETYPE_CANCEL,
+                                                  gtk.STOCK_OK, RESPONSETYPE_OK))
 
+        directory = self._pirepDirectory.get_text()
+        if directory:
+            dialog.select_filename(directory)
+        
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_OK:
+            self._pirepDirectory.set_text(dialog.get_filename())
+        
     def _buildMessages(self):
         """Build the page for the message settings."""
 
@@ -291,9 +331,9 @@ class Preferences(gtk.Dialog):
         """Build the page for the advanced settings."""
 
         mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
-                                      xscale = 0.0, yscale = 0.0)
-        mainAlignment.set_padding(padding_top = 16, padding_bottom = 32,
-                                  padding_left = 4, padding_right = 48)
+                                      xscale = 1.0, yscale = 0.0)
+        mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
+                                  padding_left = 4, padding_right = 4)
         mainBox = gtk.VBox()
         mainAlignment.add(mainBox)
 
@@ -317,7 +357,7 @@ class Preferences(gtk.Dialog):
         self._updateURL.set_width_chars(40)
         self._updateURL.set_tooltip_text(xstr("prefs_update_url_tooltip"))
         self._updateURL.connect("changed", self._updateURLChanged)
-        updateURLBox.pack_start(self._updateURL, False, False, 4)
+        updateURLBox.pack_start(self._updateURL, True, True, 4)
 
         return mainAlignment
 
@@ -349,5 +389,3 @@ class Preferences(gtk.Dialog):
     def _updateURLChanged(self, entry):
         """Called when the update URL is changed."""
         self._setOKButtonSensitivity()
-        
-            
