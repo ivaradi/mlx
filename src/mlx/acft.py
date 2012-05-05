@@ -201,12 +201,6 @@ class Aircraft(object):
                 self.logger.message(aircraftState.timestamp,
                                     "Block time: " +
                                     util.getTimeIntervalString(blockLength))
-                bookedFlight = self._flight.bookedFlight
-                # FIXME: translate the ICAO into an airport name
-                fs.sendMessage(const.MESSAGETYPE_ENVIRONMENT,
-                               "Flight plan closed. Welcome to %s" % \
-                               (bookedFlight.arrivalICAO,),
-                               5)
 
     def prepareFlare(self):
         """Called when it is detected that we will soon flare.

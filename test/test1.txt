@@ -1,4 +1,4 @@
-set zfw=45757 hour=7 min=50
+set zfw=44418 hour=7 min=50
 set latitude=47.44 longitude=19.26
 set parking=no
 set flapsControl=37.5

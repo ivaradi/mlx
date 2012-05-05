@@ -398,12 +398,17 @@ class GUI(fs.ConnectionListener):
 
         self._logView.get_buffer().set_text("")
 
-    def _disconnect(self):
+    def _disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator if connected."""
         self.stopMonitoring()
 
         if self._connected:
-            self._flight.simulator.disconnect()
+            if closingMessage is None:
+                self._flight.simulator.disconnect()
+            else:
+                fs.sendMessage(const.MESSAGETYPE_ENVIRONMENT,
+                               closingMessage, duration,
+                               disconnect = True)
             self._connected = False
 
         self._connecting = False
@@ -454,10 +459,10 @@ class GUI(fs.ConnectionListener):
         self._statusIcon.setStage(stage)
         self._wizard.setStage(stage)
         if stage==const.STAGE_END:
-            # FIXME: perhaps a more elegant method, e.g.
-            # the simulator should provide a function disconnect
-            # with a final message
-            gobject.timeout_add(1000, self._disconnect)
+            self._disconnect(closingMessage =
+                             "Flight plan closed. Welcome to %s" % \
+                             (self.bookedFlight.arrivalICAO,),
+                             duration = 5)
 
     def setRating(self, rating):
         """Set the rating of the flight."""

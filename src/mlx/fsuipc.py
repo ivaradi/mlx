@@ -244,7 +244,9 @@ class Handler(threading.Thread):
         It will be called in the handler's thread!
         """
         with self._requestCondition:
-            self._requests.append(Handler.Request(True, data, callback, extra))
+            request = Handler.Request(True, data, callback, extra)
+            #print "fsuipc.Handler.requestWrite", request
+            self._requests.append(request)
             self._requestCondition.notify()
 
     @staticmethod
@@ -370,13 +372,15 @@ class Handler(threading.Thread):
                 self._periodicRequests.sort()
                 timeout = self._periodicRequests[0].nextFire - time.time()
 
-            if timeout is not None and timeout <= 0.0:
+            if self._requests or \
+               (timeout is not None and timeout <= 0.0):
                 return
             
             self._requestCondition.wait(timeout)
                 
     def _disconnect(self):
         """Disconnect from the flight simulator."""
+        print "fsuipc.Handler._disconnect"
         if self._connected:
             pyuipc.close()
             self._connected = False
@@ -393,6 +397,8 @@ class Handler(threading.Thread):
         This function is called with the request lock held, but is relased
         whole processing the request and reconnecting."""
         self._requestCondition.release()
+
+        #print "fsuipc.Handler._processRequest", request
 
         needReconnect = False
         try:
@@ -530,7 +536,7 @@ class Simulator(object):
         self._flareRates = []
         self._flareStart = None
         self._flareStartFS = None
-    
+
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
 
     def connect(self, aircraft):
@@ -599,7 +605,8 @@ class Simulator(object):
             self._handler.clearPeriodic(self._flareRequestID)
             self._flareRequestID = None
 
-    def sendMessage(self, message, duration = 3):
+    def sendMessage(self, message, duration = 3,
+                    _disconnect = False):
         """Send a message to the pilot via the simulator.
 
         duration is the number of seconds to keep the message displayed."""
@@ -612,7 +619,11 @@ class Simulator(object):
         data = [(0x3380, -1 - len(message), message),
                 (0x32fa, 'h', duration)]
 
-        self._handler.requestWrite(data, self._handleMessageSent)
+        #if _disconnect:
+        #    print "fsuipc.Simulator.sendMessage(disconnect)", message
+
+        self._handler.requestWrite(data, self._handleMessageSent,
+                                   extra = _disconnect)
 
     def getFuel(self, tanks, callback):
         """Get the fuel from the given tanks.
@@ -654,12 +665,18 @@ class Simulator(object):
         self._syncTime = False
         self._nextSyncTime = -1
             
-    def disconnect(self):
+    def disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator."""
         assert not self._monitoringRequested 
+
+        print "fsuipc.Simulator.disconnect", closingMessage, duration
         
         self._stopNormal()
-        self._handler.disconnect()
+        if closingMessage is None:
+            self._handler.disconnect()
+        else:
+            self.sendMessage(closingMessage, duration = duration,
+                             _disconnect = True)
 
     def _startDefaultNormal(self):
         """Start the default normal periodic request."""
@@ -873,9 +890,11 @@ class Simulator(object):
         dow = zfw - payload
         callback(dow, payload, zfw, grossWeight)
 
-    def _handleMessageSent(self, success, extra):
+    def _handleMessageSent(self, success, disconnect):
         """Callback for a message sending request."""
-        pass
+        #print "fsuipc.Simulator._handleMessageSent", disconnect
+        if disconnect:
+            self._handler.disconnect()
 
     def _handleFuelRetrieved(self, data, callback):
         """Callback for a fuel retrieval request."""

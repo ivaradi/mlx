@@ -63,10 +63,11 @@ class MessageThread(threading.Thread):
 
         self.daemon = True
 
-    def add(self, messageType, text, duration):
+    def add(self, messageType, text, duration, disconnect):
         """Add the given message to the requested messages."""
         with self._requestCondition:
-            self._messages.append((messageType, text, duration))
+            self._messages.append((messageType, text, duration,
+                                   disconnect))
             self._requestCondition.notify()
 
     def quit(self):
@@ -79,7 +80,7 @@ class MessageThread(threading.Thread):
     def run(self):
         """Perform the thread's operation."""
         while True:
-            (messageType, text, duration) = (None, None, None)
+            (messageType, text, duration, disconnect) = (None, None, None, None)
             with self._requestCondition:
                 now = time.time()
                 while not self._toQuit and \
@@ -95,13 +96,14 @@ class MessageThread(threading.Thread):
                     self._nextMessageTime = None
 
                     if self._messages:
-                        (messageType, text, duration) = self._messages[0]
+                        (messageType, text,
+                         duration, disconnect) = self._messages[0]
                         del self._messages[0]
 
             if text is not None:        
-                self._sendMessage(messageType, text, duration)
+                self._sendMessage(messageType, text, duration, disconnect)
 
-    def _sendMessage(self, messageType, text, duration):
+    def _sendMessage(self, messageType, text, duration, disconnect):
         """Send the message and setup the next message time."""
         messageLevel = self._config.getMessageTypeLevel(messageType)
         if messageLevel==const.MESSAGELEVEL_SOUND or \
@@ -109,7 +111,14 @@ class MessageThread(threading.Thread):
             startSound(const.SOUND_DING)
         if (messageLevel==const.MESSAGELEVEL_FS or \
             messageLevel==const.MESSAGELEVEL_BOTH):
-            self._simulator.sendMessage("[MLX] " + text, duration = duration)
+            if disconnect:
+                self._simulator.disconnect("[MLX] " + text,
+                                           duration = duration)
+            else:
+                self._simulator.sendMessage("[MLX] " + text,
+                                            duration = duration)
+        elif disconnecte:
+            self._simulator.disconnect()
         self._nextMessageTime = time.time() + duration
 
 #-------------------------------------------------------------------------------
@@ -128,12 +137,12 @@ def setupMessageSending(config, simulator):
 
 #-------------------------------------------------------------------------------
 
-def sendMessage(messageType, text, duration = 3):
+def sendMessage(messageType, text, duration = 3, disconnect = False):
     """Send the given message of the given type into the simulator and/or play
     a corresponding sound."""
     global _messageThread
     if _messageThread is not None:
-        _messageThread.add(messageType, text, duration)
+        _messageThread.add(messageType, text, duration, disconnect)
 
 #-------------------------------------------------------------------------------
 
