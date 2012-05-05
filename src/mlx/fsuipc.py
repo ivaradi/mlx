@@ -711,8 +711,6 @@ class Simulator(object):
 
         self._scroll = data[7]!=0
 
-        self._checkTimeSync()
-        
         if self._monitoringRequested and not self._monitoring:
             self._stopNormal()
             self._startMonitoring()
@@ -723,11 +721,17 @@ class Simulator(object):
              not createdNewModel:
             aircraftState = self._aircraftModel.getAircraftState(self._aircraft, 
                                                                  timestamp, data)
+
+            self._checkTimeSync(aircraftState)
+        
             self._aircraft.handleState(aircraftState)
 
-    def _checkTimeSync(self):
+    def _checkTimeSync(self, aircraftState):
         """Check if we need to synchronize the FS time."""
-        if not self._syncTime: return
+        if not self._syncTime or aircraftState.paused or \
+           self._flareRequestID is not None:
+            self._nextSyncTime = -1
+            return
 
         now = time.time()
         seconds = time.gmtime(now).tm_sec
