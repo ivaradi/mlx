@@ -2074,7 +2074,7 @@ class FinishPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._flightRating = gtk.Label()
-        self._flightRating.set_width_chars(7)
+        self._flightRating.set_width_chars(8)
         self._flightRating.set_alignment(0.0, 0.5)
         self._flightRating.set_use_markup(True)
         labelAlignment.add(self._flightRating)
