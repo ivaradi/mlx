@@ -354,11 +354,13 @@ class Config(object):
             print "Setting up locale for", self._language
             os.environ["LANGUAGE"] = self._language
             langAndEncoding = self._language + "." + locale.getpreferredencoding()
-            print langAndEncoding
             os.environ["LANG"] = langAndEncoding
             os.environ["LC_MESSAGES"] = langAndEncoding
             os.environ["LC_COLLATE"] = langAndEncoding
             os.environ["LC_CTYPE"] = langAndEncoding
+            os.environ["LC_MONETARY"] = langAndEncoding
+            os.environ["LC_NUMERIC"] = langAndEncoding
+            os.environ["LC_TIME"] = langAndEncoding
             return True
         else:
             return False
