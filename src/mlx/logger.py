@@ -88,11 +88,9 @@ class Logger(object):
             if score<=self._faults[faultID]:
                 return
         self._faults[faultID] = score
-        if score==Logger.NO_GO_SCORE:
-            text = "%s (NO GO)" % (what)
-        else:
-            text = "%s (%.1f)" % (what, score)
-        lineIndex = self.message(timestamp, "%s (NO GO)" % (what))
+        text = "%s (NO GO)" % (what) if score==Logger.NO_GO_SCORE \
+               else "%s (%.1f)" % (what, score)
+        lineIndex = self.message(timestamp, text)
         self._faultLineIndexes.append(lineIndex)
         (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
                                   if score==Logger.NO_GO_SCORE \

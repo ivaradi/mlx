@@ -63,7 +63,7 @@ def main():
 
     try:
         gui.build(programDirectory)
-        
+
         gui.run()
     finally:
         gui.flushStdIO()
