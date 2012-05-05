@@ -130,6 +130,8 @@ class _English(_Strings):
         self.add("button_browse", "Browse...")
         
         self.add("menu_file", "File")
+        self.add("menu_file_loadPIREP", "_Load PIREP...")
+        self.add("menu_file_loadPIREP_key", "l")
         self.add("menu_file_quit", "_Quit")
         self.add("menu_file_quit_key", "q")
         self.add("quit_question", "Are you sure to quit the logger?")
@@ -425,34 +427,14 @@ class _English(_Strings):
         self.add("finish_gate", "_Arrival gate:")
         self.add("finish_gate_tooltip",
                  "Select the gate or stand at which you have arrived to LHBP.")
-        self.add("finish_save", "S_ave PIREP...")
+        self.add("finish_save", "Sa_ve PIREP...")
         self.add("finish_save_tooltip",
                  "Click to save the PIREP into a file on your computer. " \
                  "The PIREP can be loaded and sent later.")
-        self.add("finish_send", "_Send PIREP...")
-        self.add("finish_send_tooltip",
-                 "Click to send the PIREP to the MAVA website for further review.")
-        self.add("finish_send_busy", "Sending PIREP...")
-        self.add("finish_send_success",
-                 "The PIREP was sent successfully.")
-        self.add("finish_send_success_sec",
-                 "Await the thorough scrutiny by our fearless PIREP reviewers! :)")
-        self.add("finish_send_already",
-                 "The PIREP for this flight has already been sent!")
-        self.add("finish_send_already_sec",
-                 "You may clear the old PIREP on the MAVA website.")
-        self.add("finish_send_notavail",
-                 "This flight is not available anymore!")
-        self.add("finish_send_unknown",
-                 "The MAVA website returned with an unknown error.")
-        self.add("finish_send_unknown_sec",
-                 "See the debug log for more information.")
-        self.add("finish_send_failed",
-                 "Could not send the PIREP to the MAVA website.")
-        self.add("finish_send_failed_sec",
-                 "This can be a network problem, in which case\n" \
-                 "you may try again later. Or it can be a bug;\n" \
-                 "see the debug log for more information.")
+        self.add("finish_save_title", "Save PIREP into")
+        self.add("finish_save_done", "The PIREP was saved successfully")
+        self.add("finish_save_failed", "Failed to save the PIREP")
+        self.add("finish_save_failed_sec", "See the debug log for the details.")
 
         # C D
         
@@ -664,6 +646,45 @@ class _English(_Strings):
         self.add("prefs_msgs_type_visibility",
                  "_Visibility Messages")
 
+        self.add("loadPIREP_browser_title", "Select the PIREP to load")
+        self.add("loadPIREP_filter_pireps", "PIREP files")
+        self.add("loadPIREP_filter_all", "All files")
+        self.add("loadPIREP_failed", "Failed to load the PIREP")
+        self.add("loadPIREP_failed_sec", "See the debug log for the details.")
+        self.add("loadPIREP_send_title", "PIREP")
+        self.add("loadPIREP_send_help",
+                 "The main data of the PIREP loaded:")
+        self.add("loadPIREP_send_flightno", "Flight number:")
+        self.add("loadPIREP_send_date", "Date:")
+        self.add("loadPIREP_send_from", "From:")
+        self.add("loadPIREP_send_to", "To:")
+        self.add("loadPIREP_send_rating", "Rating:")
+        
+        self.add("sendPIREP", "_Send PIREP...")
+        self.add("sendPIREP_tooltip",
+                 "Click to send the PIREP to the MAVA website for further review.")
+        self.add("sendPIREP_busy", "Sending PIREP...")
+        self.add("sendPIREP_success",
+                 "The PIREP was sent successfully.")
+        self.add("sendPIREP_success_sec",
+                 "Await the thorough scrutiny by our fearless PIREP reviewers! :)")
+        self.add("sendPIREP_already",
+                 "The PIREP for this flight has already been sent!")
+        self.add("sendPIREP_already_sec",
+                 "You may clear the old PIREP on the MAVA website.")
+        self.add("sendPIREP_notavail",
+                 "This flight is not available anymore!")
+        self.add("sendPIREP_unknown",
+                 "The MAVA website returned with an unknown error.")
+        self.add("sendPIREP_unknown_sec",
+                 "See the debug log for more information.")
+        self.add("sendPIREP_failed",
+                 "Could not send the PIREP to the MAVA website.")
+        self.add("sendPIREP_failed_sec",
+                 "This can be a network problem, in which case\n" \
+                 "you may try again later. Or it can be a bug;\n" \
+                 "see the debug log for more information.")
+
 #------------------------------------------------------------------------------
 
 class _Hungarian(_Strings):
@@ -681,6 +702,8 @@ class _Hungarian(_Strings):
         self.add("button_browse", "Keresés...")
         
         self.add("menu_file", "Fájl")
+        self.add("menu_file_loadPIREP", "PIREP be_töltése...")
+        self.add("menu_file_loadPIREP_key", "t")
         self.add("menu_file_quit", "_Kilépés")
         self.add("menu_file_quit_key", "k")
         self.add("quit_question", "Biztosan ki akarsz lépni?")
@@ -987,30 +1010,10 @@ class _Hungarian(_Strings):
         self.add("finish_save_tooltip",
                  "Kattints ide, hogy elmenthesd a PIREP-et egy fájlba a számítógépeden. " \
                  "A PIREP-et később be lehet tölteni és el lehet küldeni.")
-        self.add("finish_send", "PIREP _elküldése...")
-        self.add("finish_send_tooltip",
-                 "Kattints ide, hogy elküldd a PIREP-et a MAVA szerverére javításra.")
-        self.add("finish_send_busy", "PIREP küldése...")
-        self.add("finish_send_success",
-                 "A PIREP elküldése sikeres volt.")
-        self.add("finish_send_success_sec",
-                 "Várhatod félelmet nem ismerő PIREP javítóink alapos észrevételeit! :)")
-        self.add("finish_send_already",
-                 "Ehhez a járathoz már küldtél be PIREP-et!")
-        self.add("finish_send_already_sec",
-                 "A korábban beküldött PIREP-et törölheted a MAVA honlapján.")
-        self.add("finish_send_notavail",
-                 "Ez a járat már nem elérhető!")
-        self.add("finish_send_unknown",
-                 "A MAVA szervere ismeretlen hibaüzenettel tért vissza.")
-        self.add("finish_send_unknown_sec",
-                 "A debug naplóban részletesebb információt találsz.")
-        self.add("finish_send_failed",
-                 "Nem tudtam elküldeni a PIREP-et a MAVA szerverére.")
-        self.add("finish_send_failed_sec",
-                 "Lehet, hogy hálózati probléma áll fenn, amely esetben később\n" \
-                 "újra próbálkozhatsz. Lehet azonban hiba is a loggerben:\n" \
-                 "részletesebb információt találhatsz a debug naplóban.")
+        self.add("finish_save_title", "PIREP mentése")
+        self.add("finish_save_done", "A PIREP mentése sikerült")
+        self.add("finish_save_failed", "A PIREP mentése nem sikerült")
+        self.add("finish_save_failed_sec", "A részleteket lásd a debug naplóban.")
 
         # M A 
 
@@ -1224,6 +1227,46 @@ class _Hungarian(_Strings):
                  "_Segítő üzenetek\n(pl. \"don't forget to set VREF\")")
         self.add("prefs_msgs_type_visibility",
                  "Lá_tótávolság üzenetek")
+
+        self.add("loadPIREP_browser_title", "Válaszd ki a betöltendő PIREP-et")
+        self.add("loadPIREP_filter_pireps", "PIREP fájlok")
+        self.add("loadPIREP_filter_all", "Összes fájl")
+        self.add("loadPIREP_failed", "Nem tudtam betölteni a PIREP-et")
+        self.add("loadPIREP_failed_sec",
+                 "A részleteket lásd a debug naplóban.")
+        self.add("loadPIREP_send_title", "PIREP")
+        self.add("loadPIREP_send_help",
+                 "A betöltött PIREP főbb adatai:")
+        self.add("loadPIREP_send_flightno", "Járatszám:")
+        self.add("loadPIREP_send_date", "Dátum:")
+        self.add("loadPIREP_send_from", "Honnan:")
+        self.add("loadPIREP_send_to", "Hová:")
+        self.add("loadPIREP_send_rating", "Pontszám:")
+
+        self.add("sendPIREP", "PIREP _elküldése...")
+        self.add("sendPIREP_tooltip",
+                 "Kattints ide, hogy elküldd a PIREP-et a MAVA szerverére javításra.")
+        self.add("sendPIREP_busy", "PIREP küldése...")
+        self.add("sendPIREP_success",
+                 "A PIREP elküldése sikeres volt.")
+        self.add("sendPIREP_success_sec",
+                 "Várhatod félelmet nem ismerő PIREP javítóink alapos észrevételeit! :)")
+        self.add("sendPIREP_already",
+                 "Ehhez a járathoz már küldtél be PIREP-et!")
+        self.add("sendPIREP_already_sec",
+                 "A korábban beküldött PIREP-et törölheted a MAVA honlapján.")
+        self.add("sendPIREP_notavail",
+                 "Ez a járat már nem elérhető!")
+        self.add("sendPIREP_unknown",
+                 "A MAVA szervere ismeretlen hibaüzenettel tért vissza.")
+        self.add("sendPIREP_unknown_sec",
+                 "A debug naplóban részletesebb információt találsz.")
+        self.add("sendPIREP_failed",
+                 "Nem tudtam elküldeni a PIREP-et a MAVA szerverére.")
+        self.add("sendPIREP_failed_sec",
+                 "Lehet, hogy hálózati probléma áll fenn, amely esetben később\n" \
+                 "újra próbálkozhatsz. Lehet azonban hiba is a loggerben:\n" \
+                 "részletesebb információt találhatsz a debug naplóban.")
 
 #------------------------------------------------------------------------------
 

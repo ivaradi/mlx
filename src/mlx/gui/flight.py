@@ -2186,12 +2186,15 @@ class FinishPage(Page):
 
         self._saveButton = self.addButton(xstr("finish_save"),
                                           sensitive = False,
-                                          tooltip = xstr("finish_send_tooltip"))
+                                          clicked = self._saveClicked,
+                                          tooltip = xstr("finish_save_tooltip"))
+        self._savePIREPDialog = None
+        self._lastSavePath = None
         
-        self._sendButton = self.addButton(xstr("finish_send"), default = True,
+        self._sendButton = self.addButton(xstr("sendPIREP"), default = True,
                                           sensitive = False,
                                           clicked = self._sendClicked,
-                                          tooltip = xstr("finish_send_tooltip"))
+                                          tooltip = xstr("sendPIREP_tooltip"))
         
     @property
     def flightType(self):
@@ -2254,7 +2257,7 @@ class FinishPage(Page):
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0)
         
-        #self._saveButton.set_sensitive(sensitive)
+        self._saveButton.set_sensitive(sensitive)
         self._sendButton.set_sensitive(sensitive)        
 
     def _flightTypeChanged(self, comboBox):
@@ -2265,50 +2268,96 @@ class FinishPage(Page):
         """Called when the arrival gate has changed."""
         self._updateButtons()
 
+    def _saveClicked(self, button):
+        """Called when the Save PIREP button is clicked."""
+        gui = self._wizard.gui
+
+        bookedFlight = gui.bookedFlight
+        tm = time.gmtime()
+        
+        fileName = "%s %s %02d%02d %s-%s.pirep" % \
+                   (gui.loginResult.pilotID,
+                    str(bookedFlight.departureTime.date()),
+                    tm.tm_hour, tm.tm_min,
+                    bookedFlight.departureICAO,
+                    bookedFlight.arrivalICAO)
+
+        dialog = self._getSaveDialog()
+
+        if self._lastSavePath is None:
+            pirepDirectory = gui.config.pirepDirectory
+            if pirepDirectory is not None:
+                dialog.set_current_folder(pirepDirectory)
+        else:
+            dialog.set_current_folder(os.path.dirname(self._lastSavePath))
+            
+        dialog.set_current_name(fileName)
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_OK:
+            pirep = PIREP(gui)
+
+            self._lastSavePath = dialog.get_filename()
+            
+            if pirep.save(self._lastSavePath):
+                type = MESSAGETYPE_INFO
+                message = xstr("finish_save_done")
+                secondary = None
+            else:
+                type = MESSAGETYPE_ERROR
+                message = xstr("finish_save_failed")
+                secondary = xstr("finish_save_failed_sec")
+                
+            dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                       type = type, message_format = message)
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            if secondary is not None:
+                dialog.format_secondary_markup(secondary)
+
+            dialog.run()
+            dialog.hide()
+
+    def _getSaveDialog(self):
+        """Get the PIREP saving dialog.
+
+        If it does not exist yet, create it."""
+        if self._savePIREPDialog is None:
+            gui = self._wizard.gui
+            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                           xstr("finish_save_title"),
+                                           action = FILE_CHOOSER_ACTION_SAVE,
+                                           buttons = (gtk.STOCK_CANCEL,
+                                                      RESPONSETYPE_CANCEL,
+                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                           parent = gui.mainWindow)
+            dialog.set_modal(True)
+            dialog.set_do_overwrite_confirmation(True)
+            
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("loadPIREP_filter_pireps"))
+            filter.add_pattern("*.pirep")
+            dialog.add_filter(filter)
+            
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("loadPIREP_filter_all"))
+            filter.add_pattern("*.*")
+            dialog.add_filter(filter)
+
+            self._savePIREPDialog = dialog
+
+        return self._savePIREPDialog
+        
+
     def _sendClicked(self, button):
         """Called when the Send button is clicked."""
         pirep = PIREP(self._wizard.gui)
-        gui = self._wizard.gui
-        gui.beginBusy(xstr("finish_send_busy"))
-        gui.webHandler.sendPIREP(self._pirepSentCallback, pirep)
-
-    def _pirepSentCallback(self, returned, result):
-        """Callback for the PIREP sending result."""
-        gobject.idle_add(self._handlePIREPSent, returned, result)
+        self._wizard.gui.sendPIREP(pirep,
+                                   callback = self._handlePIREPSent)
 
     def _handlePIREPSent(self, returned, result):
         """Callback for the PIREP sending result."""
-        self._wizard.gui.endBusy()
-        secondaryMarkup = None
-        type = MESSAGETYPE_ERROR
-        if returned:
-            if result.success:
-                type = MESSAGETYPE_INFO
-                messageFormat = xstr("finish_send_success")
-                secondaryMarkup = xstr("finish_send_success_sec")
-            elif result.alreadyFlown:
-                messageFormat = xstr("finish_send_already")
-                secondaryMarkup = xstr("finish_send_already_sec")
-            elif result.notAvailable:
-                messageFormat = xstr("finish_send_notavail")
-            else:
-                messageFormat = xstr("finish_send_unknown")
-                secondaryMarkup = xstr("finish_send_unknown_sec")
-        else:
-            print "PIREP sending failed", result
-            messageFormat = xstr("finish_send_failed")
-            secondaryMarkup = xstr("finish_send_failed_sec")
-        
-        dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                   type = type, message_format = messageFormat)
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-        dialog.set_title(WINDOW_TITLE_BASE)
-        if secondaryMarkup is not None:
-            dialog.format_secondary_markup(secondaryMarkup)
-
-        dialog.run()
-        dialog.hide()
-
         if self._wizard.gui.config.onlineGateSystem and returned and result.success:
             bookedFlight = self._wizard.bookedFlight
             if bookedFlight.arrivalICAO=="LHBP":

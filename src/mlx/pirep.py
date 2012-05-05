@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------
 
 import const
+import cPickle as pickle
 
 #------------------------------------------------------------------------------
 
@@ -24,6 +25,18 @@ class PIREP(object):
         """Format the given time string and line as needed for the ACARS and
         some other things."""
         return "[" + timeStr + "]-[" + line + "]"
+
+    @staticmethod
+    def load(path):
+        """Load a PIREP from the given path.
+
+        Returns the PIREP object, or None on error."""
+        try:
+            with open(path, "rb") as f:
+                return pickle.load(f)
+        except Exception, e:
+            print "Failed loading PIREP from %s: %s" % (path, str(e))
+            return None
         
     def __init__(self, gui):
         """Initialize the PIREP from the given GUI."""
@@ -113,3 +126,15 @@ class PIREP(object):
             if star: star += ", "
             star += self.transition
         return star.upper()
+
+    def save(self, path):
+        """Save the PIREP to the given file.
+
+        Returns whether the saving has succeeded."""
+        try:
+            with open(path, "wb") as f:
+                pickle.dump(self, f)
+            return True
+        except Exception, e:
+            print "Failed saving PIREP to %s: %s" % (path, str(e))
+            return False

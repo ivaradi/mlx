@@ -18,6 +18,7 @@ import mlx.logger as logger
 import mlx.acft as acft
 import mlx.web as web
 from  mlx.i18n import xstr
+from mlx.pirep import PIREP
 
 import time
 import threading
@@ -59,6 +60,8 @@ class GUI(fs.ConnectionListener):
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
+
+        self._sendPIREPCallback = None
 
         self.webHandler = web.Handler()
         self.webHandler.start()
@@ -144,6 +147,9 @@ class GUI(fs.ConnectionListener):
 
         self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH if pygobject
                                       else gdk.WATCH)
+
+        self._loadPIREPDialog = None
+        self._lastLoadedPIREP = None
 
     @property
     def mainWindow(self):
@@ -729,6 +735,17 @@ class GUI(fs.ConnectionListener):
         fileMenuItem.set_submenu(fileMenu)
         menuBar.append(fileMenuItem)
 
+        loadPIREPMenuItem = gtk.ImageMenuItem(gtk.STOCK_OPEN)
+        loadPIREPMenuItem.set_use_stock(True)
+        loadPIREPMenuItem.set_label(xstr("menu_file_loadPIREP"))
+        loadPIREPMenuItem.add_accelerator("activate", accelGroup,
+                                          ord(xstr("menu_file_loadPIREP_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
+        loadPIREPMenuItem.connect("activate", self._loadPIREP)
+        fileMenu.append(loadPIREPMenuItem)
+
+        fileMenu.append(gtk.SeparatorMenuItem())
+
         quitMenuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
         quitMenuItem.set_use_stock(True)
         quitMenuItem.set_label(xstr("menu_file_quit"))
@@ -864,3 +881,222 @@ class GUI(fs.ConnectionListener):
                 simulator.enableTimeSync()
             else:
                 simulator.disableTimeSync()
+
+    def _loadPIREP(self, menuItem):
+        """Load a PIREP for sending."""
+        dialog = self._getLoadPirepDialog()
+
+        if self._lastLoadedPIREP:
+            dialog.set_current_folder(os.path.dirname(self._lastLoadedPIREP))
+        else:
+            pirepDirectory = self.config.pirepDirectory
+            if pirepDirectory is not None:
+                dialog.set_current_folder(pirepDirectory)
+        
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_OK:
+            self._lastLoadedPIREP = dialog.get_filename()
+
+            pirep = PIREP.load(self._lastLoadedPIREP)
+            if pirep is None:
+                dialog = gtk.MessageDialog(parent = self._mainWindow,
+                                           type = MESSAGETYPE_ERROR,
+                                           message_format = xstr("loadPIREP_failed"))
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                dialog.format_secondary_markup(xstr("loadPIREP_failed_sec"))
+                dialog.run()
+                dialog.hide()
+            else:
+                dialog = self._getSendLoadedDialog(pirep)
+                dialog.show_all()
+                result = dialog.run()
+                dialog.hide()
+
+                if result==RESPONSETYPE_OK:
+                    self.sendPIREP(pirep)
+
+    def _getLoadPirepDialog(self):
+        """Get the PIREP loading file chooser dialog.
+
+        If it is not created yet, it will be created."""
+        if self._loadPIREPDialog is None:
+            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                           xstr("loadPIREP_browser_title"),
+                                           action = FILE_CHOOSER_ACTION_OPEN,
+                                           buttons = (gtk.STOCK_CANCEL,
+                                                      RESPONSETYPE_CANCEL,
+                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                           parent = self._mainWindow)
+            dialog.set_modal(True)
+            
+
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("loadPIREP_filter_pireps"))
+            filter.add_pattern("*.pirep")
+            dialog.add_filter(filter)
+            
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("loadPIREP_filter_all"))
+            filter.add_pattern("*.*")
+            dialog.add_filter(filter)
+
+            self._loadPIREPDialog = dialog
+
+        return self._loadPIREPDialog
+
+    def _getSendLoadedDialog(self, pirep):
+        """Get a dialog displaying the main information of the flight from the
+        PIREP and providing Cancel and Send buttons."""
+        dialog = gtk.Dialog(title = WINDOW_TITLE_BASE + " - " +
+                            xstr("loadPIREP_send_title"),
+                            parent = self._mainWindow,
+                            flags = DIALOG_MODAL)
+
+        contentArea = dialog.get_content_area()
+
+        label = gtk.Label(xstr("loadPIREP_send_help"))
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.set_padding(padding_top = 16, padding_bottom = 0,
+                              padding_left = 48, padding_right = 48)
+        alignment.add(label)
+        contentArea.pack_start(alignment, False, False, 8)
+
+        table = gtk.Table(5, 2)
+        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        tableAlignment.set_padding(padding_top = 0, padding_bottom = 32,
+                                   padding_left = 48, padding_right = 48)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        tableAlignment.add(table)
+        contentArea.pack_start(tableAlignment, True, True, 8)
+
+        bookedFlight = pirep.bookedFlight
+
+        label = gtk.Label("<b>" + xstr("loadPIREP_send_flightno") + "</b>")
+        label.set_use_markup(True)
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 0, 1)
+        
+        label = gtk.Label(bookedFlight.callsign)
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 1, 2, 0, 1)
+
+        label = gtk.Label("<b>" + xstr("loadPIREP_send_date") + "</b>")
+        label.set_use_markup(True)
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 1, 2)
+        
+        label = gtk.Label(str(bookedFlight.departureTime.date()))
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 1, 2, 1, 2)
+
+        label = gtk.Label("<b>" + xstr("loadPIREP_send_from") + "</b>")
+        label.set_use_markup(True)
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 2, 3)
+        
+        label = gtk.Label(bookedFlight.departureICAO)
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 1, 2, 2, 3)
+
+        label = gtk.Label("<b>" + xstr("loadPIREP_send_to") + "</b>")
+        label.set_use_markup(True)
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 3, 4)
+        
+        label = gtk.Label(bookedFlight.arrivalICAO)
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 1, 2, 3, 4)
+
+        label = gtk.Label("<b>" + xstr("loadPIREP_send_rating") + "</b>")
+        label.set_use_markup(True)
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 4, 5)
+
+        rating = pirep.rating
+        label = gtk.Label()
+        if rating<0:
+            label.set_markup('<b><span foreground="red">NO GO</span></b>')
+        else:
+            label.set_text("%.1f %%" % (rating,))
+        
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 1, 2, 4, 5)
+
+        dialog.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
+        dialog.add_button(xstr("sendPIREP"), RESPONSETYPE_OK)
+        
+        return dialog
+                            
+    def sendPIREP(self, pirep, callback = None):
+        """Send the given PIREP."""
+        self.beginBusy(xstr("sendPIREP_busy"))
+        self._sendPIREPCallback = callback
+        self.webHandler.sendPIREP(self._pirepSentCallback, pirep)
+
+    def _pirepSentCallback(self, returned, result):
+        """Callback for the PIREP sending result."""
+        gobject.idle_add(self._handlePIREPSent, returned, result)
+
+    def _handlePIREPSent(self, returned, result):
+        """Callback for the PIREP sending result."""
+        self.endBusy()
+        secondaryMarkup = None
+        type = MESSAGETYPE_ERROR
+        if returned:
+            if result.success:
+                type = MESSAGETYPE_INFO
+                messageFormat = xstr("sendPIREP_success")
+                secondaryMarkup = xstr("sendPIREP_success_sec")
+            elif result.alreadyFlown:
+                messageFormat = xstr("sendPIREP_already")
+                secondaryMarkup = xstr("sendPIREP_already_sec")
+            elif result.notAvailable:
+                messageFormat = xstr("sendPIREP_notavail")
+            else:
+                messageFormat = xstr("sendPIREP_unknown")
+                secondaryMarkup = xstr("sendPIREP_unknown_sec")
+        else:
+            print "PIREP sending failed", result
+            messageFormat = xstr("sendPIREP_failed")
+            secondaryMarkup = xstr("sendPIREP_failed_sec")
+        
+        dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                   type = type, message_format = messageFormat)
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.set_title(WINDOW_TITLE_BASE)
+        if secondaryMarkup is not None:
+            dialog.format_secondary_markup(secondaryMarkup)
+
+        dialog.run()
+        dialog.hide()
+
+        callback = self._sendPIREPCallback
+        self._sendPIREPCallback = None
+        if callback is not None:
+            callback(returned, result)

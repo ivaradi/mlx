@@ -237,7 +237,10 @@ class Preferences(gtk.Dialog):
                                        xstr("prefs_pirepDirectory_browser_title"),
                                        action = FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                        buttons = (gtk.STOCK_CANCEL, RESPONSETYPE_CANCEL,
-                                                  gtk.STOCK_OK, RESPONSETYPE_OK))
+                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                       parent = self)
+        dialog.set_modal(True)
+        dialog.set_transient_for(self)
 
         directory = self._pirepDirectory.get_text()
         if directory:

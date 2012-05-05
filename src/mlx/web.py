@@ -374,6 +374,7 @@ class Login(Request):
         result.loggedIn = status == ".OK."
 
         if result.loggedIn:
+            result.pilotID = self._pilotID
             result.pilotName = self.iso88592decoder(readline(f))[0]
             result.exams = readline(f)
             result.flights = []

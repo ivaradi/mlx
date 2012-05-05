@@ -45,6 +45,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SPIN_USER_DEFINED = gtk.SPIN_USER_DEFINED
 
     FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER
+    FILE_CHOOSER_ACTION_OPEN = gtk.FILE_CHOOSER_ACTION_OPEN
+    FILE_CHOOSER_ACTION_SAVE = gtk.FILE_CHOOSER_ACTION_SAVE
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
@@ -84,6 +86,8 @@ else:
     SPIN_USER_DEFINED = gtk.SpinType.USER_DEFINED
 
     FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FileChooserAction.SELECT_FOLDER
+    FILE_CHOOSER_ACTION_OPEN = gtk.FileChooserAction.OPEN
+    FILE_CHOOSER_ACTION_SAVE = gtk.FileChooserAction.SAVE
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
