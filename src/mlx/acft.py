@@ -231,7 +231,7 @@ class Aircraft(object):
         (flareTimeFromFS, flareTime) = self.flight.flareFinished(flareEnd,
                                                                  flareEndFS)
         self.logger.message(self._aircraftState.timestamp,
-                            "Flare time: %.1f s (from %s)" % \
+                            "Flaretime: %.3f (from %s)" % \
                             (flareTime, 
                              "the simulator" if flareTimeFromFS else "real time",))
         self.logger.message(self._aircraftState.timestamp,
