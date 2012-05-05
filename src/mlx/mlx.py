@@ -7,9 +7,6 @@ from sound import initializeSound
 import os
 import sys
 
-if os.name=="nt":
-    import win32api
-
 #--------------------------------------------------------------------------------------
 
 class StdIOHandler(object):
@@ -24,12 +21,35 @@ class StdIOHandler(object):
 
 #--------------------------------------------------------------------------------------
 
+def restart(args = []):
+    """Restart the program with the given arguments."""
+    print "Restarting with args", args
+    programPath = os.path.join(os.path.dirname(sys.argv[0]),
+                               "runmlx.exe" if os.name=="nt" else "runmlx.sh")
+    if os.name=="nt":
+        import win32api
+        try:
+            programPath = win32api.GetShortPathName(programPath)
+        except:
+            programPath = os.path.join(os.path.dirname(sys.argv[0]),
+                                       "runmlx.bat")
+            programPath = win32api.GetShortPathName(programPath)
+
+    args = [programPath] + args
+
+    os.execv(programPath, args)    
+
+#--------------------------------------------------------------------------------------
+
 def main():
     """The main operation of the program."""
     programDirectory = os.path.dirname(sys.argv[0])
 
     config = Config()
     config.load()
+
+    if (len(sys.argv)<=1 or sys.argv[1]!="usedeflang") and config.setupLocale():
+        restart(["usedeflang"])
 
     setLanguage(config.getLanguage())
     
@@ -53,12 +73,7 @@ def main():
     config.save()
 
     if gui.toRestart:
-        programPath = os.path.join(os.path.dirname(sys.argv[0]),
-                                   "runmlx.exe" if os.name=="nt" else "runmlx.sh")
-        if os.name=="nt":
-            programPath = win32api.GetShortPathName(programPath)
-
-        os.execl(programPath, programPath)
+        restart()
 
 #--------------------------------------------------------------------------------------
 

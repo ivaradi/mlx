@@ -344,7 +344,25 @@ class Config(object):
     def _getMessageTypeLevelOptionName(self, messageType):
         """Get the option name for the given message type level."""
         return const.messageType2string(messageType)
-        
+
+    def setupLocale(self):
+        """Setup the locale based on the language set.
+
+        Return True if a specific language was set, False otherwise."""
+        import locale
+        if self._language:
+            print "Setting up locale for", self._language
+            os.environ["LANGUAGE"] = self._language
+            langAndEncoding = self._language + "." + locale.getpreferredencoding()
+            print langAndEncoding
+            os.environ["LANG"] = langAndEncoding
+            os.environ["LC_MESSAGES"] = langAndEncoding
+            os.environ["LC_COLLATE"] = langAndEncoding
+            os.environ["LC_CTYPE"] = langAndEncoding
+            return True
+        else:
+            return False
+
     def getLanguage(self):
         """Get the language to be used."""
         import locale
