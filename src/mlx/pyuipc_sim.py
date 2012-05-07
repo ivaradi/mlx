@@ -931,7 +931,8 @@ class CLI(cmd.Cmd):
 
         self.daemon = True
 
-        self._client = Client("localhost")
+        host = sys.argv[1] if len(sys.argv)>1 else "localhost"
+        self._client = Client(host)
 
         self._valueHandlers = {}
         self._valueHandlers["year"] = (0x0240, "H",  lambda value: value,
