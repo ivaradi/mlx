@@ -14,7 +14,7 @@ import calendar
 import sys
 import codecs
 
-if os.name == "nt":
+if os.name == "nt" and "FORCE_PYUIPC_SIM" not in os.environ:
     import pyuipc
 else:
     import pyuipc_sim as pyuipc
