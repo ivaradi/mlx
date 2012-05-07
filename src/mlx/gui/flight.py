@@ -2298,7 +2298,7 @@ class FinishPage(Page):
         if result==RESPONSETYPE_OK:
             pirep = PIREP(gui)
 
-            self._lastSavePath = dialog.get_filename()
+            self._lastSavePath = text2unicode(dialog.get_filename())
             
             if pirep.save(self._lastSavePath):
                 type = MESSAGETYPE_INFO

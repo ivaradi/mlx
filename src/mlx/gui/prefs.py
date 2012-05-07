@@ -101,7 +101,7 @@ class Preferences(gtk.Dialog):
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
         config.syncFSTime = self._syncFSTime.get_active()
-        config.pirepDirectory = self._pirepDirectory.get_text()
+        config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
 
         for messageType in const.messageTypes:
             fsButtonActive = self._msgFSCheckButtons[messageType].get_active()
