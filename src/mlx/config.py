@@ -22,6 +22,35 @@ if os.name=="nt":
 
 #-------------------------------------------------------------------------------
 
+class Hotkey(object):
+    """A hotkey."""
+    def __init__(self, ctrl = False, shift = False, key = "0"):
+        """Construct the hotkey."""
+        self.ctrl = ctrl
+        self.shift = shift
+        self.key = key
+
+    def set(self, s):
+        """Set the hotkey from the given string."""
+        self.ctrl = "C" in s[:-1]
+        self.shift = "S" in s[:-1]
+        self.key = s[-1]
+
+    def __eq__(self, other):
+        """Check if the given hotkey is equal to the other one."""
+        return self.ctrl == other.ctrl and self.shift == other.shift and \
+               self.key == other.key
+
+    def __str__(self):
+        """Construct the hotkey to a string."""
+        s = ""
+        if self.ctrl: s += "C"
+        if self.shift: s += "S"
+        s += self.key
+        return s
+
+#-------------------------------------------------------------------------------
+
 class Config(object):
     """Our configuration."""
     DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
@@ -43,7 +72,18 @@ class Config(object):
         self._syncFSTime = False
 
         self._pirepDirectory = None
-        
+
+        self._enableSounds = True
+
+        self._pilotControlsSounds = True
+        self._pilotHotkey = Hotkey(ctrl = True, shift = False, key = "0")
+
+        #self._approachCallOuts = False
+        self._speedbrakeAtTD = True
+
+        self._enableChecklists = False
+        self._checklistHotkey = Hotkey(ctrl = True, shift = True, key = "0")
+                
         self._autoUpdate = True        
         self._updateURL = Config.DEFAULT_UPDATE_URL
 
@@ -198,6 +238,90 @@ class Config(object):
             self._modified = True
 
     @property
+    def enableSounds(self):
+        """Get whether background sounds are enabled."""
+        return self._enableSounds
+
+    @enableSounds.setter
+    def enableSounds(self, enableSounds):
+        """Set whether background sounds are enabled."""
+        if enableSounds!=self._enableSounds:
+            self._enableSounds = enableSounds
+            self._modified = True
+
+    @property 
+    def pilotControlsSounds(self):
+        """Get whether the pilot controls the background sounds."""
+        return self._pilotControlsSounds
+
+    @pilotControlsSounds.setter
+    def pilotControlsSounds(self, pilotControlsSounds):
+        """Set whether the pilot controls the background sounds."""
+        if pilotControlsSounds!=self._pilotControlsSounds:
+            self._pilotControlsSounds = pilotControlsSounds
+            self._modified = True
+
+    @property
+    def pilotHotkey(self):
+        """Get the pilot's hotkey."""
+        return self._pilotHotkey
+
+    @pilotHotkey.setter
+    def pilotHotkey(self, pilotHotkey):
+        """Set the pilot's hotkey."""
+        if pilotHotkey!=self._pilotHotkey:
+            self._pilotHotkey = pilotHotkey
+            self._modified = True
+
+    # @property
+    # def approachCallOuts(self):
+    #     """Get whether the approach callouts should be played."""
+    #     return self._approachCallOuts
+
+    # @approachCallOuts.setter
+    # def approachCallOuts(self, approachCallOuts):
+    #     """Set whether the approach callouts should be played."""
+    #     if approachCallOuts!=self._approachCallOuts:
+    #         self._approachCallOuts = approachCallOuts
+    #         self._modified = True
+
+    @property
+    def speedbrakeAtTD(self):
+        """Get whether the speedbrake sounds should be played at touchdown."""
+        return self._speedbrakeAtTD
+
+    @speedbrakeAtTD.setter
+    def speedbrakeAtTD(self, speedbrakeAtTD):
+        """Set whether the speedbrake sounds should be played at touchdown."""
+        if speedbrakeAtTD!=self._speedbrakeAtTD:
+            self._speedbrakeAtTD = speedbrakeAtTD
+            self._modified = True
+        
+    @property
+    def enableChecklists(self):
+        """Get whether aircraft-specific checklists should be played."""
+        return self._enableChecklists
+
+    @enableChecklists.setter
+    def enableChecklists(self, enableChecklists):
+        """Get whether aircraft-specific checklists should be played."""
+        if enableChecklists!=self._enableChecklists:
+            self._enableChecklists = enableChecklists
+            self._modified = True
+
+    @property
+    def checklistHotkey(self):
+        """Get the checklist hotkey."""
+        return self._checklistHotkey
+
+    @checklistHotkey.setter
+    def checklistHotkey(self, checklistHotkey):
+        """Set the checklist hotkey."""
+        if checklistHotkey!=self._checklistHotkey:
+            self._checklistHotkey = checklistHotkey
+            self._modified = True
+
+    @property
     def autoUpdate(self):
         """Get if an automatic update is needed."""
         return self._autoUpdate
@@ -253,6 +377,22 @@ class Config(object):
         for messageType in const.messageTypes:
             self._messageTypeLevels[messageType] = \
                 self._getMessageTypeLevel(config, messageType)
+
+        self._enableSounds = self._getBoolean(config, "sounds",
+                                              "enable", True)
+        self._pilotControlsSounds = self._getBoolean(config, "sounds",
+                                                     "pilotControls", True)
+        self._pilotHotkey.set(self._get(config, "sounds",
+                                        "pilotHotkey", "C0"))
+        #self._approachCallOuts = self._getBoolean(config, "sounds",
+        #                                          "approachCallOuts", False)
+        self._speedbrakeAtTD = self._getBoolean(config, "sounds",
+                                                "speedbrakeAtTD", True)
+
+        self._enableChecklists = self._getBoolean(config, "sounds",
+                                                  "enableChecklists", False)
+        self._checklistHotkey.set(self._get(config, "sounds",
+                                            "checklistHotkey", "CS0"))
             
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
@@ -297,6 +437,22 @@ class Config(object):
                 level = self._messageTypeLevels[messageType]                
                 config.set(Config._messageTypesSection, option,
                            const.messageLevel2string(level))
+
+        config.add_section("sounds")
+        config.set("sounds", "enable",
+                   "yes" if self._enableSounds else "no")
+        config.set("sounds", "pilotControls",
+                   "yes" if self._pilotControlsSounds else "no")
+        config.set("sounds", "pilotHotkey", str(self._pilotHotkey))
+        #config.set("sounds", "approachCallOuts",
+        #           "yes" if self._approachCallOuts else "no")
+        config.set("sounds", "speedbrakeAtTD",
+                   "yes" if self._speedbrakeAtTD else "no")
+
+        config.set("sounds", "enableChecklists",
+                   "yes" if self._enableChecklists else "no")
+        config.set("sounds", "checklistHotkey",
+                   str(self._checklistHotkey))
         
         config.add_section("update")
         config.set("update", "auto",

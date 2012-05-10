@@ -6,8 +6,81 @@ from common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
+import mlx.config as config
 
 import urlparse
+
+#------------------------------------------------------------------------------
+
+class Hotkey(gtk.HBox):
+    """A widget to handle a hotkey."""
+    def __init__(self, labelText, tooltips):
+        """Construct the hotkey widget.
+
+        labelText is the text for the label before the hotkey.
+
+        The tooltips parameter is an array of the tooltips for:
+        - the hotkey combo box,
+        - the control check box, and
+        - the shift check box."""
+        super(Hotkey, self).__init__()
+        
+        label = gtk.Label(labelText)
+        label.set_use_underline(True)
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        labelAlignment.add(label)
+        self.pack_start(labelAlignment, False, False, 8)
+
+        self._ctrl = gtk.CheckButton("Ctrl")
+        self._ctrl.set_tooltip_text(tooltips[1])
+        self.pack_start(self._ctrl, False, False, 4)
+            
+        self._shift = gtk.CheckButton("Shift")
+        self._shift.set_tooltip_text(tooltips[2])
+        self.pack_start(self._shift, False, False, 4)
+
+        self._hotkeyModel = gtk.ListStore(str)
+        for keyCode in range(ord("0"), ord("9")) + range(ord("A"), ord("Z")):
+            self._hotkeyModel.append([chr(keyCode)])
+
+        self._hotkey = gtk.ComboBox(model = self._hotkeyModel)
+        cell = gtk.CellRendererText()
+        self._hotkey.pack_start(cell, True)
+        self._hotkey.add_attribute(cell, 'text', 0)
+        self._hotkey.set_tooltip_text(tooltips[0])
+        self.pack_start(self._hotkey, False, False, 4)
+
+        self._setting = False
+
+    def set(self, hotkey):
+        """Set the hotkey widget from the given hotkey."""
+        self._setting = True
+
+        self._ctrl.set_active(hotkey.ctrl)
+        self._shift.set_active(hotkey.shift)
+
+        hotkeyModel = self._hotkeyModel
+        iter = hotkeyModel.get_iter_first()
+        while iter is not None and \
+              hotkeyModel.get_value(iter, 0)!=hotkey.key:
+            iter = hotkeyModel.iter_next(iter)
+
+        if iter is None:
+            iter = hotkeyModel.get_iter_first()
+
+        self._hotkey.set_active_iter(iter)            
+        
+        self._setting = False
+
+    def get(self):
+        """Get a hotkey corresponding to the settings in the widghet."""
+
+        key = self._hotkeyModel.get_value(self._hotkey.get_active_iter(), 0)
+
+        return config.Hotkey(ctrl = self._ctrl.get_active(),
+                             shift = self._shift.get_active(),
+                             key = key)
 
 #------------------------------------------------------------------------------
 
@@ -24,6 +97,7 @@ class Preferences(gtk.Dialog):
         self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
         
         self._gui = gui
+        self._settingFromConfig = False
 
         contentArea = self.get_content_area()
 
@@ -41,6 +115,12 @@ class Preferences(gtk.Dialog):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("prefs_tab_message_tooltip"))
         notebook.append_page(messages, label)
+
+        sounds = self._buildSounds()
+        label = gtk.Label(xstr("prefs_tab_sounds"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("prefs_tab_sounds_tooltip"))
+        notebook.append_page(sounds, label)
 
         advanced = self._buildAdvanced()
         label = gtk.Label(xstr("prefs_tab_advanced"))
@@ -65,6 +145,8 @@ class Preferences(gtk.Dialog):
 
     def _fromConfig(self, config):
         """Setup the dialog from the given configuration."""
+        self._settingFromConfig = True
+
         self._setLanguage(config.language)
         self._hideMinimizedWindow.set_active(config.hideMinimizedWindow)
         self._onlineGateSystem.set_active(config.onlineGateSystem)
@@ -85,13 +167,22 @@ class Preferences(gtk.Dialog):
             button.set_active(level == const.MESSAGELEVEL_SOUND or
                               level == const.MESSAGELEVEL_BOTH)
 
-        self._togglingAutoUpdate = True
+        self._enableSounds.set_active(config.enableSounds)
+        self._pilotControlsSounds.set_active(config.pilotControlsSounds)
+        self._pilotHotkey.set(config.pilotHotkey)
+        #self._approachCallOuts.set_active(config.approachCallOuts)
+        self._speedbrakeAtTD.set_active(config.speedbrakeAtTD)
+
+        self._enableChecklists.set_active(config.enableChecklists)        
+        self._checklistHotkey.set(config.checklistHotkey)
+
         self._autoUpdate.set_active(config.autoUpdate)
-        self._togglingAutoUpdate = False
         if not config.autoUpdate:
             self._warnedAutoUpdate = True
 
         self._updateURL.set_text(config.updateURL)
+
+        self._settingFromConfig = False
 
     def _toConfig(self, config):
         """Setup the given config from the settings in the dialog."""
@@ -114,6 +205,15 @@ class Preferences(gtk.Dialog):
             else:
                 level = const.MESSAGELEVEL_NONE
             config.setMessageTypeLevel(messageType, level)
+
+        config.enableSounds = self._enableSounds.get_active()
+        config.pilotControlsSounds = self._pilotControlsSounds.get_active()
+        config.pilotHotkey = self._pilotHotkey.get()
+        #config.approachCallOuts = self._approachCallOuts.get_active()
+        config.speedbrakeAtTD = self._speedbrakeAtTD.get_active()
+
+        config.enableChecklists = self._enableChecklists.get_active()
+        config.checklistHotkey = self._checklistHotkey.get()
 
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
@@ -329,7 +429,103 @@ class Preferences(gtk.Dialog):
         soundCheckButton.set_active((num&0x02)==0x02)
 
         return True
-            
+
+    def _buildSounds(self):
+        """Build the page for the sounds."""
+        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                      xscale = 1.0, yscale = 1.0)
+        mainAlignment.set_padding(padding_top = 8, padding_bottom = 8,
+                                  padding_left = 4, padding_right = 4)
+
+        mainBox = gtk.VBox()
+        mainAlignment.add(mainBox)
+
+        backgroundFrame = gtk.Frame(label = xstr("prefs_sounds_frame_bg"))
+        mainBox.pack_start(backgroundFrame, False, False, 4)
+
+        backgroundAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                            xscale = 1.0, yscale = 0.0)
+        backgroundAlignment.set_padding(padding_top = 4, padding_bottom = 4,
+                                        padding_left = 4, padding_right = 4)
+        backgroundFrame.add(backgroundAlignment)
+
+        backgroundBox = gtk.VBox()
+        backgroundAlignment.add(backgroundBox)
+
+        self._enableSounds = gtk.CheckButton(xstr("prefs_sounds_enable"))
+        self._enableSounds.set_use_underline(True)
+        self._enableSounds.set_tooltip_text(xstr("prefs_sounds_enable_tooltip"))
+        self._enableSounds.connect("toggled", self._enableSoundsToggled)
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 1.0, yscale = 0.0)
+        alignment.add(self._enableSounds)
+        backgroundBox.pack_start(alignment, False, False, 4)
+
+        self._pilotControlsSounds = gtk.CheckButton(xstr("prefs_sounds_pilotControls"))
+        self._pilotControlsSounds.set_use_underline(True)
+        self._pilotControlsSounds.set_tooltip_text(xstr("prefs_sounds_pilotControls_tooltip"))
+        backgroundBox.pack_start(self._pilotControlsSounds, False, False, 4)
+
+        self._pilotHotkey = Hotkey(xstr("prefs_sounds_pilotHotkey"),
+                                   [xstr("prefs_sounds_pilotHotkey_tooltip"),
+                                    xstr("prefs_sounds_pilotHotkeyCtrl_tooltip"),
+                                    xstr("prefs_sounds_pilotHotkeyShift_tooltip")])
+        
+        backgroundBox.pack_start(self._pilotHotkey, False, False, 4)
+
+        # self._approachCallOuts = gtk.CheckButton(xstr("prefs_sounds_approachCallOuts"))
+        # self._approachCallOuts.set_use_underline(True)
+        # self._approachCallOuts.set_tooltip_text(xstr("prefs_sounds_approachCallOuts_tooltip"))
+        # backgroundBox.pack_start(self._approachCallOuts, False, False, 4)
+        
+        self._speedbrakeAtTD = gtk.CheckButton(xstr("prefs_sounds_speedbrakeAtTD"))
+        self._speedbrakeAtTD.set_use_underline(True)
+        self._speedbrakeAtTD.set_tooltip_text(xstr("prefs_sounds_speedbrakeAtTD_tooltip"))
+        backgroundBox.pack_start(self._speedbrakeAtTD, False, False, 4)
+
+        checklistFrame = gtk.Frame(label = xstr("prefs_sounds_frame_checklists"))
+        mainBox.pack_start(checklistFrame, False, False, 4)
+
+        checklistAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                           xscale = 1.0, yscale = 0.0)
+        checklistAlignment.set_padding(padding_top = 4, padding_bottom = 4,
+                                       padding_left = 4, padding_right = 4)
+        checklistFrame.add(checklistAlignment)
+
+        checklistBox = gtk.VBox()
+        checklistAlignment.add(checklistBox)
+        
+        self._enableChecklists = gtk.CheckButton(xstr("prefs_sounds_enableChecklists"))
+        self._enableChecklists.set_use_underline(True)
+        self._enableChecklists.set_tooltip_text(xstr("prefs_sounds_enableChecklists_tooltip"))
+        self._enableChecklists.connect("toggled", self._enableChecklistsToggled)
+        checklistBox.pack_start(self._enableChecklists, False, False, 4)
+
+        self._checklistHotkey = Hotkey(xstr("prefs_sounds_checklistHotkey"),
+                                       [xstr("prefs_sounds_checklistHotkey_tooltip"),
+                                        xstr("prefs_sounds_checklistHotkeyCtrl_tooltip"),
+                                        xstr("prefs_sounds_checklistHotkeyShift_tooltip")])
+
+        checklistBox.pack_start(self._checklistHotkey, False, False, 4)
+
+        self._enableSoundsToggled(self._enableSounds)
+        self._enableChecklistsToggled(self._enableChecklists)
+
+        return mainAlignment
+
+    def _enableSoundsToggled(self, button):
+        """Called when the enable sounds button is toggled."""
+        active = button.get_active()
+        self._pilotControlsSounds.set_sensitive(active)
+        self._pilotHotkey.set_sensitive(active)
+        #self._approachCallOuts.set_sensitive(active)
+        self._speedbrakeAtTD.set_sensitive(active)
+
+    def _enableChecklistsToggled(self, button):
+        """Called when the enable checklists button is toggled."""
+        active = button.get_active()
+        self._checklistHotkey.set_sensitive(active)
+
     def _buildAdvanced(self):
         """Build the page for the advanced settings."""
 
@@ -347,7 +543,6 @@ class Preferences(gtk.Dialog):
         self._autoUpdate.connect("toggled", self._autoUpdateToggled)
         self._autoUpdate.set_tooltip_text(xstr("prefs_update_auto_tooltip"))
         self._warnedAutoUpdate = False
-        self._togglingAutoUpdate = False
         
         updateURLBox = gtk.HBox()
         mainBox.pack_start(updateURLBox, False, False, 4)
@@ -378,7 +573,7 @@ class Preferences(gtk.Dialog):
 
     def _autoUpdateToggled(self, button):
         """Called when the auto update check button is toggled."""
-        if not self._togglingAutoUpdate and not self._warnedAutoUpdate and \
+        if not self._settingFromConfig and not self._warnedAutoUpdate and \
            not self._autoUpdate.get_active():
             dialog = gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,

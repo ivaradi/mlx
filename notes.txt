@@ -40,3 +40,74 @@
         Alt+S: Segítség
         Alt+K: Kapuk
         
+-------------------------------------------------------------------------------
+
+Sounds
+------
+
+- sikoly.mp3: vs<-6000 | vs>6000, and is not playing
+
+- board.mp3: stage==BOARDING, not played yet, and pilot either pressed
+  hot key, or !pilotControlsSounds and 10s after the start of the boarding
+
+- malev.mp3: stage==PUSHANDTAXI, pilotControlsSounds && hotkey || 
+  !pilotControlsSounds && gs>5,
+  played only when board.mp3 was finished (if started at all), 
+  followed by XXXtaxi.mp3, when finished
+
+- cpt_takeoff.mp3: stage==TAKEOFF && (langingLights on || gs>80)
+
+- TOC.mp3: stage==CRUISE && (pilotControlsSounds && hotkey || 
+                             !pilotControlsSounds)
+
+- TOD.mp3: stage==DESCEND && (pilotControlsSounds && hotkey ||
+                              !pilotControlsSounds && altitude<15000)
+
+- TaxiAfterLand.mp3: stage==TAXIAFTERLAND && (pilotControlsSounds && hotkey ||
+                                              !pilotControlsSounds && timeSinceStage>10)
+
+- (notnormal.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+                   gs<40 && flown distance<0.404
+
+- (2500.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+              radioAltitude<2500
+
+- (700.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+              radioAltitude<700
+
+- (1200.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+              radioAltitude<1200
+
+- (1800.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+              radioAltitude<1800
+
+- (500.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+             radioAltitude<500
+
+- (200.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+             radioAltitude<200
+
+- (20.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+            radioAltitude<500
+
+- (atTD.mp3): approachCallouts && stage in [DESCEND, LANDING, TAXIAFTERLAND] &&
+              isOnTheGround
+
+- taps.mp3: 2 sec after touchdown, if T/D rate<150
+
+- cpt_landing.mp3: ????
+
+- notam.mp3: when the briefing window is displayed for the first time
+
+- notify.wav: for VISIBILITY message if sounds are enabled for that
+
+- speed.mp3: stage==LANDING, spoiler moves, speedbrake sound selected
+
+- Checklists:
+  - there are directories named checklist_<type>
+  - each directory contains a file named checklist.txt which is a list of
+    the sound files comprising the check list
+  - if a check list set is enabled and selected, its items are played
+    on-by-one as the second hot key is pressed
+
+  

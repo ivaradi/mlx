@@ -567,6 +567,9 @@ class _English(_Strings):
         self.add("prefs_tab_messages", "_Messages")
         self.add("prefs_tab_message_tooltip",
                  "Enable/disable message notifications in FS and/or by sound")
+        self.add("prefs_tab_sounds", "_Sounds")
+        self.add("prefs_tab_sounds_tooltip",
+                 "Preferences regarding what sounds should be played during the various flight stages")
         self.add("prefs_tab_advanced", "_Advanced")
         self.add("prefs_tab_advanced_tooltip",
                  "Advanced preferences, edit with care!")
@@ -603,7 +606,7 @@ class _English(_Strings):
                  "If this is checked, the time of the flare will be calculated "
                  "from timestamps returned by the simulator.")
         self.add("prefs_syncFSTime",
-                 "_Synchronize the time in FS with the computer's clock")
+                 "S_ynchronize the time in FS with the computer's clock")
         self.add("prefs_syncFSTime_tooltip",
                  "If this is checked the flight simulator's internal clock "
                  "will always be synchronized to the computer's clock.")
@@ -614,6 +617,60 @@ class _English(_Strings):
                  "saving a PIREP.")
         self.add("prefs_pirepDirectory_browser_title",
                  "Select PIREP directory")
+
+        self.add("prefs_sounds_frame_bg", "Background")
+        self.add("prefs_sounds_enable",
+                 "_Enable background sounds")
+        self.add("prefs_sounds_enable_tooltip",
+                 "If the background sounds are enabled, the logger "
+                 "can play different pre-recorded sounds during the "
+                 "various stages of the flight.")
+        self.add("prefs_sounds_pilotControls",
+                 "_Pilot controls the sounds")
+        self.add("prefs_sounds_pilotControls_tooltip",
+                 "If checked, the background sounds can be started by the "
+                 "pilot by pressing the hotkey specified below. Otherwise "
+                 "the sounds will start automatically when certain "
+                 "conditions hold.")
+        self.add("prefs_sounds_pilotHotkey",
+                 "_Hotkey:")
+        self.add("prefs_sounds_pilotHotkey_tooltip",
+                 "The key to press possibly together with modifiers to play "
+                 "the sound relevant to the current flight status.")
+        self.add("prefs_sounds_pilotHotkeyCtrl_tooltip",
+                 "If checked, the Ctrl key should be pressed together with the "
+                 "main key.")
+        self.add("prefs_sounds_pilotHotkeyShift_tooltip",
+                 "If checked, the Shift key should be pressed together with the "
+                 "main key.")
+        self.add("prefs_sounds_approachCallOuts",
+                 "Enable approach callouts")
+        self.add("prefs_sounds_approachCallOuts_tooltip",
+                 "If checked, the approach callouts will be played at "
+                 "certain altitudes.")
+        self.add("prefs_sounds_speedbrakeAtTD",
+                 "Enable speed_brake sound at touchdown")
+        self.add("prefs_sounds_speedbrakeAtTD_tooltip",
+                 "If checked, a speedbrake sound will be played after "
+                 "touchdown, when the speedbrakes deploy.")
+        self.add("prefs_sounds_frame_checklists", "Checklists")
+        self.add("prefs_sounds_enableChecklists",
+                 "E_nable aircraft-specific checklists")
+        self.add("prefs_sounds_enableChecklists_tooltip",
+                 "If checked, the program will play back pre-recorded "
+                 "aircraft-specific checklists at the pilot's discretion.")
+        self.add("prefs_sounds_checklistHotkey",
+                 "Checklist hot_key:")
+        self.add("prefs_sounds_checklistHotkey_tooltip",
+                 "The key to press possibly together with modifiers to play the next "
+                 "checklist item.")
+        self.add("prefs_sounds_checklistHotkeyCtrl_tooltip",
+                 "If checked, the Ctrl key should be pressed together with the "
+                 "main key.")
+        self.add("prefs_sounds_checklistHotkeyShift_tooltip",
+                 "If checked, the Shift key should be pressed together with the "
+                 "main key.")
+        
         self.add("prefs_update_auto", "Update the program auto_matically")
         self.add("prefs_update_auto_tooltip",
                  "If checked the program will look for updates when "
