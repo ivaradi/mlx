@@ -14,6 +14,16 @@ import urlparse
 
 class Hotkey(gtk.HBox):
     """A widget to handle a hotkey."""
+
+    # Constant to denote that the status of the Ctrl modifier is changed
+    CHANGED_CTRL = 1
+    
+    # Constant to denote that the status of the Shift modifier is changed
+    CHANGED_SHIFT = 2
+    
+    # Constant to denote that the value of the key is changed
+    CHANGED_KEY = 3
+    
     def __init__(self, labelText, tooltips):
         """Construct the hotkey widget.
 
@@ -34,10 +44,12 @@ class Hotkey(gtk.HBox):
 
         self._ctrl = gtk.CheckButton("Ctrl")
         self._ctrl.set_tooltip_text(tooltips[1])
+        self._ctrl.connect("toggled", self._ctrlToggled)
         self.pack_start(self._ctrl, False, False, 4)
             
         self._shift = gtk.CheckButton("Shift")
         self._shift.set_tooltip_text(tooltips[2])
+        self._shift.connect("toggled", self._shiftToggled)
         self.pack_start(self._shift, False, False, 4)
 
         self._hotkeyModel = gtk.ListStore(str)
@@ -49,38 +61,96 @@ class Hotkey(gtk.HBox):
         self._hotkey.pack_start(cell, True)
         self._hotkey.add_attribute(cell, 'text', 0)
         self._hotkey.set_tooltip_text(tooltips[0])
+        self._hotkey.connect("changed", self._keyChanged)
         self.pack_start(self._hotkey, False, False, 4)
 
         self._setting = False
 
-    def set(self, hotkey):
-        """Set the hotkey widget from the given hotkey."""
-        self._setting = True
+    @property
+    def ctrl(self):
+        """Get whether the Ctrl modifier is selected."""
+        return self._ctrl.get_active()
 
-        self._ctrl.set_active(hotkey.ctrl)
-        self._shift.set_active(hotkey.shift)
+    @ctrl.setter
+    def ctrl(self, ctrl):
+        """Get whether the Ctrl modifier is selected."""
+        self._setting = True
+        self._ctrl.set_active(ctrl)
+        self._setting = False
+
+    @property
+    def shift(self):
+        """Get whether the Shift modifier is selected."""
+        return self._shift.get_active()
+
+    @shift.setter
+    def shift(self, shift):
+        """Get whether the Shift modifier is selected."""
+        self._setting = True
+        self._shift.set_active(shift)
+        self._setting = False
+
+    @property
+    def key(self):
+        """Get the value of the key."""
+        return self._hotkeyModel.get_value(self._hotkey.get_active_iter(), 0)
+
+    @key.setter
+    def key(self, key):
+        """Set the value of the key."""
+        self._setting = True
 
         hotkeyModel = self._hotkeyModel
         iter = hotkeyModel.get_iter_first()
         while iter is not None and \
-              hotkeyModel.get_value(iter, 0)!=hotkey.key:
+              hotkeyModel.get_value(iter, 0)!=key:
             iter = hotkeyModel.iter_next(iter)
 
         if iter is None:
             iter = hotkeyModel.get_iter_first()
 
         self._hotkey.set_active_iter(iter)            
-        
+
         self._setting = False
+
+    def set(self, hotkey):
+        """Set the hotkey widget from the given hotkey."""
+        self.ctrl = hotkey.ctrl
+        self.shift = hotkey.shift
+        self.key = hotkey.key
 
     def get(self):
         """Get a hotkey corresponding to the settings in the widghet."""
 
         key = self._hotkeyModel.get_value(self._hotkey.get_active_iter(), 0)
 
-        return config.Hotkey(ctrl = self._ctrl.get_active(),
-                             shift = self._shift.get_active(),
-                             key = key)
+        return config.Hotkey(ctrl = self.ctrl, shift = self.shift,
+                             key = self.key)
+
+    def _ctrlToggled(self, checkButton):
+        """Called when the status of the Ctrl modifier has changed."""
+        if not self._setting:
+            self.emit("hotkey-changed", Hotkey.CHANGED_CTRL)
+
+    def _shiftToggled(self, checkButton):
+        """Called when the status of the Shift modifier has changed."""
+        if not self._setting:
+            self.emit("hotkey-changed", Hotkey.CHANGED_SHIFT)
+
+    def _keyChanged(self, comboBox):
+        """Called when the value of the key has changed."""
+        if not self._setting:
+            self.emit("hotkey-changed", Hotkey.CHANGED_KEY)
+
+    def __eq__(self, other):
+        """Determine if the two hotkeys are equal."""
+        return self.ctrl==other.ctrl and self.shift==other.shift and \
+               self.key==other.key
+
+#------------------------------------------------------------------------------
+
+gobject.signal_new("hotkey-changed", Hotkey, gobject.SIGNAL_RUN_FIRST,
+                   None, (int,))
 
 #------------------------------------------------------------------------------
 
@@ -511,6 +581,11 @@ class Preferences(gtk.Dialog):
         self._enableSoundsToggled(self._enableSounds)
         self._enableChecklistsToggled(self._enableChecklists)
 
+        self._pilotHotkey.connect("hotkey-changed", self._reconcileHotkeys,
+                                  self._checklistHotkey)
+        self._checklistHotkey.connect("hotkey-changed", self._reconcileHotkeys,
+                                      self._pilotHotkey)
+
         return mainAlignment
 
     def _enableSoundsToggled(self, button):
@@ -518,6 +593,9 @@ class Preferences(gtk.Dialog):
         active = button.get_active()
         self._pilotControlsSounds.set_sensitive(active)
         self._pilotHotkey.set_sensitive(active)
+        if active and self._checklistHotkey.get_sensitive():
+            self._reconcileHotkeys(self._checklistHotkey, Hotkey.CHANGED_SHIFT,
+                                   self._pilotHotkey)
         #self._approachCallOuts.set_sensitive(active)
         self._speedbrakeAtTD.set_sensitive(active)
 
@@ -525,6 +603,29 @@ class Preferences(gtk.Dialog):
         """Called when the enable checklists button is toggled."""
         active = button.get_active()
         self._checklistHotkey.set_sensitive(active)
+        if active and self._pilotHotkey.get_sensitive():
+            self._reconcileHotkeys(self._pilotHotkey, Hotkey.CHANGED_SHIFT,
+                                   self._checklistHotkey)
+
+    def _reconcileHotkeys(self, changedHotkey, what, otherHotkey):
+        """Reconcile the given hotkeys so that they are different.
+
+        changedHotkey is the hotkey that has changed. what is one of the
+        Hotkey.CHANGED_XXX constants denoting what has changed. otherHotkey is
+        the other hotkey that must be reconciled.
+
+        If the other hotkey is not sensitive or is not equal to the changed
+        one, nothing happens.
+
+        Otherwise, if the status of the Ctrl modifier has changed, the status
+        of the Ctrl modifier on the other hotkey will be negated. Similarly, if
+        the Shift modifier has changed. If the key has changed, the Shift
+        modifier is negated in the other hotkey."""
+        if otherHotkey.get_sensitive() and changedHotkey==otherHotkey:
+            if what==Hotkey.CHANGED_CTRL:
+                otherHotkey.ctrl = not changedHotkey.ctrl
+            elif what==Hotkey.CHANGED_SHIFT or what==Hotkey.CHANGED_KEY:
+                otherHotkey.shift = not changedHotkey.shift
 
     def _buildAdvanced(self):
         """Build the page for the advanced settings."""
@@ -587,3 +688,4 @@ class Preferences(gtk.Dialog):
     def _updateURLChanged(self, entry):
         """Called when the update URL is changed."""
         self._setOKButtonSensitivity()
+
