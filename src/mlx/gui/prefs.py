@@ -66,6 +66,8 @@ class Hotkey(gtk.HBox):
         self._hotkey.connect("changed", self._keyChanged)
         self.pack_start(self._hotkey, False, False, 4)
 
+        label.set_mnemonic_widget(self._hotkey)
+
         self._setting = False
 
     @property
