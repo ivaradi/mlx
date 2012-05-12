@@ -141,6 +141,8 @@ class _English(_Strings):
         self.add("quit_question", "Are you sure to quit the logger?")
 
         self.add("menu_tools", "Tools")
+        self.add("menu_tools_chklst", "_Checklist Editor")
+        self.add("menu_tools_chklst_key", "c")
         self.add("menu_tools_prefs", "_Preferences")
         self.add("menu_tools_prefs_key", "p")
 
@@ -618,6 +620,8 @@ class _English(_Strings):
         self.add("prefs_pirepDirectory_browser_title",
                  "Select PIREP directory")
 
+        self.add("chklst_title", "Checklist Editor")
+
         self.add("prefs_sounds_frame_bg", "Background")
         self.add("prefs_sounds_enable",
                  "_Enable background sounds")
@@ -770,6 +774,8 @@ class _Hungarian(_Strings):
         self.add("quit_question", "Biztosan ki akarsz lépni?")
 
         self.add("menu_tools", "Eszközök")
+        self.add("menu_tools_chklst", "_Ellenörzőlista szerkesztő")
+        self.add("menu_tools_chklst_key", "e")
         self.add("menu_tools_prefs", "_Beállítások")
         self.add("menu_tools_prefs_key", "b")
 
@@ -1199,6 +1205,8 @@ class _Hungarian(_Strings):
         self.add("gates_plane_parking", "PARKOL")
         self.add("gates_plane_unknown", "ISMERETLEN")
                  
+        self.add("chklst_title", "Ellenörzőlista szerkesztő")
+
         self.add("prefs_title", "Beállítások")
         self.add("prefs_tab_general", "_Általános")
         self.add("prefs_tab_general_tooltip", "Általános beállítások")

@@ -10,6 +10,7 @@ from mlx.gui.monitor import MonitorWindow
 from mlx.gui.weighthelp import WeightHelp
 from mlx.gui.gates import FleetGateStatus
 from mlx.gui.prefs import Preferences
+from mlx.gui.checklist import ChecklistEditor
 
 import mlx.const as const
 import mlx.fs as fs
@@ -84,6 +85,7 @@ class GUI(fs.ConnectionListener):
         window.add(mainVBox)
 
         self._preferences = Preferences(self)
+        self._checklistEditor = ChecklistEditor(self)
 
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
@@ -769,7 +771,16 @@ class GUI(fs.ConnectionListener):
         toolsMenuItem.set_submenu(toolsMenu)
         menuBar.append(toolsMenuItem)
 
-        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        checklistMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        checklistMenuItem.set_use_stock(True)
+        checklistMenuItem.set_label(xstr("menu_tools_chklst"))
+        checklistMenuItem.add_accelerator("activate", accelGroup,
+                                          ord(xstr("menu_tools_chklst_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
+        checklistMenuItem.connect("activate", self._editChecklist)
+        toolsMenu.append(checklistMenuItem)
+
+        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_APPLY)
         prefsMenuItem.set_use_stock(True)
         prefsMenuItem.set_label(xstr("menu_tools_prefs"))
         prefsMenuItem.add_accelerator("activate", accelGroup,
@@ -877,6 +888,10 @@ class GUI(fs.ConnectionListener):
         else:
             self._mainWindow.set_default(None)
 
+    def _editChecklist(self, menuItem):
+        """Callback for editing the checklists."""
+        self._checklistEditor.run()
+        
     def _editPreferences(self, menuItem):
         """Callback for editing the preferences."""
         self._clearHotkeys()
