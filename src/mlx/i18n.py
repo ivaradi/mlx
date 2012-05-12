@@ -113,6 +113,10 @@ class _Strings(object):
         assert id not in self._strings
         self._strings[id] = s
 
+    def __iter__(self):
+        """Return an iterator over the keys in the string set."""
+        return iter(self._strings)
+
     def __getitem__(self, key):
         """Get the string  with the given key."""
         return self._strings[key] if key in self._strings else None
@@ -1214,6 +1218,10 @@ class _Hungarian(_Strings):
         self.add("prefs_tab_message_tooltip",
                  "A szimulátorba és/vagy hangjelzés általi üzenetküldés be- "
                  "és kikapcsolása")
+        self.add("prefs_tab_sounds", "_Hangok")
+        self.add("prefs_tab_sounds_tooltip",
+                 "A repülés különféle fázisai alatt lejátszandó hangokkal "
+                 "kapcsolatos beállítások.")
         self.add("prefs_tab_advanced", "H_aladó")
         self.add("prefs_tab_advanced_tooltip",
                  "Haladó beállítások: óvatosan módosítsd őket!")
@@ -1261,6 +1269,63 @@ class _Hungarian(_Strings):
                  "a PIREP-ek mentésekor.")
         self.add("prefs_pirepDirectory_browser_title",
                  "Válaszd ki a PIREP-ek könyvtárát")
+
+        self.add("prefs_sounds_frame_bg", "Háttérhangok")
+        self.add("prefs_sounds_enable",
+                 "Háttérhangok _engedélyezése")
+        self.add("prefs_sounds_enable_tooltip",
+                 "Ha a háttérhangokat engedélyezed, a logger a repülés "
+                 "egyes fázisai alatt különféle hangállományokat játszik le.")
+        self.add("prefs_sounds_pilotControls",
+                 "_Pilóta vezérli a hangokat")
+        self.add("prefs_sounds_pilotControls_tooltip",
+                 "Ha azt kijelölöd, a legtöbb háttérhang csak akkor hallható, "
+                 "ha a pilóta a lent megadott gyorsbillentyűt leüti. Egyébként "
+                 "a hangok maguktól, bizonyos feltételek teljesülése esetén "
+                 "szólalnak meg.")
+        self.add("prefs_sounds_pilotHotkey",
+                 "_Gyorsbillentyű:")
+        self.add("prefs_sounds_pilotHotkey_tooltip",
+                 "A billentyű, amit az esetlegesen megadott módosítókkal "
+                 "együtt le kell ütni, hogy a repülés aktuális fázisához "
+                 "tartozó hang megszólaljon.")
+        self.add("prefs_sounds_pilotHotkeyCtrl_tooltip",
+                 "Ha kijelölöd, a Ctrl billentyűt is le kell nyomni a "
+                 "főbillentyűvel együtt.")
+        self.add("prefs_sounds_pilotHotkeyShift_tooltip",
+                 "Ha kijelölöd, a Shift billentyűt is le kell nyomni a "
+                 "főbillentyűvel együtt.")
+        self.add("prefs_sounds_approachCallOuts",
+                 "Megközelítési figyelmeztetések engedélyezés")
+        self.add("prefs_sounds_approachCallOuts_tooltip",
+                 "Ha kijelölöd, megközelítés közben egyes magasságokat "
+                 "bemond a program.")
+        self.add("prefs_sounds_speedbrakeAtTD",
+                 "_Spoiler hang bekapcsolása leszálláskor")
+        self.add("prefs_sounds_speedbrakeAtTD_tooltip",
+                 "Ha kijelölöd, egy, a spoilerek kibocsájtását imitáló "
+                 "hang hallatszik földetérés után, ha a spoilerek "
+                 "automatikusan kinyílnak.")
+        self.add("prefs_sounds_frame_checklists", "Ellenörzőlisták")
+        self.add("prefs_sounds_enableChecklists",
+                 "_Repülőgép-specifikus ellenörzőlisták engedélyezése")
+        self.add("prefs_sounds_enableChecklists_tooltip",
+                 "Ha kijelölöd, a program a lenti gyorsbillentyű "
+                 "megnyomásokor a használt repülőgép típushoz tartozó "
+                 "ellenörzőlista következő elemét játssza le.")
+        self.add("prefs_sounds_checklistHotkey",
+                 "E_llenörzőlista gyorsbillentyű:")
+        self.add("prefs_sounds_checklistHotkey_tooltip",
+                 "A billentyű, amit az esetlegesen megadott módosítókkal "
+                 "együtt le kell ütni, hogy az ellenörzőlista következő "
+                 "eleme elhangozzék.")
+        self.add("prefs_sounds_checklistHotkeyCtrl_tooltip",
+                 "Ha kijelölöd, a Ctrl billentyűt is le kell nyomni a "
+                 "főbillentyűvel együtt.")
+        self.add("prefs_sounds_checklistHotkeyShift_tooltip",
+                 "Ha kijelölöd, a Shift billentyűt is le kell nyomni a "
+                 "főbillentyűvel együtt.")
+
         self.add("prefs_update_auto",
                  "Frissítsd a programot _automatikusan")
         self.add("prefs_update_auto_tooltip",
@@ -1340,9 +1405,17 @@ class _Hungarian(_Strings):
 #------------------------------------------------------------------------------
 
 # The fallback language is English
-_English()
+_english = _English()
 
 # We also support Hungarian
-_Hungarian()
+_hungarian = _Hungarian()
+
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    _hungarian.initialize()
+    for key in _english:
+        if _hungarian[key] is None:
+            print key
 
 #------------------------------------------------------------------------------
