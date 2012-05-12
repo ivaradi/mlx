@@ -151,6 +151,8 @@ class GUI(fs.ConnectionListener):
         self._loadPIREPDialog = None
         self._lastLoadedPIREP = None
 
+        self._hotkeySetID = None
+
     @property
     def mainWindow(self):
         """Get the main window of the GUI."""
@@ -319,6 +321,7 @@ class GUI(fs.ConnectionListener):
         if not self._reconnecting:
             self._wizard.connected(fsType, descriptor)
         self._reconnecting = False
+        self._listenHotkeys()
 
     def connectionFailed(self):
         """Called when the connection failed."""
@@ -401,6 +404,7 @@ class GUI(fs.ConnectionListener):
     def _disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator if connected."""
         self.stopMonitoring()
+        self._clearHotkeys()
 
         if self._connected:
             if closingMessage is None:
@@ -874,8 +878,10 @@ class GUI(fs.ConnectionListener):
 
     def _editPreferences(self, menuItem):
         """Callback for editing the preferences."""
+        self._clearHotkeys()
         self._preferences.run(self.config)
         self._setupTimeSync()
+        self._listenHotkeys()
 
     def _setupTimeSync(self):
         """Enable or disable the simulator time synchronization based on the
@@ -1105,3 +1111,22 @@ class GUI(fs.ConnectionListener):
         self._sendPIREPCallback = None
         if callback is not None:
             callback(returned, result)
+
+    def _listenHotkeys(self):
+        """Setup the hotkeys based on the configuration."""
+        if self._hotkeySetID is None and self._simulator is not None:
+            self._hotkeySetID = \
+                self._simulator.listenHotkeys([self.config.pilotHotkey,
+                                               self.config.checklistHotkey],
+                                              self._handleHotkeys)
+
+    def _clearHotkeys(self):
+        """Clear the hotkeys."""
+        if self._hotkeySetID is not None:
+            self._hotkeySetID=None
+            self._simulator.clearHotkeys()
+
+    def _handleHotkeys(self, id, hotkeys):
+        """Handle the hotkeys."""
+        if id==self._hotkeySetID:
+            print "gui.GUI._handleHotkeys", hotkeys

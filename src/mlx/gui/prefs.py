@@ -39,8 +39,10 @@ class Hotkey(gtk.HBox):
         label.set_use_underline(True)
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
+        labelAlignment.set_padding(padding_top = 0, padding_bottom = 0,
+                                   padding_left = 0, padding_right = 4)
         labelAlignment.add(label)
-        self.pack_start(labelAlignment, False, False, 8)
+        self.pack_start(labelAlignment, False, False, 0)
 
         self._ctrl = gtk.CheckButton("Ctrl")
         self._ctrl.set_tooltip_text(tooltips[1])
@@ -53,7 +55,7 @@ class Hotkey(gtk.HBox):
         self.pack_start(self._shift, False, False, 4)
 
         self._hotkeyModel = gtk.ListStore(str)
-        for keyCode in range(ord("0"), ord("9")) + range(ord("A"), ord("Z")):
+        for keyCode in range(ord("0"), ord("9")+1) + range(ord("A"), ord("Z")+1):
             self._hotkeyModel.append([chr(keyCode)])
 
         self._hotkey = gtk.ComboBox(model = self._hotkeyModel)

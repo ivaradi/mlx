@@ -307,7 +307,7 @@ class Handler(threading.Thread):
         while True:
             self._waitConnectionRequest()
             
-            if self._connect():
+            if self._connect()>0:
                 self._handleConnection()
 
             self._disconnect()
@@ -318,14 +318,23 @@ class Handler(threading.Thread):
             while not self._connectionRequested:
                 self._requestCondition.wait()
             
-    def _connect(self, autoReconnection = False):
+    def _connect(self, autoReconnection = False, attempts = 0):
         """Try to connect to the flight simulator via FSUIPC
 
         Returns True if the connection has been established, False if it was
         not due to no longer requested.
         """
-        attempts = 0
         while self._connectionRequested:
+            if attempts>=self.NUM_CONNECTATTEMPTS:
+                self._connectionRequested = False
+                if autoReconnection:
+                    Handler._callSafe(lambda:     
+                                      self._connectionListener.disconnected())
+                else:
+                    Handler._callSafe(lambda:     
+                                      self._connectionListener.connectionFailed())
+                return 0
+                
             try:
                 attempts += 1
                 pyuipc.open(pyuipc.SIM_ANY)
@@ -337,21 +346,12 @@ class Handler(threading.Thread):
                                       self._connectionListener.connected(const.SIM_MSFS9, 
                                                                          description))
                 self._connected = True
-                return True
+                return attempts
             except Exception, e:
-                print "fsuipc.Handler._connect: connection failed: " + str(e)
+                print "fsuipc.Handler._connect: connection failed: " + str(e) + \
+                      " (attempts: %d)" % (attempts,)
                 if attempts<self.NUM_CONNECTATTEMPTS:
                     time.sleep(self.CONNECT_INTERVAL)
-                else:
-                    self._connectionRequested = False
-                    if autoReconnection:
-                        Handler._callSafe(lambda:     
-                                          self._connectionListener.disconnected())
-                    else:
-                        Handler._callSafe(lambda:     
-                                          self._connectionListener.connectionFailed())
-
-        return False
                 
     def _handleConnection(self):
         """Handle a living connection."""
@@ -385,7 +385,7 @@ class Handler(threading.Thread):
             pyuipc.close()
             self._connected = False
             
-    def _processRequest(self, request, time):
+    def _processRequest(self, request, time, attempts):
         """Process the given request. 
 
         If an exception occurs or invalid data is read too many times, we try
@@ -408,14 +408,16 @@ class Handler(threading.Thread):
                     needReconnect = True
             except Exception as e:
                 print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
-                      str(e) + "), reconnecting."
+                      str(e) + "), reconnecting (attempts=%d)." % (attempts,)
                 needReconnect = True
 
             if needReconnect:
                 with self._requestCondition:
                     self._requests.insert(0, request)
                 self._disconnect()
-                self._connect(autoReconnection = True)
+                return self._connect(autoReconnection = True, attempts = attempts)
+            else:
+                return 0
         finally:
             self._requestCondition.acquire()
         
@@ -423,6 +425,7 @@ class Handler(threading.Thread):
         """Process any pending requests.
 
         Will be called with the request lock held."""
+        attempts = 0
         while self._connectionRequested and self._periodicRequests:
             self._periodicRequests.sort()
             request = self._periodicRequests[0]
@@ -432,13 +435,13 @@ class Handler(threading.Thread):
             if request.nextFire>t:
                 break
             
-            self._processRequest(request, t)
+            attempts = self._processRequest(request, t, attempts)
 
         while self._connectionRequested and self._requests:
             request = self._requests[0]
             del self._requests[0]
 
-            self._processRequest(request, None)
+            attempts = self._processRequest(request, None, attempts)
 
         return self._connectionRequested
 
@@ -490,6 +493,21 @@ class Simulator(object):
 
         return timestamp
 
+    @staticmethod
+    def _appendHotkeyData(data, offset, hotkey):
+        """Append the data for the given hotkey to the given array, that is
+        intended to be passed to requestWrite call on the handler."""
+        data.append((offset + 0, "b", ord(hotkey.key)))
+
+        modifiers = 0
+        if hotkey.ctrl: modifiers |= 0x02
+        if hotkey.shift: modifiers |= 0x01
+        data.append((offset + 1, "b", modifiers))
+
+        data.append((offset + 2, "b", 0))
+        
+        data.append((offset + 3, "b", 0))        
+
     def __init__(self, connectionListener, connectAttempts = -1,
                  connectInterval = 0.2):
         """Construct the simulator.
@@ -514,9 +532,10 @@ class Simulator(object):
          are self-explanatory and expressed in their 'natural' units."""
         self._aircraft = None
 
-        self._handler = Handler(connectionListener,
+        self._handler = Handler(self,
                                 connectAttempts = connectAttempts,
                                 connectInterval = connectInterval)
+        self._connectionListener = connectionListener
         self._handler.start()
 
         self._scroll = False
@@ -536,6 +555,14 @@ class Simulator(object):
         self._flareRates = []
         self._flareStart = None
         self._flareStartFS = None
+
+        self._hotkeyLock = threading.Lock()
+        self._hotkeys = None
+        self._hotkeySetID = 0
+        self._hotkeySetGeneration = 0
+        self._hotkeyOffets = None
+        self._hotkeyRequestID = None
+        self._hotkeyCallback = None
 
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
 
@@ -664,6 +691,45 @@ class Simulator(object):
         """Enable the time synchronization."""
         self._syncTime = False
         self._nextSyncTime = -1
+
+    def listenHotkeys(self, hotkeys, callback):
+        """Start listening to the given hotkeys.
+
+        callback is function expecting two arguments:
+        - the ID of the hotkey set as returned by this function,
+        - the list of the indexes of the hotkeys that were pressed."""
+        with self._hotkeyLock:
+            assert self._hotkeys is None
+
+            self._hotkeys = hotkeys
+            self._hotkeySetID += 1
+            self._hotkeySetGeneration = 0
+            self._hotkeyCallback = callback
+            
+            self._handler.requestRead([(0x320c, "u")],
+                                      self._handleNumHotkeys,
+                                      (self._hotkeySetID,
+                                       self._hotkeySetGeneration))
+
+            return self._hotkeySetID
+
+    def clearHotkeys(self):
+        """Clear the current hotkey set.
+
+        Note that it is possible, that the callback function set either
+        previously or after calling this function by listenHotkeys() will be
+        called with data from the previous hotkey set.
+
+        Therefore it is recommended to store the hotkey set ID somewhere and
+        check that in the callback function. Right before calling
+        clearHotkeys(), this stored ID should be cleared so that the check
+        fails for sure."""
+        with self._hotkeyLock:
+            if self._hotkeys is not None:
+                self._hotkeys = None
+                self._hotkeySetID += 1
+                self._hotkeyCallback = None
+                self._clearHotkeyRequest()
             
     def disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator."""
@@ -672,11 +738,37 @@ class Simulator(object):
         print "fsuipc.Simulator.disconnect", closingMessage, duration
         
         self._stopNormal()
+        self.clearHotkeys()
         if closingMessage is None:
             self._handler.disconnect()
         else:
             self.sendMessage(closingMessage, duration = duration,
                              _disconnect = True)
+
+    def connected(self, fsType, descriptor):
+        """Called when a connection has been established to the flight
+        simulator of the given type."""
+        with self._hotkeyLock:
+            if self._hotkeys is not None:
+                self._hotkeySetGeneration += 1
+            
+                self._handler.requestRead([(0x320c, "u")],
+                                          self._handleNumHotkeys,
+                                          (self._hotkeySetID,
+                                           self._hotkeySetGeneration))
+        self._connectionListener.connected(fsType, descriptor)
+
+    def connectionFailed(self):
+        """Called when the connection could not be established."""
+        with self._hotkeyLock:
+            self._clearHotkeyRequest()
+        self._connectionListener.connectionFailed()
+
+    def disconnected(self):
+        """Called when a connection to the flight simulator has been broken."""
+        with self._hotkeyLock:
+            self._clearHotkeyRequest()
+        self._connectionListener.disconnected()
 
     def _startDefaultNormal(self):
         """Start the default normal periodic request."""
@@ -914,6 +1006,109 @@ class Simulator(object):
     def _handleFuelWritten(self, success, extra):
         """Callback for a fuel setting request."""
         pass
+
+    def _handleNumHotkeys(self, data, (id, generation)):
+        """Handle the result of the query of the number of hotkeys"""
+        with self._hotkeyLock:
+            if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
+                numHotkeys = data[0]
+                print "fsuipc.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys
+                data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]        
+                self._handler.requestRead(data, self._handleHotkeyTable,
+                                          (id, generation))
+
+    def _setupHotkeys(self, data):
+        """Setup the hiven hotkeys and return the data to be written.
+
+        If there were hotkeys set previously, they are reused as much as
+        possible. Any of them not reused will be cleared."""
+        hotkeys = self._hotkeys
+        numHotkeys = len(hotkeys)
+
+        oldHotkeyOffsets = set([] if self._hotkeyOffets is None else
+                               self._hotkeyOffets)
+
+        self._hotkeyOffets = []
+        numOffsets = 0
+
+        while oldHotkeyOffsets:
+            offset = oldHotkeyOffsets.pop()
+            self._hotkeyOffets.append(offset)
+            numOffsets += 1
+
+            if numOffsets>=numHotkeys:
+                break
+
+        for i in range(0, len(data)):
+            if numOffsets>=numHotkeys:
+                break
+
+            if data[i]==0:
+                self._hotkeyOffets.append(0x3210 + i*4)
+                numOffsets += 1
+
+        writeData = []
+        for i in range(0, numOffsets):
+            Simulator._appendHotkeyData(writeData,
+                                        self._hotkeyOffets[i],
+                                        hotkeys[i])
+
+        for offset in oldHotkeyOffsets:
+            writeData.append((offset, "u", long(0)))
+
+        return writeData
+
+    def _handleHotkeyTable(self, data, (id, generation)):
+        """Handle the result of the query of the hotkey table."""
+        with self._hotkeyLock:
+            if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
+                writeData = self._setupHotkeys(data)
+                self._handler.requestWrite(writeData,
+                                           self._handleHotkeysWritten,
+                                           (id, generation))
+            
+    def _handleHotkeysWritten(self, success, (id, generation)):
+        """Handle the result of the hotkeys having been written."""
+        with self._hotkeyLock:            
+            if success and id==self._hotkeySetID and \
+            generation==self._hotkeySetGeneration:
+                data = [(offset + 3, "b") for offset in self._hotkeyOffets]
+        
+                self._hotkeyRequestID = \
+                    self._handler.requestPeriodicRead(0.5, data,
+                                                      self._handleHotkeys,
+                                                      (id, generation))
+
+    def _handleHotkeys(self, data, (id, generation)):
+        """Handle the hotkeys."""        
+        with self._hotkeyLock:
+            if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
+                return
+
+            callback = self._hotkeyCallback
+            offsets = self._hotkeyOffets
+
+        hotkeysPressed = []
+        for i in range(0, len(data)):
+            if data[i]!=0:
+                hotkeysPressed.append(i)
+
+        if hotkeysPressed:
+            data = []
+            for index in hotkeysPressed:
+                data.append((offsets[index]+3, "b", int(0)))
+            self._handler.requestWrite(data, self._handleHotkeysCleared)
+
+            callback(id, hotkeysPressed)
+
+    def _handleHotkeysCleared(self, sucess, extra):
+        """Callback for the hotkey-clearing write request."""        
+
+    def _clearHotkeyRequest(self):
+        """Clear the hotkey request in the handler if there is any."""
+        if self._hotkeyRequestID is not None:
+            self._handler.clearPeriodic(self._hotkeyRequestID)
+            self._hotkeyRequestID = None
                                                   
 #------------------------------------------------------------------------------
 
