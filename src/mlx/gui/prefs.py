@@ -536,6 +536,7 @@ class Preferences(gtk.Dialog):
         self._pilotControlsSounds = gtk.CheckButton(xstr("prefs_sounds_pilotControls"))
         self._pilotControlsSounds.set_use_underline(True)
         self._pilotControlsSounds.set_tooltip_text(xstr("prefs_sounds_pilotControls_tooltip"))
+        self._pilotControlsSounds.connect("toggled", self._pilotControlsSoundsToggled)
         backgroundBox.pack_start(self._pilotControlsSounds, False, False, 4)
 
         self._pilotHotkey = Hotkey(xstr("prefs_sounds_pilotHotkey"),
@@ -594,12 +595,17 @@ class Preferences(gtk.Dialog):
         """Called when the enable sounds button is toggled."""
         active = button.get_active()
         self._pilotControlsSounds.set_sensitive(active)
+        self._pilotControlsSoundsToggled(self._pilotControlsSounds)
+        #self._approachCallOuts.set_sensitive(active)
+        self._speedbrakeAtTD.set_sensitive(active)
+
+    def _pilotControlsSoundsToggled(self, button):
+        """Called when the enable sounds button is toggled."""
+        active = button.get_active() and self._enableSounds.get_active()
         self._pilotHotkey.set_sensitive(active)
         if active and self._checklistHotkey.get_sensitive():
             self._reconcileHotkeys(self._checklistHotkey, Hotkey.CHANGED_SHIFT,
                                    self._pilotHotkey)
-        #self._approachCallOuts.set_sensitive(active)
-        self._speedbrakeAtTD.set_sensitive(active)
 
     def _enableChecklistsToggled(self, button):
         """Called when the enable checklists button is toggled."""
