@@ -833,6 +833,7 @@ class GUI(fs.ConnectionListener):
                                     else gtk.SHADOW_IN)
         logView = gtk.TextView()
         logView.set_editable(False)
+        logView.set_cursor_visible(False)
         logScroller.add(logView)
 
         logBox = gtk.VBox()
