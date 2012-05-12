@@ -3,7 +3,7 @@
 #-------------------------------------------------------------------------------
 
 # The version of the program
-VERSION="0.04"
+VERSION="0.05"
 
 #-------------------------------------------------------------------------------
 
@@ -293,6 +293,49 @@ def string2messageLevel(str):
 
 # Sound: ding
 SOUND_DING = "ding.wav"
+
+# Sound: notify
+SOUND_NOTIFY = "notify.wav"
+
+# Sound: NOTAM
+SOUND_NOTAM = "notam.mp3"
+
+# Sound: scream
+SOUND_SCREAM = "sikoly.mp3"
+
+# Sound: boarding
+SOUND_BOARDING = "board.mp3"
+
+# Sound: Malev theme
+SOUND_MALEV = "malev.mp3"
+
+# Sound: taxi: Boeing 737 NG
+SOUND_TAXI_BOEING737NG = "737taxi.mp3"
+
+# Sound: taxi: Boeing 767
+SOUND_TAXI_BOEING767 = "767taxi.mp3"
+
+# Sound: taxi: Fokker F70
+SOUND_TAXI_F70 = "F70taxi.mp3"
+
+# Sound: takeoff preparation request from the captain
+SOUND_CAPTAIN_TAKEOFF = "cpt_takeoff.mp3"
+
+# Sound: cruise
+SOUND_CRUISE = "TOC.mp3"
+
+# Sound: descent
+SOUND_DESCENT = "TOD.mp3"
+
+# Sound: applause
+SOUND_APPLAUSE = "taps.mp3"
+
+# Sound: speedbrake
+SOUND_SPEEDBRAKE = "speed.mp3"
+
+# Sound: taxi after landing
+SOUND_TAXIAFTERLAND = "TaxiAfterLand.mp3"
+
 
 #-------------------------------------------------------------------------------
 

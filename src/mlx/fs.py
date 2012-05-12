@@ -108,7 +108,9 @@ class MessageThread(threading.Thread):
         messageLevel = self._config.getMessageTypeLevel(messageType)
         if messageLevel==const.MESSAGELEVEL_SOUND or \
            messageLevel==const.MESSAGELEVEL_BOTH:
-            startSound(const.SOUND_DING)
+            startSound(const.SOUND_NOTIFY
+                       if messageType==const.MESSAGETYPE_VISIBILITY
+                       else const.SOUND_DING)
         if (messageLevel==const.MESSAGELEVEL_FS or \
             messageLevel==const.MESSAGELEVEL_BOTH):
             if disconnect:

@@ -2,6 +2,8 @@
 
 #---------------------------------------------------------------------------------------
 
+from soundsched import SoundScheduler
+
 import const
 import util
 
@@ -31,6 +33,10 @@ class Flight(object):
 
         gui.resetFlightStatus()
 
+        self._soundScheduler = SoundScheduler(self)
+        self._pilotHotkeyPressed = False
+        self._checklistHotkeyPressed = False
+
         self.flareTimeFromFS = False
         self.entranceExam = False
 
@@ -57,6 +63,8 @@ class Flight(object):
 
         self._flareStart = None
         self._flareStartFS = None
+
+        self._tdRate = None
 
     @property
     def config(self):
@@ -103,6 +111,11 @@ class Flight(object):
         """Get the VRef speed of the flight."""
         return self._gui.vref
 
+    @property
+    def tdRate(self):
+        """Get the touchdown rate if known, None otherwise."""
+        return self._tdRate
+
     def handleState(self, oldState, currentState):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)
@@ -110,6 +123,10 @@ class Flight(object):
         self.endFuel = sum(currentState.fuel)
         if self.startFuel is None:
             self.startFuel = self.endFuel
+        
+        self._soundScheduler.schedule(currentState,
+                                      self._pilotHotkeyPressed)
+        self._pilotHotkeyPressed = False
 
     def setStage(self, timestamp, stage):
         """Set the flight stage.
@@ -154,13 +171,14 @@ class Flight(object):
         self._flareStart = flareStart
         self._flareStartFS = flareStartFS
 
-    def flareFinished(self, flareEnd, flareEndFS):
+    def flareFinished(self, flareEnd, flareEndFS, tdRate):
         """Called when the flare time has ended.
         
         Return a tuple of the following items:
         - a boolean indicating if FS time is used
         - the flare time
         """
+        self._tdRate = tdRate
         if self.flareTimeFromFS:
             return (True, flareEndFS - self._flareStartFS)
         else:
@@ -175,6 +193,14 @@ class Flight(object):
     def getFleet(self, callback, force = False):
         """Get the fleet and call the given callback."""
         self._gui.getFleetAsync(callback = callback, force = force)
+
+    def pilotHotkeyPressed(self):
+        """Called when the pilot hotkey is pressed."""
+        self._pilotHotkeyPressed = True
+
+    def checklistHotkeyPressed(self):
+        """Called when the checklist hotkey is pressed."""
+        self._checklistHotkeyPressed = True
 
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""

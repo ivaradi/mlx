@@ -6,6 +6,7 @@ import fs
 import const
 import util
 from acars import ACARS
+from sound import startSound
 
 import time
 
@@ -177,6 +178,9 @@ class SpoilerLogger(StateChecker):
                 if state.spoilersExtension!=self._spoilersExtension:
                     logger.message(state.timestamp, "Spoilers deployed")
                     self._logged = True
+                    config = flight.config
+                    if config.enableSounds and config.speedbrakeAtTD:
+                        startSound(const.SOUND_SPEEDBRAKE)
             else:
                 self._spoilersExtension = state.spoilersExtension
 

@@ -229,7 +229,8 @@ class Aircraft(object):
                       ias, pitch, bank, heading):
         """Called when the flare has finished."""
         (flareTimeFromFS, flareTime) = self.flight.flareFinished(flareEnd,
-                                                                 flareEndFS)
+                                                                 flareEndFS,
+                                                                 tdRate)
         self.logger.message(self._aircraftState.timestamp,
                             "Flaretime: %.3f (from %s)" % \
                             (flareTime, 

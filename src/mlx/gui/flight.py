@@ -9,6 +9,7 @@ from mlx.checks import PayloadChecker
 import mlx.util as util
 from mlx.pirep import PIREP
 from mlx.i18n import xstr
+from mlx.sound import startSound
 
 import datetime
 import time
@@ -1422,6 +1423,7 @@ class RoutePage(Page):
             self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
                                                   bookedFlight.departureICAO,
                                                   bookedFlight.arrivalICAO)
+            startSound(const.SOUND_NOTAM)
 
     def _notamsCallback(self, returned, result):
         """Callback for the NOTAMs."""

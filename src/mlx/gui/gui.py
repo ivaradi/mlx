@@ -1129,4 +1129,8 @@ class GUI(fs.ConnectionListener):
     def _handleHotkeys(self, id, hotkeys):
         """Handle the hotkeys."""
         if id==self._hotkeySetID:
-            print "gui.GUI._handleHotkeys", hotkeys
+            for index in hotkeys:
+                if index==0:
+                    self._flight.pilotHotkeyPressed()
+                else:
+                    self._flight.checklistHotkeyPressed()
