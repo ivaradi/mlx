@@ -58,7 +58,8 @@ if os.name=="nt":
 
         def requestSound(self, name, finishCallback = None, extra = None):
             """Request the playback of the sound with the given name."""
-            path = os.path.join(self._soundsDirectory, name)
+            path = name if os.path.isabs(name) \
+                   else os.path.join(self._soundsDirectory, name)
             with self._requestCondition:
                 self._requests.append((path, (finishCallback, extra)))
                 self._requestCondition.notify()
@@ -166,7 +167,7 @@ else: # os.name!="nt"
         """Start playing back the given sound.
 
         FIXME: it does not do anything currently, but it should."""
-        pass
+        print "sound.startSound:", name
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

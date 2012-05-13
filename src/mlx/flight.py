@@ -2,7 +2,7 @@
 
 #---------------------------------------------------------------------------------------
 
-from soundsched import SoundScheduler
+from soundsched import SoundScheduler, ChecklistScheduler
 
 import const
 import util
@@ -33,7 +33,6 @@ class Flight(object):
 
         gui.resetFlightStatus()
 
-        self._soundScheduler = SoundScheduler(self)
         self._pilotHotkeyPressed = False
         self._checklistHotkeyPressed = False
 
@@ -65,6 +64,9 @@ class Flight(object):
         self._flareStartFS = None
 
         self._tdRate = None
+
+        self._soundScheduler = SoundScheduler(self)
+        self._checklistScheduler = ChecklistScheduler(self)
 
     @property
     def config(self):
@@ -127,6 +129,10 @@ class Flight(object):
         self._soundScheduler.schedule(currentState,
                                       self._pilotHotkeyPressed)
         self._pilotHotkeyPressed = False
+
+        if self._checklistHotkeyPressed:
+            self._checklistScheduler.hotkeyPressed()
+            self._checklistHotkeyPressed = False
 
     def setStage(self, timestamp, stage):
         """Set the flight stage.

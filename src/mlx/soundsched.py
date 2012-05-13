@@ -4,6 +4,7 @@
 
 from sound import startSound
 import const
+import fs
 
 import threading
 
@@ -208,5 +209,31 @@ class SoundScheduler(object):
         if flight.config.enableSounds:
             for sound in self._sounds:
                 sound.check(flight, state, pilotHotkeyPressed)
+
+#------------------------------------------------------------------------------
+
+class ChecklistScheduler(object):
+    """A scheduler for the checklist sounds"""
+    def __init__(self, flight):
+        """Construct the checklist scheduler for the given flight."""
+        self._flight = flight
+        self._checklist = None
+        self._itemIndex = 0
+
+    def hotkeyPressed(self):
+        """Called when the checklist hotkey is pressed."""
+        flight = self._flight
+        config = flight.config
+        if config.enableChecklists and flight.aircraftType is not None:
+            if self._checklist is None:
+                self._checklist = config.getChecklist(flight.aircraftType)
+
+            index = self._itemIndex
+            if index>=len(self._checklist):
+                fs.sendMessage(const.MESSAGETYPE_INFORMATION,
+                               "End of checklist")
+            else:
+                startSound(self._checklist[index])
+                self._itemIndex += 1
 
 #------------------------------------------------------------------------------
