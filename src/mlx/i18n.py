@@ -131,6 +131,22 @@ class _English(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("aircraft_b736", "Boeing 737-600")
+        self.add("aircraft_b737", "Boeing 737-700")
+        self.add("aircraft_b738", "Boeing 737-800")
+        self.add("aircraft_b733", "Boeing 737-300")
+        self.add("aircraft_b734", "Boeing 737-400")
+        self.add("aircraft_b735", "Boeing 737-500")
+        self.add("aircraft_dh8d", "Bombardier Dash 8 Q400")
+        self.add("aircraft_b762", "Boeing 767-200")
+        self.add("aircraft_b763", "Boeing 767-300")
+        self.add("aircraft_crj2", "Canadair Regional Jet CRJ-200")
+        self.add("aircraft_f70",  "Fokker F70")
+        self.add("aircraft_dc3",  "Lisunov Li-2")
+        self.add("aircraft_t134", "Tupolev Tu-134")
+        self.add("aircraft_t154", "Tupolev Tu-154")
+        self.add("aircraft_yk40", "Yakovlev Yak-40")
+
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Cancel")
         self.add("button_yes", "_Yes")
@@ -625,6 +641,26 @@ class _English(_Strings):
                  "Select PIREP directory")
 
         self.add("chklst_title", "Checklist Editor")
+        self.add("chklst_aircraftType", "Aircraft _type:")
+        self.add("chklst_aircraftType_tooltip",
+                 "The type of the aircraft for which the checklist "
+                 "is being edited.")
+        self.add("chklst_add", "_Add to checklist")
+        self.add("chklst_add_tooltip",
+                 "Append the files selected on the left to the "
+                 "checklist on the right.")
+        self.add("chklst_remove", "_Remove")
+        self.add("chklst_remove_tooltip",
+                 "Remove the selected items from the checklist.")
+        self.add("chklst_moveUp", "Move _up")
+        self.add("chklst_moveUp_tooltip",
+                 "Move up the selected file(s) in the checklist.")
+        self.add("chklst_moveDown", "Move _down")
+        self.add("chklst_moveDown_tooltip",
+                 "Move down the selected file(s) in the checklist.")
+        self.add("chklst_filter_audio", "Audio files")
+        self.add("chklst_filter_all", "All files")
+        self.add("chklst_header", "Checklist files")
 
         self.add("prefs_sounds_frame_bg", "Background")
         self.add("prefs_sounds_enable",
@@ -764,6 +800,22 @@ class _Hungarian(_Strings):
 
     def initialize(self):
         """Initialize the strings."""
+        self.add("aircraft_b736", "Boeing 737-600")
+        self.add("aircraft_b737", "Boeing 737-700")
+        self.add("aircraft_b738", "Boeing 737-800")
+        self.add("aircraft_b733", "Boeing 737-300")
+        self.add("aircraft_b734", "Boeing 737-400")
+        self.add("aircraft_b735", "Boeing 737-500")
+        self.add("aircraft_dh8d", "Bombardier Dash 8 Q400")
+        self.add("aircraft_b762", "Boeing 767-200")
+        self.add("aircraft_b763", "Boeing 767-300")
+        self.add("aircraft_crj2", "Canadair Regional Jet CRJ-200")
+        self.add("aircraft_f70",  "Fokker F70")
+        self.add("aircraft_dc3",  "Liszunov Li-2")
+        self.add("aircraft_t134", "Tupoljev Tu-134")
+        self.add("aircraft_t154", "Tupoljev Tu-154")
+        self.add("aircraft_yk40", "Jakovlev Jak-40")
+
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Mégse")
         self.add("button_yes", "_Igen")

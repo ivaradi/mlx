@@ -79,6 +79,38 @@ AIRCRAFT_YK40 = 15
 
 #-------------------------------------------------------------------------------
 
+# The list of aircraft types that we know of
+# The order is mostly from most recent to oldest considering
+# Malev's history
+aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737, AIRCRAFT_B738,
+                 AIRCRAFT_DH8D,
+                 AIRCRAFT_F70, AIRCRAFT_CRJ2,
+                 AIRCRAFT_B762, AIRCRAFT_B763,
+                 AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
+                 AIRCRAFT_T154, AIRCRAFT_T134,
+                 AIRCRAFT_YK40, AIRCRAFT_DC3]
+
+#-------------------------------------------------------------------------------
+
+# A mapping of aircraft types to their ICAO codes
+icaoCodes = { AIRCRAFT_B736 : "B736",
+              AIRCRAFT_B737 : "B737",
+              AIRCRAFT_B738 : "B738",
+              AIRCRAFT_B733 : "B733",
+              AIRCRAFT_B734 : "B734",
+              AIRCRAFT_B735 : "B735",
+              AIRCRAFT_DH8D : "DH8D",
+              AIRCRAFT_B762 : "B762",
+              AIRCRAFT_B763 : "B763",
+              AIRCRAFT_CRJ2 : "CRJ2",
+              AIRCRAFT_F70  : "F70",
+              AIRCRAFT_DC3  : "DC3",
+              AIRCRAFT_T134 : "T134",
+              AIRCRAFT_T154 : "T154",
+              AIRCRAFT_YK40 : "YK40" }
+
+#-------------------------------------------------------------------------------
+
 # Flight stage: boarding
 STAGE_BOARDING = 1
 

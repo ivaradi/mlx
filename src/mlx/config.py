@@ -51,6 +51,60 @@ class Hotkey(object):
 
 #-------------------------------------------------------------------------------
 
+class Checklist(object):
+    """A checklist for a certain aircraft type."""
+    # The name of the section of the checklists
+    SECTION="checklists"
+    
+    @staticmethod
+    def fromConfig(config, aircraftType):
+        """Create a checklist for the given aircraft type from the given
+        config."""
+        baseName = "checklist." + const.icaoCodes[aircraftType] + "."
+        fileList = []
+        while True:
+            option = baseName + str(len(fileList))
+            if config.has_option(Checklist.SECTION, option):
+                fileList.append(config.get(Checklist.SECTION, option))
+            else:
+                break
+
+        return Checklist(fileList)
+
+    def __init__(self, fileList = None):
+        """Construct the check list with the given file list."""
+        self._fileList = [] if fileList is None else fileList[:]
+
+    def clone(self):
+        """Clone the checklist."""
+        return Checklist(self._fileList)
+
+    def toConfig(self, config, aircraftType):
+        """Add this checklist to the given config."""
+        baseName = "checklist." + const.icaoCodes[aircraftType] + "."
+        for index in range(0, len(self._fileList)):
+            option = baseName + str(index)
+            config.set(Checklist.SECTION, option,
+                       self._fileList[index])
+
+    def __eq__(self, other):
+        """Determine if the checklist is equal to the given other one."""
+        return self._fileList == other._fileList
+
+    def __len__(self):
+        """Get the length of the file list."""
+        return len(self._fileList)
+
+    def __getitem__(self, index):
+        """Get the file with the given index."""
+        return self._fileList[index]
+
+    def __iter__(self):
+        """Iterate over the files."""
+        return iter(self._fileList)
+
+#-------------------------------------------------------------------------------
+
 class Config(object):
     """Our configuration."""
     DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
@@ -88,6 +142,10 @@ class Config(object):
         self._updateURL = Config.DEFAULT_UPDATE_URL
 
         self._messageTypeLevels = {}
+
+        self._checklists = {}
+        for aircraftType in const.aircraftTypes:
+            self._checklists[aircraftType] = Checklist()
         
         self._modified = False
 
@@ -345,6 +403,16 @@ class Config(object):
             self._updateURL = updateURL
             self._modified = True
 
+    def getChecklist(self, aircraftType):
+        """Get the checklist for the given aircraft type."""
+        return self._checklists[aircraftType]
+
+    def setChecklist(self, aircraftType, checklist):
+        """Set the checklist for the given aircraft type."""
+        if checklist!=self._checklists[aircraftType]:
+            self._checklists[aircraftType] = checklist.clone()
+            self._modified = True
+
     def load(self):
         """Load the configuration from its default location."""
         config = ConfigParser.RawConfigParser()
@@ -397,6 +465,10 @@ class Config(object):
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
                                     Config.DEFAULT_UPDATE_URL)
+
+        for aircraftType in const.aircraftTypes:
+            self._checklists[aircraftType] = \
+                Checklist.fromConfig(config, aircraftType)
 
         self._modified = False
 
@@ -458,6 +530,10 @@ class Config(object):
         config.set("update", "auto",
                    "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
+
+        config.add_section(Checklist.SECTION)
+        for aircraftType in const.aircraftTypes:
+            self._checklists[aircraftType].toConfig(config, aircraftType)
 
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,

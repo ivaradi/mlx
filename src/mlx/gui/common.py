@@ -1,6 +1,7 @@
 # Common things for the GUI
 
 import mlx.const as _const
+from mlx.i18n import xstr
 
 import os
 
@@ -23,12 +24,14 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     MESSAGETYPE_ERROR = gtk.MESSAGE_ERROR
     MESSAGETYPE_QUESTION = gtk.MESSAGE_QUESTION
     MESSAGETYPE_INFO = gtk.MESSAGE_INFO
+
     RESPONSETYPE_OK = gtk.RESPONSE_OK
     RESPONSETYPE_YES = gtk.RESPONSE_YES
     RESPONSETYPE_NO = gtk.RESPONSE_NO
     RESPONSETYPE_ACCEPT = gtk.RESPONSE_ACCEPT
     RESPONSETYPE_REJECT = gtk.RESPONSE_REJECT
     RESPONSETYPE_CANCEL = gtk.RESPONSE_CANCEL
+
     ACCEL_VISIBLE = gtk.ACCEL_VISIBLE
     CONTROL_MASK = gdk.CONTROL_MASK
     DIALOG_MODAL = gtk.DIALOG_MODAL
@@ -47,6 +50,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER
     FILE_CHOOSER_ACTION_OPEN = gtk.FILE_CHOOSER_ACTION_OPEN
     FILE_CHOOSER_ACTION_SAVE = gtk.FILE_CHOOSER_ACTION_SAVE
+
+    SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
@@ -88,6 +93,8 @@ else:
     FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FileChooserAction.SELECT_FOLDER
     FILE_CHOOSER_ACTION_OPEN = gtk.FileChooserAction.OPEN
     FILE_CHOOSER_ACTION_SAVE = gtk.FileChooserAction.SAVE
+
+    SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
@@ -189,5 +196,24 @@ gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
 #------------------------------------------------------------------------------
 
 WINDOW_TITLE_BASE = "MAVA Logger X " + _const.VERSION
+
+#------------------------------------------------------------------------------
+
+# A mapping of aircraft types to their screen names
+aircraftNames = { _const.AIRCRAFT_B736 : xstr("aircraft_b736"),
+                  _const.AIRCRAFT_B737 : xstr("aircraft_b737"),
+                  _const.AIRCRAFT_B738 : xstr("aircraft_b738"),
+                  _const.AIRCRAFT_B733 : xstr("aircraft_b733"),
+                  _const.AIRCRAFT_B734 : xstr("aircraft_b734"),
+                  _const.AIRCRAFT_B735 : xstr("aircraft_b735"),
+                  _const.AIRCRAFT_DH8D : xstr("aircraft_dh8d"),
+                  _const.AIRCRAFT_B762 : xstr("aircraft_b762"),
+                  _const.AIRCRAFT_B763 : xstr("aircraft_b763"),
+                  _const.AIRCRAFT_CRJ2 : xstr("aircraft_crj2"),
+                  _const.AIRCRAFT_F70  : xstr("aircraft_f70"),
+                  _const.AIRCRAFT_DC3  : xstr("aircraft_dc3"),
+                  _const.AIRCRAFT_T134 : xstr("aircraft_t134"),
+                  _const.AIRCRAFT_T154 : xstr("aircraft_t154"),
+                  _const.AIRCRAFT_YK40 : xstr("aircraft_yk40") }
 
 #------------------------------------------------------------------------------
