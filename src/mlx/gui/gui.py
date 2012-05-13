@@ -154,6 +154,8 @@ class GUI(fs.ConnectionListener):
         self._lastLoadedPIREP = None
 
         self._hotkeySetID = None
+        self._pilotHotkeyIndex = None
+        self._checklistHotkeyIndex = None
 
     @property
     def mainWindow(self):
@@ -1131,10 +1133,23 @@ class GUI(fs.ConnectionListener):
     def _listenHotkeys(self):
         """Setup the hotkeys based on the configuration."""
         if self._hotkeySetID is None and self._simulator is not None:
-            self._hotkeySetID = \
-                self._simulator.listenHotkeys([self.config.pilotHotkey,
-                                               self.config.checklistHotkey],
-                                              self._handleHotkeys)
+            self._pilotHotkeyIndex = None
+            self._checklistHotkeyIndex = None
+
+            hotkeys = []
+
+            config = self.config
+            if config.enableSounds and config.pilotControlsSounds:
+                self._pilotHotkeyIndex = len(hotkeys)
+                hotkeys.append(config.pilotHotkey)
+
+            if config.enableChecklists:
+                self._checklistHotkeyIndex = len(hotkeys)
+                hotkeys.append(config.checklistHotkey)
+
+            if hotkeys:
+                self._hotkeySetID = \
+                    self._simulator.listenHotkeys(hotkeys, self._handleHotkeys)
 
     def _clearHotkeys(self):
         """Clear the hotkeys."""
@@ -1146,7 +1161,11 @@ class GUI(fs.ConnectionListener):
         """Handle the hotkeys."""
         if id==self._hotkeySetID:
             for index in hotkeys:
-                if index==0:
+                if index==self._pilotHotkeyIndex:
+                    print "gui.GUI._handleHotkeys: pilot hotkey pressed"
                     self._flight.pilotHotkeyPressed()
-                else:
+                elif index==self._checklistHotkeyIndex:
+                    print "gui.GUI._handleHotkeys: checklist hotkey pressed"
                     self._flight.checklistHotkeyPressed()
+                else:
+                    print "gui.GUI._handleHotkeys: unhandled hotkey index:", index
