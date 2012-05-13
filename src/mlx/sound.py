@@ -75,11 +75,12 @@ if os.name=="nt":
                 with self._requestCondition:
                     if not self._requests:
                         if self._pending:
-                            timeout = max(time.time() - self._pending[0][0],
+                            timeout = max(self._pending[0][0] - time.time(),
                                           0.0)
                         else:
                             timeout = 10.0
-                            
+
+                        #print "Waiting", timeout
                         self._requestCondition.wait(timeout)
 
                     requests = []
