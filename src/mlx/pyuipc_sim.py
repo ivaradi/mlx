@@ -140,6 +140,9 @@ class Values(object):
     # Engine index: engine #3
     ENGINE_3 = 2
 
+    # The number of hotkey entries
+    HOTKEY_SIZE = 56
+
     @staticmethod
     def _readFrequency(frequency):
         """Convert the given frequency into BCD."""
@@ -251,15 +254,19 @@ class Values(object):
         self.message = ""
         self.messageDuration = 0
 
-    def read(self, offset):
+        self.hotkeyTable = []
+        for i in range(0, Values.HOTKEY_SIZE):
+            self.hotkeyTable.append([0, 0, 0, 0])
+
+    def read(self, offset, type):
         """Read the value at the given offset."""
         try:
-            return self._read(offset)
+            return self._read(offset, type)
         except Exception, e:
             print "failed to read offset %04x: %s" % (offset, str(e))
             raise FSUIPCException(ERR_DATA)
 
-    def _read(self, offset):
+    def _read(self, offset, type):
         """Read the value at the given offset."""
         if offset==0x023a:         # Second of time
             return self._readUTC().tm_sec
@@ -431,6 +438,31 @@ class Values(object):
             radioAltitude = (self.altitude - 517) \
                 if self.radioAltitude is None else self.radioAltitude
             return (radioAltitude * const.FEETTOMETRES * 65536.0)
+        elif offset==0x320c:
+            return Values.HOTKEY_SIZE
+        elif offset>=0x3210 and offset<0x3210+Values.HOTKEY_SIZE*4:
+            tableOffset = offset - 0x3210
+            hotkeyIndex = tableOffset / 4
+            index = tableOffset % 4
+            if type=="b" or type=="c":
+                return self.hotkeyTable[hotkeyIndex][index]
+            elif type=="d" or type=="u":
+                if index==0:
+                    hotkey = self.hotkeyTable[hotkeyIndex]
+                    value = hotkey[3]
+                    value <<= 8
+                    value |= hotkey[2]
+                    value <<= 8
+                    value |= hotkey[1]
+                    value <<= 8
+                    value |= hotkey[0]
+                    return value
+                else:
+                    print "Unhandled offset: %04x" % (offset,)
+                    raise FSUIPCException(ERR_DATA)
+            else:
+                print "Unhandled offset: %04x" % (offset,)
+                raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             return self.messageDuration
         elif offset==0x3380:       # Message
@@ -447,15 +479,15 @@ class Values(object):
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
 
-    def write(self, offset, value):
+    def write(self, offset, value, type):
         """Write the value at the given offset."""
         try:
-            return self._write(offset, value)
+            return self._write(offset, value, type)
         except Exception, e:
             print "failed to write offset %04x: %s" % (offset, str(e))
             raise FSUIPCException(ERR_DATA)
 
-    def _write(self, offset, value):
+    def _write(self, offset, value, type):
         """Write the given value at the given offset."""
         if offset==0x023a:         # Second of time
             self._updateTimeOffset(5, value)
@@ -616,6 +648,27 @@ class Values(object):
             raise FSUIPCException(ERR_DATA)
         elif offset==0x31e4:       # Radio altitude
             raise FSUIPCException(ERR_DATA)
+        elif offset==0x320c:
+            return Values.HOTKEY_SIZE
+        elif offset>=0x3210 and offset<0x3210+Values.HOTKEY_SIZE*4:
+            tableOffset = offset - 0x3210
+            hotkeyIndex = tableOffset / 4
+            index = tableOffset % 4
+            if type=="b" or type=="c":
+                self.hotkeyTable[hotkeyIndex][index] = value
+            elif type=="d" or type=="u":
+                if index==0:
+                    hotkey = self.hotkeyTable[hotkeyIndex]
+                    hotkey[0] = value & 0xff
+                    hotkey[1] = (value>>8) & 0xff
+                    hotkey[2] = (value>>16) & 0xff
+                    hotkey[3] = (value>>24) & 0xff
+                else:
+                    print "Unhandled offset: %04x for type '%s'" % (offset, type)
+                    raise FSUIPCException(ERR_DATA)
+            else:
+                print "Unhandled offset: %04x for type '%s'" % (offset, type)
+                raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             self.messageDuration = value
         elif offset==0x3380:       # Message
@@ -721,7 +774,7 @@ def prepare_data(pattern, forRead = True):
 def read(data):
     """Read the given data."""
     if opened:
-        return [values.read(offset) for (offset, type) in data]
+        return [values.read(offset, type) for (offset, type) in data]
     else:
         raise FSUIPCException(ERR_OPEN)
             
@@ -731,7 +784,7 @@ def write(data):
     """Write the given data."""
     if opened:
         for (offset, type, value) in data:
-            values.write(offset, value)
+            values.write(offset, value, type)
     else:
         raise FSUIPCException(ERR_OPEN)
             
@@ -1162,6 +1215,11 @@ class CLI(cmd.Cmd):
         self._valueHandlers["message"] = (0x3380, -128,
                                           lambda value: value,
                                           lambda word: word)
+
+        for i in range(0, Values.HOTKEY_SIZE):
+            self._valueHandlers["hotkey%d" % (i,)] = (0x3210 + i*4, "u",
+                                                      lambda value: "0x%08x" % (value,),
+                                                      lambda word: long(word, 16))
     def default(self, line):
         """Handle unhandle commands."""
         if line=="EOF":
