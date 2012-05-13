@@ -830,7 +830,7 @@ class _Hungarian(_Strings):
         self.add("quit_question", "Biztosan ki akarsz lépni?")
 
         self.add("menu_tools", "Eszközök")
-        self.add("menu_tools_chklst", "_Ellenörzőlista szerkesztő")
+        self.add("menu_tools_chklst", "_Ellenőrzőlista szerkesztő")
         self.add("menu_tools_chklst_key", "e")
         self.add("menu_tools_prefs", "_Beállítások")
         self.add("menu_tools_prefs_key", "b")
@@ -1261,7 +1261,27 @@ class _Hungarian(_Strings):
         self.add("gates_plane_parking", "PARKOL")
         self.add("gates_plane_unknown", "ISMERETLEN")
                  
-        self.add("chklst_title", "Ellenörzőlista szerkesztő")
+        self.add("chklst_title", "Ellenőrzőlista szerkesztő")
+        self.add("chklst_aircraftType", "Repülőgép _típusa:")
+        self.add("chklst_aircraftType_tooltip",
+                 "Az a típus, amelyhez tartozó ellenőrzőlista "
+                 "szerkesztése történik.")
+        self.add("chklst_add", "Listához hozzá_adás")
+        self.add("chklst_add_tooltip",
+                 "A bal oldalt kiválasztott fájloknak a jobb "
+                 "oldali ellenőrzőlistához fűzése.")
+        self.add("chklst_remove", "_Törlés")
+        self.add("chklst_remove_tooltip",
+                 "A kijelölt fájl(ok) törlése az ellenőrzőlistából.")
+        self.add("chklst_moveUp", "Mozgatás _felfelé")
+        self.add("chklst_moveUp_tooltip",
+                 "Az ellenőrzőlistából kijelölt fájl(ok) eggyel feljebb mozgatása.")
+        self.add("chklst_moveDown", "Mozgatás _lefelé")
+        self.add("chklst_moveDown_tooltip",
+                 "Az ellenőrzőlistából kijelölt fájl(ok) eggyel lejjebb mozgatása.")
+        self.add("chklst_filter_audio", "Audio fájlok")
+        self.add("chklst_filter_all", "Összes fájl")
+        self.add("chklst_header", "Ellenőrzőlista fájljai")
 
         self.add("prefs_title", "Beállítások")
         self.add("prefs_tab_general", "_Általános")
@@ -1358,18 +1378,18 @@ class _Hungarian(_Strings):
                  "Ha kijelölöd, egy, a spoilerek kibocsájtását imitáló "
                  "hang hallatszik földetérés után, ha a spoilerek "
                  "automatikusan kinyílnak.")
-        self.add("prefs_sounds_frame_checklists", "Ellenörzőlisták")
+        self.add("prefs_sounds_frame_checklists", "Ellenőrzőlisták")
         self.add("prefs_sounds_enableChecklists",
-                 "_Repülőgép-specifikus ellenörzőlisták engedélyezése")
+                 "_Repülőgép-specifikus ellenőrzőlisták engedélyezése")
         self.add("prefs_sounds_enableChecklists_tooltip",
                  "Ha kijelölöd, a program a lenti gyorsbillentyű "
                  "megnyomásokor a használt repülőgép típushoz tartozó "
-                 "ellenörzőlista következő elemét játssza le.")
+                 "ellenőrzőlista következő elemét játssza le.")
         self.add("prefs_sounds_checklistHotkey",
                  "E_llenörzőlista gyorsbillentyű:")
         self.add("prefs_sounds_checklistHotkey_tooltip",
                  "A billentyű, amit az esetlegesen megadott módosítókkal "
-                 "együtt le kell ütni, hogy az ellenörzőlista következő "
+                 "együtt le kell ütni, hogy az ellenőrzőlista következő "
                  "eleme elhangozzék.")
         self.add("prefs_sounds_checklistHotkeyCtrl_tooltip",
                  "Ha kijelölöd, a Ctrl billentyűt is le kell nyomni a "
