@@ -18,6 +18,7 @@ import mlx.flight as flight
 import mlx.logger as logger
 import mlx.acft as acft
 import mlx.web as web
+import mlx.singleton as singleton
 from  mlx.i18n import xstr
 from mlx.pirep import PIREP
 
@@ -305,8 +306,10 @@ class GUI(fs.ConnectionListener):
                                     self.config.updateURL,
                                     self._mainWindow)
             self._updater.start()
-
+        
+        singleton.raiseCallback = self.raiseCallback
         gtk.main()
+        singleton.raiseCallback = None
 
         self._disconnect()
 
@@ -498,6 +501,16 @@ class GUI(fs.ConnectionListener):
            (event.changed_mask&iconified)!=0 and \
            (event.new_window_state&iconified)!=0:
             self.hideMainWindow(savePosition = False)
+
+    def raiseCallback(self):
+        """Callback for the singleton handling code."""
+        gobject.idle_add(self.raiseMainWindow)
+
+    def raiseMainWindow(self):
+        """SHow the main window if invisible, and raise it."""
+        if not self._mainWindow.get_visible():
+            self.showMainWindow()
+        self._mainWindow.present()
 
     def hideMainWindow(self, savePosition = True):
         """Hide the main window and save its position."""

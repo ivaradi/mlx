@@ -43,6 +43,11 @@ def restart(args = []):
 
 def main():
     """The main operation of the program."""
+    from singleton import SingleInstance, raiseCallbackWrapper
+
+    instance = SingleInstance("mlx", raiseCallbackWrapper)
+    if not instance: return
+
     programDirectory = os.path.dirname(sys.argv[0])
 
     config = Config()
@@ -78,4 +83,5 @@ def main():
 #--------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main()
+    if instance:
+        main()
