@@ -630,8 +630,13 @@ class _English(_Strings):
         self.add("prefs_syncFSTime",
                  "S_ynchronize the time in FS with the computer's clock")
         self.add("prefs_syncFSTime_tooltip",
-                 "If this is checked the flight simulator's internal clock "
+                 "If this is checked, the flight simulator's internal clock "
                  "will always be synchronized to the computer's clock.")
+        self.add("prefs_usingFS2Crew",
+                 "Using FS_2Crew")
+        self.add("prefs_usingFS2Crew_tooltip",
+                 "If this is checked, the logger will take into account, "
+                 "that you are using the FS2Crew addon.")
         self.add("prefs_pirepDirectory",
                  "_PIREP directory:")
         self.add("prefs_pirepDirectory_tooltip",
@@ -1334,6 +1339,11 @@ class _Hungarian(_Strings):
         self.add("prefs_syncFSTime_tooltip",
                  "Ha ez bejelölöd, a szimulátor belső óráját a program "
                  "szinkronban tartja a számítógép órájával.")
+        self.add("prefs_usingFS2Crew",
+                 "Használom az FS_2Crew kiegészítőt")
+        self.add("prefs_usingFS2Crew_tooltip",
+                 "Ha ezt bejelölöd, a program figyelembe veszi, "
+                 "hogy az FS2Crew kiegészítőt használod.")
         self.add("prefs_pirepDirectory",
                  "_PIREP-ek könyvtára:")
         self.add("prefs_pirepDirectory_tooltip",

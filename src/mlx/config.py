@@ -124,6 +124,7 @@ class Config(object):
         self._onlineACARS = True
         self._flareTimeFromFS = False
         self._syncFSTime = False
+        self._usingFS2Crew = False
 
         self._pirepDirectory = None
 
@@ -259,6 +260,18 @@ class Config(object):
         machine's clock."""
         if syncFSTime!=self._syncFSTime:
             self._syncFSTime = syncFSTime
+            self._modified = True
+
+    @property
+    def usingFS2Crew(self):
+        """Get whether the FS2Crew addon is being used."""
+        return self._usingFS2Crew
+
+    @usingFS2Crew.setter
+    def usingFS2Crew(self, usingFS2Crew):
+        """Set whether the FS2Crew addon is being used."""
+        if usingFS2Crew!=self._usingFS2Crew:
+            self._usingFS2Crew = usingFS2Crew
             self._modified = True
 
     @property
@@ -438,6 +451,9 @@ class Config(object):
         self._syncFSTime = self._getBoolean(config, "general",
                                             "syncFSTime",
                                             False)
+        self._usingFS2Crew = self._getBoolean(config, "general",
+                                              "usingFS2Crew",
+                                              False)
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
@@ -498,6 +514,8 @@ class Config(object):
                    "yes" if self._flareTimeFromFS else "no")
         config.set("general", "syncFSTime",
                    "yes" if self._syncFSTime else "no")
+        config.set("general", "usingFS2Crew",
+                   "yes" if self._usingFS2Crew else "no")
 
         if self._pirepDirectory is not None:
             config.set("general", "pirepDirectory", self._pirepDirectory)

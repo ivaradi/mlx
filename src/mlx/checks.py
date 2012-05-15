@@ -548,7 +548,7 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
         isTupolev = aircraft.type in [const.AIRCRAFT_T134, 
                                       const.AIRCRAFT_T154]
         return (flight.stage!=const.STAGE_PARKING or \
-                not flight.options.fs2Crew) and \
+                not flight.config.usingFS2Crew) and \
                 not state.antiCollisionLightsOn and \
                 ((isTupolev and max(state.n1[1:])>5) or \
                  (not isTupolev and max(state.n1)>5))
@@ -720,8 +720,8 @@ class WeightChecker(PatientFaultChecker):
 
         limit = self.getLimit(flight, aircraft, state)
         if limit is not None:
-            if flight.options.compensation is not None:
-                limit += flight.options.compensation
+            #if flight.options.compensation is not None:
+            #    limit += flight.options.compensation
             return self.getWeight(state)>limit
 
         return False

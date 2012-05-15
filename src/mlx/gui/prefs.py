@@ -227,6 +227,7 @@ class Preferences(gtk.Dialog):
         self._onlineACARS.set_active(config.onlineACARS)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
         self._syncFSTime.set_active(config.syncFSTime)
+        self._usingFS2Crew.set_active(config.usingFS2Crew)
 
         pirepDirectory = config.pirepDirectory
         self._pirepDirectory.set_text("" if pirepDirectory is None
@@ -266,6 +267,7 @@ class Preferences(gtk.Dialog):
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
         config.syncFSTime = self._syncFSTime.get_active()
+        config.usingFS2Crew = self._usingFS2Crew.get_active()
         config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
 
         for messageType in const.messageTypes:
@@ -352,6 +354,11 @@ class Preferences(gtk.Dialog):
         self._syncFSTime.set_use_underline(True)
         self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
         mainBox.pack_start(self._syncFSTime, False, False, 4)
+
+        self._usingFS2Crew = gtk.CheckButton(xstr("prefs_usingFS2Crew"))
+        self._usingFS2Crew.set_use_underline(True)
+        self._usingFS2Crew.set_tooltip_text(xstr("prefs_usingFS2Crew_tooltip"))
+        mainBox.pack_start(self._usingFS2Crew, False, False, 4)
 
         pirepBox = gtk.HBox()
         mainBox.pack_start(pirepBox, False, False, 4)
