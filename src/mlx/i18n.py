@@ -230,10 +230,10 @@ class _English(_Strings):
         self.add("login_button_tooltip", "Click to log in.")
         self.add("login_busy", "Logging in...")
         self.add("login_invalid", "Invalid pilot's ID or password.")
-        self.add("login_entranceExam_invalid",
-                 "Invalid pilot's ID or not registered for exam.")
         self.add("login_invalid_sec",
                  "Check the ID and try to reenter the password.")
+        self.add("login_entranceExam_invalid",
+                 "Invalid pilot's ID or not registered for exam.")
         self.add("login_entranceExam_invalid_sec",
                  "Check the ID and make sure that you are "
                  "allowed to take your entrance exam.")
@@ -253,7 +253,7 @@ class _English(_Strings):
         self.add("flightsel_deptime", "Departure time [UTC]")
         self.add("flightsel_from", "From")
         self.add("flightsel_to", "To")
-        self.add("flightsel_load", "Load flight from _file")
+        self.add("flightsel_load", "L_oad flight from file")
         self.add("flightsel_load_tooltip",
                  "Click here to load a flight from a file, "
                  "and add it to the list above.")
@@ -918,12 +918,20 @@ class _Hungarian(_Strings):
                  "nem kell mindig újból beírnod. Vedd azonban figyelembe, "
                  "hogy a jelszót szövegként tároljuk, így bárki elolvashatja, "
                  "aki hozzáfér a fájljaidhoz.")
+        self.add("login_entranceExam", "_Ellenőrző repülés")
+        self.add("login_entranceExam_tooltip",
+                 "Ha ezt bejelölöd, ellenörző repülésre jelentkezhetsz be.")
         self.add("button_login", "_Bejelentkezés")
         self.add("login_button_tooltip", "Kattints ide a bejelentkezéshez.")
         self.add("login_busy", "Bejelentkezés...")
         self.add("login_invalid", "Érvénytelen azonosító vagy jelszó.")
         self.add("login_invalid_sec",
                  "Ellenőrízd az azonosítót, és próbáld meg újra beírni a jelszót.")
+        self.add("login_entranceExam_invalid",
+                 "Érvénytelen azonosító, vagy nem regisztráltak a vizsgára.")
+        self.add("login_entranceExam_invalid_sec",
+                 "Ellenőrízd az azonosítót, és bizonyosdj meg "
+                 "arról, hogy végrehajthatod-e az ellenőrző repülést.")
         self.add("login_failconn",
                  "Nem sikerült kapcsolódni a MAVA honlaphoz.")
         self.add("login_failconn_sec", "Próbáld meg pár perc múlva.")
@@ -942,6 +950,16 @@ class _Hungarian(_Strings):
         self.add("flightsel_deptime", "Indulás ideje [UTC]")
         self.add("flightsel_from", "Honnan")
         self.add("flightsel_to", "Hová")
+        self.add("flightsel_load", "Járat betöltése _fájlból")
+        self.add("flightsel_load_tooltip",
+                 "Kattints ide, hogy fájlból betölthess egy járatot, "
+                 "ami bekerül a fenti listába.")
+        self.add("flightsel_load_title", "Járat betöltése fájlból")
+        self.add("flightsel_filter_flights", "Járat fájlok")
+        self.add("flightsel_load_failed",
+                 "Nem tudtam betölteni a járatfájlt.")
+        self.add("flightsel_load_failed_sec",
+                 "A további részleteket lásd a debug naplóban.")
 
         self.add("fleet_busy", "Flottaadatok letöltése...")
         self.add("fleet_failed",
