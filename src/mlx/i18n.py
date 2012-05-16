@@ -665,6 +665,9 @@ class _English(_Strings):
                  "saving a PIREP.")
         self.add("prefs_pirepDirectory_browser_title",
                  "Select PIREP directory")
+        self.add("prefs_frame_gui", "GUI")
+        self.add("prefs_frame_online", "MAVA Online Systems")
+        self.add("prefs_frame_simulator", "Simulator")
 
         self.add("chklst_title", "Checklist Editor")
         self.add("chklst_aircraftType", "Aircraft _type:")
@@ -1389,6 +1392,9 @@ class _Hungarian(_Strings):
                  "a PIREP-ek mentésekor.")
         self.add("prefs_pirepDirectory_browser_title",
                  "Válaszd ki a PIREP-ek könyvtárát")
+        self.add("prefs_frame_gui", "Grafikus felület")
+        self.add("prefs_frame_online", "MAVA online rendszerek")
+        self.add("prefs_frame_simulator", "Szimulátor")
 
         self.add("prefs_sounds_frame_bg", "Háttérhangok")
         self.add("prefs_sounds_enable",

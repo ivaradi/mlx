@@ -298,13 +298,15 @@ class Preferences(gtk.Dialog):
         """Build the page for the general settings."""
         mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 0.0)
-        mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
+        mainAlignment.set_padding(padding_top = 0, padding_bottom = 8,
                                   padding_left = 4, padding_right = 4)
         mainBox = gtk.VBox()
         mainAlignment.add(mainBox)
 
+        guiBox = self._createFrame(mainBox, xstr("prefs_frame_gui"))
+        
         languageBox = gtk.HBox()
-        mainBox.pack_start(languageBox, False, False, 4)
+        guiBox.pack_start(languageBox, False, False, 4)
 
         label = gtk.Label(xstr("prefs_language"))
         label.set_use_underline(True)
@@ -333,35 +335,39 @@ class Preferences(gtk.Dialog):
         self._hideMinimizedWindow = gtk.CheckButton(xstr("prefs_hideMinimizedWindow"))
         self._hideMinimizedWindow.set_use_underline(True)
         self._hideMinimizedWindow.set_tooltip_text(xstr("prefs_hideMinimizedWindow_tooltip"))
-        mainBox.pack_start(self._hideMinimizedWindow, False, False, 4)
+        guiBox.pack_start(self._hideMinimizedWindow, False, False, 4)
+
+        onlineBox = self._createFrame(mainBox, xstr("prefs_frame_online"))        
 
         self._onlineGateSystem = gtk.CheckButton(xstr("prefs_onlineGateSystem"))
         self._onlineGateSystem.set_use_underline(True)
         self._onlineGateSystem.set_tooltip_text(xstr("prefs_onlineGateSystem_tooltip"))
-        mainBox.pack_start(self._onlineGateSystem, False, False, 4)
+        onlineBox.pack_start(self._onlineGateSystem, False, False, 4)
 
         self._onlineACARS = gtk.CheckButton(xstr("prefs_onlineACARS"))
         self._onlineACARS.set_use_underline(True)
         self._onlineACARS.set_tooltip_text(xstr("prefs_onlineACARS_tooltip"))
-        mainBox.pack_start(self._onlineACARS, False, False, 4)
+        onlineBox.pack_start(self._onlineACARS, False, False, 4)
+
+        simulatorBox = self._createFrame(mainBox, xstr("prefs_frame_simulator"))
 
         self._flareTimeFromFS = gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
         self._flareTimeFromFS.set_use_underline(True)
         self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
-        mainBox.pack_start(self._flareTimeFromFS, False, False, 4)
+        simulatorBox.pack_start(self._flareTimeFromFS, False, False, 4)
                                        
         self._syncFSTime = gtk.CheckButton(xstr("prefs_syncFSTime"))
         self._syncFSTime.set_use_underline(True)
         self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
-        mainBox.pack_start(self._syncFSTime, False, False, 4)
+        simulatorBox.pack_start(self._syncFSTime, False, False, 4)
 
         self._usingFS2Crew = gtk.CheckButton(xstr("prefs_usingFS2Crew"))
         self._usingFS2Crew.set_use_underline(True)
         self._usingFS2Crew.set_tooltip_text(xstr("prefs_usingFS2Crew_tooltip"))
-        mainBox.pack_start(self._usingFS2Crew, False, False, 4)
+        simulatorBox.pack_start(self._usingFS2Crew, False, False, 4)
 
         pirepBox = gtk.HBox()
-        mainBox.pack_start(pirepBox, False, False, 4)
+        mainBox.pack_start(pirepBox, False, False, 8)
 
         label = gtk.Label(xstr("prefs_pirepDirectory"))
         label.set_use_underline(True)
@@ -378,6 +384,22 @@ class Preferences(gtk.Dialog):
         pirepBox.pack_start(self._pirepDirectoryButton, False, False, 4)
         
         return mainAlignment
+
+    def _createFrame(self, mainBox, label):
+        """Create a frame with an inner alignment and VBox.
+
+        Return the vbox."""
+        frame = gtk.Frame(label = label)
+        mainBox.pack_start(frame, False, False, 4)
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 1.0, yscale = 0.0)
+        alignment.set_padding(padding_top = 4, padding_bottom = 0,
+                              padding_left = 0, padding_right = 0)
+        frame.add(alignment)
+        vbox = gtk.VBox()
+        alignment.add(vbox)
+
+        return vbox
 
     def _setLanguage(self, language):
         """Set the language to the given one."""
