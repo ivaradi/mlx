@@ -71,7 +71,7 @@ class ChecklistEditor(gtk.Dialog):
         self._fileChooser.add_filter(filter)
             
         filter = gtk.FileFilter()
-        filter.set_name(xstr("chklst_filter_all"))
+        filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         self._fileChooser.add_filter(filter)
 

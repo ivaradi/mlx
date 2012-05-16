@@ -10,6 +10,7 @@ import mlx.util as util
 from mlx.pirep import PIREP
 from mlx.i18n import xstr
 from mlx.sound import startSound
+import mlx.web as web
 
 import datetime
 import time
@@ -214,7 +215,7 @@ class LoginPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(2, 3)
+        table = gtk.Table(4, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
         alignment.add(table)
@@ -228,7 +229,7 @@ class LoginPage(Page):
         table.attach(labelAlignment, 0, 1, 0, 1)
 
         self._pilotID = gtk.Entry()
-        self._pilotID.connect("changed", self._setLoginButton)
+        self._pilotID.connect("changed", self._setControls)
         self._pilotID.set_tooltip_text(xstr("login_pilotID_tooltip"))
         table.attach(self._pilotID, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._pilotID)
@@ -242,7 +243,7 @@ class LoginPage(Page):
 
         self._password = gtk.Entry()
         self._password.set_visibility(False)
-        self._password.connect("changed", self._setLoginButton)
+        self._password.connect("changed", self._setControls)
         self._password.set_tooltip_text(xstr("login_password_tooltip"))
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
@@ -252,10 +253,22 @@ class LoginPage(Page):
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
+        self._entranceExam = gtk.CheckButton(xstr("login_entranceExam"))
+        self._entranceExam.set_use_underline(True)
+        self._entranceExam.set_tooltip_text(xstr("login_entranceExam_tooltip"))
+        self._entranceExam.connect("toggled", self._setControls)
+        table.attach(self._entranceExam, 1, 2, 3, 4, ypadding = 12)
+
         self._loginButton = self.addButton(xstr("button_login"), default = True)
-        self._loginButton.set_sensitive(False)
         self._loginButton.connect("clicked", self._loginClicked)
-        self._loginButton.set_tooltip_text(xstr("login_button_tooltip"))        
+        self._loginButton.set_tooltip_text(xstr("login_button_tooltip"))
+
+
+    @property
+    def entranceExam(self):
+        """Get whether an entrance exam is being performed."""
+        return self._entranceExam.get_active() and \
+               self._pilotID.get_text()!=""
 
     def activate(self):
         """Activate the page."""
@@ -263,23 +276,39 @@ class LoginPage(Page):
         self._pilotID.set_text(config.pilotID)
         self._password.set_text(config.password)
         self._rememberButton.set_active(config.rememberPassword)
+        self._setControls(None)    
 
-    def _setLoginButton(self, entry):
-        """Set the login button's sensitivity.
+    def _setControls(self, entry = None):
+        """Set the sensitivity of the various controls.
 
-        The button is sensitive only if both the pilot ID and the password
-        fields contain values."""
-        self._loginButton.set_sensitive(self._pilotID.get_text()!="" and
-                                        self._password.get_text()!="")
+        The login button is sensitive only if both the pilot ID and the
+        password fields contain values.
+
+        The password field is sensitive only, if the entrance exam checkbox is
+        not selected.
+
+        The remember password checkbox is sensitive only, if the password field
+        contains text.
+
+        The entrance exam checkbox is senstive only, if the pilot ID is not
+        empty."""
+        pilotID = self._pilotID.get_text()
+        password = self._password.get_text()
+        entranceExam = self._entranceExam.get_active()
+        self._password.set_sensitive(not entranceExam)
+        self._rememberButton.set_sensitive(password!="" and not entranceExam)
+        self._entranceExam.set_sensitive(pilotID!="")
+        self._loginButton.set_sensitive(pilotID!="" and
+                                        (password!="" or entranceExam))
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
-        self._loginButton.set_sensitive(False)
         gui = self._wizard.gui
         gui.beginBusy(xstr("login_busy"))
         gui.webHandler.login(self._loginResultCallback,
-                            self._pilotID.get_text(),
-                            self._password.get_text())
+                             self._pilotID.get_text(),
+                             self._password.get_text(),
+                             entranceExam = self.entranceExam)
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""
@@ -305,12 +334,18 @@ class LoginPage(Page):
                 self._wizard._loginResult = result
                 self._wizard.nextPage()
             else:
+                message = xstr("login_entranceExam_invalid"
+                               if self.entranceExam else
+                               xstr("login_invalid"))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
-                                           message_format = xstr("login_invalid"))
+                                           message_format = message)
                 dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
-                dialog.format_secondary_markup(xstr("login_invalid_sec"))
+                secondary = xstr("login_entranceExam_invalid_sec"
+                                 if self.entranceExam else
+                                 xstr("login_invalid_sec"))
+                dialog.format_secondary_markup(secondary)
                 dialog.run()
                 dialog.hide()
         else:
@@ -374,27 +409,69 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(alignment)
 
+        self._loadButton = self.addButton(xstr("flightsel_load"),
+                                          sensitive = True,
+                                          tooltip = xstr("flightsel_load_tooltip"))
+        self._loadButton.connect("clicked", self._loadButtonClicked)
+        self._loadDialog = None
+        
         self._button = self.addNextButton(sensitive = False,
                                           clicked =  self._forwardClicked)
+
+        self._flights = []
 
     def activate(self):
         """Fill the flight list."""
         self._flightList.set_sensitive(True)
+        self._flights = []
         self._listStore.clear()
         for flight in self._wizard.loginResult.flights:
-            self._listStore.append([str(flight.departureTime),
-                                    flight.callsign,
-                                    flight.departureICAO,
-                                    flight.arrivalICAO])
-
+            self._addFlight(flight)
+            
     def finalize(self):
         """Finalize the page."""
         self._flightList.set_sensitive(False)
+
+    def _addFlight(self, flight):
+        """Add the given file to the list of flights."""
+        self._flights.append(flight)
+        self._listStore.append([str(flight.departureTime),
+                                flight.callsign,
+                                flight.departureICAO,
+                                flight.arrivalICAO])
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
         self._button.set_sensitive(selection.count_selected_rows()==1)
 
+    def _loadButtonClicked(self, loadButton):
+        """Called when the load a flight button is clicked."""
+        dialog = self._getLoadDialog()
+        dialog.show_all()
+        response = dialog.run()
+        dialog.hide()
+
+        if response==RESPONSETYPE_OK:
+            fileName = dialog.get_filename()
+            print "Loading", fileName
+            bookedFlight = web.BookedFlight()
+            try:
+                with open(fileName, "rt") as f:
+                    bookedFlight.readFromFile(f)
+                self._addFlight(bookedFlight)                
+            except Exception, e:
+                print "Failed to load flight:", str(e)
+                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                           type = MESSAGETYPE_ERROR,
+                                           message_format =
+                                           xstr("flightsel_load_failed"))
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                secondary = xstr("flightsel_load_failed_sec")
+                dialog.format_secondary_markup(secondary)
+                dialog.run()
+                dialog.hide()                
+            
     def _forwardClicked(self, button):
         """Called when the forward button was clicked."""
         if self._completed:
@@ -405,7 +482,7 @@ class FlightSelectionPage(Page):
             path = listStore.get_path(iter)
             [index] = path.get_indices() if pygobject else path
 
-            flight = self._wizard.loginResult.flights[index]
+            flight = self._flights[index]
             self._wizard._bookedFlight = flight
             self._wizard.gui.enableFlightInfo()
 
@@ -414,7 +491,8 @@ class FlightSelectionPage(Page):
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
-        if self._wizard.gui.config.onlineGateSystem:
+        if self._wizard.gui.config.onlineGateSystem and \
+           not self._wizard.entranceExam:
             if flight.departureICAO=="LHBP":
                 self._wizard.getFleet(self._fleetRetrieved)
             else:
@@ -448,7 +526,36 @@ class FlightSelectionPage(Page):
         """Callback for the plane updating."""
         self._nextDistance = 2
         self._wizard.jumpPage(2)
+
+    def _getLoadDialog(self):
+        """Get the dialog to load a flight file."""
+        if self._loadDialog is not None:
+            return self._loadDialog
         
+        gui = self._wizard.gui
+        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                       xstr("flightsel_load_title"),
+                                       action = FILE_CHOOSER_ACTION_OPEN,
+                                       buttons = (gtk.STOCK_CANCEL,
+                                                  RESPONSETYPE_CANCEL,
+                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                       parent = gui.mainWindow)
+        dialog.set_modal(True)            
+
+        filter = gtk.FileFilter()
+        filter.set_name(xstr("flightsel_filter_flights"))
+        filter.add_pattern("*.vaflight")
+        dialog.add_filter(filter)
+            
+        filter = gtk.FileFilter()
+        filter.set_name(xstr("file_filter_all"))
+        filter.add_pattern("*.*")
+        dialog.add_filter(filter)
+
+        self._loadDialog = dialog
+        
+        return dialog        
+    
 #-----------------------------------------------------------------------------
 
 class GateSelectionPage(Page):
@@ -2035,7 +2142,8 @@ class LandingPage(Page):
         """Called when the forward button is clicked."""
         if self._wizard.gui.config.onlineGateSystem and \
            not self._completed and \
-           self._wizard.bookedFlight.arrivalICAO=="LHBP":
+           self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
+           not self._wizard.entranceExam:
             self._wizard.getFleet(callback = self._fleetRetrieved,
                                   force = True)
         else:
@@ -2237,7 +2345,8 @@ class FinishPage(Page):
 
         self._gatesModel.clear()
         if self._wizard.gui.config.onlineGateSystem and \
-           self._wizard.bookedFlight.arrivalICAO=="LHBP":
+           self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
+           not self._wizard.entranceExam:
             occupiedGates = self._wizard._fleet.getOccupiedGateNumbers()
             for gateNumber in const.lhbpGateNumbers:
                 if gateNumber not in occupiedGates:
@@ -2260,7 +2369,8 @@ class FinishPage(Page):
                      self._gate.get_active()>=0)
         
         self._saveButton.set_sensitive(sensitive)
-        self._sendButton.set_sensitive(sensitive)        
+        self._sendButton.set_sensitive(sensitive and
+                                       self._wizard.bookedFlight.id is not None)
 
     def _flightTypeChanged(self, comboBox):
         """Called when the flight type has changed."""
@@ -2338,12 +2448,12 @@ class FinishPage(Page):
             dialog.set_do_overwrite_confirmation(True)
             
             filter = gtk.FileFilter()
-            filter.set_name(xstr("loadPIREP_filter_pireps"))
+            filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
             
             filter = gtk.FileFilter()
-            filter.set_name(xstr("loadPIREP_filter_all"))
+            filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
             dialog.add_filter(filter)
 
@@ -2360,7 +2470,9 @@ class FinishPage(Page):
 
     def _handlePIREPSent(self, returned, result):
         """Callback for the PIREP sending result."""
-        if self._wizard.gui.config.onlineGateSystem and returned and result.success:
+        if self._wizard.gui.config.onlineGateSystem and \
+           not self._wizard.entranceExam and \
+           returned and result.success:
             bookedFlight = self._wizard.bookedFlight
             if bookedFlight.arrivalICAO=="LHBP":
                 iter = self._gate.get_active_iter()                
@@ -2393,8 +2505,9 @@ class Wizard(gtk.VBox):
 
         self._pages = []
         self._currentPage = None
-        
-        self._pages.append(LoginPage(self))
+
+        self._loginPage = LoginPage(self)
+        self._pages.append(self._loginPage)
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
         self._pages.append(ConnectPage(self))
@@ -2431,6 +2544,11 @@ class Wizard(gtk.VBox):
         self.set_size_request(maxWidth, maxHeight)
 
         self._initialize()
+
+    @property
+    def entranceExam(self):
+        """Get whether an entrance exam is about to be taken."""
+        return self._loginPage.entranceExam
         
     @property
     def loginResult(self):

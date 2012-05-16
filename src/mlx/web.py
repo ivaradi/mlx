@@ -64,13 +64,20 @@ class BookedFlight(object):
                       const.AIRCRAFT_T134 : "TU3",
                       const.AIRCRAFT_T154 : "TU5",
                       const.AIRCRAFT_YK40 : "YK4" }
-    
-    def __init__(self, id, f):
-        """Construct a booked flight with the given ID.
 
-        The rest of the data is read from the given file."""
+    @staticmethod
+    def getDateTime(date, time):
+        """Get a datetime object from the given textual date and time."""
+        return datetime.datetime.strptime(date + " " + time,
+                                          "%Y-%m-%d %H:%M:%S")
 
+    def __init__(self, id = None):
+        """Construct a booked flight with the given ID."""
         self.id = id
+
+    def readFromWeb(self, f):
+        """Read the data of the flight from the web via the given file
+        object."""
         self.callsign = readline(f)
 
         date = readline(f)
@@ -88,22 +95,92 @@ class BookedFlight(object):
         self.route = readline(f)
 
         departureTime = readline(f)
-        self.departureTime = datetime.datetime.strptime(date + " " + departureTime,
-                                                        "%Y-%m-%d %H:%M:%S")
+        self.departureTime = BookedFlight.getDateTime(date, departureTime)
                                                
         arrivalTime = readline(f)
-        self.arrivalTime = datetime.datetime.strptime(date + " " + arrivalTime,
-                                                      "%Y-%m-%d %H:%M:%S")
+        self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
 
         if not readline(f)==".NEXT.":
             raise Exception("Invalid line in flight data")
 
+    def readFromFile(self, f):
+        """Read the data of the flight from a file via the given file
+        object."""
+        date = None
+        departureTime = None
+        arrivalTime = None
+        
+        line = f.readline()
+        lineNumber = 0    
+        while line:
+            lineNumber += 1
+            line = line.strip()
+            
+            hashIndex = line.find("#")
+            if hashIndex>=0: line = line[:hashIndex]
+            if line:
+                equalIndex = line.find("=")
+                lineOK = equalIndex>0
+                
+                if lineOK:
+                    key = line[:equalIndex].strip()                    
+                    value = line[equalIndex+1:].strip().replace("\:", ":")
+                    
+                    lineOK = key and value
+
+                if lineOK:
+                    if key=="callsign": self.callsign = value
+                    elif key=="date": date = value
+                    elif key=="dep_airport": self.departureICAO = value
+                    elif key=="dest_airport": self.arrivalICAO = value
+                    elif key=="planecode": self.aircraftType = \
+                         self._decodeAircraftType(value)
+                    elif key=="tail_nr": self.tailNumber = value
+                    elif key=="passenger": self.numPassengers = int(value)
+                    elif key=="crew": self.numCrew = int(value)
+                    elif key=="bag": self.bagWeight = int(value)
+                    elif key=="cargo": self.cargoWeight = int(value)
+                    elif key=="mail": self.mailWeight = int(value)
+                    elif key=="flight_route": self.route = value
+                    elif key=="departure_time": departureTime = value
+                    elif key=="arrival_time": arrivalTime = value
+                    elif key=="foglalas_id": pass
+                    elif key=="planetype": pass
+                    else: lineOK = False
+
+                if not lineOK:
+                    print "web.BookedFlight.readFromFile: line %d is invalid" % \
+                          (lineNumber,)
+
+            line = f.readline()
+
+        if date is not None:
+            if departureTime is not None:
+                self.departureTime = BookedFlight.getDateTime(date,
+                                                              departureTime)
+            if arrivalTime is not None:
+                self.arrivalTime = BookedFlight.getDateTime(date,
+                                                            arrivalTime)
+
+        d = dir(self)
+        for attribute in ["callsign", "departureICAO", "arrivalICAO",
+                          "aircraftType", "tailNumber",
+                          "numPassengers", "numCrew",
+                          "bagWeight", "cargoWeight", "mailWeight",
+                          "route", "departureTime", "arrivalTime"]:
+            if attribute not in d:
+                raise Exception("Attribute %s could not be read" % (attribute,))
+            
     def _readAircraftType(self, f):
         """Read the aircraft type from the given file."""
         line = readline(f)
         typeCode = line[:3]
+        self.aircraftType = self._decodeAircraftType(typeCode)
+
+    def _decodeAircraftType(self, typeCode):
+        """Decode the aircraft type from the given typeCode."""
         if typeCode in self.TYPECODE2TYPE:
-            self.aircraftType = self.TYPECODE2TYPE[typeCode]
+            return self.TYPECODE2TYPE[typeCode]
         else:
             raise Exception("Invalid aircraft type code: '" + typeCode + "'")
         
@@ -345,13 +422,14 @@ class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
     
-    def __init__(self, callback, pilotID, password):
+    def __init__(self, callback, pilotID, password, entranceExam):
         """Construct the login request with the given pilot ID and
         password."""
         super(Login, self).__init__(callback)
 
         self._pilotID = pilotID
         self._password = password
+        self._entranceExam = entranceExam
 
     def run(self):
         """Perform the login request."""
@@ -363,28 +441,44 @@ class Login(Request):
         md5.update(self._password)
         password = md5.hexdigest()
 
-        url = "http://www.virtualairlines.hu/leker2.php?pid=%s&psw=%s" % \
-              (pilotID, password)
+        if self._entranceExam:
+            url = "http://www.virtualairlines.hu/ellenorzo/getflightplan.php?pid=%s" % \
+                  (pilotID,)
+        else:
+            url = "http://www.virtualairlines.hu/leker2.php?pid=%s&psw=%s" % \
+                  (pilotID, password)
 
         result = Result()
+        result.entranceExam = self._entranceExam
 
         f = urllib2.urlopen(url, timeout = 10.0)
 
         status = readline(f)
-        result.loggedIn = status == ".OK."
+        if self._entranceExam:
+            result.loggedIn = status != "#NOEXAM"
+        else:
+            result.loggedIn = status == ".OK."
 
         if result.loggedIn:
             result.pilotID = self._pilotID
-            result.pilotName = self.iso88592decoder(readline(f))[0]
-            result.exams = readline(f)
             result.flights = []
+            # FIXME: this may not be the correct behaviour
+            # for an entrance exam, but the website returns
+            # an error
+            if self._entranceExam:
+                result.pilotName = result.pilotID
+                result.exams = ""
+            else:
+                result.pilotName = self.iso88592decoder(readline(f))[0]
+                result.exams = readline(f)
+                
+                while True:
+                    line = readline(f)
+                    if not line or line == "#ENDPIREP": break
 
-            while True:
-                line = readline(f)
-                if not line or line == "#ENDPIREP": break
-
-                flight = BookedFlight(line, f)
-                result.flights.append(flight)
+                    flight = BookedFlight(line)
+                    flight.readFromWeb(f)
+                    result.flights.append(flight)
 
             result.flights.sort(cmp = lambda flight1, flight2:
                                 cmp(flight1.departureTime,
@@ -739,9 +833,9 @@ class Handler(threading.Thread):
 
         self.daemon = True
 
-    def login(self, callback, pilotID, password):
+    def login(self, callback, pilotID, password, entranceExam = False):
         """Enqueue a login request."""
-        self._addRequest(Login(callback, pilotID, password))
+        self._addRequest(Login(callback, pilotID, password, entranceExam))
 
     def getFleet(self, callback):
         """Enqueue a fleet retrieval request."""

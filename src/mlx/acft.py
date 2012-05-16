@@ -65,7 +65,7 @@ class Aircraft(object):
         # etc. that is entered into the GUI) *should* be a part of the GUI and
         # queried from it, so the model should have a reference to the GUI as
         # well and access such data via the GUI!
-        if flight.config.onlineACARS:
+        if flight.config.onlineACARS and not flight.entranceExam:
             self._checkers.append(checks.ACARSSender(flight._gui))
 
         # Fault checkers
@@ -172,9 +172,11 @@ class Aircraft(object):
                                      aircraftState.windSpeed))
                 self._logV1R2()
             elif newStage==const.STAGE_TAXIAFTERLAND:
-                bookedFlight = self._flight.bookedFlight
-                config = self._flight.config
+                flight = self._flight
+                bookedFlight = flight.bookedFlight
+                config = flight.config
                 if config.onlineGateSystem and \
+                   not flight.entranceExam and \
                    bookedFlight.arrivalICAO=="LHBP" and \
                    config.isMessageTypeFS(const.MESSAGETYPE_GATE_SYSTEM):
                     self._flight.getFleet(callback = self._fleetRetrieved,

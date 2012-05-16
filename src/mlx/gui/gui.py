@@ -179,6 +179,11 @@ class GUI(fs.ConnectionListener):
         return self._flight
 
     @property
+    def entranceExam(self):
+        """Get whether an entrance exam is about to be taken."""
+        return self._wizard.entranceExam
+        
+    @property
     def loginResult(self):
         """Get the result of the login."""
         return self._wizard.loginResult
@@ -976,12 +981,12 @@ class GUI(fs.ConnectionListener):
             
 
             filter = gtk.FileFilter()
-            filter.set_name(xstr("loadPIREP_filter_pireps"))
+            filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
             
             filter = gtk.FileFilter()
-            filter.set_name(xstr("loadPIREP_filter_all"))
+            filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
             dialog.add_filter(filter)
 

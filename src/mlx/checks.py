@@ -749,7 +749,8 @@ class MLWChecker(WeightChecker):
     def getLimit(self, flight, aircraft, state):
         """Get the limit if we are in the right state."""
         return aircraft.mlw if flight.stage==const.STAGE_LANDING and \
-                               state.onTheGround else None
+                               state.onTheGround and \
+                               not flight.entranceExam else None
 
 #---------------------------------------------------------------------------------------
 
@@ -761,7 +762,8 @@ class MTOWChecker(WeightChecker):
 
     def getLimit(self, flight, aircraft, state):
         """Get the limit if we are in the right state."""
-        return aircraft.mtow if flight.stage==const.STAGE_TAKEOFF else None
+        return aircraft.mtow if flight.stage==const.STAGE_TAKEOFF and \
+                             not flight.entranceExam else None
 
 #---------------------------------------------------------------------------------------
 
@@ -773,7 +775,7 @@ class MZFWChecker(WeightChecker):
 
     def getLimit(self, flight, aircraft, state):
         """Get the limit if we are in the right state."""
-        return aircraft.mzfw
+        return aircraft.mzfw if not flight.entranceExam else None
 
     def getWeight(self, state):
         """Get the weight that is interesting for us."""
@@ -828,7 +830,8 @@ class PayloadChecker(SimpleFaultChecker):
     
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return flight.stage==const.STAGE_PUSHANDTAXI and \
+        return not flight.entranceExam and \
+               flight.stage==const.STAGE_PUSHANDTAXI and \
                PayloadChecker.isZFWFaulty(state.zfw, flight.zfw)
                
     def logFault(self, flight, aircraft, logger, oldState, state):

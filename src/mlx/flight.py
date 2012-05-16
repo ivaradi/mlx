@@ -28,7 +28,6 @@ class Flight(object):
         self._checklistHotkeyPressed = False
 
         self.flareTimeFromFS = False
-        self.entranceExam = False
 
         self.aircraftType = None
         self.aircraft = None
@@ -66,6 +65,11 @@ class Flight(object):
     def stage(self):
         """Get the flight stage."""
         return self._stage
+
+    @property
+    def entranceExam(self):
+        """Get whether an entrance exam is being performed."""
+        return self._gui.entranceExam
 
     @property
     def bookedFlight(self):

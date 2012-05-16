@@ -147,6 +147,9 @@ class _English(_Strings):
         self.add("aircraft_t154", "Tupolev Tu-154")
         self.add("aircraft_yk40", "Yakovlev Yak-40")
 
+        self.add("file_filter_all", "All files")
+        self.add("file_filter_pireps", "PIREP files")
+
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Cancel")
         self.add("button_yes", "_Yes")
@@ -220,12 +223,20 @@ class _English(_Strings):
                  "not have to enter it every time. Note, however, that the password "
                  "is stored as text, and anybody who can access your files will "
                  "be able to read it.")
+        self.add("login_entranceExam", "_Entrance Exam")
+        self.add("login_entranceExam_tooltip",
+                 "Check this to log in to take your entrance exam.")
         self.add("button_login", "Logi_n")
         self.add("login_button_tooltip", "Click to log in.")
         self.add("login_busy", "Logging in...")
         self.add("login_invalid", "Invalid pilot's ID or password.")
+        self.add("login_entranceExam_invalid",
+                 "Invalid pilot's ID or not registered for exam.")
         self.add("login_invalid_sec",
                  "Check the ID and try to reenter the password.")
+        self.add("login_entranceExam_invalid_sec",
+                 "Check the ID and make sure that you are "
+                 "allowed to take your entrance exam.")
         self.add("login_failconn",
                  "Failed to connect to the MAVA website.")
         self.add("login_failconn_sec", "Try again in a few minutes.")
@@ -242,6 +253,16 @@ class _English(_Strings):
         self.add("flightsel_deptime", "Departure time [UTC]")
         self.add("flightsel_from", "From")
         self.add("flightsel_to", "To")
+        self.add("flightsel_load", "Load flight from _file")
+        self.add("flightsel_load_tooltip",
+                 "Click here to load a flight from a file, "
+                 "and add it to the list above.")
+        self.add("flightsel_load_title", "Load flight from file")
+        self.add("flightsel_filter_flights", "Flight files")
+        self.add("flightsel_load_failed",
+                 "Could not load the flight file")
+        self.add("flightsel_load_failed_sec",
+                 "Check the debug log for more details.")
 
         self.add("fleet_busy", "Retrieving fleet...")
         self.add("fleet_failed",
@@ -664,7 +685,6 @@ class _English(_Strings):
         self.add("chklst_moveDown_tooltip",
                  "Move down the selected file(s) in the checklist.")
         self.add("chklst_filter_audio", "Audio files")
-        self.add("chklst_filter_all", "All files")
         self.add("chklst_header", "Checklist files")
 
         self.add("prefs_sounds_frame_bg", "Background")
@@ -757,8 +777,6 @@ class _English(_Strings):
                  "_Visibility Messages")
 
         self.add("loadPIREP_browser_title", "Select the PIREP to load")
-        self.add("loadPIREP_filter_pireps", "PIREP files")
-        self.add("loadPIREP_filter_all", "All files")
         self.add("loadPIREP_failed", "Failed to load the PIREP")
         self.add("loadPIREP_failed_sec", "See the debug log for the details.")
         self.add("loadPIREP_send_title", "PIREP")
@@ -820,6 +838,9 @@ class _Hungarian(_Strings):
         self.add("aircraft_t134", "Tupoljev Tu-134")
         self.add("aircraft_t154", "Tupoljev Tu-154")
         self.add("aircraft_yk40", "Jakovlev Jak-40")
+
+        self.add("file_filter_all", "Összes fájl")
+        self.add("file_filter_pireps", "PIREP fájlok")
 
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Mégse")
@@ -1285,7 +1306,6 @@ class _Hungarian(_Strings):
         self.add("chklst_moveDown_tooltip",
                  "Az ellenőrzőlistából kijelölt fájl(ok) eggyel lejjebb mozgatása.")
         self.add("chklst_filter_audio", "Audio fájlok")
-        self.add("chklst_filter_all", "Összes fájl")
         self.add("chklst_header", "Ellenőrzőlista fájljai")
 
         self.add("prefs_title", "Beállítások")
@@ -1445,8 +1465,6 @@ class _Hungarian(_Strings):
                  "Lá_tótávolság üzenetek")
 
         self.add("loadPIREP_browser_title", "Válaszd ki a betöltendő PIREP-et")
-        self.add("loadPIREP_filter_pireps", "PIREP fájlok")
-        self.add("loadPIREP_filter_all", "Összes fájl")
         self.add("loadPIREP_failed", "Nem tudtam betölteni a PIREP-et")
         self.add("loadPIREP_failed_sec",
                  "A részleteket lásd a debug naplóban.")
