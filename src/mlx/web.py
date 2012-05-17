@@ -81,6 +81,8 @@ class BookedFlight(object):
         self.callsign = readline(f)
 
         date = readline(f)
+        print "web.BookedFlight.readFromWeb: date:", date
+        if date=="0000-00-00": date = "0001-01-01"
 
         self.departureICAO = readline(f)
         self.arrivalICAO = readline(f)
