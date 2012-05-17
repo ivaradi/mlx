@@ -238,8 +238,10 @@ class _English(_Strings):
                  "Check the ID and make sure that you are "
                  "allowed to take your entrance exam.")
         self.add("login_failconn",
-                 "Failed to connect to the MAVA website.")
-        self.add("login_failconn_sec", "Try again in a few minutes.")
+                 "Failed to communicate with the MAVA website.")
+        self.add("login_failconn_sec",
+                 "Try again in a few minutes. If it does not help, "
+                 "see the debug log for details.")
 
         self.add("button_next", "_Next")
         self.add("button_next_tooltip", "Click to go to the next page.")
@@ -936,8 +938,10 @@ class _Hungarian(_Strings):
                  "Ellenőrízd az azonosítót, és bizonyosdj meg "
                  "arról, hogy végrehajthatod-e az ellenőrző repülést.")
         self.add("login_failconn",
-                 "Nem sikerült kapcsolódni a MAVA honlaphoz.")
-        self.add("login_failconn_sec", "Próbáld meg pár perc múlva.")
+                 "Nem sikerült kommunikálni a MAVA honlappal.")
+        self.add("login_failconn_sec",
+                 "Próbáld meg pár perc múlva. Ha az nem segít, "
+                 "részletesebb információt találsz a debug naplóban.")
         
         self.add("button_next", "_Előre")
         self.add("button_next_tooltip",
