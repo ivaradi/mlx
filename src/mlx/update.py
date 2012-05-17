@@ -41,6 +41,12 @@ class Manifest(object):
         Each file is returned as a 3-tuple with items as in the file."""
         for (path, (size, sum)) in self._files.iteritems():
             yield (path, size, sum)
+
+    def copy(self):
+        """Create a copy of the manifest."""
+        manifest = Manifest()
+        manifest._files = self._files.copy()
+        return manifest
         
     def addFile(self, path, size, sum):
         """Add a file to the manifest."""
@@ -98,6 +104,14 @@ class Manifest(object):
         removed = [path for path in self._files if path not in other._files]
         
         return (modifiedAndNew, removed)
+
+    def __contains__(self, path):
+        """Determine if the given path is in the manifest."""
+        return path in self._files
+
+    def __getitem__(self, path):
+        """Get data of the file with the given path."""
+        return self._files[path] if path in self._files else None
             
 #------------------------------------------------------------------------------
 
