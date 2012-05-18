@@ -74,7 +74,7 @@ if __name__ == "__main__":
     (fd, path) = tempfile.mkstemp()
     with os.fdopen(fd, "wt") as f:
         finalManifest.writeInto(f)
-    
+    os.chmod(path, 0644)
     tarFile.add(path, arcname = manifestName)
     tarFile.close()
 
