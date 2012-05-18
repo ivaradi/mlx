@@ -200,20 +200,21 @@ WINDOW_TITLE_BASE = "MAVA Logger X " + _const.VERSION
 #------------------------------------------------------------------------------
 
 # A mapping of aircraft types to their screen names
-aircraftNames = { _const.AIRCRAFT_B736 : xstr("aircraft_b736"),
-                  _const.AIRCRAFT_B737 : xstr("aircraft_b737"),
-                  _const.AIRCRAFT_B738 : xstr("aircraft_b738"),
-                  _const.AIRCRAFT_B733 : xstr("aircraft_b733"),
-                  _const.AIRCRAFT_B734 : xstr("aircraft_b734"),
-                  _const.AIRCRAFT_B735 : xstr("aircraft_b735"),
-                  _const.AIRCRAFT_DH8D : xstr("aircraft_dh8d"),
-                  _const.AIRCRAFT_B762 : xstr("aircraft_b762"),
-                  _const.AIRCRAFT_B763 : xstr("aircraft_b763"),
-                  _const.AIRCRAFT_CRJ2 : xstr("aircraft_crj2"),
-                  _const.AIRCRAFT_F70  : xstr("aircraft_f70"),
-                  _const.AIRCRAFT_DC3  : xstr("aircraft_dc3"),
-                  _const.AIRCRAFT_T134 : xstr("aircraft_t134"),
-                  _const.AIRCRAFT_T154 : xstr("aircraft_t154"),
-                  _const.AIRCRAFT_YK40 : xstr("aircraft_yk40") }
+aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
+                  _const.AIRCRAFT_B737  : xstr("aircraft_b737"),
+                  _const.AIRCRAFT_B738  : xstr("aircraft_b738"),
+                  _const.AIRCRAFT_B738C : xstr("aircraft_b738c"),
+                  _const.AIRCRAFT_B733  : xstr("aircraft_b733"),
+                  _const.AIRCRAFT_B734  : xstr("aircraft_b734"),
+                  _const.AIRCRAFT_B735  : xstr("aircraft_b735"),
+                  _const.AIRCRAFT_DH8D  : xstr("aircraft_dh8d"),
+                  _const.AIRCRAFT_B762  : xstr("aircraft_b762"),
+                  _const.AIRCRAFT_B763  : xstr("aircraft_b763"),
+                  _const.AIRCRAFT_CRJ2  : xstr("aircraft_crj2"),
+                  _const.AIRCRAFT_F70   : xstr("aircraft_f70"),
+                  _const.AIRCRAFT_DC3   : xstr("aircraft_dc3"),
+                  _const.AIRCRAFT_T134  : xstr("aircraft_t134"),
+                  _const.AIRCRAFT_T154  : xstr("aircraft_t154"),
+                  _const.AIRCRAFT_YK40  : xstr("aircraft_yk40") }
 
 #------------------------------------------------------------------------------

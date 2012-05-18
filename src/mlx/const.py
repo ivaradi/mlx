@@ -41,6 +41,9 @@ AIRCRAFT_B737 = 2
 # Aircraft type: Boeing 737-800
 AIRCRAFT_B738 = 3
 
+# Aircraft type: Boeing 737-800 (charter configuration)
+AIRCRAFT_B738C = 16
+
 # Aircraft type: Boeing 737-300
 AIRCRAFT_B733 = 4
 
@@ -82,7 +85,8 @@ AIRCRAFT_YK40 = 15
 # The list of aircraft types that we know of
 # The order is mostly from most recent to oldest considering
 # Malev's history
-aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737, AIRCRAFT_B738,
+aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
+                 AIRCRAFT_B738, AIRCRAFT_B738C,
                  AIRCRAFT_DH8D,
                  AIRCRAFT_F70, AIRCRAFT_CRJ2,
                  AIRCRAFT_B762, AIRCRAFT_B763,
@@ -92,22 +96,24 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737, AIRCRAFT_B738,
 
 #-------------------------------------------------------------------------------
 
-# A mapping of aircraft types to their ICAO codes
-icaoCodes = { AIRCRAFT_B736 : "B736",
-              AIRCRAFT_B737 : "B737",
-              AIRCRAFT_B738 : "B738",
-              AIRCRAFT_B733 : "B733",
-              AIRCRAFT_B734 : "B734",
-              AIRCRAFT_B735 : "B735",
-              AIRCRAFT_DH8D : "DH8D",
-              AIRCRAFT_B762 : "B762",
-              AIRCRAFT_B763 : "B763",
-              AIRCRAFT_CRJ2 : "CRJ2",
-              AIRCRAFT_F70  : "F70",
-              AIRCRAFT_DC3  : "DC3",
-              AIRCRAFT_T134 : "T134",
-              AIRCRAFT_T154 : "T154",
-              AIRCRAFT_YK40 : "YK40" }
+# A mapping of aircraft types to their 'internal' ICAO codes (which are
+# the same as the real ICAO codes, except in a few cases)
+icaoCodes = { AIRCRAFT_B736  : "B736",
+              AIRCRAFT_B737  : "B737",
+              AIRCRAFT_B738  : "B738",
+              AIRCRAFT_B738C : "B738C",
+              AIRCRAFT_B733  : "B733",
+              AIRCRAFT_B734  : "B734",
+              AIRCRAFT_B735  : "B735",
+              AIRCRAFT_DH8D  : "DH8D",
+              AIRCRAFT_B762  : "B762",
+              AIRCRAFT_B763  : "B763",
+              AIRCRAFT_CRJ2  : "CRJ2",
+              AIRCRAFT_F70   : "F70",
+              AIRCRAFT_DC3   : "DC3",
+              AIRCRAFT_T134  : "T134",
+              AIRCRAFT_T154  : "T154",
+              AIRCRAFT_YK40  : "YK40" }
 
 #-------------------------------------------------------------------------------
 

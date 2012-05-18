@@ -734,20 +734,21 @@ MostFuelTankAircraft = T134
 
 #---------------------------------------------------------------------------------------
 
-_classes = { const.AIRCRAFT_B736 : B736,
-             const.AIRCRAFT_B737 : B737,
-             const.AIRCRAFT_B738 : B738,
-             const.AIRCRAFT_B733 : B733,
-             const.AIRCRAFT_B734 : B734,
-             const.AIRCRAFT_B735 : B735,
-             const.AIRCRAFT_DH8D : DH8D,
-             const.AIRCRAFT_B762 : B762,
-             const.AIRCRAFT_B763 : B763,
-             const.AIRCRAFT_CRJ2 : CRJ2,
-             const.AIRCRAFT_F70 : F70,
-             const.AIRCRAFT_DC3 : DC3,
-             const.AIRCRAFT_T134 : T134,
-             const.AIRCRAFT_T154 : T154,
-             const.AIRCRAFT_YK40 : YK40 }
+_classes = { const.AIRCRAFT_B736  : B736,
+             const.AIRCRAFT_B737  : B737,
+             const.AIRCRAFT_B738  : B738,
+             const.AIRCRAFT_B738C : B738Charter,
+             const.AIRCRAFT_B733  : B733,
+             const.AIRCRAFT_B734  : B734,
+             const.AIRCRAFT_B735  : B735,
+             const.AIRCRAFT_DH8D  : DH8D,
+             const.AIRCRAFT_B762  : B762,
+             const.AIRCRAFT_B763  : B763,
+             const.AIRCRAFT_CRJ2  : CRJ2,
+             const.AIRCRAFT_F70   : F70,
+             const.AIRCRAFT_DC3   : DC3,
+             const.AIRCRAFT_T134  : T134,
+             const.AIRCRAFT_T154  : T154,
+             const.AIRCRAFT_YK40  : YK40 }
 
 #---------------------------------------------------------------------------------------

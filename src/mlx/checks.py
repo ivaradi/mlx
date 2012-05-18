@@ -830,7 +830,7 @@ class PayloadChecker(SimpleFaultChecker):
     
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return not flight.entranceExam and \
+       return not flight.entranceExam and \
                flight.stage==const.STAGE_PUSHANDTAXI and \
                PayloadChecker.isZFWFaulty(state.zfw, flight.zfw)
                

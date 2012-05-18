@@ -15,24 +15,6 @@ import mlx.web as web
 import datetime
 import time
 
-#------------------------------------------------------------------------------
-
-acftTypeNames = { const.AIRCRAFT_B736: "Boeing 737-600",
-                  const.AIRCRAFT_B737: "Boeing 737-700",
-                  const.AIRCRAFT_B738: "Boeing 737-800",
-                  const.AIRCRAFT_DH8D: "Bombardier Dash 8-Q400",
-                  const.AIRCRAFT_B733: "Boeing 737-300",
-                  const.AIRCRAFT_B734: "Boeing 737-400",
-                  const.AIRCRAFT_B735: "Boeing 737-500",
-                  const.AIRCRAFT_B762: "Boeing 767-200",
-                  const.AIRCRAFT_B763: "Boeing 767-300",
-                  const.AIRCRAFT_CRJ2: "Bombardier CRJ200",
-                  const.AIRCRAFT_F70:  "Fokker 70",
-                  const.AIRCRAFT_DC3:  "Lisunov Li-2",
-                  const.AIRCRAFT_T134: "Tupolev Tu-134",
-                  const.AIRCRAFT_T154: "Tupolev Tu-154",
-                  const.AIRCRAFT_YK40: "Yakovlev Yak-40" }
-
 #-----------------------------------------------------------------------------
 
 class Page(gtk.Alignment):
@@ -687,7 +669,7 @@ class ConnectPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._flightNumber = gtk.Label()
-        self._flightNumber.set_width_chars(7)
+        self._flightNumber.set_width_chars(9)
         self._flightNumber.set_alignment(0.0, 0.5)
         labelAlignment.add(self._flightNumber)
         table.attach(labelAlignment, 1, 2, 0, 1)
@@ -758,7 +740,7 @@ class ConnectPage(Page):
 
         self._flightNumber.set_markup("<b>" + bookedFlight.callsign + "</b>")
 
-        aircraftType = acftTypeNames[bookedFlight.aircraftType]
+        aircraftType = aircraftNames[bookedFlight.aircraftType]
         self._aircraft.set_markup("<b>" + aircraftType + "</b>")
         
         self._tailNumber.set_markup("<b>" + bookedFlight.tailNumber + "</b>")

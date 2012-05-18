@@ -1449,7 +1449,8 @@ class PMDGBoeing737NGModel(B737Model):
         name."""
         return aircraft.type in [const.AIRCRAFT_B736,
                                  const.AIRCRAFT_B737,
-                                 const.AIRCRAFT_B738] and \
+                                 const.AIRCRAFT_B738,
+                                 const.AIRCRAFT_B738C] and \
             (name.find("PMDG")!=-1 or airPath.find("PMDG")!=-1) and \
             (name.find("737")!=-1 or airPath.find("737")!=-1) and \
             (name.find("600")!=-1 or airPath.find("600")!=-1 or \
@@ -1647,21 +1648,22 @@ class YK40Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
-_genericModels = { const.AIRCRAFT_B736 : B737Model,
-                   const.AIRCRAFT_B737 : B737Model,
-                   const.AIRCRAFT_B738 : B737Model,
-                   const.AIRCRAFT_B733 : B737Model,
-                   const.AIRCRAFT_B734 : B737Model,
-                   const.AIRCRAFT_B735 : B737Model,
-                   const.AIRCRAFT_DH8D : DH8DModel,
-                   const.AIRCRAFT_B762 : B767Model,
-                   const.AIRCRAFT_B763 : B767Model,
-                   const.AIRCRAFT_CRJ2 : B767Model,
-                   const.AIRCRAFT_F70  : F70Model,
-                   const.AIRCRAFT_DC3  : DC3Model,
-                   const.AIRCRAFT_T134 : T134Model,
-                   const.AIRCRAFT_T154 : T154Model,
-                   const.AIRCRAFT_YK40 : YK40Model }
+_genericModels = { const.AIRCRAFT_B736  : B737Model,
+                   const.AIRCRAFT_B737  : B737Model,
+                   const.AIRCRAFT_B738  : B737Model,
+                   const.AIRCRAFT_B738C : B737Model,
+                   const.AIRCRAFT_B733  : B737Model,
+                   const.AIRCRAFT_B734  : B737Model,
+                   const.AIRCRAFT_B735  : B737Model,
+                   const.AIRCRAFT_DH8D  : DH8DModel,
+                   const.AIRCRAFT_B762  : B767Model,
+                   const.AIRCRAFT_B763  : B767Model,
+                   const.AIRCRAFT_CRJ2  : B767Model,
+                   const.AIRCRAFT_F70   : F70Model,
+                   const.AIRCRAFT_DC3   : DC3Model,
+                   const.AIRCRAFT_T134  : T134Model,
+                   const.AIRCRAFT_T154  : T154Model,
+                   const.AIRCRAFT_YK40  : YK40Model }
 
 #------------------------------------------------------------------------------
 

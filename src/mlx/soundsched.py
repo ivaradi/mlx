@@ -119,13 +119,14 @@ class TaxiSound(SimpleSound):
     sound. The playback is started only, if the boarding sound is not being
     played."""
 
-    _sounds = { const.AIRCRAFT_B736 : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B737 : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B738 : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B762 : const.SOUND_TAXI_BOEING767,
-                const.AIRCRAFT_B763 : const.SOUND_TAXI_BOEING767,
-                const.AIRCRAFT_F70  : const.SOUND_TAXI_F70 }
-                    
+    _sounds = { const.AIRCRAFT_B736  : const.SOUND_TAXI_BOEING737NG,
+                const.AIRCRAFT_B737  : const.SOUND_TAXI_BOEING737NG,
+                const.AIRCRAFT_B738  : const.SOUND_TAXI_BOEING737NG,
+                const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG,
+                const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767,
+                const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767,
+                const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 }
+
     def __init__(self, flight, boardingSound = None):
         """Construct the taxi sound."""
         super(TaxiSound, self).__init__(const.SOUND_MALEV,
