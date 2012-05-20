@@ -224,7 +224,7 @@ class _English(_Strings):
                  "not have to enter it every time. Note, however, that the password "
                  "is stored as text, and anybody who can access your files will "
                  "be able to read it.")
-        self.add("login_entranceExam", "_Entrance Exam")
+        self.add("login_entranceExam", "_Entrance exam")
         self.add("login_entranceExam_tooltip",
                  "Check this to log in to take your entrance exam.")
         self.add("button_login", "Logi_n")
@@ -768,11 +768,11 @@ class _English(_Strings):
         self.add("prefs_msgs_sound", "Sound alert")
         self.add("prefs_msgs_type_loggerError", "Logger _Error Messages")
         self.add("prefs_msgs_type_information",
-                 "_Information Messages\n(e.g. flight status)")
+                 "_Information Messages\n(e.g. flight stage)")
         self.add("prefs_msgs_type_fault",
                  "_Fault Messages\n(e.g. strobe light fault)")
         self.add("prefs_msgs_type_nogo",
-                 "_NOGO Fault messages\n(e.g. MTOW NOGO)")
+                 "_NO GO Fault messages\n(e.g. MTOW NO GO)")
         self.add("prefs_msgs_type_gateSystem",
                  "Ga_te System Messages\n(e.g. available gates)")
         self.add("prefs_msgs_type_environment",
@@ -1484,7 +1484,7 @@ class _Hungarian(_Strings):
         self.add("prefs_msgs_type_fault",
                  "Hi_baüzenetek\n(pl. a villogó fény hiba)")
         self.add("prefs_msgs_type_nogo",
-                 "_NOGO hibaüzenetek\n(pl. MTOW NOGO)")
+                 "_NO GO hibaüzenetek\n(pl. MTOW NO GO)")
         self.add("prefs_msgs_type_gateSystem",
                  "_Kapukezelő rendszer üzenetei\n(pl. a szabad kapuk listája)")
         self.add("prefs_msgs_type_environment",

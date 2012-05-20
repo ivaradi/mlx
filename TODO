@@ -1,7 +1,5 @@
 - Make the windows non-resizable.
 
-- The "Entrance Exam" checkbox should be called "Entrance exam".
-
 - The PIREP constructor should get the flight object as its argument
    and not the GUI. Thus flight should expose other data as well, but
    not the GUI!
@@ -10,10 +8,6 @@
    end of the flight.
 
 - A lamp-like icon for the connection status,
-
-- Information Messages (e. g. flight status -> flight stage)
-
-- NOGO Messages -> NO-GO Messages
 
 - Checklist editor: fix the problems with moving files when selecting
    not consecutive files.
