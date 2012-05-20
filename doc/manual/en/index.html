@@ -1,0 +1,814 @@
+<html>
+  <head>
+    <title>MAVA Logger X User's Manual</title>
+  </head>
+<body>
+  <h1>MAVA Logger X User's Manual</h1>
+
+  <h2>Overview</h2>
+
+  <p>
+  MAVA Logger X is an application that monitors the execution of a
+  Malév Virtual flight, and collects data that can be sent to the MAVA
+  website for further evaluation. This manual describes how to use
+  this program. To be able to use the program properly, you need to
+  have a working Internet connection, even if you don't fly on-line on
+  VATSIM or IVAO.
+  </p>
+
+  <p>
+  While monitoring your flight the program continuously checks if your
+  airplane's configuration is always within the parameters prescribed
+  by the airline's operating procedures. For example, you have to turn
+  on or off the various lights of your aircraft according to rules,
+  you cannot exceed certain weight or speed limits, and so on. Any
+  deviation from the expected parameters, also know as a fault, can
+  result in points subtracted from the initial 100 points (or
+  percentage). The result is your <i>flight rating</i>. Some
+  deviations are so serious, that they are deemed <i>NO GO</i> faults
+  and result in the rejection of your flight.
+  </p>
+
+  <p>
+  Besides the faults the program also monitors many other parameters,
+  which are recorded in a textual <i>log</i>. This log is sent as a
+  part of your PIREP (<b>PI</b>lot's <b>REP</b>ort), and will be
+  analyzed, and possibly commented on by more experienced pilot's of
+  Malév Virtual. This way you can perfect the way you execute your
+  flights.
+  </p>
+
+  <p>
+  The application breaks up your flight into
+  several <i>stage</i>s. The advancement from one stage to another is
+  detected automatically. These stages and the conditions under which
+  they are entered are as follows:
+  <ol>
+    <li><b>boarding</b>: This is the initial stage when you start the
+    flight.</li>
+    <li><b>push-back and taxi</b>: If you release the parking brakes
+    or your ground speed becomes 5 knots or greater during the
+    boarding stage, your flight enters this stage.</li>
+    <li><b>takeoff</b>: If you turn on the landing and/or the strobe
+    lights or your ground speed exceeds 80 knots during taxi or after
+    a rejected takeoff (RTO).</li>
+    <li><b>climb</b>: When you retract the gears or you reach 3000
+    feet altitude AGL with a positive climb rate after takeoff.</li>
+    <li><b>RTO</b>: If you switch off both the landing and the
+    strobe lights, and your speed is reduced below 50 knots while on
+    the ground during takeoff.</li>
+    <li><b>cruise</b>: When the aircraft's altitude is within 2000
+    feet of the cruise altitude and you are climbing.</li>
+    <li><b>descent</b>: If the altitude decreases to more than 2000
+    feet below the cruise altitude during cruise.</li>
+    <li><b>landing</b>: If the gears are lowered and the altitude is
+    less than 2000 feet AGL during descent or go-around.</li>
+    <li><b>go-around</b>: If you retract the gears during landing.</li>
+    <li><b>taxi after landing</b>: When the aircraft is in the
+    ground and its ground speed is below 50 knots after landing.</li>
+    <li><b>parking</b>: If the parking brake is activated after taxi.</li>
+    <li><b>end</b>: If the N<sub>1</sub> of the turbines becomes
+    less than 0.5, or the RPM of the piston engines becomes 0 during
+    parking. This is the final stage.</li>
+  </ol>
+
+  <p>
+  To enhance the simulation, the program can play various sound files
+  during the various stages of your flight, such as the announcements
+  made by the flight attendants. These files are supplied with the
+  application, and they can be played automatically, or when you press
+  a certain hotkey in the flight simulator. You can also organize
+  pre-recorded sound files into checklists for the each aircraft
+  type, and these files can also be played back one-by-one when you
+  repeatedly press a key combination in the simulator. See below for
+  more information on this.
+  </p>
+
+  <p>
+  Malév Virtual has implemented an <i>Online ACARS System</i>, which
+  displays the status of the flights in progress. The data appears on
+  the front page of the MAVA website and on a map accessible from the
+  inner page.
+  </p>
+
+  <p>
+  Malév Virtual has also implemented an <i>Online Gate System</i>
+  which maintains a database of the aircraft in the airline's fleet
+  and their location. An aircraft may be parked at the Budapest
+  Ferihegy Airport, in which case the number of the gate or stand it
+  is located at is recorded in the database. If so, this number is
+  displayed to you when starting your flight, and you are recommended
+  to place your aircraft at the indicated gate or stand in the
+  simulator. If your flight begins at Ferihegy and the aircraft is
+  away (usually due to someone else's flight), you can select from
+  which gate or stand you start your flight. The database of the
+  Online Gate System can also be displayed by using the application.
+  </p>
+
+  <p>
+  The program can automatically update itself. When it starts up, it
+  checks if there is a newer version available. If so, it downloads
+  its files and replaces the program's current files with the new
+  ones. Then the program is restarted so that you can use the new
+  version. Besides acquiring bug fixes, updating is also important,
+  because the program can be extended with new checks or more refined
+  checks, and if you are using too old a version, the PIREP reviewers
+  may refuse your flight.
+  </p>
+
+  <h3>Graphical User Interface</h3>
+
+  <p>
+  The GUI of the application is made up of traditional building blocks
+  (buttons, checkboxes, lists, text entry boxes, etc.) found in other
+  applications as well. Many such controls have informative tooltips
+  that supplement the contents of this User's Guide in helping you
+  using the application. Many controls are also accessible by pressing
+  the <b>Alt</b> plus the underlined letter in the control's label.
+  </p>
+
+  <p>
+  The most often used part of the program is the main window, to be
+  described in detail below. When you minimize or close the window, it
+  disappears by default, but the program continues to run. You can
+  redisplay the window by clicking on the tray icon of the program,
+  which looks like the one on the picture below.
+  </p>
+
+  <p>
+  If you click on the tray icon when the program's window is hidden,
+  the window will be displayed. If you hover the mouse pointer over
+  the icon, the flight stage and the current rating will be
+  displayed. The tray icon has a right-button menu as well with the
+  following items: 
+  <ul>
+    <li><b>Show main window</b>: displays or hides the main window.</li>
+    <li><b>Show monitor window</b>: displays or hides the monitor
+    window (see below).</li>
+    <li><b>Quit</b>: quit the application. A confirmation window will
+    be displayed.</li>
+  </ul>
+  </p>
+
+  <p>
+  You can also quit the application by selecting the <b>File/Quit</b>
+  menu item, or by pressing <b>Ctrl+Q</b>.
+  </p>
+
+  <p>
+  If you start the application, when it is already running, the main
+  window of the already running instance will be displayed instead of
+  starting a new instance of the program.
+  </p>
+  
+  <h2>The Main Window</h2>
+
+  <p>
+  The figure below depicts the main window of the application. The top
+  of it contains the usual menu bar, which will be describe in more
+  detail later.
+  </p>
+
+  <p>
+  The content area consists of several tabs the use of which is
+  described below.
+  </p>
+
+  <p>
+  The bottom of the window is a status bar. Its left end contains the
+  icon indicating the status of the connection to the simulator. Since
+  the application continuously monitors the parameters of your
+  aircraft, it needs to communicate with the simulator. The icon's
+  colour indicates the health of this communication channel.
+  </p>
+ 
+  <p>
+  If it is grey, the program is not connected. This is normal before
+  and after the flight. If it is green, the connection is alive and
+  working properly. If it is red, the connection is broken. In this
+  case a dialog window is displayed. The most likely cause for such a
+  disruption is the crash of the simulator. If this is the case,
+  restart the simulator and try to restore the flight to a state as
+  close to the one before the crash as possible. Then click
+  the <b>Reconnect</b> button, and the program will try to
+  re-establish the connection to the simulator. It preserves all data
+  of your flight, so you can continue where you left off easily.
+  </p>
+
+  <p>
+  If the reason for the failure of the connection is something else,
+  do whatever is needed to be done to restore it. Of course, it is
+  possible that the logger application itself fails, in which case
+  you, unfortunately, have to restart the flight. Do not forget to
+  notify the author if this happens.
+  </p>
+
+  <p>
+  If you click the <b>Cancel</b> button in the reconnection dialog,
+  the logger will be reset as if it were stopped and restarted.
+  </p>
+
+  <p>
+  To the right of the connection status icon, you can see the current
+  stage of the flight, if the monitoring has begun. Otherwise it is a
+  single dash. It is followed by the simulator time, if the program is
+  already connected to the simulator. Then comes the current flight
+  rating. 
+  </p>
+
+  <p>
+  The right if the status bar is normally empty, but if there is some
+  potentially long operation going on (typically communicating with
+  the MAVA servers), information about the operation is displayed
+  here. This is accompanied by the cursor becoming that of signaling
+  a busy state and most parts of the main window becoming
+  unresponsive.
+  </p>
+
+  <h3>The Flight Tab</h3>
+  
+  <p>
+  The flight tab is the most import tab. It consists of a sequence of
+  pages similar to wizards found in many programs. The first several of
+  these pages guide you through the various steps of the preparations
+  for your flight, while the last pages allow you to enter some
+  information about your flight necessary for its evaluation and to
+  send the PIREP (Pilot's Report) assembled by the program to the MAVA
+  website.
+  </p>
+
+  <p>
+  Each page has a title at the top indicating the purpose of the
+  page. There is a short text below this, which describes what the
+  page contains and/or what is expected from you to do with the page.
+  Below the text you can find the main information and possibly data
+  entry areas for the page. Finally, you can find the button row at
+  the bottom.
+  </p>
+  
+  <p>
+  Most of the pages contain two buttons: <b>Next</b> and
+  <b>Previous</b>. These help in navigating between the pages. In most
+  cases you can go back to previously visited pages by using
+  the <b>Previous</b> button, although you cannot edit the contents of
+  those pages once finalized by moving to the next page using
+  the <b>Next</b> button. There are a few exceptions though, as
+  detailed below.
+  </p>
+
+  <h4>The <i>Login</i> Page</h4>
+
+  <p>
+  Each flight starts with the Login page where you can enter the your
+  pilot's ID and password for the MAVA website. Both data are given
+  to you when joining Malév Virtual. The pilot's ID usually starts
+  with the letter <q>P</q> followed by three digits. 
+  </p>
+
+  <p>
+  If you check <b>Remember password</b>, the password will be saved by
+  the program, so you don't have to enter it all the time. Note,
+  however, that the password is saved plainly into a configuration
+  file, so you this possibility only if your home directory can be
+  accessed only by people you trust. The pilot's ID is saved anyway.
+  </p>
+
+  <p>
+  If you are about to perform the entrance flight, check
+  <b>Entrance exam</b>. In this case you don't have to (and cannot)
+  enter the password, as that is not needed for the entrance exam.
+  </p>
+
+  <p>
+  The login to the MAVA server, and proceed to the next page, press
+  the <b>Login</b> button.
+  </p>
+  
+  <h4>The <i>Flight selection</i> Page</h4>
+
+  <p>
+  This page displays the list of the flight you have booked previously
+  on the MAVA website. You can also upload a flight from a file by
+  pressing the <b>Load flight from file</b> button. This displays a
+  file selection dialog where you select the flight file (usually with
+  a suffix of <code>.vaflight</code>). Since you cannot
+  send the PIREP for such flights, this is mostly useful during the
+  entrance exam.
+  </p>
+
+  <p>
+  Select a flight from the list, and press <b>Next</b> button to
+  proceed with that flight.
+  </p>
+
+  <h4>The <i>LHBP gate selection</i> Page</h4>
+  
+  <p>
+  This page is displayed after the flight selection page only if your
+  flight starts at the Budapest Ferihegy Airport and the number of the
+  gate or stand at which your aircraft is located cannot be
+  determined.
+  </p>
+
+  <p>
+  Select a number from the list presented, and press <b>Next</b>.
+  </p>
+
+  <h4>The <i>Connect to the simulator</i> Page</h4>
+
+  <p>
+  This page displays some important information about your flight,
+  such as the type and tail number of the aircraft to use, the
+  departure airport and possibly the gate.
+  </p>
+
+  <p>
+  Select the aircraft indicated and park it at the departure airport,
+  then press <b>Connect</b> to establish the connection with the
+  simulator. If the connection cannot be established, a dialog will be
+  displayed about it, and you can <b>Try again</b> the connection
+  or <b>Cancel</b> to go back to the login page.
+  </p>
+  
+  <p>
+  Note, that after a successful connection, the monitoring of your
+  flight does not begin immediately, but some data can be queried by
+  the logger at this stage.
+  </p>
+
+  <h4>The <i>Payload</i> Page</h4>
+
+  <p>
+  This page displays the components of the flight's payload and the
+  calculated Zero-Fuel Weight (ZFW). You can enter here the cargo
+  weight you determined for your flight. You can also press the <b>ZFW
+  from FS</b> button, which queries the ZFW from the simulator and
+  displays the retrieved value. If the ZFW calculated from the payload
+  data differs too much from the queried one, the calculated value is
+  displayed in red. This the right time to set up the payload in the
+  simulator. If you forget about it, it will be a NO GO fault.
+  </p>
+
+  <p>
+  If you have finished with this page, press the <b>Next</b>
+  button. At this point, the <i>Help</i> tab becomes available, which
+  you can use if you have failed to set up the correct payload in the
+  simulator. See a more detailed description of it below.
+  </p>
+
+  <h4>The <i>Time</i> Page</h4>
+
+  <p>
+  This page displays the departure and arrival times of your
+  flight in UTC. Press the <b>Time from FS</b> button to query the
+  current UTC time of the simulator. To be able to simulate the real
+  lighting circumstances of the flight, the simulator's time should mach
+  the time of the flight according to the schedule. Therefore you are
+  expected to set the simulator's time properly. It is recommended to
+  set it to about 15 minutes before the departure at this stage so
+  that you have enough time to set up your flight.
+  </p>
+
+  <p>
+  When you have set the time of the simulator properly, press
+  the <b>Next</b> button.
+  </p>
+
+  <h4>The <i>Fuel</i> Page</h4>
+
+  <p>
+  This page contains a graphical representation of the fuel tanks of
+  your aircraft. The yellowish colour represents the current level of
+  the fuel in the tank, and turquoise slider is the expected level,
+  which is also displayed numerically (in kilograms) below each graph. 
+  </p>
+
+  <p>
+  You can enter the requested amount of fuel numerically, or you can
+  set it by the turquoise sliders, though this method less accurate. The
+  lever can be moved by clicking in the fuel tank's representation,
+  and you can drag it if you keep the button pressed. If your mouse
+  has a wheel, that can also be used to modify the expected level. To
+  use the wheel, keep the mouse pointer within the fuel tank's
+  graphic. Each click of the wheel increment or decrements the amount
+  by 10 kilograms. If you hold down the <b>Shift</b> key, the
+  increment will be 100, if you hold down the <b>Ctrl</b> key, the
+  increment will be 1.
+  </p>
+
+  <p>
+  When all tanks have the correct amount of fuel set, press
+  the <b>Next</b> button. This causes the pumping of the fuel to
+  start. The progress is represented by the yellowish fuel bars
+  growing or shrinking (fuel may be pumped out of a tank as
+  well). This is a relatively quick process and should finish within a
+  few seconds. 
+  </p>
+
+  <h4>The <i>Route</i> Page</h4>
+  
+  <p>
+  This page displays the cruise level and the flight plan route. The
+  cruise level starts out at FL240, but the route comes from the
+  booked flight. Set the cruise level to the one you have calculated
+  with, and modify the flight plan if needed. For example, if you will
+  enter some airspace that will require you to change the flight
+  level, you should add that here.
+  </p>
+
+  <p>
+  When satisfied with the information on the page, press
+  the <b>Next</b> button to advance. Note, that these data can be
+  edited later as well if you come back to this page.
+  </p>
+
+  <h4>The <i>Briefing</i> Pages</h4>
+  
+  <p>
+  These pages display the NOTAMs and the METAR for the departure and
+  the arrival airports. You can edit the METAR if your network
+  provides a different weather, or you do not fly with real
+  weather. The METAR of the arrival airport will be updated when
+  entering the landing stage, unless you have edited it before. The
+  METARs can be edited during the whole duration of the flight. If you
+  do so, please, comment it in the <i>Comments</i> sections of
+  the <i>Flight info</i> tab.
+  </p>
+
+  <p>
+  On the second briefing page (that of the arrival airport), confirm
+  that you have read the briefing and are ready to start the flight by
+  clicking the button. This begins the monitoring of your flight with
+  the boarding stage.
+  </p>
+  
+  <h4>The <i>Takeoff</i> Page</h4>
+
+  <p>
+  On this page you have to enter the name of the departure runway, the
+  name of the Standard Instrument Departure procedure you follow after
+  takeoff and the takeoff V-speeds. While you can edit these data
+  anytime, it is recommended to do so before takeoff.
+  <p>
+
+  <p>
+  You can proceed to the next page after takeoff, and if all data has
+  been entered, by pressing the <b>Next</b> button.
+  </p>
+
+  <h4>The <i>Landing</i> Page</h4>
+
+  <p>
+  On this page you have to enter the name of the STAR and/or transition followed
+  (if you get vectors from ATC, enter <q>VECTORS</q> here), the
+  approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>, etc.),
+  the name of the landing runway, and the landing reference speed,
+  V<sub>ref</sub>. You can enter this data during the flight, or after
+  you have landed at your discretion.
+  </p>
+
+  <p>
+  When you have entered all data, press the <b>Next</b> button. It is
+  active only, if the flight has ended.
+  </p>
+
+  <h4>The <i>Finish</i> Page</h4>
+
+  <p>
+  This is the final page of the flight wizard. It contains a summary
+  of your flight: the rating, the flight and block times, the distance
+  flown and the amount of fuel burnt.
+  </p>
+
+  <p>
+  You also have to provide a few pieces of information. You have to
+  select the type of the flight from the list provided (scheduled,
+  old-timer, VIP, charter) and whether it was an online flight or
+  not. If you arrive at the Budapest Ferihegy Airport, and are using
+  the Online Gate System, you also need to specify the number of the
+  gate or stand you have parked you aircraft at.
+  </p>
+
+  <p>
+  With all data entered, you may want it review your flight, then save
+  or send the PIREP created from it. These can be accomplished by
+  pressing one of the buttons at the bottom. A saved PIREP can be
+  loaded later and sent, if the sending fails for some reason. When a
+  PIREP is sent, it becomes available for review by the designated
+  PIREP reviewers of Malév Virtual.
+  </p>
+
+  <h3>The Flight info Tab</h3>
+
+  <p>
+  This tab allows one to enter some additional information about the 
+  flight, if necessary.
+  </p>
+  
+  <p>
+  The <i>Comments</i> text area should contain any general information
+  that you would like the PIREP reviewer to know about. For example,
+  why you changed the METAR, why you lowered the gears accidentally
+  (i.e. pressed the wrong key on the keyboard), etc.
+  </p>
+
+  <p>
+  The <i>Flight defects</i> text area should contain information about
+  any problems you encountered with the plane during the flight. For
+  example an engine stopped and why (if known), that flaps could not
+  be extended or retracted, etc.
+  </p>
+
+  <p>
+  In the <i>Delay codes</i> area you can mark one or more reasons why
+  the flight was delayed, if it was. The options are self-explanatory.
+  </p>
+
+  <h3>The Help Tab</h3>
+
+  <p>
+  This tab provides some help for calculating and setting the payload
+  weight of the aircraft. It can be used once the <i>Payload</i>
+  (i.e. the cargo weight) is finalized. To use this tab, check
+  the <b>Using help</b> checkbox. It causes the page to become
+  sensitive and filled with data. Note, that the fact of using the
+  help is logged, so the PIREP reviewers will know about it.
+  </p>
+
+  <p>
+  The most important information is after the <i>Payload:</i> label,
+  which is the payload weight of the aircraft. This value should be
+  set in the simulator as the airplane's payload weight. By pressing
+  the <b>Simulator data</b> button, the data on the right coming from
+  the simulator can be queried and displayed. If the data is out of
+  the tolerances, it is displayed in red, otherwise in green.
+  </p>
+
+  <p>
+  The gross weight is also displayed with some maximum weights of the
+  aircraft, so it can be checked or estimated if you will remain within
+  those maximums during the flight.
+  </p>
+  
+  <h3>The Log Tab</h3>
+
+  <p>
+  This is the main log of your flight that will be analyzed by the
+  PIREP reviewers. Its contents is generated automatically by the
+  program, and most lines are prefixed by the simulator times the
+  information in the given line belongs to.
+  </p>
+
+  <p>
+  While the log's contents is mainly useful for PIREP reviewers, it
+  can come handy when things start to happen very fast, and you have
+  no time check each fault message passing by (if you have enabled
+  such messages at all). Later, when things calm down, you can check
+  the log to see what happened exactly, so that you know why so many
+  fault points have been awarded. For example, you may even decide to
+  abort the flight, if you think some of the faults are to
+  embarrassing :)
+  </p>
+
+  <h3>The Gates Tab</h3>
+
+  <p>
+  This tab displays information retrieved from the MAVA Online Gate
+  System. If the program needs to retrieve data, this tab's contents
+  are refreshed automatically, but you can refresh them anytime using
+  the <b>Refresh data</b> button.
+  </p>
+
+  <p>
+  The left side of the tab contains the fleet information. The tail
+  number of each aircraft is listed with the plane's status, as known
+  by the Online Gate System. The two major statuses are <i>LHBP-nn</i>
+  and <i>AWAY</i>. The former indicates that the aircraft is parked at
+  the Budapest Ferihegy Airport at gate or stand <i>nn</i>, while the
+  latter one denotes that the airplane is parked at another
+  airport. Another possible status is <i>PARKED</i>, which means that
+  the airplane is parked somewhere at the Ferihegy Airport, but we
+  (or at least the Gate System) don't know where. It may happen that
+  several aircraft are parked at the same gate or stand at
+  Ferihegy. In this case the tail numbers and the statuses of those
+  airplanes are displayed in red.
+  </p>
+
+  <p>
+  The right side contains the list of the numbers of the gates and
+  parking positions. A number is black if no aircraft is positioned at
+  the corresponding gate or stand, and it is orange, if the location
+  is occupied.
+  </p>
+
+  <h3>The Debug log</h3>
+
+  <p>
+  This tab is not visible by default, but can be displayed by
+  selecting <b>View/Show debug log</b> or by
+  pressing <b>Ctrl+D</b>. It is another kind of log, which is mainly
+  useful for debugging. If you experience some problem with the
+  program, please, include the contents of this log with your bug
+  report. It can help a low with finding a solution to the problem.
+  </p>
+
+  <h2>Loading PIREPs</h2>
+
+  <p>
+  Saved PIREPs can be loaded and sent by the program loader. This can
+  become necessary, for example, if you cannot send a PIREP due to
+  some network problem right after your flight.
+  </p>
+
+  <p>
+  To load a PIREP select the <b>File/Load PIREP...</b> menu option or
+  press the <b>Ctrl+L</b> key. A file selection dialog appears, from
+  which you can select the PIREP to load. If you select a valid PIREP
+  file, it will be loaded and a new window will be displayed with the
+  most important data of your flight. By clicking <b>Send
+  PIREP...</b>, the PIREP will be sent (or at least an attempt will be
+  made at sending it). A dialog window will be displayed about the
+  results of the attempt.
+  </p>
+
+  <h2>Editing checklists</h2>
+
+  <p>
+  The checklists are lists of audio files. When checklist playback is
+  enabled (see the description of the Preferences window below), and
+  there is a checklist for the type of the aircraft used for the
+  flight, the files constituting the checklist can be played
+  one-by-one by pressing the checklist hotkey repeatedly.
+  </p>
+
+  <p>
+  The checklist editor dialog box allows for editing the checklist. It
+  can be displayed by selecting <b>Tools/Checklist Editor...</b> or
+  pressing <b>Ctrl+C</b>. The top of the window contains an aircraft
+  type selector.
+  </p>
+
+  <p>
+  The files making up the checklist for the currently  selected flight
+  are displayed on the right. You can move a file up or down by
+  dragging it with the mouse. You can also select one or more files
+  from the list. Then you can remove them with the <b>Remove</b>
+  button, or move them up or down by pressing <b>Move up</b>
+  and <b>Move down</b>. 
+  </p>
+
+  <p>
+  To add new files to the checklist, select them in the file selector
+  on the left, and press <b>Add to checklist</b>. The file(s) will be
+  appended to the end of the checklist.
+  </p>
+
+  <p>
+  Note, that any changes you make are effective only if you press
+  the <b>OK</b> button when having finished the modifications. If the
+  flight has already started, no changes made to the corresponding
+  checklist have any effect during the flight (i.e. you will still use
+  the old checklist, or no checklist if there was none).
+  </p>
+  
+  <h2>The Preferences Window</h2>
+
+  </p>
+  The Preferences window can be displayed by
+  selecting <b>Tools/Preferences</b> or by
+  pressing <b>Ctrl+P</b>. Here you can set options that you usually
+  don't have to change for every flight. This window also consists of
+  tabs grouping the options logically.
+  </p>
+  
+  <h3>The <i>General</i> Tab</h3>
+  
+  <p>
+  These are some general settings for various parts of the
+  program. The <i>GUI</i> frame contains options regarding the
+  behaviour of the graphical user interface. The <i>Language</i> combo
+  box can be used to selected what language the program should
+  use. Currently English and Hungarian are supported. The value
+  of <i>system default</i> means that the operating system's default
+  language is used if it is one of the supported ones or English
+  otherwise. Note, that the program must be restarted for the change
+  to take effect if you modify this setting. If the <b>Hide main window
+  when minimized</b> checkbox is checked, and you minimize the window
+  it will actually disappear completely (i.e. not appear among the
+  other minimized windows). You can make it appear by using the tray
+  icon. 
+  </p>
+
+  <h3>The <i>Messages</i> Tab</h3>
+ 
+  <p>
+  The program can display messages about certain events in the
+  simulator and/or it can play a warning sound when those events
+  occur. The tab allows configuring this.
+  <p>
+
+  <p>
+  The categories of the message are listed on the left. These are the
+  following:
+  </p>
+
+  <ul>
+    <li><b>Logger Error Messages</b>: error messages about the
+    internal working of the logger.</li>
+    <li><b>Information Messages</b>: informational messages about,
+    e.g., the flight stage, the end of an audio checklist, etc.</li>
+    <li><b>Fault Messages</b>: messages about the non-NO GO faults the program detects.</li>
+    <li><b>NO-GO Fault Messages</b>: messages about the NO GO faults the program detects</li>
+    <li><b>Gate System Messages</b>: messages related to the Online
+    Gate System. For example, when you have landed at Ferihegy, it can display
+    the list of the available gates so that you can choose where to
+    park, if there is no ATC available.</li>
+    <li><b>Environment Messages</b>: other messages, e.g. the welcome
+    message when the flight has ended.</li>
+    <li><b>Help Messages</b>: help messages, e.g. warning about
+    entering the V-speeds into the Takeoff page before takeoff.</li>
+    <li><b>Visibility Messages</b>: messages about the visibility
+    during descent and landing.</li>
+  </ul>
+
+  <p>
+  There are two checkboxes associated with each messages category. If the
+  left one (<i>Displayed in FS</i>) is checked, the messages of the
+  category will be displayed in the simulator. If the right one
+  (<i>Sound alert</i>) is checked, and a message of the given category
+  is about to be displayed, a warning sound will be played. It is
+  mainly intended to accompany the text messages, but the two options
+  can be controlled separately, so you can select the sound alert, but
+  not the displaying of the messages. This may be useful if you don't
+  want these messages to clutter up the windscreen of your aircraft,
+  but still get some notification that some problem occurred.
+  </p>
+
+  <h3>The <i>Sounds</i> Tab</h3>
+  
+  <p>
+  This tab controls how the sounds are played by the application.
+  </p>
+
+  <p>
+  The top part is for the background sounds. These are pre-recorded
+  sound files that are played when certain conditions hold during the
+  flight. Typical examples are the various announcements the flight
+  attendants make during the flight. The <b>Enable background
+  sounds</b> checkbox controls whether such sounds are enabled at
+  all. If the <b>Pilot controls sounds</b> checkbox is enabled, the
+  pilot should start the playback of these sound files by pressing a
+  hotkey in the simulator. Note, that you should still be in the right
+  flight stage (and sometimes fulfill other conditions) to be able to
+  play the sound files. Also, one file can be played only once. If you
+  enable this option, the hotkey to press in the simulator can be
+  selected below. You can choose one of the alphanumeric keys (0-9,
+  A-Z) optionally combined with one or both of the <i>Ctrl</i>
+  and <i>Shift</i> modifiers. If this checkbox is not checked, the
+  sound files will be played automatically.
+  </p>
+
+  <p>
+  If the <b>Enable speedbrake sound at touchdown</b> checkbox is
+  checked, you will here a distinctive sound when the spoilers deploy
+  automatically after touchdown.
+  </p>
+
+  <p>
+  The lower part, named <i>Checklist</i> contains some settings
+  related to the audio checklists belonging to the aircraft. They are
+  available only if the <b>Enable aircraft-specific checklist></b>
+  checkbox is selected. In this case another hotkey should be
+  specified. If you press this hotkey, the next file from the
+  checklist will be played. 
+  </p>
+
+  <h3>The <i>Advanced</i> Tab</h3>
+
+  <p>
+  This tab contains some settings that you normally should not
+  change. Currently, these settings are related to the automatic
+  update. If the <b>Update the program automatically</b> checkbox is
+  not checked, the automatic update at program start-up will be
+  omitted. The <i>Update URL</i> text entry field contains the URL
+  from which to download the updates. Occasionally the developers of
+  the application may tell you to change this something else, e.g. to
+  test some development version. Or it may need to be changed due to
+  organizational reasons, such as moving to a new server, etc.
+  </p>
+
+  <h2>The Monitor Window</h2>
+
+  <p>
+  The monitor window can be used when debugging the program. You can
+  display it by selecting <b>View/Show monitor window</b> or by
+  pressing <b>Ctrl+M</b>. It displays the various parameters from the
+  aircraft as read from the flight simulator. During flight, it is
+  updated once per second. If something is not detected properly by
+  the logger, this window can be used to determine if the problem is
+  in interpreting and translating the data read from the simulator, or
+  when the translated data is being evaluated by other parts of the
+  program.
+  </p>
+  
+</html>
