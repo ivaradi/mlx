@@ -125,6 +125,8 @@ class Config(object):
         self._flareTimeFromFS = False
         self._syncFSTime = False
         self._usingFS2Crew = False
+        self._iasSmoothingLength = -2
+        self._vsSmoothingLength = -2
 
         self._pirepDirectory = None
 
@@ -272,6 +274,48 @@ class Config(object):
         """Set whether the FS2Crew addon is being used."""
         if usingFS2Crew!=self._usingFS2Crew:
             self._usingFS2Crew = usingFS2Crew
+            self._modified = True
+
+    @property
+    def iasSmoothingLength(self):
+        """Get the number of samples over which the IAS is averaged for the
+        smoothed IAS calculation. It may be negative, in which case smoothing
+        is disabled, but we nevertheless store the number of seconds in case it
+        may become useful later."""
+        return self._iasSmoothingLength
+
+    @property
+    def realIASSmoothingLength(self):
+        """Get the real smoothing length of IAS."""
+        return max(self._iasSmoothingLength, 1)
+
+    @iasSmoothingLength.setter
+    def iasSmoothingLength(self, iasSmoothingLength):
+        """Set the number of samples over which the IAS is averaged for the
+        smoothed IAS calculation."""
+        if iasSmoothingLength!=self._iasSmoothingLength:
+            self._iasSmoothingLength = iasSmoothingLength
+            self._modified = True
+
+    @property
+    def vsSmoothingLength(self):
+        """Get the number of samples over which the VS is averaged for the
+        smoothed VS calculation. It may be negative, in which case smoothing
+        is disabled, but we nevertheless store the number of seconds in case it
+        may become useful later."""
+        return self._vsSmoothingLength
+
+    @property
+    def realVSSmoothingLength(self):
+        """Get the real smoothing length of VS."""
+        return max(self._vsSmoothingLength, 1)
+
+    @vsSmoothingLength.setter
+    def vsSmoothingLength(self, vsSmoothingLength):
+        """Set the number of samples over which the VS is averaged for the
+        smoothed VS calculation."""
+        if vsSmoothingLength!=self._vsSmoothingLength:
+            self._vsSmoothingLength = vsSmoothingLength
             self._modified = True
 
     @property
@@ -454,6 +498,12 @@ class Config(object):
         self._usingFS2Crew = self._getBoolean(config, "general",
                                               "usingFS2Crew",
                                               False)
+        self._iasSmoothingLength = int(self._get(config, "general",
+                                                 "iasSmoothingLength",
+                                                 -2))
+        self._vsSmoothingLength = int(self._get(config, "general",
+                                                "vsSmoothingLength",
+                                                -2))
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
@@ -516,6 +566,10 @@ class Config(object):
                    "yes" if self._syncFSTime else "no")
         config.set("general", "usingFS2Crew",
                    "yes" if self._usingFS2Crew else "no")
+        config.set("general", "iasSmoothingLength",
+                   str(self._iasSmoothingLength))
+        config.set("general", "vsSmoothingLength",
+                   str(self._vsSmoothingLength))
 
         if self._pirepDirectory is not None:
             config.set("general", "pirepDirectory", self._pirepDirectory)

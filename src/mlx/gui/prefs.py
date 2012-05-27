@@ -228,6 +228,11 @@ class Preferences(gtk.Dialog):
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
         self._syncFSTime.set_active(config.syncFSTime)
         self._usingFS2Crew.set_active(config.usingFS2Crew)
+        
+        self._setSmoothing(self._iasSmoothingEnabled, self._iasSmoothingLength,
+                           config.iasSmoothingLength)
+        self._setSmoothing(self._vsSmoothingEnabled, self._vsSmoothingLength,
+                           config.vsSmoothingLength)
 
         pirepDirectory = config.pirepDirectory
         self._pirepDirectory.set_text("" if pirepDirectory is None
@@ -268,6 +273,10 @@ class Preferences(gtk.Dialog):
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
         config.syncFSTime = self._syncFSTime.get_active()
         config.usingFS2Crew = self._usingFS2Crew.get_active()
+        config.iasSmoothingLength = self._getSmoothing(self._iasSmoothingEnabled,
+                                                       self._iasSmoothingLength)
+        config.vsSmoothingLength = self._getSmoothing(self._vsSmoothingEnabled,
+                                                       self._vsSmoothingLength)
         config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
 
         for messageType in const.messageTypes:
@@ -365,6 +374,18 @@ class Preferences(gtk.Dialog):
         self._usingFS2Crew.set_use_underline(True)
         self._usingFS2Crew.set_tooltip_text(xstr("prefs_usingFS2Crew_tooltip"))
         simulatorBox.pack_start(self._usingFS2Crew, False, False, 4)
+        
+        (iasSmoothingBox, self._iasSmoothingEnabled,
+         self._iasSmoothingLength) = \
+           self._createSmoothingBox(xstr("prefs_iasSmoothingEnabled"),
+                                    xstr("prefs_iasSmoothingEnabledTooltip"))
+        simulatorBox.pack_start(iasSmoothingBox, False, False, 4)
+
+        (vsSmoothingBox, self._vsSmoothingEnabled,
+         self._vsSmoothingLength) = \
+           self._createSmoothingBox(xstr("prefs_vsSmoothingEnabled"),
+                                    xstr("prefs_vsSmoothingEnabledTooltip"))
+        simulatorBox.pack_start(vsSmoothingBox, False, False, 4)
 
         pirepBox = gtk.HBox()
         mainBox.pack_start(pirepBox, False, False, 8)
@@ -401,6 +422,35 @@ class Preferences(gtk.Dialog):
 
         return vbox
 
+    def _createSmoothingBox(self, checkBoxLabel, checkBoxTooltip,
+                            maxSeconds = 10):
+        """Create a HBox that contains entry fields for smoothing some value."""
+        smoothingBox = gtk.HBox()
+
+        smoothingEnabled = gtk.CheckButton(checkBoxLabel)
+        smoothingEnabled.set_use_underline(True)
+        smoothingEnabled.set_tooltip_text(checkBoxTooltip)
+
+        smoothingBox.pack_start(smoothingEnabled, False, False, 0)
+
+        smoothingLength = gtk.SpinButton()
+        smoothingLength.set_numeric(True)
+        smoothingLength.set_range(2, maxSeconds)
+        smoothingLength.set_increments(1, 1)
+        smoothingLength.set_alignment(1.0)
+        smoothingLength.set_width_chars(2)
+
+        smoothingBox.pack_start(smoothingLength, False, False, 0)
+
+        smoothingBox.pack_start(gtk.Label(xstr("prefs_smoothing_seconds")),
+                                False, False, 4)
+
+        smoothingEnabled.connect("toggled", self._smoothingToggled,
+                                 smoothingLength)
+        smoothingLength.set_sensitive(False)
+
+        return (smoothingBox, smoothingEnabled, smoothingLength)
+
     def _setLanguage(self, language):
         """Set the language to the given one."""
         iter = self._languageList.get_iter_first()
@@ -433,7 +483,32 @@ class Preferences(gtk.Dialog):
             dialog.run()
             dialog.hide()
             self._warnedRestartNeeded = True
-       
+
+    def _smoothingToggled(self, smoothingEnabled, smoothingLength):
+        """Called when a smoothing enabled check box is toggled."""
+        sensitive = smoothingEnabled.get_active()
+        smoothingLength.set_sensitive(sensitive)
+        if sensitive:
+            smoothingLength.grab_focus()
+
+    def _setSmoothing(self, smoothingEnabled, smoothingLength, smoothing):
+        """Set the smoothing controls from the given value.
+
+        If the value is less than 2, smoothing is disabled. The smoothing
+        length is the absolute value of the value."""
+        smoothingEnabled.set_active(smoothing>=2)
+        smoothingLength.set_value(abs(smoothing))
+        
+    def _getSmoothing(self, smoothingEnabled, smoothingLength):
+        """Get the smoothing value from the given controls.
+
+        The returned value is the value of smoothingLength multiplied by -1, if
+        smoothing is disabled."""
+        value = smoothingLength.get_value_as_int()
+        if not smoothingEnabled.get_active():
+            value *= -1
+        return value
+        
     def _pirepDirectoryButtonClicked(self, button):
         """Called when the PIREP directory button is clicked."""
         dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +

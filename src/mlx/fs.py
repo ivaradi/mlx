@@ -172,10 +172,12 @@ class AircraftState(object):
     negative means pitch up (float)
     - bank: the bank of the aircraft in degrees. Positive means bank left,
     negative means bank right (float)
-    - ias: the indicated airspeed in knots (float)    
+    - ias: the indicated airspeed in knots (float)
+    - smoothedIAS: the smoothed IAS in knots (float)
     - mach: the airspeed in mach (float)    
     - groundSpeed: the ground speed (float)
     - vs: the vertical speed in feet/minutes (float)
+    - smoothedVS: the smoothed VS in feet/minutes (float)
     - radioAltitude: the radio altitude of the aircraft in feet (float)
     - altitude: the altitude of the aircraft in feet (float)
     - gLoad: G-load (float)

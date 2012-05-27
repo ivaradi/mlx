@@ -618,7 +618,7 @@ class FlapsSpeedLimitChecker(SimpleFaultChecker):
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         speedLimit = aircraft.getFlapsSpeedLimit(state.flapsSet)
-        return speedLimit is not None and state.ias>speedLimit
+        return speedLimit is not None and state.smoothedIAS>speedLimit
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
@@ -648,7 +648,7 @@ class GearSpeedLimitChecker(PatientFaultChecker):
     """Check if the gears not down at too high a speed."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return state.gearsDown and state.ias>aircraft.gearSpeedLimit
+        return state.gearsDown and state.smoothedIAS>aircraft.gearSpeedLimit
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
@@ -802,9 +802,9 @@ class NavLightsChecker(PatientFaultChecker):
 
 class OverspeedChecker(PatientFaultChecker):
     """Check if Vne has been exceeded."""
-    def __init__(self):
+    def __init__(self, timeout = 5.0):
         """Construct the checker."""
-        super(OverspeedChecker, self).__init__(timeout = 5.0)
+        super(OverspeedChecker, self).__init__(timeout = timeout)
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
@@ -973,7 +973,7 @@ class VSChecker(SimpleFaultChecker):
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        vs = state.vs
+        vs = state.smoothedVS
         altitude = state.altitude
         return vs < -8000 or vs > 8000 or \
                (altitude<500 and vs < (VSChecker.BELOW500 *
@@ -987,7 +987,7 @@ class VSChecker(SimpleFaultChecker):
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        vs = state.vs
+        vs = state.smoothedVS
 
         message = "Vertical speed was %.0f feet/min" % (vs,)
         if vs>-8000 and vs<8000:

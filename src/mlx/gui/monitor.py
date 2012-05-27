@@ -71,11 +71,11 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 8, 9, 1, 2)
         table.attach(self._bank, 9, 10, 1, 2)
 
-        (label, self._vs) = self._createLabeledEntry("VS:", 5)
+        (label, self._vs) = self._createLabeledEntry("VS:", 13)
         table.attach(label, 10, 11, 1, 2)
         table.attach(self._vs, 11, 12, 1, 2)
 
-        (label, self._ias) = self._createLabeledEntry("IAS:", 4)
+        (label, self._ias) = self._createLabeledEntry("IAS:", 11)
         table.attach(label, 0, 1, 2, 3)
         table.attach(self._ias, 1, 2, 2, 3)
 
@@ -258,8 +258,10 @@ class MonitorWindow(gtk.Window):
             self._heading.set_text("%03.0f" % (aircraftState.heading,))
             self._pitch.set_text("%.0f" % (aircraftState.pitch,))
             self._bank.set_text("%.0f" % (aircraftState.bank,))
-            self._vs.set_text("%.0f" % (aircraftState.vs,))
-            self._ias.set_text("%.0f" % (aircraftState.ias,))
+            self._vs.set_text("%.0f (%.0f)" % (aircraftState.vs,
+                                               aircraftState.smoothedVS))
+            self._ias.set_text("%.0f (%.0f)" % (aircraftState.ias,
+                                                aircraftState.smoothedIAS))
             self._mach.set_text("%.2f" % (aircraftState.mach,))
             self._groundSpeed.set_text("%.0f" % (aircraftState.groundSpeed,))
             self._radioAltitude.set_text("%.0f" % (aircraftState.radioAltitude,))

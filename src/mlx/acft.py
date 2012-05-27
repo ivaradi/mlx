@@ -11,6 +11,31 @@ import sys
 import time
 import traceback
 
+from collections import deque
+
+#---------------------------------------------------------------------------------------
+
+class SmoothedValue(object):
+    """A smoothed value."""
+    def __init__(self):
+        """Construct the value."""
+        self._deque = deque()
+        self._sum = 0
+
+    def add(self, length, value):
+        """Add the given value and smooth with the given length."""
+        dequeLength = len(self._deque)
+        while dequeLength>=length:
+            self._sum -= self._deque.popleft()
+            dequeLength -= 1
+
+        self._sum += value
+        self._deque.append(value)
+
+    def get(self):
+        """Get the average."""
+        return self._sum / len(self._deque)
+        
 #---------------------------------------------------------------------------------------
 
 class Aircraft(object):
@@ -35,6 +60,7 @@ class Aircraft(object):
 
         self._checkers = []
 
+        config = flight.config
         # Loggers
 
         self._checkers.append(checks.StageChecker())
@@ -57,7 +83,7 @@ class Aircraft(object):
         self._checkers.append(checks.CruiseSpeedLogger())
         self._checkers.append(checks.SpoilerLogger())
 
-        if flight.config.isMessageTypeFS(const.MESSAGETYPE_VISIBILITY):
+        if config.isMessageTypeFS(const.MESSAGETYPE_VISIBILITY):
             self._checkers.append(checks.VisibilityChecker())
 
         # FIXME: we should have a central data model object, and not collect
@@ -65,7 +91,7 @@ class Aircraft(object):
         # etc. that is entered into the GUI) *should* be a part of the GUI and
         # queried from it, so the model should have a reference to the GUI as
         # well and access such data via the GUI!
-        if flight.config.onlineACARS and not flight.entranceExam:
+        if config.onlineACARS and not flight.entranceExam:
             self._checkers.append(checks.ACARSSender(flight._gui))
 
         # Fault checkers
@@ -92,12 +118,18 @@ class Aircraft(object):
 
         self._checkers.append(checks.SpeedChecker())
         self._checkers.append(checks.VSChecker())
-        self._checkers.append(checks.OverspeedChecker())
+
+        timeout = 5.0 + config.realIASSmoothingLength - 1
+        self._checkers.append(checks.OverspeedChecker(timeout = timeout))
+                              
         self._checkers.append(checks.StallChecker())
 
         self._checkers.append(checks.PitotChecker())
         
         self._checkers.append(checks.ReverserChecker())
+
+        self._smoothedIAS = SmoothedValue()
+        self._smoothedVS = SmoothedValue()
 
     @property
     def type(self):
@@ -131,7 +163,19 @@ class Aircraft(object):
                                     (aircraftName, modelName))
 
     def handleState(self, aircraftState):
-        """Called when the state of the aircraft changes."""
+        """Called when the state of the aircraft changes.
+
+        This is the function that the simulator calls directly with the new
+        state."""
+        config = self._flight.config
+
+        self._smoothedIAS.add(config.realIASSmoothingLength, aircraftState.ias)
+        aircraftState.smoothedIAS = self._smoothedIAS.get()
+
+        print "handleState, realVSSmoothingLength:", config.realVSSmoothingLength
+        self._smoothedVS.add(config.realVSSmoothingLength, aircraftState.vs)
+        aircraftState.smoothedVS = self._smoothedVS.get()
+        
         for checker in self._checkers:
             try:
                 checker.check(self._flight, self, self._flight.logger,
@@ -750,5 +794,54 @@ _classes = { const.AIRCRAFT_B736  : B736,
              const.AIRCRAFT_T134  : T134,
              const.AIRCRAFT_T154  : T154,
              const.AIRCRAFT_YK40  : YK40 }
+
+#---------------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    value = SmoothedValue()
+
+    print "Adding 1, 12.0"
+    value.add(1, 12.0)
+    print value.get()
+
+    print "Adding 1, 15.0"
+    value.add(1, 15.0)
+    print value.get()
+
+    print "Adding 2, 18.0"
+    value.add(2, 18.0)
+    print value.get()
+
+    print "Adding 2, 20.0"
+    value.add(2, 20.0)
+    print value.get()
+
+    print "Adding 5, 22.0"
+    value.add(5, 22.0)
+    print value.get()
+
+    print "Adding 5, 25.0"
+    value.add(5, 25.0)
+    print value.get()
+
+    print "Adding 5, 29.0"
+    value.add(5, 29.0)
+    print value.get()
+
+    print "Adding 5, 21.0"
+    value.add(5, 21.0)
+    print value.get()
+
+    print "Adding 5, 26.0"
+    value.add(5, 26.0)
+    print value.get()
+
+    print "Adding 2, 30.0"
+    value.add(2, 30.0)
+    print value.get()
+
+    print "Adding 2, 55.0"
+    value.add(2, 55.0)
+    print value.get()
 
 #---------------------------------------------------------------------------------------

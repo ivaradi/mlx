@@ -661,6 +661,19 @@ class _English(_Strings):
         self.add("prefs_usingFS2Crew_tooltip",
                  "If this is checked, the logger will take into account, "
                  "that you are using the FS2Crew addon.")
+        self.add("prefs_iasSmoothingEnabled",
+                 "Enable the smoothing of _IAS over ")
+        self.add("prefs_iasSmoothingEnabledTooltip",
+                 "If enabled, the IAS value will be averaged over the "
+                 "given number of seconds, and in some checks "
+                 "this averaged value will be considered.")
+        self.add("prefs_vsSmoothingEnabled",
+                 "Enable the smoothing of _VS over ")
+        self.add("prefs_vsSmoothingEnabledTooltip",
+                 "If enabled, the VS value will be averaged over the "
+                 "given number of seconds, and in some checks "
+                 "this averaged value will be considered.")
+        self.add("prefs_smoothing_seconds", "sec.")
         self.add("prefs_pirepDirectory",
                  "_PIREP directory:")
         self.add("prefs_pirepDirectory_tooltip",
