@@ -1404,6 +1404,19 @@ class _Hungarian(_Strings):
         self.add("prefs_usingFS2Crew_tooltip",
                  "Ha ezt bejelölöd, a program figyelembe veszi, "
                  "hogy az FS2Crew kiegészítőt használod.")
+        self.add("prefs_iasSmoothingEnabled",
+                 "Az _IAS átlagolása ")
+        self.add("prefs_iasSmoothingEnabledTooltip",
+                 "Ha bekapcsolod, az IAS értékét a program a jelzett "
+                 "időtartamig átlagolja, és az egyes ellenőrzéseknél  "
+                 "ezt az átlagértéket hasznája.")
+        self.add("prefs_vsSmoothingEnabled",
+                 "A _vario átlagolása ")
+        self.add("prefs_vsSmoothingEnabledTooltip",
+                 "Ha bekapcsolod, a vario értékét a program a jelzett "
+                 "időtartamig átlagolja, és az egyes ellenőrzéseknél  "
+                 "ezt az átlagértéket hasznája.")
+        self.add("prefs_smoothing_seconds", "másodpercig.")
         self.add("prefs_pirepDirectory",
                  "_PIREP-ek könyvtára:")
         self.add("prefs_pirepDirectory_tooltip",
