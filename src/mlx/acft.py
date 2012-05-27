@@ -172,7 +172,6 @@ class Aircraft(object):
         self._smoothedIAS.add(config.realIASSmoothingLength, aircraftState.ias)
         aircraftState.smoothedIAS = self._smoothedIAS.get()
 
-        print "handleState, realVSSmoothingLength:", config.realVSSmoothingLength
         self._smoothedVS.add(config.realVSSmoothingLength, aircraftState.vs)
         aircraftState.smoothedVS = self._smoothedVS.get()
         
