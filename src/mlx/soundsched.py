@@ -168,7 +168,7 @@ class TouchdownApplause(Sound):
             self._touchdownTime = state.timestamp
 
         if state.timestamp>=(self._touchdownTime + 2) and \
-           flight.tdRate<150:
+           flight.tdRate>=150 and flight.tdRate<0:
             self._played = True
             return True
         else:
