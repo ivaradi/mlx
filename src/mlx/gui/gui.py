@@ -76,6 +76,7 @@ class GUI(fs.ConnectionListener):
         self._mainWindow = window = gtk.Window()
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
+        window.set_resizable(False)
         window.connect("delete-event",
                        lambda a, b: self.hideMainWindow())
         window.connect("window-state-event", self._handleMainWindowState)

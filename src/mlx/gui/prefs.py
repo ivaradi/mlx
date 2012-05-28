@@ -169,6 +169,7 @@ class Preferences(gtk.Dialog):
 
         self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
         self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+        self.set_resizable(False)
         
         self._gui = gui
         self._settingFromConfig = False
