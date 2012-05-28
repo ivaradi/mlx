@@ -789,6 +789,8 @@ class SendACARS(Request):
 
     def run(self):
         """Perform the sending of the ACARS."""
+        print "Sending the online ACARS"
+        
         url = "http://www.virtualairlines.hu/acars2/acarsonline.php"
 
         acars = self._acars

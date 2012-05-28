@@ -25,6 +25,7 @@ from mlx.pirep import PIREP
 import time
 import threading
 import sys
+import datetime
 
 #------------------------------------------------------------------------------
 
@@ -62,6 +63,7 @@ class GUI(fs.ConnectionListener):
 
         self._stdioLock = threading.Lock()
         self._stdioText = ""
+        self._stdioStartingLine = True
 
         self._sendPIREPCallback = None
 
@@ -714,14 +716,23 @@ class GUI(fs.ConnectionListener):
         else:
             text = lines[-1]
             lines = lines[:-1]
+
+        now = datetime.datetime.now()
+        timeStr = "%02d:%02d:%02d: " % (now.hour, now.minute, now.second)
             
         for line in lines:
             #print >> sys.__stdout__, line
+            if self._stdioStartingLine:
+                self._writeLog(timeStr, self._debugLogView)
             self._writeLog(line + "\n", self._debugLogView)
+            self._stdioStartingLine = True
 
         if text:
             #print >> sys.__stdout__, text,
+            if self._stdioStartingLine:
+                self._writeLog(timeStr, self._debugLogView)
             self._writeLog(text, self._debugLogView)
+            self._stdioStartingLine = False
 
     def connectSimulator(self, aircraftType):
         """Connect to the simulator for the first time."""
