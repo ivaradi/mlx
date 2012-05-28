@@ -103,6 +103,8 @@ class BookedFlight(object):
                                                
         arrivalTime = readline(f)
         self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
+        if self.arrivalTime<self.departureTime:
+            self.arrivalTime += datetime.timedelta(days = 1)
 
         if not readline(f)==".NEXT.":
             raise Exception("Invalid line in flight data")
