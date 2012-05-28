@@ -803,7 +803,7 @@ class GUI(fs.ConnectionListener):
         toolsMenuItem.set_submenu(toolsMenu)
         menuBar.append(toolsMenuItem)
 
-        checklistMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        checklistMenuItem = gtk.ImageMenuItem(gtk.STOCK_APPLY)
         checklistMenuItem.set_use_stock(True)
         checklistMenuItem.set_label(xstr("menu_tools_chklst"))
         checklistMenuItem.add_accelerator("activate", accelGroup,
@@ -812,7 +812,7 @@ class GUI(fs.ConnectionListener):
         checklistMenuItem.connect("activate", self._editChecklist)
         toolsMenu.append(checklistMenuItem)
 
-        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_APPLY)
+        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         prefsMenuItem.set_use_stock(True)
         prefsMenuItem.set_label(xstr("menu_tools_prefs"))
         prefsMenuItem.add_accelerator("activate", accelGroup,

@@ -904,8 +904,10 @@ if __name__ == "__main__":
     #time.sleep(3)
 
     #handler.getNOTAMs(callback, "LHBP", "EPWA")
-    handler.getMETARs(callback, ["LHBP", "EPWA"])
-    time.sleep(5)
+    #handler.getMETARs(callback, ["LHBP", "EPWA"])
+    #time.sleep(5)
     
+    handler.updatePlane(callback, "HA-LON", const.PLANE_AWAY, "")
+    time.sleep(3)    
 
 #------------------------------------------------------------------------------

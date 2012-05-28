@@ -1,9 +1,10 @@
 <html>
-  <head>
-    <title>MAVA Logger X User's Manual</title>
-  </head>
+<head>
+  <title>MAVA Logger X User's Manual</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
 <body>
-  <h1>MAVA Logger X User's Manual</h1>
+  <div align="center"><h1>MAVA Logger X User's Manual</h1></div>
 
   <h2>Overview</h2>
 
@@ -697,6 +698,30 @@
   it will actually disappear completely (i.e. not appear among the
   other minimized windows). You can make it appear by using the tray
   icon. 
+  </p>
+
+  <p>
+  The <i>MAVA Online Systems</i> frame contains settings related to
+  the online systems of MAVA, the gate and the ACARS systems mentioned
+  above. It is recommended to enabled these for normal operations.
+  </p>
+
+  <p>
+  The <i>Simulator</i> frame contains settings for how the program
+  interacts with the simulator. Most options are self-explanatory, but
+  the ones related to smoothing requires some discussion. Flight
+  Simulator is known for producing wind speed changes that are not
+  entirely realistic and can result in the simulated aircraft
+  experiencing some very high indicated airspeeds, which in turn can
+  also cause the autopilot to suddenly increase the climb rate to
+  counter the high speeds. Since this phenomenon is difficult to
+  protect oneself against without buying extra products, like FSUIPC,
+  the logger provides the possibility to average the IAS and/or the VS
+  over a few seconds so that spikes in these values are
+  smoothed. The <b>Enable the smoothing of IAS/VS over N sec.</b>
+  options allow controlling this feature. The number of seconds may
+  need experimenting with, but note that every change for which you
+  press the <b>OK</b> button  is taken into account immediately. 
   </p>
 
   <h3>The <i>Messages</i> Tab</h3>
