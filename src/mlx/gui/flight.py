@@ -29,27 +29,26 @@ class Page(gtk.Alignment):
         frame = gtk.Frame()
         self.add(frame)
 
-        style = self.get_style() if pygobject else self.rc_get_style()
-
         self._vbox = gtk.VBox()
         self._vbox.set_homogeneous(False)
         frame.add(self._vbox)
 
         eventBox = gtk.EventBox()
-        eventBox.modify_bg(0, style.bg[3])
 
         alignment = gtk.Alignment(xalign = 0.0, xscale = 0.0)
         
-        label = gtk.Label(title)
-        label.modify_fg(0, style.fg[3])
-        label.modify_font(pango.FontDescription("bold 24"))
+        titleLabel = gtk.Label(title)
+        titleLabel.modify_font(pango.FontDescription("bold 24"))
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 6, padding_right = 0)
                               
-        alignment.add(label)
+        alignment.add(titleLabel)
         eventBox.add(alignment)
         
         self._vbox.pack_start(eventBox, False, False, 0)
+
+        self._titleEventBox = eventBox
+        self._titleLabel = titleLabel
 
         mainBox = gtk.VBox()        
 
@@ -140,6 +139,13 @@ class Page(gtk.Alignment):
                               tooltip = xstr("button_next_tooltip"),
                               clicked = clicked)
 
+    def setStyle(self):
+        """Set the styles of some of the items on the page."""
+        style = self.get_style() if pygobject else self.rc_get_style()
+
+        self._titleEventBox.modify_bg(0, style.bg[3])
+        self._titleLabel.modify_fg(0, style.fg[3])
+    
     def initialize(self):
         """Initialize the page.
 
@@ -2511,7 +2517,7 @@ class Wizard(gtk.VBox):
         self._pages.append(self._landingPage)
         self._finishPage = FinishPage(self)
         self._pages.append(self._finishPage)
-        
+
         maxWidth = 0
         maxHeight = 0
         for page in self._pages:
@@ -2521,6 +2527,7 @@ class Wizard(gtk.VBox):
             height = pageSizeRequest.height if pygobject else pageSizeRequest[1]
             maxWidth = max(maxWidth, width)
             maxHeight = max(maxHeight, height)
+            page.setStyle()
         maxWidth += 16
         maxHeight += 32
         self.set_size_request(maxWidth, maxHeight)
