@@ -697,10 +697,10 @@ class T134(Aircraft):
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
         self.logger.message(aircraftState.timestamp,
-                            "Fuel: left aux=%.0f kg - left tip=%.0f kg - centre= %.0f kg - right tip=%.0f kg - right aux=%.0f kg - external 1=%.0f kg - external 2=%.0f kg" % \
-                            (aircraftState.fuel[1], aircraftState.fuel[0],
+                            "Fuel: left tip=%.0f kg - external 1=%.0f kg - left aux=%.0f kg - centre= %.0f kg - right aux=%.0f kg - external 2=%.0f kg - right tip=%.0f kg" % \
+                            (aircraftState.fuel[0], aircraftState.fuel[1],
                              aircraftState.fuel[2], 
-                             aircraftState.fuel[4], aircraftState.fuel[3],
+                             aircraftState.fuel[3], aircraftState.fuel[4],
                              aircraftState.fuel[5], aircraftState.fuel[6]))
         self.logger.message(aircraftState.timestamp,
                             "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
