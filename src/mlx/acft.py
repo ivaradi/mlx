@@ -676,10 +676,11 @@ class T134(Aircraft):
     external 2
     - n1: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_LEFT_AUX,
+    fuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
+                 const.FUELTANK_LEFT_AUX,
                  const.FUELTANK_CENTRE,
-                 const.FUELTANK_RIGHT_AUX, const.FUELTANK_RIGHT_TIP,
-                 const.FUELTANK_EXTERNAL1, const.FUELTANK_EXTERNAL2]
+                 const.FUELTANK_RIGHT_AUX,
+                 const.FUELTANK_EXTERNAL2, const.FUELTANK_RIGHT_TIP]
 
     def __init__(self, flight):
         super(T134, self).__init__(flight)
