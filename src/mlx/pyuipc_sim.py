@@ -780,31 +780,31 @@ def open(request):
 
 #------------------------------------------------------------------------------
 
-def prepare_data(pattern, forRead = True):
+def prepare_data(pattern, forRead = True, checkOpened = True):
     """Prepare the given pattern for reading and/or writing."""
-    if opened:
+    if not checkOpened or opened:
         return pattern
     else:
-        raise FSUIPCException(ERR_OPEN)
+        raise FSUIPCException(ERR_NOTOPEN)
         
 #------------------------------------------------------------------------------
 
-def read(data):
+def read(data, checkOpened = True):
     """Read the given data."""
-    if opened:
+    if not checkOpened or opened:
         return [values.read(offset, type) for (offset, type) in data]
     else:
-        raise FSUIPCException(ERR_OPEN)
+        raise FSUIPCException(ERR_NOTOPEN)
             
 #------------------------------------------------------------------------------
 
-def write(data):
+def write(data, checkOpened = True):
     """Write the given data."""
-    if opened:
+    if not checkOpened or opened:
         for (offset, type, value) in data:
             values.write(offset, value, type)
     else:
-        raise FSUIPCException(ERR_OPEN)
+        raise FSUIPCException(ERR_NOTOPEN)
             
 #------------------------------------------------------------------------------
 
@@ -862,9 +862,9 @@ class Server(threading.Thread):
                 
                 try:
                     if call==CALL_READ:
-                        result = read(args[0])
+                        result = read(args[0], checkOpened = False)
                     elif call==CALL_WRITE:
-                        result = write(args[0])
+                        result = write(args[0], checkOpened = False)
                     elif call==CALL_SETVERSION:
                         global fs_version
                         fs_version = args[0]
@@ -885,7 +885,7 @@ class Server(threading.Thread):
                 if exception is None:
                     data = cPickle.dumps((RESULT_RETURNED, result))
                 else:
-                    data = cPickle.dumps((RESULT_EXCEPTION, exception))
+                    data = cPickle.dumps((RESULT_EXCEPTION, str(exception)))
                 clientSocket.send(struct.pack("I", len(data)) + data)
         except Exception, e:
             print >> sys.stderr, "pyuipc_sim.Server._process: failed with exception:", str(e)
@@ -943,7 +943,7 @@ class Client(object):
         if resultCode==RESULT_RETURNED:
             return result
         else:
-            raise result        
+            raise Exception(result)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
