@@ -273,6 +273,15 @@ class _English(_Strings):
         self.add("flightsel_deptime", "Departure time [UTC]")
         self.add("flightsel_from", "From")
         self.add("flightsel_to", "To")
+        self.add("flightsel_save", "_Save flight")
+        self.add("flightsel_save_tooltip",
+                 "Click here to save the currently selected flight into "
+                 "a file that can be loaded later.")
+        self.add("flightsel_save_title", "Save a flight into a file")
+        self.add("flightsel_save_failed",
+                 "Could not save the flight into a file.")
+        self.add("flightsel_save_failed_sec",
+                 "Check the debug log for more details.")
         self.add("flightsel_refresh", "_Refresh flights")
         self.add("flightsel_refresh_tooltip",
                  "Click here to refresh the list of flights from the MAVA website.")

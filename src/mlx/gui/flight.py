@@ -374,6 +374,12 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(alignment)
 
+        self._saveButton = self.addButton(xstr("flightsel_save"),
+                                          sensitive = False,
+                                          clicked = self._saveClicked,
+                                          tooltip = xstr("flightsel_save_tooltip"))
+        self._saveDialog = None
+
         self._refreshButton = self.addButton(xstr("flightsel_refresh"),
                                              sensitive = True,
                                              clicked = self._refreshClicked,
@@ -418,6 +424,39 @@ class FlightSelectionPage(Page):
                                 flight.departureICAO,
                                 flight.arrivalICAO])
 
+    def _saveClicked(self, button):
+        """Called when the Save flight button is clicked."""
+        flight = self._getSelectedFlight()
+        date = flight.departureTime.date()
+        name = "%04d-%02d-%02d %s %s-%s.vaflight" % \
+               (date.year, date.month, date.day, flight.callsign,
+                flight.departureICAO, flight.arrivalICAO)
+
+        dialog = self._getSaveDialog()
+        dialog.set_current_name(name)
+        dialog.show_all()
+        response = dialog.run()
+        dialog.hide()
+
+        if response==RESPONSETYPE_OK:
+            fileName = dialog.get_filename()
+            print "Saving", fileName
+            try:
+                with open(fileName, "wt") as f:
+                    flight.writeIntoFile(f)
+            except Exception, e:
+                print "Failed to save flight:", str(e)
+                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                           type = MESSAGETYPE_ERROR,
+                                           message_format =
+                                           xstr("flightsel_save_failed"))
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                secondary = xstr("flightsel_save_failed_sec")
+                dialog.format_secondary_markup(secondary)
+                dialog.run()
+                dialog.hide()
+                
     def _refreshClicked(self, button):
         """Called when the refresh button is clicked."""
         self._wizard.reloadFlights(self._refreshCallback)
@@ -429,7 +468,9 @@ class FlightSelectionPage(Page):
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
-        self._button.set_sensitive(selection.count_selected_rows()==1)
+        selected = selection.count_selected_rows()==1
+        self._saveButton.set_sensitive(selected)
+        self._button.set_sensitive(selected)
 
     def _loadButtonClicked(self, loadButton):
         """Called when the load a flight button is clicked."""
@@ -464,16 +505,20 @@ class FlightSelectionPage(Page):
         if self._completed:
             self._wizard.jumpPage(self._nextDistance, finalize = False)
         else:
-            selection = self._flightList.get_selection()
-            (listStore, iter) = selection.get_selected()
-            path = listStore.get_path(iter)
-            [index] = path.get_indices() if pygobject else path
-
-            flight = self._flights[index]
+            flight = self._getSelectedFlight()
             self._wizard._bookedFlight = flight
             self._wizard.gui.enableFlightInfo()
 
             self._updateDepartureGate()
+
+    def _getSelectedFlight(self):
+        """Get the currently selected flight."""
+        selection = self._flightList.get_selection()
+        (listStore, iter) = selection.get_selected()
+        path = listStore.get_path(iter)
+        [index] = path.get_indices() if pygobject else path
+        
+        return self._flights[index]
         
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
@@ -514,6 +559,36 @@ class FlightSelectionPage(Page):
         self._nextDistance = 2
         self._wizard.jumpPage(2)
 
+    def _getSaveDialog(self):
+        """Get the dialog to load a flight file."""
+        if self._saveDialog is not None:
+            return self._saveDialog
+        
+        gui = self._wizard.gui
+        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                       xstr("flightsel_save_title"),
+                                       action = FILE_CHOOSER_ACTION_SAVE,
+                                       buttons = (gtk.STOCK_CANCEL,
+                                                  RESPONSETYPE_CANCEL,
+                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                       parent = gui.mainWindow)
+        dialog.set_modal(True)            
+        dialog.set_do_overwrite_confirmation(True)
+
+        filter = gtk.FileFilter()
+        filter.set_name(xstr("flightsel_filter_flights"))
+        filter.add_pattern("*.vaflight")
+        dialog.add_filter(filter)
+            
+        filter = gtk.FileFilter()
+        filter.set_name(xstr("file_filter_all"))
+        filter.add_pattern("*.*")
+        dialog.add_filter(filter)
+
+        self._saveDialog = dialog
+        
+        return dialog        
+    
     def _getLoadDialog(self):
         """Get the dialog to load a flight file."""
         if self._loadDialog is not None:
