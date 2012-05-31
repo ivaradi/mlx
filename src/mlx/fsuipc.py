@@ -342,8 +342,12 @@ class Handler(threading.Thread):
                     (pyuipc.fsuipc_version, pyuipc.lib_version, 
                      pyuipc.fs_version)
                 if not autoReconnection:
+                    fsType = const.SIM_MSFSX \
+                             if pyuipc.fs_version == pyuipc.SIM_FSX \
+                             else const.SIM_MSFS9
+                
                     Handler._callSafe(lambda:     
-                                      self._connectionListener.connected(const.SIM_MSFS9, 
+                                      self._connectionListener.connected(fsType,
                                                                          description))
                 self._connected = True
                 return attempts
@@ -530,6 +534,7 @@ class Simulator(object):
          the touch-down rate, tdRateCalculatedBySim indicates if the data comes
          from the simulator or was calculated by the adapter. The other data
          are self-explanatory and expressed in their 'natural' units."""
+        self._fsType = None
         self._aircraft = None
 
         self._handler = Handler(self,
@@ -748,6 +753,7 @@ class Simulator(object):
     def connected(self, fsType, descriptor):
         """Called when a connection has been established to the flight
         simulator of the given type."""
+        self._fsType = fsType
         with self._hotkeyLock:
             if self._hotkeys is not None:
                 self._hotkeySetGeneration += 1
@@ -891,7 +897,7 @@ class Simulator(object):
     def _startMonitoring(self):
         """Start monitoring with the current aircraft model."""
         data = Simulator.normalData[:]
-        self._aircraftModel.addMonitoringData(data)
+        self._aircraftModel.addMonitoringData(data, self._fsType)
         
         self._normalRequestID = \
             self._handler.requestPeriodicRead(1.0, data, 
@@ -1238,7 +1244,7 @@ class AircraftModel(object):
         for (name, offset, type) in data:
             self._addOffsetWithIndexMember(dest, offset, type, prefix + name)
             
-    def addMonitoringData(self, data):
+    def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
         self._addDataWithIndexMembers(data, "_monidx_",
                                       AircraftModel.monitoringData)
@@ -1366,9 +1372,9 @@ class GenericAircraftModel(AircraftModel):
         This implementation returns True."""
         return True
 
-    def addMonitoringData(self, data):
+    def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
-        super(GenericAircraftModel, self).addMonitoringData(data)
+        super(GenericAircraftModel, self).addMonitoringData(data, fsType)
         
         self._addOffsetWithIndexMember(data, 0x0af4, "H", "_monidx_fuelWeight")
 
@@ -1463,13 +1469,20 @@ class PMDGBoeing737NGModel(B737Model):
     @property
     def name(self):
         """Get the name for this aircraft model."""
-        return "FSUIPC/PMDG Boeing 737NG"
+        return "FSUIPC/PMDG Boeing 737NG(X)"
 
-    def addMonitoringData(self, data):
+    def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
-        super(PMDGBoeing737NGModel, self).addMonitoringData(data)
+        self._fsType = fsType
+        
+        super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
                 
         self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
+
+        if fsType==const.SIM_MSFSX:
+            print "FSX detected, adding position lights switch offset"
+            self._addOffsetWithIndexMember(data, 0x6500, "b",
+                                           "_pmdgidx_lts_positionsw")
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
@@ -1480,6 +1493,9 @@ class PMDGBoeing737NGModel(B737Model):
                                                                    data)
         if data[self._pmdgidx_switches]&0x01==0x01:
             state.altimeter = 1013.25
+
+        if self._fsType==const.SIM_MSFSX:
+            state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
 
         return state
 

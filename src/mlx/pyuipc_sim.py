@@ -24,6 +24,7 @@ SIM_CFS1=4
 SIM_FLY=5
 SIM_FS2K2=6
 SIM_FS2K4=7
+SIM_FSX=8
 
 #------------------------------------------------------------------------------
 
@@ -260,6 +261,9 @@ class Values(object):
         for i in range(0, Values.HOTKEY_SIZE):
             self.hotkeyTable.append([0, 0, 0, 0])
 
+        self.pmdg_737ng_switches = 0
+        self.pmdg_737ngx_lts_positionsw = 0
+
     def read(self, offset, type):
         """Read the value at the given offset."""
         try:
@@ -479,6 +483,10 @@ class Values(object):
             return self.airPath
         elif offset==0x3d00:       # Name of the current aircraft
             return self.aircraftName
+        elif offset==0x6202:       # PMDG 737NG switches
+            return self.pmdg_737ng_switches
+        elif offset==0x6500:       # PMDG 737NGX lights position SW
+            return self.pmdg_737ngx_lts_positionsw
         else:
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
@@ -687,6 +695,10 @@ class Values(object):
             self.airPath = value
         elif offset==0x3d00:       # Name of the current aircraft
             self.aircraftName = value
+        elif offset==0x6202:       # PMDG 737NG switches
+            self.pmdg_737ng_switches = value
+        elif offset==0x6500:       # PMDG 737NGX lights position SW
+            self.pmdg_737ngx_lts_positionsw = value
         else:
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
@@ -807,8 +819,9 @@ PORT=15015
 
 CALL_READ=1
 CALL_WRITE=2
-CALL_CLOSE=3
-CALL_FAILOPEN=4
+CALL_SETVERSION=3
+CALL_CLOSE=4
+CALL_FAILOPEN=5
 CALL_QUIT = 99
 
 RESULT_RETURNED=1
@@ -852,6 +865,10 @@ class Server(threading.Thread):
                         result = read(args[0])
                     elif call==CALL_WRITE:
                         result = write(args[0])
+                    elif call==CALL_SETVERSION:
+                        global fs_version
+                        fs_version = args[0]
+                        result = None
                     elif call==CALL_CLOSE:
                         global opened
                         opened = False
@@ -898,6 +915,10 @@ class Client(object):
     def write(self, data):
         """Write the given data."""
         return self._call(CALL_WRITE, data)
+
+    def setVersion(self, version):
+        """Set the FS version to emulate."""
+        return self._call(CALL_SETVERSION, int(version))
 
     def close(self):
         """Close the connection currently opened in the simulator."""
@@ -1230,6 +1251,15 @@ class CLI(cmd.Cmd):
             self._valueHandlers["hotkey%d" % (i,)] = (0x3210 + i*4, "u",
                                                       lambda value: "0x%08x" % (value,),
                                                       lambda word: long(word, 16))
+
+        self._valueHandlers["pmdg_737ng_switches"] = (0x6202, "b",
+                                                      lambda value: value,
+                                                      lambda word: int(word))
+
+        self._valueHandlers["pmdg_737ngx_lts_positionsw"] = (0x6500, "b",
+                                                             lambda value: value,
+                                                             lambda word: int(word))
+
     def default(self, line):
         """Handle unhandle commands."""
         if line=="EOF":
@@ -1312,13 +1342,27 @@ class CLI(cmd.Cmd):
         else:
             return [key + "=" for key in self._valueHandlers if key.startswith(text)]
 
+    def do_setversion(self, args):
+        """Set the version number to simulate"""
+        try:
+            value = int(args)
+            self._client.setVersion(value)
+            print "Emulating version %d" % (value,)
+        except Exception, e:
+            print >> sys.stderr, "Failed to set the version: " + str(e)
+
+    def help_setversion(self, usage = False):
+        """Help for the setversion command"""
+        if usage: print "Usage:",
+        print "setversion <number>"
+
     def do_close(self, args):
         """Close an existing connection so that FS will fail."""
         try:
             self._client.close()
             print "Connection closed"
         except Exception, e:
-            print >> sys.stderr, "Failed to close the connection: " + str(e)        
+            print >> sys.stderr, "Failed to close the connection: " + str(e)
         
     def do_failopen(self, args):
         """Enable/disable the failing of opens."""
@@ -1330,7 +1374,7 @@ class CLI(cmd.Cmd):
             print >> sys.stderr, "Failed to set open failure: " + str(e)        
 
     def help_failopen(self, usage = False):
-        """Help for the failopen close"""
+        """Help for the failopen command"""
         if usage: print "Usage:",
         print "failopen yes|no"
 
