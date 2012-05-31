@@ -72,10 +72,7 @@ class Aircraft(object):
         self._checkers.append(checks.NAV2Logger())
         self._checkers.append(checks.SquawkLogger())
 
-        self._checkers.append(checks.AnticollisionLightsLogger())
-        self._checkers.append(checks.LandingLightsLogger())
-        self._checkers.append(checks.StrobeLightsLogger())
-        self._checkers.append(checks.NavLightsLogger())
+        self._appendLightsLoggers()
 
         self._checkers.append(checks.FlapsLogger())
 
@@ -95,11 +92,8 @@ class Aircraft(object):
             self._checkers.append(checks.ACARSSender(flight._gui))
 
         # Fault checkers
-        
-        self._checkers.append(checks.AntiCollisionLightsChecker())
-        self._checkers.append(checks.LandingLightsChecker())
-        self._checkers.append(checks.NavLightsChecker())
-        self._checkers.append(checks.StrobeLightsChecker())
+
+        self._appendLightsCheckers()
 
         self._checkers.append(checks.BankChecker())
 
@@ -312,6 +306,26 @@ class Aircraft(object):
         have already been logged."""
         if self._v1r2LineIndex is not None:
             self._logV1R2()
+
+    def _appendLightsLoggers(self):
+        """Append the loggers needed for the lights.
+
+        This default implementation adds the loggers for the anti-collision
+        lights, the landing lights, the strobe lights and the NAV lights."""
+        self._checkers.append(checks.AnticollisionLightsLogger())
+        self._checkers.append(checks.LandingLightsLogger())
+        self._checkers.append(checks.StrobeLightsLogger())
+        self._checkers.append(checks.NavLightsLogger())
+
+    def _appendLightsCheckers(self):
+        """Append the checkers needed for the lights.
+
+        This default implementation adds the checkers for the anti-collision
+        lights, the landing lights, the strobe lights and the NAV lights."""
+        self._checkers.append(checks.AntiCollisionLightsChecker())
+        self._checkers.append(checks.LandingLightsChecker())
+        self._checkers.append(checks.NavLightsChecker())
+        self._checkers.append(checks.StrobeLightsChecker())
 
     def _logV1R2(self):
         """Log the V1, Vr and V2 value either newly, or by updating the
@@ -705,6 +719,18 @@ class T134(Aircraft):
         self.logger.message(aircraftState.timestamp,
                             "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
                             
+    def _appendLightsLoggers(self):
+        """Append the loggers needed for the lights."""
+        self._checkers.append(checks.AnticollisionLightsLogger())
+        self._checkers.append(checks.LandingLightsLogger())
+        self._checkers.append(checks.NavLightsLogger())
+
+    def _appendLightsCheckers(self):
+        """Append the checkers needed for the lights."""
+        self._checkers.append(checks.TupolevAntiCollisionLightsChecker())
+        self._checkers.append(checks.LandingLightsChecker())
+        self._checkers.append(checks.NavLightsChecker())
+
 #---------------------------------------------------------------------------------------
 
 class T154(Aircraft):
@@ -740,6 +766,18 @@ class T154(Aircraft):
         self.logger.message(aircraftState.timestamp,
                             "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
 
+    def _appendLightsLoggers(self):
+        """Append the loggers needed for the lights."""
+        self._checkers.append(checks.AnticollisionLightsLogger())
+        self._checkers.append(checks.LandingLightsLogger())
+        self._checkers.append(checks.NavLightsLogger())
+
+    def _appendLightsCheckers(self):
+        """Append the checkers needed for the lights."""
+        self._checkers.append(checks.TupolevAntiCollisionLightsChecker())
+        self._checkers.append(checks.LandingLightsChecker())
+        self._checkers.append(checks.NavLightsChecker())
+
 #---------------------------------------------------------------------------------------
 
 
@@ -771,6 +809,18 @@ class YK40(Aircraft):
                             (aircraftState.fuel[0], aircraftState.fuel[1]))
         self.logger.message(aircraftState.timestamp,
                             "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
+
+    def _appendLightsLoggers(self):
+        """Append the loggers needed for the lights."""
+        self._checkers.append(checks.AnticollisionLightsLogger())
+        self._checkers.append(checks.LandingLightsLogger())
+        self._checkers.append(checks.NavLightsLogger())
+
+    def _appendLightsCheckers(self):
+        """Append the checkers needed for the lights."""
+        self._checkers.append(checks.AntiCollisionLightsChecker())
+        self._checkers.append(checks.LandingLightsChecker())
+        self._checkers.append(checks.NavLightsChecker())
 
 #---------------------------------------------------------------------------------------
 

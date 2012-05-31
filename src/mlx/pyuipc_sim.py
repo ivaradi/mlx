@@ -117,7 +117,7 @@ class Values(object):
     FUEL_LEFT_TIP = 5
 
     # Fuel data index: right tip tank
-    FUEL_RIGHT_AUX = 6
+    FUEL_RIGHT_TIP = 6
 
     # Fuel data index: external 1 tank
     FUEL_EXTERNAL_1 = 7
@@ -185,7 +185,8 @@ class Values(object):
                        "FS9\\Aircraft\\Cessna\\cessna172.air"
         self.aircraftName = "Cessna 172SP"
         self.flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40]
-        self.fuelCapacities = [10000.0, 5000.0, 5000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.fuelCapacities = [10000.0, 5000.0, 5000.0, 5000.0, 5000.0,
+                               5000.0, 5000.0, 5000.0, 5000.0, 5000.0]
 
         self.latitude = 47.5
         self.longitude = 19.05
