@@ -467,6 +467,7 @@ class Login(Request):
 
         if result.loggedIn:
             result.pilotID = self._pilotID
+            result.password = self._password
             result.flights = []
             # FIXME: this may not be the correct behaviour
             # for an entrance exam, but the website returns

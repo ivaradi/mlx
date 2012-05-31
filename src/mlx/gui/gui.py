@@ -401,6 +401,22 @@ class GUI(fs.ConnectionListener):
         """Enable the flight info tab."""
         self._flightInfo.enable()
 
+    def cancelFlight(self):
+        """Cancel the current file, if the user confirms it."""
+        dialog = gtk.MessageDialog(parent = self._mainWindow,
+                                   type = MESSAGETYPE_QUESTION,
+                                   message_format = xstr("cancelFlight_question"))
+
+        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+
+        dialog.set_title(WINDOW_TITLE_BASE)
+        result = dialog.run()
+        dialog.hide()
+        
+        if result==RESPONSETYPE_YES:
+            self.reset()
+
     def reset(self):
         """Reset the GUI."""
         self._disconnect()
@@ -411,10 +427,15 @@ class GUI(fs.ConnectionListener):
 
         self._weightHelp.reset()
         self._weightHelp.disable()
-        self._wizard.reset()
         self._notebook.set_current_page(0)
 
         self._logView.get_buffer().set_text("")
+
+        self._wizard.reloadFlights(self._handleReloadResult)
+
+    def _handleReloadResult(self, returned, result):
+        """Handle the result of the reloading of the flights."""
+        self._wizard.reset(result if returned and result.loggedIn else None)
 
     def _disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator if connected."""

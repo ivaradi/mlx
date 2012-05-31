@@ -106,12 +106,12 @@ class Page(gtk.Alignment):
         self._mainAlignment.add(widget)
 
     def addButton(self, label, default = False, sensitive = True,
-                  tooltip = None, clicked = None):
+                  tooltip = None, clicked = None, padding = 4):
         """Add a button with the given label.
 
         Return the button object created."""
         button = gtk.Button(label)
-        self._buttonBox.pack_start(button, False, False, 4)
+        self._buttonBox.pack_start(button, False, False, padding)
         button.set_use_underline(True)
         if default:
             button.set_can_default(True)
@@ -122,6 +122,14 @@ class Page(gtk.Alignment):
         if clicked is not None:
             button.connect("clicked", clicked)
         return button
+
+    def addCancelFlightButton(self):
+        """Add the 'Cancel flight' button to the page."""
+        return self.addButton(xstr("button_cancelFlight"),
+                              sensitive = True,
+                              tooltip = xstr("button_cancelFlight_tooltip"),
+                              clicked = self._cancelFlight,
+                              padding = 16)
 
     def addPreviousButton(self, sensitive = True, clicked = None):
         """Add the 'Next' button to the page."""
@@ -190,6 +198,10 @@ class Page(gtk.Alignment):
         assert self._fromPage is not None
         
         self._wizard.setCurrentPage(self._fromPage, finalize = False)
+
+    def _cancelFlight(self, button):
+        """Called when the Cancel flight button is clicked."""
+        self._wizard.gui.cancelFlight()
     
 #-----------------------------------------------------------------------------
 
@@ -278,7 +290,7 @@ class LoginPage(Page):
         The remember password checkbox is sensitive only, if the password field
         contains text.
 
-        The entrance exam checkbox is senstive only, if the pilot ID is not
+        The entrance exam checkbox is sensitive only, if the pilot ID is not
         empty."""
         pilotID = self._pilotID.get_text()
         password = self._password.get_text()
@@ -291,61 +303,26 @@ class LoginPage(Page):
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
-        gui = self._wizard.gui
-        gui.beginBusy(xstr("login_busy"))
-        gui.webHandler.login(self._loginResultCallback,
-                             self._pilotID.get_text(),
-                             self._password.get_text(),
-                             entranceExam = self.entranceExam)
-
-    def _loginResultCallback(self, returned, result):
-        """The login result callback, called in the web handler's thread."""
-        gobject.idle_add(self._handleLoginResult, returned, result)
+        self._wizard.login(self._handleLoginResult,
+                           self._pilotID.get_text(),
+                           self._password.get_text(),
+                           self.entranceExam)
 
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
-        self._wizard.gui.endBusy()
         self._loginButton.set_sensitive(True)
-        if returned:
-            if result.loggedIn:
-                config = self._wizard.gui.config
+        if returned and result.loggedIn:
+            config = self._wizard.gui.config
 
-                config.pilotID = self._pilotID.get_text()
+            config.pilotID = self._pilotID.get_text()
 
-                rememberPassword = self._rememberButton.get_active()                
-                config.password = self._password.get_text() if rememberPassword  \
-                                  else ""
+            rememberPassword = self._rememberButton.get_active()                
+            config.password = result.password if rememberPassword else ""
 
-                config.rememberPassword = rememberPassword
-                
-                config.save()
-                self._wizard._loginResult = result
-                self._wizard.nextPage()
-            else:
-                message = xstr("login_entranceExam_invalid"
-                               if self.entranceExam else
-                               xstr("login_invalid"))
-                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                           type = MESSAGETYPE_ERROR,
-                                           message_format = message)
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-                dialog.set_title(WINDOW_TITLE_BASE)
-                secondary = xstr("login_entranceExam_invalid_sec"
-                                 if self.entranceExam else
-                                 xstr("login_invalid_sec"))
-                dialog.format_secondary_markup(secondary)
-                dialog.run()
-                dialog.hide()
-        else:
-            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
-                                       message_format = xstr("login_failconn"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-            dialog.set_title(WINDOW_TITLE_BASE)
-            dialog.format_secondary_markup(xstr("login_failconn_sec"))
-            
-            dialog.run()
-            dialog.hide()
+            config.rememberPassword = rememberPassword
+
+            config.save()
+            self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
 
@@ -397,6 +374,11 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(alignment)
 
+        self._refreshButton = self.addButton(xstr("flightsel_refresh"),
+                                             sensitive = True,
+                                             clicked = self._refreshClicked,
+                                             tooltip = xstr("flightsel_refresh_tooltip"))
+
         self._loadButton = self.addButton(xstr("flightsel_load"),
                                           sensitive = True,
                                           tooltip = xstr("flightsel_load_tooltip"))
@@ -411,14 +393,22 @@ class FlightSelectionPage(Page):
     def activate(self):
         """Fill the flight list."""
         self._flightList.set_sensitive(True)
-        self._flights = []
-        self._listStore.clear()
-        for flight in self._wizard.loginResult.flights:
-            self._addFlight(flight)
+        self._loadButton.set_sensitive(True)
+        self._refreshButton.set_sensitive(True)
+        self._buildFlights()
             
     def finalize(self):
         """Finalize the page."""
         self._flightList.set_sensitive(False)
+        self._loadButton.set_sensitive(False)
+        self._refreshButton.set_sensitive(False)
+
+    def _buildFlights(self):
+        """Rebuild the flights from the login result."""
+        self._flights = []
+        self._listStore.clear()
+        for flight in self._wizard.loginResult.flights:
+            self._addFlight(flight)
 
     def _addFlight(self, flight):
         """Add the given file to the list of flights."""
@@ -427,6 +417,15 @@ class FlightSelectionPage(Page):
                                 flight.callsign,
                                 flight.departureICAO,
                                 flight.arrivalICAO])
+
+    def _refreshClicked(self, button):
+        """Called when the refresh button is clicked."""
+        self._wizard.reloadFlights(self._refreshCallback)
+
+    def _refreshCallback(self, returned, result):
+        """Callback for the refresh."""
+        if returned and result.loggedIn:
+            self._buildFlights()
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""
@@ -580,6 +579,8 @@ class GateSelectionPage(Page):
 
         self.setMainWidget(alignment)        
 
+        self.addCancelFlightButton()
+
         self.addPreviousButton(clicked = self._backClicked)
         
         self._button = self.addNextButton(sensitive = False,
@@ -727,6 +728,8 @@ class ConnectPage(Page):
         self._departureGate.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 4, 5)
+
+        self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
 
@@ -878,6 +881,7 @@ class PayloadPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 6, 7)
 
+        self.addCancelFlightButton()
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
 
@@ -1007,6 +1011,8 @@ class TimePage(Page):
         self._simulatorTime = gtk.Label("-")
         self._simulatorTime.set_alignment(0.0, 0.5)
         table.attach(self._simulatorTime, 1, 2, 2, 3)
+
+        self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
@@ -1282,6 +1288,8 @@ class FuelPage(Page):
         tankData = ((2500, 3900),) * len(tanks)
         self._setupTanks(tanks, tankData)
 
+        self.addCancelFlightButton()
+
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
 
@@ -1442,6 +1450,8 @@ class RoutePage(Page):
         routeBox.pack_start(routeWindow, True, True, 0)        
 
         mainBox.pack_start(routeBox, True, True, 8)
+
+        self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)        
         self._button = self.addNextButton(clicked = self._forwardClicked)
@@ -1628,6 +1638,8 @@ class BriefingPage(Page):
         self._metarFrame.add(alignment)
         mainBox.pack_start(self._metarFrame, True, True, 4)
         self.metarEdited = False
+
+        self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
@@ -1823,6 +1835,8 @@ class TakeoffPage(Page):
         
         table.attach(gtk.Label(xstr("label_knots")), 3, 4, 4, 5)
 
+        self.addCancelFlightButton()
+
         self.addPreviousButton(clicked = self._backClicked)
 
         self._button = self.addNextButton(clicked = self._forwardClicked)
@@ -2004,6 +2018,8 @@ class LandingPage(Page):
         label.set_mnemonic_widget(self._vref)
         
         table.attach(gtk.Label(xstr("label_knots")), 4, 5, 5, 6)
+
+        self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
 
@@ -2280,6 +2296,12 @@ class FinishPage(Page):
         table.attach(gateAlignment, 1, 2, 7, 8)
         self._gateLabel.set_mnemonic_widget(self._gate)
 
+        self.addButton(xstr("finish_newFlight"),
+                       sensitive = True,
+                       clicked = self._newFlightClicked,
+                       tooltip = xstr("finish_newFlight_tooltip"),
+                       padding = 16)
+
         self.addPreviousButton(clicked = self._backClicked)
 
         self._saveButton = self.addButton(xstr("finish_save"),
@@ -2288,6 +2310,9 @@ class FinishPage(Page):
                                           tooltip = xstr("finish_save_tooltip"))
         self._savePIREPDialog = None
         self._lastSavePath = None
+
+        self._pirepSaved = False
+        self._pirepSent = False
         
         self._sendButton = self.addButton(xstr("sendPIREP"), default = True,
                                           sensitive = False,
@@ -2307,6 +2332,9 @@ class FinishPage(Page):
 
     def activate(self):
         """Activate the page."""
+        self._pirepSaved = False
+        self._pirepSent = False
+
         flight = self._wizard.gui._flight
         rating = flight.logger.getRating()
         if rating<0:
@@ -2368,6 +2396,25 @@ class FinishPage(Page):
         """Called when the arrival gate has changed."""
         self._updateButtons()
 
+    def _newFlightClicked(self, button):
+        """Called when the new flight button is clicked."""
+        gui = self._wizard.gui
+        if not self._pirepSent and not self._pirepSaved:
+            dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                       type = MESSAGETYPE_QUESTION,
+                                       message_format = xstr("finish_newFlight_question"))
+
+            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+
+            dialog.set_title(WINDOW_TITLE_BASE)
+            result = dialog.run()
+            dialog.hide()
+            if result!=RESPONSETYPE_YES:
+                return
+            
+        gui.reset()
+
     def _saveClicked(self, button):
         """Called when the Save PIREP button is clicked."""
         gui = self._wizard.gui
@@ -2404,6 +2451,7 @@ class FinishPage(Page):
                 type = MESSAGETYPE_INFO
                 message = xstr("finish_save_done")
                 secondary = None
+                self._pirepSaved = True
             else:
                 type = MESSAGETYPE_ERROR
                 message = xstr("finish_save_failed")
@@ -2458,6 +2506,7 @@ class FinishPage(Page):
 
     def _handlePIREPSent(self, returned, result):
         """Callback for the PIREP sending result."""
+        self._pirepSent = returned and result.success
         if self._wizard.gui.config.onlineGateSystem and \
            not self._wizard.entranceExam and \
            returned and result.success:
@@ -2682,9 +2731,10 @@ class Wizard(gtk.VBox):
         """Called when the connection could be made to the simulator."""
         self.nextPage()
 
-    def reset(self):
+    def reset(self, loginResult):
         """Resets the wizard to go back to the login page."""
-        self._initialize()
+        self._initialize(keepLoginResult = loginResult is None,
+                         loginResult = loginResult)
 
     def setStage(self, stage):
         """Set the flight stage to the given one."""
@@ -2699,12 +2749,16 @@ class Wizard(gtk.VBox):
         elif stage==const.STAGE_END:
             self._landingPage.flightEnded()
 
-    def _initialize(self):
+    def _initialize(self, keepLoginResult = False, loginResult = None):
         """Initialize the wizard."""
+        if not keepLoginResult:
+            self._loginResult = loginResult
+
+        self._loginCallback = None
+
         self._fleet = None
         self._fleetCallback = None
         
-        self._loginResult = None
         self._bookedFlight = None
         self._departureGate = "-"
         self._fuelData = None
@@ -2713,10 +2767,86 @@ class Wizard(gtk.VBox):
         self._arrivalNOTAMs = None
         self._arrivalMETAR = None
 
-        for page in self._pages:
+        firstPage = 0 if self._loginResult is None else 1
+        for page in self._pages[firstPage:]:
             page.reset()
         
-        self.setCurrentPage(0)
+        self.setCurrentPage(firstPage)
+
+    def login(self, callback, pilotID, password, entranceExam):
+        """Called when the login button was clicked."""
+        self._loginCallback = callback
+        if pilotID is None:
+            loginResult = self._loginResult
+            assert loginResult is not None and loginResult.loggedIn
+            pilotID = loginResult.pilotID
+            password = loginResult.password
+            entranceExam = loginResult.entranceExam
+            busyMessage = xstr("reload_busy")
+        else:
+            self._loginResult = None
+            busyMessage = xstr("login_busy")
+
+        self.gui.beginBusy(busyMessage)
+        
+        self.gui.webHandler.login(self._loginResultCallback,
+                                  pilotID, password,
+                                  entranceExam = entranceExam)
+
+    def reloadFlights(self, callback):
+        """Reload the flights from the MAVA server."""
+        self.login(callback, None, None, None)
+
+    def _loginResultCallback(self, returned, result):
+        """The login result callback, called in the web handler's thread."""
+        gobject.idle_add(self._handleLoginResult, returned, result)
+
+    def _handleLoginResult(self, returned, result):
+        """Handle the login result."""
+        self.gui.endBusy()
+        isReload = self._loginResult is not None
+        if returned:
+            if result.loggedIn:
+                self._loginResult = result
+            else:
+                if isReload:
+                    message = xstr("reload_failed")
+                else:
+                    message = xstr("login_entranceExam_invalid"
+                                   if self.entranceExam else
+                                   xstr("login_invalid"))
+                dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                                           type = MESSAGETYPE_ERROR,
+                                           message_format = message)
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                if isReload:
+                    secondary = xstr("reload_failed_sec")
+                else:
+                    secondary = xstr("login_entranceExam_invalid_sec"
+                                     if self.entranceExam else
+                                     xstr("login_invalid_sec"))
+                dialog.format_secondary_markup(secondary)
+                dialog.run()
+                dialog.hide()
+        else:
+            message = xstr("reload_failconn") if isReload \
+                      else xstr("login_failconn")
+            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       message_format = message)
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            secondary = xstr("reload_failconn_sec") if isReload \
+                        else xstr("login_failconn_sec")
+            dialog.format_secondary_markup(secondary)
+            
+            dialog.run()
+            dialog.hide()
+
+        callback = self._loginCallback
+        self._loginCallback = None
+        callback(returned, result)
 
     def getFleet(self, callback, force = False):
         """Get the fleet via the GUI and call the given callback."""

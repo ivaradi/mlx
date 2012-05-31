@@ -193,7 +193,7 @@ class SoundScheduler(object):
         self._sounds.append(SimpleSound(const.SOUND_CAPTAIN_TAKEOFF,
                                         const.STAGE_TAKEOFF,
                                         extraCondition = lambda flight, state:
-                                        state.landingLightsOn or state.gs>80,
+                                        state.landingLightsOn or state.groundSpeed>80,
                                         considerHotkey = False))
         self._sounds.append(SimpleSound(const.SOUND_CRUISE, const.STAGE_CRUISE))
         self._sounds.append(SimpleSound(const.SOUND_DESCENT, const.STAGE_DESCENT,

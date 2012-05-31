@@ -156,6 +156,7 @@ class _English(_Strings):
         self.add("button_yes", "_Yes")
         self.add("button_no", "_No")
         self.add("button_browse", "Browse...")
+        self.add("button_cancelFlight", "Cancel flight")
         
         self.add("menu_file", "File")
         self.add("menu_file_loadPIREP", "_Load PIREP...")
@@ -244,10 +245,26 @@ class _English(_Strings):
                  "Try again in a few minutes. If it does not help, "
                  "see the debug log for details.")
 
+        self.add("reload_busy", "Reloading flights...")
+        self.add("reload_failed",
+                 "Your pilot ID and password failed this time.")
+        self.add("reload_failed_sec",
+                 "This must be some problem with the MAVA website "
+                 "(or you are fired), using your old list of flights.")
+        self.add("reload_failconn",
+                 "Failed to communicate with the MAVA website.")
+        self.add("reload_failconn_sec",
+                 "Your previously downloaded list of flights will be used.")
+
+        self.add("cancelFlight_question",
+                 "Are you sure to cancel the flight?")
+
         self.add("button_next", "_Next")
         self.add("button_next_tooltip", "Click to go to the next page.")
         self.add("button_previous", "_Previous")
         self.add("button_previous_tooltip", "Click to go to the previous page.")
+        self.add("button_cancelFlight_tooltip",
+                 "Click to cancel the current flight and go back to the flight selection page.")
 
         self.add("flightsel_title", "Flight selection")
         self.add("flightsel_help", "Select the flight you want to perform.")
@@ -256,6 +273,9 @@ class _English(_Strings):
         self.add("flightsel_deptime", "Departure time [UTC]")
         self.add("flightsel_from", "From")
         self.add("flightsel_to", "To")
+        self.add("flightsel_refresh", "_Refresh flights")
+        self.add("flightsel_refresh_tooltip",
+                 "Click here to refresh the list of flights from the MAVA website.")
         self.add("flightsel_load", "L_oad flight from file")
         self.add("flightsel_load_tooltip",
                  "Click here to load a flight from a file, "
@@ -477,6 +497,12 @@ class _English(_Strings):
         self.add("finish_gate", "_Arrival gate:")
         self.add("finish_gate_tooltip",
                  "Select the gate or stand at which you have arrived to LHBP.")
+        self.add("finish_newFlight", "_New flight...")
+        self.add("finish_newFlight_tooltip",
+                 "Click here to start a new flight.")
+        self.add("finish_newFlight_question",
+                 "You have neither saved nor sent your PIREP. "
+                 "Are you sure to start a new flight?")
         self.add("finish_save", "Sa_ve PIREP...")
         self.add("finish_save_tooltip",
                  "Click to save the PIREP into a file on your computer. " \
@@ -958,6 +984,17 @@ class _Hungarian(_Strings):
                  "Próbáld meg pár perc múlva. Ha az nem segít, "
                  "részletesebb információt találsz a debug naplóban.")
         
+        self.add("reload_busy", "Járatok újratöltése...")
+        self.add("reload_failed",
+                 "Ezúttal nem működött az azonosítód és a jelszavad.")
+        self.add("reload_failed_sec",
+                 "Ez minden bizonnyal a MAVA website hibája "
+                 "(hacsak nem rúgtak ki), így használom a régi járatlistát.")
+        self.add("reload_failconn",
+                 "Nem sikerült kommunikálni a MAVA honlappal.")
+        self.add("reload_failconn_sec",
+                 "A korábban letöltött járatlistát használom.")
+
         self.add("button_next", "_Előre")
         self.add("button_next_tooltip",
                  "Kattints ide, hogy a következő lapra ugorj.")
