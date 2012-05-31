@@ -685,14 +685,14 @@ class T134(Aircraft):
     def __init__(self, flight):
         super(T134, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
-        self.dow = 29927
-        self.mtow = 47600
+        self.dow = 29500
+        self.mtow = 49000
         self.mlw = 43000
         self.mzfw = 38500
         self.gearSpeedLimit = 216
-        self.flapSpeedLimits = { 10 : 240,
-                                 20 : 216,
-                                 30 : 161 }
+        self.flapSpeedLimits = { 10 : 450,
+                                 20 : 400,
+                                 30 : 300 }
 
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
