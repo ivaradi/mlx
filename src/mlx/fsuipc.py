@@ -1144,6 +1144,7 @@ class AircraftModel(object):
                       ("lights", 0x0d0c, "H"),
                       ("pitot", 0x029c, "b"),
                       ("parking", 0x0bc8, "H"),
+                      ("gearControl", 0x0be8, "d"),
                       ("noseGear", 0x0bec, "d"),
                       ("spoilersArmed", 0x0bcc, "d"),
                       ("spoilers", 0x0bd0, "d"),
@@ -1307,6 +1308,7 @@ class AircraftModel(object):
 
         state.parking = data[self._monidx_parking]!=0
 
+        state.gearControlDown = data[self._monidx_gearControl]==16383
         state.gearsDown = data[self._monidx_noseGear]==16383
 
         state.spoilersArmed = data[self._monidx_spoilersArmed]!=0

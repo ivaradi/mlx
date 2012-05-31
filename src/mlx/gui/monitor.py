@@ -140,19 +140,22 @@ class MonitorWindow(gtk.Window):
         table.attach(self._navLightsOn, 0, 1, 5, 6)
 
         self._antiCollisionLightsOn = gtk.Label("ANTICOLLISION")
-        table.attach(self._antiCollisionLightsOn, 1, 3, 5, 6)
+        table.attach(self._antiCollisionLightsOn, 1, 2, 5, 6)
 
         self._strobeLightsOn = gtk.Label("STROBE")
-        table.attach(self._strobeLightsOn, 3, 4, 5, 6)
+        table.attach(self._strobeLightsOn, 2, 3, 5, 6)
 
         self._landingLightsOn = gtk.Label("LANDING")
-        table.attach(self._landingLightsOn, 4, 5, 5, 6)
+        table.attach(self._landingLightsOn, 3, 4, 5, 6)
 
         self._pitotHeatOn = gtk.Label("PITOT HEAT")
-        table.attach(self._pitotHeatOn, 5, 7, 5, 6)
+        table.attach(self._pitotHeatOn, 4, 5, 5, 6)
 
         self._parking = gtk.Label("PARKING")
-        table.attach(self._parking, 7, 8, 5, 6)
+        table.attach(self._parking, 5, 6, 5, 6)
+
+        self._gearControlDown = gtk.Label("GEAR LEVER DOWN")
+        table.attach(self._gearControlDown, 6, 8, 5, 6)
 
         self._gearsDown = gtk.Label("GEARS DOWN")
         table.attach(self._gearsDown, 8, 10, 5, 6)
@@ -240,6 +243,7 @@ class MonitorWindow(gtk.Window):
             self._landingLightsOn.set_sensitive(False)
             self._pitotHeatOn.set_sensitive(False)
             self._parking.set_sensitive(False)
+            self._gearControlDown.set_sensitive(False)
             self._gearsDown.set_sensitive(False)
             self._spoilersArmed.set_sensitive(False)
             self._spoilersExtension.set_text("-")
@@ -307,6 +311,7 @@ class MonitorWindow(gtk.Window):
             self._landingLightsOn.set_sensitive(aircraftState.landingLightsOn)
             self._pitotHeatOn.set_sensitive(aircraftState.pitotHeatOn)
             self._parking.set_sensitive(aircraftState.parking)
+            self._gearControlDown.set_sensitive(aircraftState.gearControlDown)
             self._gearsDown.set_sensitive(aircraftState.gearsDown)
             self._spoilersArmed.set_sensitive(aircraftState.spoilersArmed)
             self._spoilersExtension.set_text("%.0f" % (aircraftState.spoilersExtension,))

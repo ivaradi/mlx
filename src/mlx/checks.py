@@ -454,12 +454,13 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
     def __init__(self):
         """Construct the logger."""
         StateChangeLogger.__init__(self, logInitial = True)
-        SingleValueMixin.__init__(self, "gearsDown")
+        SingleValueMixin.__init__(self, "gearControlDown")
 
     def _getMessage(self, state):
         """Get the message to log on a change."""
-        return "Gears %s at %.0f knots, %.0f feet" % \
-            ("DOWN" if state.gearsDown else "UP", state.ias, state.altitude)
+        return "Gears SET to %s at %.0f knots, %.0f feet" % \
+            ("DOWN" if state.gearControlDown else "UP",
+             state.ias, state.altitude)
 
 #---------------------------------------------------------------------------------------
 

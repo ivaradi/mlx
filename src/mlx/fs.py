@@ -200,6 +200,7 @@ class AircraftState(object):
     - landingLightsOn: a boolean indicating if the landing lights are on
     - pitotHeatOn: a boolean indicating if the pitot heat is on
     - parking: a boolean indicating if the parking brake is set
+    - gearControlDown: a boolean indicating if the gear control is set to down
     - gearsDown: a boolean indicating if the gears are down
     - spoilersArmed: a boolean indicating if the spoilers have been armed for
     automatic deployment

@@ -228,6 +228,7 @@ class Values(object):
         self.pitot = False
         self.parking = True
 
+        self.gearControl = 1.0
         self.noseGear = 1.0
 
         self.spoilersArmed = False
@@ -384,6 +385,8 @@ class Values(object):
                            (self.flapsNotches[index+1] - self.flapsNotches[index]))
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
             return self.flaps * 16383.0 / self.flapsNotches[-1]        
+        elif offset==0x0be8:       # Gear control
+            return int(self.gearControl * 16383.0)
         elif offset==0x0bec:       # Nose gear
             return int(self.noseGear * 16383.0)
         elif offset==0x0d0c:       # Lights
@@ -601,6 +604,8 @@ class Values(object):
                     flapsIncrement
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
             self.flaps = value * self.flapsNotches[-1] / 16383.0
+        elif offset==0x0be8:       # Gear control
+            self.gearControl = value / 16383.0
         elif offset==0x0bec:       # Nose gear
             self.noseGear = value / 16383.0
         elif offset==0x0d0c:       # Lights
@@ -1091,6 +1096,10 @@ class CLI(cmd.Cmd):
                                          lambda word: int(word))
         self._valueHandlers["pitot"] = (0x029c, "b", CLI.bool2str, CLI.str2bool)
         self._valueHandlers["parking"] = (0x0bc8, "H", CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["gearControl"] = (0x0be8, "d",
+                                              lambda value: value * 100.0 / 16383.0,
+                                              lambda word: int(float(word) *
+                                                               16383.0 / 100.0))
         self._valueHandlers["noseGear"] = (0x0bec, "d",
                                            lambda value: value * 100.0 / 16383.0,
                                            lambda word: int(float(word) *
