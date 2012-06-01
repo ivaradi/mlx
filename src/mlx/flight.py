@@ -67,6 +67,11 @@ class Flight(object):
         return self._stage
 
     @property
+    def loggedIn(self):
+        """Indicate if the user has logged in properly."""
+        return self._gui.loggedIn
+
+    @property
     def entranceExam(self):
         """Get whether an entrance exam is being performed."""
         return self._gui.entranceExam

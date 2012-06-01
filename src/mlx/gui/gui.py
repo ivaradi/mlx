@@ -185,6 +185,11 @@ class GUI(fs.ConnectionListener):
     def entranceExam(self):
         """Get whether an entrance exam is about to be taken."""
         return self._wizard.entranceExam
+
+    @property
+    def loggedIn(self):
+        """Indicate if the user has logged in properly."""
+        return self._wizard.loggedIn
         
     @property
     def loginResult(self):
@@ -431,7 +436,10 @@ class GUI(fs.ConnectionListener):
 
         self._logView.get_buffer().set_text("")
 
-        self._wizard.reloadFlights(self._handleReloadResult)
+        if self.loggedIn:
+            self._wizard.reloadFlights(self._handleReloadResult)
+        else:
+            self._wizard.reset(None)
 
     def _handleReloadResult(self, returned, result):
         """Handle the result of the reloading of the flights."""

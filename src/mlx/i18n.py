@@ -228,6 +228,10 @@ class _English(_Strings):
         self.add("login_entranceExam", "_Entrance exam")
         self.add("login_entranceExam_tooltip",
                  "Check this to log in to take your entrance exam.")
+        self.add("button_offline", "Fl_y offline")
+        self.add("button_offline_tooltip",
+                 "Click this button to fly offline, without logging in "
+                 "to the MAVA website.")
         self.add("button_login", "Logi_n")
         self.add("login_button_tooltip", "Click to log in.")
         self.add("login_busy", "Logging in...")

@@ -259,6 +259,10 @@ class LoginPage(Page):
         self._entranceExam.connect("toggled", self._setControls)
         table.attach(self._entranceExam, 1, 2, 3, 4, ypadding = 12)
 
+        self.addButton(xstr("button_offline"),
+                       clicked = self._offlineClicked,
+                       tooltip = xstr("button_offline_tooltip"))
+
         self._loginButton = self.addButton(xstr("button_login"), default = True)
         self._loginButton.connect("clicked", self._loginClicked)
         self._loginButton.set_tooltip_text(xstr("login_button_tooltip"))
@@ -269,6 +273,11 @@ class LoginPage(Page):
         """Get whether an entrance exam is being performed."""
         return self._entranceExam.get_active() and \
                self._pilotID.get_text()!=""
+
+    @property
+    def pilotID(self):
+        """Get the pilot ID, if given."""
+        return self._pilotID.get_text()
 
     def activate(self):
         """Activate the page."""
@@ -300,6 +309,10 @@ class LoginPage(Page):
         self._entranceExam.set_sensitive(pilotID!="")
         self._loginButton.set_sensitive(pilotID!="" and
                                         (password!="" or entranceExam))
+
+    def _offlineClicked(self, button):
+        """Called when the offline button was clicked."""
+        self._wizard.nextPage()
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
@@ -413,8 +426,9 @@ class FlightSelectionPage(Page):
         """Rebuild the flights from the login result."""
         self._flights = []
         self._listStore.clear()
-        for flight in self._wizard.loginResult.flights:
-            self._addFlight(flight)
+        if self._wizard.loggedIn:
+            for flight in self._wizard.loginResult.flights:
+                self._addFlight(flight)
 
     def _addFlight(self, flight):
         """Add the given file to the list of flights."""
@@ -524,7 +538,7 @@ class FlightSelectionPage(Page):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
         if self._wizard.gui.config.onlineGateSystem and \
-           not self._wizard.entranceExam:
+           self._wizard.loggedIn and not self._wizard.entranceExam:
             if flight.departureICAO=="LHBP":
                 self._wizard.getFleet(self._fleetRetrieved)
             else:
@@ -2220,7 +2234,7 @@ class LandingPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         if self._wizard.gui.config.onlineGateSystem and \
-           not self._completed and \
+           self._wizard.loggedIn and not self._completed and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
            not self._wizard.entranceExam:
             self._wizard.getFleet(callback = self._fleetRetrieved,
@@ -2432,10 +2446,11 @@ class FinishPage(Page):
                                   (flight.startFuel - flight.endFuel,))
 
         self._flightType.set_active(-1)
-        self._onlineFlight.set_active(True)
+        self._onlineFlight.set_active(self._wizard.loggedIn)
 
         self._gatesModel.clear()
         if self._wizard.gui.config.onlineGateSystem and \
+           self._wizard.loggedIn and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
            not self._wizard.entranceExam:
             occupiedGates = self._wizard._fleet.getOccupiedGateNumbers()
@@ -2496,10 +2511,11 @@ class FinishPage(Page):
 
         bookedFlight = gui.bookedFlight
         tm = time.gmtime()
-        
-        fileName = "%s %s %02d%02d %s-%s.pirep" % \
-                   (gui.loginResult.pilotID,
-                    str(bookedFlight.departureTime.date()),
+
+        pilotID = self._wizard.pilotID
+        if pilotID: pilotID += " "
+        fileName = "%s%s %02d%02d %s-%s.pirep" % \
+                   (pilotID, str(bookedFlight.departureTime.date()),
                     tm.tm_hour, tm.tm_min,
                     bookedFlight.departureICAO,
                     bookedFlight.arrivalICAO)
@@ -2583,7 +2599,7 @@ class FinishPage(Page):
         """Callback for the PIREP sending result."""
         self._pirepSent = returned and result.success
         if self._wizard.gui.config.onlineGateSystem and \
-           not self._wizard.entranceExam and \
+           self._wizard.loggedIn and not self._wizard.entranceExam and \
            returned and result.success:
             bookedFlight = self._wizard.bookedFlight
             if bookedFlight.arrivalICAO=="LHBP":
@@ -2659,9 +2675,19 @@ class Wizard(gtk.VBox):
         self._initialize()
 
     @property
+    def pilotID(self):
+        """Get the pilot ID, if given."""
+        return self._loginPage.pilotID
+
+    @property
     def entranceExam(self):
         """Get whether an entrance exam is about to be taken."""
         return self._loginPage.entranceExam
+
+    @property
+    def loggedIn(self):
+        """Indicate if there was a successful login."""
+        return self._loginResult is not None
         
     @property
     def loginResult(self):
