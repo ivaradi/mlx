@@ -268,7 +268,9 @@ class _English(_Strings):
         self.add("button_previous", "_Previous")
         self.add("button_previous_tooltip", "Click to go to the previous page.")
         self.add("button_cancelFlight_tooltip",
-                 "Click to cancel the current flight and go back to the flight selection page.")
+                 "Click to cancel the current flight. If you have "
+                 "logged in, you will go back to the flight selection "
+                 "page, otherwise to the login page.")
 
         self.add("flightsel_title", "Flight selection")
         self.add("flightsel_help", "Select the flight you want to perform.")
@@ -906,6 +908,7 @@ class _Hungarian(_Strings):
         self.add("button_yes", "_Igen")
         self.add("button_no", "_Nem")
         self.add("button_browse", "Keresés...")
+        self.add("button_cancelFlight", "Járat megszakítása")
         
         self.add("menu_file", "Fájl")
         self.add("menu_file_loadPIREP", "PIREP be_töltése...")
@@ -980,6 +983,10 @@ class _Hungarian(_Strings):
         self.add("login_entranceExam", "_Ellenőrző repülés")
         self.add("login_entranceExam_tooltip",
                  "Ha ezt bejelölöd, ellenörző repülésre jelentkezhetsz be.")
+        self.add("button_offline", "_Offline repülés")
+        self.add("button_offline_tooltip",
+                 "Kattints ide hogy offline, a MAVA szerverre való "
+                 "bejelentkezés nélkül repülhess.")
         self.add("button_login", "_Bejelentkezés")
         self.add("login_button_tooltip", "Kattints ide a bejelentkezéshez.")
         self.add("login_busy", "Bejelentkezés...")
@@ -1008,12 +1015,19 @@ class _Hungarian(_Strings):
         self.add("reload_failconn_sec",
                  "A korábban letöltött járatlistát használom.")
 
+        self.add("cancelFlight_question",
+                 "Biztosan meg akarod szakítani a járatot?")
+
         self.add("button_next", "_Előre")
         self.add("button_next_tooltip",
-                 "Kattints ide, hogy a következő lapra ugorj.")
+                 "Kattints ide, ha a következő lapra szeretnél lépni.")
         self.add("button_previous", "_Vissza")
         self.add("button_previous_tooltip",
-                 "Kattints ide, hogy az előző lapra ugorj.")
+                 "Kattints ide, ha az előző lapra szeretnél lépni.")
+        self.add("button_cancelFlight_tooltip",
+                 "Kattints ide, ha meg akarod szakítani a járatot. "
+                 "Ha bejelentkeztél, visszakerülsz a járatválasztó "
+                 "lapra, egyébként a bejelentkező lapra.")
 
         self.add("flightsel_title", "Járatválasztás")
         self.add("flightsel_help", "Válaszd ki a járatot, amelyet le szeretnél repülni.")
@@ -1022,6 +1036,19 @@ class _Hungarian(_Strings):
         self.add("flightsel_deptime", "Indulás ideje [UTC]")
         self.add("flightsel_from", "Honnan")
         self.add("flightsel_to", "Hová")
+        self.add("flightsel_save", "Járat _mentése")
+        self.add("flightsel_save_tooltip",
+                 "Kattints ide az éppen kiválasztott járatnak "
+                 "fájlba mentéséhez. A fájl később visszatölthető, "
+                 "és így a járat offline is teljesíthető lesz.")
+        self.add("flightsel_save_title", "Járat mentése fájlba")
+        self.add("flightsel_save_failed",
+                 "Nem tudtam elmenteni a járatot.")
+        self.add("flightsel_save_failed_sec",
+                 "A további részleteket lásd a debug naplóban.")
+        self.add("flightsel_refresh", "Járatlista f_rissítése")
+        self.add("flightsel_refresh_tooltip",
+                 "Kattints ide a járatlista újbóli letöltéséhez.")
         self.add("flightsel_load", "Járat betöltése _fájlból")
         self.add("flightsel_load_tooltip",
                  "Kattints ide, hogy fájlból betölthess egy járatot, "
@@ -1245,6 +1272,12 @@ class _Hungarian(_Strings):
         self.add("finish_gate", "_Érkezési kapu:")
         self.add("finish_gate_tooltip",
                  "Válaszd ki azt a kaput vagy állóhelyet, ahová érkeztél LHBP-n.")
+        self.add("finish_newFlight", "_Új járat...")
+        self.add("finish_newFlight_tooltip",
+                 "Kattints ide egy új járat teljesítésének elkezdéséhez.")
+        self.add("finish_newFlight_question",
+                 "A PIREP-et még nem mentetted el és nem is küldted el. "
+                 "Biztosan új járatot szeretnél kezdeni?")
         self.add("finish_save", "PIREP _mentése...")
         self.add("finish_save_tooltip",
                  "Kattints ide, hogy elmenthesd a PIREP-et egy fájlba a számítógépeden. " \
