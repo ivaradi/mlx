@@ -413,7 +413,7 @@ class FlightSelectionPage(Page):
         """Fill the flight list."""
         self._flightList.set_sensitive(True)
         self._loadButton.set_sensitive(True)
-        self._refreshButton.set_sensitive(True)
+        self._refreshButton.set_sensitive(self._wizard.loggedIn)
         self._buildFlights()
             
     def finalize(self):
