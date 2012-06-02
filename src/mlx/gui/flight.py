@@ -1968,6 +1968,7 @@ class TakeoffPage(Page):
         self._v2.set_int(None)
         self._v2.set_sensitive(True)
         self._button.set_sensitive(False)
+        self._forwardAllowed = False
         
     def finalize(self):
         """Finalize the page."""
@@ -2144,6 +2145,11 @@ class LandingPage(Page):
         """Return the landing reference speed."""
         return self._vref.get_int()
 
+    def reset(self):
+        """Reset the page if the wizard is reset."""
+        super(LandingPage, self).reset()
+        self._flightEnded = False
+
     def activate(self):
         """Called when the page is activated."""
         self._starButton.set_sensitive(True)
@@ -2184,9 +2190,6 @@ class LandingPage(Page):
 
         self._vref.set_sensitive(False)
         self._wizard.gui.flight.aircraft.updateVRef()
-        # FIXME: Perhaps a separate initialize() call which would set up
-        # defaults? -> use reset()
-        self._flightEnded = False
 
     def _starButtonClicked(self, button):
         """Called when the STAR button is clicked."""
