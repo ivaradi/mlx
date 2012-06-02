@@ -12,18 +12,19 @@
   MAVA Logger X is an application that monitors the execution of a
   Malév Virtual flight, and collects data that can be sent to the MAVA
   website for further evaluation. This manual describes how to use
-  this program. To be able to use the program properly, you need to
-  have a working Internet connection, even if you don't fly on-line on
-  VATSIM or IVAO.
+  this program. To be able to use all features of the program, you
+  need to have a working Internet connection, even if you don't fly
+  on-line on VATSIM or IVAO. However, it is possible to perform a
+  flight completely offline as well.
   </p>
 
   <p>
-  While monitoring your flight the program continuously checks if your
+  While monitoring your flight, the program continuously checks if your
   airplane's configuration is always within the parameters prescribed
   by the airline's operating procedures. For example, you have to turn
   on or off the various lights of your aircraft according to rules,
   you cannot exceed certain weight or speed limits, and so on. Any
-  deviation from the expected parameters, also know as a fault, can
+  deviation from the expected parameters, also known as a fault, can
   result in points subtracted from the initial 100 points (or
   percentage). The result is your <i>flight rating</i>. Some
   deviations are so serious, that they are deemed <i>NO GO</i> faults
@@ -34,14 +35,14 @@
   Besides the faults the program also monitors many other parameters,
   which are recorded in a textual <i>log</i>. This log is sent as a
   part of your PIREP (<b>PI</b>lot's <b>REP</b>ort), and will be
-  analyzed, and possibly commented on by more experienced pilot's of
+  analyzed, and possibly commented on by more experienced pilots of
   Malév Virtual. This way you can perfect the way you execute your
   flights.
   </p>
 
   <p>
   The application breaks up your flight into
-  several <i>stage</i>s. The advancement from one stage to another is
+  several <i>stage</i>s. The advancement from one stage to another is 
   detected automatically. These stages and the conditions under which
   they are entered are as follows:
   <ol>
@@ -86,24 +87,28 @@
   </p>
 
   <p>
-  Malév Virtual has implemented an <i>Online ACARS System</i>, which
+  Malév Virtual have implemented an <i>Online ACARS System</i>, which
   displays the status of the flights in progress. The data appears on
-  the front page of the MAVA website and on a map accessible from the
-  inner page.
+  the front page of the MAVA website and also on a map.
   </p>
 
   <p>
-  Malév Virtual has also implemented an <i>Online Gate System</i>
+  Malév Virtual have also implemented an <i>Online Gate System</i>
   which maintains a database of the aircraft in the airline's fleet
   and their location. An aircraft may be parked at the Budapest
   Ferihegy Airport, in which case the number of the gate or stand it
   is located at is recorded in the database. If so, this number is
-  displayed to you when starting your flight, and you are recommended
-  to place your aircraft at the indicated gate or stand in the
-  simulator. If your flight begins at Ferihegy and the aircraft is
-  away (usually due to someone else's flight), you can select from
-  which gate or stand you start your flight. The database of the
-  Online Gate System can also be displayed by using the application.
+  displayed to you when starting your flight from Ferihegy, and you
+  are recommended to place your aircraft at the indicated gate or
+  stand in the simulator. If your flight begins at Ferihegy and the
+  aircraft is away (usually due to someone else's flight), you can
+  select from which gate or stand you start your flight. The database
+  of the Online Gate System can also be displayed by using the
+  application.
+  </p>
+
+  <p>
+  These online systems can only be used when flying online.
   </p>
 
   <p>
@@ -166,17 +171,13 @@
 
   <p>
   The figure below depicts the main window of the application. The top
-  of it contains the usual menu bar, which will be describe in more
-  detail later.
+  of it contains the usual menu bar, which will be described in more
+  detail later. The content area consists of several tabs the use of
+  which is described below.
   </p>
 
   <p>
-  The content area consists of several tabs the use of which is
-  described below.
-  </p>
-
-  <p>
-  The bottom of the window is a status bar. Its left end contains the
+  The bottom of the window is a status bar. Its left side contains the
   icon indicating the status of the connection to the simulator. Since
   the application continuously monitors the parameters of your
   aircraft, it needs to communicate with the simulator. The icon's
@@ -218,7 +219,7 @@
   </p>
 
   <p>
-  The right if the status bar is normally empty, but if there is some
+  The right of the status bar is normally empty, but if there is some
   potentially long operation going on (typically communicating with
   the MAVA servers), information about the operation is displayed
   here. This is accompanied by the cursor becoming that of signaling
@@ -257,6 +258,13 @@
   detailed below.
   </p>
 
+  <p>
+  Many of the pages also contain a <b>Cancel flight</b>
+  button. Clicking this button will allow you to cancel the flight and
+  go back to the flight selection if you have logged in to the MAVA
+  website, or the login page, after a confirmation of your intent.
+  </p>
+
   <h4>The <i>Login</i> Page</h4>
 
   <p>
@@ -284,17 +292,43 @@
   The login to the MAVA server, and proceed to the next page, press
   the <b>Login</b> button.
   </p>
+
+  <p>
+  If you would like to fly without an Internet connection, use
+  the <b>Fly offline</b> button. This immediately takes you to the
+  next page, without trying to log in to the MAVA website.
+  </p>
   
   <h4>The <i>Flight selection</i> Page</h4>
 
   <p>
   This page displays the list of the flight you have booked previously
-  on the MAVA website. You can also upload a flight from a file by
-  pressing the <b>Load flight from file</b> button. This displays a
-  file selection dialog where you select the flight file (usually with
-  a suffix of <code>.vaflight</code>). Since you cannot
-  send the PIREP for such flights, this is mostly useful during the
-  entrance exam.
+  on the MAVA website, if you have logged in properly. If you chose to
+  fly offline, the list is empty.
+  </p>
+
+  <p>
+  If you have selected a flight, you can also save it by using
+  the <b>Save flight</b> button. This is useful when planning to fly
+  offline at some later time. When preparing for that flight, you can
+  properly log in to the MAVA website, and acquire the list of your
+  booked flights. Then you can save the flight you wish to perform
+  later offline, on which occasion, you can load the saved flight.
+  </p>
+
+  <p>
+  You may need to refresh the list of flights. For example, you notice
+  that you have forgotten to book the flight you want to perform. Then
+  you can book the flight on the MAVA website, and press
+  the <b>Refresh flights</b> button to update the list.
+  </p>
+
+  <p>
+  You can also load a flight from a file by  pressing the <b>Load
+  flight from file</b> button. This displays a file selection dialog
+  where you select the flight file (usually with a suffix
+  of <code>.vaflight</code>). This is mostly useful when flying
+  offline, or during the entrance exam.
   </p>
 
   <p>
@@ -363,7 +397,7 @@
   This page displays the departure and arrival times of your
   flight in UTC. Press the <b>Time from FS</b> button to query the
   current UTC time of the simulator. To be able to simulate the real
-  lighting circumstances of the flight, the simulator's time should mach
+  lighting circumstances of the flight, the simulator's time should match
   the time of the flight according to the schedule. Therefore you are
   expected to set the simulator's time properly. It is recommended to
   set it to about 15 minutes before the departure at this stage so
@@ -465,7 +499,7 @@
   approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>, etc.),
   the name of the landing runway, and the landing reference speed,
   V<sub>ref</sub>. You can enter this data during the flight, or after
-  you have landed at your discretion.
+  you have landed, at your discretion.
   </p>
 
   <p>
@@ -499,6 +533,15 @@
   PIREP reviewers of Malév Virtual.
   </p>
 
+  <p>
+  You can also start a new flight using the <b>New flight</b>
+  button. If you have not saved or sent the PIREP, you will be asked
+  to confirm your intention. When starting a new flight you are taken
+  to the flight selection page, if you have logged in to the MAVA
+  website, or to the login page, if your flight has been an offline
+  flight.
+  </p>
+  
   <h3>The Flight info Tab</h3>
 
   <p>
@@ -540,9 +583,9 @@
   The most important information is after the <i>Payload:</i> label,
   which is the payload weight of the aircraft. This value should be
   set in the simulator as the airplane's payload weight. By pressing
-  the <b>Simulator data</b> button, the data on the right coming from
-  the simulator can be queried and displayed. If the data is out of
-  the tolerances, it is displayed in red, otherwise in green.
+  the <b>Simulator data</b> button, the data coming from the simulator
+  can be queried and displayed. If the data is out of the tolerances,
+  it is displayed in red, otherwise in green. 
   </p>
 
   <p>
@@ -576,8 +619,8 @@
   <p>
   This tab displays information retrieved from the MAVA Online Gate
   System. If the program needs to retrieve data, this tab's contents
-  are refreshed automatically, but you can refresh them anytime using
-  the <b>Refresh data</b> button.
+  are refreshed automatically, but you can refresh them manually
+  anytime using the <b>Refresh data</b> button.
   </p>
 
   <p>
@@ -616,9 +659,10 @@
   <h2>Loading PIREPs</h2>
 
   <p>
-  Saved PIREPs can be loaded and sent by the program loader. This can
+  Saved PIREPs can be loaded and sent by the program. This can
   become necessary, for example, if you cannot send a PIREP due to
-  some network problem right after your flight.
+  some network problem right after your flight, or when you
+  deliberately performed a flight without connecting to the Internet.
   </p>
 
   <p>
@@ -636,7 +680,7 @@
 
   <p>
   The checklists are lists of audio files. When checklist playback is
-  enabled (see the description of the Preferences window below), and
+  enabled (see the description of the <i>Preferences</i> window below), and
   there is a checklist for the type of the aircraft used for the
   flight, the files constituting the checklist can be played
   one-by-one by pressing the checklist hotkey repeatedly.
@@ -650,7 +694,7 @@
   </p>
 
   <p>
-  The files making up the checklist for the currently  selected flight
+  The files making up the checklist for the currently selected flight
   are displayed on the right. You can move a file up or down by
   dragging it with the mouse. You can also select one or more files
   from the list. Then you can remove them with the <b>Remove</b>
@@ -694,7 +738,7 @@
   language is used if it is one of the supported ones or English
   otherwise. Note, that the program must be restarted for the change
   to take effect if you modify this setting. If the <b>Hide main window
-  when minimized</b> checkbox is checked, and you minimize the window
+  when minimized</b> checkbox is checked, and you minimize the window,
   it will actually disappear completely (i.e. not appear among the
   other minimized windows). You can make it appear by using the tray
   icon. 
@@ -710,7 +754,7 @@
   The <i>Simulator</i> frame contains settings for how the program
   interacts with the simulator. Most options are self-explanatory, but
   the ones related to smoothing requires some discussion. Flight
-  Simulator is known for producing wind speed changes that are not
+  Simulator is known to produce wind speed changes that are not
   entirely realistic and can result in the simulated aircraft
   experiencing some very high indicated airspeeds, which in turn can
   also cause the autopilot to suddenly increase the climb rate to
@@ -721,7 +765,7 @@
   smoothed. The <b>Enable the smoothing of IAS/VS over N sec.</b>
   options allow controlling this feature. The number of seconds may
   need experimenting with, but note that every change for which you
-  press the <b>OK</b> button  is taken into account immediately. 
+  press the <b>OK</b> button is taken into account immediately. 
   </p>
 
   <h3>The <i>Messages</i> Tab</h3>
@@ -795,7 +839,7 @@
 
   <p>
   If the <b>Enable speedbrake sound at touchdown</b> checkbox is
-  checked, you will here a distinctive sound when the spoilers deploy
+  checked, you will hear a distinctive sound when the spoilers deploy
   automatically after touchdown.
   </p>
 

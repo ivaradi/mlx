@@ -1,4 +1,11 @@
-- Make the windows non-resizable.
+- Check what the Flight defects are is for, in the manual of 
+   the old logger
+
+- Right click menus to some lists:
+   - list of flights: saving
+   - checklist elements: moving, deleting
+
+- Perhaps update the fuel level on the fuel page while flying?
 
 - The PIREP constructor should get the flight object as its argument
    and not the GUI. Thus flight should expose other data as well, but
@@ -13,6 +20,3 @@
    not consecutive files.
 
 - Check how piston engines report RPM
-
-- Test:
-   - Check how pitot heat works on the Dash-8: reversed, 0 means on, 1 means off
