@@ -324,8 +324,6 @@ class PIREPViewer(gtk.Dialog):
                                     xstr("pirepView_arrival_time"),
                                     width = 6)
 
-        PIREPViewer.addVFiller(mainBox)
-
         table = gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)

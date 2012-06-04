@@ -1321,7 +1321,7 @@ class _Hungarian(_Strings):
                  "Ellenőrízd az adatokat, az előző oldalakon is, és ha\n" \
                  "megfelelnek, elmentheted vagy elküldheted a PIREP-et.")
         self.add("finish_rating", "Pontszám:")
-        self.add("finish_flight_time", "Repülési idő:")
+        self.add("finish_flight_time", "Repült idő:")
         self.add("finish_block_time", "Blokk idő:")
         self.add("finish_distance", "Repült táv:")
         self.add("finish_fuel", "Elhasznált üzemanyag:")
@@ -1702,6 +1702,68 @@ class _Hungarian(_Strings):
                  "Lehet, hogy hálózati probléma áll fenn, amely esetben később\n" \
                  "újra próbálkozhatsz. Lehet azonban hiba is a loggerben:\n" \
                  "részletesebb információt találhatsz a debug naplóban.")
+
+        self.add("viewPIREP", "PIREP meg_tekintése...")
+
+        self.add("pirepView_title", "PIREP megtekintése")
+
+        self.add("pirepView_tab_data", "_Adatok")
+        self.add("pirepView_tab_data_tooltip", 
+                 "A járat és a repülés főbb adatai.")
+
+        self.add("pirepView_frame_flight", "Járat")
+        self.add("pirepView_callsign", "Hívójel:")
+        self.add("pirepView_tailNumber", "Lajstromjel:")
+        self.add("pirepView_aircraftType", "Repülőgép:")
+        self.add("pirepView_departure", "Indulási repülőtér:")
+        self.add("pirepView_departure_time", "idő:")
+        self.add("pirepView_arrival", "Érkezési repülőtér:")
+        self.add("pirepView_arrival_time", "idő:")
+        self.add("pirepView_numPassengers", "Utasok:")
+        self.add("pirepView_numCrew", "Legénység:")
+        self.add("pirepView_bagWeight", "Poggyász:")
+        self.add("pirepView_cargoWeight", "Teher:")
+        self.add("pirepView_mailWeight", "Posta:")
+        self.add("pirepView_route", "MAVA útvonal:")
+
+        self.add("pirepView_frame_route", "Beadott útvonal")
+        self.add("pirepView_filedCruiseLevel", "Repülési szint:")
+        self.add("pirepView_modifiedCruiseLevel", "módosítva:")
+
+        self.add("pirepView_frame_departure", "Indulás")
+        self.add("pirepView_runway", "Futópálya:")
+        self.add("pirepView_sid", "SID:")
+
+        self.add("pirepView_frame_arrival", "Érkezés")
+        self.add("pirepView_star", "STAR:")
+        self.add("pirepView_transition", "Bevezetés:")
+        self.add("pirepView_approachType", "Megközelítés:")
+
+        self.add("pirepView_frame_statistics", "Statisztika")
+        self.add("pirepView_blockTimeStart", "Blokk idő kezdete:")
+        self.add("pirepView_blockTimeEnd", "vége:")
+        self.add("pirepView_flightTimeStart", "Repült idő kezdete:")
+        self.add("pirepView_flightTimeEnd", "vége:")
+        self.add("pirepView_flownDistance", "Repült táv:")
+        self.add("pirepView_fuelUsed", "Üzemanyag:")
+        self.add("pirepView_rating", "Pontszám:")
+
+        self.add("pirepView_frame_miscellaneous", "Egyéb")
+        self.add("pirepView_flightType", "Típus:")
+        self.add("pirepView_online", "Online:")
+        self.add("pirepView_yes", "igen")
+        self.add("pirepView_no", "nem")
+        self.add("pirepView_delayCodes", "Késés kódok:")
+
+        self.add("pirepView_tab_comments", "_Megjegyzések és hibák")
+        self.add("pirepView_tab_comments_tooltip", 
+                 "Megjegyzések, és a repülés során előfordult hibajelenségek")
+
+        self.add("pirepView_comments", "Megjegyzések")
+        self.add("pirepView_flightDefects", "Hibajelenségek")
+
+        self.add("pirepView_tab_log", "_Napló")
+        self.add("pirepView_tab_log_tooltip", "A repülési napló.")
 
 #------------------------------------------------------------------------------
 
