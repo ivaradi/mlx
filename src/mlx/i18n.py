@@ -877,6 +877,10 @@ class _English(_Strings):
 
         self.add("pirepView_title", "PIREP viewer")
 
+        self.add("pirepView_tab_data", "_Data")
+        self.add("pirepView_tab_data_tooltip", 
+                 "The main data of the flight.")
+
         self.add("pirepView_frame_flight", "Flight")
         self.add("pirepView_callsign", "Callsign:")
         self.add("pirepView_tailNumber", "Tail no.:")
@@ -920,6 +924,16 @@ class _English(_Strings):
         self.add("pirepView_yes", "yes")
         self.add("pirepView_no", "no")
         self.add("pirepView_delayCodes", "Delay codes:")
+
+        self.add("pirepView_tab_comments", "_Comments & defects")
+        self.add("pirepView_tab_comments_tooltip", 
+                 "The comments and the flight defects.")
+
+        self.add("pirepView_comments", "Comments")
+        self.add("pirepView_flightDefects", "Flight defects")
+
+        self.add("pirepView_tab_log", "_Log")
+        self.add("pirepView_tab_log_tooltip", "The flight log.")
 
 #------------------------------------------------------------------------------
 

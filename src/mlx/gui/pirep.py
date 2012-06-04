@@ -130,8 +130,27 @@ class PIREPViewer(gtk.Dialog):
         self._gui = gui
         
         contentArea = self.get_content_area()
+
+        self._notebook = gtk.Notebook()
+        contentArea.pack_start(self._notebook, False, False, 4)
+        
         dataTab = self._buildDataTab()
-        contentArea.pack_start(dataTab, False, False, 0)
+        label = gtk.Label(xstr("pirepView_tab_data"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("pirepView_tab_data_tooltip"))
+        self._notebook.append_page(dataTab, label)
+        
+        commentsTab = self._buildCommentsTab()
+        label = gtk.Label(xstr("pirepView_tab_comments"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("pirepView_tab_comments_tooltip"))
+        self._notebook.append_page(commentsTab, label)
+        
+        logTab = self._buildLogTab()
+        label = gtk.Label(xstr("pirepView_tab_log"))
+        label.set_use_underline(True)
+        label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
+        self._notebook.append_page(logTab, label)
         
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
@@ -204,7 +223,18 @@ class PIREPViewer(gtk.Dialog):
             if delayCodes: delayCodes += ", "
             delayCodes += PIREP.delayCodes[code]
         
-        self._delayCodes.get_buffer().set_text(delayCodes)
+        self._delayCodes.get_buffer().set_text(delayCodes)        
+
+        self._comments.get_buffer().set_text(pirep.comments)
+        self._flightDefects.get_buffer().set_text(pirep.flightDefects)
+
+        logBuffer = self._log.get_buffer()
+        logBuffer.set_text("")
+        for (timeStr, line) in pirep.logLines:
+            logBuffer.insert(logBuffer.get_end_iter(), 
+                             formatFlightLogLine(timeStr, line))
+
+        self._notebook.set_current_page(0)
 
     def _buildDataTab(self):
         """Build the data tab of the viewer."""
@@ -436,6 +466,7 @@ class PIREPViewer(gtk.Dialog):
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
+        table.set_homogeneous(False)
         
         self._blockTimeStart = \
             PIREPViewer.tableAttach(table, 0, 0,
@@ -500,7 +531,36 @@ class PIREPViewer(gtk.Dialog):
 
         return frame        
 
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+    def _buildCommentsTab(self):
+        """Build the tab with the comments and flight defects."""
+        table = gtk.Table(2, 1)
+        table.set_col_spacings(16)
+
+        (frame, commentsBox) = \
+            PIREPViewer.createFrame(xstr("pirepView_comments"))
+        table.attach(frame, 0, 1, 0, 1)
+
+        (commentsWindow, self._comments) = \
+            PIREPViewer.getTextWindow(heightRequest = -1)
+        commentsBox.pack_start(commentsWindow, True, True, 0)
+
+        (frame, flightDefectsBox) = \
+            PIREPViewer.createFrame(xstr("pirepView_flightDefects"))
+        table.attach(frame, 1, 2, 0, 1)
+
+        (flightDefectsWindow, self._flightDefects) = \
+            PIREPViewer.getTextWindow(heightRequest = -1)
+        flightDefectsBox.pack_start(flightDefectsWindow, True, True, 0)
+        
+        return table
+
+    def _buildLogTab(self):
+        """Build the log tab."""
+        mainBox = gtk.VBox()
+
+        (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
+        mainBox.pack_start(logWindow, True, True, 0)
+        
+        return mainBox
+        
 #------------------------------------------------------------------------------

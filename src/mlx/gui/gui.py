@@ -32,13 +32,6 @@ import datetime
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
-    @staticmethod
-    def _formatFlightLogLine(timeStr, line):
-        """Format the given line for flight logging."""
-        if timeStr is not None:
-            line = timeStr + ": " + line
-        return line + "\n"
-        
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
         gobject.threads_init()
@@ -472,13 +465,13 @@ class GUI(fs.ConnectionListener):
     def addFlightLogLine(self, timeStr, line):
         """Write the given message line to the log."""
         gobject.idle_add(self._writeLog,
-                         GUI._formatFlightLogLine(timeStr, line),
+                         formatFlightLogLine(timeStr, line),
                          self._logView)
 
     def updateFlightLogLine(self, index, timeStr, line):
         """Update the line with the given index."""
         gobject.idle_add(self._updateFlightLogLine, index,
-                         GUI._formatFlightLogLine(timeStr, line))
+                         formatFlightLogLine(timeStr, line))
 
     def _updateFlightLogLine(self, index, line):
         """Replace the contents of the given line in the log."""
