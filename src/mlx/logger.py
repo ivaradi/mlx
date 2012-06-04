@@ -55,14 +55,14 @@ class Logger(object):
         self._faults.clear()
         self._faultLineIndexes = []
                 
-    def message(self, timestamp, msg):
+    def message(self, timestamp, msg, isFault = False):
         """Put a simple textual message into the log with the given timestamp."""
         timeStr = util.getTimestampString(timestamp)
-        return self._logLine(msg, timeStr)
+        return self._logLine(msg, timeStr, isFault = isFault)
 
-    def untimedMessage(self, msg):
+    def untimedMessage(self, msg, isFault = False):
         """Put an untimed message into the log."""
-        return self._logLine(msg)
+        return self._logLine(msg, isFault = isFault)
 
     def debug(self, msg):
         """Log a debug message."""
@@ -90,7 +90,7 @@ class Logger(object):
         self._faults[faultID] = score
         text = "%s (NO GO)" % (what) if score==Logger.NO_GO_SCORE \
                else "%s (%.1f)" % (what, score)
-        lineIndex = self.message(timestamp, text)
+        lineIndex = self.message(timestamp, text, isFault = True)
         self._faultLineIndexes.append(lineIndex)
         (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
                                   if score==Logger.NO_GO_SCORE \
@@ -117,11 +117,11 @@ class Logger(object):
         self._lines[index] = (timeStr, line)
         self._output.updateFlightLogLine(index, timeStr, line)
 
-    def _logLine(self, line, timeStr = None):
+    def _logLine(self, line, timeStr = None, isFault = False):
         """Log the given line."""
         index = len(self._lines)
         self._lines.append((timeStr, line))
-        self._output.addFlightLogLine(timeStr, line)
+        self._output.addFlightLogLine(timeStr, line, isFault)
         return index
         
 #--------------------------------------------------------------------------------------

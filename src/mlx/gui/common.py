@@ -227,11 +227,13 @@ aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
 
 #------------------------------------------------------------------------------
 
-def formatFlightLogLine(timeStr, line):
+def formatFlightLogLine(timeStr, line, isFault = False):
     """Format the given flight log line."""
     """Format the given line for flight logging."""
     if timeStr is not None:
         line = timeStr + ": " + line
+    #if isFault:
+    #    line = "<b>" + line + "</b>"
     return line + "\n"
 
 #------------------------------------------------------------------------------

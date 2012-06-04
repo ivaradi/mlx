@@ -233,10 +233,15 @@ class PIREPViewer(gtk.Dialog):
         self._flightDefects.get_buffer().set_text(pirep.flightDefects)
 
         logBuffer = self._log.get_buffer()
+        print dir(logBuffer)
         logBuffer.set_text("")
+        lineIndex = 0
         for (timeStr, line) in pirep.logLines:
+            isFault = lineIndex in pirep.faultLineIndexes
             logBuffer.insert(logBuffer.get_end_iter(), 
-                             formatFlightLogLine(timeStr, line))
+                             formatFlightLogLine(timeStr, line, 
+                                                 isFault = isFault))
+            lineIndex += 1
 
         self._notebook.set_current_page(0)
         self._okButton.grab_default()

@@ -462,16 +462,17 @@ class GUI(fs.ConnectionListener):
 
         return True
             
-    def addFlightLogLine(self, timeStr, line):
+    def addFlightLogLine(self, timeStr, line, isFault = False):
         """Write the given message line to the log."""
         gobject.idle_add(self._writeLog,
-                         formatFlightLogLine(timeStr, line),
+                         formatFlightLogLine(timeStr, line, isFault = isFault),
                          self._logView)
 
-    def updateFlightLogLine(self, index, timeStr, line):
+    def updateFlightLogLine(self, index, timeStr, line, isFault = False):
         """Update the line with the given index."""
         gobject.idle_add(self._updateFlightLogLine, index,
-                         formatFlightLogLine(timeStr, line))
+                         formatFlightLogLine(timeStr, line,
+                                             isFault = isFault))
 
     def _updateFlightLogLine(self, index, line):
         """Replace the contents of the given line in the log."""
