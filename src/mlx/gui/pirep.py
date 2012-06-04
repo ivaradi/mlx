@@ -213,6 +213,7 @@ class PIREPViewer(gtk.Dialog):
         else:
             self._rating.set_text("%.1f %%" % (rating,))
 
+        self._flownCargoWeight.set_text("%.0f" % (pirep.cargoWeight,))
         self._flightType.set_text(xstr("flighttype_" + 
                                        flightType2string(pirep.flightType)))
         self._online.set_text(xstr("pirepView_" +
@@ -509,6 +510,11 @@ class PIREPViewer(gtk.Dialog):
         dataBox = gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
         
+        self._flownCargoWeight = \
+            PIREPViewer.addLabeledData(dataBox,
+                                       xstr("pirepView_cargoWeight"),
+                                       width = 6)
+
         self._flightType = \
             PIREPViewer.addLabeledData(dataBox,
                                        xstr("pirepView_flightType"),
