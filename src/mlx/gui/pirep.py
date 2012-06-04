@@ -151,6 +151,9 @@ class PIREPViewer(gtk.Dialog):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
+
+        self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        self._okButton.set_can_default(True)
         
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
@@ -236,6 +239,7 @@ class PIREPViewer(gtk.Dialog):
                              formatFlightLogLine(timeStr, line))
 
         self._notebook.set_current_page(0)
+        self._okButton.grab_default()
 
     def _buildDataTab(self):
         """Build the data tab of the viewer."""

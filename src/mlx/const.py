@@ -216,7 +216,6 @@ _flightTypeStrings = { FLIGHTTYPE_SCHEDULED : "scheduled",
 
 def flightType2string(flightType):
     """Get the string equivalent of the given flight type."""
-    print _flightTypeStrings
     return _flightTypeStrings[flightType] \
            if flightType in _flightTypeStrings else None    
 
