@@ -202,6 +202,26 @@ FLIGHTTYPE_CHARTER = 3
 
 #-------------------------------------------------------------------------------
 
+flightTypes = [ FLIGHTTYPE_SCHEDULED,
+                FLIGHTTYPE_OLDTIMER,
+                FLIGHTTYPE_VIP,
+                FLIGHTTYPE_CHARTER ]
+
+#-------------------------------------------------------------------------------
+
+_flightTypeStrings = { FLIGHTTYPE_SCHEDULED : "scheduled",
+                       FLIGHTTYPE_OLDTIMER : "ot",
+                       FLIGHTTYPE_VIP : "vip",
+                       FLIGHTTYPE_CHARTER : "charter" }
+
+def flightType2string(flightType):
+    """Get the string equivalent of the given flight type."""
+    print _flightTypeStrings
+    return _flightTypeStrings[flightType] \
+           if flightType in _flightTypeStrings else None    
+
+#-------------------------------------------------------------------------------
+
 # Delay code: loading problems
 DELAYCODE_LOADING = 0
 

@@ -11,6 +11,7 @@ from mlx.gui.weighthelp import WeightHelp
 from mlx.gui.gates import FleetGateStatus
 from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
+from mlx.gui.pirep import PIREPViewer
 
 import mlx.const as const
 import mlx.fs as fs
@@ -143,6 +144,8 @@ class GUI(fs.ConnectionListener):
         self._monitorWindowX = None
         self._monitorWindowY = None
         self._selfToggling = False
+
+        self._pirepViewer = PIREPViewer(self)
 
         window.show_all()
         self._wizard.grabDefault()
@@ -1005,6 +1008,11 @@ class GUI(fs.ConnectionListener):
 
                 if result==RESPONSETYPE_OK:
                     self.sendPIREP(pirep)
+                elif result==1:
+                    self._pirepViewer.setPIREP(pirep)
+                    self._pirepViewer.show_all()
+                    self._pirepViewer.run()
+                    self._pirepViewer.hide()
 
     def _getLoadPirepDialog(self):
         """Get the PIREP loading file chooser dialog.
@@ -1137,6 +1145,7 @@ class GUI(fs.ConnectionListener):
         table.attach(labelAlignment, 1, 2, 4, 5)
 
         dialog.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
+        dialog.add_button(xstr("viewPIREP"), 1)
         dialog.add_button(xstr("sendPIREP"), RESPONSETYPE_OK)
         
         return dialog

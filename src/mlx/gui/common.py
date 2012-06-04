@@ -53,6 +53,10 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
 
+    SHADOW_IN = gtk.SHADOW_IN
+
+    POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
+
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return unicode(text)
@@ -95,6 +99,10 @@ else:
     FILE_CHOOSER_ACTION_SAVE = gtk.FileChooserAction.SAVE
 
     SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
+
+    SHADOW_IN = gtk.ShadowType.IN
+
+    POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")

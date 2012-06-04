@@ -873,6 +873,54 @@ class _English(_Strings):
                  "you may try again later. Or it can be a bug;\n" \
                  "see the debug log for more information.")
 
+        self.add("viewPIREP", "_View PIREP...")
+
+        self.add("pirepView_title", "PIREP viewer")
+
+        self.add("pirepView_frame_flight", "Flight")
+        self.add("pirepView_callsign", "Callsign:")
+        self.add("pirepView_tailNumber", "Tail no.:")
+        self.add("pirepView_aircraftType", "Aircraft:")
+        self.add("pirepView_departure", "Departure airport:")
+        self.add("pirepView_departure_time", "time:")
+        self.add("pirepView_arrival", "Arrival airport:")
+        self.add("pirepView_arrival_time", "time:")
+        self.add("pirepView_numPassengers", "PAX:")
+        self.add("pirepView_numCrew", "Crew:")
+        self.add("pirepView_bagWeight", "Baggage:")
+        self.add("pirepView_cargoWeight", "Cargo:")
+        self.add("pirepView_mailWeight", "Mail:")
+        self.add("pirepView_route", "MAVA route:")
+
+        self.add("pirepView_frame_route", "Route filed")
+        self.add("pirepView_filedCruiseLevel", "Cruise level:")
+        self.add("pirepView_modifiedCruiseLevel", "modified to:")
+
+        self.add("pirepView_frame_departure", "Departure")
+        self.add("pirepView_runway", "Runway:")
+        self.add("pirepView_sid", "SID:")
+
+        self.add("pirepView_frame_arrival", "Arrival")
+        self.add("pirepView_star", "STAR:")
+        self.add("pirepView_transition", "Transition:")
+        self.add("pirepView_approachType", "Approach:")
+
+        self.add("pirepView_frame_statistics", "Statistics")
+        self.add("pirepView_blockTimeStart", "Block time start:")
+        self.add("pirepView_blockTimeEnd", "end:")
+        self.add("pirepView_flightTimeStart", "Flight time start:")
+        self.add("pirepView_flightTimeEnd", "end:")
+        self.add("pirepView_flownDistance", "Flown distance:")
+        self.add("pirepView_fuelUsed", "Fuel used:")
+        self.add("pirepView_rating", "Rating:")
+
+        self.add("pirepView_frame_miscellaneous", "Miscellaneous")
+        self.add("pirepView_flightType", "Type:")
+        self.add("pirepView_online", "Online:")
+        self.add("pirepView_yes", "yes")
+        self.add("pirepView_no", "no")
+        self.add("pirepView_delayCodes", "Delay codes:")
+
 #------------------------------------------------------------------------------
 
 class _Hungarian(_Strings):
