@@ -1,4 +1,5 @@
 # The main file for the GUI
+# -*- coding: utf-8 -*-
 
 from statusicon import StatusIcon
 from statusbar import Statusbar
@@ -20,18 +21,26 @@ import mlx.logger as logger
 import mlx.acft as acft
 import mlx.web as web
 import mlx.singleton as singleton
-from  mlx.i18n import xstr
+from  mlx.i18n import xstr, getLanguage
 from mlx.pirep import PIREP
 
 import time
 import threading
 import sys
 import datetime
+import webbrowser
 
 #------------------------------------------------------------------------------
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
+    _authors = [ ("Váradi", "István", "prog_test"),
+                 ("Galyassy", "Tamás", "negotiation"),
+                 ("Petrovszki", "Gábor", "test"),
+                 ("Zsebényi-Loksa", "Gergely", "test"),
+                 ("Kurják", "Ákos", "test"),
+                 ("Radó", "Iván", "test") ]
+
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
         gobject.threads_init()
@@ -157,6 +166,8 @@ class GUI(fs.ConnectionListener):
         self._hotkeySetID = None
         self._pilotHotkeyIndex = None
         self._checklistHotkeyIndex = None
+
+        self._aboutDialog = None
 
     @property
     def mainWindow(self):
@@ -872,6 +883,31 @@ class GUI(fs.ConnectionListener):
         showDebugMenuItem.connect("toggled", self._toggleDebugLog)
         viewMenu.append(showDebugMenuItem)
 
+        helpMenuItem = gtk.MenuItem(xstr("menu_help"))
+        helpMenu = gtk.Menu()
+        helpMenuItem.set_submenu(helpMenu)
+        menuBar.append(helpMenuItem)
+
+        manualMenuItem = gtk.ImageMenuItem(gtk.STOCK_HELP)
+        manualMenuItem.set_use_stock(True)
+        manualMenuItem.set_label(xstr("menu_help_manual"))
+        manualMenuItem.add_accelerator("activate", accelGroup,
+                                       ord(xstr("menu_help_manual_key")),
+                                       CONTROL_MASK, ACCEL_VISIBLE)
+        manualMenuItem.connect("activate", self._showManual)
+        helpMenu.append(manualMenuItem)
+
+        helpMenu.append(gtk.SeparatorMenuItem())
+        
+        aboutMenuItem = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
+        aboutMenuItem.set_use_stock(True)
+        aboutMenuItem.set_label(xstr("menu_help_about"))
+        aboutMenuItem.add_accelerator("activate", accelGroup,
+                                      ord(xstr("menu_help_about_key")),
+                                      CONTROL_MASK, ACCEL_VISIBLE)
+        aboutMenuItem.connect("activate", self._showAbout)
+        helpMenu.append(aboutMenuItem)
+
         return menuBar
 
     def _toggleDebugLog(self, menuItem):
@@ -1231,3 +1267,47 @@ class GUI(fs.ConnectionListener):
                     self._flight.checklistHotkeyPressed()
                 else:
                     print "gui.GUI._handleHotkeys: unhandled hotkey index:", index
+
+    def _showManual(self, menuitem):
+        """Show the user's manual."""
+        webbrowser.open(url ="file://" +
+                        os.path.join(self._programDirectory, "doc", "manual",
+                                     getLanguage(), "index.html"),
+                        new = 1)
+
+    def _showAbout(self, menuitem):
+        """Show the about dialog."""
+        dialog = self._getAboutDialog()
+        dialog.show_all()
+        dialog.run()
+        dialog.hide()
+
+    def _getAboutDialog(self):
+        """Get the about dialog.
+
+        If it does not exist yet, it will be created."""
+        if self._aboutDialog is None:
+            self._aboutDialog = dialog = gtk.AboutDialog()
+            dialog.set_transient_for(self._mainWindow)
+            dialog.set_modal(True)
+            
+            logoPath = os.path.join(self._programDirectory, "logo.png")
+            logo = pixbuf_new_from_file(logoPath)
+            dialog.set_logo(logo)
+                                
+            dialog.set_program_name(PROGRAM_NAME)
+            dialog.set_version(const.VERSION)
+            dialog.set_copyright("(c) 2012 by István Váradi")
+
+            isHungarian = getLanguage()=="hu"
+            authors = []
+            for (familyName, firstName, role) in GUI._authors:
+                authors.append("%s %s (%s)" % \
+                               (familyName if isHungarian else firstName,
+                                firstName if isHungarian else familyName,
+                                xstr("about_role_" + role)))            
+            dialog.set_authors(authors)
+
+            dialog.set_license(xstr("about_license"))
+
+        return self._aboutDialog

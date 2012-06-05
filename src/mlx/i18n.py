@@ -19,6 +19,14 @@ def setLanguage(language):
     
 #------------------------------------------------------------------------------
 
+def getLanguage():
+    """Get the two-letter language code."""
+    language = _Strings.current().getLanguage()
+    underscoreIndex = language.find("_")
+    return language[:underscoreIndex] if underscoreIndex>0 else language
+
+#------------------------------------------------------------------------------
+
 def xstr(key):
     """Get the string for the given key in the current language.
 
@@ -51,8 +59,7 @@ class _Strings(object):
         from the end until the last underscore and that is searched for. And so
         on, until no underscore remains.
 
-        If nothing is found this way, the 
-        """
+        If nothing is found this way, the fallback will be returned."""
         while language:
             if language in _Strings._instances:
                 return _Strings._instances[language]
@@ -88,6 +95,7 @@ class _Strings(object):
     def __init__(self, languages, fallback = False):
         """Construct an empty strings object."""
         self._strings = {}
+        self._language = languages[0]
         for language in languages:
             _Strings._instances[language] = self
         if fallback:
@@ -105,6 +113,10 @@ class _Strings(object):
 
         This releases the string dictionary to free space."""
         self._strings = {}
+
+    def getLanguage(self):
+        """Get the language."""
+        return self._language
 
     def add(self, id, s):
         """Add the given text as the string with the given ID.
@@ -177,6 +189,12 @@ class _English(_Strings):
         self.add("menu_view_debug", "Show _debug log")
         self.add("menu_view_debug_key", "d")
         
+        self.add("menu_help", "Help")
+        self.add("menu_help_manual", "_User's manual")
+        self.add("menu_help_manual_key", "u")
+        self.add("menu_help_about", "_About")
+        self.add("menu_help_about_key", "a")
+
         self.add("tab_flight", "_Flight")
         self.add("tab_flight_tooltip", "Flight wizard")
         self.add("tab_flight_info", "Flight _info")
@@ -935,6 +953,13 @@ class _English(_Strings):
         self.add("pirepView_tab_log", "_Log")
         self.add("pirepView_tab_log_tooltip", "The flight log.")
 
+        self.add("about_license",
+                 "This program is in the public domain.")
+
+        self.add("about_role_prog_test", "programming, testing")
+        self.add("about_role_negotiation", "negotiation")
+        self.add("about_role_test", "testing")
+
 #------------------------------------------------------------------------------
 
 class _Hungarian(_Strings):
@@ -991,6 +1016,12 @@ class _Hungarian(_Strings):
         self.add("menu_view_debug", "Mutasd a _debug naplót")
         self.add("menu_view_debug_key", "d")
         
+        self.add("menu_help", "Segítség")
+        self.add("menu_help_manual", "_Felhasználói kézikönyv")
+        self.add("menu_help_manual_key", "f")
+        self.add("menu_help_about", "_Névjegy")
+        self.add("menu_help_about_key", "n")
+
         self.add("tab_flight", "_Járat")
         self.add("tab_flight_tooltip", "Járat varázsló")
         self.add("tab_flight_info", "Járat _info")
@@ -1764,6 +1795,13 @@ class _Hungarian(_Strings):
 
         self.add("pirepView_tab_log", "_Napló")
         self.add("pirepView_tab_log_tooltip", "A repülési napló.")
+
+        self.add("about_license",
+                 "A program köztulajdonban van.")
+
+        self.add("about_role_prog_test", "programozás, tesztelés")
+        self.add("about_role_negotiation", "tárgyalások")
+        self.add("about_role_test", "tesztelés")
 
 #------------------------------------------------------------------------------
 

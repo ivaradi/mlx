@@ -59,6 +59,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     WEIGHT_BOLD = pango.WEIGHT_BOLD
 
+    pixbuf_new_from_file = gdk.pixbuf_new_from_file
+
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return unicode(text)
@@ -66,6 +68,7 @@ else:
     print "Using PyGObject"
     pygobject = True
     from gi.repository import Gdk as gdk
+    from gi.repository import GdkPixbuf as gdkPixbuf
     from gi.repository import Gtk as gtk
     from gi.repository import GObject as gobject
     from gi.repository import AppIndicator3 as appindicator
@@ -107,6 +110,8 @@ else:
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
     WEIGHT_BOLD = pango.Weight.BOLD
+
+    pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
@@ -207,7 +212,9 @@ gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
 
 #------------------------------------------------------------------------------
 
-WINDOW_TITLE_BASE = "MAVA Logger X " + _const.VERSION
+PROGRAM_NAME = "MAVA Logger X"
+
+WINDOW_TITLE_BASE = PROGRAM_NAME + " " + _const.VERSION
 
 #------------------------------------------------------------------------------
 
