@@ -111,6 +111,7 @@ class GUI(fs.ConnectionListener):
         self._notebook.append_page(self._weightHelp, label)
         
         (logWidget, self._logView)  = self._buildLogWidget()
+        addFaultTag(self._logView.get_buffer())        
         label = gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_log_tooltip"))
@@ -465,14 +466,13 @@ class GUI(fs.ConnectionListener):
     def addFlightLogLine(self, timeStr, line, isFault = False):
         """Write the given message line to the log."""
         gobject.idle_add(self._writeLog,
-                         formatFlightLogLine(timeStr, line, isFault = isFault),
-                         self._logView)
+                         formatFlightLogLine(timeStr, line),
+                         self._logView, isFault)
 
-    def updateFlightLogLine(self, index, timeStr, line, isFault = False):
+    def updateFlightLogLine(self, index, timeStr, line):
         """Update the line with the given index."""
         gobject.idle_add(self._updateFlightLogLine, index,
-                         formatFlightLogLine(timeStr, line,
-                                             isFault = isFault))
+                         formatFlightLogLine(timeStr, line))
 
     def _updateFlightLogLine(self, index, line):
         """Replace the contents of the given line in the log."""
@@ -913,10 +913,10 @@ class GUI(fs.ConnectionListener):
 
         return (alignment, logView)
 
-    def _writeLog(self, msg, logView):
+    def _writeLog(self, msg, logView, isFault = False):
         """Write the given message to the log."""
         buffer = logView.get_buffer()
-        buffer.insert(buffer.get_end_iter(), msg)
+        appendTextBuffer(buffer, msg, isFault = isFault)
         logView.scroll_mark_onscreen(buffer.get_insert())
 
     def _quit(self, what = None, force = False):

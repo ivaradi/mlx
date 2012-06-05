@@ -238,9 +238,9 @@ class PIREPViewer(gtk.Dialog):
         lineIndex = 0
         for (timeStr, line) in pirep.logLines:
             isFault = lineIndex in pirep.faultLineIndexes
-            logBuffer.insert(logBuffer.get_end_iter(), 
-                             formatFlightLogLine(timeStr, line, 
-                                                 isFault = isFault))
+            appendTextBuffer(logBuffer,
+                             formatFlightLogLine(timeStr, line),
+                             isFault = isFault)
             lineIndex += 1
 
         self._notebook.set_current_page(0)
@@ -572,6 +572,7 @@ class PIREPViewer(gtk.Dialog):
         mainBox = gtk.VBox()
 
         (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
+        addFaultTag(self._log.get_buffer())
         mainBox.pack_start(logWindow, True, True, 0)
         
         return mainBox

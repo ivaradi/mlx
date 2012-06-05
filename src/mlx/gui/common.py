@@ -57,6 +57,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
 
+    WEIGHT_BOLD = pango.WEIGHT_BOLD
+
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return unicode(text)
@@ -103,6 +105,8 @@ else:
     SHADOW_IN = gtk.ShadowType.IN
 
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
+
+    WEIGHT_BOLD = pango.Weight.BOLD
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
@@ -227,13 +231,32 @@ aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
 
 #------------------------------------------------------------------------------
 
-def formatFlightLogLine(timeStr, line, isFault = False):
+def formatFlightLogLine(timeStr, line):
     """Format the given flight log line."""
     """Format the given line for flight logging."""
     if timeStr is not None:
         line = timeStr + ": " + line
-    #if isFault:
-    #    line = "<b>" + line + "</b>"
     return line + "\n"
+
+#------------------------------------------------------------------------------
+
+def addFaultTag(buffer):
+    """Add a tag named 'fault' to the given buffer."""
+    faultTag = gtk.TextTag(name = "fault")
+    faultTag.set_property("foreground", "red")
+    faultTag.set_property("weight", WEIGHT_BOLD)
+    buffer.get_tag_table().add(faultTag)    
+
+#------------------------------------------------------------------------------
+
+def appendTextBuffer(buffer, text, isFault = False):
+    """Append the given line at the end of the given text buffer.
+
+    If isFault is set, use the tag named 'fault'."""
+    if isFault:
+        buffer.insert_with_tags_by_name(buffer.get_end_iter(), text,
+                                        "fault")
+    else:
+        buffer.insert(buffer.get_end_iter(), text)
 
 #------------------------------------------------------------------------------
