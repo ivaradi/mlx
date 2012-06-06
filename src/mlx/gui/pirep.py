@@ -4,6 +4,7 @@
 
 from common import *
 
+from mlx.pirep import PIREP
 from mlx.const import *
 
 import time
@@ -225,7 +226,7 @@ class PIREPViewer(gtk.Dialog):
         delayCodes = ""
         for code in pirep.delayCodes:
             if delayCodes: delayCodes += ", "
-            delayCodes += PIREP.delayCodes[code]
+            delayCodes += PIREP.delayCodeNames[code]
         
         self._delayCodes.get_buffer().set_text(delayCodes)        
 
