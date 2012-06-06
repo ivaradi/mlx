@@ -1033,16 +1033,20 @@ class GUI(fs.ConnectionListener):
             else:
                 dialog = self._getSendLoadedDialog(pirep)
                 dialog.show_all()
-                result = dialog.run()
-                dialog.hide()
+                while True:
+                    result = dialog.run()
 
-                if result==RESPONSETYPE_OK:
-                    self.sendPIREP(pirep)
-                elif result==1:
-                    self._pirepViewer.setPIREP(pirep)
-                    self._pirepViewer.show_all()
-                    self._pirepViewer.run()
-                    self._pirepViewer.hide()
+                    if result==RESPONSETYPE_OK:
+                        self.sendPIREP(pirep)
+                    elif result==1:
+                        self._pirepViewer.setPIREP(pirep)
+                        self._pirepViewer.show_all()
+                        self._pirepViewer.run()
+                        self._pirepViewer.hide()
+                    else:
+                        break
+
+                dialog.hide()
 
     def _getLoadPirepDialog(self):
         """Get the PIREP loading file chooser dialog.
