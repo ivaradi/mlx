@@ -953,6 +953,8 @@ class _English(_Strings):
         self.add("pirepView_tab_log", "_Log")
         self.add("pirepView_tab_log_tooltip", "The flight log.")
 
+        self.add("about_website", "Project Homepage")
+
         self.add("about_license",
                  "This program is in the public domain.")
 
@@ -1795,6 +1797,8 @@ class _Hungarian(_Strings):
 
         self.add("pirepView_tab_log", "_Napló")
         self.add("pirepView_tab_log_tooltip", "A repülési napló.")
+
+        self.add("about_website", "A projekt honlapja")
 
         self.add("about_license",
                  "A program köztulajdonban van.")

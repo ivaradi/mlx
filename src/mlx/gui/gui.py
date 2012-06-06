@@ -1298,6 +1298,8 @@ class GUI(fs.ConnectionListener):
             dialog.set_program_name(PROGRAM_NAME)
             dialog.set_version(const.VERSION)
             dialog.set_copyright("(c) 2012 by István Váradi")
+            dialog.set_website("http://mlx.varadiistvan.hu")
+            dialog.set_website_label(xstr("about_website"))
 
             isHungarian = getLanguage()=="hu"
             authors = []
@@ -1310,4 +1312,11 @@ class GUI(fs.ConnectionListener):
 
             dialog.set_license(xstr("about_license"))
 
+            if not pygobject:
+                gtk.about_dialog_set_url_hook(self._showAboutURL, None)
+
         return self._aboutDialog
+
+    def _showAboutURL(self, dialog, link, user_data):
+        """Show the about URL."""        
+        webbrowser.open(url = link, new = 1)
