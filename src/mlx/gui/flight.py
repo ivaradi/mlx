@@ -453,7 +453,7 @@ class FlightSelectionPage(Page):
         dialog.hide()
 
         if response==RESPONSETYPE_OK:
-            fileName = dialog.get_filename()
+            fileName = text2unicode(dialog.get_filename())
             print "Saving", fileName
             try:
                 with open(fileName, "wt") as f:
@@ -494,7 +494,7 @@ class FlightSelectionPage(Page):
         dialog.hide()
 
         if response==RESPONSETYPE_OK:
-            fileName = dialog.get_filename()
+            fileName = text2unicode(dialog.get_filename())
             print "Loading", fileName
             bookedFlight = web.BookedFlight()
             try:

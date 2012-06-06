@@ -529,7 +529,7 @@ class Preferences(gtk.Dialog):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            self._pirepDirectory.set_text(dialog.get_filename())
+            self._pirepDirectory.set_text(text2unicode(dialog.get_filename()))
         
     def _buildMessages(self):
         """Build the page for the message settings."""

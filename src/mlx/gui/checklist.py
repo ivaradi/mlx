@@ -184,6 +184,7 @@ class ChecklistEditor(gtk.Dialog):
         numFiles = 0
         numSelected = 0
         for path in fileChooser.get_filenames():
+            path = text2unicode(path)
             numSelected += 1
             if os.path.isfile(path): numFiles += 1
 
@@ -192,6 +193,7 @@ class ChecklistEditor(gtk.Dialog):
     def _addButtonClicked(self, button):
         """Called when the Add button is clicked."""
         for path in self._fileChooser.get_filenames():
+            path = text2unicode(path)
             self._fileListModel.append([os.path.basename(path),
                                         path])
         self._fileChooser.unselect_all()
