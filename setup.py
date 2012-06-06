@@ -15,12 +15,12 @@ data_files = [("sounds", glob(os.path.join("sounds", "*.*")))]
 data_files.append((os.path.join("doc", "manual", "en"),
                    glob(os.path.join("doc", "manual", "en", "*.*"))))
 data_files.append((os.path.join("doc", "manual", "hu"),
-                   glob(os.path.join("doc", "manual", "hu", "*.*"))))
+                   glob(os.path.join("doc", "manual", "en", "*.*"))))
+data_files.append(("", ["logo.png"]))
 if os.name=="nt":
     import py2exe
 
     data_files.append(("", ["logo.ico"]))
-    data_files.append(("", ["logo.png"]))
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
