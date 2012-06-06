@@ -107,8 +107,9 @@ class PIREPViewer(gtk.Dialog):
 
     @staticmethod
     def addVFiller(vBox, height = 4):
-        """Add a filler eventbox to the given vertical box."""
-        filler = gtk.EventBox()
+        """Add a filler to the given vertical box."""
+        filler = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                               xscale = 1.0, yscale = 1.0)
         filler.set_size_request(-1, height)
         vBox.pack_start(filler, False, False, 0)
         
@@ -527,7 +528,7 @@ class PIREPViewer(gtk.Dialog):
         self._flightType = \
             PIREPViewer.addLabeledData(dataBox,
                                        xstr("pirepView_flightType"),
-                                       width = 10)
+                                       width = 15)
             
         self._online = \
             PIREPViewer.addLabeledData(dataBox,
