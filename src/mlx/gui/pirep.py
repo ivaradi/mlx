@@ -233,7 +233,6 @@ class PIREPViewer(gtk.Dialog):
         self._flightDefects.get_buffer().set_text(pirep.flightDefects)
 
         logBuffer = self._log.get_buffer()
-        print dir(logBuffer)
         logBuffer.set_text("")
         lineIndex = 0
         for (timeStr, line) in pirep.logLines:
