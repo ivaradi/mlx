@@ -18,7 +18,7 @@ class MonitorWindow(gtk.Window):
         self._gui = gui
 
         self.set_resizable(False)
-        self.set_title("MAVA Logger X " + const.VERSION + " - Data Monitor")
+        self.set_title(WINDOW_TITLE_BASE + " - Data Monitor")
         self.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         self.connect("delete-event",
                      lambda a, b: self._gui.hideMonitorWindow())

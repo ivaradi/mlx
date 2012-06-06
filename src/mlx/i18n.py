@@ -1016,7 +1016,7 @@ class _Hungarian(_Strings):
         self.add("menu_view_debug", "Mutasd a _debug naplót")
         self.add("menu_view_debug_key", "d")
         
-        self.add("menu_help", "Segítség")
+        self.add("menu_help", "Súgó")
         self.add("menu_help_manual", "_Felhasználói kézikönyv")
         self.add("menu_help_manual_key", "f")
         self.add("menu_help_about", "_Névjegy")
