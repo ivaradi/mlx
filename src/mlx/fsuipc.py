@@ -684,7 +684,8 @@ class Simulator(object):
         data = []
         for (tank, level) in levels:
             offset = _tank2offset[tank]
-            data.append( (offset, "u", long(level * 128.8 * 65536.0)) )
+            value = long(level * 128.0 * 65536.0)
+            data.append( (offset, "u", value) )
         self._handler.requestWrite(data, self._handleFuelWritten)
 
     def enableTimeSync(self):
