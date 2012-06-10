@@ -1984,15 +1984,6 @@ class TakeoffPage(Page):
         self._button.set_sensitive(False)
         self._forwardAllowed = False
         
-    def finalize(self):
-        """Finalize the page."""
-        self._runway.set_sensitive(False)
-        self._sid.set_sensitive(False)
-        self._v1.set_sensitive(False)
-        self._vr.set_sensitive(False)
-        self._v2.set_sensitive(False)
-        self._wizard.gui.flight.aircraft.updateV1R2()
-
     def allowForward(self):
         """Allow going to the next page."""
         self._forwardAllowed = True
@@ -2033,6 +2024,7 @@ class TakeoffPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
+        self._wizard.gui.flight.aircraft.updateV1R2()
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -2206,21 +2198,6 @@ class LandingPage(Page):
         self._flightEnded = True
         self._updateForwardButton()
 
-    def finalize(self):
-        """Finalize the page."""
-        self._starButton.set_sensitive(False)
-        self._star.set_sensitive(False)
-
-        self._transitionButton.set_sensitive(False)
-        self._transition.set_sensitive(False)
-
-        self._runway.set_sensitive(False)
-
-        self._approachType.set_sensitive(False)
-
-        self._vref.set_sensitive(False)
-        self._wizard.gui.flight.aircraft.updateVRef()
-
     def _starButtonClicked(self, button):
         """Called when the STAR button is clicked."""
         active = button.get_active()
@@ -2266,6 +2243,7 @@ class LandingPage(Page):
         
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
+        self._wizard.gui.flight.aircraft.updateVRef()
         if self._wizard.gui.config.onlineGateSystem and \
            self._wizard.loggedIn and not self._completed and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
