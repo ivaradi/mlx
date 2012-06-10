@@ -178,6 +178,10 @@ class IntegerEntry(gtk.Entry):
         """Get the integer."""
         return self._currentInteger
 
+    def reset(self):
+        """Reset the integer."""
+        self.set_int(None)
+
     def set_int(self, value):
         """Set the integer."""
         if value!=self._currentInteger:

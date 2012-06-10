@@ -144,6 +144,13 @@ class Aircraft(object):
     def state(self):
         """Get the current aircraft state."""
         return self._aircraftState
+
+    @property
+    def speedInKnots(self):
+        """Indicate if the speed is in knots.
+
+        This default implementation returns True."""
+        return True
     
     def getFlapsSpeedLimit(self, flaps):
         """Get the speed limit for the given flaps setting."""
@@ -199,7 +206,8 @@ class Aircraft(object):
                                    "Don't forget to set the takeoff V-speeds!",
                                    5)
             elif newStage==const.STAGE_TAKEOFF:
-                self.logger.message(aircraftState.timestamp, "Flight time start")
+                self.logger.message(aircraftState.timestamp,
+                                    "Flight time start")
                 self.logger.message(aircraftState.timestamp, 
                                     "Takeoff weight: %.0f kg, MTOW: %.0f kg" % \
                                     (aircraftState.grossWeight, self.mtow))
@@ -280,8 +288,11 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown rate was calculated by the %s" % \
                             ("simulator" if tdRateCalculatedByFS else "logger",))
+        flight = self._flight
         self.logger.message(self._aircraftState.timestamp,
-                            "Touchdown speed: %.0f knots" % (ias,))
+                            "Touchdown speed: %.0f %s" % \
+                            (flight.speedFromKnots(ias),
+                             flight.getEnglishSpeedUnit()))
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown pitch: %.1f degrees" % (pitch,))
         self.logger.message(self._aircraftState.timestamp,
@@ -328,16 +339,21 @@ class Aircraft(object):
         self._checkers.append(checks.NavLightsChecker())
         self._checkers.append(checks.StrobeLightsChecker())
 
+    def _speedToLog(self, speed):
+        """Convert the given speed (being either None or expressed in the
+        flight's speed unit into a string."""
+        if speed is None:
+            return "-"
+        else:
+            return str(speed) + " " + self._flight.getEnglishSpeedUnit()
+
     def _logV1R2(self):
         """Log the V1, Vr and V2 value either newly, or by updating the
         corresponding line."""
         message = "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
-                  ("-" if self._flight.v1 is None
-                   else str(self._flight.v1),
-                   "-" if self._flight.vr is None
-                   else str(self._flight.vr),
-                   "-" if self._flight.v2 is None
-                   else str(self._flight.v2))
+                  (self._speedToLog(self._flight.v1),
+                   self._speedToLog(self._flight.vr),
+                   self._speedToLog(self._flight.v2))
 
         if self._v1r2LineIndex is None:
             self._v1r2LineIndex = \
@@ -355,7 +371,7 @@ class Aircraft(object):
         """Log the Vref value either newly, or by updating the corresponding
         line."""
         message = "VRef speed calculated by the pilot: %s" % \
-                  ("-" if self._flight.vref is None else str(self._flight.vref))
+                  (self._speedToLog(self._flight.vref),)
         if self._vrefLineIndex is None:
             self._vrefLineIndex = \
                 self.logger.message(self._aircraftState.timestamp, message)
@@ -709,6 +725,11 @@ class T134(Aircraft):
                                  20 : 400,
                                  30 : 300 }
 
+    @property
+    def speedInKnots(self):
+        """Indicate if the speed is in knots."""
+        return False
+    
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
         self.logger.message(aircraftState.timestamp,
@@ -757,6 +778,11 @@ class T154(Aircraft):
                                  28 : 194,
                                  45 : 162 }
 
+    @property
+    def speedInKnots(self):
+        """Indicate if the speed is in knots."""
+        return False
+    
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
         self.logger.message(aircraftState.timestamp,
@@ -803,6 +829,11 @@ class YK40(Aircraft):
         self.flapSpeedLimits = { 20 : 165,
                                  35 : 135 }
 
+    @property
+    def speedInKnots(self):
+        """Indicate if the speed is in knots."""
+        return False
+    
     def logFuel(self, aircraftState):
         """Log the amount of fuel"""
         self.logger.message(aircraftState.timestamp,

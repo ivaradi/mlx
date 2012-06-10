@@ -337,7 +337,8 @@ class GUI(fs.ConnectionListener):
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
         self._connected = True
-        self._logger.untimedMessage("Connected to the simulator %s" % (descriptor,))
+        self._logger.untimedMessage("MLX %s connected to the simulator %s" % \
+                                    (const.VERSION, descriptor))
         fs.sendMessage(const.MESSAGETYPE_INFORMATION,
                        "Welcome to MAVA Logger X " + const.VERSION)
         gobject.idle_add(self._handleConnected, fsType, descriptor)

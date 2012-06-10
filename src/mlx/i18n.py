@@ -476,13 +476,17 @@ class _English(_Strings):
         self.add("takeoff_sid", "_SID:")
         self.add("takeoff_sid_tooltip",
                  "The name of the Standard Instrument Deparature procedure followed.")
-        self.add("takeoff_v1", "V<sub>_1</sub>:")
-        self.add("takeoff_v1_tooltip", "The takeoff decision speed in knots.")
         self.add("label_knots", "knots")
+        self.add("label_kmph", "km/h")
+        self.add("takeoff_v1", "V<sub>_1</sub>:")
+        self.add("takeoff_v1_tooltip_knots", "The takeoff decision speed in knots.")
+        self.add("takeoff_v1_tooltip_kmph", "The takeoff decision speed in km/h.")
         self.add("takeoff_vr", "V<sub>_R</sub>:")
-        self.add("takeoff_vr_tooltip", "The takeoff rotation speed in knots.")
+        self.add("takeoff_vr_tooltip_knots", "The takeoff rotation speed in knots.")
+        self.add("takeoff_vr_tooltip_kmph", "The takeoff rotation speed in km/h.")
         self.add("takeoff_v2", "V<sub>_2</sub>:")
-        self.add("takeoff_v2_tooltip", "The takeoff safety speed in knots.")
+        self.add("takeoff_v2_tooltip_knots", "The takeoff safety speed in knots.")
+        self.add("takeoff_v2_tooltip_kmph", "The takeoff safety speed in km/h.")
 
         self.add("landing_title", "Landing")
         self.add("landing_help",
@@ -504,8 +508,10 @@ class _English(_Strings):
         self.add("landing_approach_tooltip",
                  "The type of the approach, e.g. ILS or VISUAL.")
         self.add("landing_vref", "V<sub>_Ref</sub>:")
-        self.add("landing_vref_tooltip",
+        self.add("landing_vref_tooltip_knots",
                  "The landing reference speed in knots.")
+        self.add("landing_vref_tooltip_kmph",
+                 "The landing reference speed in km/h.")
 
         self.add("flighttype_scheduled", "scheduled")
         self.add("flighttype_ot", "old-timer")
@@ -1312,12 +1318,18 @@ class _Hungarian(_Strings):
         self.add("takeoff_sid_tooltip",
                  "Az alkalmazott szabványos műszeres indulási eljárás neve.")
         self.add("takeoff_v1", "V<sub>_1</sub>:")
-        self.add("takeoff_v1_tooltip", "Az elhatározási sebesség csomóban.")
+        self.add("takeoff_v1_tooltip_knots", "Az elhatározási sebesség csomóban.")
+        self.add("takeoff_v1_tooltip_kmph", "Az elhatározási sebesség km/órában.")
         self.add("label_knots", "csomó")
+        self.add("label_kmph", "km/h")
         self.add("takeoff_vr", "V<sub>_R</sub>:")
-        self.add("takeoff_vr_tooltip", "Az elemelkedési sebesség csomóban.")
+        self.add("takeoff_vr_tooltip_knots", "Az elemelkedési sebesség csomóban.")
+        self.add("takeoff_vr_tooltip_kmph", "Az elemelkedési sebesség km/órában.")
         self.add("takeoff_v2", "V<sub>_2</sub>:")
-        self.add("takeoff_v2_tooltip", "A biztonságos emelkedési sebesség csomóban.")
+        self.add("takeoff_v2_tooltip_knots",
+                 "A biztonságos emelkedési sebesség csomóban.")
+        self.add("takeoff_v2_tooltip_kmph",
+                 "A biztonságos emelkedési sebesség km/órában.")
         
         self.add("landing_title", "Leszállás")
         self.add("landing_help",
@@ -1340,8 +1352,10 @@ class _Hungarian(_Strings):
         self.add("landing_approach_tooltip",
                  "A megközelítgés típusa, pl. ILS vagy VISUAL.")
         self.add("landing_vref", "V<sub>_Ref</sub>:")
-        self.add("landing_vref_tooltip",
+        self.add("landing_vref_tooltip_knots",
                  "A leszállási sebesség csomóban.")
+        self.add("landing_vref_tooltip_km/h",
+                 "A leszállási sebesség km/órában.")
         
         self.add("flighttype_scheduled", "menetrendszerinti")
         self.add("flighttype_ot", "old-timer")

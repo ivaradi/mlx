@@ -1887,12 +1887,13 @@ class TakeoffPage(Page):
 
         self._v1 = IntegerEntry()
         self._v1.set_width_chars(4)
-        self._v1.set_tooltip_markup(xstr("takeoff_v1_tooltip"))
+        self._v1.set_tooltip_markup(xstr("takeoff_v1_tooltip_knots"))
         self._v1.connect("integer-changed", self._valueChanged)
         table.attach(self._v1, 2, 3, 2, 3)
         label.set_mnemonic_widget(self._v1)
-        
-        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 2, 3)
+
+        self._v1Unit = gtk.Label(xstr("label_knots"))
+        table.attach(self._v1Unit, 3, 4, 2, 3)
         
         label = gtk.Label(xstr("takeoff_vr"))
         label.set_use_markup(True)
@@ -1902,12 +1903,13 @@ class TakeoffPage(Page):
 
         self._vr = IntegerEntry()
         self._vr.set_width_chars(4)
-        self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip"))
+        self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip_knots"))
         self._vr.connect("integer-changed", self._valueChanged)
         table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
         
-        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 3, 4)
+        self._vrUnit = gtk.Label(xstr("label_knots"))
+        table.attach(self._vrUnit, 3, 4, 3, 4)
         
         label = gtk.Label(xstr("takeoff_v2"))
         label.set_use_markup(True)
@@ -1917,12 +1919,13 @@ class TakeoffPage(Page):
 
         self._v2 = IntegerEntry()
         self._v2.set_width_chars(4)
-        self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip"))
+        self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip_knots"))
         self._v2.connect("integer-changed", self._valueChanged)
         table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
         
-        table.attach(gtk.Label(xstr("label_knots")), 3, 4, 4, 5)
+        self._v2Unit = gtk.Label(xstr("label_knots"))
+        table.attach(self._v2Unit, 3, 4, 4, 5)
 
         self.addCancelFlightButton()
 
@@ -1967,6 +1970,17 @@ class TakeoffPage(Page):
         self._vr.set_sensitive(True)
         self._v2.set_int(None)
         self._v2.set_sensitive(True)
+
+        i18nSpeedUnit = self._wizard.gui.flight.getI18NSpeedUnit()
+        speedUnit = xstr("label" + i18nSpeedUnit)
+        self._v1Unit.set_text(speedUnit)
+        self._vrUnit.set_text(speedUnit)
+        self._v2Unit.set_text(speedUnit)
+
+        self._v1.set_tooltip_markup(xstr("takeoff_v1_tooltip" + i18nSpeedUnit))
+        self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip" + i18nSpeedUnit))
+        self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip" + i18nSpeedUnit))
+
         self._button.set_sensitive(False)
         self._forwardAllowed = False
         
@@ -1984,6 +1998,13 @@ class TakeoffPage(Page):
         self._forwardAllowed = True
         self._updateForwardButton()
 
+    def reset(self):
+        """Reset the page if the wizard is reset."""
+        super(TakeoffPage, self).reset()
+        self._v1.reset()
+        self._vr.reset()
+        self._v2.reset()
+        
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
         sensitive = self._forwardAllowed and \
@@ -2102,12 +2123,13 @@ class LandingPage(Page):
 
         self._vref = IntegerEntry()
         self._vref.set_width_chars(5)
-        self._vref.set_tooltip_markup(xstr("landing_vref_tooltip"))
+        self._vref.set_tooltip_markup(xstr("landing_vref_tooltip_knots"))
         self._vref.connect("integer-changed", self._vrefChanged)
         table.attach(self._vref, 3, 4, 5, 6)
         label.set_mnemonic_widget(self._vref)
-        
-        table.attach(gtk.Label(xstr("label_knots")), 4, 5, 5, 6)
+
+        self._vrefUnit = gtk.Label(xstr("label_knots"))
+        table.attach(self._vrefUnit, 4, 5, 5, 6)
 
         self.addCancelFlightButton()
 
@@ -2148,8 +2170,9 @@ class LandingPage(Page):
     def reset(self):
         """Reset the page if the wizard is reset."""
         super(LandingPage, self).reset()
+        self._vref.reset()
         self._flightEnded = False
-
+        
     def activate(self):
         """Called when the page is activated."""
         self._starButton.set_sensitive(True)
@@ -2168,6 +2191,13 @@ class LandingPage(Page):
 
         self._vref.set_int(None)
         self._vref.set_sensitive(True)
+
+        i18nSpeedUnit = self._wizard.gui.flight.getI18NSpeedUnit()
+        speedUnit = xstr("label" + i18nSpeedUnit)
+        self._vrefUnit.set_text(speedUnit)
+
+        self._vref.set_tooltip_markup(xstr("landing_vref_tooltip" +
+                                           i18nSpeedUnit))
 
         self._updateForwardButton()
 

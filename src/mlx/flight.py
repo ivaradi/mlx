@@ -116,6 +116,13 @@ class Flight(object):
         """Get the touchdown rate if known, None otherwise."""
         return self._tdRate
 
+    @property
+    def speedInKnots(self):
+        """Determine if the speeds for the flight are to be expressed in
+        knots."""
+        return self.aircraft.speedInKnots if self.aircraft is not None \
+               else True
+
     def handleState(self, oldState, currentState):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)
@@ -205,6 +212,24 @@ class Flight(object):
     def checklistHotkeyPressed(self):
         """Called when the checklist hotkey is pressed."""
         self._checklistHotkeyPressed = True
+
+    def speedFromKnots(self, knots):
+        """Convert the given speed value expressed in knots into the flight's
+        speed unit."""
+        return knots if self.speedInKnots else knots * const.KNOTSTOKMPH
+
+    def speedToKnots(self, speed):
+        """Convert the given speed expressed in the flight's speed unit into
+        knots."""        
+        return speed if self.speedInKnots else speed * const.KMPHTOKNOTS
+
+    def getEnglishSpeedUnit(self):
+        """Get the English name of the speed unit used by the flight."""
+        return "knots" if self.speedInKnots else "km/h"
+
+    def getI18NSpeedUnit(self):
+        """Get the speed unit suffix for i18n message identifiers."""
+        return "_knots" if self.speedInKnots else "_kmph"
 
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""

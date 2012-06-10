@@ -134,7 +134,9 @@ class TakeOffLogger(StateChecker):
         if flight.stage==const.STAGE_TAKEOFF and \
            self._onTheGround and not state.onTheGround:
             logger.message(state.timestamp,
-                           "Takeoff speed: %.0f knots" % (state.ias,))
+                           "Takeoff speed: %.0f %s" % \
+                           (flight.speedFromKnots(state.ias),
+                            flight.getEnglishSpeedUnit()))
             logger.message(state.timestamp,
                            "Takeoff heading: %03.0f degrees" % (state.heading,))
             logger.message(state.timestamp,
@@ -159,7 +161,9 @@ class CruiseSpeedLogger(StateChecker):
                                    "Cruise speed: %.3f mach" % (state.mach,))
                 else:
                     logger.message(state.timestamp,
-                                   "Cruise speed: %.0f knots" % (state.ias,))
+                                   "Cruise speed: %.0f %s" %
+                                   (flight.speedFromKnots(state.ias),
+                                    flight.getEnglishSpeedUnit()))
                 self._lastTime = state.timestamp
 
 #---------------------------------------------------------------------------------------
@@ -224,8 +228,8 @@ class StateChangeLogger(StateChecker):
         Child classes should define the following functions:
         - _changed(self, oldState, state): returns a boolean indicating if the
         value has changed or not
-        - _getMessage(self, state): return a strings containing the message to log
-        with the new value
+        - _getMessage(self, flight, state): return a strings containing the
+        message to log with the new value
         """
         self._logInitial = logInitial    
 
@@ -242,9 +246,10 @@ class StateChangeLogger(StateChecker):
             shouldLog = self._changed(oldState, state)
         
         if shouldLog:
-            logger.message(self._getLogTimestamp(state), self._getMessage(state))
+            logger.message(self._getLogTimestamp(state),
+                           self._getMessage(flight, state))
         
-#---------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 class SimpleChangeMixin(object):
     """A mixin that defines a _changed() function which simply calls a function
@@ -321,7 +326,7 @@ class TemplateMessageMixin(object):
         """Construct the mixin."""
         self._template = template
 
-    def _getMessage(self, state):
+    def _getMessage(self, flight, state):
         """Get the message."""
         return self._template % (self._getValue(state),)
 
@@ -354,7 +359,7 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
         self._getLogTimestamp = lambda state: \
                                 DelayedChangeMixin._getLogTimestamp(self, state)
 
-    def _getMessage(self, state):
+    def _getMessage(self, flight, state):
         """Get the message to log on a change."""
         logState = self._lastChangeState if \
                    self._lastChangeState is not None else state
@@ -397,7 +402,7 @@ class LightsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         
         self._template = template
 
-    def _getMessage(self, state):
+    def _getMessage(self, flight, state):
         """Get the message from the given state."""
         return self._template % ("ON" if self._getValue(state) else "OFF")
         
@@ -442,10 +447,12 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "flapsSet")
 
-    def _getMessage(self, state):
+    def _getMessage(self, flight, state):
         """Get the message to log on a change."""
         speed = state.groundSpeed if state.groundSpeed<80.0 else state.ias
-        return "Flaps set to %.0f at %.0f knots" % (state.flapsSet, speed)
+        return "Flaps set to %.0f at %.0f %s" % \
+               (state.flapsSet, flight.speedFromKnots(speed),
+                flight.getEnglishSpeedUnit())
 
 #---------------------------------------------------------------------------------------
 
@@ -456,11 +463,12 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "gearControlDown")
 
-    def _getMessage(self, state):
+    def _getMessage(self, flight, state):
         """Get the message to log on a change."""
-        return "Gears SET to %s at %.0f knots, %.0f feet" % \
+        return "Gears SET to %s at %.0f %s, %.0f feet" % \
             ("DOWN" if state.gearControlDown else "UP",
-             state.ias, state.altitude)
+             flight.speedFromKnots(state.ias),
+             flight.getEnglishSpeedUnit(), state.altitude)
 
 #---------------------------------------------------------------------------------------
 
@@ -888,10 +896,11 @@ class ReverserChecker(SimpleFaultChecker):
                            
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
+        message = "Reverser used below %.0f %s" % \
+                  (flight.speedFromKnots(60), flight.getEnglishSpeedUnit())
         flight.handleFault(ReverserChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight,
-                                                      "Reverser used below 60 knots"),
-                           15)        
+                           FaultChecker._appendDuring(flight, message),
+                           15)
 
 #---------------------------------------------------------------------------------------
 
@@ -905,9 +914,10 @@ class SpeedChecker(SimpleFaultChecker):
                            
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
+        message = "Taxi speed over %.0f %s" % \
+                  (flight.speedFromKnots(50), flight.getEnglishSpeedUnit())
         flight.handleFault(SpeedChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight,
-                                                      "Taxi speed over 50 knots"),
+                           FaultChecker._appendDuring(flight, message),
                            FaultChecker._getLinearScore(50, 80, 10, 15,
                                                         state.groundSpeed))
 
