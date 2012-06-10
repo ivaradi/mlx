@@ -261,6 +261,8 @@ class Values(object):
         for i in range(0, Values.HOTKEY_SIZE):
             self.hotkeyTable.append([0, 0, 0, 0])
 
+        self.cog = 0.27
+
         self.pmdg_737ng_switches = 0
         self.pmdg_737ngx_lts_positionsw = 0
 
@@ -437,6 +439,8 @@ class Values(object):
             return self.n1[self.ENGINE_2]
         elif offset==0x2200:       # Engine #3 N1
             return self.n1[self.ENGINE_3]
+        elif offset==0x2ef8:       # Centre of Gravity
+            return self.cog
         elif offset==0x30c0:       # Gross weight
             return (self.zfw + sum(self.fuelWeights)) * const.KGSTOLB
         elif offset==0x31e4:       # Radio altitude
@@ -658,6 +662,8 @@ class Values(object):
             self.n1[self.ENGINE_2] = value
         elif offset==0x2200:       # Engine #3 N1
             self.n1[self.ENGINE_3] = value
+        elif offset==0x2ef8:       # Centre of Gravity
+            self.cog = value
         elif offset==0x30c0:       # Gross weight
             raise FSUIPCException(ERR_DATA)
         elif offset==0x31e4:       # Radio altitude
@@ -1251,6 +1257,9 @@ class CLI(cmd.Cmd):
             self._valueHandlers["hotkey%d" % (i,)] = (0x3210 + i*4, "u",
                                                       lambda value: "0x%08x" % (value,),
                                                       lambda word: long(word, 16))
+
+        self._valueHandlers["cog"] = (0x2ef8, "f", lambda value: value,
+                                       lambda word: float(word))
 
         self._valueHandlers["pmdg_737ng_switches"] = (0x6202, "b",
                                                       lambda value: value,

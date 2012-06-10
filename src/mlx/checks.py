@@ -141,6 +141,8 @@ class TakeOffLogger(StateChecker):
                            "Takeoff heading: %03.0f degrees" % (state.heading,))
             logger.message(state.timestamp,
                            "Takeoff pitch: %.1f degrees" % (state.pitch,))
+            logger.message(state.timestamp, 
+                           "Centre of gravity:  %.03f" % (state.cog,))
             self._onTheGround = False
 
 #---------------------------------------------------------------------------------------
