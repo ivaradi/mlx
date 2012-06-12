@@ -543,17 +543,27 @@ class GUI(fs.ConnectionListener):
         """Hande a change in the state of the window"""
         iconified = gdk.WindowState.ICONIFIED if pygobject \
                     else gdk.WINDOW_STATE_ICONIFIED
-        if self.config.hideMinimizedWindow and \
-           (event.changed_mask&iconified)!=0 and \
-           (event.new_window_state&iconified)!=0:
-            self.hideMainWindow(savePosition = False)
 
+        if (event.changed_mask&WINDOW_STATE_WITHDRAWN)!=0:
+            if (event.new_window_state&WINDOW_STATE_WITHDRAWN)!=0:
+                self._statusIcon.mainWindowHidden()
+            else:
+                self._statusIcon.mainWindowShown()
+
+        if self.config.hideMinimizedWindow and not pygobject and \
+           (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
+           (event.new_window_state&WINDOW_STATE_ICONIFIED)!=0:
+            self.hideMainWindow(savePosition = False)
+        elif (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
+             (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
+            self._mainWindow.present()
+            
     def raiseCallback(self):
         """Callback for the singleton handling code."""
         gobject.idle_add(self.raiseMainWindow)
 
     def raiseMainWindow(self):
-        """SHow the main window if invisible, and raise it."""
+        """Show the main window if invisible, and raise it."""
         if not self._mainWindow.get_visible():
             self.showMainWindow()
         self._mainWindow.present()
@@ -566,7 +576,6 @@ class GUI(fs.ConnectionListener):
         else:
             self._mainWindowX = self._mainWindowY = None
         self._mainWindow.hide()
-        self._statusIcon.mainWindowHidden()
         return True
 
     def showMainWindow(self):
@@ -574,11 +583,12 @@ class GUI(fs.ConnectionListener):
         if self._mainWindowX is not None and self._mainWindowY is not None:
             self._mainWindow.move(self._mainWindowX, self._mainWindowY)
 
-        self._mainWindow.show()
+        if pygobject:
+            self._mainWindow.show()
+        else:
+            self._mainWindow.present()
         self._mainWindow.deiconify()
             
-        self._statusIcon.mainWindowShown()
-
     def toggleMainWindow(self):
         """Toggle the main window."""
         if self._mainWindow.get_visible():

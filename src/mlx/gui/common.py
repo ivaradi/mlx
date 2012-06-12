@@ -59,6 +59,9 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     WEIGHT_BOLD = pango.WEIGHT_BOLD
 
+    WINDOW_STATE_ICONIFIED = gdk.WINDOW_STATE_ICONIFIED
+    WINDOW_STATE_WITHDRAWN = gdk.WINDOW_STATE_WITHDRAWN
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -110,6 +113,9 @@ else:
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
     WEIGHT_BOLD = pango.Weight.BOLD
+
+    WINDOW_STATE_ICONIFIED = gdk.WindowState.ICONIFIED
+    WINDOW_STATE_WITHDRAWN = gdk.WindowState.WITHDRAWN
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 
