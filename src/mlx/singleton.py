@@ -94,6 +94,12 @@ if os.name=="nt":
             else:
                 self._notifySingleton()
 
+        def close(self):
+            """Close the instance by closing the mutex."""
+            if self._mutex:
+                win32api.CloseHandle(self._mutex)
+                self._mutex = None
+
         def _getPipeName(self):
             """Get the name of the pipe to be used for communication."""
             return r'\\.\pipe\\' + self._name
@@ -126,8 +132,8 @@ if os.name=="nt":
                 
         def __del__(self):
             """Destroy the object."""
-            if self._mutex:
-                win32api.CloseHandle(self._mutex)
+            self.close()
+                
 #----------------------------------------------------------------------------
 
 else:     # os.name=="nt"
@@ -196,6 +202,22 @@ else:     # os.name=="nt"
             else:
                 self._notifySingleton()
 
+        def close(self):
+            """Close the instance by closing the mutex."""
+            if self._isSingle:
+                if self._lockFile:
+                    self._lockFile.close()
+                    self._lockFile = None
+                    try:
+                        os.remove(self._lockName)
+                    except:
+                        pass
+                    try:
+                        os.remove(self._socketName)
+                    except:
+                        pass
+                
+
         def _startSocketServer(self, raiseCallback):
             """Start the pipe server"""
             pipeServer = _SocketServer(self._socketName, raiseCallback)
@@ -223,16 +245,7 @@ else:     # os.name=="nt"
 
         def __del__(self):
             """Destroy the object."""
-            if self._isSingle:
-                self._lockFile.close()
-                try:
-                    os.remove(self._lockName)
-                except:
-                    pass
-                try:
-                    os.remove(self._socketName)
-                except:
-                    pass
+            self.close()
                 
 #----------------------------------------------------------------------------
 #----------------------------------------------------------------------------

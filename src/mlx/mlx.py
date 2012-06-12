@@ -9,6 +9,10 @@ import sys
 
 #--------------------------------------------------------------------------------------
 
+instance = None
+
+#--------------------------------------------------------------------------------------
+
 class StdIOHandler(object):
     """Handler for the standard I/O messages."""
     def __init__(self, gui):
@@ -23,7 +27,7 @@ class StdIOHandler(object):
 
 def restart(args = []):
     """Restart the program with the given arguments."""
-    print "Restarting with args", args
+    #print "Restarting with args", args
     programPath = os.path.join(os.path.dirname(sys.argv[0]),
                                "runmlx.exe" if os.name=="nt" else "runmlx.sh")
     if os.name=="nt":
@@ -37,6 +41,7 @@ def restart(args = []):
 
     args = [programPath] + args
 
+    instance.close()
     os.execv(programPath, args)    
 
 #--------------------------------------------------------------------------------------
@@ -45,6 +50,7 @@ def main():
     """The main operation of the program."""
     from singleton import SingleInstance, raiseCallbackWrapper
 
+    global instance
     instance = SingleInstance("mlx", raiseCallbackWrapper)
     if not instance: return
 
