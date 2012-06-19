@@ -701,6 +701,13 @@ class _English(_Strings):
                  "If checked, the main window will be hidden completely "
                  "when minimized. You can still make it appear by "
                  "clicking on the status icon or using its popup menu.")
+        self.add("prefs_quitOnClose",
+                 "_Quit when the window close button is clicked")
+        self.add("prefs_quitOnClose_tooltip",
+                 "If checked, the application will quit when the window close "
+                 "button is clicked. Before quitting, the confirmation "
+                 "will be asked. If not checked, the window will be hidden "
+                 "to the tray.")
         self.add("prefs_onlineGateSystem",
                  "_Use the Online Gate System")
         self.add("prefs_onlineGateSystem_tooltip",
@@ -1571,6 +1578,12 @@ class _Hungarian(_Strings):
                  "Ha ezt kijelölöd, a főablak teljesen eltűnik, "
                  "ha minimalizálod. A státuszikonra kattintással vagy annak "
                  "menüje segítségével újra meg tudod jeleníteni.")
+        self.add("prefs_quitOnClose",
+                 "_Kilépés az ablakzáró gomb megnyomásakor")
+        self.add("prefs_quitOnClose_tooltip",
+                 "Ha ezt kijelölöd, a program az ablakzáró gomb megnyomására "
+                 "kilép, ha ebbéli szándékát megerősíted. Ha nem jelölöd "
+                 "ki, a főablak eltűnik, de a tálcaikon a helyén marad.")
         self.add("prefs_onlineGateSystem",
                  "Az Online _Gate System használata")
         self.add("prefs_onlineGateSystem_tooltip",

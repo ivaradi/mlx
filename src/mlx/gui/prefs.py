@@ -224,6 +224,7 @@ class Preferences(gtk.Dialog):
 
         self._setLanguage(config.language)
         self._hideMinimizedWindow.set_active(config.hideMinimizedWindow)
+        self._quitOnClose.set_active(config.quitOnClose)
         self._onlineGateSystem.set_active(config.onlineGateSystem)
         self._onlineACARS.set_active(config.onlineACARS)
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
@@ -269,6 +270,7 @@ class Preferences(gtk.Dialog):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
         config.hideMinimizedWindow = self._hideMinimizedWindow.get_active()
+        config.quitOnClose = self._quitOnClose.get_active()
         config.onlineGateSystem = self._onlineGateSystem.get_active()
         config.onlineACARS = self._onlineACARS.get_active()
         config.flareTimeFromFS = self._flareTimeFromFS.get_active()
@@ -346,6 +348,11 @@ class Preferences(gtk.Dialog):
         self._hideMinimizedWindow.set_use_underline(True)
         self._hideMinimizedWindow.set_tooltip_text(xstr("prefs_hideMinimizedWindow_tooltip"))
         guiBox.pack_start(self._hideMinimizedWindow, False, False, 4)
+
+        self._quitOnClose = gtk.CheckButton(xstr("prefs_quitOnClose"))
+        self._quitOnClose.set_use_underline(True)
+        self._quitOnClose.set_tooltip_text(xstr("prefs_quitOnClose_tooltip"))
+        guiBox.pack_start(self._quitOnClose, False, False, 4)
 
         onlineBox = self._createFrame(mainBox, xstr("prefs_frame_online"))        
 

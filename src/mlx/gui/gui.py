@@ -82,8 +82,7 @@ class GUI(fs.ConnectionListener):
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.set_resizable(False)
-        window.connect("delete-event",
-                       lambda a, b: self.hideMainWindow())
+        window.connect("delete-event", self.deleteMainWindow)
         window.connect("window-state-event", self._handleMainWindowState)
         accelGroup = gtk.AccelGroup()
         window.add_accel_group(accelGroup)
@@ -567,6 +566,14 @@ class GUI(fs.ConnectionListener):
         if not self._mainWindow.get_visible():
             self.showMainWindow()
         self._mainWindow.present()
+
+    def deleteMainWindow(self, window, event):
+        """Handle the delete event for the main window."""
+        if self.config.quitOnClose:
+            self._quit()
+        else:
+            self.hideMainWindow()
+        return True
 
     def hideMainWindow(self, savePosition = True):
         """Hide the main window and save its position."""

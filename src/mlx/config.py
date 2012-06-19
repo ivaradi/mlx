@@ -120,6 +120,7 @@ class Config(object):
 
         self._language = ""
         self._hideMinimizedWindow = True
+        self._quitOnClose = False
         self._onlineGateSystem = True
         self._onlineACARS = True
         self._flareTimeFromFS = False
@@ -210,6 +211,20 @@ class Config(object):
         """Set whether a minimized window should be hidden."""
         if hideMinimizedWindow!=self._hideMinimizedWindow:
             self._hideMinimizedWindow = hideMinimizedWindow
+            self._modified = True
+    
+    @property
+    def quitOnClose(self):
+        """Get whether the application should quit when the close button is
+        clicked."""
+        return self._quitOnClose
+
+    @quitOnClose.setter
+    def quitOnClose(self, quitOnClose):
+        """Set whether the application should quit when the close button is
+        clicked."""
+        if quitOnClose!=self._quitOnClose:
+            self._quitOnClose = quitOnClose
             self._modified = True
     
     @property
@@ -481,9 +496,13 @@ class Config(object):
                                                   "rememberPassword", False)
 
         self._language = self._get(config, "general", "language", "")
+
         self._hideMinimizedWindow = self._getBoolean(config, "general",
                                                      "hideMinimizedWindow",
                                                      True)
+        self._quitOnClose = self._getBoolean(config, "general",
+                                             "quitOnClose", False)
+        
         self._onlineGateSystem = self._getBoolean(config, "general",
                                                   "onlineGateSystem",
                                                   True)
@@ -556,6 +575,8 @@ class Config(object):
             config.set("general", "language", self._language)
         config.set("general", "hideMinimizedWindow",
                    "yes" if self._hideMinimizedWindow else "no")
+        config.set("general", "quitOnClose",
+                   "yes" if self._quitOnClose else "no")
         config.set("general", "onlineGateSystem",
                    "yes" if self._onlineGateSystem else "no")
         config.set("general", "onlineACARS",
