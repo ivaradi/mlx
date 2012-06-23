@@ -10,15 +10,16 @@
 
   <p>
   MAVA Logger X is an application that monitors the execution of a
-  Malév Virtual flight, and collects data that can be sent to the MAVA
-  website for further evaluation. This manual describes how to use
-  this program. To be able to use all features of the program, you
-  need to have a working Internet connection, even if you don't fly
-  on-line on VATSIM or IVAO. However, it is possible to perform a
-  flight completely offline as well.
+  Malév Virtual flight, and collects data that can be sent to
+  the <a href="http://virtualairlines.hu">MAVA website</a> for further
+  evaluation. This manual describes how to use this program. To be
+  able to use all features of the program, you need to have a working
+  Internet connection, even if you don't fly on-line on VATSIM or
+  IVAO. However, it is possible to perform a flight completely offline
+  as well.
   </p>
 
-  <p>
+  <p><a name="flightRating"/>
   While monitoring your flight, the program continuously checks if your
   airplane's configuration is always within the parameters prescribed
   by the airline's operating procedures. For example, you have to turn
@@ -33,14 +34,14 @@
 
   <p>
   Besides the faults the program also monitors many other parameters,
-  which are recorded in a textual <i>log</i>. This log is sent as a
-  part of your PIREP (<b>PI</b>lot's <b>REP</b>ort), and will be
-  analyzed, and possibly commented on by more experienced pilots of
-  Malév Virtual. This way you can perfect the way you execute your
-  flights.
+  which are recorded in a textual <a href="#logTab"><i>log</i></a>. 
+  This log is sent as a part of your PIREP
+  (<b>PI</b>lot's <b>REP</b>ort), and will be   analyzed, and possibly 
+  commented on by more experienced pilots of  Malév Virtual. This way
+  you can perfect the way you execute your flights.
   </p>
 
-  <p>
+  <p><a name="flightStages"/>
   The application breaks up your flight into
   several <i>stage</i>s. The advancement from one stage to another is 
   detected automatically. These stages and the conditions under which
@@ -75,24 +76,26 @@
   </ol>
 
   <p>
-  To enhance the simulation, the program can play various sound files
+  To enhance the simulation, the program can play various 
+  <a href="#prefsSounds">sound</a> files
   during the various stages of your flight, such as the announcements
   made by the flight attendants. These files are supplied with the
   application, and they can be played automatically, or when you press
   a certain hotkey in the flight simulator. You can also organize
-  pre-recorded sound files into checklists for the each aircraft
+  pre-recorded sound files
+  into <a href="#checklistEditor">checklists</a> for the each aircraft 
   type, and these files can also be played back one-by-one when you
-  repeatedly press a key combination in the simulator. See below for
-  more information on this.
+  repeatedly press a key combination in the simulator. See 
+  <a href="#prefsSounds">below</a> for more information on this.
   </p>
 
-  <p>
+  <p><a name="onlineACARSSystem"/>
   Malév Virtual have implemented an <i>Online ACARS System</i>, which
   displays the status of the flights in progress. The data appears on
   the front page of the MAVA website and also on a map.
   </p>
 
-  <p>
+  <p><a name="onlineGateSystem"/>
   Malév Virtual have also implemented an <i>Online Gate System</i>
   which maintains a database of the aircraft in the airline's fleet
   and their location. An aircraft may be parked at the Budapest
@@ -187,7 +190,8 @@
   detail later. The content area consists of several tabs the use of
   which is described below.
   </p>
-
+  
+  <a name="mainWindowShot"/>
   <div align="center"><img src="mainWindow.png" alt="The main window"/></div>
 
   <p>
@@ -217,7 +221,8 @@
   possible that the logger application itself fails, in which case
   you, unfortunately, have to restart the flight. Do not forget to
   notify the author if this happens. In this case, try to copy and
-  save the debug log and send it with your bug report.
+  save the <a href="#debugLog">debug log</a> and send it with your bug
+  report.  
   </p>
 
   <p>
@@ -227,10 +232,10 @@
 
   <p>
   To the right of the connection status icon, you can see the current
-  stage of the flight, if the monitoring has begun. Otherwise it is a
-  single dash. It is followed by the simulator time, if the program is
-  already connected to the simulator. Then comes the current flight
-  rating. 
+  <a href="#flightStages">stage</a> of the flight, if the monitoring
+  has begun. Otherwise it is a single dash. It is followed by the
+  simulator time, if the program is already connected to the
+  simulator. Then comes the current <a href="#flightRating">flight rating</a>.
   </p>
 
   <p>
@@ -268,7 +273,7 @@
   <b>Previous</b>. These help in navigating between the pages. In most
   cases you can go back to previously visited pages by using
   the <b>Previous</b> button, although you cannot edit the contents of
-  those pages once finalized by moving to the next page using
+  most of the pages once finalized by moving to the next page using
   the <b>Next</b> button. There are a few exceptions though, as
   detailed below.
   </p>
@@ -276,25 +281,28 @@
   <p>
   Many of the pages also contain a <b>Cancel flight</b>
   button. Clicking this button will allow you to cancel the flight and
-  go back to the flight selection if you have logged in to the MAVA
-  website, or the login page, after a confirmation of your intent.
+  go back to the <a href="#flightSelectionPage">flight selection</a> 
+  if you have logged in to the MAVA website, or to the login page, after
+  a confirmation of your intent.
   </p>
 
   <h4><a name="loginPage">The <i>Login</i> Page</a></h4>
 
   <p>
-  Each flight starts with the Login page where you can enter the your
-  pilot's ID and password for the MAVA website. Both data are given
-  to you when joining Malév Virtual. The pilot's ID usually starts
-  with the letter <q>P</q> followed by three digits. 
+  Each flight starts with the Login page (see the 
+  <a href="#mainWindowShot">picture</a> above) where you can enter the
+  your pilot's ID and password for the MAVA website. Both data are
+  given to you when joining Malév Virtual. The pilot's ID usually
+  starts with the letter <q>P</q> followed by three digits.
   </p>
 
   <p>
   If you check <b>Remember password</b>, the password will be saved by
   the program, so you don't have to enter it all the time. Note,
-  however, that the password is saved plainly into a configuration
-  file, so you this possibility only if your home directory can be
-  accessed only by people you trust. The pilot's ID is saved anyway.
+  however, that the password is saved in a readble form into a
+  configuration file, so you this possibility only if your home
+  directory can be  accessed only by people you trust. The pilot's ID
+  is saved anyway.
   </p>
 
   <p>
@@ -320,8 +328,8 @@
   
   <p>
   This page displays the list of the flight you have booked previously
-  on the MAVA website, if you have logged in properly. If you chose to
-  fly offline, the list is empty.
+  on the MAVA website, if you have <a href="#loginPage">logged in</a>
+  properly. If you chose to fly offline, the list is empty.
   </p>
 
   <p>
@@ -349,7 +357,7 @@
   </p>
 
   <p>
-  Select a flight from the list, and press <b>Next</b> button to
+  Select a flight from the list, and press the <b>Next</b> button to
   proceed with that flight.
   </p>
 
@@ -409,9 +417,10 @@
 
   <p>
   If you have finished with this page, press the <b>Next</b>
-  button. At this point, the <i>Help</i> tab becomes available, which
-  you can use if you have failed to set up the correct payload in the
-  simulator. See a more detailed description of it below.
+  button. At this point, the <a href="#helpTab"><i>Help</i> tab</a>
+  becomes available, which you can use if you have failed to set up
+  the correct payload in the simulator. See a more detailed
+  description of it <a href="#helpTab">below</a>. 
   </p>
 
   <h4><a name="timePage">The <i>Time</i> Page</a></h4>
@@ -447,8 +456,8 @@
 
   <p>
   You can enter the requested amount of fuel numerically, or you can
-  set it by the turquoise sliders, though this method less accurate. The
-  lever can be moved by clicking in the fuel tank's representation,
+  set it by the turquoise sliders, though this method is less accurate. The
+  lever can be moved by clicking withinin the fuel tank's representation,
   and you can drag it if you keep the button pressed. If your mouse
   has a wheel, that can also be used to modify the expected level. To
   use the wheel, keep the mouse pointer within the fuel tank's
@@ -497,8 +506,8 @@
   weather. The METAR of the arrival airport will be updated when
   entering the landing stage, unless you have edited it before. The
   METARs can be edited during the whole duration of the flight. If you
-  do so, please, comment it in the <i>Comments</i> sections of
-  the <i>Flight info</i> tab.
+  do so, please, comment on it in the <i>Comments</i> sections of
+  the <a href="#flightInfoTab"><i>Flight info</i> tab</a>.
   </p>
 
   <p>
@@ -535,14 +544,15 @@
   <img src="landing.png" alt="The Landing page"/> 
 
   <p>
-  On this page you have to enter the name of the STAR and/or transition followed
-  (if you get vectors from ATC, enter <q>VECTORS</q> here), the
-  approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>, etc.),
-  the name of the landing runway, and the landing reference speed,
+  On this page you have to enter the name of the STAR and/or
+  transition you planned to follow (even if you get a different one,
+  or simply vectors from ATC, in which case add a 
+  <a href="#flightInfoTab">comment</a> about it),
+  the approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>,
+  etc.), the name of the landing runway, and the landing reference speed,
   V<sub>ref</sub>. You can enter this data during the flight, or after
   you have landed, at your discretion. Note, that if you fly one of
-  the Tupolev or Yak aircraft, the speed will have to be entered in
-  km/h.
+  the Tupolev or Yak aircraft, the speed will have to be entered in km/h.
   </p>
 
   <p>
@@ -570,21 +580,23 @@
   </p>
 
   <p>
-  With all data entered, you may want it review your flight, then save
-  or send the PIREP created from it. These can be accomplished by
-  pressing one of the buttons at the bottom. A saved PIREP can be
-  loaded later and sent, if the sending fails for some reason. When a
-  PIREP is sent, it becomes available for review by the designated
-  PIREP reviewers of Malév Virtual.
+  With all data entered, you may want it review your flight (i.e. the
+  earlier pages or some of the other tabs), then save or send the
+  PIREP created from it. These can be accomplished by pressing one of
+  the buttons at the bottom. A saved PIREP can be loaded later and
+  sent, if the sending fails for some reason. When a PIREP is sent, it
+  becomes available for review by the designated PIREP reviewers of
+  Malév Virtual.
   </p>
 
   <p>
   You can also start a new flight using the <b>New flight</b>
   button. If you have not saved or sent the PIREP, you will be asked
   to confirm your intention. When starting a new flight you are taken
-  to the flight selection page, if you have logged in to the MAVA
-  website, or to the login page, if your flight has been an offline
-  flight.
+  to the <a href="#flightSelectionPage">flight selection page</a>, if
+  you have logged in to the MAVA website, or to
+  the <a href="#loginPage">login page</a>, if your flight has been an
+  offline flight.  
   </p>
   
   <h3><a name="flightInfoTab">The Flight info Tab</a></h3>
@@ -621,11 +633,13 @@
 
   <p>
   This tab provides some help for calculating and setting the payload
-  weight of the aircraft. It can be used once the <i>Payload</i>
+  weight of the aircraft. It can be used once the
+  <a href="#payloadPage"><i>Payload</i></a>
   (i.e. the cargo weight) is finalized. To use this tab, check
   the <b>Using help</b> checkbox. It causes the page to become
   sensitive and filled with data. Note, that the fact of using the
-  help is logged, so the PIREP reviewers will know about it.
+  help is <a href="#logTab">logged</a>, so the PIREP reviewers will
+  know about it.
   </p>
 
   <p>
@@ -661,7 +675,7 @@
   such messages at all). Later, when things calm down, you can check
   the log to see what happened exactly, so that you know why so many
   fault points have been awarded. For example, you may even decide to
-  abort the flight, if you think some of the faults are to
+  abort the flight, if you think some of the faults are too
   embarrassing :) For quick identification, the lines containing the
   fault messages are highlighted.
   </p>
@@ -671,9 +685,10 @@
   <img src="gatesTab.png" alt="The Gates tab"/> 
 
   <p>
-  This tab displays information retrieved from the MAVA Online Gate
+  This tab displays information retrieved from
+  the <a href="#onlineGateSystem">MAVA Online Gate</a>
   System. If the program needs to retrieve data, this tab's contents
-  are refreshed automatically, but you can refresh them manually
+  are refreshed automatically, but you can also refresh them manually
   anytime using the <b>Refresh data</b> button.
   </p>
 
@@ -709,7 +724,7 @@
   pressing <b>Ctrl+D</b>. It is another kind of log, which is mainly
   useful for debugging. If you experience some problem with the
   program, please, include the contents of this log with your bug
-  report. It can help a low with finding a solution to the problem.
+  report. It can help a lot with finding a solution to the problem.
   </p>
 
   <h2><a name="loadingPIREPs">Loading PIREPs</a></h2>
@@ -755,10 +770,11 @@
 
   <p>
   The checklists are lists of audio files. When checklist playback is
-  enabled (see the description of the <i>Preferences</i> window below), and
-  there is a checklist for the type of the aircraft used for the
-  flight, the files constituting the checklist can be played
-  one-by-one by pressing the checklist hotkey repeatedly.
+  enabled (see the <a href="#prefsSounds">description</a> of
+  the <i>Preferences</i> window below), and there is a checklist for
+  the type of the aircraft used for the flight, the files constituting
+  the checklist can be played one-by-one by pressing the checklist
+  hotkey repeatedly.
   </p>
 
   <p>
@@ -769,7 +785,7 @@
   </p>
 
   <p>
-  The files making up the checklist for the currently selected flight
+  The files making up the checklist for the currently selected aircraft
   are displayed on the right. You can move a file up or down by
   dragging it with the mouse. You can also select one or more files
   from the list. Then you can remove them with the <b>Remove</b>
@@ -797,7 +813,7 @@
   The Preferences window can be displayed by
   selecting <b>Tools/Preferences</b> or by
   pressing <b>Ctrl+P</b>. Here you can set options that you usually
-  don't have to change for every flight. This window also consists of
+  don't have to change for every flight. This window consists of
   tabs grouping the options logically.
   </p>
   
@@ -818,13 +834,17 @@
   when minimized</b> checkbox is checked, and you minimize the window,
   it will actually disappear completely (i.e. not appear among the
   other minimized windows). You can make it appear by using the tray
-  icon. 
+  icon. If the <b>Quit when the window close button is clicked</b>
+  checkbox is checked, the program will quit, after you have confirmed
+  it. Otherwise it will just disappear, and you can use the tray icon
+  to display it again.
   </p>
 
   <p>
   The <i>MAVA Online Systems</i> frame contains settings related to
-  the online systems of MAVA, the gate and the ACARS systems mentioned
-  above. It is recommended to enabled these for normal operations.
+  the online systems of MAVA, the <a href="#onlineGateSystem">gate</a>
+  and the <a href="#onlineACARSSystem">ACARS</a> systems mentioned
+  above. It is recommended to enable these for normal operations.
   </p>
 
   <p>
@@ -835,14 +855,15 @@
   entirely realistic and can result in the simulated aircraft
   experiencing some very high indicated airspeeds, which in turn can
   also cause the autopilot to suddenly increase the climb rate to
-  counter the high speeds. Since this phenomenon is difficult to
-  protect oneself against without buying extra products, like FSUIPC,
-  the logger provides the possibility to average the IAS and/or the VS
-  over a few seconds so that spikes in these values are
-  smoothed. The <b>Enable the smoothing of IAS/VS over N sec.</b>
-  options allow controlling this feature. The number of seconds may
-  need experimenting with, but note that every change for which you
-  press the <b>OK</b> button is taken into account immediately. 
+  counter the high speeds or other erratic behaviour. Since these
+  phenomena are difficult to protect oneself against without buying
+  extra products, like FSUIPC, the logger provides the possibility to
+  average the IAS and/or the VS over a few seconds so that spikes in
+  these values are smoothed. The <b>Enable the smoothing of IAS/VS
+  over N sec.</b> options allow controlling this feature. The number
+  of seconds may need experimenting with, but note that every change
+  for which you press the <b>OK</b> button is taken into account
+  immediately.
   </p>
 
   <h3><a name="prefsMessages">The <i>Messages</i> Tab</a></h3>
@@ -867,10 +888,11 @@
     e.g., the flight stage, the end of an audio checklist, etc.</li>
     <li><b>Fault Messages</b>: messages about the non-NO GO faults the program detects.</li>
     <li><b>NO GO Fault Messages</b>: messages about the NO GO faults the program detects</li>
-    <li><b>Gate System Messages</b>: messages related to the Online
-    Gate System. For example, when you have landed at Ferihegy, it can display
-    the list of the available gates so that you can choose where to
-    park, if there is no ATC available.</li>
+    <li><b>Gate System Messages</b>: messages related to the 
+    <a href="#onlineGateSystem">Online Gate System</a>. For example,
+    when you have landed at Ferihegy, it can display the list of the
+    available gates so that you can choose where to park, if there is
+    no ATC available.</li> 
     <li><b>Environment Messages</b>: other messages, e.g. the welcome
     message when the flight has ended.</li>
     <li><b>Help Messages</b>: help messages, e.g. warning about
@@ -927,7 +949,7 @@
   <p>
   The lower part, named <i>Checklist</i> contains some settings
   related to the audio checklists belonging to the aircraft. They are
-  available only if the <b>Enable aircraft-specific checklist></b>
+  available only if the <b>Enable aircraft-specific checklist</b>
   checkbox is selected. In this case another hotkey should be
   specified. If you press this hotkey, the next file from the
   checklist will be played. 
