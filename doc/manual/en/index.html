@@ -256,7 +256,7 @@
   for your flight, while the last pages allow you to enter some
   information about your flight necessary for its evaluation and to
   send the PIREP (Pilot's Report) assembled by the program to the MAVA
-  website.
+  server.
   </p>
 
   <p>
@@ -273,7 +273,7 @@
   <b>Previous</b>. These help in navigating between the pages. In most
   cases you can go back to previously visited pages by using
   the <b>Previous</b> button, although you cannot edit the contents of
-  most of the pages once finalized by moving to the next page using
+  some of the pages once finalized by moving to the next page using
   the <b>Next</b> button. There are a few exceptions though, as
   detailed below.
   </p>
@@ -282,14 +282,14 @@
   Many of the pages also contain a <b>Cancel flight</b>
   button. Clicking this button will allow you to cancel the flight and
   go back to the <a href="#flightSelectionPage">flight selection</a> 
-  if you have logged in to the MAVA website, or to the login page, after
+  if you have logged in to the MAVA server, or to the login page, after
   a confirmation of your intent.
   </p>
 
   <h4><a name="loginPage">The <i>Login</i> Page</a></h4>
 
   <p>
-  Each flight starts with the Login page (see the 
+  The program starts with the Login page (see the 
   <a href="#mainWindowShot">picture</a> above) where you can enter the
   your pilot's ID and password for the MAVA website. Both data are
   given to you when joining Malév Virtual. The pilot's ID usually
@@ -299,7 +299,7 @@
   <p>
   If you check <b>Remember password</b>, the password will be saved by
   the program, so you don't have to enter it all the time. Note,
-  however, that the password is saved in a readble form into a
+  however, that the password is saved in a readable form into a
   configuration file, so you this possibility only if your home
   directory can be  accessed only by people you trust. The pilot's ID
   is saved anyway.
@@ -319,7 +319,7 @@
   <p>
   If you would like to fly without an Internet connection, use
   the <b>Fly offline</b> button. This immediately takes you to the
-  next page, without trying to log in to the MAVA website.
+  next page, without trying to log in to the MAVA server.
   </p>
   
   <h4><a name="flightSelectionPage">The <i>Flight selection</i> Page</a></h4>
@@ -336,7 +336,7 @@
   If you have selected a flight, you can also save it by using
   the <b>Save flight</b> button. This is useful when planning to fly
   offline at some later time. When preparing for that flight, you can
-  properly log in to the MAVA website, and acquire the list of your
+  properly log in to the MAVA server, and acquire the list of your
   booked flights. Then you can save the flight you wish to perform
   later offline, on which occasion, you can load the saved flight.
   </p>
@@ -387,11 +387,12 @@
   </p>
 
   <p>
-  Select the aircraft indicated and park it at the departure airport,
+  Select the aircraft indicated and park it at the departure airport
+  in the simulator,
   then press <b>Connect</b> to establish the connection with the
   simulator. If the connection cannot be established, a dialog will be
   displayed about it, and you can <b>Try again</b> the connection
-  or <b>Cancel</b> to go back to the login page.
+  or <b>Cancel</b> to go back to the flight selection or to the login page.
   </p>
   
   <p>
@@ -506,7 +507,7 @@
   weather. The METAR of the arrival airport will be updated when
   entering the landing stage, unless you have edited it before. The
   METARs can be edited during the whole duration of the flight. If you
-  do so, please, comment on it in the <i>Comments</i> sections of
+  do so, please, comment on it in the <i>Comments</i> section of
   the <a href="#flightInfoTab"><i>Flight info</i> tab</a>.
   </p>
 
@@ -594,7 +595,7 @@
   button. If you have not saved or sent the PIREP, you will be asked
   to confirm your intention. When starting a new flight you are taken
   to the <a href="#flightSelectionPage">flight selection page</a>, if
-  you have logged in to the MAVA website, or to
+  you have logged in to the MAVA server, or to
   the <a href="#loginPage">login page</a>, if your flight has been an
   offline flight.  
   </p>
@@ -686,8 +687,8 @@
 
   <p>
   This tab displays information retrieved from
-  the <a href="#onlineGateSystem">MAVA Online Gate</a>
-  System. If the program needs to retrieve data, this tab's contents
+  the MAVA <a href="#onlineGateSystem">Online Gate System</a>.
+  If the program needs to retrieve data, this tab's contents
   are refreshed automatically, but you can also refresh them manually
   anytime using the <b>Refresh data</b> button.
   </p>
@@ -759,6 +760,7 @@
   itemized data of the flight. The <i>Comments & defects</i> tab
   displays the comments and or flight defects entered by the
   user. The <i>Log</i> tab contains the flight log. 
+  </p>
 
   <div align="center">
     <img src="pirepViewer.png" alt="The PIREP Viewer"/> 
@@ -778,7 +780,7 @@
   </p>
 
   <p>
-  The checklist editor dialog box allows for editing the checklist. It
+  The checklist editor window allows for editing the checklists. It
   can be displayed by selecting <b>Tools/Checklist Editor...</b> or
   pressing <b>Ctrl+C</b>. The top of the window contains an aircraft
   type selector.
@@ -947,7 +949,7 @@
   </p>
 
   <p>
-  The lower part, named <i>Checklist</i> contains some settings
+  The lower part, named <i>Checklists</i> contains some settings
   related to the audio checklists belonging to the aircraft. They are
   available only if the <b>Enable aircraft-specific checklist</b>
   checkbox is selected. In this case another hotkey should be
