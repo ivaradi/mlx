@@ -39,6 +39,7 @@ class GUI(fs.ConnectionListener):
                  ("Petrovszki", "Gábor", "test"),
                  ("Zsebényi-Loksa", "Gergely", "test"),
                  ("Kurják", "Ákos", "test"),
+                 ("Nagy", "Dániel", "test"),
                  ("Radó", "Iván", "test") ]
 
     def __init__(self, programDirectory, config):
