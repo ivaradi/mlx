@@ -497,10 +497,10 @@ class _English(_Strings):
                  "type and V<sub>Ref</sub> logged can be seen below.")
         self.add("landing_star", "_STAR:")
         self.add("landing_star_tooltip",
-                 "The name of Standard Terminal Arrival Route followed.")
+                 "The name of Standard Terminal Arrival Route planned.")
         self.add("landing_transition", "_Transition:")
         self.add("landing_transition_tooltip",
-                 "The name of transition executed or VECTORS if vectored by ATC.")
+                 "The name of transition planned.")
         self.add("landing_runway", "Run_way:")
         self.add("landing_runway_tooltip",
                  "The runway the landing is performed on.")
@@ -1340,18 +1340,17 @@ class _Hungarian(_Strings):
         
         self.add("landing_title", "Leszállás")
         self.add("landing_help",
-                 "Írd be az alkalmazott STAR és/vagy bevezetési eljárás nevét,\n"
+                 "Írd be a tervezett STAR és/vagy bevezetési eljárás nevét,\n"
                  "a használt futópályát, a megközelítés módját, és a V<sub>Ref</sub>-et.")
         self.add("landing_chelp",
-                 "Az alkalmazott STAR és/vagy bevezetési eljárás neve, a használt\n"
+                 "A tervezett STAR és/vagy bevezetési eljárás neve, a használt\n"
                  "futópálya, a megközelítés módja és a V<sub>Ref</sub> lent olvasható.")
         self.add("landing_star", "_STAR:")
         self.add("landing_star_tooltip",
-                 "A követett szabványos érkezési eljárás neve.")
+                 "A tervezett szabványos érkezési eljárás neve.")
         self.add("landing_transition", "_Bevezetés:")
         self.add("landing_transition_tooltip",
-                 "Az alkalmazott bevezetési eljárás neve, vagy VECTORS, "
-                 "ha az irányítás vezetett be.")
+                 "A tervezett bevezetési eljárás neve.")
         self.add("landing_runway", "_Futópálya:")
         self.add("landing_runway_tooltip",
                  "A leszállásra használt futópálya.")
