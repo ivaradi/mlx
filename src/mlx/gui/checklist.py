@@ -219,7 +219,7 @@ class ChecklistEditor(gtk.Dialog):
         selection = self._fileList.get_selection()
         (model, paths) = selection.get_selected_rows()
         indexes = [(path.get_indices() if pygobject else path)[0]
-                   for path in paths]
+                   for path in paths]        
         indexes.sort()
         if not up:
             indexes.reverse()
@@ -235,7 +235,7 @@ class ChecklistEditor(gtk.Dialog):
         self._moveUpButton.set_sensitive(indexes[0]>1 if up else True)
         numRows = model.iter_n_children(None)
         self._moveDownButton.set_sensitive(True if up else
-                                           indexes[-1]<(numRows-2))
+                                           indexes[0]<(numRows-2))
 
     def _fileListSelectionChanged(self, selection):
         """Called when the selection in the file list changes."""
