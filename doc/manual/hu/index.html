@@ -1,144 +1,148 @@
 <html>
 <head>
-  <title>MAVA Logger X User's Manual</title>
+  <title>MAVA Logger X Felhasználói kézikönyv</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-  <div align="center"><h1>MAVA Logger X User's Manual</h1></div>
+  <div align="center"><h1>MAVA Logger X Felhasználói kézikönyv</h1></div>
 
-  <h2><a name="overview">Overview</a></h2>
+  <h2><a name="overview">Áttekintés</a></h2>
 
   <p>
-  MAVA Logger X is an application that monitors the execution of a
-  Malév Virtual flight, and collects data that can be sent to the MAVA
-  website for further evaluation. This manual describes how to use
-  this program. To be able to use all features of the program, you
-  need to have a working Internet connection, even if you don't fly
-  on-line on VATSIM or IVAO. However, it is possible to perform a
-  flight completely offline as well.
+  A MAVA Logger X követi a Malév Virtual légitársaság színeiben
+  történő szimulált járatok végrehajtását, és összegyűjti a járatról a 
+  <a href="http://virtualairlines.hu">MAVA honlapjára</a> további
+  elemzés céljából elküldendő adatokat. Ez a kézikönyv leírja a
+  program használatát. A program képességeinek teljes kihasználásához
+  szükség van élő Internat kapcsolatra, még akkor is ha nem a VATSIM
+  vagy az IVAO hálózaton repülünk. Ezzel együtt azonban lehetséges
+  járatot teljesíteni hálózati kapcsolat nélkül is.
+  </p>
+
+  <p><a name="flightRating"/>
+  A járat teljesítésének követése közben a program folyamatosan
+  ellenőrzi, hogy a repülőgép konfigurációja megfelel-e a légitársaság
+  működési eljárásaiban meghatározott paramétereknek. Például a
+  repülőgép fényeit meghatározott szabályok szerint kell fel- és
+  lekapcsolni, nem haladhatunk meg bizonyos tömeg- és
+  sebességkorlátokat, s.í.t. Az elvárt paraméterektől való eltérések,
+  vagy hibák a kezdeti 100 pontot (vagy százalékot) meghatározott
+  mértékben csökkentik. Az eredmény a járat <i>pontszáma</i>. Néhány
+  eltérés annyira súlyos, hogy <i>NO GO</i> hibának tekintjük és a
+  járat elutasítát eredményezi.
   </p>
 
   <p>
-  While monitoring your flight, the program continuously checks if your
-  airplane's configuration is always within the parameters prescribed
-  by the airline's operating procedures. For example, you have to turn
-  on or off the various lights of your aircraft according to rules,
-  you cannot exceed certain weight or speed limits, and so on. Any
-  deviation from the expected parameters, also known as a fault, can
-  result in points subtracted from the initial 100 points (or
-  percentage). The result is your <i>flight rating</i>. Some
-  deviations are so serious, that they are deemed <i>NO GO</i> faults
-  and result in the rejection of your flight.
+  A hibák mellett a program más paramétereket is figyel, amelyeket egy
+  szöveges <a href="#logTab"><i>napló</i></a>ba jegyez le. E naplót is
+  tartalmazza az elküldött PIREP (<b>PI</b>lot's <b>REP</b>ort), és a
+  Malév Virtual tapasztalt pilótái ezt is elemzik, illetve adott
+  esetben megjegyzést fűzhetnek hozzá. Így tökéletesíthetjük a járatok
+  teljesítésének színvonalát.
   </p>
 
-  <p>
-  Besides the faults the program also monitors many other parameters,
-  which are recorded in a textual <i>log</i>. This log is sent as a
-  part of your PIREP (<b>PI</b>lot's <b>REP</b>ort), and will be
-  analyzed, and possibly commented on by more experienced pilots of
-  Malév Virtual. This way you can perfect the way you execute your
-  flights.
-  </p>
-
-  <p>
-  The application breaks up your flight into
-  several <i>stage</i>s. The advancement from one stage to another is 
-  detected automatically. These stages and the conditions under which
-  they are entered are as follows:
+  <p><a name="flightStages"/>
+  A program a járat teljesítését több <i>fázis</i>ra bontja. Az egyik
+  fázisról a következőre való átmenetet automatikusan érzékeli. Az
+  alábbiakban felsoroljuk e fázisokat és azokat a feltételeket,
+  amelyeknek teljesülniük kell az egy adott fázisba való belépéshez:
   <ol>
-    <li><b>boarding</b>: This is the initial stage when you start the
-    flight.</li>
-    <li><b>push-back and taxi</b>: If you release the parking brakes
-    or your ground speed becomes 5 knots or greater during the
-    boarding stage, your flight enters this stage.</li>
-    <li><b>takeoff</b>: If you turn on the landing and/or the strobe
-    lights or your ground speed exceeds 80 knots during taxi or after
-    a rejected takeoff (RTO).</li>
-    <li><b>climb</b>: When you retract the gears or you reach 3000
-    feet altitude AGL with a positive climb rate after takeoff.</li>
-    <li><b>RTO</b>: If you switch off both the landing and the
-    strobe lights, and your speed is reduced below 50 knots while on
-    the ground during takeoff.</li>
-    <li><b>cruise</b>: When the aircraft's altitude is within 2000
-    feet of the cruise altitude and you are climbing.</li>
-    <li><b>descent</b>: If the altitude decreases to more than 2000
-    feet below the cruise altitude during cruise.</li>
-    <li><b>landing</b>: If the gears are lowered and the altitude is
-    less than 2000 feet AGL during descent or go-around.</li>
-    <li><b>go-around</b>: If you retract the gears during landing.</li>
-    <li><b>taxi after landing</b>: When the aircraft is in the
-    ground and its ground speed is below 50 knots after landing.</li>
-    <li><b>parking</b>: If the parking brake is activated after taxi.</li>
-    <li><b>end</b>: If the N<sub>1</sub> of the turbines becomes
-    less than 0.5, or the RPM of the piston engines becomes 0 during
-    parking. This is the final stage.</li>
+    <li><b>beszállás</b>: Ez a járat első fázisa.</li>
+    <li><b>hátratolás és kigurulás</b>: Ha a beszállási fázis alatt
+    felengedjük a parkoló fékeket vagy a guruló sebesség meghaladja az
+    5 csomót, a program ebbe a fázisba lép.</li>
+    <li><b>felszállás</b>: Ha kigurulás közben vagy megszakított
+    felszállás után felkapcsoljuk a leszálló fényeket és/vagy a
+    villogót, vagy a guruló sebesség meghaladja a 80 csomót.</li>
+    <li><b>emelkedés</b>: Ha felszállás közben behúzzuk a futóműveket
+    vagy elérjük a reptér magassága feletti 3000 lábat.</li>
+    <li><b>megszakított felszállás</b>: Ha felszállás közben még a
+    földön vagyunk, és kikapcsoljuk mind a leszálló fényeket, mind a
+    villogót, vagy a sebesség 50 csomó alá csökken.</li>
+    <li><b>utazó</b>: Ha emelkedés közben az utazómagasságot 2000
+    lábnyira megközelítjük.</li>
+    <li><b>süllyedés</b>: Ha az utazó fázis közben a repülési magasság
+    több mint 2000 lábbal az utazó magasság alá csökken.</li>
+    <li><b>leszállás</b>: Ha süllyedés vagy átstartolás közben a
+    futóműveket kiengedjük és a reptérhez viszonyítva 2000 láb alá
+    csökken a magasság.</li>
+    <li><b>átstartolás</b>: Ha leszállás közben visszahúzzuk a futóműveket.</li>
+    <li><b>begurulás</b>: Ha leszállás után a repülőgéo a földön van
+    és a guruló sebesség 50 csomó alá csökken.</li>
+    <li><b>parkolás</b>: Ha begurulás után behúzzuk a parkoló féket.</li>
+    <li><b>vége</b>: Ha parkolás közben a gázturbinák N<sub>1</sub>
+    paramétere 0,5 alá, vagy a dugattyús motorok fordulatszáma
+    0-ra csökken. Ez a járat teljesítésének utolsó fázisa.</li>
   </ol>
 
   <p>
-  To enhance the simulation, the program can play various sound files
-  during the various stages of your flight, such as the announcements
-  made by the flight attendants. These files are supplied with the
-  application, and they can be played automatically, or when you press
-  a certain hotkey in the flight simulator. You can also organize
-  pre-recorded sound files into checklists for the each aircraft
-  type, and these files can also be played back one-by-one when you
-  repeatedly press a key combination in the simulator. See below for
-  more information on this.
+  A szimuláció élményének javítására a program a járat teljesítésének
+  egyes szakaszaiban megfelelő beállítás esetén
+  különféle <a href="#prefsSounds">hang</a> állományokat, mint például 
+  a légiutaskísérők bejentéseit, játssza le. Ezen állományok a
+  programhoz tartoznak, és vagy automatikusan kerülnek lejátszásra,
+  vagy ha megnyomunk egy gyorsbillentyűt a szimulátorban. Emellett
+  előre felvett hangállományokból ez egyes repülőgép
+  típusokhoz <a href="#checklistEditor">ellenőrzőlistákat</a>
+  állíthatunk össze. Az ellenőrzőlistákat alkotó hangfelvételeket egy
+  másik gyorsbillentyű lenyomásával játszhatjuk le egyenként. Ezzel
+  kapcsolatban további tudnivalók az 
+  <a href="#prefsSounds">alábbiakban</a> olvashatók.
+  </p>
+
+  <p><a name="onlineACARSSystem"/>
+  A Malév Virtual rendelkezik egy <i>Online ACARS rendszerrel</i>,
+  amelyik a MAVA honlapján valamint egy térképen megjeleníti a
+  folyamatban lévő járatok állapotát.
+  </p>
+
+  <p><a name="onlineGateSystem"/>
+  A Malév Virtual továbbá egy <i>Online kapukezelő rendszert</i> is
+  üzemeltet, amelynek adatbázisa tartalmazza a flottát alkotó
+  repülőgépek helyét. Egy adott repülőgép tartózkodhat a budapesti
+  ferihegyi repülőtéren, amikor is az adatbázis tartalmazza, hogy
+  a gép melyik kapun vagy állóhelyen áll. Ha ez a helyzet, és
+  Ferihegyről indul az éppen teljesített járat, a program megjeleníti
+  a kapu vagy állóhely számát, és a szimulátorban javasolt a
+  megjelelölt pozícióra állítani a gépet. Ha Ferihegyről indulunk, de
+  a repülőgép máshol van (például egy másik járat teljesítése miatt),
+  kiválaszthatjuk, hogy honnan szeretnénk indulni. Az Online
+  kapukezelő rendszer adatbázisa külön is megjeleníthető a
+  programban. 
   </p>
 
   <p>
-  Malév Virtual have implemented an <i>Online ACARS System</i>, which
-  displays the status of the flights in progress. The data appears on
-  the front page of the MAVA website and also on a map.
+  A fenti két rendszer csak online repülés esetén használható.
   </p>
 
   <p>
-  Malév Virtual have also implemented an <i>Online Gate System</i>
-  which maintains a database of the aircraft in the airline's fleet
-  and their location. An aircraft may be parked at the Budapest
-  Ferihegy Airport, in which case the number of the gate or stand it
-  is located at is recorded in the database. If so, this number is
-  displayed to you when starting your flight from Ferihegy, and you
-  are recommended to place your aircraft at the indicated gate or
-  stand in the simulator. If your flight begins at Ferihegy and the
-  aircraft is away (usually due to someone else's flight), you can
-  select from which gate or stand you start your flight. The database
-  of the Online Gate System can also be displayed by using the
-  application.
+  A program automatikusan frissíti önmagát. Elinduláskor leellenőrzi,
+  hogy van-e a telepítettnél újabb változat. Ha igen, letölti azt, majd
+  újraindítja saját magát, immár az új változatban. A frissítés
+  nemcsak a hibajavítások beszerzése miatt fontos, hanem például azért
+  is, mert a program bővülhet újabb ellenőrzésekkel vagy meglévők
+  kifinomultabbá válhatnak, és ha túl régi változatot használunk, a
+  PIREP javítók akár amiatt is elutasíthatják a járatot.
+  </p>
+
+  <h3><a name="gui">A grafikus felhasználói felület</a></h3>
+
+  <p>
+  Az alkalmazás felülete a megszokott elemekből (gombok,
+  jelölőnégyzetekből, listákból, szövegbeviteli mezőkből, stb.) épül
+  fel. A legtöbb elem rendelkezik tooltippel, amelyek e kézikönyv
+  mellett további segítséget nyújtanak a program használatához. A
+  legtöbb elem a billentyűzetről is kezelhető, ha a címkéjében lévő
+  aláhúzott betűt vagy számot az <b>Alt</b> billentyűvel együtt
+  ütjük le.
   </p>
 
   <p>
-  These online systems can only be used when flying online.
-  </p>
-
-  <p>
-  The program can automatically update itself. When it starts up, it
-  checks if there is a newer version available. If so, it downloads
-  its files and replaces the program's current files with the new
-  ones. Then the program is restarted so that you can use the new
-  version. Besides acquiring bug fixes, updating is also important,
-  because the program can be extended with new checks or more refined
-  checks, and if you are using too old a version, the PIREP reviewers
-  may refuse your flight.
-  </p>
-
-  <h3><a name="gui">Graphical User Interface</a></h3>
-
-  <p>
-  The GUI of the application is made up of traditional building blocks
-  (buttons, checkboxes, lists, text entry boxes, etc.) found in other
-  applications as well. Many such controls have informative tooltips
-  that supplement the contents of this User's Guide in helping you
-  using the application. Many controls are also accessible by pressing
-  the <b>Alt</b> plus the underlined letter in the control's label.
-  </p>
-
-  <p>
-  The most often used part of the program is the main window, to be
-  described in detail below. When you minimize or close the window, it
-  disappears by default, but the program continues to run. You can
-  redisplay the window by clicking on the tray icon of the program,
-  which looks like the one on the picture below.
+  A program legtöbbször használ része a főablak, amelyet az
+  alábbiakban részletesen leírunk. Ha az ablakot minimalizáljuk vagy
+  lecsukjuk, alapértelmezésben csupán eltűnik, de maga a program
+  tovább fut. A lenti képen is látható tálcaikon segítségével az
+  ablak újra megjeleníthető.
   </p>
 
   <div align="center">
@@ -154,815 +158,854 @@
   </div>
 
   <p>
-  If you click on the tray icon when the program's window is hidden,
-  the window will be displayed. If you hover the mouse pointer over
-  the icon, the flight stage and the current rating will be
-  displayed. The tray icon has a right-button menu as well with the
-  following items: 
+  Ha rákkantintuk a tálcaikonra mikor a program ablak nem látszik,
+  akkor az megjelenik. Ha az ikon fölé visszuk az egérmutatót, majd
+  várunk, a repülés aktuális fázisa és pontszáma jelenik meg. A
+  tálcaikon jobbgombos menüje az alábbi pontokat tartalmazza:
   <ul>
-    <li><b>Show main window</b>: displays or hides the main window.</li>
-    <li><b>Show monitor window</b>: displays or hides the monitor
-    window (see below).</li>
-    <li><b>Quit</b>: quit the application. A confirmation window will
-    be displayed.</li>
+    <li><b>Mutasd a főablakot</b>: a főablak megjelenítése vagy elrejtése.</li>
+    <li><b>Mutasd a monitor ablakot</b>: a monitor ablak (lásd lent)
+    megjelenítése vagy elrejtése.</li>
+    <li><b>Kilépés</b>: kilépés az alkalmazásból. A kilépési szándékot
+    a megjelenő ablakban meg kell erősíteni.</li>
   </ul>
   </p>
 
   <p>
-  You can also quit the application by selecting the <b>File/Quit</b>
-  menu item, or by pressing <b>Ctrl+Q</b>.
+  Az alkalmazásból a <b>Fájl/Kilépés</b> menüpont választásával vagy a 
+  <b>Ctrl+K</b> billentyűkombinációval is kiléphetünk.
   </p>
 
   <p>
-  If you start the application, when it is already running, the main
-  window of the already running instance will be displayed instead of
-  starting a new instance of the program.
+  Ha elindítjuk a programot, de az már fut, akkor a már futó példány
+  főablaka jelenik meg ahelyett, hogy új példány indulna el.
   </p>
   
-  <h2><a name="mainWindow">The Main Window</a></h2>
+  <h2><a name="mainWindow">A főablak</a></h2>
 
   <p>
-  The figure below depicts the main window of the application. The top
-  of it contains the usual menu bar, which will be described in more
-  detail later. The content area consists of several tabs the use of
-  which is described below.
+  A lenti ábra az alkalmazás főablakának a képe. A felső része a
+  megszokott menüsort tartalmazza, amelyről az alábbiakban olvasható
+  több tudnivaló. Az ablak középső része több fülből áll, amelyek
+  használatát a lentiekben részletesen leírjuk.
   </p>
-
+  
+  <a name="mainWindowShot"/>
   <div align="center"><img src="mainWindow.png" alt="The main window"/></div>
 
   <p>
-  The bottom of the window is a status bar. Its left side contains the
-  icon indicating the status of the connection to the simulator. Since
-  the application continuously monitors the parameters of your
-  aircraft, it needs to communicate with the simulator. The icon's
-  colour indicates the health of this communication channel.
+  Az ablak alsó része az állapotsor. Bal szélén látható a
+  szimulátorral való kapcsolat állapotát jelző ikon. Mivel a program
+  folyamatosan figyeli a repülőgép paramétereit, kommunikálnia kell a
+  szimulátorral. E kommunikációs csatorna állapotát az ikon színe jelzi.
   </p>
  
   <p>
-  If it is grey, the program is not connected. This is normal before
-  and after the flight. If it is green, the connection is alive and
-  working properly. If it is red, the connection is broken. In this
-  case a dialog window is displayed. The most likely cause for such a
-  disruption is the crash of the simulator. If this is the case,
-  restart the simulator and try to restore the flight to a state as
-  close to the one before the crash as possible. Then click
-  the <b>Reconnect</b> button, and the program will try to
-  re-establish the connection to the simulator. It preserves all data
-  of your flight, so you can continue where you left off easily.
+  Ha az szürke, a program nem áll kapcsolatban a szimulátorral. Ez
+  normális a járat teljesítése előtt és azután. Ha az ikon zöld színű,
+  a kapcsolat él és megfelelően működik. Ha az ikon piros, a kapcsolat
+  megszakadt. Ebben az esetben egy dialógus ablak jelenik meg. A
+  kapcsolat megszakadásának legvalószínúbb oka a szimulátor
+  elszállása. Ebben az esetben indítsuk azt újra és a repülést
+  állítsuk vissza, amennyira csak lehetséges, az elszállás előtt
+  állapotra. Ezután kattintsunk az <b>Újrakapcsolódás</b> gombra, és a
+  logger megpróbálja visszállítani a kapcsolatot a
+  szimulátorral. Mivel megőrzi a járat összes adatát, ott
+  folytathatjuk, ahol abbahagytuk.
   </p>
 
   <p>
-  If the reason for the failure of the connection is something else,
-  do whatever is needed to be done to restore it. Of course, it is
-  possible that the logger application itself fails, in which case
-  you, unfortunately, have to restart the flight. Do not forget to
-  notify the author if this happens. In this case, try to copy and
-  save the debug log and send it with your bug report.
+  Ha a kapcsolat megszakadásának más az oka, próbáljuk az okot
+  megszüntetni. Természetesen lehetséges, hogy maga a logger működik
+  hibásan, és ebben az esetben sajnos nincs más lehetőség, mint a
+  járat újrakezdése. Ebben az esetben feltétlenül értesítsük a
+  szerzőt, és az értesítésbe másoljuk be a <a href="#debugLog">debug
+  napló</a> tartalmát.
   </p>
 
   <p>
-  If you click the <b>Cancel</b> button in the reconnection dialog,
-  the logger will be reset as if it were stopped and restarted.
+  Ha a kapcsolat megszakadását jelző dialógus ablakban a <b>Mégse</b>
+  gombot nyomjuk meg, a logger alapállapotba kerül.
   </p>
 
   <p>
-  To the right of the connection status icon, you can see the current
-  stage of the flight, if the monitoring has begun. Otherwise it is a
-  single dash. It is followed by the simulator time, if the program is
-  already connected to the simulator. Then comes the current flight
-  rating. 
+  A kapcsolat állapotát jelző ikontól jobbra a járat aktuális
+  <a href="#flightStages">fázisa</a> olvasható, ha annak követése már
+  elkezdődött, egyébként egy gondolatjel. Ezt követi a szimulátor
+  belső ideje, ha már kapcsolódtunk hozzá, majd
+  a <a href="#flightRating">pontszám</a>.
   </p>
 
   <p>
-  The right of the status bar is normally empty, but if there is some
-  potentially long operation going on (typically communicating with
-  the MAVA servers), information about the operation is displayed
-  here. This is accompanied by the cursor becoming that of signaling
-  a busy state and most parts of the main window becoming
-  unresponsive.
+  Az állapotsor jobb oldala általában üres, de ha valamilyen
+  potenciálisan hosszú ideig tartó művelet (például a MAVA szerverével
+  való kommunikáció) van folyamatban, akkor arról itt jelenik meg
+  információ. Ennek időtartama alatt a kurzor foglalt állapotot jelez és a
+  főablak nagy része nem reagál.
   </p>
 
-  <h3><a name="tabFlight">The Flight Tab</a></h3>
+  <h3><a name="tabFlight">A Járat fül</a></h3>
 
   <p>
-  The flight tab is the most important tab. It consists of a sequence of
-  pages similar to wizards found in many programs. The first several of
-  these pages guide you through the various steps of the preparations
-  for your flight, while the last pages allow you to enter some
-  information about your flight necessary for its evaluation and to
-  send the PIREP (Pilot's Report) assembled by the program to the MAVA
-  website.
+  A járat fül a legfontosabb. A sok programban megtalálható
+  varázslókhoz hasonlóan lapok sorozatából áll. E lapok nagy része a 
+  a repülés előkészítésének lépésein vezet végig, míg az utolsó
+  néhányon olyan adatokat adhatunk meg, amelyek szükségesek a repülés
+  kiértékeléséhez és az összeállított PIREP-nek a MAVA szerverére való
+  elküldéséhez. 
   </p>
 
   <p>
-  Each page has a title at the top indicating the purpose of the
-  page. There is a short text below this, which describes what the
-  page contains and/or what is expected from you to do with the page.
-  Below the text you can find the main information and possibly data
-  entry areas for the page. Finally, you can find the button row at
-  the bottom.
+  Minden lap tetején egy, a lap célját jelző cím olvasható. Ez alatt
+  egy rövid szöveg írja le, hogy mit tartalmaz a lap és/vagy mit kell
+  azon a lapon tennünk. E szöveg alatt találhatók a lényegi
+  információk és az esetleges adatbeviteli eszközök. Alul, jobb
+  oldalon pedig a gombsor látható.
   </p>
   
   <p>
-  Most of the pages contain two buttons: <b>Next</b> and
-  <b>Previous</b>. These help in navigating between the pages. In most
-  cases you can go back to previously visited pages by using
-  the <b>Previous</b> button, although you cannot edit the contents of
-  those pages once finalized by moving to the next page using
-  the <b>Next</b> button. There are a few exceptions though, as
-  detailed below.
+  A legötbb lap két gombot tartalmaz: <b>Előre</b>
+  és <b>Vissza</b>. Ezekkel lehet mozogni a lapok között. A legtöbb
+  esetben a <b>Vissza</b> gombbal visszamehetünk a korábban már látott
+  lapokhoz, bár azok egy részének a tartalma nem módosítható miután
+  az <b>Előre</b> gombbal már továbbléptünk róluk. Ez alól van néhány
+  kivétel, mint azt az alábbiakban részletezzük.
   </p>
 
   <p>
-  Many of the pages also contain a <b>Cancel flight</b>
-  button. Clicking this button will allow you to cancel the flight and
-  go back to the flight selection if you have logged in to the MAVA
-  website, or the login page, after a confirmation of your intent.
+  Sok lap tartalmaz még egy <b>Járat megszakítása</b> feliratú gombot
+  is. Erre kattintva az aktuális járat megszakítható és ha ebbéli
+  szándékunkat megerősítettük, visszakerülünk
+  a <a href="#flightSelectionPage">járatválasztás</a> oldalra, ha 
+  korábban bejelentkeztünk a MAVA szerverére, vagy a bejelentkezés
+  oldalra egyébként.
   </p>
 
-  <h4><a name="loginPage">The <i>Login</i> Page</a></h4>
+  <h4><a name="loginPage">A <i>Bejelentkezés</i> oldal</a></h4>
 
   <p>
-  Each flight starts with the Login page where you can enter the your
-  pilot's ID and password for the MAVA website. Both data are given
-  to you when joining Malév Virtual. The pilot's ID usually starts
-  with the letter <q>P</q> followed by three digits. 
-  </p>
-
-  <p>
-  If you check <b>Remember password</b>, the password will be saved by
-  the program, so you don't have to enter it all the time. Note,
-  however, that the password is saved plainly into a configuration
-  file, so you this possibility only if your home directory can be
-  accessed only by people you trust. The pilot's ID is saved anyway.
+  A program a Bejelentkezés oldallal indul (lásd a fenti
+  <a href="#mainWindowShot">képet</a>), ahol megadhatjuk a pilóta
+  azonosítónkat és a MAVA honlapján is használható
+  jelszavunkat. Mindkét adatot a rendelkezésünkre bocsájtját a Malév
+  Virtualhoz való belépéskor. A pilóta azonosító rendszerint <q>P</q>
+  betűvel kezdődik, amit három számjegy követ.
   </p>
 
   <p>
-  If you are about to perform the entrance flight, check
-  <b>Entrance exam</b>. In this case you don't have to (and cannot)
-  enter the password, as that is not needed for the entrance exam.
+  Ha kijelöljök az <b>Emlékezz a jelszóra</b> jelölőnégyzetet, a
+  jelszót elmenti a program, így nem kell azt mindig beírnunk. Fontos
+  figyelembe venni, hogy a jelszót olvasható formában menti el a
+  program a konfigurációs fájlba, így csak akkor használjuk ezt a
+  lehetőséget, ha a könyvtárunkhoz csak megbízható emberek férnek
+  hozzá. A pilóta azonosítót mindenképpen elmenti a program.
   </p>
 
   <p>
-  The login to the MAVA server, and proceed to the next page, press
-  the <b>Login</b> button.
+  Ha az ellenőrző repülést szeretnénk elvégezni, jelöljük be az
+  <b>Ellenőrző repülés</b> jelölőnégyzetet. Ebben az esetben a jelszót
+  nem is kell, és nem is adhatjuk meg, mivel az ellenőrző repüléshez
+  arra nincs szükség.
   </p>
 
   <p>
-  If you would like to fly without an Internet connection, use
-  the <b>Fly offline</b> button. This immediately takes you to the
-  next page, without trying to log in to the MAVA website.
-  </p>
-  
-  <h4><a name="flightSelectionPage">The <i>Flight selection</i> Page</a></h4>
-
-  <img src="flightSelection.png" alt="The Flight selection page"/>
-  
-  <p>
-  This page displays the list of the flight you have booked previously
-  on the MAVA website, if you have logged in properly. If you chose to
-  fly offline, the list is empty.
+  A MAVA szerverére való bejelentkezéshez és a következő lap
+  eléréséhez nyomjuk meg a <b>Bejelentkezés</b> gombot.
   </p>
 
   <p>
-  If you have selected a flight, you can also save it by using
-  the <b>Save flight</b> button. This is useful when planning to fly
-  offline at some later time. When preparing for that flight, you can
-  properly log in to the MAVA website, and acquire the list of your
-  booked flights. Then you can save the flight you wish to perform
-  later offline, on which occasion, you can load the saved flight.
-  </p>
-
-  <p>
-  You may need to refresh the list of flights. For example, you notice
-  that you have forgotten to book the flight you want to perform. Then
-  you can book the flight on the MAVA website, and press
-  the <b>Refresh flights</b> button to update the list.
-  </p>
-
-  <p>
-  You can also load a flight from a file by  pressing the <b>Load
-  flight from file</b> button. This displays a file selection dialog
-  where you select the flight file (usually with a suffix
-  of <code>.vaflight</code>). This is mostly useful when flying
-  offline, or during the entrance exam.
-  </p>
-
-  <p>
-  Select a flight from the list, and press <b>Next</b> button to
-  proceed with that flight.
-  </p>
-
-  <h4><a name="gataSelectionPage">The <i>LHBP gate selection</i> Page</a></h4>
-  
-  <img src="gateSelection.png" alt="The LHBP gate selection page"/>
-  
-  <p>
-  This page is displayed after the flight selection page only if your
-  flight starts at the Budapest Ferihegy Airport and the number of the
-  gate or stand at which your aircraft is located cannot be
-  determined.
-  </p>
-
-  <p>
-  Select a number from the list presented, and press <b>Next</b>.
-  </p>
-
-  <h4><a name="connectPage">The <i>Connect to the simulator</i> Page</a></h4>
-
-  <img src="connect.png" alt="The Connect to the simulator page"/>
-  
-  <p>
-  This page displays some important information about your flight,
-  such as the type and tail number of the aircraft to use, the
-  departure airport and possibly the gate.
-  </p>
-
-  <p>
-  Select the aircraft indicated and park it at the departure airport,
-  then press <b>Connect</b> to establish the connection with the
-  simulator. If the connection cannot be established, a dialog will be
-  displayed about it, and you can <b>Try again</b> the connection
-  or <b>Cancel</b> to go back to the login page.
+  Ha Internet kapcsolat nélkül szeretnénk repülni, használjuk
+  az <b>Offline repülés</b> gombot. Ezzel egyből a következő lapra
+  kerülünk anélkül, hogy a program megpróbálni belépni a MAVA
+  szerverére. 
   </p>
   
-  <p>
-  Note, that after a successful connection, the monitoring of your
-  flight does not begin immediately, but some data can be queried by
-  the logger at this stage.
-  </p>
+  <h4><a name="flightSelectionPage">A <i>Járatválasztás</i> oldal</a></h4>
 
-  <h4><a name="payloadPage">The <i>Payload</i> Page</a></h4>
-
-  <img src="payload.png" alt="The Payload page"/>
+  <img src="flightSelection.png" alt="A járatválasztás oldal"/>
   
   <p>
-  This page displays the components of the flight's payload and the
-  calculated Zero-Fuel Weight (ZFW). You can enter here the cargo
-  weight you determined for your flight. You can also press the <b>ZFW
-  from FS</b> button, which queries the ZFW from the simulator and
-  displays the retrieved value. If the ZFW calculated from the payload
-  data differs too much from the queried one, the calculated value is
-  displayed in red. This the right time to set up the payload in the
-  simulator. If you forget about it, it will be a NO GO fault.
+  Ezen az oldalon a korábban a MAVA honlapján foglalt járatok listáját
+  találjuk, amenyiben
+  sikeresen <a href="#loginPage">bejelentkeztünk</a>. Ha offline
+  repülést választottunk, a lista üres.
   </p>
 
   <p>
-  If you have finished with this page, press the <b>Next</b>
-  button. At this point, the <i>Help</i> tab becomes available, which
-  you can use if you have failed to set up the correct payload in the
-  simulator. See a more detailed description of it below.
+  Ha a listából kijelölünk egy járatot, akkor azt a <b>Járat
+  mentése</b> gombbal elmenthetjük. Ez akkor lehet hasznos, ha egy
+  későbbi időpontban, offline szeretnénk repülni. A repülés
+  előkészítése során a loggerrel bejelentkezhetünk a MAVA szerverére
+  és lekérhetjük a foglalt járatok listáját. Ezután a később offline
+  végrehajtani kívánt járatot elmenthetjük, majd a tényleges
+  végrehajtáskor visszatölthetjük.
   </p>
 
-  <h4><a name="timePage">The <i>Time</i> Page</a></h4>
+  <p>
+  Szükség lehet a járatlista frissítésére. Például, elképzelhető, hogy
+  elfelejtettük lefoglalni a teljesíteni kívánt járatot. Ekkor a
+  foglalást megtehetjük a MAVA honlapján, majd a <b>Járatlista
+  frissítése</b> gombra kattintva frissíthetjük a listát.
+  </p>
 
-  <img src="time.png" alt="The Time page"/>
+  <p>
+  A <b>Járat betöltése fájlból</b> gombra kattintva egy járatot
+  tölthetünk be. Ekkor egy fájlválasztó dialógus ablak jelenik meg,
+  ahol kiválaszthatjuk a betölteni kivánt járat fájlt (amelynek
+  kiterjesztése általában <code>.vaflight</code>). Ez leginkább
+  offline vagy ellenőrző repüléskor hasznos.
+  </p>
+
+  <p>
+  Válasszunk egy járatot a listából, majd nyomjuk meg az <b>Előre</b>
+  gombot a kiválasztott járat teljesítésének elkezdéséhez.
+  </p>
+
+  <h4><a name="gataSelectionPage">Az <i>LHBP kapuválasztás</i> oldal</a></h4>
+  
+  <img src="gateSelection.png" alt="Az LHBP kapuválasztás oldal"/>
   
   <p>
-  This page displays the departure and arrival times of your
-  flight in UTC. Press the <b>Time from FS</b> button to query the
-  current UTC time of the simulator. To be able to simulate the real
-  lighting circumstances of the flight, the simulator's time should match
-  the time of the flight according to the schedule. Therefore you are
-  expected to set the simulator's time properly. It is recommended to
-  set it to about 15 minutes before the departure at this stage so
-  that you have enough time to set up your flight.
+  Ez az oldal csak akkor jelenik meg, ha a járat a budapesti
+  ferihegyi repülőtérről indul és nem lehet eldönteni, hogy annak
+  melyik kapujáról vagy állóhelyéről.
   </p>
 
   <p>
-  When you have set the time of the simulator properly, press
-  the <b>Next</b> button.
+  Válasszuk ki a megfelelő számot a listából, majd nyomjuk meg
+  az <b>Előre</b> gombot.
   </p>
 
-  <h4><a name="fuelPage">The <i>Fuel</i> Page</a></h4>
+  <h4><a name="connectPage">A <i>Kapcsolódás a szimulátorhoz</i> oldal</a></h4>
 
-  <img src="fuel.png" alt="The Fuel page"/>
+  <img src="connect.png" alt="A Kapcsolódás a szimulátorhoz oldal"/>
   
   <p>
-  This page contains a graphical representation of the fuel tanks of
-  your aircraft. The yellowish colour represents the current level of
-  the fuel in the tank, and turquoise slider is the expected level,
-  which is also displayed numerically (in kilograms) below each graph. 
+  Ez az oldal a járat néhány fontos adatát tartalmazza, mint a
+  használandó repülőgép típusát és lajstromjelét, az induló
+  repülőteret és esetleg a kapu vagy állóhely számát.
   </p>
 
   <p>
-  You can enter the requested amount of fuel numerically, or you can
-  set it by the turquoise sliders, though this method less accurate. The
-  lever can be moved by clicking in the fuel tank's representation,
-  and you can drag it if you keep the button pressed. If your mouse
-  has a wheel, that can also be used to modify the expected level. To
-  use the wheel, keep the mouse pointer within the fuel tank's
-  graphic. Each click of the wheel increment or decrements the amount
-  by 10 kilograms. If you hold down the <b>Shift</b> key, the
-  increment will be 100, if you hold down the <b>Ctrl</b> key, the
-  increment will be 1.
-  </p>
-
-  <p>
-  When all tanks have the correct amount of fuel set, press
-  the <b>Next</b> button. This causes the pumping of the fuel to
-  start. The progress is represented by the yellowish fuel bars
-  growing or shrinking (fuel may be pumped out of a tank as
-  well). This is a relatively quick process and should finish within a
-  few seconds. 
-  </p>
-
-  <h4><a name="routePage">The <i>Route</i> Page</a></h4>
-  
-  <img src="route.png" alt="The Route page"/>
-  
-  <p>
-  This page displays the cruise level and the flight plan route. The
-  cruise level starts out at FL240, but the route comes from the
-  booked flight. Set the cruise level to the one you have calculated
-  with, and modify the flight plan if needed. For example, if you will
-  enter some airspace that will require you to change the flight
-  level, you should add that here.
-  </p>
-
-  <p>
-  When satisfied with the information on the page, press
-  the <b>Next</b> button to advance. Note, that these data can be
-  edited later as well if you come back to this page.
-  </p>
-
-  <h4><a name="briefingPage">The <i>Briefing</i> Pages</a></h4>
-  
-  <img src="briefing.png" alt="The Briefing page"/>
-  
-  <p>
-  These pages display the NOTAMs and the METAR for the departure and
-  the arrival airports. You can edit the METAR if your network
-  provides a different weather, or you do not fly with real
-  weather. The METAR of the arrival airport will be updated when
-  entering the landing stage, unless you have edited it before. The
-  METARs can be edited during the whole duration of the flight. If you
-  do so, please, comment it in the <i>Comments</i> sections of
-  the <i>Flight info</i> tab.
-  </p>
-
-  <p>
-  On the second briefing page (that of the arrival airport), confirm
-  that you have read the briefing and are ready to start the flight by
-  clicking the button. This begins the monitoring of your flight with
-  the boarding stage.
-  </p>
-  
-  <h4><a name="takeoffPage">The <i>Takeoff</i> Page</a></h4>
-
-  <img src="takeoff.png" alt="The Takeoff page"/>
-  
-  <p>
-  On this page you have to enter the name of the departure runway, the
-  name of the Standard Instrument Departure procedure you follow after
-  takeoff and the takeoff V-speeds. While you can edit these data
-  anytime, it is recommended to do so before takeoff.
-  <p>
-
-  <p>
-  Note that if you are flying one of the Tupolev or Yak aircraft, the
-  page will look different, as speeds will have to be entered in
-  kilometres per hour.
-  </p>
-
-  <p>
-  You can proceed to the next page after takeoff, and if all data has
-  been entered, by pressing the <b>Next</b> button.
-  </p>
-
-  <h4><a name="landingPage">The <i>Landing</i> Page</a></h4>
-
-  <img src="landing.png" alt="The Landing page"/> 
-
-  <p>
-  On this page you have to enter the name of the STAR and/or transition followed
-  (if you get vectors from ATC, enter <q>VECTORS</q> here), the
-  approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>, etc.),
-  the name of the landing runway, and the landing reference speed,
-  V<sub>ref</sub>. You can enter this data during the flight, or after
-  you have landed, at your discretion. Note, that if you fly one of
-  the Tupolev or Yak aircraft, the speed will have to be entered in
-  km/h.
-  </p>
-
-  <p>
-  When you have entered all data, press the <b>Next</b> button. It is
-  active only, if the flight has ended.
-  </p>
-
-  <h4><a name="finishPage">The <i>Finish</i> Page</a></h4>
-
-  <img src="finish.png" alt="The Finish page"/> 
-
-  <p>
-  This is the final page of the flight wizard. It contains a summary
-  of your flight: the rating, the flight and block times, the distance
-  flown and the amount of fuel burnt.
-  </p>
-
-  <p>
-  You also have to provide a few pieces of information. You have to
-  select the type of the flight from the list provided (scheduled,
-  old-timer, VIP, charter) and whether it was an online flight or
-  not. If you arrive at the Budapest Ferihegy Airport, and are using
-  the Online Gate System, you also need to specify the number of the
-  gate or stand you have parked you aircraft at.
-  </p>
-
-  <p>
-  With all data entered, you may want it review your flight, then save
-  or send the PIREP created from it. These can be accomplished by
-  pressing one of the buttons at the bottom. A saved PIREP can be
-  loaded later and sent, if the sending fails for some reason. When a
-  PIREP is sent, it becomes available for review by the designated
-  PIREP reviewers of Malév Virtual.
-  </p>
-
-  <p>
-  You can also start a new flight using the <b>New flight</b>
-  button. If you have not saved or sent the PIREP, you will be asked
-  to confirm your intention. When starting a new flight you are taken
-  to the flight selection page, if you have logged in to the MAVA
-  website, or to the login page, if your flight has been an offline
-  flight.
-  </p>
-  
-  <h3><a name="flightInfoTab">The Flight info Tab</a></h3>
-
-  <img src="flightInfoTab.png" alt="The Flight info tab"/> 
-
-  <p>
-  This tab allows one to enter some additional information about the 
-  flight, if necessary.
+  A szimulátorban válasszuk ki a jelzett repülőgépet és parkoljuk le
+  az induló repülőtéren, majd a loggerben nyomjuk meg
+  a <b>Kapcsolódás</b> gombot a szimulátorral való kapcsolat
+  kiépítéséhez. Ha az nem sikerül, erről egy dialógus ablakban
+  tájékoztat a program, amelynek segítéségvle a hiba elhárítása
+  után a <b>Próbáld újra</b> gombbal a kapcsolat létrehozására újabb
+  kísérlet tehető, míg a <b>Mégse</b> gombbal visszamehetünk a
+  járatválasztó vagy a bejelentkező oldalra.
   </p>
   
   <p>
-  The <i>Comments</i> text area should contain any general information
-  that you would like the PIREP reviewer to know about. For example,
-  why you changed the METAR, why you lowered the gears accidentally
-  (i.e. pressed the wrong key on the keyboard), etc.
+  A kapcsolat sikeres létrehozása után a járat követése még nem
+  kezdődik el azonnal, de a logger már ekkor is lekérdezhet bizonyos
+  adatokat.
+  </p>
+
+  <h4><a name="payloadPage">A <i>Terhelés</i> oldal</a></h4>
+
+  <img src="payload.png" alt="A Terhelés oldal"/>
+  
+  <p>
+  Ezen az oldalon a járattal szállított hasznos teher összetevőit
+  láthatjuk valamint a kiszámított Zero-Fuel Weight (ZFW) értékét. Itt
+  adhatjuk meg a teherszállítmány tömegét. A <b>ZFW a
+  szimulátorból</b> gomb megnyomásának hatására a program a
+  szimulátorból lekérdezi a ZFW értékét és megjeleníti azt. Ha az
+  túlzottan eltér a számított értéktől, akkor ez utóbbi piros színnel
+  jelenik meg. Állítsuk be a szimulátorban a hasznos terhet. Ha ezt
+  elfelejtjük, abból NO GO hiba lesz.
   </p>
 
   <p>
-  The <i>Flight defects</i> text area should contain information about
-  any problems you encountered with the plane during the flight. For
-  example an engine stopped and why (if known), that flaps could not
-  be extended or retracted, etc.
+  Ha végeztünk az oldal kitöltésével, nyomjuk meg az <b>Előre</b>
+  gombot. Ekkor a <a href="#helpTab"><i>Segítség</i></a> fül használhatóvá
+  válik, ls igénybe is vehetjük, ha a szimulátorban nem sikerült
+  megfelelően beállítani a hasznos terhet. A fül részletesebb leírását
+  lásd az <a href="#helpTab">alábbiakban</a>. 
+  </p>
+
+  <h4><a name="timePage">A <i>Menetrend</i> oldal</a></h4>
+
+  <img src="time.png" alt="A Menetrend oldal"/>
+  
+  <p>
+  Ez az oldal tartalmazza a járat indulási és érkezési idejét
+  UTC-ben. Az <b>Idő a szimulátorból</b> gomb megnyomásának hatására a
+  program lekérdezi a szimulátor aktuális idejét. A járat
+  valós fényviszonyainak megjelenítése érdekében a szimulátor idejének
+  meg kell egyeznie a járatéval. Javasolt az időt az indulási idő
+  előtt 15 perccel korábbra állítani, hogy legyen elég időnk a repülés
+  előkészítésére. 
   </p>
 
   <p>
-  In the <i>Delay codes</i> area you can mark one or more reasons why
-  the flight was delayed, if it was. The options are self-explanatory.
+  Ha a szimulátorban beállítottuk a megfelelő időt, nyomjuk meg az
+  <b>Előre</b> gombot.
   </p>
 
-  <h3><a name="helpTab">The Help Tab</a></h3>
+  <h4><a name="fuelPage">Az <i>Üzemanyag</i> oldal</a></h4>
 
-  <img src="helpTab.png" alt="The Help tab"/> 
-
+  <img src="fuel.png" alt="Az Üzemanyag oldal"/>
+  
   <p>
-  This tab provides some help for calculating and setting the payload
-  weight of the aircraft. It can be used once the <i>Payload</i>
-  (i.e. the cargo weight) is finalized. To use this tab, check
-  the <b>Using help</b> checkbox. It causes the page to become
-  sensitive and filled with data. Note, that the fact of using the
-  help is logged, so the PIREP reviewers will know about it.
-  </p>
-
-  <p>
-  The most important information is after the <i>Payload:</i> label,
-  which is the payload weight of the aircraft. This value should be
-  set in the simulator as the airplane's payload weight. By pressing
-  the <b>Simulator data</b> button, the data coming from the simulator
-  can be queried and displayed. If the data is out of the tolerances,
-  it is displayed in red, otherwise in green. 
+  Ezen az oldalon a repülőgép üzemanyagtartályainak grafikus képét
+  láthatjuk. A sárgás szín az egyes tartályok aktuális
+  üzemanyagszintjét jelzi, a zöldeskék csúszka pedig a kívánt szintet,
+  amelyet az egyes ábrák alatt számmal (kilogrammban) is láthatunk.
   </p>
 
   <p>
-  The gross weight is also displayed with some maximum weights of the
-  aircraft, so it can be checked or estimated if you will remain within
-  those maximums during the flight.
+  A kívánt mennyiséget megadhatjuk számmal, vagy beállíthatjuk a
+  zöldeskék csúszkákkal is, bár ez a módszer kevésbé pontos. A
+  csúszkát mozgathatjuk a tartályt jelképező ábrába való kattintással,
+  vagy húzhatjuk is, ha az egér gombját lenyomva tartjuk. Ha az egér
+  rendelkezik görgővel, azzal is módosíthatjuk a kívánt mennyiséget,
+  ha az egérmutatót az ábrán tartjuk. A görgő minden fokozata 10
+  kilogrammal növeli vagy csökkenti a mennyiséget. Ha görgetés közben
+  lenyomva tartjuk a <b>Shift</b> gombot, a változás 100, ha pedig
+  a <b>Ctrl</b> gombot tartjuk lenyomva, a változás 1 kg.
+  </p>
+
+  <p>
+  Ha beállítottuk az összes tartályt, nyomjuk meg az <b>Előre</b>
+  gombot. Ekkor elkezdődik az üzemanyag szivattyúzása. Ennek
+  folyamatát a sárgás oszlopok magasságának növekedése vagy csökkenése
+  jelzi (elképzelhető, hogy egyes tartályokból ki kell szivattyúzni az
+  üzemanyagot). A pumpálás viszonylag rövid ideig, néhány másodpercig tart.
+  </p>
+
+  <h4><a name="routePage">Az <i>Útvonal</i> oldal</a></h4>
+  
+  <img src="route.png" alt="Az Útvonal oldal"/>
+  
+  <p>
+  Ezen az oldalon az utazószintet és az útvonaltervet láthatjuk és
+  szerkeszthetjük. Az utazószint kezdeti értéke FL240, de az útvonalat
+  a foglalt járatból veszi a program. Állítsuk be a szintet a
+  tervezettre, és szükség esetén módosítsuk az útvonalat. Ha például
+  egyes légterekbe belépve szükség lehet az utazószint módosítására,
+  azt adjuk meg itt.
+  </p>
+
+  <p>
+  Ha megtettük a szükséges módosításokat, nyomjuk meg az <b>Előre</b>
+  gombot a továbblépéshez. Ha később visszatérünk erre az oldalra, az
+  adatokat szerkeszthetjük.
+  </p>
+
+  <h4><a name="briefingPage">Az <i>Eligazítás</i> oldalak</a></h4>
+  
+  <img src="briefing.png" alt="Az Eligazítás oldalak"/>
+  
+  <p>
+  Ezen a két oldalon az induló illetve az érkező repülőtér NOTAM-jait
+  és METAR-ját olvashatjuk. A METAR-t szerkeszthetjük ha a hálózatról
+  más időjárást kapunk, vagy nem a valós időjárási viszonyok mellett
+  repülünk. Az érkező repülőtér METAR-ját a program frissíti a
+  leszállási fázisba való belépéskor, hacsak előtt nem szerkesztettük
+  azt. A METAR-ok a repülés teljes időtartama alatt szerkeszthetők. Ha
+  azonban így teszünk, annak okát a <a href="#flightInfoTab"><i>Járat
+  info</i></a> fül <i>Megjegyzések</i> rovatában jelezzük. 
+  </p>
+
+  <p>
+  A második (az érkezési repülőtérhez tartozó) eligazítási oldalon
+  erősítsük meg, hogy készen állunk a repülésre a megfelelő gomb
+  megnyomásával. Ezzel elkezdődik a járat teljesítésének követése a
+  beszállás fázissal.
   </p>
   
-  <h3><a name="logTab">The Log Tab</a></h3>
+  <h4><a name="takeoffPage">A <i>Felszállás</i> oldal</a></h4>
 
-  <img src="logTab.png" alt="The Log tab"/> 
+  <img src="takeoff.png" alt="A Felszállás oldal"/>
+  
+  <p>
+  Ezen az oldalon kell beírni a felszállásra használt futópálya
+  számát, az alkalmazott szabványos műszeres indulási eljárást,
+  valamint a felszállási sebességeket. Noha bármikor szerkeszthetjük
+  ezeket az adatokat, javasolt azokat a felszállás előtt beírni.
+  <p>
 
   <p>
-  This is the main log of your flight that will be analyzed by the
-  PIREP reviewers. Its contents is generated automatically by the
-  program, and most lines are prefixed by the simulator times the
-  information in the given line belongs to.
+  Ha valamelyik Tupoljev vagy Jak típussal repülünk, a
+  sebességeket kilométer per órában kell megadni.
   </p>
 
   <p>
-  While the log's contents is mainly useful for PIREP reviewers, it
-  can come handy when things start to happen very fast, and you have
-  no time check each fault message passing by (if you have enabled
-  such messages at all). Later, when things calm down, you can check
-  the log to see what happened exactly, so that you know why so many
-  fault points have been awarded. For example, you may even decide to
-  abort the flight, if you think some of the faults are to
-  embarrassing :) For quick identification, the lines containing the
-  fault messages are highlighted.
+  A következő oldalra felszállás után az <b>Előre</b> gomb
+  megnyomásával léphetünk tovább, ha minden adatot beírtunk.
   </p>
 
-  <h3><a name="gatesTab">The Gates Tab</a></h3>
+  <h4><a name="landingPage">A <i>Leszállás</i> oldal</a></h4>
 
-  <img src="gatesTab.png" alt="The Gates tab"/> 
-
-  <p>
-  This tab displays information retrieved from the MAVA Online Gate
-  System. If the program needs to retrieve data, this tab's contents
-  are refreshed automatically, but you can refresh them manually
-  anytime using the <b>Refresh data</b> button.
-  </p>
+  <img src="landing.png" alt="A Leszállás oldal"/> 
 
   <p>
-  The left side of the tab contains the fleet information. The tail
-  number of each aircraft is listed with the plane's status, as known
-  by the Online Gate System. The two major statuses are <i>LHBP-nn</i>
-  and <i>AWAY</i>. The former indicates that the aircraft is parked at
-  the Budapest Ferihegy Airport at gate or stand <i>nn</i>, while the
-  latter one denotes that the airplane is parked at another
-  airport. Another possible status is <i>PARKED</i>, which means that
-  the airplane is parked somewhere at the Ferihegy Airport, but we
-  (or at least the Gate System) don't know where. It may happen that
-  several aircraft are parked at the same gate or stand at
-  Ferihegy. In this case the tail numbers and the statuses of those
-  airplanes are displayed in red.
+  Ezen az oldalon a tervbe vett szabványos érkezési és/vagy bevezetési
+  eljárás nevét, a megközelítés típusát
+  (pl. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>, stb.) és a
+  köszöbátlépési sebességet (V<sub>ref</sub>) kell megadni. Az
+  eljárások esetén mindig a tervezettet adjuk meg, és ha például az
+  irányítástól eltérőt, netán vektorokat kaptunk, azt a megjegyzésben
+  tüntessük fel. Az adatokat repülés közben vagy akár leszállás után
+  is megadhatjuk. Ha Tupoljev vagy Jak típussal repülönk, a sebességet
+  km/órában kell megadni.
   </p>
 
   <p>
-  The right side contains the list of the numbers of the gates and
-  parking positions. A number is black if no aircraft is positioned at
-  the corresponding gate or stand, and it is orange, if the location
-  is occupied.
+  Ha minden adatot megadtunk, nyomjuk meg az <b>Előre</b> gombot. Ez
+  csak akkor használható, ha a járat teljesítése véget ért.
   </p>
 
-  <h3><a name="debugLog">The Debug log</a></h3>
+  <h4><a name="finishPage">A <i>Lezárás</i> oldal</a></h4>
 
-  <img src="debugLogTab.png" alt="The Debug log tab"/> 
-
-  <p>
-  This tab is not visible by default, but can be displayed by
-  selecting <b>View/Show debug log</b> or by
-  pressing <b>Ctrl+D</b>. It is another kind of log, which is mainly
-  useful for debugging. If you experience some problem with the
-  program, please, include the contents of this log with your bug
-  report. It can help a low with finding a solution to the problem.
-  </p>
-
-  <h2><a name="loadingPIREPs">Loading PIREPs</a></h2>
+  <img src="finish.png" alt="A Lezárás oldal"/> 
 
   <p>
-  Saved PIREPs can be loaded and sent by the program. This can
-  become necessary, for example, if you cannot send a PIREP due to
-  some network problem right after your flight, or when you
-  deliberately performed a flight without connecting to the Internet.
+  Ez a járat varázsló utolsó oldala. Tartalmazza a járat
+  összesítgését: a pontszámot, a repült és blokk időt, a repült távot
+  és az eltüzelt üzemanyag mennyiségét.
   </p>
 
   <p>
-  To load a PIREP select the <b>File/Load PIREP...</b> menu option or
-  press the <b>Ctrl+L</b> key. A file selection dialog appears, from
-  which you can select the PIREP to load. If you select a valid PIREP
-  file, it will be loaded and a new window will be displayed with the
-  most important data of your flight. By clicking <b>Send
-  PIREP...</b>, the PIREP will be sent (or at least an attempt will be
-  made at sending it). A dialog window will be displayed about the
-  results of the attempt.
+  Emellett néhány adatot is meg kell adnunk. Ki kell választani a
+  járat típusát (menetrendszerint, old-timer, VIP vagy charter), és
+  hogy online repülés volt-e. Ha a ferihegy repülőtérre érkezünk, ki
+  kell választani annak a kapunak vagy állóhelynek a számát, ahol a
+  repülőgépet leparkoltuk.
+  </p>
+
+  <p>
+  Ha minden adatot megadtunk, ellenőrizhetjük a korábbi oldalakon vagy
+  más füleken megadottakat, majd elmenthetjük vagy elküldhetjük az
+  elkészített PIREP-et az alul lévő, erre a célre szolgáló két gomb
+  valamelyikének a megnyomásával. Az elmentett PIREP-et később
+  betölthetjük, és megpróbálhatjuk elküldeni, hogy korábban az nem
+  sikerült. Ha a PIREP-et sikeresen elküldjük, az a Malév Virtual
+  kijelölt PIREP javítói számára értékelhetővé válik.
+  </p>
+
+  <p>
+  Az <b>Új járat...</b> gomb megnyomásával egy új járat teljesítését
+  kezdhetjük el. Ha még nem mentettük el és nem is küldtük el a
+  PIREP-et, az járat elkezdésének megerősítését kéri a logger. Új
+  járat kezdésekor a <a href="#flightSelectionPage">járatválasztás
+  oldalra</a> kerülünk, ha korábban sikeresen bejelentkeztünk a MAVA
+  szerverére, egyébként pedig a <a href="#loginPage">bejelentkezés
+  oldalra</a>. 
+  </p>
+  
+  <h3><a name="flightInfoTab">A Járat info fül</a></h3>
+
+  <img src="flightInfoTab.png" alt="A Járat info fül"/> 
+
+  <p>
+  Ezen az oldalon további információt adhatunk a járattal
+  kapcsolatban, ha szükséges.
+  </p>
+  
+  <p>
+  A <i>Megjegyzések</i> szövegmezőbe olyan információt írhatunk be,
+  amit szeretnénk a PIREP javító tudomására hozni. Például, hogy miért
+  változtattuk meg METAR-t, miért engedtük ki véletlenül a futóművet
+  (rossz gombot nyomtunk meg a billentyűzeten), stb.
+  </p>
+
+  <p>
+  A <i>Hibajelenségek</i> szövegmező a repülőgéppel kapcsolatban
+  tapasztalt hibák leírását tartalmazhatja. Például, hogy leállt az
+  egyik hajtómű, és (ha ismert) miért, hogy a fékszárnyakat nem
+  sikerült kiengedni vagy visszahúzni, stb.
+  </p>
+
+  <p>
+  A <i>Késés kódok</i> részben kijelölhetjük a késés okát vagy okait,
+  ha volt ilyen.
+  </p>
+
+  <h3><a name="helpTab">A Segítség fül</a></h3>
+
+  <img src="helpTab.png" alt="A Segítség fül"/> 
+
+  <p>
+  Ez a fül segít a repülőgép hasznos terhének kiszámításában. Azután
+  használható, hogy a <a href="#payloadPage"><i>Terhelés</i></a>
+  lapot, pontosabban ott a teherszállítmány tömegét véglegesítettük. A
+  segítség igénybe vételéhez jelöljük ki a <b>Használom a
+  segítséget</b> négyzetet. Ekkor a fülön látható adatok kitöltésre
+  kerülnek és a szimulátorból is letölthetjük az adatokat. A segítség
+  igénybevételének ténye bekerül a
+  repülési <a href="#logTab">naplóba</a>, így a PIREP javítója tudni
+  fog róla.
+  </p>
+
+  <p>
+  A legfontosabb információ a <i>Hasznos teher:</i> címke után
+  olvasható, ugyanis ezt kell a szimulátorban beállítani mint a
+  repülőgép hasznos terhét. A <b>Szimulátor adatok</b> gomb
+  megnyomására a program lekérdezi és megjeleníti a szimulátorból
+  kilvasott adatokat. Ha azok a megengedettnél nagyobb mértékben
+  térnek el a kiszámított adatoktól, piros színnel, egyébként zölden
+  jelennek meg.
+  </p>
+
+  <p>
+  A teljes tömeget és bizonyos maximális tömeget szintén megjelenít a
+  program, így hozzávetőlegesen azt is ellenőrizhetjük, hogy a
+  maximumokat nem fogjuk-e túllépni a repülés során.
+  </p>
+  
+  <h3><a name="logTab">A Napló fül</a></h3>
+
+  <img src="logTab.png" alt="A Napló fül"/> 
+
+  <p>
+  Ez a repülési napló, amit a PIREP javítók elemezni fognak. A
+  tartalmát a program automatikusan állítja elő, és a legtöbb sor
+  elején az a szimulátorbeli időpont olvasható, amelyhez a sorban
+  olvasható információ tartozik.
+  </p>
+
+  <p>
+  Bár a napló tartalma elsősorban a PIREP javítók számára szükséges,
+  jól jöhet akkor is, ha a dolgok hirtelen nagyon gyorsan kezdenek
+  zajlani, és nem tudjuk követni az összes hibaüzenetet (ha egyáltalán
+  engedélyeztük azokat). Később, ha a helyzet normalizálódott,
+  megnézhetjük a naplót, hogy pontosan mi is történt, miért kaptunk
+  annyi hibapontot. Például úgy is dönthetünk, hogy abbahagyjuk a
+  repülést, ha úgy gondoljuk, hogy egyes hibák túl kínosak :) A gyors
+  felismerhetőség érdekében a hibaüzeneteket tartalmazó sorokat
+  kiemeli a program.
+  </p>
+
+  <h3><a name="gatesTab">A Kapuk fül</a></h3>
+
+  <img src="gatesTab.png" alt="A Kapuk fül"/> 
+
+  <p>
+  Ez a fül a MAVA <a href="#onlineGateSystem">online kapukezelő
+  rendszerétől</a> lekérdezett adatokat jeleníti meg. Amikor a
+  programnak szüksége van ezekre az adatokra, e fül adatait is
+  frissíti magától, de kézzel is kérhetünk frissítést az <b>Adatok
+  frissítése</b> gomb megnyomásával.
+  </p>
+
+  <p>
+  A bal oldalon a flotta állapotát láthatjuk. A lista az egyes repülőgépek
+  lajstromjelét és állapotát tartalmazza, legalábbis amit erről a
+  kapukezelő rendszer adatbázisa tárol. A két legfontosabb állapot
+  az <i>LHBP-nn</i> és a <i>TÁVOL</i>. Az előbbi ezt jelzi, hogy a
+  repülőgép a budapesti ferihegyi repülőtéren az <i>nn</i> számú
+  kapunál vagy állóhelyen parkol, míg az utóbbi arra utal, hogy a
+  repülőgép egy másik repülőtéren tartózkodik. Másik lehetséges
+  állapot a <i>PARKOL</i>, ami azt jelenti, hogy a repülőgép valahogy
+  a ferihegyi repülőtéren áll, de nem tudjuk (vagy legalábbis a
+  kapukezelő rendszer nem tudja), hol. Az is előfordulhat, hogy több
+  repülőgép parkol ugyanott Ferihegyen. Ebben az esetben ezek
+  lajstromjele és állapota pirossal szerepel.
+  </p>
+
+  <p>
+  Jobb oldalt a kapuk és állóhelyek száma látható. A szám fekete, ha
+  az annak megfelelő helyen nem áll repülőgép, egyébként narancssárga.
+  </p>
+
+  <h3><a name="debugLog">A Debug napló</a></h3>
+
+  <img src="debugLogTab.png" alt="A Debug napló fül"/> 
+
+  <p>
+  Ez a fül alapértelmezésben nem látható, de a <b>Nézet/Mutasd a
+  debug naplót</b> menüpont kiválasztásával vagy a <b>Ctrl+D</b>
+  billentyűkombináció leütésével megjeleníthető. Ez egy másik fajta
+  napló, ami hibakereséshez lehet hasznos. Ha valamilyen problémát
+  tapasztalunk a program működésével kapcsolatban, e napló tartalmát
+  is mellékeljük a hibajelentéshez. Sokban segíthet a megoldás
+  megtalálásában. 
+  </p>
+
+  <h2><a name="loadingPIREPs">PIREP-ek betöltése</a></h2>
+
+  <p>
+  Az elmentett PIREP-eket a programmal visszatölthetjük és
+  elküldhetjük. Erre akkor lehet szükség, ha például egy járat
+  teljesítése után közvetlenül nem tudjuk elküldeni a PIREP-et
+  valamilyen hálózati probléma miatt, vagy ha szándékosan Internat
+  kapcsolat nélkül repültük a járatot.
+  </p>
+
+  <p>
+  PIREP betöltséhez válasszuk ki a <b>Fájl/PIREP betöltése...</b>
+  menüpontot vagy nyomjuk meg a <b>Ctrl+T</b>
+  billentyűkombinációt. Egy fájlválasztó ablak jelenik meg, amelyben
+  kiválaszthatjuk a betöltendő PIREP-et. A kiválasztás után a PUJREP
+  betöltődik, és egy másik ablak jelenik meg a járat legfontosabb
+  adataival. A <b>PIREP elküldése...</b> gomb megnyomására a PIREP-et
+  a program megpróbálja elküldeni, és ennek eredményéről egy dialógus
+  ablakban tájékoztat minket.
   </p>
 
   <div align="center">
-    <img src="pirepLoaded.png" alt="The loaded PIREP window"/> 
+    <img src="pirepLoaded.png" alt="A betöltött PIREP ablaka"/> 
   </div>
 
   <p>
-  You may also want to view a saved PIREP, for example, if it is a
-  PIREP about an entrance exam flight. To do so, click the <b>View
-  PIREP...</b> button. This displays the PIREP viewer window, which
-  groups the data into three tabs. The <i>Data</i> tab contains the
-  itemized data of the flight. The <i>Comments & defects</i> tab
-  displays the comments and or flight defects entered by the
-  user. The <i>Log</i> tab contains the flight log. 
+  Előfordulhat, hogy egy elmentett PIREP-et alaposabban is meg
+  szeretnénk nézni, például ha az egy ellenőrző repülésről
+  készült. Ehhez nyomjuk meg a <b>PIREP megtekintése...</b>
+  gombot. Ennek hatására megjleneik a PIREP megtekintő ablak, amely az
+  adatokat három fül alá csoportosítja. Az <i>Adatok</i> fül a
+  járattal kapcsolatos adatokat tartalmazza. A <i>Megjegyzések és
+  hibák</i> fül a pilóta esetleges megjegyzéseit és hibajelenségekről
+  szóló beszámolóit tartalmazza. A <i>Napló</i> fülön pedig a repülési
+  napló olvasható.
+  </p>
 
   <div align="center">
-    <img src="pirepViewer.png" alt="The PIREP Viewer"/> 
+    <img src="pirepViewer.png" alt="PIREP megtekintő ablak"/> 
   </div>
 
-  <h2><a name="checklistEditor">Editing checklists</a></h2>
+  <h2><a name="checklistEditor">Ellenőrzőlisták szerkeszése</a></h2>
 
-  <img src="checklistEditor.png" alt="The Checklist Editor"/> 
+  <img src="checklistEditor.png" alt="Ellenőrzőlista szerkesztő"/> 
 
   <p>
-  The checklists are lists of audio files. When checklist playback is
-  enabled (see the description of the <i>Preferences</i> window below), and
-  there is a checklist for the type of the aircraft used for the
-  flight, the files constituting the checklist can be played
-  one-by-one by pressing the checklist hotkey repeatedly.
+  Egy ellenőrzőlista tulajdonképpen hangfájlok listája. Ha az
+  ellenőrzőlisták lejátszását engedélyeztük (lásd lent a <i>Beállítások</i>
+  ablak <a href="#prefsSounds">leírását</a>), és az hárat
+  teljesítéséhez használt repülőgéphez tartozik ellenőrzőlista, akkor
+  a megfelelő gyorsbillentyű ismételt leütésével a listát alkotó
+  fájlok egyenként lejátszhatók.
   </p>
 
   <p>
-  The checklist editor dialog box allows for editing the checklist. It
-  can be displayed by selecting <b>Tools/Checklist Editor...</b> or
-  pressing <b>Ctrl+C</b>. The top of the window contains an aircraft
-  type selector.
+  Az ellenőrzőlista szerkesztő ablak az <b>Eszközök/Ellenőrzőlista
+  szerkesztő...</b> menüpont kiválasztásával, vagy a <b>Ctrl+E</b>
+  billentyűkombinációval jeleníthető meg. Az ablak felső részén
+  kiválaszthatjuk azt a repülőgép típust, amelynek az
+  ellenőrzőlistáját szerkeszteni óhajtjuk.
   </p>
 
   <p>
-  The files making up the checklist for the currently selected flight
-  are displayed on the right. You can move a file up or down by
-  dragging it with the mouse. You can also select one or more files
-  from the list. Then you can remove them with the <b>Remove</b>
-  button, or move them up or down by pressing <b>Move up</b>
-  and <b>Move down</b>. 
+  Az ablak jobb oldalán látható azoknak a fájloknak a listája, amelyek
+  az ellenőrzőlistát alkotják. Az egérrel fel-le húzhatjuk a fájlokat
+  a listában. Emellett a listából kijelölhetünk egy vagy több fájlt,
+  amelyeket aztán a <b>Törlés</b> gombbal törölhetünk, a <b>Mozgatás
+  felfelé</b> és a <b>Mozgatás lefelé</b> gombbal pedig fel és le
+  mozgathatunk.
   </p>
 
   <p>
-  To add new files to the checklist, select them in the file selector
-  on the left, and press <b>Add to checklist</b>. The file(s) will be
-  appended to the end of the checklist.
+  Az ellenőrzőlistához úgy adhatunk hozzá további fájlokat, hogy a bal
+  oldali fájlválasztóban kijelöljük azokat, majd megnyomjuk
+  a <b>Listához hozzáadás</b> gombot. A kijelölt fájl(ok) a lista
+  végére kerül(nek).
   </p>
 
   <p>
-  Note, that any changes you make are effective only if you press
-  the <b>OK</b> button when having finished the modifications. If the
-  flight has already started, no changes made to the corresponding
-  checklist have any effect during the flight (i.e. you will still use
-  the old checklist, or no checklist if there was none).
+  A változtatásokat csak akkor jegyzi meg a program, ha azok
+  végeztével megnyomjuk az <b>OK</b> gombot. Ha azonban a járat
+  teljesítése már elkezdődött, az ellenőrzőlista változtatása a
+  folyamatban lévő repülés során nem tapasztalható (azaz a régi
+  ellenőrzőlistát hallhatjuk, vagy egyáltalán nem kapunk
+  ellenőrzőlistát, ha a járat megkezdésekor nem volt olyan).
   </p>
   
-  <h2><a name="prefs">The Preferences Window</a></h2>
+  <h2><a name="prefs">A Beállítások ablak</a></h2>
 
   </p>
-  The Preferences window can be displayed by
-  selecting <b>Tools/Preferences</b> or by
-  pressing <b>Ctrl+P</b>. Here you can set options that you usually
-  don't have to change for every flight. This window also consists of
-  tabs grouping the options logically.
+  A Beálltások ablakot az <b>Eszközök/Beállítások</b> menüpont
+  kiválasztásával vagy a <b>Ctrl+B</b> billentyűkombináció
+  alkalmazásával érhetjük el. Itt olyan paramétereket állíthatunk be,
+  amelyeket általában nem kell minden egyes járathoz külön
+  módosítani. Az ablakban több fül található a paraméterek logikus
+  csoportosítása céljából.
   </p>
   
-  <h3><a name="prefsGeneral">The <i>General</i> Tab<a></h3>
+  <h3><a name="prefsGeneral">Az <i>Általános</i> fül<a></h3>
   
-  <img src="prefsGeneral.png" alt="The General Tab of Preferences"/> 
+  <img src="prefsGeneral.png" alt="A Beállítások ablak Általános füle"/> 
 
   <p>
-  These are some general settings for various parts of the
-  program. The <i>GUI</i> frame contains options regarding the
-  behaviour of the graphical user interface. The <i>Language</i> combo
-  box can be used to selected what language the program should
-  use. Currently English and Hungarian are supported. The value
-  of <i>system default</i> means that the operating system's default
-  language is used if it is one of the supported ones or English
-  otherwise. Note, that the program must be restarted for the change
-  to take effect if you modify this setting. If the <b>Hide main window
-  when minimized</b> checkbox is checked, and you minimize the window,
-  it will actually disappear completely (i.e. not appear among the
-  other minimized windows). You can make it appear by using the tray
-  icon. 
+  Itt néhány általános beállítás található, amelyek a program
+  különböző részeinek a működését befolyásolják. A <i>Grafikus
+  felület</i> keretben a program grafikus felületének viselkedésére
+  vonatkozó opciók találhatók. A <i>Nyelv</i> listában választhatjuk
+  ki, hogy milyen nyelvet használjon a program. Jelenleg a magyar és
+  az angol nyelvet támogatjuk. Az <i>alapértelmezett</i> lehetőség azt
+  jelenti, hogy ha az operációs rendszer nyelve valamelyik támogatott
+  nyelv, akkor a program is azon a nyelven fut, egyébként pedig
+  angolul. Ha ezt a beállítást megváltoztatjuk, a programot újra kell
+  indítani, hogy érvényre is jusson. Ha az <b>A főablak eltüntetése
+  minimalizálásakor</b> jelölőnégyzetet kijelöljük, akkor a főablak
+  minimalizálásakor az teljesen eltűnik (nem jelenik meg a többi
+  minimalizált ablak között). Az ablak a tálcaikon használatával
+  jeleníthető meg újra. Ha a <b>Kilépés az ablakzáró gomb
+  megnyomásakor</b> jelölönégyzet ki van jelölve, a program az
+  ablakzáró gomb megnyomásának hatására megjeleníti a kilépési szándék
+  megerősítésére szolgáló ablakot, és a jóváhagyás után
+  kilép. Egyébként a főablak csak eltűnik, és a tálcaikon segítségével
+  újra megjeleníthető.
   </p>
 
   <p>
-  The <i>MAVA Online Systems</i> frame contains settings related to
-  the online systems of MAVA, the gate and the ACARS systems mentioned
-  above. It is recommended to enabled these for normal operations.
+  A <i>MAVA inline rendszerek</i> keretben a MAVA fent leírt online
+  rendszereit, a <a href="#onlineGateSystem">kapukezelő</a> és az 
+  <a href="#onlineACARSSystem">ACARS</a> rendszert engedélyezhetjük vagy
+  tilthatjuk le. Javasolt ezek engedélyezése.
   </p>
 
   <p>
-  The <i>Simulator</i> frame contains settings for how the program
-  interacts with the simulator. Most options are self-explanatory, but
-  the ones related to smoothing requires some discussion. Flight
-  Simulator is known to produce wind speed changes that are not
-  entirely realistic and can result in the simulated aircraft
-  experiencing some very high indicated airspeeds, which in turn can
-  also cause the autopilot to suddenly increase the climb rate to
-  counter the high speeds. Since this phenomenon is difficult to
-  protect oneself against without buying extra products, like FSUIPC,
-  the logger provides the possibility to average the IAS and/or the VS
-  over a few seconds so that spikes in these values are
-  smoothed. The <b>Enable the smoothing of IAS/VS over N sec.</b>
-  options allow controlling this feature. The number of seconds may
-  need experimenting with, but note that every change for which you
-  press the <b>OK</b> button is taken into account immediately. 
+  A <i>Szimulátor</i> keretben található azok a beállítások, amelyek
+  befolyásoljak, hogy a program hogyan működik együtt a
+  szimulátorral. A legtöbb beállítás magától értetődő, de az
+  átlagolással kapcsolatosak némi magyarázatra szorulhatnak. A Flight
+  Simulator egyik jellegzetessége, hogy néha nagyon hirtelen, nem
+  egészen valószerű változásokat produkál a szélmozgásban. Ez azt
+  eredményezi, hogy a szimulált repülőgép nagyon magas sebességet
+  érzékel, amelynek hatására a robotpilóta adott esetben például
+  jelentősen megnöveli az emelkedés sebességét, hogy ellensúlyozza a
+  sebességnövekedést, vagy más hibás működést tapasztalunk. Mivel ezen
+  jelenségek ellen nehéz védekezni különböző fizetős termékek, mint
+  például az FSUIPC megvásárlása nélkül, a logger lehetőséget biztosít
+  arra, hogy az IAS és a vario értékét néhány másodpercnyi átlagolás
+  után vegye figyelembe egyes esetekben, így az ezekben az értékekben
+  tapasztalható kiugrások kiátlagolhatók bizonyos fokig. Ez a
+  lehetőség az <b>Az IAS/vario átlagolása N másodpercig</b>
+  beállításokkal szabályozható. A beállítandó másodpercek számával
+  szükséges lehet kísérletezni, de ha megnyomjuk az <b>OK</b> gombot,
+  a beállítást azonnal figyelembe veszi a program.
   </p>
 
-  <h3><a name="prefsMessages">The <i>Messages</i> Tab</a></h3>
+  <h3><a name="prefsMessages">Az <i>Üzenetek</i> fül</a></h3>
  
-  <img src="prefsMessages.png" alt="The Messages Tab of Preferences"/> 
+  <img src="prefsMessages.png" alt="A Beállítások ablak Üzenetek füle"/> 
 
   <p>
-  The program can display messages about certain events in the
-  simulator and/or it can play a warning sound when those events
-  occur. The tab allows configuring this.
+  A program bizonyos események megtörténtekor azokról üzenetet tud
+  megjeleníteni a szimulátorban és/vagy hangjelzést ad. Ezen a fülön
+  ezt a funkciót konfigurálhatjuk.
   <p>
 
   <p>
-  The categories of the message are listed on the left. These are the
-  following:
+  A bal oldalon olvasható az üzenetek kategóriáinak listája. Ezek a következők:
   </p>
 
   <ul>
-    <li><b>Logger Error Messages</b>: error messages about the
-    internal working of the logger.</li>
-    <li><b>Information Messages</b>: informational messages about,
-    e.g., the flight stage, the end of an audio checklist, etc.</li>
-    <li><b>Fault Messages</b>: messages about the non-NO GO faults the program detects.</li>
-    <li><b>NO GO Fault Messages</b>: messages about the NO GO faults the program detects</li>
-    <li><b>Gate System Messages</b>: messages related to the Online
-    Gate System. For example, when you have landed at Ferihegy, it can display
-    the list of the available gates so that you can choose where to
-    park, if there is no ATC available.</li>
-    <li><b>Environment Messages</b>: other messages, e.g. the welcome
-    message when the flight has ended.</li>
-    <li><b>Help Messages</b>: help messages, e.g. warning about
-    entering the V-speeds into the Takeoff page before takeoff.</li>
-    <li><b>Visibility Messages</b>: messages about the visibility
-    during descent and landing.</li>
+    <li><b>Logger hibaüzenetek</b>: a logger belső működésével kapcsolatos
+    hibákról szóló üzenetek.</li>
+    <li><b>Információs üzenetek</b>: informatív üzenetek, például a
+    repülés fázisairól, az ellenőrzőlisták végéről, stb.</li>
+    <li><b>Hibaüzenetek</b>: a program által észlelt, de még nem NO GO
+    kategóriájú hibákról szóló üzenetek.</li>
+    <li><b>NO GO hibaüzenetek</b>: a program által észlelt NO GO
+    kategóriájú hibákról szóló üzenetek.</li>
+    <li><b>Kapukezelő rendszer üzenetei</b>:
+    az <a href="#onlineGateSystem">online kapukezelő rendszerrel</a>
+    kapcsolatos üzenetek. Ha például leszállunk Ferihegyen, a program
+    megjeleníti a nem foglalt kapuk és állohelyek listáját, így
+    irányítás hiányában is el tudjuk dönteni, hova álljunk.</li> 
+    <li><b>Környezeti üzenetek</b>: egyéb üzenetek, például a repülés
+    végén a célrepülőtéren üdvözlő üzenet.</li>
+    <li><b>Segítő üzenetek</b>: segítő üzenetek, például a
+    figyelmeztetés arról, hogy ne feledjük a sebességeket
+    a felszállás előtt megadni a Felszállás oldalon.</li>
+    <li><b>Látótávolság üzenetek</b>: a süllyedés és a leszállás
+    közben a látótávolságot tartalmazó üzenetek.</li>
   </ul>
 
   <p>
-  There are two checkboxes associated with each messages category. If the
-  left one (<i>Displayed in FS</i>) is checked, the messages of the
-  category will be displayed in the simulator. If the right one
-  (<i>Sound alert</i>) is checked, and a message of the given category
-  is about to be displayed, a warning sound will be played. It is
-  mainly intended to accompany the text messages, but the two options
-  can be controlled separately, so you can select the sound alert, but
-  not the displaying of the messages. This may be useful if you don't
-  want these messages to clutter up the windscreen of your aircraft,
-  but still get some notification that some problem occurred.
+  Mindegyik üzenetkategóriához két jelölőnégyzet tartozik. Ha a bal
+  oldalit (<i>Szimulátorban megjelenítés</i>) kijelöljök, az adott
+  kategóriába tartozó szöveges üzenetek megjelennek a
+  szimulátorban. Ha a jobb oldalit (<i>Hangjelzés</i>), akkor
+  amennyiben egy, az adott kategóriába tartozó üzenetet kiváltó
+  esemény következik be, figyelmeztető hangjelzést ad a program. Ezt
+  elsősorban a szöveges üzenetek mellé szánjuk, de a két jelölőnégyzet
+  egymástól függetlenül is állítható, így kijelölhetjük csak a
+  hangjelzést a szimulátorban való megjelenítés nélkül. Ez akkor lehet
+  hasznos, ha nem akarjuk a repülőgép szélvédőjét mindenféle
+  üzenetekkel elborítani, de mégis szeretnénk valamilyen jelzést kapni
+  arról, hogy gond lehet.
   </p>
 
-  <h3><a name="prefsSounds">The <i>Sounds</i> Tab</a></h3>
+  <h3><a name="prefsSounds">A <i>Hangok</i> fül</a></h3>
   
-  <img src="prefsSounds.png" alt="The Sounds Tab of Preferences"/> 
+  <img src="prefsSounds.png" alt="A Beállítások ablak Hangok füle"/> 
 
   <p>
-  This tab controls how the sounds are played by the application.
+  Ezen a fülön állíthatjuk be, hogy az alkalmazás hogyan játssza le a
+  hangfájlokat. 
   </p>
 
   <p>
-  The top part is for the background sounds. These are pre-recorded
-  sound files that are played when certain conditions hold during the
-  flight. Typical examples are the various announcements the flight
-  attendants make during the flight. The <b>Enable background
-  sounds</b> checkbox controls whether such sounds are enabled at
-  all. If the <b>Pilot controls sounds</b> checkbox is enabled, the
-  pilot should start the playback of these sound files by pressing a
-  hotkey in the simulator. Note, that you should still be in the right
-  flight stage (and sometimes fulfill other conditions) to be able to
-  play the sound files. Also, one file can be played only once. If you
-  enable this option, the hotkey to press in the simulator can be
-  selected below. You can choose one of the alphanumeric keys (0-9,
-  A-Z) optionally combined with one or both of the <i>Ctrl</i>
-  and <i>Shift</i> modifiers. If this checkbox is not checked, the
-  sound files will be played automatically.
+  A felső rész a háttérhangokra vonatkoznak. Ezek olyan előre
+  rögzített hangfájlok, amelyeket a repülés közben, bizonyos
+  körülmények fennállása esetén játszik le a program. Ilyenek például
+  a légiutaskísérők különböző bejelentései. A <b>Háttérhangok
+  engedélyezése</b> jelölőnégyzettel lehet egyáltalán engedélyezni
+  ezeket. Ha a <b>Pilóta vezérli a hangokat</b> jelölőnégyzetet
+  kijelöljük, a hangfájlok lejátszását a pilótának kell indítani egy
+  gyorsbillentyű megnyomásával. Persze emellett egy adott hangfájl
+  lejátszáshoz a járat teljesítésének megfelelő fázisában kell
+  lennünk, és egyes esetekben más feltételeknek is teljesülniük
+  kell. Emellett egy fájlt csak egyszer játszhatunk le. Ha
+  bekapcsoljuk ezt a lehetőséget, a szimulátorban leütendő
+  gyorsbillentyűt is meg kell adnunk. A szám és betű billentyűk (0-9,
+  A-Z) közül választhatünk, esetleg kombinálva a <i>Ctrl</i> és
+  a <i>Shift</i> emelők közül valamelyikkel vagy mindkettővel. Ha nem
+  engedélyezzük a pilóta által történő vezérlést, a program
+  automatikusan játssza le a hangfájlokat.
   </p>
 
   <p>
-  If the <b>Enable speedbrake sound at touchdown</b> checkbox is
-  checked, you will hear a distinctive sound when the spoilers deploy
-  automatically after touchdown.
+  Ha a <b>Spoiler hang bekapcsolása leszálláskor</b> jelölőnégyzetet
+  kijelöljük, a földetéréskor a spoilerek kinyílásakor egy jellegzetes
+  hangot hallunk.
   </p>
 
   <p>
-  The lower part, named <i>Checklist</i> contains some settings
-  related to the audio checklists belonging to the aircraft. They are
-  available only if the <b>Enable aircraft-specific checklist></b>
-  checkbox is selected. In this case another hotkey should be
-  specified. If you press this hotkey, the next file from the
-  checklist will be played. 
+  Az alsó, <i>Ellenőrzőlisták</i> nevű részben az ellenőrzőlisták
+  lejátszával kapcsolatos beállításokat találjuk. Az ellenőrzőlisták
+  lejátszhatóságát a <b>Repülőgép-specifikus ellenőrzőlisták
+  engedélyezése</b> jelölőnégyzettel engedélyezhetjük. Engedélyezés
+  esetén meg kell adnunk egy másik gyorsbillentyűt, amelynek
+  megnyomásakor az ellenőrzőlistát alkotó fájlok közül mindig a soron
+  következők játssza le a program.
   </p>
 
-  <h3><a name="prefsAdvanced">The <i>Advanced</i> Tab</a></h3>
+  <h3><a name="prefsAdvanced">A <i>Haladó</i> fül</a></h3>
 
-  <img src="prefsAdvanced.png" alt="The Advanced Tab of Preferences"/> 
+  <img src="prefsAdvanced.png" alt="A Beállítások ablak Haladó füle"/> 
 
   <p>
-  This tab contains some settings that you normally should not
-  change. Currently, these settings are related to the automatic
-  update. If the <b>Update the program automatically</b> checkbox is
-  not checked, the automatic update at program start-up will be
-  omitted. The <i>Update URL</i> text entry field contains the URL
-  from which to download the updates. Occasionally the developers of
-  the application may tell you to change this something else, e.g. to
-  test some development version. Or it may need to be changed due to
-  organizational reasons, such as moving to a new server, etc.
+  Ezen a fülön olyan beállítások vannak, amelyeket normális esetben
+  nem kell megváltoztatnunk. Jelenleg ezek az automatikus frissítéssel
+  kapcsolatos beállítások. Ha a <b>Frissítsd a programot
+  automatikusan</b> jelölőnégyzet kijelölését megszüntetjük, a program
+  az indulásakor nem ellenőrzi, hogy van-e frissebb
+  változat. A <i>Frissítés URL-je</i> szövegmezőben látható az az URL,
+  ahonnan a frissítést letölti a program. A program fejlesztői
+  kérhetik, hogy ezt változtasd meg, mert például egy tesztverziót
+  szeretnének kipróbáltatni. Vagy szervezeti okok, például egy új
+  szerverre való költözés miatt kell megváltoztatni, stb.
   </p>
 
-  <h2><a name="monitorWindow">The Monitor Window</a></h2>
+  <h2><a name="monitorWindow">A Monitor ablak</a></h2>
 
-  <img src="monitorWindow.png" alt="The Monitor Window"/> 
+  <img src="monitorWindow.png" alt="A Monitor ablak"/> 
 
   <p>
-  The monitor window can be used when debugging the program. You can
-  display it by selecting <b>View/Show monitor window</b> or by
-  pressing <b>Ctrl+M</b>. It displays the various parameters from the
-  aircraft as read from the flight simulator. During flight, it is
-  updated once per second. If something is not detected properly by
-  the logger, this window can be used to determine if the problem is
-  in interpreting and translating the data read from the simulator, or
-  when the translated data is being evaluated by other parts of the
-  program.
+  A monitor ablakot elsősorban hibakeresésre lehet
+  használni. A <b>Nézet/Mutasd a monitor ablakot</b> menüpont
+  kiválasztásával vagy a <b>Ctrl+M</b> billentyűkombináció leütésével
+  lehet megjeleníteni. A tartalma repülés közben másodpercenként
+  frissül. Ha a logger valamit nem érzékel megfelelően, ennek az
+  ablaknak a segítségével dönthető el, hogy a probléma a szimulátorból
+  kiolvasott adatok átalakításával, vagy a már átalakított értékek
+  feldolgozásával van-e.
   </p>
   
 </html>
