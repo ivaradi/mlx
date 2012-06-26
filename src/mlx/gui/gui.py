@@ -21,6 +21,7 @@ import mlx.logger as logger
 import mlx.acft as acft
 import mlx.web as web
 import mlx.singleton as singleton
+import mlx.airports as airports
 from  mlx.i18n import xstr, getLanguage
 from mlx.pirep import PIREP
 
@@ -516,9 +517,10 @@ class GUI(fs.ConnectionListener):
         self._statusIcon.setStage(stage)
         self._wizard.setStage(stage)
         if stage==const.STAGE_END:
+            welcomeMessage = \
+                airports.getWelcomeMessage(self.bookedFlight.arrivalICAO)
             self._disconnect(closingMessage =
-                             "Flight plan closed. Welcome to %s" % \
-                             (self.bookedFlight.arrivalICAO,),
+                             "Flight plan closed. " + welcomeMessage,
                              duration = 5)
 
     def setRating(self, rating):
