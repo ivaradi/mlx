@@ -2545,7 +2545,7 @@ class FinishPage(Page):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            pirep = PIREP(gui)
+            pirep = PIREP(gui.flight)
 
             self._lastSavePath = text2unicode(dialog.get_filename())
             
@@ -2602,7 +2602,7 @@ class FinishPage(Page):
 
     def _sendClicked(self, button):
         """Called when the Send button is clicked."""
-        pirep = PIREP(self._wizard.gui)
+        pirep = PIREP(self._wizard.gui.flight)
         self._wizard.gui.sendPIREP(pirep,
                                    callback = self._handlePIREPSent)
 

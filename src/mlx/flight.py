@@ -82,14 +82,49 @@ class Flight(object):
         return self._gui.bookedFlight
 
     @property
+    def cargoWeight(self):
+        """Get the cargo weight for the flight."""
+        return self._gui.cargoWeight
+
+    @property
     def zfw(self):
         """Get the Zero-Fuel Weight of the flight."""
         return self._gui.zfw
 
     @property
+    def filedCruiseAltitude(self):
+        """Get the filed cruise altitude."""
+        return self._gui.filedCruiseAltitude
+
+    @property
     def cruiseAltitude(self):
         """Get the cruise altitude of the flight."""
         return self._gui.cruiseAltitude
+
+    @property
+    def route(self):
+        """Get the route of the flight."""
+        return self._gui.route
+
+    @property
+    def departureMETAR(self):
+        """Get the departure METAR of the flight."""
+        return self._gui.departureMETAR
+
+    @property
+    def arrivalMETAR(self):
+        """Get the arrival METAR of the flight."""
+        return self._gui.arrivalMETAR
+
+    @property
+    def departureRunway(self):
+        """Get the departure runway."""
+        return self._gui.departureRunway
+
+    @property
+    def sid(self):
+        """Get the SID followed."""
+        return self._gui.sid
 
     @property
     def v1(self):
@@ -107,6 +142,26 @@ class Flight(object):
         return self._gui.v2
 
     @property
+    def star(self):
+        """Get the STAR planned."""
+        return self._gui.star
+
+    @property
+    def transition(self):
+        """Get the transition planned."""
+        return self._gui.transition
+
+    @property
+    def approachType(self):
+        """Get the approach type."""
+        return self._gui.approachType
+
+    @property
+    def arrivalRunway(self):
+        """Get the arrival runway."""
+        return self._gui.arrivalRunway
+
+    @property
     def vref(self):
         """Get the VRef speed of the flight."""
         return self._gui.vref
@@ -115,6 +170,31 @@ class Flight(object):
     def tdRate(self):
         """Get the touchdown rate if known, None otherwise."""
         return self._tdRate
+
+    @property
+    def flightType(self):
+        """Get the type of the flight."""
+        return self._gui.flightType
+
+    @property
+    def online(self):
+        """Get whether the flight was an online flight."""
+        return self._gui.online
+
+    @property
+    def comments(self):
+        """Get the comments made by the pilot."""
+        return self._gui.comments
+
+    @property
+    def flightDefects(self):
+        """Get the flight defects reported by the pilot."""
+        return self._gui.flightDefects
+
+    @property
+    def delayCodes(self):
+        """Get the delay codes."""
+        return self._gui.delayCodes
 
     @property
     def speedInKnots(self):

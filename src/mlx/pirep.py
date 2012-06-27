@@ -38,34 +38,33 @@ class PIREP(object):
             print "Failed loading PIREP from %s: %s" % (path, str(e))
             return None
         
-    def __init__(self, gui):
-        """Initialize the PIREP from the given GUI."""
-        self.bookedFlight = gui.bookedFlight
-        self.cargoWeight = gui.cargoWeight
+    def __init__(self, flight):
+        """Initialize the PIREP from the given flight."""
+        self.bookedFlight = flight.bookedFlight
+        self.cargoWeight = flight.cargoWeight
         
-        self.filedCruiseAltitude = gui.filedCruiseAltitude
-        self.cruiseAltitude = gui.cruiseAltitude
-        self.route = gui.route
+        self.filedCruiseAltitude = flight.filedCruiseAltitude
+        self.cruiseAltitude = flight.cruiseAltitude
+        self.route = flight.route
 
-        self.departureMETAR = gui.departureMETAR.upper()
-        self.arrivalMETAR = gui.arrivalMETAR.upper()
+        self.departureMETAR = flight.departureMETAR.upper()
+        self.arrivalMETAR = flight.arrivalMETAR.upper()
 
-        self.departureRunway = gui.departureRunway.upper()
-        self.sid = gui.sid.upper()
+        self.departureRunway = flight.departureRunway.upper()
+        self.sid = flight.sid.upper()
 
-        self.star = gui.star
-        self.transition = gui.transition
-        self.approachType = gui.approachType.upper()
-        self.arrivalRunway = gui.arrivalRunway.upper()
+        self.star = flight.star
+        self.transition = flight.transition
+        self.approachType = flight.approachType.upper()
+        self.arrivalRunway = flight.arrivalRunway.upper()
 
-        self.flightType = gui.flightType
-        self.online = gui.online
+        self.flightType = flight.flightType
+        self.online = flight.online
 
-        self.comments = gui.comments
-        self.flightDefects = gui.flightDefects
-        self.delayCodes = gui.delayCodes
+        self.comments = flight.comments
+        self.flightDefects = flight.flightDefects
+        self.delayCodes = flight.delayCodes
         
-        flight = gui.flight
         self.blockTimeStart = flight.blockTimeStart
         self.flightTimeStart = flight.flightTimeStart
         self.flightTimeEnd = flight.flightTimeEnd
@@ -73,7 +72,7 @@ class PIREP(object):
         self.flownDistance = flight.flownDistance
         self.fuelUsed = flight.startFuel - flight.endFuel
 
-        logger = gui.logger
+        logger = flight.logger
         self.rating = logger.getRating()
         self.logLines = logger.lines
         self.faultLineIndexes = logger.faultLineIndexes
