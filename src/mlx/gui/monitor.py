@@ -285,12 +285,12 @@ class MonitorWindow(gtk.Window):
                 fuelStr += "%.0f" % (fuel,)                
             self._fuel.set_text(fuelStr)
 
-            if hasattr(aircraftState, "n1"):
+            if aircraftState.n1 is not None:
                 n1Str = ""
                 for n1 in aircraftState.n1:
                     if n1Str: n1Str += ", "
                     n1Str += "%.0f" % (n1,)
-            elif hasattr(aircraftState, "rpm"):
+            elif aircraftState.rpm is not None:
                 n1Str = ""
                 for rpm in aircraftState.rpm:
                     if n1Str: n1Str += ", "

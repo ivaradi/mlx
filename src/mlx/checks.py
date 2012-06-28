@@ -571,7 +571,12 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
     def isEngineCondition(self, state):
         """Determine if the engines are in such a state that the lights should
         be on."""
-        return max(state.n1)>5
+        if state.n1 is not None:
+            return max(state.n1)>5
+        elif state.rpm is not None:
+            return max(state.rpm)>0
+        else:
+            return False
 
 #---------------------------------------------------------------------------------------
 
@@ -581,13 +586,12 @@ class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
     def isEngineCondition(self, state):
         """Determine if the engines are in such a state that the lights should
         be on."""
-        return max(state.n1[1:])>5
-    
+        return max(state.n1[1:])>5    
 
 #---------------------------------------------------------------------------------------
 
 class BankChecker(SimpleFaultChecker):
-    """Check for the anti-collision light being off at high N1 values."""
+    """Check for the bank is within limits."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         if flight.stage==const.STAGE_CRUISE:
@@ -972,11 +976,11 @@ class ThrustChecker(SimpleFaultChecker):
     FIXME: is this really so general, for all aircraft?"""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return flight.stage==const.STAGE_TAKEOFF and max(state.n1)>97
+        return flight.stage==const.STAGE_TAKEOFF and \
+               state.n1 is not None and max(state.n1)>97
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        print state.n1
         flight.handleFault(ThrustChecker, state.timestamp,
                            FaultChecker._appendDuring(flight,
                                                       "Thrust setting was too high (>97%)"),

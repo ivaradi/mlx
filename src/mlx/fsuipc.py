@@ -1387,11 +1387,14 @@ class GenericAircraftModel(AircraftModel):
             self._addOffsetWithIndexMember(data, offset, "u")    # tank level
             self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
 
-        if self._isN1:
-            self._engineStartIndex = len(data)
-            for i in range(0, self._numEngines):
+        self._engineStartIndex = len(data)
+        for i in range(0, self._numEngines):
+            self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "h")  # throttle lever
+            if self._isN1:
                 self._addOffsetWithIndexMember(data, 0x2000 + i * 0x100, "f")  # N1
-                self._addOffsetWithIndexMember(data, 0x088c + i * 0x98, "h")  # throttle lever
+            else:
+                self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "H")  # RPM
+                self._addOffsetWithIndexMember(data, 0x08c8 + i * 0x98, "H")  # RPM scaler
         
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
@@ -1409,12 +1412,21 @@ class GenericAircraftModel(AircraftModel):
             fuel = data[i+1]*data[i]*fuelWeight*const.LBSTOKG/128.0/65536.0
             state.fuel.append(fuel)
 
-        state.n1 = []
+
+        state.n1 = [] if self._isN1 else None
+        state.rpm = None if self._isN1 else []
+        itemsPerEngine = 2 if self._isN1 else 3
+        
         state.reverser = []
         for i in range(self._engineStartIndex,
-                       self._engineStartIndex + 2*self._numEngines, 2):
-            state.n1.append(data[i])
-            state.reverser.append(data[i+1]<0)
+                       self._engineStartIndex +
+                       itemsPerEngine*self._numEngines,
+                       itemsPerEngine):
+            state.reverser.append(data[i]<0)
+            if self._isN1:
+                state.n1.append(data[i+1])
+            else:
+                state.rpm.append(data[i+1] * data[i+2]/65536.0)
 
         return state
 
@@ -1604,12 +1616,12 @@ class DC3Model(GenericAircraftModel):
         super(DC3Model, self). \
             __init__(flapsNotches = [0, 15, 30, 45],
                      fuelTanks = acft.DC3.fuelTanks,
-                     numEngines = 2)
+                     numEngines = 2, isN1 = False)
 
     @property
     def name(self):
         """Get the name for this aircraft model."""
-        return "FSUIPC/Generic Lisunov Li-2"
+        return "FSUIPC/Generic Lisunov Li-2 (DC-3)"
 
 #------------------------------------------------------------------------------
 

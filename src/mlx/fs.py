@@ -187,10 +187,10 @@ class AircraftState(object):
     floats of as many items as the number fuel tanks)
     - n1[]: the N1 values of the turbine engines (array of floats
     of as many items as the number of engines, present only for aircraft with
-    turbines)
+    turbines, for other aircraft it is None)
     - rpm[]: the RPM values of the piston engines (array of floats
     of as many items as the number of engines, present only for aircraft with
-    pistons)
+    pistons, for other aircraft it is None)
     - reverser[]: an array of booleans indicating if the thrust reversers are
     activated on any of the engines. The number of items equals to the number
     of engines with a reverser.

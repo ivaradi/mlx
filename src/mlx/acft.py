@@ -668,8 +668,9 @@ class DC3(Aircraft):
     - fuel: left aux, left, right, right aux
     - rpm: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
-                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    # fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
+    #              const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
 
     def __init__(self, flight):
         super(DC3, self).__init__(flight)
