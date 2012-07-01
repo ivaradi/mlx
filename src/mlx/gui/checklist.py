@@ -202,9 +202,12 @@ class ChecklistEditor(gtk.Dialog):
         """Called when the Remove button is clicked."""
         selection = self._fileList.get_selection()
         (model, paths) = selection.get_selected_rows()
-        while paths:
-            model.remove(model.get_iter(paths[0]))
-            (model, paths) = selection.get_selected_rows()
+
+        iters = [model.get_iter(path) for path in paths]
+
+        for i in iters:
+            if i is not None:
+                model.remove(i)
         
     def _moveUpButtonClicked(self, button):
         """Called when the move up button is clicked."""

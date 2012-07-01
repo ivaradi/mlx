@@ -62,6 +62,9 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     WINDOW_STATE_ICONIFIED = gdk.WINDOW_STATE_ICONIFIED
     WINDOW_STATE_WITHDRAWN = gdk.WINDOW_STATE_WITHDRAWN
 
+    SORT_ASCENDING = gtk.SORT_ASCENDING
+    SORT_DESCENDING = gtk.SORT_DESCENDING
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -116,6 +119,9 @@ else:
 
     WINDOW_STATE_ICONIFIED = gdk.WindowState.ICONIFIED
     WINDOW_STATE_WITHDRAWN = gdk.WindowState.WITHDRAWN
+
+    SORT_ASCENDING = gtk.SortType.ASCENDING
+    SORT_DESCENDING = gtk.SortType.DESCENDING
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

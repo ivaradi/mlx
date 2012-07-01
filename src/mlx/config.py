@@ -41,6 +41,10 @@ class Hotkey(object):
         return self.ctrl == other.ctrl and self.shift == other.shift and \
                self.key == other.key
 
+    def __ne__(self, other):
+        """Check if the given hotkey is not equal to the other one."""
+        return not self==other
+        
     def __str__(self):
         """Construct the hotkey to a string."""
         s = ""
@@ -91,6 +95,10 @@ class Checklist(object):
         """Determine if the checklist is equal to the given other one."""
         return self._fileList == other._fileList
 
+    def __ne__(self, other):
+        """Determine if the checklist is not equal to the given other one."""
+        return not self==other
+        
     def __len__(self):
         """Get the length of the file list."""
         return len(self._fileList)
@@ -102,6 +110,87 @@ class Checklist(object):
     def __iter__(self):
         """Iterate over the files."""
         return iter(self._fileList)
+
+#-------------------------------------------------------------------------------
+
+class ApproachCallouts(object):
+    """The approach callouts for a certain aircraft type."""
+    # The name of the section of the approach callouts
+    SECTION="callouts"
+    
+    @staticmethod
+    def fromConfig(config, aircraftType):
+        """Create a checklist for the given aircraft type from the given
+        config."""
+        baseName = "callouts." + const.icaoCodes[aircraftType] + "."
+        mapping = {}
+        while True:
+            option = baseName + str(len(mapping))
+            if config.has_option(ApproachCallouts.SECTION, option):
+                value = config.get(ApproachCallouts.SECTION, option)
+                (altitude, path) = value.split(",")
+                altitude = int(altitude.strip())
+                path = path.strip()
+                mapping[altitude] = path
+            else:
+                break
+
+        return ApproachCallouts(mapping)    
+
+    def __init__(self, mapping = None):
+        """Construct the check list with the given mapping of altitudes to
+        files."""
+        self._mapping = {} if mapping is None else mapping.copy()
+
+    def clone(self):
+        """Clone the callout information."""
+        return ApproachCallouts(self._mapping)
+
+    def toConfig(self, config, aircraftType):
+        """Add this checklist to the given config."""
+        baseName = "callouts." + const.icaoCodes[aircraftType] + "."
+        index = 0
+        for (altitude, path) in self._mapping.iteritems():
+            option = baseName + str(index)
+            config.set(ApproachCallouts.SECTION, option,
+                       "%d, %s" % (altitude, path))
+            index += 1
+
+    def __eq__(self, other):
+        """Determine if the approach callout mapping is equal to the given
+        other one."""
+        return self._mapping == other._mapping
+
+    def __ne__(self, other):
+        """Determine if the approach callout mapping is not equal to the given
+        other one."""
+        return not self==other
+
+    def __len__(self):
+        """Get the number of elements in the mapping."""
+        return len(self._mapping)
+
+    def __getitem__(self, altitude):
+        """Get the file that is associated with the highest altitude not higher
+        than the given one.
+
+        If no such file found, return None."""
+        candidate = None
+        for (alt, path) in self._mapping.iteritems():
+            if alt<=altitude:
+                if candidate is None or alt>candidate[0]:
+                    candidate = (alt, path)
+
+        return candidate
+
+    def __iter__(self):
+        """Iterate over the pairs of altitudes and paths in decreasing order of
+        the altitude."""
+        altitudes = self._mapping.keys()
+        altitudes.sort(reverse = True)
+
+        for altitude in altitudes:
+            yield (altitude, self._mapping[altitude])
 
 #-------------------------------------------------------------------------------
 
@@ -136,7 +225,7 @@ class Config(object):
         self._pilotControlsSounds = True
         self._pilotHotkey = Hotkey(ctrl = True, shift = False, key = "0")
 
-        #self._approachCallOuts = False
+        self._enableApproachCallouts = False
         self._speedbrakeAtTD = True
 
         self._enableChecklists = False
@@ -148,9 +237,11 @@ class Config(object):
         self._messageTypeLevels = {}
 
         self._checklists = {}
+        self._approachCallouts = {}
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = Checklist()
-        
+            self._approachCallouts[aircraftType] = ApproachCallouts()
+            
         self._modified = False
 
     @property
@@ -403,17 +494,17 @@ class Config(object):
             self._pilotHotkey = pilotHotkey
             self._modified = True
 
-    # @property
-    # def approachCallOuts(self):
-    #     """Get whether the approach callouts should be played."""
-    #     return self._approachCallOuts
+    @property
+    def enableApproachCallouts(self):
+        """Get whether the approach callouts should be played."""
+        return self._enableApproachCallouts
 
-    # @approachCallOuts.setter
-    # def approachCallOuts(self, approachCallOuts):
-    #     """Set whether the approach callouts should be played."""
-    #     if approachCallOuts!=self._approachCallOuts:
-    #         self._approachCallOuts = approachCallOuts
-    #         self._modified = True
+    @enableApproachCallouts.setter
+    def enableApproachCallouts(self, enableApproachCallouts):
+        """Set whether the approach callouts should be played."""
+        if enableApproachCallouts!=self._enableApproachCallouts:
+            self._enableApproachCallouts = enableApproachCallouts
+            self._modified = True
 
     @property
     def speedbrakeAtTD(self):
@@ -485,6 +576,17 @@ class Config(object):
             self._checklists[aircraftType] = checklist.clone()
             self._modified = True
 
+    def getApproachCallouts(self, aircraftType):
+        """Get the approach callouts for the given aircraft type."""
+        return self._approachCallouts[aircraftType]
+
+    def setApproachCallouts(self, aircraftType, approachCallouts):
+        """Set the approach callouts for the given aircraft type."""
+        if not approachCallouts==self._approachCallouts[aircraftType]:
+            print "Updating approach callouts"
+            self._approachCallouts[aircraftType] = approachCallouts.clone()
+            self._modified = True
+
     def load(self):
         """Load the configuration from its default location."""
         config = ConfigParser.RawConfigParser()
@@ -537,8 +639,8 @@ class Config(object):
                                                      "pilotControls", True)
         self._pilotHotkey.set(self._get(config, "sounds",
                                         "pilotHotkey", "C0"))
-        #self._approachCallOuts = self._getBoolean(config, "sounds",
-        #                                          "approachCallOuts", False)
+        self._enableApproachCallOuts = \
+            self._getBoolean(config, "sounds", "enableApproachCallOuts", False)
         self._speedbrakeAtTD = self._getBoolean(config, "sounds",
                                                 "speedbrakeAtTD", True)
 
@@ -554,6 +656,8 @@ class Config(object):
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = \
                 Checklist.fromConfig(config, aircraftType)
+            self._approachCallouts[aircraftType] = \
+                ApproachCallouts.fromConfig(config, aircraftType)
 
         self._modified = False
 
@@ -625,8 +729,10 @@ class Config(object):
         config.set("update", "url", self._updateURL)
 
         config.add_section(Checklist.SECTION)
+        config.add_section(ApproachCallouts.SECTION)
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType].toConfig(config, aircraftType)
+            self._approachCallouts[aircraftType].toConfig(config, aircraftType)
 
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,

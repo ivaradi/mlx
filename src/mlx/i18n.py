@@ -180,6 +180,8 @@ class _English(_Strings):
         self.add("menu_tools", "Tools")
         self.add("menu_tools_chklst", "_Checklist Editor")
         self.add("menu_tools_chklst_key", "c")
+        self.add("menu_tools_callouts", "_Approach Callouts Editor")
+        self.add("menu_tools_callouts_key", "e")
         self.add("menu_tools_prefs", "_Preferences")
         self.add("menu_tools_prefs_key", "p")
 
@@ -974,6 +976,33 @@ class _English(_Strings):
         self.add("about_role_prog_test", "programming, testing")
         self.add("about_role_negotiation", "negotiation")
         self.add("about_role_test", "testing")
+
+        self.add("callouts_title", "Approach Callouts Editor")
+        self.add("callouts_aircraftType", "Aircraft _type:")
+        self.add("callouts_aircraftType_tooltip",
+                 "The type of the aircraft for which the approach "
+                 "callouts are being edited.")
+        self.add("callouts_header_altitude", "Altitude")
+        self.add("callouts_header_path", "Callout file")
+        self.add("callouts_add", "_Add new callout")
+        self.add("callouts_add_tooltip",
+                 "Add a new callout with some default altitude.")
+        self.add("callouts_remove", "_Remove")
+        self.add("callouts_remove_tooltip",
+                 "Remove the selected items from the list of callouts.")
+        self.add("callouts_altitude_clash",
+                 "There is already a callout for this altitude")
+        self.add("callouts_altitude_clash_sec",
+                 "Shall I set the altitude nevertheless? If so, "
+                 "both callouts will be played when reaching the altitude "
+                 "simultaneously.")
+        # self.add("chklst_moveUp", "Move _up")
+        # self.add("chklst_moveUp_tooltip",
+        #          "Move up the selected file(s) in the checklist.")
+        # self.add("chklst_moveDown", "Move _down")
+        # self.add("chklst_moveDown_tooltip",
+        #          "Move down the selected file(s) in the checklist.")
+        # self.add("chklst_filter_audio", "Audio files")
 
 #------------------------------------------------------------------------------
 

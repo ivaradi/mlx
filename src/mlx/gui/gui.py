@@ -12,6 +12,7 @@ from mlx.gui.weighthelp import WeightHelp
 from mlx.gui.gates import FleetGateStatus
 from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
+from mlx.gui.callouts import ApproachCalloutsEditor
 from mlx.gui.pirep import PIREPViewer
 
 import mlx.const as const
@@ -94,6 +95,7 @@ class GUI(fs.ConnectionListener):
 
         self._preferences = Preferences(self)
         self._checklistEditor = ChecklistEditor(self)
+        self._approachCalloutsEditor = ApproachCalloutsEditor(self)
 
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
@@ -870,6 +872,15 @@ class GUI(fs.ConnectionListener):
         checklistMenuItem.connect("activate", self._editChecklist)
         toolsMenu.append(checklistMenuItem)
 
+        approachCalloutsMenuItem = gtk.ImageMenuItem(gtk.STOCK_EDIT)
+        approachCalloutsMenuItem.set_use_stock(True)
+        approachCalloutsMenuItem.set_label(xstr("menu_tools_callouts"))
+        approachCalloutsMenuItem.add_accelerator("activate", accelGroup,
+                                                 ord(xstr("menu_tools_callouts_key")),
+                                                 CONTROL_MASK, ACCEL_VISIBLE)
+        approachCalloutsMenuItem.connect("activate", self._editApproachCallouts)
+        toolsMenu.append(approachCalloutsMenuItem)
+
         prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         prefsMenuItem.set_use_stock(True)
         prefsMenuItem.set_label(xstr("menu_tools_prefs"))
@@ -1006,6 +1017,10 @@ class GUI(fs.ConnectionListener):
     def _editChecklist(self, menuItem):
         """Callback for editing the checklists."""
         self._checklistEditor.run()
+        
+    def _editApproachCallouts(self, menuItem):
+        """Callback for editing the approach callouts."""
+        self._approachCalloutsEditor.run()
         
     def _editPreferences(self, menuItem):
         """Callback for editing the preferences."""
