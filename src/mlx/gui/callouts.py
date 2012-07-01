@@ -9,11 +9,33 @@ import mlx.const as const
 import mlx.config as config
 
 import os
+import re
 
 #------------------------------------------------------------------------------
 
 class ApproachCalloutsEditor(gtk.Dialog):
     """The dialog to edit the approach callouts."""
+    integerRE = re.compile("[0-9]+")
+
+    # A list of "usual" altitudes for callouts
+    _usualAltitudes = [10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000,
+                       1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
+
+    @staticmethod
+    def _getNextUsualAltitude(altitude, descending):
+        """Get the next altitude coming after the given one in the
+        given direction."""
+        if descending:
+            previous = None
+            for alt in ApproachCalloutsEditor._usualAltitudes:
+                if alt>=altitude: return previous
+                previous = alt
+        else:
+            for alt in ApproachCalloutsEditor._usualAltitudes:
+                if alt>altitude: return alt                
+                    
+        return None
+
     def __init__(self, gui):
         super(ApproachCalloutsEditor, self).__init__(WINDOW_TITLE_BASE + " - " +
                                                      xstr("callouts_title"),
@@ -26,6 +48,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         self._gui = gui
         self._approachCallouts = {}
         self._currentAircraftType = const.aircraftTypes[0]
+        self._fileOpenDialog = None
 
         contentArea = self.get_content_area()
 
@@ -59,28 +82,9 @@ class ApproachCalloutsEditor(gtk.Dialog):
         typeBoxAlignment.add(typeBox)
 
         contentArea.pack_start(typeBoxAlignment, False, False, 12)
-        # Until here, but not that some texts are different
+        # FIXME: common code until here, but note that some texts are different
 
         fileBox = gtk.HBox()        
-
-        # self._fileChooser = gtk.FileChooserWidget()
-        # self._fileChooser.set_select_multiple(True)
-        
-        # filter = gtk.FileFilter()
-        # filter.set_name(xstr("chklst_filter_audio"))
-        # filter.add_pattern("*.wav")
-        # filter.add_pattern("*.mp3")
-        # self._fileChooser.add_filter(filter)
-            
-        # filter = gtk.FileFilter()
-        # filter.set_name(xstr("file_filter_all"))
-        # filter.add_pattern("*.*")
-        # self._fileChooser.add_filter(filter)
-
-        # self._fileChooser.connect("selection-changed",
-        #                           self._fileChooserSelectionChanged)
-
-        # fileBox.pack_start(self._fileChooser, True, True, 4)
 
         controlBox = gtk.VBox()
         controlAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
@@ -96,7 +100,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         self._addButton.connect("clicked", self._addButtonClicked)
         addAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                      xscale = 0.0, yscale = 0.0)
-        addAlignment.set_padding(padding_top = 64, padding_bottom = 0,
+        addAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                  padding_left = 0, padding_right = 0)
         addAlignment.add(self._addButton)
         controlBox.pack_start(addAlignment, False, False, 0)
@@ -109,39 +113,17 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         removeAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 0.0)
-        removeAlignment.set_padding(padding_top = 64, padding_bottom = 0,
+        removeAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                     padding_left = 0, padding_right = 0)
         removeAlignment.add(self._removeButton)
         controlBox.pack_start(removeAlignment, False, False, 0)
 
-        # self._moveUpButton = gtk.Button(xstr("chklst_moveUp"))
-        # self._moveUpButton.set_use_underline(True)
-        # self._moveUpButton.set_tooltip_text(xstr("chklst_moveUp_tooltip"))
-        # self._moveUpButton.set_sensitive(False)
-        # self._moveUpButton.connect("clicked", self._moveUpButtonClicked)
-
-        # moveUpAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
-        #                                 xscale = 0.0, yscale = 0.0)
-        # moveUpAlignment.set_padding(padding_top = 16, padding_bottom = 0,
-        #                             padding_left = 0, padding_right = 0)
-        # moveUpAlignment.add(self._moveUpButton)
-        # controlBox.pack_start(moveUpAlignment, False, False, 0)
-
-        # self._moveDownButton = gtk.Button(xstr("chklst_moveDown"))
-        # self._moveDownButton.set_use_underline(True)
-        # self._moveDownButton.set_tooltip_text(xstr("chklst_moveDown_tooltip"))
-        # self._moveDownButton.set_sensitive(False)
-        # self._moveDownButton.connect("clicked", self._moveDownButtonClicked)
-
-        # moveDownAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
-        #                                 xscale = 0.0, yscale = 0.0)
-        # moveDownAlignment.set_padding(padding_top = 4, padding_bottom = 0,
-        #                             padding_left = 0, padding_right = 0)
-        # moveDownAlignment.add(self._moveDownButton)
-        # controlBox.pack_start(moveDownAlignment, False, False, 0)
-
         self._fileListModel = gtk.ListStore(int, str, str)
         self._fileListModel.set_sort_column_id(0, SORT_DESCENDING)
+
+        self._addingFile = False
+        self._fileListModel.connect("row-inserted", self._fileAdded)
+        
         self._fileList = gtk.TreeView(model = self._fileListModel)
 
         renderer = gtk.CellRendererSpin()
@@ -172,7 +154,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         
         self._fileList.set_tooltip_column(2)
         self._fileList.set_reorderable(False)
-        self._fileList.set_size_request(400, -1)
+        self._fileList.set_size_request(300, -1)
         selection = self._fileList.get_selection()
         selection.set_mode(SELECTION_MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
@@ -181,7 +163,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         contentArea.pack_start(fileBox, True, True, 4)
 
-        self.set_size_request(500, 500)
+        self.set_size_request(400, 300)
 
     def run(self):
         """Run the approach callouts editor dialog."""
@@ -204,25 +186,33 @@ class ApproachCalloutsEditor(gtk.Dialog):
         self._saveApproachCallouts()
         self._displayCurrentApproachCallouts()
         
-    # def _fileChooserSelectionChanged(self, fileChooser):
-    #     """Called when the selection of the given file chooser is changed."""
-    #     numFiles = 0
-    #     numSelected = 0
-    #     for path in fileChooser.get_filenames():
-    #         path = text2unicode(path)
-    #         numSelected += 1
-    #         if os.path.isfile(path): numFiles += 1
-
-    #     self._addButton.set_sensitive(numFiles>0 and numFiles==numSelected)
-
     def _addButtonClicked(self, button):
         """Called when the Add button is clicked."""
-        selection = self._fileList.get_selection()
-        (model, paths) = selection.get_selected_rows()
-        iters = [model.get_iter(path) for path in paths]
-        print paths, iters
-        self._fileListModel.append([1300, "1300.mp3", "1300.mp3"])
+        dialog = self._getFileOpenDialog()
         
+        dialog.show_all()
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_OK:
+            filePath = dialog.get_filename()
+            baseName = os.path.basename(filePath)
+            altitude = self._getNewAltitude(baseName)
+            self._addingFile = True
+            self._fileListModel.append([altitude, baseName, filePath])
+            self._addingFile = False
+
+    def _fileAdded(self, model, path, iter):
+        """Called when a file is added to the list of callouts.
+
+        Makes the treeview to edit the altitude in the given row."""
+        if self._addingFile:
+            gobject.idle_add(self._fileList.set_cursor,
+                             model.get_path(iter),
+                             self._fileList.get_column(0), True)
+            self._fileList.grab_focus()
+            self.grab_focus()
+                             
     def _removeButtonClicked(self, button):
         """Called when the Remove button is clicked."""
         selection = self._fileList.get_selection()
@@ -234,37 +224,6 @@ class ApproachCalloutsEditor(gtk.Dialog):
             if i is not None:
                 model.remove(i)
         
-    # def _moveUpButtonClicked(self, button):
-    #     """Called when the move up button is clicked."""
-    #     self._moveSelected(True)
-        
-    # def _moveDownButtonClicked(self, button):
-    #     """Called when the move down button is clicked."""
-    #     self._moveSelected(False)
-
-    # def _moveSelected(self, up):
-    #     """Move the selected files up or down."""
-    #     selection = self._fileList.get_selection()
-    #     (model, paths) = selection.get_selected_rows()
-    #     indexes = [(path.get_indices() if pygobject else path)[0]
-    #                for path in paths]        
-    #     indexes.sort()
-    #     if not up:
-    #         indexes.reverse()
-
-    #     for index in indexes:
-    #         fromIter = model.iter_nth_child(None, index)
-    #         toIter = model.iter_nth_child(None, index-1 if up else index + 1)
-    #         if up:
-    #             model.move_before(fromIter, toIter)
-    #         else:
-    #             model.move_after(fromIter, toIter)
-        
-    #     self._moveUpButton.set_sensitive(indexes[0]>1 if up else True)
-    #     numRows = model.iter_n_children(None)
-    #     self._moveDownButton.set_sensitive(True if up else
-    #                                        indexes[0]<(numRows-2))
-
     def _fileListSelectionChanged(self, selection):
         """Called when the selection in the file list changes."""
         anySelected = selection.count_selected_rows()>0
@@ -283,28 +242,24 @@ class ApproachCalloutsEditor(gtk.Dialog):
         model = self._fileListModel
         editedIter = model.get_iter_from_string(path)
         editedPath = model.get_path(editedIter)
-        iter = model.get_iter_first()
-        while iter is not None and newAltitude is not None:
-            path = model.get_path(iter)
-            if editedPath!=path and newAltitude==model[path][0]:
-                dialog = gtk.MessageDialog(parent = self,
-                                           type = MESSAGETYPE_QUESTION,
-                                           message_format =
-                                           xstr("callouts_altitude_clash"))
-                dialog.format_secondary_markup(xstr("callouts_altitude_clash_sec"))
-                dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-                dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
-                dialog.set_title(WINDOW_TITLE_BASE)
+        if self._hasAltitude(newAltitude, ignorePath = editedPath):
+            dialog = gtk.MessageDialog(parent = self,
+                                       type = MESSAGETYPE_QUESTION,
+                                       message_format =
+                                       xstr("callouts_altitude_clash"))
+            dialog.format_secondary_markup(xstr("callouts_altitude_clash_sec"))
+            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+            dialog.set_title(WINDOW_TITLE_BASE)
 
-                result = dialog.run()
-                dialog.hide()
+            result = dialog.run()
+            dialog.hide()
 
-                if result==RESPONSETYPE_NO:
-                    newAltitude = None
-            iter = model.iter_next(iter)
+            if result==RESPONSETYPE_NO:
+                newAltitude = None
                 
         if newAltitude is not None:
-            self._fileListModel[editedPath][0] = newAltitude
+            model[editedPath][0] = newAltitude
 
     def _saveApproachCallouts(self):
         """Save the currently displayed list of approach callouts for the
@@ -334,5 +289,125 @@ class ApproachCalloutsEditor(gtk.Dialog):
         self._fileListModel.clear()
         for (altitude, path) in approachCallouts:
             self._fileListModel.append([altitude, os.path.basename(path), path])        
+
+    def _getFileOpenDialog(self):
+        """Get the dialog to open a file.
+
+        If it does not exist yet, it will be created."""
+        if self._fileOpenDialog is None:
+            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                           xstr("callouts_open_title"),
+                                           action = FILE_CHOOSER_ACTION_OPEN,
+                                           buttons = (gtk.STOCK_CANCEL,
+                                                      RESPONSETYPE_CANCEL,
+                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                           parent = self)
+            dialog.set_modal(True)            
+            dialog.set_do_overwrite_confirmation(True)
+      
+            # FIXME: create the filters in one location and use them
+            # from there
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("file_filter_audio"))
+            filter.add_pattern("*.wav")
+            filter.add_pattern("*.mp3")
+            dialog.add_filter(filter)
+
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("file_filter_all"))
+            filter.add_pattern("*.*")
+            dialog.add_filter(filter)
+            
+            self._fileOpenDialog = dialog
+
+        return self._fileOpenDialog
+    
+    def _getNewAltitude(self, baseName):
+        """Get a new, unique altitude for the audio file with the given
+        base name.
+
+        First the given file name is searched for suitable
+        numbers. Otherwise the smallest altitude in the model is
+        considered, and, depending on the actual ordering of the
+        table, a suitable smaller or greater value is found. It is
+        ensured that the number is unique, unless all numbers are
+        taken.
+        
+        If there is no entry in the table yet, 2500 is returned if the
+        table is sorted descending, 10 otherwise."""
+        altitude = self._getNewAltitudeFromFileName(baseName)
+        if altitude is not None: return altitude
+
+        descending = self._fileList.get_column(0).get_sort_order()==SORT_DESCENDING
+        model = self._fileListModel
+        numEntries = model.iter_n_children(None)
+        if numEntries==0:
+            return 2500 if descending else 10
+        else:
+            lastIter = model.iter_nth_child(None, numEntries-1)
+            lastValue = model.get_value(lastIter, 0)
+
+            altitude = self._getNextValidUsualAltitude(lastValue, descending)
+            if altitude is None:
+                altitude = self._getNextValidUsualAltitude(lastValue,
+                                                           not descending)
+
+            if altitude is None:
+                for altitude in range(0 if descending else 4999,
+                                      4999 if descending else 0,
+                                      1 if descending else -1):
+                    if not self._hasAltitude(altitude): break
+                                   
+            return altitude
+
+    def _getNewAltitudeFromFileName(self, baseName):
+        """Get a new altitude value from the given file name.
+
+        The name is traversed for numbers. If a number is less than
+        5000 and there is no such altitude yet in the table, it is
+        checked if it is divisible by 100 or 1000, and if so, it gets
+        a score of 2. If it is divisible by 10, the score will be 1,
+        otherwise 0. The first highest scoring number is returned, if
+        there are any at all, otherwise None."""
+        candidateAltitude = None
+        candidateScore = None
+        
+        (baseName, _) = os.path.splitext(baseName)
+        numbers = ApproachCalloutsEditor.integerRE.findall(baseName)
+        for number in numbers:
+            value = int(number)
+            if value<5000 and not self._hasAltitude(value):
+                score = 2 if (value%100)==0 or (value%1000)==0 \
+                    else 1 if (value%10)==0 else 0
+                if candidateAltitude is None or score>candidateScore:
+                    candidateAltitude = value
+                    candidateScore = score
+
+        return candidateAltitude        
+        
+    def _hasAltitude(self, altitude, ignorePath = None):
+        """Determine if the model already contains the given altitude
+        or not.
+        
+        ignorePath is a path in the model to ignore."""        
+        model = self._fileListModel
+        iter = model.get_iter_first()
+        while iter is not None:
+            path = model.get_path(iter)
+            if path!=ignorePath and altitude==model[path][0]:
+                return True
+            iter = model.iter_next(iter)
+
+        return False
+
+    def _getNextValidUsualAltitude(self, startValue, descending):
+        """Get the next valid usual altitude."""
+        value = startValue
+        while value is not None and self._hasAltitude(value):
+            value = \
+                ApproachCalloutsEditor._getNextUsualAltitude(value, 
+                                                             descending)        
+
+        return value
         
 #------------------------------------------------------------------------------

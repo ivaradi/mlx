@@ -162,6 +162,7 @@ class _English(_Strings):
 
         self.add("file_filter_all", "All files")
         self.add("file_filter_pireps", "PIREP files")
+        self.add("file_filter_audio", "Audio files")
 
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Cancel")
@@ -777,7 +778,6 @@ class _English(_Strings):
         self.add("chklst_moveDown", "Move _down")
         self.add("chklst_moveDown_tooltip",
                  "Move down the selected file(s) in the checklist.")
-        self.add("chklst_filter_audio", "Audio files")
         self.add("chklst_header", "Checklist files")
 
         self.add("prefs_sounds_frame_bg", "Background")
@@ -1033,6 +1033,7 @@ class _Hungarian(_Strings):
 
         self.add("file_filter_all", "Összes fájl")
         self.add("file_filter_pireps", "PIREP fájlok")
+        self.add("file_filter_audio", "Audio fájlok")
 
         self.add("button_ok", "_OK")
         self.add("button_cancel", "_Mégse")
@@ -1572,7 +1573,6 @@ class _Hungarian(_Strings):
         self.add("chklst_moveDown", "Mozgatás _lefelé")
         self.add("chklst_moveDown_tooltip",
                  "Az ellenőrzőlistából kijelölt fájl(ok) eggyel lejjebb mozgatása.")
-        self.add("chklst_filter_audio", "Audio fájlok")
         self.add("chklst_header", "Ellenőrzőlista fájljai")
 
         self.add("prefs_title", "Beállítások")

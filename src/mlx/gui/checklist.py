@@ -65,7 +65,7 @@ class ChecklistEditor(gtk.Dialog):
         self._fileChooser.set_select_multiple(True)
         
         filter = gtk.FileFilter()
-        filter.set_name(xstr("chklst_filter_audio"))
+        filter.set_name(xstr("file_filter_audio"))
         filter.add_pattern("*.wav")
         filter.add_pattern("*.mp3")
         self._fileChooser.add_filter(filter)

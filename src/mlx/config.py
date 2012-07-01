@@ -583,7 +583,6 @@ class Config(object):
     def setApproachCallouts(self, aircraftType, approachCallouts):
         """Set the approach callouts for the given aircraft type."""
         if not approachCallouts==self._approachCallouts[aircraftType]:
-            print "Updating approach callouts"
             self._approachCallouts[aircraftType] = approachCallouts.clone()
             self._modified = True
 
