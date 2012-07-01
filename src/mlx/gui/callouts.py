@@ -84,7 +84,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         contentArea.pack_start(typeBoxAlignment, False, False, 12)
         # FIXME: common code until here, but note that some texts are different
 
-        fileBox = gtk.HBox()        
+        contentBox = gtk.HBox()        
 
         controlBox = gtk.VBox()
         controlAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
@@ -92,7 +92,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         controlAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                      padding_left = 32, padding_right = 32)
         controlAlignment.add(controlBox)
-        fileBox.pack_start(controlAlignment, False, False, 0)
+        contentBox.pack_start(controlAlignment, False, False, 0)
 
         self._addButton = gtk.Button(xstr("callouts_add"))
         self._addButton.set_use_underline(True)
@@ -153,17 +153,29 @@ class ApproachCalloutsEditor(gtk.Dialog):
         column.set_expand(True)
         
         self._fileList.set_tooltip_column(2)
-        self._fileList.set_reorderable(False)
         self._fileList.set_size_request(300, -1)
+        self._fileList.set_reorderable(False)
         selection = self._fileList.get_selection()
         selection.set_mode(SELECTION_MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
         
-        fileBox.pack_start(self._fileList, False, False, 4)
+        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow.add(self._fileList)
+        scrolledWindow.set_size_request(300, -1)
+        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scrolledWindow.set_shadow_type(SHADOW_IN)
+        
+        fileListAlignment = gtk.Alignment(xscale=1.0, yscale=1.0, 
+                                          xalign=0.5, yalign=0.5)
+        fileListAlignment.set_padding(padding_top = 0, padding_bottom = 16,
+                                      padding_left = 0, padding_right = 8)
+        fileListAlignment.add(scrolledWindow)
+        
+        contentBox.pack_start(fileListAlignment, False, False, 4)
 
-        contentArea.pack_start(fileBox, True, True, 4)
+        contentArea.pack_start(contentBox, True, True, 4)
 
-        self.set_size_request(400, 300)
+        self.set_size_request(-1, 300)
 
     def run(self):
         """Run the approach callouts editor dialog."""

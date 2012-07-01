@@ -148,12 +148,17 @@ class ChecklistEditor(gtk.Dialog):
         self._fileList.append_column(column)
         self._fileList.set_tooltip_column(1)
         self._fileList.set_reorderable(True)
-        self._fileList.set_size_request(200, -1)
         selection = self._fileList.get_selection()
         selection.set_mode(SELECTION_MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
 
-        fileBox.pack_start(self._fileList, False, False, 4)
+        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow.add(self._fileList)
+        scrolledWindow.set_size_request(200, -1)
+        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scrolledWindow.set_shadow_type(SHADOW_IN)
+
+        fileBox.pack_start(scrolledWindow, False, False, 4)
 
         contentArea.pack_start(fileBox, True, True, 4)
 
