@@ -9,12 +9,12 @@
   <h2><a name="overview">Áttekintés</a></h2>
 
   <p>
-  A MAVA Logger X követi a Malév Virtual légitársaság színeiben
-  történő szimulált járatok végrehajtását, és összegyűjti a járatról a 
+  A MAVA Logger X a Malév Virtual légitársaság színeiben
+  történő szimulált járatok végrehajtását kíséri figyelemmel, és összegyűjti a járatról a
   <a href="http://virtualairlines.hu">MAVA honlapjára</a> további
   elemzés céljából elküldendő adatokat. Ez a kézikönyv leírja a
   program használatát. A program képességeinek teljes kihasználásához
-  szükség van élő Internat kapcsolatra, még akkor is ha nem a VATSIM
+  szükség van élő Internet kapcsolatra, még akkor is ha nem a VATSIM
   vagy az IVAO hálózaton repülünk. Ezzel együtt azonban lehetséges
   járatot teljesíteni hálózati kapcsolat nélkül is.
   </p>
@@ -55,7 +55,7 @@
     felszállás után felkapcsoljuk a leszálló fényeket és/vagy a
     villogót, vagy a guruló sebesség meghaladja a 80 csomót.</li>
     <li><b>emelkedés</b>: Ha felszállás közben behúzzuk a futóműveket
-    vagy elérjük a reptér magassága feletti 3000 lábat.</li>
+    vagy elérjük a reptérhez viszonyított 3000 láb magasságot.</li>
     <li><b>megszakított felszállás</b>: Ha felszállás közben még a
     földön vagyunk, és kikapcsoljuk mind a leszálló fényeket, mind a
     villogót, vagy a sebesség 50 csomó alá csökken.</li>
@@ -67,8 +67,8 @@
     futóműveket kiengedjük és a reptérhez viszonyítva 2000 láb alá
     csökken a magasság.</li>
     <li><b>átstartolás</b>: Ha leszállás közben visszahúzzuk a futóműveket.</li>
-    <li><b>begurulás</b>: Ha leszállás után a repülőgéo a földön van
-    és a guruló sebesség 50 csomó alá csökken.</li>
+    <li><b>begurulás</b>: Ha leszállás után a repülőgép a földön gurul
+    és a sebessége 50 csomó alá csökken.</li>
     <li><b>parkolás</b>: Ha begurulás után behúzzuk a parkoló féket.</li>
     <li><b>vége</b>: Ha parkolás közben a gázturbinák N<sub>1</sub>
     paramétere 0,5 alá, vagy a dugattyús motorok fordulatszáma
@@ -82,7 +82,7 @@
   a légiutaskísérők bejentéseit, játssza le. Ezen állományok a
   programhoz tartoznak, és vagy automatikusan kerülnek lejátszásra,
   vagy ha megnyomunk egy gyorsbillentyűt a szimulátorban. Emellett
-  előre felvett hangállományokból ez egyes repülőgép
+  előre felvett hangállományokból az egyes repülőgép
   típusokhoz <a href="#checklistEditor">ellenőrzőlistákat</a>
   állíthatunk össze. Az ellenőrzőlistákat alkotó hangfelvételeket egy
   másik gyorsbillentyű lenyomásával játszhatjuk le egyenként. Ezzel
@@ -123,15 +123,15 @@
   hogy van-e a telepítettnél újabb változat. Ha igen, letölti azt, majd
   újraindítja saját magát, immár az új változatban. A frissítés
   nemcsak a hibajavítások beszerzése miatt fontos, hanem például azért
-  is, mert a program bővülhet újabb ellenőrzésekkel vagy meglévők
-  kifinomultabbá válhatnak, és ha túl régi változatot használunk, a
+  is, mert a program bővülhet újabb ellenőrzésekkel vagy a már meglévők
+  közül egyesek kifinomultabbá válhatnak, és ha túl régi változatot használunk, a
   PIREP javítók akár amiatt is elutasíthatják a járatot.
   </p>
 
   <h3><a name="gui">A grafikus felhasználói felület</a></h3>
 
   <p>
-  Az alkalmazás felülete a megszokott elemekből (gombok,
+  Az alkalmazás felülete a megszokott elemekből (gombokból,
   jelölőnégyzetekből, listákból, szövegbeviteli mezőkből, stb.) épül
   fel. A legtöbb elem rendelkezik tooltippel, amelyek e kézikönyv
   mellett további segítséget nyújtanak a program használatához. A
@@ -141,7 +141,7 @@
   </p>
 
   <p>
-  A program legtöbbször használ része a főablak, amelyet az
+  A program legtöbbször használt része a főablak, amelyet az
   alábbiakban részletesen leírunk. Ha az ablakot minimalizáljuk vagy
   lecsukjuk, alapértelmezésben csupán eltűnik, de maga a program
   tovább fut. A lenti képen is látható tálcaikon segítségével az
@@ -167,7 +167,7 @@
   tálcaikon jobbgombos menüje az alábbi pontokat tartalmazza:
   <ul>
     <li><b>Mutasd a főablakot</b>: a főablak megjelenítése vagy elrejtése.</li>
-    <li><b>Mutasd a monitor ablakot</b>: a monitor ablak (lásd lent)
+    <li><b>Mutasd a monitor ablakot</b>: a <a href="#monitorWindow">monitor ablak</a>
     megjelenítése vagy elrejtése.</li>
     <li><b>Kilépés</b>: kilépés az alkalmazásból. A kilépési szándékot
     a megjelenő ablakban meg kell erősíteni.</li>
@@ -210,7 +210,7 @@
   megszakadt. Ebben az esetben egy dialógus ablak jelenik meg. A
   kapcsolat megszakadásának legvalószínúbb oka a szimulátor
   elszállása. Ebben az esetben indítsuk azt újra és a repülést
-  állítsuk vissza, amennyira csak lehetséges, az elszállás előtt
+  állítsuk vissza, amennyira csak lehetséges, az elszállás előtti
   állapotra. Ezután kattintsunk az <b>Újrakapcsolódás</b> gombra, és a
   logger megpróbálja visszállítani a kapcsolatot a
   szimulátorral. Mivel megőrzi a járat összes adatát, ott
@@ -261,7 +261,7 @@
   <p>
   Minden lap tetején egy, a lap célját jelző cím olvasható. Ez alatt
   egy rövid szöveg írja le, hogy mit tartalmaz a lap és/vagy mit kell
-  azon a lapon tennünk. E szöveg alatt találhatók a lényegi
+  azzal a lappal kapcsolatban tennünk. E szöveg alatt találhatók a lényegi
   információk és az esetleges adatbeviteli eszközök. Alul, jobb
   oldalon pedig a gombsor látható.
   </p>
@@ -290,7 +290,7 @@
   A program a Bejelentkezés oldallal indul (lásd a fenti
   <a href="#mainWindowShot">képet</a>), ahol megadhatjuk a pilóta
   azonosítónkat és a MAVA honlapján is használható
-  jelszavunkat. Mindkét adatot a rendelkezésünkre bocsájtját a Malév
+  jelszavunkat. Mindkét adatot a rendelkezésünkre bocsájtják a Malév
   Virtualhoz való belépéskor. A pilóta azonosító rendszerint <q>P</q>
   betűvel kezdődik, amit három számjegy követ.
   </p>
@@ -319,7 +319,7 @@
   <p>
   Ha Internet kapcsolat nélkül szeretnénk repülni, használjuk
   az <b>Offline repülés</b> gombot. Ezzel egyből a következő lapra
-  kerülünk anélkül, hogy a program megpróbálni belépni a MAVA
+  kerülünk anélkül, hogy a program megpróbálna belépni a MAVA
   szerverére. 
   </p>
   
@@ -345,7 +345,7 @@
   </p>
 
   <p>
-  Szükség lehet a járatlista frissítésére. Például, elképzelhető, hogy
+  Szükség lehet a járatlista frissítésére. Például elképzelhető, hogy
   elfelejtettük lefoglalni a teljesíteni kívánt járatot. Ekkor a
   foglalást megtehetjük a MAVA honlapján, majd a <b>Járatlista
   frissítése</b> gombra kattintva frissíthetjük a listát.
@@ -465,7 +465,7 @@
   csúszkát mozgathatjuk a tartályt jelképező ábrába való kattintással,
   vagy húzhatjuk is, ha az egér gombját lenyomva tartjuk. Ha az egér
   rendelkezik görgővel, azzal is módosíthatjuk a kívánt mennyiséget,
-  ha az egérmutatót az ábrán tartjuk. A görgő minden fokozata 10
+  ha az egérmutatót az ábrán tartjuk. A görgő minden lépése 10
   kilogrammal növeli vagy csökkenti a mennyiséget. Ha görgetés közben
   lenyomva tartjuk a <b>Shift</b> gombot, a változás 100, ha pedig
   a <b>Ctrl</b> gombot tartjuk lenyomva, a változás 1 kg.
@@ -507,7 +507,7 @@
   és METAR-ját olvashatjuk. A METAR-t szerkeszthetjük ha a hálózatról
   más időjárást kapunk, vagy nem a valós időjárási viszonyok mellett
   repülünk. Az érkező repülőtér METAR-ját a program frissíti a
-  leszállási fázisba való belépéskor, hacsak előtt nem szerkesztettük
+  leszállási fázisba való belépéskor, hacsak előtte nem szerkesztettük
   azt. A METAR-ok a repülés teljes időtartama alatt szerkeszthetők. Ha
   azonban így teszünk, annak okát a <a href="#flightInfoTab"><i>Járat
   info</i></a> fül <i>Megjegyzések</i> rovatában jelezzük. 
@@ -515,8 +515,8 @@
 
   <p>
   A második (az érkezési repülőtérhez tartozó) eligazítási oldalon
-  erősítsük meg, hogy készen állunk a repülésre a megfelelő gomb
-  megnyomásával. Ezzel elkezdődik a járat teljesítésének követése a
+  a megfelelő gomb megnyomásával erősítsük meg, hogy készen állunk a
+  repülésre. Ezzel elkezdődik a járat teljesítésének követése a  
   beszállás fázissal.
   </p>
   
@@ -568,14 +568,14 @@
 
   <p>
   Ez a járat varázsló utolsó oldala. Tartalmazza a járat
-  összesítgését: a pontszámot, a repült és blokk időt, a repült távot
+  összesítését: a pontszámot, a repült és blokk időt, a repült távot
   és az eltüzelt üzemanyag mennyiségét.
   </p>
 
   <p>
   Emellett néhány adatot is meg kell adnunk. Ki kell választani a
   járat típusát (menetrendszerint, old-timer, VIP vagy charter), és
-  hogy online repülés volt-e. Ha a ferihegy repülőtérre érkezünk, ki
+  hogy online repülés volt-e. Ha a ferihegyi repülőtérre érkezünk, ki
   kell választani annak a kapunak vagy állóhelynek a számát, ahol a
   repülőgépet leparkoltuk.
   </p>
@@ -593,7 +593,7 @@
   <p>
   Az <b>Új járat...</b> gomb megnyomásával egy új járat teljesítését
   kezdhetjük el. Ha még nem mentettük el és nem is küldtük el a
-  PIREP-et, az járat elkezdésének megerősítését kéri a logger. Új
+  PIREP-et, szándékunk megerősítését kéri a logger. Új
   járat kezdésekor a <a href="#flightSelectionPage">járatválasztás
   oldalra</a> kerülünk, ha korábban sikeresen bejelentkeztünk a MAVA
   szerverére, egyébként pedig a <a href="#loginPage">bejelentkezés
@@ -649,13 +649,13 @@
   olvasható, ugyanis ezt kell a szimulátorban beállítani mint a
   repülőgép hasznos terhét. A <b>Szimulátor adatok</b> gomb
   megnyomására a program lekérdezi és megjeleníti a szimulátorból
-  kilvasott adatokat. Ha azok a megengedettnél nagyobb mértékben
+  kiolvasott adatokat. Ha azok a megengedettnél nagyobb mértékben
   térnek el a kiszámított adatoktól, piros színnel, egyébként zölden
   jelennek meg.
   </p>
 
   <p>
-  A teljes tömeget és bizonyos maximális tömeget szintén megjelenít a
+  A teljes tömeget és bizonyos maximális tömegeket szintén megjelenít a
   program, így hozzávetőlegesen azt is ellenőrizhetjük, hogy a
   maximumokat nem fogjuk-e túllépni a repülés során.
   </p>
@@ -735,15 +735,15 @@
   Az elmentett PIREP-eket a programmal visszatölthetjük és
   elküldhetjük. Erre akkor lehet szükség, ha például egy járat
   teljesítése után közvetlenül nem tudjuk elküldeni a PIREP-et
-  valamilyen hálózati probléma miatt, vagy ha szándékosan Internat
+  valamilyen hálózati probléma miatt, vagy ha szándékosan Internet
   kapcsolat nélkül repültük a járatot.
   </p>
 
   <p>
-  PIREP betöltséhez válasszuk ki a <b>Fájl/PIREP betöltése...</b>
+  PIREP betöltéséhez válasszuk ki a <b>Fájl/PIREP betöltése...</b>
   menüpontot vagy nyomjuk meg a <b>Ctrl+T</b>
   billentyűkombinációt. Egy fájlválasztó ablak jelenik meg, amelyben
-  kiválaszthatjuk a betöltendő PIREP-et. A kiválasztás után a PUJREP
+  kiválaszthatjuk a betöltendő PIREP-et. A kiválasztás után a PIREP
   betöltődik, és egy másik ablak jelenik meg a járat legfontosabb
   adataival. A <b>PIREP elküldése...</b> gomb megnyomására a PIREP-et
   a program megpróbálja elküldeni, és ennek eredményéről egy dialógus
@@ -758,7 +758,7 @@
   Előfordulhat, hogy egy elmentett PIREP-et alaposabban is meg
   szeretnénk nézni, például ha az egy ellenőrző repülésről
   készült. Ehhez nyomjuk meg a <b>PIREP megtekintése...</b>
-  gombot. Ennek hatására megjleneik a PIREP megtekintő ablak, amely az
+  gombot. Ennek hatására megjelenik a PIREP megtekintő ablak, amely az
   adatokat három fül alá csoportosítja. Az <i>Adatok</i> fül a
   járattal kapcsolatos adatokat tartalmazza. A <i>Megjegyzések és
   hibák</i> fül a pilóta esetleges megjegyzéseit és hibajelenségekről
@@ -777,7 +777,7 @@
   <p>
   Egy ellenőrzőlista tulajdonképpen hangfájlok listája. Ha az
   ellenőrzőlisták lejátszását engedélyeztük (lásd lent a <i>Beállítások</i>
-  ablak <a href="#prefsSounds">leírását</a>), és az hárat
+  ablak <a href="#prefsSounds">leírását</a>), és a járat
   teljesítéséhez használt repülőgéphez tartozik ellenőrzőlista, akkor
   a megfelelő gyorsbillentyű ismételt leütésével a listát alkotó
   fájlok egyenként lejátszhatók.
@@ -819,7 +819,7 @@
   <h2><a name="prefs">A Beállítások ablak</a></h2>
 
   </p>
-  A Beálltások ablakot az <b>Eszközök/Beállítások</b> menüpont
+  A Beállítások ablakot az <b>Eszközök/Beállítások</b> menüpont
   kiválasztásával vagy a <b>Ctrl+B</b> billentyűkombináció
   alkalmazásával érhetjük el. Itt olyan paramétereket állíthatunk be,
   amelyeket általában nem kell minden egyes járathoz külön
@@ -846,7 +846,7 @@
   minimalizálásakor az teljesen eltűnik (nem jelenik meg a többi
   minimalizált ablak között). Az ablak a tálcaikon használatával
   jeleníthető meg újra. Ha a <b>Kilépés az ablakzáró gomb
-  megnyomásakor</b> jelölönégyzet ki van jelölve, a program az
+  megnyomásakor</b> jelölőnégyzet ki van jelölve, a program az
   ablakzáró gomb megnyomásának hatására megjeleníti a kilépési szándék
   megerősítésére szolgáló ablakot, és a jóváhagyás után
   kilép. Egyébként a főablak csak eltűnik, és a tálcaikon segítségével
@@ -854,15 +854,17 @@
   </p>
 
   <p>
-  A <i>MAVA inline rendszerek</i> keretben a MAVA fent leírt online
-  rendszereit, a <a href="#onlineGateSystem">kapukezelő</a> és az 
-  <a href="#onlineACARSSystem">ACARS</a> rendszert engedélyezhetjük vagy
-  tilthatjuk le. Javasolt ezek engedélyezése.
+  A <i>MAVA online rendszerek</i> keretben a loggernek a MAVA fent
+  leírt online rendszereivel,
+  a <a href="#onlineGateSystem">kapukezelő</a> és
+  az <a href="#onlineACARSSystem">ACARS</a> rendszerrel való
+  együttműködését engedélyezhetjük vagy tilthatjuk le. Javasolt ezek
+  engedélyezése.
   </p>
 
   <p>
-  A <i>Szimulátor</i> keretben található azok a beállítások, amelyek
-  befolyásoljak, hogy a program hogyan működik együtt a
+  A <i>Szimulátor</i> keretben találhatók azok a beállítások, amelyek
+  befolyásolják, hogy a program hogyan működik együtt a
   szimulátorral. A legtöbb beállítás magától értetődő, de az
   átlagolással kapcsolatosak némi magyarázatra szorulhatnak. A Flight
   Simulator egyik jellegzetessége, hogy néha nagyon hirtelen, nem
@@ -889,7 +891,7 @@
   <p>
   A program bizonyos események megtörténtekor azokról üzenetet tud
   megjeleníteni a szimulátorban és/vagy hangjelzést ad. Ezen a fülön
-  ezt a funkciót konfigurálhatjuk.
+  ezt a funkciót állíthatjuk be.
   <p>
 
   <p>
@@ -908,8 +910,8 @@
     <li><b>Kapukezelő rendszer üzenetei</b>:
     az <a href="#onlineGateSystem">online kapukezelő rendszerrel</a>
     kapcsolatos üzenetek. Ha például leszállunk Ferihegyen, a program
-    megjeleníti a nem foglalt kapuk és állohelyek listáját, így
-    irányítás hiányában is el tudjuk dönteni, hova álljunk.</li> 
+    megjeleníti a nem foglalt kapuk és állóhelyek listáját, így
+    irányítás hiányában is el tudjuk dönteni, hová álljunk.</li> 
     <li><b>Környezeti üzenetek</b>: egyéb üzenetek, például a repülés
     végén a célrepülőtéren üdvözlő üzenet.</li>
     <li><b>Segítő üzenetek</b>: segítő üzenetek, például a
@@ -948,11 +950,11 @@
   rögzített hangfájlok, amelyeket a repülés közben, bizonyos
   körülmények fennállása esetén játszik le a program. Ilyenek például
   a légiutaskísérők különböző bejelentései. A <b>Háttérhangok
-  engedélyezése</b> jelölőnégyzettel lehet egyáltalán engedélyezni
+  engedélyezése</b> jelölőnégyzettel lehet engedélyezni
   ezeket. Ha a <b>Pilóta vezérli a hangokat</b> jelölőnégyzetet
-  kijelöljük, a hangfájlok lejátszását a pilótának kell indítani egy
-  gyorsbillentyű megnyomásával. Persze emellett egy adott hangfájl
-  lejátszáshoz a járat teljesítésének megfelelő fázisában kell
+  kijelöljük, a hangfájlok lejátszását a pilótának kell indítania egy
+  gyorsbillentyű megnyomásával. Természetesen egy adott hangfájl
+  lejátszásához a járat teljesítésének megfelelő fázisában kell
   lennünk, és egyes esetekben más feltételeknek is teljesülniük
   kell. Emellett egy fájlt csak egyszer játszhatunk le. Ha
   bekapcsoljuk ezt a lehetőséget, a szimulátorban leütendő
