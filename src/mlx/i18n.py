@@ -996,13 +996,6 @@ class _English(_Strings):
                  "Shall I set the altitude nevertheless? If so, "
                  "both callouts will be played when reaching the altitude "
                  "simultaneously.")
-        # self.add("chklst_moveUp", "Move _up")
-        # self.add("chklst_moveUp_tooltip",
-        #          "Move up the selected file(s) in the checklist.")
-        # self.add("chklst_moveDown", "Move _down")
-        # self.add("chklst_moveDown_tooltip",
-        #          "Move down the selected file(s) in the checklist.")
-        # self.add("chklst_filter_audio", "Audio files")
 
 #------------------------------------------------------------------------------
 
@@ -1052,6 +1045,8 @@ class _Hungarian(_Strings):
         self.add("menu_tools", "Eszközök")
         self.add("menu_tools_chklst", "_Ellenőrzőlista szerkesztő")
         self.add("menu_tools_chklst_key", "e")
+        self.add("menu_tools_callouts", "_Megközelítési bemondások szerkesztése")
+        self.add("menu_tools_callouts_key", "m")
         self.add("menu_tools_prefs", "_Beállítások")
         self.add("menu_tools_prefs_key", "b")
 
@@ -1390,7 +1385,7 @@ class _Hungarian(_Strings):
         self.add("landing_vref", "V<sub>_Ref</sub>:")
         self.add("landing_vref_tooltip_knots",
                  "A leszállási sebesség csomóban.")
-        self.add("landing_vref_tooltip_km/h",
+        self.add("landing_vref_tooltip_kmph",
                  "A leszállási sebesség km/órában.")
         
         self.add("flighttype_scheduled", "menetrendszerinti")
@@ -1687,10 +1682,10 @@ class _Hungarian(_Strings):
                  "Ha kijelölöd, a Shift billentyűt is le kell nyomni a "
                  "főbillentyűvel együtt.")
         self.add("prefs_sounds_approachCallOuts",
-                 "Megközelítési figyelmeztetések engedélyezés")
+                 "Megközelítési bemondások engedélyezése")
         self.add("prefs_sounds_approachCallOuts_tooltip",
-                 "Ha kijelölöd, megközelítés közben egyes magasságokat "
-                 "bemond a program.")
+                 "Ha kijelölöd, megközelítés közben egyes magasságok "
+                 "elérésekor a program lejátssza a megadott fájlokat.")
         self.add("prefs_sounds_speedbrakeAtTD",
                  "_Spoiler hang bekapcsolása leszálláskor")
         self.add("prefs_sounds_speedbrakeAtTD_tooltip",
@@ -1861,6 +1856,26 @@ class _Hungarian(_Strings):
         self.add("about_role_prog_test", "programozás, tesztelés")
         self.add("about_role_negotiation", "tárgyalások")
         self.add("about_role_test", "tesztelés")
+
+        self.add("callouts_title", "Megközelítési bemondások szerkesztése")
+        self.add("callouts_aircraftType", "Repülőgép _típusa:")
+        self.add("callouts_aircraftType_tooltip",
+                 "Az a típus, amelyhez tartozó bemondások szerkesztése történik.")
+        self.add("callouts_header_altitude", "Magasság")
+        self.add("callouts_header_path", "Bemondás-fájl")
+        self.add("callouts_add", "Bemondás hozzá_adása")
+        self.add("callouts_add_tooltip",
+                 "Bemondás hangfájl hozzáadása valamilyen "
+                 "alapértelmezett magasságal.")
+        self.add("callouts_remove", "_Törlés")
+        self.add("callouts_remove_tooltip",
+                 "A kiválasztott bemondások törlése.")
+        self.add("callouts_altitude_clash",
+                 "Már tartozik bemondás ehhez a magassághoz.")
+        self.add("callouts_altitude_clash_sec",
+                 "Ennek ellenére beállítsam a megadott magasságoz? Ha "
+                 "így teszek, mindkét bemondást egyidejűleg le fogja "
+                 "játszani a program a magasság elérésekor.")
 
 #------------------------------------------------------------------------------
 
