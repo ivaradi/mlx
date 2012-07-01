@@ -344,12 +344,19 @@ class ApproachCalloutsEditor(gtk.Dialog):
         if numEntries==0:
             return 2500 if descending else 10
         else:
-            lastIter = model.iter_nth_child(None, numEntries-1)
-            lastValue = model.get_value(lastIter, 0)
+            selection = self._fileList.get_selection()
+            (_model, paths) = selection.get_selected_rows()
 
-            altitude = self._getNextValidUsualAltitude(lastValue, descending)
+            if paths:
+                startIter = model.get_iter(max(paths))
+            else:
+                startIter = model.iter_nth_child(None, numEntries-1)
+
+            startValue = model.get_value(startIter, 0)
+
+            altitude = self._getNextValidUsualAltitude(startValue, descending)
             if altitude is None:
-                altitude = self._getNextValidUsualAltitude(lastValue,
+                altitude = self._getNextValidUsualAltitude(startValue,
                                                            not descending)
 
             if altitude is None:
