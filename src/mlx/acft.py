@@ -300,8 +300,8 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown heading: %03.0f degrees" % (heading,))
         self.logger.message(self._aircraftState.timestamp, 
-                           "Centre of gravity:  %.03f" % \
-                            (self._aircraftState.cog,))
+                           "Centre of gravity:  %.1f%%" % \
+                            (self._aircraftState.cog*100.0,))
 
     def cancelFlare(self):
         """Cancel flare, if it has started."""
