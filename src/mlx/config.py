@@ -638,8 +638,8 @@ class Config(object):
                                                      "pilotControls", True)
         self._pilotHotkey.set(self._get(config, "sounds",
                                         "pilotHotkey", "C0"))
-        self._enableApproachCallOuts = \
-            self._getBoolean(config, "sounds", "enableApproachCallOuts", False)
+        self._enableApproachCallouts = \
+            self._getBoolean(config, "sounds", "enableApproachCallouts", False)
         self._speedbrakeAtTD = self._getBoolean(config, "sounds",
                                                 "speedbrakeAtTD", True)
 
@@ -712,8 +712,8 @@ class Config(object):
         config.set("sounds", "pilotControls",
                    "yes" if self._pilotControlsSounds else "no")
         config.set("sounds", "pilotHotkey", str(self._pilotHotkey))
-        #config.set("sounds", "approachCallOuts",
-        #           "yes" if self._approachCallOuts else "no")
+        config.set("sounds", "enableApproachCallouts",
+                   "yes" if self._enableApproachCallouts else "no")
         config.set("sounds", "speedbrakeAtTD",
                    "yes" if self._speedbrakeAtTD else "no")
 

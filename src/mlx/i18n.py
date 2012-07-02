@@ -805,9 +805,9 @@ class _English(_Strings):
         self.add("prefs_sounds_pilotHotkeyShift_tooltip",
                  "If checked, the Shift key should be pressed together with the "
                  "main key.")
-        self.add("prefs_sounds_approachCallOuts",
-                 "Enable approach callouts")
-        self.add("prefs_sounds_approachCallOuts_tooltip",
+        self.add("prefs_sounds_approachCallouts",
+                 "Enable app_roach callouts")
+        self.add("prefs_sounds_approachCallouts_tooltip",
                  "If checked, the approach callouts will be played at "
                  "certain altitudes.")
         self.add("prefs_sounds_speedbrakeAtTD",
@@ -1681,9 +1681,9 @@ class _Hungarian(_Strings):
         self.add("prefs_sounds_pilotHotkeyShift_tooltip",
                  "Ha kijelölöd, a Shift billentyűt is le kell nyomni a "
                  "főbillentyűvel együtt.")
-        self.add("prefs_sounds_approachCallOuts",
-                 "Megközelítési bemondások engedélyezése")
-        self.add("prefs_sounds_approachCallOuts_tooltip",
+        self.add("prefs_sounds_approachCallouts",
+                 "Megközelítési _bemondások engedélyezése")
+        self.add("prefs_sounds_approachCallouts_tooltip",
                  "Ha kijelölöd, megközelítés közben egyes magasságok "
                  "elérésekor a program lejátssza a megadott fájlokat.")
         self.add("prefs_sounds_speedbrakeAtTD",

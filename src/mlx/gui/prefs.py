@@ -252,7 +252,7 @@ class Preferences(gtk.Dialog):
         self._enableSounds.set_active(config.enableSounds)
         self._pilotControlsSounds.set_active(config.pilotControlsSounds)
         self._pilotHotkey.set(config.pilotHotkey)
-        #self._approachCallOuts.set_active(config.approachCallOuts)
+        self._enableApproachCallouts.set_active(config.enableApproachCallouts)
         self._speedbrakeAtTD.set_active(config.speedbrakeAtTD)
 
         self._enableChecklists.set_active(config.enableChecklists)        
@@ -297,7 +297,7 @@ class Preferences(gtk.Dialog):
         config.enableSounds = self._enableSounds.get_active()
         config.pilotControlsSounds = self._pilotControlsSounds.get_active()
         config.pilotHotkey = self._pilotHotkey.get()
-        #config.approachCallOuts = self._approachCallOuts.get_active()
+        config.enableApproachCallouts = self._enableApproachCallouts.get_active()
         config.speedbrakeAtTD = self._speedbrakeAtTD.get_active()
 
         config.enableChecklists = self._enableChecklists.get_active()
@@ -660,10 +660,10 @@ class Preferences(gtk.Dialog):
         
         backgroundBox.pack_start(self._pilotHotkey, False, False, 4)
 
-        # self._approachCallOuts = gtk.CheckButton(xstr("prefs_sounds_approachCallOuts"))
-        # self._approachCallOuts.set_use_underline(True)
-        # self._approachCallOuts.set_tooltip_text(xstr("prefs_sounds_approachCallOuts_tooltip"))
-        # backgroundBox.pack_start(self._approachCallOuts, False, False, 4)
+        self._enableApproachCallouts = gtk.CheckButton(xstr("prefs_sounds_approachCallouts"))
+        self._enableApproachCallouts.set_use_underline(True)
+        self._enableApproachCallouts.set_tooltip_text(xstr("prefs_sounds_approachCallouts_tooltip"))
+        backgroundBox.pack_start(self._enableApproachCallouts, False, False, 4)
         
         self._speedbrakeAtTD = gtk.CheckButton(xstr("prefs_sounds_speedbrakeAtTD"))
         self._speedbrakeAtTD.set_use_underline(True)
@@ -710,7 +710,7 @@ class Preferences(gtk.Dialog):
         active = button.get_active()
         self._pilotControlsSounds.set_sensitive(active)
         self._pilotControlsSoundsToggled(self._pilotControlsSounds)
-        #self._approachCallOuts.set_sensitive(active)
+        self._enableApproachCallouts.set_sensitive(active)
         self._speedbrakeAtTD.set_sensitive(active)
 
     def _pilotControlsSoundsToggled(self, button):
