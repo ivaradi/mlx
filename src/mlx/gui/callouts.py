@@ -254,7 +254,8 @@ class ApproachCalloutsEditor(gtk.Dialog):
         model = self._fileListModel
         editedIter = model.get_iter_from_string(path)
         editedPath = model.get_path(editedIter)
-        if self._hasAltitude(newAltitude, ignorePath = editedPath):
+        otherPath = self._hasAltitude(newAltitude, ignorePath = editedPath)
+        if otherPath is not None:
             dialog = gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_QUESTION,
                                        message_format =
@@ -272,6 +273,8 @@ class ApproachCalloutsEditor(gtk.Dialog):
                 
         if newAltitude is not None:
             model[editedPath][0] = newAltitude
+            if otherPath is not None:
+                model.remove(model.get_iter(otherPath))
 
     def _saveApproachCallouts(self):
         """Save the currently displayed list of approach callouts for the
@@ -408,16 +411,19 @@ class ApproachCalloutsEditor(gtk.Dialog):
         """Determine if the model already contains the given altitude
         or not.
         
-        ignorePath is a path in the model to ignore."""        
+        ignorePath is a path in the model to ignore.
+
+        Returns the path of the element found, if any, or None, if the
+        altitude is not found."""        
         model = self._fileListModel
         iter = model.get_iter_first()
         while iter is not None:
             path = model.get_path(iter)
             if path!=ignorePath and altitude==model[path][0]:
-                return True
+                return path
             iter = model.iter_next(iter)
 
-        return False
+        return None
 
     def _getNextValidUsualAltitude(self, startValue, descending):
         """Get the next valid usual altitude."""

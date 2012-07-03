@@ -994,8 +994,8 @@ class _English(_Strings):
                  "There is already a callout for this altitude")
         self.add("callouts_altitude_clash_sec",
                  "Shall I set the altitude nevertheless? If so, "
-                 "both callouts will be played when reaching the altitude "
-                 "simultaneously.")
+                 "the other callout with the same altitude will be "
+                 "removed.")
 
 #------------------------------------------------------------------------------
 
@@ -1874,8 +1874,7 @@ class _Hungarian(_Strings):
                  "Már tartozik bemondás ehhez a magassághoz.")
         self.add("callouts_altitude_clash_sec",
                  "Ennek ellenére beállítsam a megadott magasságoz? Ha "
-                 "így teszek, mindkét bemondást egyidejűleg le fogja "
-                 "játszani a program a magasság elérésekor.")
+                 "így teszek, a másik bemondást egyúttal törlöm.")
 
 #------------------------------------------------------------------------------
 
