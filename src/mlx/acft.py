@@ -122,6 +122,11 @@ class Aircraft(object):
         
         self._checkers.append(checks.ReverserChecker())
 
+        if flight.aircraftType is not None and config.enableApproachCallouts:
+            approachCallouts = flight.config.getApproachCallouts(flight.aircraftType)
+            if approachCallouts:
+                self._checkers.append(checks.ApproachCalloutsPlayer(approachCallouts))
+
         self._smoothedIAS = SmoothedValue()
         self._smoothedVS = SmoothedValue()
 

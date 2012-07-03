@@ -218,6 +218,31 @@ class VisibilityChecker(StateChecker):
 
 #---------------------------------------------------------------------------------------
 
+class ApproachCalloutsPlayer(StateChecker):
+    """A state checker that plays a sequence of approach callouts.
+
+    It tracks the altitude during the descent and landing phases and
+    if the altitude crosses one that has a callout associated with and
+    the vertical speed is negative, that callout will be played."""    
+    def __init__(self, approachCallouts):
+        """Construct the approach callouts player."""
+        self._approachCallouts = approachCallouts
+        self._altitudes = approachCallouts.getAltitudes(descending = False)
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Check if we need to play a callout."""
+        if (flight.stage==const.STAGE_DESCENT or \
+            flight.stage==const.STAGE_LANDING) and state.vs<0:
+            oldRadioAltitude = oldState.radioAltitude
+            radioAltitude = state.radioAltitude
+            for altitude in self._altitudes:
+                if radioAltitude<=altitude and \
+                   oldRadioAltitude>altitude:
+                    startSound(self._approachCallouts[altitude])
+                    break
+
+#---------------------------------------------------------------------------------------
+
 class StateChangeLogger(StateChecker):
     """Base class for classes the instances of which check if a specific change has
     occured in the aircraft's state, and log such change."""

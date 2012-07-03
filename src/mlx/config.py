@@ -156,6 +156,16 @@ class ApproachCallouts(object):
                        "%d, %s" % (altitude, path))
             index += 1
 
+    def getAltitudes(self, descending = True):
+        """Get the altitudes in decreasing order by default."""
+        altitudes = self._mapping.keys()
+        altitudes.sort(reverse = descending)
+        return altitudes
+
+    def __nonzero__(self):
+        """Return if there is anything in the mapping."""
+        return not not self._mapping
+
     def __eq__(self, other):
         """Determine if the approach callout mapping is equal to the given
         other one."""
@@ -171,23 +181,15 @@ class ApproachCallouts(object):
         return len(self._mapping)
 
     def __getitem__(self, altitude):
-        """Get the file that is associated with the highest altitude not higher
-        than the given one.
+        """Get the file that is associated with the given altitude.
 
         If no such file found, return None."""
-        candidate = None
-        for (alt, path) in self._mapping.iteritems():
-            if alt<=altitude:
-                if candidate is None or alt>candidate[0]:
-                    candidate = (alt, path)
-
-        return candidate
+        return self._mapping[altitude] if altitude in self._mapping else None
 
     def __iter__(self):
         """Iterate over the pairs of altitudes and paths in decreasing order of
         the altitude."""
-        altitudes = self._mapping.keys()
-        altitudes.sort(reverse = True)
+        altitudes = self.getAltitudes()
 
         for altitude in altitudes:
             yield (altitude, self._mapping[altitude])

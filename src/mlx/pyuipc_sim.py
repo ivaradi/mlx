@@ -551,6 +551,7 @@ class Values(object):
             self.longitude = value * 360.0 / 65536.0 / 65536.0 / 65536.0 / 65536.0
         elif offset==0x0570:       # Altitude
             self.altitude = value / const.FEETTOMETRES / 65536.0 / 65536.0
+            self.radioAltitude = self.altitude - 517
         elif offset==0x0578:       # Pitch
             self.pitch = value * 360.0 / 65536.0 / 65536.0
         elif offset==0x057c:       # Bank
@@ -666,6 +667,9 @@ class Values(object):
             self.cog = value
         elif offset==0x30c0:       # Gross weight
             raise FSUIPCException(ERR_DATA)
+        elif offset==0x31e4:       # Radio altitude
+            self.radioAltitude = value / const.FEETTOMETRES / 65536.0
+            self.altitude = self.radioAltitude + 517
         elif offset==0x31e4:       # Radio altitude
             raise FSUIPCException(ERR_DATA)
         elif offset==0x320c:
