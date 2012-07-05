@@ -657,21 +657,18 @@ class Simulator(object):
         self._handler.requestWrite(data, self._handleMessageSent,
                                    extra = _disconnect)
 
-    def getFuel(self, tanks, callback):
-        """Get the fuel from the given tanks.
+    def getFuel(self, callback):
+        """Get the fuel information for the current model.
 
-        The callback will be called with a list of two-tuples, where the tuples
-        have the following items:
+        The callback will be called with a list of triplets with the following
+        items:
+        - the fuel tank identifier
         - the current weight of the fuel in the tank (in kgs)
         - the current total capacity of the tank (in kgs)."""
-        data = [(0x0af4, "H")]     # Fuel weight
-        for tank in tanks:
-            offset = _tank2offset[tank]
-            data.append( (offset, "u") )     # tank level
-            data.append( (offset+4, "u") )   # tank capacity
-
-        self._handler.requestRead(data, self._handleFuelRetrieved,
-                                  extra = callback)
+        if self._aircraftModel is None:
+            callback([])
+        else:
+            self._aircraftModel.getFuel(self._handler, callback)
 
     def setFuelLevel(self, levels):
         """Set the fuel level to the given ones.
@@ -681,12 +678,8 @@ class Simulator(object):
         - the const.FUELTANK_XXX constant denoting the tank that must be set,
         - the requested level of the fuel as a floating-point value between 0.0
         and 1.0."""
-        data = []
-        for (tank, level) in levels:
-            offset = _tank2offset[tank]
-            value = long(level * 128.0 * 65536.0)
-            data.append( (offset, "u", value) )
-        self._handler.requestWrite(data, self._handleFuelWritten)
+        if self._aircraftModel is not None:
+            self._aircraftModel.setFuelLevel(self._handler, levels)
 
     def enableTimeSync(self):
         """Enable the time synchronization."""
@@ -998,21 +991,6 @@ class Simulator(object):
         #print "fsuipc.Simulator._handleMessageSent", disconnect
         if disconnect:
             self._handler.disconnect()
-
-    def _handleFuelRetrieved(self, data, callback):
-        """Callback for a fuel retrieval request."""
-        fuelWeight = data[0] / 256.0
-        result = []
-        for i in range(1, len(data), 2):
-            capacity = data[i+1] * fuelWeight * const.LBSTOKG
-            amount = data[i] * capacity / 128.0 / 65536.0
-            result.append( (amount, capacity) )
-
-        callback(result)
-                                                  
-    def _handleFuelWritten(self, success, extra):
-        """Callback for a fuel setting request."""
-        pass
 
     def _handleNumHotkeys(self, data, (id, generation)):
         """Handle the result of the query of the number of hotkeys"""
@@ -1379,13 +1357,7 @@ class GenericAircraftModel(AircraftModel):
         """Add the model-specific monitoring data to the given array."""
         super(GenericAircraftModel, self).addMonitoringData(data, fsType)
         
-        self._addOffsetWithIndexMember(data, 0x0af4, "H", "_monidx_fuelWeight")
-
-        self._fuelStartIndex = len(data)
-        for tank in self._fuelTanks:
-            offset = _tank2offset[tank]
-            self._addOffsetWithIndexMember(data, offset, "u")    # tank level
-            self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
+        self._fuelStartIndex = self._addFuelOffsets(data, "_monidx_fuelWeight")
 
         self._engineStartIndex = len(data)
         for i in range(0, self._numEngines):
@@ -1405,13 +1377,8 @@ class GenericAircraftModel(AircraftModel):
                                                                    timestamp,
                                                                    data)
 
-        fuelWeight = data[self._monidx_fuelWeight]/256.0
-        state.fuel = []
-        for i in range(self._fuelStartIndex, 
-                       self._fuelStartIndex + 2*len(self._fuelTanks), 2):
-            fuel = data[i+1]*data[i]*fuelWeight*const.LBSTOKG/128.0/65536.0
-            state.fuel.append(fuel)
-
+        (state.fuel, state.totalFuel) = \
+            self._convertFuelData(data, index = self._monidx_fuelWeight)
 
         state.n1 = [] if self._isN1 else None
         state.rpm = None if self._isN1 else []
@@ -1429,6 +1396,82 @@ class GenericAircraftModel(AircraftModel):
                 state.rpm.append(data[i+1] * data[i+2]/65536.0)
 
         return state
+
+    def getFuel(self, handler, callback):
+        """Get the fuel information for this model.
+
+        See Simulator.getFuel for more information. This
+        implementation simply queries the fuel tanks given to the
+        constructor."""
+        data = []
+        self._addFuelOffsets(data)
+
+        handler.requestRead(data, self._handleFuelRetrieved,
+                            extra = callback)
+
+    def setFuelLevel(self, handler, levels):
+        """Set the fuel level.
+
+        See the description of Simulator.setFuelLevel. This
+        implementation simply sets the fuel tanks as given."""
+        data = []
+        for (tank, level) in levels:
+            offset = _tank2offset[tank]
+            value = long(level * 128.0 * 65536.0)
+            data.append( (offset, "u", value) )
+
+        handler.requestWrite(data, self._handleFuelWritten)
+
+    def _addFuelOffsets(self, data, weightIndexName = None):
+        """Add the fuel offsets to the given data array.
+
+        If weightIndexName is not None, it will be the name of the
+        fuel weight index.
+
+        Returns the index of the first fuel tank's data."""
+        self._addOffsetWithIndexMember(data, 0x0af4, "H", weightIndexName)
+
+        fuelStartIndex = len(data)
+        for tank in self._fuelTanks:
+            offset = _tank2offset[tank]
+            self._addOffsetWithIndexMember(data, offset, "u")    # tank level
+            self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
+        
+        return fuelStartIndex
+
+    def _convertFuelData(self, data, index = 0, addCapacities = False):
+        """Convert the given data into a fuel info list.
+
+        The list consists of two or three-tuples of the following
+        items:
+        - the fuel tank ID,
+        - the amount of the fuel in kg,
+        - if addCapacities is True, the total capacity of the tank."""
+        fuelWeight = data[index] / 256.0
+        index += 1
+
+        result = []
+        totalFuel = 0
+        for fuelTank in self._fuelTanks:
+            capacity = data[index+1] * fuelWeight * const.LBSTOKG
+            amount = data[index] * capacity / 128.0 / 65536.0
+            index += 2
+            
+            result.append( (fuelTank, amount, capacity) if addCapacities 
+                           else (fuelTank, amount))
+            totalFuel += amount
+
+        return (result, totalFuel)        
+
+    def _handleFuelRetrieved(self, data, callback):
+        """Callback for a fuel retrieval request."""
+        (fuelData, _totalFuel) = self._convertFuelData(data, 
+                                                       addCapacities = True)
+        callback(fuelData)
+                                                          
+    def _handleFuelWritten(self, success, extra):
+        """Callback for a fuel setting request."""
+        pass
 
 #------------------------------------------------------------------------------
 
@@ -1450,11 +1493,13 @@ class GenericModel(GenericAircraftModel):
 
 class B737Model(GenericAircraftModel):
     """Generic model for the Boeing 737 Classing and NG aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    
     def __init__(self):
         """Construct the model."""
         super(B737Model, self). \
             __init__(flapsNotches = [0, 1, 2, 5, 10, 15, 25, 30, 40],
-                     fuelTanks = acft.Boeing737.fuelTanks,
+                     fuelTanks = B737Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1518,11 +1563,13 @@ class PMDGBoeing737NGModel(B737Model):
 
 class B767Model(GenericAircraftModel):
     """Generic model for the Boeing 767 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self):
         """Construct the model."""
         super(B767Model, self). \
             __init__(flapsNotches = [0, 1, 5, 15, 20, 25, 30],
-                     fuelTanks = acft.Boeing767.fuelTanks,
+                     fuelTanks = Boeing767Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1534,11 +1581,13 @@ class B767Model(GenericAircraftModel):
 
 class DH8DModel(GenericAircraftModel):
     """Generic model for the Bombardier  Dash 8-Q400 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]    
+    
     def __init__(self):
         """Construct the model."""
         super(DH8DModel, self). \
             __init__(flapsNotches = [0, 5, 10, 15, 35],
-                     fuelTanks = acft.DH8D.fuelTanks,
+                     fuelTanks = DH8DModel.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1579,11 +1628,13 @@ class DreamwingsDH8DModel(DH8DModel):
 
 class CRJ2Model(GenericAircraftModel):
     """Generic model for the Bombardier CRJ-200 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self):
         """Construct the model."""
         super(CRJ2Model, self). \
             __init__(flapsNotches = [0, 8, 20, 30, 45],
-                     fuelTanks = acft.CRJ2.fuelTanks,
+                     fuelTanks = CRJ2Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1595,11 +1646,13 @@ class CRJ2Model(GenericAircraftModel):
 
 class F70Model(GenericAircraftModel):
     """Generic model for the Fokker F70 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+
     def __init__(self):
         """Construct the model."""
         super(F70Model, self). \
             __init__(flapsNotches = [0, 8, 15, 25, 42],
-                     fuelTanks = acft.F70.fuelTanks,
+                     fuelTanks = F70Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1611,11 +1664,15 @@ class F70Model(GenericAircraftModel):
 
 class DC3Model(GenericAircraftModel):
     """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    # fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
+    #              const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
+
     def __init__(self):
         """Construct the model."""
         super(DC3Model, self). \
             __init__(flapsNotches = [0, 15, 30, 45],
-                     fuelTanks = acft.DC3.fuelTanks,
+                     fuelTanks = DC3Model.fuelTanks,
                      numEngines = 2, isN1 = False)
 
     @property
@@ -1623,15 +1680,73 @@ class DC3Model(GenericAircraftModel):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic Lisunov Li-2 (DC-3)"
 
+    def _convertFuelData(self, data, index = 0, addCapacities = False):
+        """Convert the given data into a fuel info list.
+
+        It assumes to receive the 3 fuel tanks as seen above (left,
+        centre and right) and converts it to left aux, left, right,
+        and right aux. The amount in the left tank goes into left aux,
+        the amount of the right tank goes into right aux and the
+        amount of the centre tank goes into the left and right tanks
+        evenly distributed."""
+        (rawFuelData, totalFuel) = \
+            super(DC3Model, self)._convertFuelData(data, index, addCapacities)
+
+        centreAmount = rawFuelData[1][1]
+        if addCapacities:
+            centreCapacity = rawFuelData[1][2]
+            fuelData = [(const.FUELTANK_LEFT_AUX, 
+                         rawFuelData[0][1], rawFuelData[0][2]),
+                        (const.FUELTANK_LEFT,
+                         centreAmount/2.0, centreCapacity/2.0),
+                        (const.FUELTANK_RIGHT,
+                         centreAmount/2.0, centreCapacity/2.0),
+                        (const.FUELTANK_RIGHT_AUX,
+                         rawFuelData[2][1], rawFuelData[2][2])]
+        else:
+            fuelData = [(const.FUELTANK_LEFT_AUX, rawFuelData[0][1]),
+                        (const.FUELTANK_LEFT, centreAmount/2.0),
+                        (const.FUELTANK_RIGHT, centreAmount/2.0),
+                        (const.FUELTANK_RIGHT_AUX, rawFuelData[2][1])]
+
+        return (fuelData, totalFuel)
+
+    def setFuelLevel(self, handler, levels):
+        """Set the fuel level.
+
+        See the description of Simulator.setFuelLevel. This
+        implementation assumes to get the four-tank representation,
+        as returned by getFuel()."""
+        leftLevel = 0.0
+        centreLevel = 0.0
+        rightLevel = 0.0
+        
+        for (tank, level) in levels:
+            if tank==const.FUELTANK_LEFT_AUX: leftLevel += level
+            elif tank==const.FUELTANK_LEFT or  tank==const.FUELTANK_RIGHT: 
+                centreLevel += level
+            elif tank==const.FUELTANK_RIGHT_AUX: rightLevel += level
+
+        super(DC3Model, self).setFuelLevel([(const.FUELTANK_LEFT, leftLevel),
+                                            (const.FUELTANK_CENTRE,
+                                            centreLevel),
+                                            (const.FUELTANK_RIGHT, rightLevel)])
+
 #------------------------------------------------------------------------------
 
 class T134Model(GenericAircraftModel):
     """Generic model for the Tupolev Tu-134 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
+                 const.FUELTANK_LEFT_AUX,
+                 const.FUELTANK_CENTRE,
+                 const.FUELTANK_RIGHT_AUX,
+                 const.FUELTANK_EXTERNAL2, const.FUELTANK_RIGHT_TIP]
+
     def __init__(self):
         """Construct the model."""
         super(T134Model, self). \
             __init__(flapsNotches = [0, 10, 20, 30],
-                     fuelTanks = acft.T134.fuelTanks,
+                     fuelTanks = T134Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -1643,11 +1758,15 @@ class T134Model(GenericAircraftModel):
 
 class T154Model(GenericAircraftModel):
     """Generic model for the Tupolev Tu-134 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
+                 const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
+                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
+
     def __init__(self):
         """Construct the model."""
         super(T154Model, self). \
             __init__(flapsNotches = [0, 15, 28, 45],
-                     fuelTanks = acft.T154.fuelTanks,
+                     fuelTanks = T154Model.fuelTanks,
                      numEngines = 3)
 
     @property
@@ -1667,11 +1786,13 @@ class T154Model(GenericAircraftModel):
 
 class YK40Model(GenericAircraftModel):
     """Generic model for the Yakovlev Yak-40 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
+    
     def __init__(self):
         """Construct the model."""
         super(YK40Model, self). \
             __init__(flapsNotches = [0, 20, 35],
-                     fuelTanks = acft.YK40.fuelTanks,
+                     fuelTanks = YK40Model.fuelTanks,
                      numEngines = 2)
 
     @property

@@ -183,8 +183,10 @@ class AircraftState(object):
     - gLoad: G-load (float)
     - flapsSet: the selected degrees of the flaps (float)
     - flaps: the actual degrees of the flaps (float)
-    - fuelWeight[]: the fuel weights in the different tanks in kgs (array of
-    floats of as many items as the number fuel tanks)
+    - fuel[]: the fuel information. It is a list of tuples with items:
+    the fuel tank identifier and the amount of fuel in that tank in
+    kgs
+    - totalFuel: the total amount of fuel in kg
     - n1[]: the N1 values of the turbine engines (array of floats
     of as many items as the number of engines, present only for aircraft with
     turbines, for other aircraft it is None)

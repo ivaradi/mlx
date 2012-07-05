@@ -467,6 +467,24 @@ def fuelTank2string(fuelTank):
 
 #-------------------------------------------------------------------------------
 
+_fuelTankLogStrings = { FUELTANK_CENTRE : "centre",
+                        FUELTANK_LEFT : "left",
+                        FUELTANK_RIGHT : "right",
+                        FUELTANK_LEFT_AUX : "left aux",
+                        FUELTANK_RIGHT_AUX : "right aux",
+                        FUELTANK_LEFT_TIP : "left tip",
+                        FUELTANK_RIGHT_TIP : "right tip",
+                        FUELTANK_EXTERNAL1 : "external 1",
+                        FUELTANK_EXTERNAL2 : "external 2",
+                        FUELTANK_CENTRE2 : "centre 2" }
+
+def fuelTank2logString(fuelTank):
+    """Get the log string equivalent of the given fuelTank."""
+    return _fuelTankLogStrings[fuelTank] \
+        if fuelTank in _fuelTankLogStrings else "unknown"
+
+#-------------------------------------------------------------------------------
+
 # The available gates at LHBP
 lhbpGateNumbers = []
 

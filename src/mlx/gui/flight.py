@@ -1162,8 +1162,7 @@ class TimePage(Page):
             gui = self._wizard.gui
             gui.beginBusy(xstr("fuel_get_busy"))
             
-            gui.simulator.getFuel(gui.flight.aircraft.fuelTanks,
-                                  self._handleFuel)
+            gui.simulator.getFuel(self._handleFuel)
         else:
             self._wizard.nextPage()
 
@@ -1373,9 +1372,8 @@ class FuelPage(Page):
                                             xscale = 0.0, yscale = 1.0)
         self.setMainWidget(self._fuelAlignment)
 
-        tanks = acft.MostFuelTankAircraft.fuelTanks
-        tankData = ((2500, 3900),) * len(tanks)
-        self._setupTanks(tanks, tankData)
+        tankData = [(tank, 2500, 3900) for tank in acft.mostFuelTanks]
+        self._setupTanks(tankData)
 
         self.addCancelFlightButton()
 
@@ -1386,10 +1384,7 @@ class FuelPage(Page):
 
     def activate(self):
         """Activate the page."""
-        gui = self._wizard.gui
-
-        self._setupTanks(gui.flight.aircraft.fuelTanks,
-                         self._wizard._fuelData)
+        self._setupTanks(self._wizard._fuelData)
 
     def finalize(self):
         """Finalize the page."""
@@ -1409,25 +1404,24 @@ class FuelPage(Page):
         else:
             self._wizard.nextPage()        
 
-    def _setupTanks(self, tanks, tankData):
+    def _setupTanks(self, tankData):
         """Setup the tanks for the given data."""
-        numTanks = len(tanks)
+        numTanks = len(tankData)
         if self._fuelTable is not None:
             self._fuelAlignment.remove(self._fuelTable)
 
         self._fuelTanks = []
         self._fuelTable = gtk.Table(numTanks, 1)
         self._fuelTable.set_col_spacings(16)
-        for i in range(0, numTanks):
-            tank = tanks[i]
-            (current, capacity) = tankData[i]
-
+        index = 0
+        for (tank, current, capacity) in tankData:
             fuelTank = FuelTank(tank,
                                 xstr("fuel_tank_" +
                                      const.fuelTank2string(tank)),
                                 capacity, current)
-            self._fuelTable.attach(fuelTank, i, i+1, 0, 1)
+            self._fuelTable.attach(fuelTank, index, index+1, 0, 1)
             self._fuelTanks.append(fuelTank)
+            index += 1
             
         self._fuelAlignment.add(self._fuelTable)
         self.show_all()

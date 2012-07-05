@@ -207,7 +207,7 @@ class Flight(object):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)
         
-        self.endFuel = sum(currentState.fuel)
+        self.endFuel = currentState.totalFuel
         if self.startFuel is None:
             self.startFuel = self.endFuel
         
@@ -310,6 +310,17 @@ class Flight(object):
     def getI18NSpeedUnit(self):
         """Get the speed unit suffix for i18n message identifiers."""
         return "_knots" if self.speedInKnots else "_kmph"
+
+    def logFuel(self, aircraftState):
+        """Log the amount of fuel"""
+        fuelStr = ""
+        for (tank, amount) in aircraftState.fuel:
+            if fuelStr: fuelStr += " - "
+            fuelStr += "%s=%.0f kg" % (const.fuelTank2logString(tank), amount)
+            
+        self.logger.message(aircraftState.timestamp, "Fuel: " + fuelStr)
+        self.logger.message(aircraftState.timestamp,
+                            "Total fuel: %.0f kg" % (aircraftState.totalFuel,))                            
 
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""

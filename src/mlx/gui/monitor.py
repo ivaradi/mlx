@@ -280,7 +280,7 @@ class MonitorWindow(gtk.Window):
             self._nav2.set_text(aircraftState.nav2)
 
             fuelStr = ""
-            for fuel in aircraftState.fuel:
+            for (_tank, fuel) in aircraftState.fuel:
                 if fuelStr: fuelStr += ", "
                 fuelStr += "%.0f" % (fuel,)                
             self._fuel.set_text(fuelStr)

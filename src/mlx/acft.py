@@ -173,28 +173,32 @@ class Aircraft(object):
 
         This is the function that the simulator calls directly with the new
         state."""
-        config = self._flight.config
+        try:
+            config = self._flight.config
 
-        self._smoothedIAS.add(config.realIASSmoothingLength, aircraftState.ias)
-        aircraftState.smoothedIAS = self._smoothedIAS.get()
+            self._smoothedIAS.add(config.realIASSmoothingLength, aircraftState.ias)
+            aircraftState.smoothedIAS = self._smoothedIAS.get()
 
-        self._smoothedVS.add(config.realVSSmoothingLength, aircraftState.vs)
-        aircraftState.smoothedVS = self._smoothedVS.get()
-        
-        for checker in self._checkers:
-            try:
-                checker.check(self._flight, self, self._flight.logger,
-                              self._aircraftState, aircraftState)
-            except:
-                print >> sys.stderr, "Checker", checker, "failed"
-                traceback.print_exc()
+            self._smoothedVS.add(config.realVSSmoothingLength, aircraftState.vs)
+            aircraftState.smoothedVS = self._smoothedVS.get()
 
-        self._flight.handleState(self._aircraftState, aircraftState)
+            for checker in self._checkers:
+                try:
+                    checker.check(self._flight, self, self._flight.logger,
+                                  self._aircraftState, aircraftState)
+                except:
+                    print >> sys.stderr, "Checker", checker, "failed"
+                    traceback.print_exc()
 
-        self._maxVS = max(self._maxVS, aircraftState.vs)
-        self._minVS = min(self._minVS, aircraftState.vs)
+            self._flight.handleState(self._aircraftState, aircraftState)
 
-        self._aircraftState = aircraftState
+            self._maxVS = max(self._maxVS, aircraftState.vs)
+            self._minVS = min(self._minVS, aircraftState.vs)
+        except:
+            print >> sys.stderr, "Failed to handle the state"
+            traceback.print_exc()
+        finally:
+            self._aircraftState = aircraftState
     
     def setStage(self, aircraftState, newStage):
         """Set the given stage as the new one and do whatever should be
@@ -202,7 +206,7 @@ class Aircraft(object):
         if self._flight.setStage(aircraftState.timestamp, newStage):
             if newStage==const.STAGE_PUSHANDTAXI:
                 self.logger.message(aircraftState.timestamp, "Block time start")
-                self.logFuel(aircraftState)
+                self._flight.logFuel(aircraftState)
                 self.logger.message(aircraftState.timestamp, 
                                     "Zero-fuel weight: %.0f kg" % (aircraftState.zfw))
                 flight = self._flight
@@ -233,7 +237,7 @@ class Aircraft(object):
                     self._flight.getFleet(callback = self._fleetRetrieved,
                                           force = True)
                 self.logger.message(aircraftState.timestamp, "Flight time end")
-                self.logFuel(aircraftState)
+                self._flight.logFuel(aircraftState)
                 self.logger.message(aircraftState.timestamp,
                                     "Landing weight: %.0f kg, MLW: %.0f" % \
                                     (aircraftState.grossWeight, self.mlw))
@@ -408,9 +412,7 @@ class Boeing737(Aircraft):
     structure:
     - fuel: left, centre, right
     - n1: left, right
-    - reverser: left, right"""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
-    
+    - reverser: left, right"""    
     def __init__(self, flight):
         super(Boeing737, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -425,15 +427,6 @@ class Boeing737(Aircraft):
                                  30 : 175,
                                  40 : 162 }
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - centre=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
 #---------------------------------------------------------------------------------------
 
 class B736(Boeing737):
@@ -518,7 +511,6 @@ class DH8D(Aircraft):
     - fuel: left, right
     - n1: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]    
 
     def __init__(self, flight):
         super(DH8D, self).__init__(flight)
@@ -532,14 +524,6 @@ class DH8D(Aircraft):
                                  15 : 172,
                                  35 : 158 }
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-
 #---------------------------------------------------------------------------------------
 
 class Boeing767(Aircraft):
@@ -550,7 +534,6 @@ class Boeing767(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right"""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
 
     def __init__(self, flight):
         super(Boeing767, self).__init__(flight)
@@ -563,15 +546,6 @@ class Boeing767(Aircraft):
                                  25 : 185,
                                  30 : 175 }
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - centre=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
 #---------------------------------------------------------------------------------------
 
 class B762(Boeing767):
@@ -604,8 +578,6 @@ class CRJ2(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
-
     def __init__(self, flight):
         super(CRJ2, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -619,15 +591,6 @@ class CRJ2(Aircraft):
                                  30 : 190,
                                  45 : 175 }
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - centre=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
 #---------------------------------------------------------------------------------------
 
 class F70(Aircraft):
@@ -638,8 +601,6 @@ class F70(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
-
     def __init__(self, flight):
         super(F70, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -654,15 +615,6 @@ class F70(Aircraft):
                                  25 : 220,
                                  42 : 180 }
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - centre=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
 #---------------------------------------------------------------------------------------
 
 class DC3(Aircraft):
@@ -673,10 +625,6 @@ class DC3(Aircraft):
     - fuel: left aux, left, right, right aux
     - rpm: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
-    # fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
-    #              const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
-
     def __init__(self, flight):
         super(DC3, self).__init__(flight)
         self.dow = 8627
@@ -696,15 +644,6 @@ class DC3(Aircraft):
             if rpm>0: return False
         return True
 
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left aux=%.0f kg - left=%.0f kg - right=%.0f kg - right aux=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2], aircraftState.fuel[3]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
 #---------------------------------------------------------------------------------------
 
 class T134(Aircraft):
@@ -716,12 +655,6 @@ class T134(Aircraft):
     external 2
     - n1: left, right
     - reverser: left, right."""
-    fuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
-                 const.FUELTANK_LEFT_AUX,
-                 const.FUELTANK_CENTRE,
-                 const.FUELTANK_RIGHT_AUX,
-                 const.FUELTANK_EXTERNAL2, const.FUELTANK_RIGHT_TIP]
-
     def __init__(self, flight):
         super(T134, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -739,17 +672,6 @@ class T134(Aircraft):
         """Indicate if the speed is in knots."""
         return False
     
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left tip=%.0f kg - external 1=%.0f kg - left aux=%.0f kg - centre= %.0f kg - right aux=%.0f kg - external 2=%.0f kg - right tip=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2], 
-                             aircraftState.fuel[3], aircraftState.fuel[4],
-                             aircraftState.fuel[5], aircraftState.fuel[6]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-                            
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -772,9 +694,6 @@ class T154(Aircraft):
     - fuel: left aux, left, centre, centre 2, right, right aux
     - n1: left, centre, right
     - reverser: left, right"""
-    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
-                 const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
-                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
     def __init__(self, flight):
         super(T154, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -792,16 +711,6 @@ class T154(Aircraft):
         """Indicate if the speed is in knots."""
         return False
     
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left aux=%.0f kg - left=%.0f kg - centre=%.0f kg - centre 2=%.0f kg - right=%.0f kg - right aux=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1],
-                             aircraftState.fuel[2], aircraftState.fuel[3], 
-                             aircraftState.fuel[4], aircraftState.fuel[5]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -825,8 +734,6 @@ class YK40(Aircraft):
     - fuel: left, right
     - n1: left, right
     - reverser: left, right"""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
-    
     def __init__(self, flight):
         super(YK40, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -843,14 +750,6 @@ class YK40(Aircraft):
         """Indicate if the speed is in knots."""
         return False
     
-    def logFuel(self, aircraftState):
-        """Log the amount of fuel"""
-        self.logger.message(aircraftState.timestamp,
-                            "Fuel: left=%.0f kg - right=%.0f kg" % \
-                            (aircraftState.fuel[0], aircraftState.fuel[1]))
-        self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (sum(aircraftState.fuel),))
-
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -865,7 +764,11 @@ class YK40(Aircraft):
 
 #---------------------------------------------------------------------------------------
 
-MostFuelTankAircraft = T134
+mostFuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
+                 const.FUELTANK_LEFT_AUX,
+                 const.FUELTANK_CENTRE,
+                 const.FUELTANK_RIGHT_AUX,
+                 const.FUELTANK_EXTERNAL2, const.FUELTANK_RIGHT_TIP]
 
 #---------------------------------------------------------------------------------------
 
