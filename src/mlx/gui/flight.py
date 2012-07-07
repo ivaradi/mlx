@@ -731,6 +731,7 @@ class GateSelectionPage(Page):
         column.set_expand(True)
         self._gateList.append_column(column)
         self._gateList.set_headers_visible(False)
+        self._gateList.connect("row-activated", self._rowActivated)
 
         gateSelection = self._gateList.get_selection()
         gateSelection.connect("changed", self._selectionChanged)
@@ -781,17 +782,26 @@ class GateSelectionPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         if not self._completed:
-            selection = self._gateList.get_selection()
-            (listStore, iter) = selection.get_selected()
-            (gateNumber,) = listStore.get(iter, 0)
-
-            self._wizard._departureGate = gateNumber
-
-            self._wizard.updatePlane(self._planeUpdated,
-                                     self._wizard._bookedFlight.tailNumber,
-                                     const.PLANE_HOME, gateNumber)
+            self._gateSelected()
         else:
             self._wizard.nextPage()
+
+    def _rowActivated(self, flightList, path, column):
+        """Called when a row is activated."""
+        if not self._completed:
+            self._gateSelected()
+
+    def _gateSelected(self):
+        """Called when a gate has been selected."""
+        selection = self._gateList.get_selection()
+        (listStore, iter) = selection.get_selected()
+        (gateNumber,) = listStore.get(iter, 0)
+
+        self._wizard._departureGate = gateNumber
+
+        self._wizard.updatePlane(self._planeUpdated,
+                                 self._wizard._bookedFlight.tailNumber,
+                                 const.PLANE_HOME, gateNumber)        
 
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
