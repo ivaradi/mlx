@@ -140,6 +140,8 @@ class ChecklistEditor(gtk.Dialog):
 
         self._fileListModel = gtk.ListStore(str, str)
         self._fileList = gtk.TreeView(model = self._fileListModel)
+        self._fileList.connect("button-press-event",
+                               self._fileListButtonPressed)
         column = gtk.TreeViewColumn(xstr("chklst_header"),
                                     gtk.CellRendererText(), text = 0)
         column.set_expand(True)
@@ -148,9 +150,12 @@ class ChecklistEditor(gtk.Dialog):
         self._fileList.append_column(column)
         self._fileList.set_tooltip_column(1)
         self._fileList.set_reorderable(True)
+        self._fileListPopupMenu = None
         selection = self._fileList.get_selection()
         selection.set_mode(SELECTION_MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
+
+        self._buildFileListPopupMenu()
 
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
@@ -205,6 +210,10 @@ class ChecklistEditor(gtk.Dialog):
         
     def _removeButtonClicked(self, button):
         """Called when the Remove button is clicked."""
+        self._removeSelected()
+
+    def _removeSelected(self):
+        """Remove the currently selected files."""
         selection = self._fileList.get_selection()
         (model, paths) = selection.get_selected_rows()
 
@@ -249,6 +258,7 @@ class ChecklistEditor(gtk.Dialog):
         """Called when the selection in the file list changes."""
         anySelected = selection.count_selected_rows()>0
         self._removeButton.set_sensitive(anySelected)
+        self._popupRemoveItem.set_sensitive(anySelected)
 
         if anySelected:
             (model, paths) = selection.get_selected_rows()
@@ -260,12 +270,16 @@ class ChecklistEditor(gtk.Dialog):
                 if maxIndex is None or index>maxIndex: maxIndex = index
                         
             self._moveUpButton.set_sensitive(minIndex>0)
+            self._popupMoveUpItem.set_sensitive(minIndex>0)
 
             numRows = model.iter_n_children(None)
             self._moveDownButton.set_sensitive(maxIndex<(numRows-1))
+            self._popupMoveDownItem.set_sensitive(maxIndex<(numRows-1))
         else:
             self._moveUpButton.set_sensitive(False)
+            self._popupMoveUpItem.set_sensitive(False)
             self._moveDownButton.set_sensitive(False)
+            self._popupMoveDownItem.set_sensitive(False)
 
     def _getAircraftType(self):
         """Get the currently selected aircraft type."""
@@ -298,5 +312,66 @@ class ChecklistEditor(gtk.Dialog):
         for path in checklist:
             self._fileListModel.append([os.path.basename(path), path])
         
+    def _fileListButtonPressed(self, widget, event):
+        """Called when a mouse button is pressed on the file list."""
+        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+            return
+
+        # (path, _, _, _) = self._flightList.get_path_at_pos(int(event.x),
+        #                                                    int(event.y))
+        # selection = self._flightList.get_selection()
+        # selection.unselect_all()
+        # selection.select_path(path)
+
+        menu = self._fileListPopupMenu
+        if pygobject:
+            menu.popup(None, None, None, None, event.button, event.time)
+        else:
+            menu.popup(None, None, None, event.button, event.time)
+
+    def _buildFileListPopupMenu(self):
+        """Get the file list popup menu."""
+        menu = gtk.Menu()
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("chklst_remove"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupRemove)
+        menuItem.show()
+        self._popupRemoveItem = menuItem
+
+        menu.append(menuItem)
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("chklst_moveUp"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupMoveUp)
+        menuItem.show()
+        self._popupMoveUpItem = menuItem
+
+        menu.append(menuItem)
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("chklst_moveDown"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupMoveDown)
+        menuItem.show()
+        self._popupMoveDownItem = menuItem
+
+        menu.append(menuItem)
+
+        self._fileListPopupMenu = menu
+
+    def _popupRemove(self, menuItem):
+        """Remove the currently selected menu items."""
+        self._removeSelected()
+
+    def _popupMoveUp(self, menuItem):
+        """Move up the currently selected menu items."""
+        self._moveSelected(True)
+
+    def _popupMoveDown(self, menuItem):
+        """Move down the currently selected menu items."""
+        self._moveSelected(False)
         
 #------------------------------------------------------------------------------
