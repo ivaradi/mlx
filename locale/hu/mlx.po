@@ -395,6 +395,12 @@ msgstr "Nem tudtam betölteni a járatfájlt."
 msgid "flightsel_load_failed_sec"
 msgstr "A további részleteket lásd a debug naplóban."
 
+msgid "flightsel_popup_select"
+msgstr "_Kiválasztás"
+
+msgid "flightsel_popup_save"
+msgstr "_Mentés..."
+
 msgid "fleet_busy"
 msgstr "Flottaadatok letöltése..."
 

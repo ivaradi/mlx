@@ -65,6 +65,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SORT_ASCENDING = gtk.SORT_ASCENDING
     SORT_DESCENDING = gtk.SORT_DESCENDING
 
+    EVENT_BUTTON_PRESS = gdk.BUTTON_PRESS
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -126,6 +128,8 @@ else:
 
     SORT_ASCENDING = gtk.SortType.ASCENDING
     SORT_DESCENDING = gtk.SortType.DESCENDING
+
+    EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

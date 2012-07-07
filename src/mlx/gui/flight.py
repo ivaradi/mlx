@@ -380,9 +380,13 @@ class FlightSelectionPage(Page):
                                     text = 3)
         column.set_expand(True)
         self._flightList.append_column(column)
+        self._flightList.connect("row-activated", self._rowActivated)
+        self._flightList.connect("button-press-event", self._listButtonPressed)
+
+        self._flightListPopupMenu = None
 
         flightSelection = self._flightList.get_selection()
-        flightSelection.connect("changed", self._selectionChanged)
+        flightSelection.connect("changed", self._selectionChanged)        
 
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._flightList)
@@ -453,6 +457,10 @@ class FlightSelectionPage(Page):
 
     def _saveClicked(self, button):
         """Called when the Save flight button is clicked."""
+        self._saveSelected()
+
+    def _saveSelected(self):
+        """Save the selected flight."""
         flight = self._getSelectedFlight()
         date = flight.departureTime.date()
         name = "%04d-%02d-%02d %s %s-%s.vaflight" % \
@@ -532,11 +540,20 @@ class FlightSelectionPage(Page):
         if self._completed:
             self._wizard.jumpPage(self._nextDistance, finalize = False)
         else:
-            flight = self._getSelectedFlight()
-            self._wizard._bookedFlight = flight
-            self._wizard.gui.enableFlightInfo()
+            self._flightSelected()
 
-            self._updateDepartureGate()
+    def _rowActivated(self, flightList, path, column):
+        """Called when a row is activated."""
+        if not self._completed:
+            self._flightSelected()
+
+    def _flightSelected(self):
+        """Called when a flight has been selected."""
+        flight = self._getSelectedFlight()
+        self._wizard._bookedFlight = flight
+        self._wizard.gui.enableFlightInfo()
+        
+        self._updateDepartureGate()
 
     def _getSelectedFlight(self):
         """Get the currently selected flight."""
@@ -546,6 +563,23 @@ class FlightSelectionPage(Page):
         [index] = path.get_indices() if pygobject else path
         
         return self._flights[index]
+
+    def _listButtonPressed(self, widget, event):
+        """Called when a mouse button is pressed on the flight list."""
+        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+            return
+
+        (path, _, _, _) = self._flightList.get_path_at_pos(int(event.x),
+                                                           int(event.y))
+        selection = self._flightList.get_selection()
+        selection.unselect_all()
+        selection.select_path(path)
+
+        menu = self._getListPopupMenu()
+        if pygobject:
+            menu.popup(None, None, None, None, event.button, event.time)
+        else:
+            menu.popup(None, None, None, event.button, event.time)
         
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
@@ -644,6 +678,41 @@ class FlightSelectionPage(Page):
         self._loadDialog = dialog
         
         return dialog        
+
+    def _getListPopupMenu(self):
+        """Get the flight list popup menu."""
+        if self._flightListPopupMenu is None:
+            menu = gtk.Menu()
+
+            menuItem = gtk.MenuItem()
+            menuItem.set_label(xstr("flightsel_popup_select"))
+            menuItem.set_use_underline(True)
+            menuItem.connect("activate", self._popupSelect)
+            menuItem.show()
+
+            menu.append(menuItem)
+        
+            menuItem = gtk.MenuItem()
+            menuItem.set_label(xstr("flightsel_popup_save"))
+            menuItem.set_use_underline(True)
+            menuItem.connect("activate", self._popupSave)
+            menuItem.show()
+
+            menu.append(menuItem)
+
+            self._flightListPopupMenu = menu
+
+        return self._flightListPopupMenu
+
+    def _popupSelect(self, menuItem):
+        """Called when the Select menu item is activated in the popup menu."""
+        if not self._completed:
+            self._flightSelected()
+    
+    def _popupSave(self, menuItem):
+        """Called when the Save menu item is activated in the popup menu."""
+        if not self._completed:
+            self._saveSelected()
     
 #-----------------------------------------------------------------------------
 
