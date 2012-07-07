@@ -1664,7 +1664,8 @@ class F70Model(GenericAircraftModel):
 
 class DC3Model(GenericAircraftModel):
     """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE,
+                 const.FUELTANK_RIGHT]    
     # fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
     #              const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
 
@@ -1674,6 +1675,8 @@ class DC3Model(GenericAircraftModel):
             __init__(flapsNotches = [0, 15, 30, 45],
                      fuelTanks = DC3Model.fuelTanks,
                      numEngines = 2, isN1 = False)
+        self._leftLevel = 0.0
+        self._rightLevel = 0.0
 
     @property
     def name(self):
@@ -1695,6 +1698,8 @@ class DC3Model(GenericAircraftModel):
         centreAmount = rawFuelData[1][1]
         if addCapacities:
             centreCapacity = rawFuelData[1][2]
+            self._leftLevel = self._rightLevel = \
+                centreAmount / centreCapacity / 2.0
             fuelData = [(const.FUELTANK_LEFT_AUX, 
                          rawFuelData[0][1], rawFuelData[0][2]),
                         (const.FUELTANK_LEFT,
@@ -1717,20 +1722,36 @@ class DC3Model(GenericAircraftModel):
         See the description of Simulator.setFuelLevel. This
         implementation assumes to get the four-tank representation,
         as returned by getFuel()."""
-        leftLevel = 0.0
-        centreLevel = 0.0
-        rightLevel = 0.0
+        leftLevel = None
+        centreLevel = None
+        rightLevel = None
         
         for (tank, level) in levels:
-            if tank==const.FUELTANK_LEFT_AUX: leftLevel += level
-            elif tank==const.FUELTANK_LEFT or  tank==const.FUELTANK_RIGHT: 
-                centreLevel += level
-            elif tank==const.FUELTANK_RIGHT_AUX: rightLevel += level
+            if tank==const.FUELTANK_LEFT_AUX:
+                leftLevel = level if leftLevel is None else (leftLevel + level)
+            elif tank==const.FUELTANK_LEFT:
+                level /= 2.0
+                centreLevel = (self._rightLevel + level) \
+                              if centreLevel is None else (centreLevel + level)
+                self._leftLevel = level
+            elif tank==const.FUELTANK_RIGHT:
+                level /= 2.0
+                centreLevel = (self._leftLevel + level) \
+                              if centreLevel is None else (centreLevel + level)
+                self._rightLevel = level
+            elif tank==const.FUELTANK_RIGHT_AUX:
+                rightLevel = level if rightLevel is None \
+                             else (rightLevel + level)
 
-        super(DC3Model, self).setFuelLevel([(const.FUELTANK_LEFT, leftLevel),
-                                            (const.FUELTANK_CENTRE,
-                                            centreLevel),
-                                            (const.FUELTANK_RIGHT, rightLevel)])
+        levels = []
+        if leftLevel is not None: levels.append((const.FUELTANK_LEFT,
+                                                 leftLevel))
+        if centreLevel is not None: levels.append((const.FUELTANK_CENTRE,
+                                                   centreLevel))
+        if rightLevel is not None: levels.append((const.FUELTANK_RIGHT,
+                                                 rightLevel))
+
+        super(DC3Model, self).setFuelLevel(handler, levels)
 
 #------------------------------------------------------------------------------
 
