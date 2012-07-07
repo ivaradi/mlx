@@ -123,6 +123,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         self._addingFile = False
         self._fileListModel.connect("row-inserted", self._fileAdded)
+        self._lastAddedAltitude = None
         
         self._fileList = gtk.TreeView(model = self._fileListModel)
 
@@ -215,6 +216,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
             baseName = os.path.basename(filePath)
             altitude = self._getNewAltitude(baseName)
             self._addingFile = True
+            self._lastAddedAltitude = altitude
             self._fileListModel.append([altitude, baseName, filePath])
             self._addingFile = False
 
@@ -223,11 +225,23 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         Makes the treeview to edit the altitude in the given row."""
         if self._addingFile:
-            gobject.idle_add(self._fileList.set_cursor,
-                             model.get_path(iter),
-                             self._fileList.get_column(0), True)
+            gobject.idle_add(self._selectFile)
             self._fileList.grab_focus()
             self.grab_focus()
+
+    def _selectFile(self):
+        """Select the file with the last added altitude."""
+        if self._lastAddedAltitude is None: return
+
+        model = self._fileListModel
+        iter = model.get_iter_first()
+        while iter is not None:
+            if model.get_value(iter, 0)==self._lastAddedAltitude: break
+            iter = model.iter_next(iter)
+        if iter is not None:
+            self._fileList.set_cursor(model.get_path(iter),
+                                      self._fileList.get_column(0), True)
+        self._lastAddedAltitude = None
                              
     def _removeButtonClicked(self, button):
         """Called when the Remove button is clicked."""
