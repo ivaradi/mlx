@@ -16,7 +16,8 @@ data_files.append((os.path.join("doc", "manual", "en"),
                    glob(os.path.join("doc", "manual", "en", "*.*"))))
 data_files.append((os.path.join("doc", "manual", "hu"),
                    glob(os.path.join("doc", "manual", "en", "*.*"))))
-data_files.append(("", ["logo.png"]))
+data_files.append(("", ["logo.png",
+                        "conn_grey.png", "conn_red.png", "conn_green.png"]))
 if os.name=="nt":
     import py2exe
 

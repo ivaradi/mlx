@@ -140,7 +140,7 @@ class GUI(fs.ConnectionListener):
 
         mainVBox.pack_start(gtk.HSeparator(), False, False, 0)
 
-        self._statusbar = Statusbar()
+        self._statusbar = Statusbar(iconDirectory)
         mainVBox.pack_start(self._statusbar, False, False, 0)
 
         self._notebook.connect("switch-page", self._notebookPageSwitch)

@@ -14,7 +14,7 @@ import time
 
 class Statusbar(gtk.Frame, FlightStatusHandler):
     """A status bar for the logger."""
-    def __init__(self):
+    def __init__(self, iconDirectory):
         """Construct the status bar."""
         gtk.Frame.__init__(self)
         FlightStatusHandler.__init__(self)
@@ -34,8 +34,17 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         statusBox = gtk.HBox()
         frameAlignment.add(statusBox)
 
+        iconPath = os.path.join(iconDirectory, "conn_grey.png")
+        self._connGreyIcon = pixbuf_new_from_file(iconPath)
+
+        iconPath = os.path.join(iconDirectory, "conn_red.png")
+        self._connRedIcon = pixbuf_new_from_file(iconPath)
+
+        iconPath = os.path.join(iconDirectory, "conn_green.png")
+        self._connGreenIcon = pixbuf_new_from_file(iconPath)
+
         self._connStateArea = gtk.DrawingArea()
-        self._connStateArea.set_size_request(16, 16)
+        self._connStateArea.set_size_request(18, 18)
         self._connStateArea.set_tooltip_markup(xstr("statusbar_conn_tooltip"))
 
         if pygobject:
@@ -104,24 +113,22 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._timeLabel.set_text(timeStr)
 
     def _drawConnState(self, connStateArea, eventOrContext):
-        """Draw the connection state."""        
-        context = eventOrContext if pygobject else connStateArea.window.cairo_create()
-
+        """Draw the connection state."""
         if self._connecting:
             if self._connected:
-                context.set_source_rgb(0.0, 1.0, 0.0)
+                icon = self._connGreenIcon
             else:
-                context.set_source_rgb(1.0, 0.0, 0.0)
+                icon = self._connRedIcon
         else:
-            context.set_source_rgb(0.75, 0.75, 0.75)
+            icon = self._connGreyIcon
 
-        width = connStateArea.get_allocated_width() if pygobject \
-                else connStateArea.allocation.width
-        height = connStateArea.get_allocated_height() if pygobject \
-                 else connStateArea.allocation.height
-        context.arc(width/2, height/2, width/2, 0, 2*math.pi)
-
-        context.fill()
+        if pygobject:
+            gdk.cairo_set_source_pixbuf(eventOrContext, icon, 0, 0)
+            eventOrContext.paint()
+        else:
+            gc = connStateArea.get_style().fg_gc[gtk.STATE_NORMAL]
+            drawable = connStateArea.get_window()
+            drawable.draw_pixbuf(gc, icon, 0, 0, 0, 0)
 
     def _updateFlightStatus(self):
         """Update the flight status information."""
