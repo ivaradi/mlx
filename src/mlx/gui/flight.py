@@ -98,6 +98,8 @@ class Page(gtk.Alignment):
 
         self._wizard = wizard
 
+        self._cancelFlightButton = None
+
         self._completed = False
         self._fromPage = None
 
@@ -125,11 +127,13 @@ class Page(gtk.Alignment):
 
     def addCancelFlightButton(self):
         """Add the 'Cancel flight' button to the page."""
-        return self.addButton(xstr("button_cancelFlight"),
-                              sensitive = True,
-                              tooltip = xstr("button_cancelFlight_tooltip"),
-                              clicked = self._cancelFlight,
-                              padding = 16)
+        self._cancelFlightButton = \
+            self.addButton(xstr("button_cancelFlight"),
+                           sensitive = True,
+                           tooltip = xstr("button_cancelFlight_tooltip"),
+                           clicked = self._cancelFlight,
+                           padding = 16)
+        return self._cancelFlightButton
 
     def addPreviousButton(self, sensitive = True, clicked = None):
         """Add the 'Next' button to the page."""
@@ -192,12 +196,21 @@ class Page(gtk.Alignment):
         """Reset the page if the wizard is reset."""
         self._completed = False
         self._fromPage = None
+        if self._cancelFlightButton is not None:
+            self._cancelFlightButton.set_sensitive(True)
 
     def goBack(self):
         """Go to the page we were invoked from."""
         assert self._fromPage is not None
         
         self._wizard.setCurrentPage(self._fromPage, finalize = False)
+
+    def flightEnded(self):
+        """Called when the flight has ended.
+
+        This default implementation disables the cancel flight button."""
+        if self._cancelFlightButton is not None:
+            self._cancelFlightButton.set_sensitive(False)
 
     def _cancelFlight(self, button):
         """Called when the Cancel flight button is clicked."""
@@ -2189,6 +2202,7 @@ class LandingPage(Page):
 
     def flightEnded(self):
         """Called when the flight has ended."""
+        super(LandingPage, self).flightEnded()
         self._flightEnded = True
         self._updateForwardButton()
 
@@ -2853,7 +2867,8 @@ class Wizard(gtk.VBox):
                                               [self._bookedFlight.arrivalICAO])
             
         elif stage==const.STAGE_END:
-            self._landingPage.flightEnded()
+            for page in self._pages:
+                page.flightEnded()
 
     def _initialize(self, keepLoginResult = False, loginResult = None):
         """Initialize the wizard."""
