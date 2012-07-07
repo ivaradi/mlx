@@ -12,10 +12,12 @@ import mlx.const
 import mlx.update
 
 data_files = [("sounds", glob(os.path.join("sounds", "*.*")))]
-data_files.append((os.path.join("doc", "manual", "en"),
-                   glob(os.path.join("doc", "manual", "en", "*.*"))))
-data_files.append((os.path.join("doc", "manual", "hu"),
-                   glob(os.path.join("doc", "manual", "en", "*.*"))))
+for language in ["en", "hu"]:
+    data_files.append((os.path.join("doc", "manual", language),
+                       glob(os.path.join("doc", "manual", language, "*.*"))))
+    data_files.append((os.path.join("locale", language, "LC_MESSAGES"),
+                       [os.path.join("locale", language, "LC_MESSAGES",
+                                     "mlx.mo")]))
 data_files.append(("", ["logo.png",
                         "conn_grey.png", "conn_red.png", "conn_green.png"]))
 if os.name=="nt":
