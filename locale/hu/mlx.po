@@ -1747,3 +1747,7 @@ msgid "callouts_altitude_clash_sec"
 msgstr ""
 "Ennek ellenére beállítsam a megadott magasságoz? "
 "Ha így teszek, a másik bemondást egyúttal törlöm."
+
+msgid "callouts_open_title"
+msgstr "Válaszd ki a bemondás fájlt"
+

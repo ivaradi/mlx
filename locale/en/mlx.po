@@ -1734,3 +1734,7 @@ msgid "callouts_altitude_clash_sec"
 msgstr ""
 "Shall I set the altitude nevertheless? If so, the other callout "
 "with the same altitude will be removed."
+
+msgid "callouts_open_title"
+msgstr "Select a callout file"
+
