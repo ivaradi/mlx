@@ -155,10 +155,14 @@ class ApproachCalloutsEditor(gtk.Dialog):
         self._fileList.set_tooltip_column(2)
         self._fileList.set_size_request(300, -1)
         self._fileList.set_reorderable(False)
+        self._fileList.connect("button-press-event",
+                               self._fileListButtonPressed)
         selection = self._fileList.get_selection()
         selection.set_mode(SELECTION_MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
-        
+
+        self._buildFileListPopupMenu()
+
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
         scrolledWindow.set_size_request(300, -1)
@@ -227,6 +231,10 @@ class ApproachCalloutsEditor(gtk.Dialog):
                              
     def _removeButtonClicked(self, button):
         """Called when the Remove button is clicked."""
+        self._removeSelected()
+        
+    def _removeSelected(self):
+        """Remove the selected files."""
         selection = self._fileList.get_selection()
         (model, paths) = selection.get_selected_rows()
 
@@ -435,4 +443,34 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         return value
         
+    def _fileListButtonPressed(self, widget, event):
+        """Called when a mouse button is pressed on the file list."""
+        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+            return
+
+        menu = self._fileListPopupMenu
+        if pygobject:
+            menu.popup(None, None, None, None, event.button, event.time)
+        else:
+            menu.popup(None, None, None, event.button, event.time)
+
+    def _buildFileListPopupMenu(self):
+        """Build the file list popup menu."""
+        menu = gtk.Menu()
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("callouts_remove"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupRemove)
+        menuItem.show()
+        self._popupRemoveItem = menuItem
+
+        menu.append(menuItem)
+
+        self._fileListPopupMenu = menu
+
+    def _popupRemove(self, menuItem):
+        """Remove the currently selected menu items."""
+        self._removeSelected()
+
 #------------------------------------------------------------------------------

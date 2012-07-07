@@ -317,12 +317,6 @@ class ChecklistEditor(gtk.Dialog):
         if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
             return
 
-        # (path, _, _, _) = self._flightList.get_path_at_pos(int(event.x),
-        #                                                    int(event.y))
-        # selection = self._flightList.get_selection()
-        # selection.unselect_all()
-        # selection.select_path(path)
-
         menu = self._fileListPopupMenu
         if pygobject:
             menu.popup(None, None, None, None, event.button, event.time)
@@ -330,7 +324,7 @@ class ChecklistEditor(gtk.Dialog):
             menu.popup(None, None, None, event.button, event.time)
 
     def _buildFileListPopupMenu(self):
-        """Get the file list popup menu."""
+        """Build the file list popup menu."""
         menu = gtk.Menu()
 
         menuItem = gtk.MenuItem()
