@@ -36,13 +36,13 @@ import webbrowser
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
-    _authors = [ ("Váradi", "István", "prog_test"),
-                 ("Galyassy", "Tamás", "negotiation"),
-                 ("Petrovszki", "Gábor", "test"),
-                 ("Zsebényi-Loksa", "Gergely", "test"),
-                 ("Kurják", "Ákos", "test"),
-                 ("Nagy", "Dániel", "test"),
-                 ("Radó", "Iván", "test") ]
+    _authors = [ (u"Váradi", u"István", "prog_test"),
+                 (u"Galyassy", u"Tamás", "negotiation"),
+                 (u"Petrovszki", u"Gábor", "test"),
+                 (u"Zsebényi-Loksa", u"Gergely", "test"),
+                 (u"Kurják", u"Ákos", "test"),
+                 (u"Nagy", u"Dániel", "test"),
+                 (u"Radó", u"Iván", "test") ]
 
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
@@ -1327,7 +1327,7 @@ class GUI(fs.ConnectionListener):
 
         If it does not exist yet, it will be created."""
         if self._aboutDialog is None:
-            self._aboutDialog = dialog = gtk.AboutDialog()
+            dialog = gtk.AboutDialog()
             dialog.set_transient_for(self._mainWindow)
             dialog.set_modal(True)
             
@@ -1344,16 +1344,19 @@ class GUI(fs.ConnectionListener):
             isHungarian = getLanguage()=="hu"
             authors = []
             for (familyName, firstName, role) in GUI._authors:
-                authors.append("%s %s (%s)" % \
-                               (familyName if isHungarian else firstName,
-                                firstName if isHungarian else familyName,
-                                xstr("about_role_" + role)))            
+                author = "%s %s" % \
+                         (familyName if isHungarian else firstName,
+                          firstName if isHungarian else familyName)
+                role = xstr("about_role_" + role)
+                authors.append(author + " (" + role + ")")
             dialog.set_authors(authors)
 
             dialog.set_license(xstr("about_license"))
 
             if not pygobject:
                 gtk.about_dialog_set_url_hook(self._showAboutURL, None)
+
+            self._aboutDialog = dialog
 
         return self._aboutDialog
 

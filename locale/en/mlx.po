@@ -1,0 +1,1730 @@
+# English-language texts for the MAVA Logger X
+#
+# István Váradi <ivaradi@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: MAVA Logger X\n"
+"Language: en_GB\n"
+"PO-Revision-Date: 2012-07-07 10:18+0200\n"
+"Last-Translator: István Váradi <ivaradi@gmail.com>\n"
+"Language-Team: MAVA Logger X development team <ivaradi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "aircraft_b736"
+msgstr "Boeing 737-600"
+
+msgid "aircraft_b737"
+msgstr "Boeing 737-700"
+
+msgid "aircraft_b738"
+msgstr "Boeing 737-800"
+
+msgid "aircraft_b738c"
+msgstr "Boeing 737-800 (charter)"
+
+msgid "aircraft_b733"
+msgstr "Boeing 737-300"
+
+msgid "aircraft_b734"
+msgstr "Boeing 737-400"
+
+msgid "aircraft_b735"
+msgstr "Boeing 737-500"
+
+msgid "aircraft_dh8d"
+msgstr "Bombardier Dash 8 Q400"
+
+msgid "aircraft_b762"
+msgstr "Boeing 767-200"
+
+msgid "aircraft_b763"
+msgstr "Boeing 767-300"
+
+msgid "aircraft_crj2"
+msgstr "Canadair Regional Jet CRJ-200"
+
+msgid "aircraft_f70"
+msgstr "Fokker F70"
+
+msgid "aircraft_dc3"
+msgstr "Lisunov Li-2"
+
+msgid "aircraft_t134"
+msgstr "Tupolev Tu-134"
+
+msgid "aircraft_t154"
+msgstr "Tupolev Tu-154"
+
+msgid "aircraft_yk40"
+msgstr "Yakovlev Yak-40"
+
+msgid "file_filter_all"
+msgstr "All files"
+
+msgid "file_filter_pireps"
+msgstr "PIREP files"
+
+msgid "file_filter_audio"
+msgstr "Audio files"
+
+msgid "button_ok"
+msgstr "_OK"
+
+msgid "button_cancel"
+msgstr "_Cancel"
+
+msgid "button_yes"
+msgstr "_Yes"
+
+msgid "button_no"
+msgstr "_No"
+
+msgid "button_browse"
+msgstr "Browse..."
+
+msgid "button_cancelFlight"
+msgstr "Cancel flight"
+
+msgid "menu_file"
+msgstr "File"
+
+msgid "menu_file_loadPIREP"
+msgstr "_Load PIREP..."
+
+msgid "menu_file_loadPIREP_key"
+msgstr "l"
+
+msgid "menu_file_quit"
+msgstr "_Quit"
+
+msgid "menu_file_quit_key"
+msgstr "q"
+
+msgid "quit_question"
+msgstr "Are you sure to quit the logger?"
+
+msgid "menu_tools"
+msgstr "Tools"
+
+msgid "menu_tools_chklst"
+msgstr "_Checklist Editor"
+
+msgid "menu_tools_chklst_key"
+msgstr "c"
+
+msgid "menu_tools_callouts"
+msgstr "_Approach Callouts Editor"
+
+msgid "menu_tools_callouts_key"
+msgstr "e"
+
+msgid "menu_tools_prefs"
+msgstr "_Preferences"
+
+msgid "menu_tools_prefs_key"
+msgstr "p"
+
+msgid "menu_view"
+msgstr "View"
+
+msgid "menu_view_monitor"
+msgstr "Show _monitor window"
+
+msgid "menu_view_monitor_key"
+msgstr "m"
+
+msgid "menu_view_debug"
+msgstr "Show _debug log"
+
+msgid "menu_view_debug_key"
+msgstr "d"
+
+msgid "menu_help"
+msgstr "Help"
+
+msgid "menu_help_manual"
+msgstr "_User's manual"
+
+msgid "menu_help_manual_key"
+msgstr "u"
+
+msgid "menu_help_about"
+msgstr "_About"
+
+msgid "menu_help_about_key"
+msgstr "a"
+
+msgid "tab_flight"
+msgstr "_Flight"
+
+msgid "tab_flight_tooltip"
+msgstr "Flight wizard"
+
+msgid "tab_flight_info"
+msgstr "Flight _info"
+
+msgid "tab_flight_info_tooltip"
+msgstr "Further information regarding the flight"
+
+msgid "tab_weight_help"
+msgstr "_Help"
+
+msgid "tab_weight_help_tooltip"
+msgstr "Help to calculate the weights"
+
+msgid "tab_log"
+msgstr "_Log"
+
+msgid "tab_log_tooltip"
+msgstr "The log of your flight that will be sent to the MAVA website"
+
+msgid "tab_gates"
+msgstr "_Gates"
+
+msgid "tab_gates_tooltip"
+msgstr "The status of the MAVA fleet and the gates at LHBP"
+
+msgid "tab_debug_log"
+msgstr "_Debug log"
+
+msgid "tab_debug_log_tooltip"
+msgstr "Log with debugging information."
+
+msgid "conn_failed"
+msgstr "Cannot connect to the simulator."
+
+msgid "conn_failed_sec"
+msgstr ""
+"Rectify the situation, and press <b>Try again</b> to try "
+"the connection again, or <b>Cancel</b> to cancel the flight."
+
+msgid "conn_broken"
+msgstr "The connection to the simulator failed unexpectedly."
+
+msgid "conn_broken_sec"
+msgstr ""
+"If the simulator has crashed, restart it and restore your flight "
+"as much as possible to the state it was in before the crash. "
+"Then press <b>Reconnect</b> to reconnect.\n"
+"\n"
+"If you want to cancel the flight, press <b>Cancel</b>."
+
+msgid "button_tryagain"
+msgstr "_Try again"
+
+msgid "button_reconnect"
+msgstr "_Reconnect"
+
+msgid "login"
+msgstr "Login"
+
+msgid "loginHelp"
+msgstr ""
+"Enter your MAVA pilot's ID and password to\n"
+"log in to the MAVA website and download\n"
+"your booked flights."
+
+msgid "label_pilotID"
+msgstr "Pil_ot ID:"
+
+msgid "login_pilotID_tooltip"
+msgstr ""
+"Enter your MAVA pilot's ID. This usually starts with a 'P' "
+"followed by 3 digits."
+
+msgid "label_password"
+msgstr "_Password:"
+
+msgid "login_password_tooltip"
+msgstr "Enter the password for your pilot's ID"
+
+msgid "remember_password"
+msgstr "_Remember password"
+
+msgid "login_remember_tooltip"
+msgstr ""
+"If checked, your password will be stored, so that you "
+"should not have to enter it every time. Note, however, that "
+"the password is stored as text, and anybody who can access "
+"your files will be able to read it."
+
+msgid "login_entranceExam"
+msgstr "_Entrance exam"
+
+msgid "login_entranceExam_tooltip"
+msgstr "Check this to log in to take your entrance exam."
+
+msgid "button_offline"
+msgstr "Fl_y offline"
+
+msgid "button_offline_tooltip"
+msgstr ""
+"Click this button to fly offline, without logging in "
+"to the MAVA website."
+
+msgid "button_login"
+msgstr "Logi_n"
+
+msgid "login_button_tooltip"
+msgstr "Click to log in."
+
+msgid "login_busy"
+msgstr "Logging in..."
+
+msgid "login_invalid"
+msgstr "Invalid pilot's ID or password."
+
+msgid "login_invalid_sec"
+msgstr "Check the ID and try to reenter the password."
+
+msgid "login_entranceExam_invalid"
+msgstr "Invalid pilot's ID or not registered for exam."
+
+msgid "login_entranceExam_invalid_sec"
+msgstr ""
+"Check the ID and make sure that you are allowed to take your entrance exam."
+
+msgid "login_failconn"
+msgstr "Failed to communicate with the MAVA website."
+
+msgid "login_failconn_sec"
+msgstr ""
+"Try again in a few minutes. If it does not help, "
+"see the debug log for details."
+
+msgid "reload_busy"
+msgstr "Reloading flights..."
+
+msgid "reload_failed"
+msgstr "Your pilot ID and password failed this time."
+
+msgid "reload_failed_sec"
+msgstr ""
+"This must be some problem with the MAVA website (or you are fired), "
+"using your old list of flights."
+
+msgid "reload_failconn"
+msgstr "Failed to communicate with the MAVA website."
+
+msgid "reload_failconn_sec"
+msgstr "Your previously downloaded list of flights will be used."
+
+msgid "cancelFlight_question"
+msgstr "Are you sure to cancel the flight?"
+
+msgid "button_next"
+msgstr "_Next"
+
+msgid "button_next_tooltip"
+msgstr "Click to go to the next page."
+
+msgid "button_previous"
+msgstr "_Previous"
+
+msgid "button_previous_tooltip"
+msgstr "Click to go to the previous page."
+
+msgid "button_cancelFlight_tooltip"
+msgstr ""
+"Click to cancel the current flight. If you have logged in, "
+"you will go back to the flight selection page, otherwise to the login page."
+
+msgid "flightsel_title"
+msgstr "Flight selection"
+
+msgid "flightsel_help"
+msgstr "Select the flight you want to perform."
+
+msgid "flightsel_chelp"
+msgstr "You have selected the flight highlighted below."
+
+msgid "flightsel_no"
+msgstr "Flight no."
+
+msgid "flightsel_deptime"
+msgstr "Departure time [UTC]"
+
+msgid "flightsel_from"
+msgstr "From"
+
+msgid "flightsel_to"
+msgstr "To"
+
+msgid "flightsel_save"
+msgstr "_Save flight"
+
+msgid "flightsel_save_tooltip"
+msgstr ""
+"Click here to save the currently selected flight into a "
+"file that can be loaded later."
+
+msgid "flightsel_save_title"
+msgstr "Save a flight into a file"
+
+msgid "flightsel_save_failed"
+msgstr "Could not save the flight into a file."
+
+msgid "flightsel_save_failed_sec"
+msgstr "Check the debug log for more details."
+
+msgid "flightsel_refresh"
+msgstr "_Refresh flights"
+
+msgid "flightsel_refresh_tooltip"
+msgstr "Click here to refresh the list of flights from the MAVA website."
+
+msgid "flightsel_load"
+msgstr "L_oad flight from file"
+
+msgid "flightsel_load_tooltip"
+msgstr "Click here to load a flight from a file, and add it to the list above."
+
+msgid "flightsel_load_title"
+msgstr "Load flight from file"
+
+msgid "flightsel_filter_flights"
+msgstr "Flight files"
+
+msgid "flightsel_load_failed"
+msgstr "Could not load the flight file"
+
+msgid "flightsel_load_failed_sec"
+msgstr "Check the debug log for more details."
+
+msgid "fleet_busy"
+msgstr "Retrieving fleet..."
+
+msgid "fleet_failed"
+msgstr "Failed to retrieve the information on the fleet."
+
+msgid "fleet_update_busy"
+msgstr "Updating plane status..."
+
+msgid "fleet_update_failed"
+msgstr "Failed to update the status of the airplane."
+
+msgid "gatesel_title"
+msgstr "LHBP gate selection"
+
+msgid "gatesel_help"
+msgstr ""
+"The airplane's gate position is invalid.\n"
+"\n"
+"Select the gate from which you\n"
+"would like to begin the flight."
+
+msgid "gatesel_conflict"
+msgstr "Gate conflict detected again."
+
+msgid "gatesel_conflict_sec"
+msgstr "Try to select a different gate."
+
+msgid "connect_title"
+msgstr "Connect to the simulator"
+
+msgid "connect_help"
+msgstr ""
+"Load the aircraft below into the simulator and park it\n"
+"at the given airport, at the gate below, if present.\n"
+"\n"
+"Then press the Connect button to connect to the simulator."
+
+msgid "connect_chelp"
+msgstr "The basic data of your flight can be read below."
+
+msgid "connect_flightno"
+msgstr "Flight number:"
+
+msgid "connect_acft"
+msgstr "Aircraft:"
+
+msgid "connect_tailno"
+msgstr "Tail number:"
+
+msgid "connect_airport"
+msgstr "Airport:"
+
+msgid "connect_gate"
+msgstr "Gate:"
+
+msgid "button_connect"
+msgstr "_Connect"
+
+msgid "button_connect_tooltip"
+msgstr "Click to connect to the simulator."
+
+msgid "connect_busy"
+msgstr "Connecting to the simulator..."
+
+msgid "payload_title"
+msgstr "Payload"
+
+msgid "payload_help"
+msgstr ""
+"The briefing contains the weights below.\n"
+"Setup the cargo weight here and the payload weight in the simulator.\n"
+"\n"
+"You can also check here what the simulator reports as ZFW."
+
+msgid "payload_chelp"
+msgstr ""
+"You can see the weights in the briefing\n"
+"and the cargo weight you have selected below.\n"
+"\n"
+"You can also query the ZFW reported by the simulator."
+
+msgid "payload_crew"
+msgstr "Crew:"
+
+msgid "payload_pax"
+msgstr "Passengers:"
+
+msgid "payload_bag"
+msgstr "Baggage:"
+
+msgid "payload_cargo"
+msgstr "_Cargo:"
+
+msgid "payload_cargo_tooltip"
+msgstr "The weight of the cargo for your flight."
+
+msgid "payload_mail"
+msgstr "Mail:"
+
+msgid "payload_zfw"
+msgstr "Calculated ZFW:"
+
+msgid "payload_fszfw"
+msgstr "_ZFW from FS:"
+
+msgid "payload_fszfw_tooltip"
+msgstr "Click here to refresh the ZFW value from the simulator."
+
+msgid "payload_zfw_busy"
+msgstr "Querying ZFW..."
+
+msgid "time_title"
+msgstr "Time"
+
+msgid "time_help"
+msgstr ""
+"The departure and arrival times are displayed below in UTC.\n"
+"\n"
+"You can also query the current UTC time from the simulator.\n"
+"Ensure that you have enough time to properly prepare for the flight."
+
+msgid "time_chelp"
+msgstr ""
+"The departure and arrival times are displayed below in UTC.\n"
+"\n"
+"You can also query the current UTC time from the simulator."
+
+msgid "time_departure"
+msgstr "Departure:"
+
+msgid "time_arrival"
+msgstr "Arrival:"
+
+msgid "time_fs"
+msgstr "_Time from FS:"
+
+msgid "time_fs_tooltip"
+msgstr "Click here to query the current UTC time from the simulator."
+
+msgid "time_busy"
+msgstr "Querying time..."
+
+msgid "fuel_title"
+msgstr "Fuel"
+
+msgid "fuel_help"
+msgstr ""
+"Enter the amount of fuel in kilograms that need to be present "
+"in each tank below.\n"
+"\n"
+"When you press <b>Next</b>, the necessary amount of fuel\n"
+"will be pumped into or out of the tanks."
+
+msgid "fuel_chelp"
+msgstr ""
+"The amount of fuel tanked into your aircraft at the\n"
+"beginning of the flight can be seen below."
+
+msgid "fuel_tank_centre"
+msgstr "_Centre"
+
+msgid "fuel_tank_left"
+msgstr "L_eft"
+
+msgid "fuel_tank_right"
+msgstr "_Right"
+
+msgid "fuel_tank_left_aux"
+msgstr ""
+"Left\n"
+"A_ux"
+
+msgid "fuel_tank_right_aux"
+msgstr ""
+"Right\n"
+"Au_x"
+
+msgid "fuel_tank_left_tip"
+msgstr ""
+"Left\n"
+"_Tip"
+
+msgid "fuel_tank_right_tip"
+msgstr ""
+"Right\n"
+"Tip"
+
+msgid "fuel_tank_external1"
+msgstr ""
+"External\n"
+"_1"
+
+msgid "fuel_tank_external2"
+msgstr ""
+"External\n"
+"_2"
+
+msgid "fuel_tank_centre2"
+msgstr ""
+"Ce_ntre\n"
+"2"
+
+msgid "fuel_get_busy"
+msgstr "Querying fuel information..."
+
+msgid "fuel_pump_busy"
+msgstr "Pumping fuel..."
+
+msgid "fuel_tank_tooltip"
+msgstr ""
+"This part displays the current level of the fuel in the tank compared "
+"to its capacity. The <span color=\"turquoise\">turquoise</span> slider "
+"shows the level that should be loaded into the tank for the flight. "
+"You can click anywhere in the widget to move the slider there. "
+"Or you can grab it by holding down the left button of your mouse, "
+"and move the pointer up or down. The scroll wheel on your mouse "
+"also increments or decrements the amount of fuel by 10. If you "
+"hold down the <b>Shift</b> key while scrolling, the steps "
+"will be 100, or with the <b>Control</b> key, 1."
+
+msgid "route_title"
+msgstr "Route"
+
+msgid "route_help"
+msgstr ""
+"Set your cruise flight level below, and\n"
+"if necessary, edit the flight plan."
+
+msgid "route_chelp"
+msgstr ""
+"If necessary, you can modify the cruise level and\n"
+"the flight plan below during flight.\n"
+"If so, please, add a comment on why the modification became necessary."
+
+msgid "route_level"
+msgstr "_Cruise level:"
+
+msgid "route_level_tooltip"
+msgstr ""
+"The cruise flight level. Click on the arrows to increment "
+"or decrement by 10, or enter the number on the keyboard."
+
+msgid "route_route"
+msgstr "_Route"
+
+msgid "route_route_tooltip"
+msgstr "The planned flight route in the standard format."
+
+msgid "route_down_notams"
+msgstr "Downloading NOTAMs..."
+
+msgid "route_down_metars"
+msgstr "Downloading METARs..."
+
+msgid "briefing_title"
+msgstr "Briefing (%d/2): %s"
+
+msgid "briefing_departure"
+msgstr "departure"
+
+msgid "briefing_arrival"
+msgstr "arrival"
+
+msgid "briefing_help"
+msgstr ""
+"Read carefully the NOTAMs and METAR below.\n"
+"\n"
+"You can edit the METAR if your simulator or network\n"
+"provides different weather."
+
+msgid "briefing_chelp"
+msgstr ""
+"If your simulator or network provides a different\n"
+"weather, you can edit the METAR below."
+
+msgid "briefing_notams_init"
+msgstr "LHBP NOTAMs"
+
+msgid "briefing_metar_init"
+msgstr "LHBP METAR"
+
+msgid "briefing_button"
+msgstr "I have read the briefing and am _ready to fly!"
+
+msgid "briefing_notams_template"
+msgstr "%s NOTAMs"
+
+msgid "briefing_metar_template"
+msgstr "%s _METAR"
+
+msgid "briefing_notams_failed"
+msgstr "Could not download NOTAMs"
+
+msgid "briefing_notams_missing"
+msgstr "Could not download NOTAM for this airport"
+
+msgid "briefing_metar_failed"
+msgstr "Could not download METAR"
+
+msgid "takeoff_title"
+msgstr "Takeoff"
+
+msgid "takeoff_help"
+msgstr "Enter the runway and SID used, as well as the speeds."
+
+msgid "takeoff_chelp"
+msgstr "The runway, SID and takeoff speeds logged can be seen below."
+
+msgid "takeoff_runway"
+msgstr "Run_way:"
+
+msgid "takeoff_runway_tooltip"
+msgstr "The runway the takeoff is performed from."
+
+msgid "takeoff_sid"
+msgstr "_SID:"
+
+msgid "takeoff_sid_tooltip"
+msgstr "The name of the Standard Instrument Deparature procedure followed."
+
+msgid "label_knots"
+msgstr "knots"
+
+msgid "label_kmph"
+msgstr "km/h"
+
+msgid "takeoff_v1"
+msgstr "V<sub>_1</sub>:"
+
+msgid "takeoff_v1_tooltip_knots"
+msgstr "The takeoff decision speed in knots."
+
+msgid "takeoff_v1_tooltip_kmph"
+msgstr "The takeoff decision speed in km/h."
+
+msgid "takeoff_vr"
+msgstr "V<sub>_R</sub>:"
+
+msgid "takeoff_vr_tooltip_knots"
+msgstr "The takeoff rotation speed in knots."
+
+msgid "takeoff_vr_tooltip_kmph"
+msgstr "The takeoff rotation speed in km/h."
+
+msgid "takeoff_v2"
+msgstr "V<sub>_2</sub>:"
+
+msgid "takeoff_v2_tooltip_knots"
+msgstr "The takeoff safety speed in knots."
+
+msgid "takeoff_v2_tooltip_kmph"
+msgstr "The takeoff safety speed in km/h."
+
+msgid "landing_title"
+msgstr "Landing"
+
+msgid "landing_help"
+msgstr ""
+"Enter the STAR and/or transition, runway,\n"
+"approach type and V<sub>Ref</sub> used."
+
+msgid "landing_chelp"
+msgstr ""
+"The STAR and/or transition, runway, approach\n"
+"type and V<sub>Ref</sub> logged can be seen below."
+
+msgid "landing_star"
+msgstr "_STAR:"
+
+msgid "landing_star_tooltip"
+msgstr "The name of Standard Terminal Arrival Route planned."
+
+msgid "landing_transition"
+msgstr "_Transition:"
+
+msgid "landing_transition_tooltip"
+msgstr "The name of transition planned."
+
+msgid "landing_runway"
+msgstr "Run_way:"
+
+msgid "landing_runway_tooltip"
+msgstr "The runway the landing is performed on."
+
+msgid "landing_approach"
+msgstr "_Approach type:"
+
+msgid "landing_approach_tooltip"
+msgstr "The type of the approach, e.g. ILS or VISUAL."
+
+msgid "landing_vref"
+msgstr "V<sub>_Ref</sub>:"
+
+msgid "landing_vref_tooltip_knots"
+msgstr "The landing reference speed in knots."
+
+msgid "landing_vref_tooltip_kmph"
+msgstr "The landing reference speed in km/h."
+
+msgid "flighttype_scheduled"
+msgstr "scheduled"
+
+msgid "flighttype_ot"
+msgstr "old-timer"
+
+msgid "flighttype_vip"
+msgstr "VIP"
+
+msgid "flighttype_charter"
+msgstr "charter"
+
+msgid "finish_title"
+msgstr "Finish"
+
+msgid "finish_help"
+msgstr ""
+"There are some statistics about your flight below.\n"
+"\n"
+"Review the data, also on earlier pages, and if you are\n"
+"satisfied, you can save or send your PIREP."
+
+msgid "finish_rating"
+msgstr "Flight rating:"
+
+msgid "finish_flight_time"
+msgstr "Flight time:"
+
+msgid "finish_block_time"
+msgstr "Block time:"
+
+msgid "finish_distance"
+msgstr "Distance flown:"
+
+msgid "finish_fuel"
+msgstr "Fuel used:"
+
+msgid "finish_type"
+msgstr "_Type:"
+
+msgid "finish_type_tooltip"
+msgstr "Select the type of the flight."
+
+msgid "finish_online"
+msgstr "_Online flight"
+
+msgid "finish_online_tooltip"
+msgstr "Check if your flight was online, uncheck otherwise."
+
+msgid "finish_gate"
+msgstr "_Arrival gate:"
+
+msgid "finish_gate_tooltip"
+msgstr "Select the gate or stand at which you have arrived to LHBP."
+
+msgid "finish_newFlight"
+msgstr "_New flight..."
+
+msgid "finish_newFlight_tooltip"
+msgstr "Click here to start a new flight."
+
+msgid "finish_newFlight_question"
+msgstr ""
+"You have neither saved nor sent your PIREP. "
+"Are you sure to start a new flight?"
+
+msgid "finish_save"
+msgstr "Sa_ve PIREP..."
+
+msgid "finish_save_tooltip"
+msgstr ""
+"Click to save the PIREP into a file on your computer. "
+"The PIREP can be loaded and sent later."
+
+msgid "finish_save_title"
+msgstr "Save PIREP into"
+
+msgid "finish_save_done"
+msgstr "The PIREP was saved successfully"
+
+msgid "finish_save_failed"
+msgstr "Failed to save the PIREP"
+
+msgid "finish_save_failed_sec"
+msgstr "See the debug log for the details."
+
+msgid "info_comments"
+msgstr "_Comments"
+
+msgid "info_defects"
+msgstr "Flight _defects"
+
+msgid "info_delay"
+msgstr "Delay codes"
+
+msgid "info_delay_loading"
+msgstr "L_oading problems"
+
+msgid "info_delay_vatsim"
+msgstr "_VATSIM problem"
+
+msgid "info_delay_net"
+msgstr "_Net problems"
+
+msgid "info_delay_atc"
+msgstr "Controll_er's fault"
+
+msgid "info_delay_system"
+msgstr "S_ystem crash/freeze"
+
+msgid "info_delay_nav"
+msgstr "Naviga_tion problem"
+
+msgid "info_delay_traffic"
+msgstr "T_raffic problems"
+
+msgid "info_delay_apron"
+msgstr "_Apron navigation problem"
+
+msgid "info_delay_weather"
+msgstr "_Weather problems"
+
+msgid "info_delay_personal"
+msgstr "_Personal reasons"
+
+msgid "statusbar_conn_tooltip"
+msgstr ""
+"The state of the connection.\n"
+"<span foreground=\"grey\">Grey</span> means idle.\n"
+"<span foreground=\"red\">Red</span> means trying to connect "
+"or connection is broken.\n"
+"<span foreground=\"green\">Green</span> means connected."
+
+msgid "statusbar_stage_tooltip"
+msgstr "The flight stage"
+
+msgid "statusbar_time_tooltip"
+msgstr "The simulator time in UTC"
+
+msgid "statusbar_rating_tooltip"
+msgstr "The flight rating"
+
+msgid "statusbar_busy_tooltip"
+msgstr "The status of the background tasks."
+
+msgid "flight_stage_boarding"
+msgstr "boarding"
+
+msgid "flight_stage_pushback and taxi"
+msgstr "pushback and taxi"
+
+msgid "flight_stage_takeoff"
+msgstr "takeoff"
+
+msgid "flight_stage_RTO"
+msgstr "RTO"
+
+msgid "flight_stage_climb"
+msgstr "climb"
+
+msgid "flight_stage_cruise"
+msgstr "cruise"
+
+msgid "flight_stage_descent"
+msgstr "descent"
+
+msgid "flight_stage_landing"
+msgstr "landing"
+
+msgid "flight_stage_taxi"
+msgstr "taxi"
+
+msgid "flight_stage_parking"
+msgstr "parking"
+
+msgid "flight_stage_go-around"
+msgstr "go-around"
+
+msgid "flight_stage_end"
+msgstr "end"
+
+msgid "statusicon_showmain"
+msgstr "Show main window"
+
+msgid "statusicon_showmonitor"
+msgstr "Show monitor window"
+
+msgid "statusicon_quit"
+msgstr "Quit"
+
+msgid "statusicon_stage"
+msgstr "Stage"
+
+msgid "statusicon_rating"
+msgstr "Rating"
+
+msgid "update_title"
+msgstr "Update"
+
+msgid "update_needsudo"
+msgstr ""
+"There is an update available, but the program cannot write\n"
+"its directory due to insufficient privileges.\n"
+"\n"
+"Click OK, if you want to run a helper program\n"
+"with administrator privileges to complete the update,\n"
+"Cancel otherwise."
+
+msgid "update_manifest_progress"
+msgstr "Downloading manifest..."
+
+msgid "update_manifest_done"
+msgstr "Downloaded manifest..."
+
+msgid "update_files_progress"
+msgstr "Downloading files..."
+
+msgid "update_files_bytes"
+msgstr "Downloaded %d of %d bytes"
+
+msgid "update_renaming"
+msgstr "Renaming downloaded files..."
+
+msgid "update_renamed"
+msgstr "Renamed %s"
+
+msgid "update_removing"
+msgstr "Removing files..."
+
+msgid "update_removed"
+msgstr "Removed %s"
+
+msgid "update_writing_manifest"
+msgstr "Writing the new manifest"
+
+msgid "update_finished"
+msgstr "Finished updating. Press OK to restart the program."
+
+msgid "update_nothing"
+msgstr "There was nothing to update"
+
+msgid "update_failed"
+msgstr "Failed, see the debug log for details."
+
+msgid "weighthelp_usinghelp"
+msgstr "_Using help"
+
+msgid "weighthelp_usinghelp_tooltip"
+msgstr ""
+"If you check this, some help will be displayed on how to "
+"calculate the payload weight for your flight. Note, that "
+"the usage of this facility will be logged."
+
+msgid "weighthelp_header_calculated"
+msgstr ""
+"Requested/\n"
+"calculated"
+
+msgid "weighthelp_header_simulator"
+msgstr ""
+"Simulator\n"
+"data"
+
+msgid "weighthelp_header_simulator_tooltip"
+msgstr ""
+"Click this button to retrieve the weight values from the simulator, "
+"which will be displayed below. If a value is within 10% of the tolerance, "
+"it is displayed in <b><span foreground=\"darkgreen\">green</span></b>, "
+"if it is out of the tolerance, it is displayed in "
+"<b><span foreground=\"red\">red</span></b>, otherwise in "
+"<b><span foreground=\"orange\">yellow</span></b>."
+
+msgid "weighthelp_crew"
+msgstr "Crew (%s):"
+
+msgid "weighthelp_pax"
+msgstr "Passengers (%s):"
+
+msgid "weighthelp_baggage"
+msgstr "Baggage:"
+
+msgid "weighthelp_cargo"
+msgstr "Cargo:"
+
+msgid "weighthelp_mail"
+msgstr "Mail:"
+
+msgid "weighthelp_payload"
+msgstr "Payload:"
+
+msgid "weighthelp_dow"
+msgstr "DOW:"
+
+msgid "weighthelp_zfw"
+msgstr "ZFW:"
+
+msgid "weighthelp_gross"
+msgstr "Gross weight:"
+
+msgid "weighthelp_mzfw"
+msgstr "MZFW:"
+
+msgid "weighthelp_mtow"
+msgstr "MTOW:"
+
+msgid "weighthelp_mlw"
+msgstr "MLW:"
+
+msgid "weighthelp_busy"
+msgstr "Querying weight data..."
+
+msgid "gates_fleet_title"
+msgstr "Fl_eet"
+
+msgid "gates_gates_title"
+msgstr "LHBP gates"
+
+msgid "gates_tailno"
+msgstr "Tail nr."
+
+msgid "gates_planestatus"
+msgstr "Status"
+
+msgid "gates_refresh"
+msgstr "_Refresh data"
+
+msgid "gates_refresh_tooltip"
+msgstr "Click this button to refresh the status data above"
+
+msgid "gates_planes_tooltip"
+msgstr ""
+"This table lists all the planes in the MAVA fleet and their "
+"last known location. If a plane is conflicting with another "
+"because of occupying the same gate its data is displayed in "
+"<b><span foreground=\"red\">red</span></b>."
+
+msgid "gates_gates_tooltip"
+msgstr ""
+"The numbers of the gates occupied by MAVA planes are displayed "
+"in <b><span foreground=\"orange\">yellow</span></b>, while "
+"available gates in black."
+
+msgid "gates_plane_away"
+msgstr "AWAY"
+
+msgid "gates_plane_parking"
+msgstr "PARKING"
+
+msgid "gates_plane_unknown"
+msgstr "UNKNOWN"
+
+msgid "prefs_title"
+msgstr "Preferences"
+
+msgid "prefs_tab_general"
+msgstr "_General"
+
+msgid "prefs_tab_general_tooltip"
+msgstr "General preferences"
+
+msgid "prefs_tab_messages"
+msgstr "_Messages"
+
+msgid "prefs_tab_message_tooltip"
+msgstr "Enable/disable message notifications in FS and/or by sound"
+
+msgid "prefs_tab_sounds"
+msgstr "_Sounds"
+
+msgid "prefs_tab_sounds_tooltip"
+msgstr ""
+"Preferences regarding what sounds should be played during "
+"the various flight stages"
+
+msgid "prefs_tab_advanced"
+msgstr "_Advanced"
+
+msgid "prefs_tab_advanced_tooltip"
+msgstr "Advanced preferences, edit with care!"
+
+msgid "prefs_language"
+msgstr "_Language:"
+
+msgid "prefs_language_tooltip"
+msgstr "The language of the program"
+
+msgid "prefs_restart"
+msgstr "Restart needed"
+
+msgid "prefs_language_restart_sec"
+msgstr ""
+"If you change the language, the program should be restarted "
+"so that the change has an effect."
+
+msgid "prefs_lang_$system"
+msgstr "system default"
+
+msgid "prefs_lang_en_GB"
+msgstr "English"
+
+msgid "prefs_lang_hu_HU"
+msgstr "Hungarian"
+
+msgid "prefs_hideMinimizedWindow"
+msgstr "_Hide the main window when minimized"
+
+msgid "prefs_hideMinimizedWindow_tooltip"
+msgstr ""
+"If checked, the main window will be hidden completely when minimized. "
+"You can still make it appear by clicking on the status icon or using "
+"its popup menu."
+
+msgid "prefs_quitOnClose"
+msgstr "_Quit when the window close button is clicked"
+
+msgid "prefs_quitOnClose_tooltip"
+msgstr ""
+"If checked, the application will quit when the window close "
+"button is clicked. Before quitting, the confirmation will be asked. "
+"If not checked, the window will be hidden to the tray."
+
+msgid "prefs_onlineGateSystem"
+msgstr "_Use the Online Gate System"
+
+msgid "prefs_onlineGateSystem_tooltip"
+msgstr ""
+"If this is checked, the logger will query and update the "
+"LHBP Online Gate System."
+
+msgid "prefs_onlineACARS"
+msgstr "Use the Online ACA_RS System"
+
+msgid "prefs_onlineACARS_tooltip"
+msgstr ""
+"If this is checked, the logger will continuously update the "
+"MAVA Online ACARS System with your flight's data."
+
+msgid "prefs_flaretimeFromFS"
+msgstr "Take flare _time from the simulator"
+
+msgid "prefs_flaretimeFromFS_tooltip"
+msgstr ""
+"If this is checked, the time of the flare will be calculated "
+"from timestamps returned by the simulator."
+
+msgid "prefs_syncFSTime"
+msgstr "S_ynchronize the time in FS with the computer's clock"
+
+msgid "prefs_syncFSTime_tooltip"
+msgstr ""
+"If this is checked, the flight simulator's internal clock will "
+"always be synchronized to the computer's clock."
+
+msgid "prefs_usingFS2Crew"
+msgstr "Using FS_2Crew"
+
+msgid "prefs_usingFS2Crew_tooltip"
+msgstr ""
+"If this is checked, the logger will take into account, "
+"that you are using the FS2Crew addon."
+
+msgid "prefs_iasSmoothingEnabled"
+msgstr "Enable the smoothing of _IAS over "
+
+msgid "prefs_iasSmoothingEnabledTooltip"
+msgstr ""
+"If enabled, the IAS value will be averaged over the given number "
+"of seconds, and in some checks this averaged value will be considered."
+
+msgid "prefs_vsSmoothingEnabled"
+msgstr "Enable the smoothing of _VS over "
+
+msgid "prefs_vsSmoothingEnabledTooltip"
+msgstr ""
+"If enabled, the VS value will be averaged over the given number "
+"of seconds, and in some checks this averaged value will be considered."
+
+msgid "prefs_smoothing_seconds"
+msgstr "sec."
+
+msgid "prefs_pirepDirectory"
+msgstr "_PIREP directory:"
+
+msgid "prefs_pirepDirectory_tooltip"
+msgstr "The directory that will be offered by default when saving a PIREP."
+
+msgid "prefs_pirepDirectory_browser_title"
+msgstr "Select PIREP directory"
+
+msgid "prefs_frame_gui"
+msgstr "GUI"
+
+msgid "prefs_frame_online"
+msgstr "MAVA Online Systems"
+
+msgid "prefs_frame_simulator"
+msgstr "Simulator"
+
+msgid "chklst_title"
+msgstr "Checklist Editor"
+
+msgid "chklst_aircraftType"
+msgstr "Aircraft _type:"
+
+msgid "chklst_aircraftType_tooltip"
+msgstr "The type of the aircraft for which the checklist is being edited."
+
+msgid "chklst_add"
+msgstr "_Add to checklist"
+
+msgid "chklst_add_tooltip"
+msgstr "Append the files selected on the left to the checklist on the right."
+
+msgid "chklst_remove"
+msgstr "_Remove"
+
+msgid "chklst_remove_tooltip"
+msgstr "Remove the selected items from the checklist."
+
+msgid "chklst_moveUp"
+msgstr "Move _up"
+
+msgid "chklst_moveUp_tooltip"
+msgstr "Move up the selected file(s) in the checklist."
+
+msgid "chklst_moveDown"
+msgstr "Move _down"
+
+msgid "chklst_moveDown_tooltip"
+msgstr "Move down the selected file(s) in the checklist."
+
+msgid "chklst_header"
+msgstr "Checklist files"
+
+msgid "prefs_sounds_frame_bg"
+msgstr "Background"
+
+msgid "prefs_sounds_enable"
+msgstr "_Enable background sounds"
+
+msgid "prefs_sounds_enable_tooltip"
+msgstr ""
+"If the background sounds are enabled, the logger can play different "
+"pre-recorded sounds during the various stages of the flight."
+
+msgid "prefs_sounds_pilotControls"
+msgstr "_Pilot controls the sounds"
+
+msgid "prefs_sounds_pilotControls_tooltip"
+msgstr ""
+"If checked, the background sounds can be started by the pilot by "
+"pressing the hotkey specified below. Otherwise the sounds will start "
+"automatically when certain conditions hold."
+
+msgid "prefs_sounds_pilotHotkey"
+msgstr "_Hotkey:"
+
+msgid "prefs_sounds_pilotHotkey_tooltip"
+msgstr ""
+"The key to press possibly together with modifiers to play the sound "
+"relevant to the current flight status."
+
+msgid "prefs_sounds_pilotHotkeyCtrl_tooltip"
+msgstr "If checked, the Ctrl key should be pressed together with the main key."
+
+msgid "prefs_sounds_pilotHotkeyShift_tooltip"
+msgstr "If checked, the Shift key should be pressed together with the main key."
+
+msgid "prefs_sounds_approachCallouts"
+msgstr "Enable app_roach callouts"
+
+msgid "prefs_sounds_approachCallouts_tooltip"
+msgstr "If checked, the approach callouts will be played at certain altitudes."
+
+msgid "prefs_sounds_speedbrakeAtTD"
+msgstr "Enable speed_brake sound at touchdown"
+
+msgid "prefs_sounds_speedbrakeAtTD_tooltip"
+msgstr ""
+"If checked, a speedbrake sound will be played after touchdown, "
+"when the speedbrakes deploy."
+
+msgid "prefs_sounds_frame_checklists"
+msgstr "Checklists"
+
+msgid "prefs_sounds_enableChecklists"
+msgstr "E_nable aircraft-specific checklists"
+
+msgid "prefs_sounds_enableChecklists_tooltip"
+msgstr ""
+"If checked, the program will play back pre-recorded aircraft-specific "
+"checklists at the pilot's discretion."
+
+msgid "prefs_sounds_checklistHotkey"
+msgstr "Checklist hot_key:"
+
+msgid "prefs_sounds_checklistHotkey_tooltip"
+msgstr ""
+"The key to press possibly together with modifiers to play the next "
+"checklist item."
+
+msgid "prefs_sounds_checklistHotkeyCtrl_tooltip"
+msgstr "If checked, the Ctrl key should be pressed together with the main key."
+
+msgid "prefs_sounds_checklistHotkeyShift_tooltip"
+msgstr "If checked, the Shift key should be pressed together with the main key."
+
+msgid "prefs_update_auto"
+msgstr "Update the program auto_matically"
+
+msgid "prefs_update_auto_tooltip"
+msgstr ""
+"If checked the program will look for updates when it is starting, "
+"and if new updates are found, they will be downloaded and installed. "
+"This ensures that the PIREP you send will always conform to the latest "
+"expectations of the airline."
+
+msgid "prefs_update_auto_warning"
+msgstr ""
+"Disabling automatic updates may result in your version of the "
+"program becoming out of date and your PIREPs not being accepted."
+
+msgid "prefs_update_url"
+msgstr "Update _URL:"
+
+msgid "prefs_update_url_tooltip"
+msgstr ""
+"The URL from which to download the updates. Change this only if you "
+"know what you are doing!"
+
+msgid "prefs_msgs_fs"
+msgstr "Displayed in FS"
+
+msgid "prefs_msgs_sound"
+msgstr "Sound alert"
+
+msgid "prefs_msgs_type_loggerError"
+msgstr "Logger _Error Messages"
+
+msgid "prefs_msgs_type_information"
+msgstr ""
+"_Information Messages\n"
+"(e.g. flight stage)"
+
+msgid "prefs_msgs_type_fault"
+msgstr ""
+"_Fault Messages\n"
+"(e.g. strobe light fault)"
+
+msgid "prefs_msgs_type_nogo"
+msgstr ""
+"_NO GO Fault messages\n"
+"(e.g. MTOW NO GO)"
+
+msgid "prefs_msgs_type_gateSystem"
+msgstr ""
+"Ga_te System Messages\n"
+"(e.g. available gates)"
+
+msgid "prefs_msgs_type_environment"
+msgstr ""
+"Envi_ronment Messages\n"
+"(e.g. \"welcome to XY aiport\")"
+
+msgid "prefs_msgs_type_help"
+msgstr ""
+"_Help Messages\n"
+"(e.g. \"don't forget to set VREF\")"
+
+msgid "prefs_msgs_type_visibility"
+msgstr "_Visibility Messages"
+
+msgid "loadPIREP_browser_title"
+msgstr "Select the PIREP to load"
+
+msgid "loadPIREP_failed"
+msgstr "Failed to load the PIREP"
+
+msgid "loadPIREP_failed_sec"
+msgstr "See the debug log for the details."
+
+msgid "loadPIREP_send_title"
+msgstr "PIREP"
+
+msgid "loadPIREP_send_help"
+msgstr "The main data of the PIREP loaded:"
+
+msgid "loadPIREP_send_flightno"
+msgstr "Flight number:"
+
+msgid "loadPIREP_send_date"
+msgstr "Date:"
+
+msgid "loadPIREP_send_from"
+msgstr "From:"
+
+msgid "loadPIREP_send_to"
+msgstr "To:"
+
+msgid "loadPIREP_send_rating"
+msgstr "Rating:"
+
+msgid "sendPIREP"
+msgstr "_Send PIREP..."
+
+msgid "sendPIREP_tooltip"
+msgstr "Click to send the PIREP to the MAVA website for further review."
+
+msgid "sendPIREP_busy"
+msgstr "Sending PIREP..."
+
+msgid "sendPIREP_success"
+msgstr "The PIREP was sent successfully."
+
+msgid "sendPIREP_success_sec"
+msgstr "Await the thorough scrutiny by our fearless PIREP reviewers! :)"
+
+msgid "sendPIREP_already"
+msgstr "The PIREP for this flight has already been sent!"
+
+msgid "sendPIREP_already_sec"
+msgstr "You may clear the old PIREP on the MAVA website."
+
+msgid "sendPIREP_notavail"
+msgstr "This flight is not available anymore!"
+
+msgid "sendPIREP_unknown"
+msgstr "The MAVA website returned with an unknown error."
+
+msgid "sendPIREP_unknown_sec"
+msgstr "See the debug log for more information."
+
+msgid "sendPIREP_failed"
+msgstr "Could not send the PIREP to the MAVA website."
+
+msgid "sendPIREP_failed_sec"
+msgstr ""
+"This can be a network problem, in which case\n"
+"you may try again later. Or it can be a bug;\n"
+"see the debug log for more information."
+
+msgid "viewPIREP"
+msgstr "_View PIREP..."
+
+msgid "pirepView_title"
+msgstr "PIREP viewer"
+
+msgid "pirepView_tab_data"
+msgstr "_Data"
+
+msgid "pirepView_tab_data_tooltip"
+msgstr "The main data of the flight."
+
+msgid "pirepView_frame_flight"
+msgstr "Flight"
+
+msgid "pirepView_callsign"
+msgstr "Callsign:"
+
+msgid "pirepView_tailNumber"
+msgstr "Tail no.:"
+
+msgid "pirepView_aircraftType"
+msgstr "Aircraft:"
+
+msgid "pirepView_departure"
+msgstr "Departure airport:"
+
+msgid "pirepView_departure_time"
+msgstr "time:"
+
+msgid "pirepView_arrival"
+msgstr "Arrival airport:"
+
+msgid "pirepView_arrival_time"
+msgstr "time:"
+
+msgid "pirepView_numPassengers"
+msgstr "PAX:"
+
+msgid "pirepView_numCrew"
+msgstr "Crew:"
+
+msgid "pirepView_bagWeight"
+msgstr "Baggage:"
+
+msgid "pirepView_cargoWeight"
+msgstr "Cargo:"
+
+msgid "pirepView_mailWeight"
+msgstr "Mail:"
+
+msgid "pirepView_route"
+msgstr "MAVA route:"
+
+msgid "pirepView_frame_route"
+msgstr "Route filed"
+
+msgid "pirepView_filedCruiseLevel"
+msgstr "Cruise level:"
+
+msgid "pirepView_modifiedCruiseLevel"
+msgstr "modified to:"
+
+msgid "pirepView_frame_departure"
+msgstr "Departure"
+
+msgid "pirepView_runway"
+msgstr "Runway:"
+
+msgid "pirepView_sid"
+msgstr "SID:"
+
+msgid "pirepView_frame_arrival"
+msgstr "Arrival"
+
+msgid "pirepView_star"
+msgstr "STAR:"
+
+msgid "pirepView_transition"
+msgstr "Transition:"
+
+msgid "pirepView_approachType"
+msgstr "Approach:"
+
+msgid "pirepView_frame_statistics"
+msgstr "Statistics"
+
+msgid "pirepView_blockTimeStart"
+msgstr "Block time start:"
+
+msgid "pirepView_blockTimeEnd"
+msgstr "end:"
+
+msgid "pirepView_flightTimeStart"
+msgstr "Flight time start:"
+
+msgid "pirepView_flightTimeEnd"
+msgstr "end:"
+
+msgid "pirepView_flownDistance"
+msgstr "Flown distance:"
+
+msgid "pirepView_fuelUsed"
+msgstr "Fuel used:"
+
+msgid "pirepView_rating"
+msgstr "Rating:"
+
+msgid "pirepView_frame_miscellaneous"
+msgstr "Miscellaneous"
+
+msgid "pirepView_flightType"
+msgstr "Type:"
+
+msgid "pirepView_online"
+msgstr "Online:"
+
+msgid "pirepView_yes"
+msgstr "yes"
+
+msgid "pirepView_no"
+msgstr "no"
+
+msgid "pirepView_delayCodes"
+msgstr "Delay codes:"
+
+msgid "pirepView_tab_comments"
+msgstr "_Comments & defects"
+
+msgid "pirepView_tab_comments_tooltip"
+msgstr "The comments and the flight defects."
+
+msgid "pirepView_comments"
+msgstr "Comments"
+
+msgid "pirepView_flightDefects"
+msgstr "Flight defects"
+
+msgid "pirepView_tab_log"
+msgstr "_Log"
+
+msgid "pirepView_tab_log_tooltip"
+msgstr "The flight log."
+
+msgid "about_website"
+msgstr "Project Homepage"
+
+msgid "about_license"
+msgstr "This program is in the public domain."
+
+msgid "about_role_prog_test"
+msgstr "programming, testing"
+
+msgid "about_role_negotiation"
+msgstr "negotiation"
+
+msgid "about_role_test"
+msgstr "testing"
+
+msgid "callouts_title"
+msgstr "Approach Callouts Editor"
+
+msgid "callouts_aircraftType"
+msgstr "Aircraft _type:"
+
+msgid "callouts_aircraftType_tooltip"
+msgstr ""
+"The type of the aircraft for which the approach callouts are being edited."
+
+msgid "callouts_header_altitude"
+msgstr "Altitude"
+
+msgid "callouts_header_path"
+msgstr "Callout file"
+
+msgid "callouts_add"
+msgstr "_Add new callout"
+
+msgid "callouts_add_tooltip"
+msgstr "Add a new callout with some default altitude."
+
+msgid "callouts_remove"
+msgstr "_Remove"
+
+msgid "callouts_remove_tooltip"
+msgstr "Remove the selected items from the list of callouts."
+
+msgid "callouts_altitude_clash"
+msgstr "There is already a callout for this altitude"
+
+msgid "callouts_altitude_clash_sec"
+msgstr ""
+"Shall I set the altitude nevertheless? If so, the other callout "
+"with the same altitude will be removed."

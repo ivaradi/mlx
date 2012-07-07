@@ -4,3 +4,4 @@ MANIFEST
 dist/.+
 build/.+
 mlx-common.nsh
+locale/.+/LC_MESSAGES

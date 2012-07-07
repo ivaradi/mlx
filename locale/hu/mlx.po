@@ -1,0 +1,1743 @@
+# Hungarian-language texts for the MAVA Logger X
+#
+# István Váradi <ivaradi@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: MAVA Logger X\n"
+"Language: hu_HU\n"
+"PO-Revision-Date: 2012-07-07 09:40+0200\n"
+"Last-Translator: István Váradi <ivaradi@gmail.com>\n"
+"Language-Team: MAVA Logger X development team <ivaradi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "aircraft_b736"
+msgstr "Boeing 737-600"
+
+msgid "aircraft_b737"
+msgstr "Boeing 737-700"
+
+msgid "aircraft_b738"
+msgstr "Boeing 737-800"
+
+msgid "aircraft_b738c"
+msgstr "Boeing 737-800 (charter)"
+
+msgid "aircraft_b733"
+msgstr "Boeing 737-300"
+
+msgid "aircraft_b734"
+msgstr "Boeing 737-400"
+
+msgid "aircraft_b735"
+msgstr "Boeing 737-500"
+
+msgid "aircraft_dh8d"
+msgstr "Bombardier Dash 8 Q400"
+
+msgid "aircraft_b762"
+msgstr "Boeing 767-200"
+
+msgid "aircraft_b763"
+msgstr "Boeing 767-300"
+
+msgid "aircraft_crj2"
+msgstr "Canadair Regional Jet CRJ-200"
+
+msgid "aircraft_f70"
+msgstr "Fokker F70"
+
+msgid "aircraft_dc3"
+msgstr "Liszunov Li-2"
+
+msgid "aircraft_t134"
+msgstr "Tupoljev Tu-134"
+
+msgid "aircraft_t154"
+msgstr "Tupoljev Tu-154"
+
+msgid "aircraft_yk40"
+msgstr "Jakovlev Jak-40"
+
+msgid "file_filter_all"
+msgstr "Összes fájl"
+
+msgid "file_filter_pireps"
+msgstr "PIREP fájlok"
+
+msgid "file_filter_audio"
+msgstr "Audio fájlok"
+
+msgid "button_ok"
+msgstr "_OK"
+
+msgid "button_cancel"
+msgstr "_Mégse"
+
+msgid "button_yes"
+msgstr "_Igen"
+
+msgid "button_no"
+msgstr "_Nem"
+
+msgid "button_browse"
+msgstr "Keresés..."
+
+msgid "button_cancelFlight"
+msgstr "Járat megszakítása"
+
+msgid "menu_file"
+msgstr "Fájl"
+
+msgid "menu_file_loadPIREP"
+msgstr "PIREP be_töltése..."
+
+msgid "menu_file_loadPIREP_key"
+msgstr "t"
+
+msgid "menu_file_quit"
+msgstr "_Kilépés"
+
+msgid "menu_file_quit_key"
+msgstr "k"
+
+msgid "quit_question"
+msgstr "Biztosan ki akarsz lépni?"
+
+msgid "menu_tools"
+msgstr "Eszközök"
+
+msgid "menu_tools_chklst"
+msgstr "_Ellenőrzőlista szerkesztő"
+
+msgid "menu_tools_chklst_key"
+msgstr "e"
+
+msgid "menu_tools_callouts"
+msgstr "_Megközelítési bemondások szerkesztése"
+
+msgid "menu_tools_callouts_key"
+msgstr "m"
+
+msgid "menu_tools_prefs"
+msgstr "_Beállítások"
+
+msgid "menu_tools_prefs_key"
+msgstr "b"
+
+msgid "menu_view"
+msgstr "Nézet"
+
+msgid "menu_view_monitor"
+msgstr "Mutasd a _monitor ablakot"
+
+msgid "menu_view_monitor_key"
+msgstr "m"
+
+msgid "menu_view_debug"
+msgstr "Mutasd a _debug naplót"
+
+msgid "menu_view_debug_key"
+msgstr "d"
+
+msgid "menu_help"
+msgstr "Súgó"
+
+msgid "menu_help_manual"
+msgstr "_Felhasználói kézikönyv"
+
+msgid "menu_help_manual_key"
+msgstr "f"
+
+msgid "menu_help_about"
+msgstr "_Névjegy"
+
+msgid "menu_help_about_key"
+msgstr "n"
+
+msgid "tab_flight"
+msgstr "_Járat"
+
+msgid "tab_flight_tooltip"
+msgstr "Járat varázsló"
+
+msgid "tab_flight_info"
+msgstr "Járat _info"
+
+msgid "tab_flight_info_tooltip"
+msgstr "Egyéb információk a járat teljesítésével kapcsolatban"
+
+msgid "tab_weight_help"
+msgstr "_Segítség"
+
+msgid "tab_weight_help_tooltip"
+msgstr "Segítség a súlyszámításhoz"
+
+msgid "tab_log"
+msgstr "_Napló"
+
+msgid "tab_log_tooltip"
+msgstr "A járat naplója, amit majd el lehet küldeni a MAVA szerverére"
+
+msgid "tab_gates"
+msgstr "_Kapuk"
+
+msgid "tab_gates_tooltip"
+msgstr "A MAVA flotta és LHBP kapuinak állapota"
+
+msgid "tab_debug_log"
+msgstr "_Debug napló"
+
+msgid "tab_debug_log_tooltip"
+msgstr "Hibakereséshez használható információkat tartalmazó napló."
+
+msgid "conn_failed"
+msgstr "Nem tudtam kapcsolódni a szimulátorhoz."
+
+msgid "conn_failed_sec"
+msgstr ""
+"Korrigáld a problémát, majd nyomd meg az <b>Próbáld újra</b> gombot "
+"az újrakapcsolódáshoz, vagy a <b>Mégse</b> gombot a járat megszakításához."
+
+msgid "conn_broken"
+msgstr "A szimulátorral való kapcsolat váratlanul megszakadt."
+
+msgid "conn_broken_sec"
+msgstr ""
+"Ha a szimulátor elszállt, indítsd újra és állítsd vissza a repülésed "
+"elszállás előtti állapotát amennyire csak lehet. Ezután nyomd meg az "
+"<b>Újrakapcsolódás</b> gombot a kapcsolat ismételt felvételéhez.\n"
+"\n"
+"Ha meg akarod szakítani a repülést, nyomd meg a <b>Mégse</b> gombot."
+
+msgid "button_tryagain"
+msgstr "_Próbáld újra"
+
+msgid "button_reconnect"
+msgstr "Újra_kapcsolódás"
+
+msgid "login"
+msgstr "Bejelentkezés"
+
+msgid "loginHelp"
+msgstr ""
+"Írd be a MAVA pilóta azonosítódat és a\n"
+"bejelentkezéshez használt jelszavadat,\n"
+"hogy választhass a foglalt járataid közül."
+
+msgid "label_pilotID"
+msgstr "_Azonosító:"
+
+msgid "login_pilotID_tooltip"
+msgstr ""
+"Írd be a MAVA pilóta azonosítódat. Ez általában egy 'P' betűvel kezdődik, "
+"melyet 3 számjegy követ."
+
+msgid "label_password"
+msgstr "Je_lszó:"
+
+msgid "login_password_tooltip"
+msgstr "Írd be a pilóta azonosítódhoz tartozó jelszavadat."
+
+msgid "remember_password"
+msgstr "_Emlékezz a jelszóra"
+
+msgid "login_remember_tooltip"
+msgstr ""
+"Ha ezt kiválasztod, a jelszavadat eltárolja a program, így nem kell mindig "
+"újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként tároljuk, "
+"ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
+
+msgid "login_entranceExam"
+msgstr "_Ellenőrző repülés"
+
+msgid "login_entranceExam_tooltip"
+msgstr "Ha ezt bejelölöd, ellenörző repülésre jelentkezhetsz be."
+
+msgid "button_offline"
+msgstr "_Offline repülés"
+
+msgid "button_offline_tooltip"
+msgstr ""
+"Kattints ide hogy offline, a MAVA szerverre való bejelentkezés "
+"nélkül repülhess."
+
+msgid "button_login"
+msgstr "_Bejelentkezés"
+
+msgid "login_button_tooltip"
+msgstr "Kattints ide a bejelentkezéshez."
+
+msgid "login_busy"
+msgstr "Bejelentkezés..."
+
+msgid "login_invalid"
+msgstr "Érvénytelen azonosító vagy jelszó."
+
+msgid "login_invalid_sec"
+msgstr "Ellenőrízd az azonosítót, és próbáld meg újra beírni a jelszót."
+
+msgid "login_entranceExam_invalid"
+msgstr "Érvénytelen azonosító, vagy nem regisztráltak a vizsgára."
+
+msgid "login_entranceExam_invalid_sec"
+msgstr ""
+"Ellenőrízd az azonosítót, és bizonyosdj meg arról, hogy végrehajthatod-e "
+"az ellenőrző repülést."
+
+msgid "login_failconn"
+msgstr "Nem sikerült kommunikálni a MAVA honlappal."
+
+msgid "login_failconn_sec"
+msgstr ""
+"Próbáld meg pár perc múlva. Ha az nem segít, részletesebb információt "
+"találsz a debug naplóban."
+
+msgid "reload_busy"
+msgstr "Járatok újratöltése..."
+
+msgid "reload_failed"
+msgstr "Ezúttal nem működött az azonosítód és a jelszavad."
+
+msgid "reload_failed_sec"
+msgstr ""
+"Ez minden bizonnyal a MAVA website hibája (hacsak nem rúgtak ki), "
+"így használom a régi járatlistát."
+
+msgid "reload_failconn"
+msgstr "Nem sikerült kommunikálni a MAVA honlappal."
+
+msgid "reload_failconn_sec"
+msgstr "A korábban letöltött járatlistát használom."
+
+msgid "cancelFlight_question"
+msgstr "Biztosan meg akarod szakítani a járatot?"
+
+msgid "button_next"
+msgstr "_Előre"
+
+msgid "button_next_tooltip"
+msgstr "Kattints ide, ha a következő lapra szeretnél lépni."
+
+msgid "button_previous"
+msgstr "_Vissza"
+
+msgid "button_previous_tooltip"
+msgstr "Kattints ide, ha az előző lapra szeretnél lépni."
+
+msgid "button_cancelFlight_tooltip"
+msgstr ""
+"Kattints ide, ha meg akarod szakítani a járatot. Ha bejelentkeztél, "
+"visszakerülsz a járatválasztó lapra, egyébként a bejelentkező lapra."
+
+msgid "flightsel_title"
+msgstr "Járatválasztás"
+
+msgid "flightsel_help"
+msgstr "Válaszd ki a járatot, amelyet le szeretnél repülni."
+
+msgid "flightsel_chelp"
+msgstr "A lent kiemelt járatot választottad."
+
+msgid "flightsel_no"
+msgstr "Járatszám"
+
+msgid "flightsel_deptime"
+msgstr "Indulás ideje [UTC]"
+
+msgid "flightsel_from"
+msgstr "Honnan"
+
+msgid "flightsel_to"
+msgstr "Hová"
+
+msgid "flightsel_save"
+msgstr "Járat _mentése"
+
+msgid "flightsel_save_tooltip"
+msgstr ""
+"Kattints ide az éppen kiválasztott járatnak fájlba mentéséhez. "
+"A fájl később visszatölthető, és így a járat offline is teljesíthető lesz."
+
+msgid "flightsel_save_title"
+msgstr "Járat mentése fájlba"
+
+msgid "flightsel_save_failed"
+msgstr "Nem tudtam elmenteni a járatot."
+
+msgid "flightsel_save_failed_sec"
+msgstr "A további részleteket lásd a debug naplóban."
+
+msgid "flightsel_refresh"
+msgstr "Járatlista f_rissítése"
+
+msgid "flightsel_refresh_tooltip"
+msgstr "Kattints ide a járatlista újbóli letöltéséhez."
+
+msgid "flightsel_load"
+msgstr "Járat betöltése _fájlból"
+
+msgid "flightsel_load_tooltip"
+msgstr ""
+"Kattints ide, hogy fájlból betölthess egy járatot, ami bekerül "
+"a fenti listába."
+
+msgid "flightsel_load_title"
+msgstr "Járat betöltése fájlból"
+
+msgid "flightsel_filter_flights"
+msgstr "Járat fájlok"
+
+msgid "flightsel_load_failed"
+msgstr "Nem tudtam betölteni a járatfájlt."
+
+msgid "flightsel_load_failed_sec"
+msgstr "A további részleteket lásd a debug naplóban."
+
+msgid "fleet_busy"
+msgstr "Flottaadatok letöltése..."
+
+msgid "fleet_failed"
+msgstr "Nem sikerült letöltenem a flotta adatait."
+
+msgid "fleet_update_busy"
+msgstr "Repülőgép pozíció frissítése..."
+
+msgid "fleet_update_failed"
+msgstr "Nem sikerült frissítenem a repülőgép pozícióját."
+
+msgid "gatesel_title"
+msgstr "LHBP kapuválasztás"
+
+msgid "gatesel_help"
+msgstr ""
+"A repülőgép kapu pozíciója érvénytelen.\n"
+"\n"
+"Válaszd ki azt a kaput, ahonnan\n"
+"el szeretnéd kezdeni a járatot."
+
+msgid "gatesel_conflict"
+msgstr "Ismét kapuütközés történt."
+
+msgid "gatesel_conflict_sec"
+msgstr "Próbálj egy másik kaput választani."
+
+msgid "connect_title"
+msgstr "Kapcsolódás a szimulátorhoz"
+
+msgid "connect_help"
+msgstr ""
+"Tölsd be a lent látható repülőgépet a szimulátorba\n"
+"az alább megadott reptérre és kapuhoz.\n"
+"\n"
+"Ezután nyomd meg a Kapcsolódás gombot a kapcsolódáshoz."
+
+msgid "connect_chelp"
+msgstr "A járat alapadatai lent olvashatók."
+
+msgid "connect_flightno"
+msgstr "Járatszám:"
+
+msgid "connect_acft"
+msgstr "Típus:"
+
+msgid "connect_tailno"
+msgstr "Lajstromjel:"
+
+msgid "connect_airport"
+msgstr "Repülőtér:"
+
+msgid "connect_gate"
+msgstr "Kapu:"
+
+msgid "button_connect"
+msgstr "K_apcsolódás"
+
+msgid "button_connect_tooltip"
+msgstr "Kattints ide a szimulátorhoz való kapcsolódáshoz."
+
+msgid "connect_busy"
+msgstr "Kapcsolódás a szimulátorhoz..."
+
+msgid "payload_title"
+msgstr "Terhelés"
+
+msgid "payload_help"
+msgstr ""
+"Az eligazítás az alábbi tömegeket tartalmazza.\n"
+"Allítsd be a teherszállítmány tömegét itt, a hasznos terhet "
+"pedig a szimulátorban.\n"
+"\n"
+"Azt is ellenőrízheted, hogy a szimulátor milyen ZFW-t jelent."
+
+msgid "payload_chelp"
+msgstr ""
+"Lent láthatók az eligazításban szereplő tömegek, valamint\n"
+"a teherszállítmány általad megadott tömege.\n"
+"\n"
+"Azt is ellenőrízheted, hogy a szimulátor milyen ZFW-t jelent."
+
+msgid "payload_crew"
+msgstr "Legénység:"
+
+msgid "payload_pax"
+msgstr "Utasok:"
+
+msgid "payload_bag"
+msgstr "Poggyász:"
+
+msgid "payload_cargo"
+msgstr "_Teher:"
+
+msgid "payload_cargo_tooltip"
+msgstr "A teherszállítmány tömege."
+
+msgid "payload_mail"
+msgstr "Posta:"
+
+msgid "payload_zfw"
+msgstr "Kiszámolt ZFW:"
+
+msgid "payload_fszfw"
+msgstr "_ZFW a szimulátorból:"
+
+msgid "payload_fszfw_tooltip"
+msgstr "Kattints ide, hogy frissítsd a ZFW értékét a szimulátorból."
+
+msgid "payload_zfw_busy"
+msgstr "ZFW lekérdezése..."
+
+msgid "time_title"
+msgstr "Menetrend"
+
+msgid "time_help"
+msgstr ""
+"Az indulás és az érkezés ideje lent látható UTC szerint.\n"
+"\n"
+"A szimulátor aktuális UTC szerinti idejét is lekérdezheted.\n"
+"Győzödj meg arról, hogy elég időd van a repülés előkészítéséhez."
+
+msgid "time_chelp"
+msgstr ""
+"Az indulás és az érkezés ideje lent látható UTC szerint.\n"
+"\n"
+"A szimulátor aktuális UTC szerinti idejét is lekérdezheted."
+
+msgid "time_departure"
+msgstr "Indulás:"
+
+msgid "time_arrival"
+msgstr "Érkezés:"
+
+msgid "time_fs"
+msgstr "Idő a s_zimulátorból:"
+
+msgid "time_fs_tooltip"
+msgstr "Kattings ide, hogy frissítsd a szimulátor aktuális UTC szerint idejét."
+
+msgid "time_busy"
+msgstr "Idő lekérdezése..."
+
+msgid "fuel_title"
+msgstr "Üzemanyag"
+
+msgid "fuel_help"
+msgstr ""
+"Írd be az egyes tartályokba szükséges üzemanyag mennyiségét kilogrammban.\n"
+"\n"
+"Ha megnyomod az <b>Előre</b> gombot, a megadott mennyiségű\n"
+"üzemanyag bekerül a tartályokba."
+
+msgid "fuel_chelp"
+msgstr ""
+"A repülés elején az egyes tartályokba tankolt\n"
+"üzemanyag mennyisége lent látható."
+
+msgid "fuel_tank_centre"
+msgstr "Kö_zépső"
+
+msgid "fuel_tank_left"
+msgstr "_Bal"
+
+msgid "fuel_tank_right"
+msgstr "J_obb"
+
+msgid "fuel_tank_left_aux"
+msgstr ""
+"Bal\n"
+"kie_gészítő"
+
+msgid "fuel_tank_right_aux"
+msgstr ""
+"Jobb\n"
+"kiegészí_tő"
+
+msgid "fuel_tank_left_tip"
+msgstr ""
+"B_al\n"
+"szárnyvég"
+
+msgid "fuel_tank_right_tip"
+msgstr ""
+"Jobb\n"
+"szárn_yvég"
+
+msgid "fuel_tank_external1"
+msgstr ""
+"Külső\n"
+"_1"
+
+msgid "fuel_tank_external2"
+msgstr ""
+"Külső\n"
+"_2"
+
+msgid "fuel_tank_centre2"
+msgstr ""
+"Közé_pső\n"
+"2"
+
+msgid "fuel_get_busy"
+msgstr "Az üzemanyag lekérdezése..."
+
+msgid "fuel_pump_busy"
+msgstr "Az üzemanyag pumpálása..."
+
+msgid "fuel_tank_tooltip"
+msgstr ""
+"Ez mutatja az üzemanyag szintjét a tartályban annak kapacitásához mérve. "
+"A <span color=\"turquoise\">türkizkék</span> csúszka mutatja a repüléshez "
+"kívánt szintet. Ha a bal gombbal bárhová kattintasz az ábrán, a csúszka "
+"odaugrik. Ha a gombot lenyomva tartod, és az egérmutatót föl-le mozgatod, "
+"a csúszka követi azt. Az egered görgőjével is kezelheted a csúszkát. "
+"Alaphelyzetben az üzemanyag mennyisége 10-zel nő, illetve csökken a "
+"görgetés irányától függően. Ha a <b>Shift</b> billentyűt lenyomva tartod, "
+"a növekmény 100, a <b>Control</b> billentyűvel pedig 1 lesz."
+
+msgid "route_title"
+msgstr "Útvonal"
+
+msgid "route_help"
+msgstr ""
+"Állítsd be az utazószintet lent, és ha szükséges,\n"
+"módosítsd az útvonaltervet."
+
+msgid "route_chelp"
+msgstr ""
+"Ha szükséges, lent módosíthatod az utazószintet és\n"
+"az útvonaltervet repülés közben is.\n"
+"Ha így teszel, légy szíves a megjegyzés mezőben ismertesd ennek okát."
+
+msgid "route_level"
+msgstr "_Utazószint:"
+
+msgid "route_level_tooltip"
+msgstr "Az utazószint."
+
+msgid "route_route"
+msgstr "Út_vonal"
+
+msgid "route_route_tooltip"
+msgstr "Az útvonal a szokásos formátumban."
+
+msgid "route_down_notams"
+msgstr "NOTAM-ok letöltése..."
+
+msgid "route_down_metars"
+msgstr "METAR-ok letöltése..."
+
+msgid "briefing_title"
+msgstr "Eligazítás (%d/2): %s"
+
+msgid "briefing_departure"
+msgstr "indulás"
+
+msgid "briefing_arrival"
+msgstr "érkezés"
+
+msgid "briefing_help"
+msgstr ""
+"Olvasd el figyelmesen a lenti NOTAM-okat és METAR-t.\n"
+"\n"
+"Ha a szimulátor vagy hálózat más időjárást ad,\n"
+"a METAR-t módosíthatod."
+
+msgid "briefing_chelp"
+msgstr ""
+"Ha a szimulátor vagy hálózat más időjárást ad,\n"
+"a METAR-t módosíthatod."
+
+msgid "briefing_notams_init"
+msgstr "LHBP NOTAM-ok"
+
+msgid "briefing_metar_init"
+msgstr "LHBP METAR"
+
+msgid "briefing_button"
+msgstr "Elolvastam az eligazítást, és készen állok a _repülésre!"
+
+msgid "briefing_notams_template"
+msgstr "%s NOTAM-ok"
+
+msgid "briefing_metar_template"
+msgstr "%s _METAR"
+
+msgid "briefing_notams_failed"
+msgstr "Nem tudtam letölteni a NOTAM-okat."
+
+msgid "briefing_notams_missing"
+msgstr "Ehhez a repülőtérhez nem találtam NOTAM-ot."
+
+msgid "briefing_metar_failed"
+msgstr "Nem tudtam letölteni a METAR-t."
+
+msgid "takeoff_title"
+msgstr "Felszállás"
+
+msgid "takeoff_help"
+msgstr ""
+"Írd be a felszállásra használt futópálya és SID nevét, "
+"valamint a sebességeket."
+
+msgid "takeoff_chelp"
+msgstr "A naplózott futópálya, SID és a sebességek lent olvashatók."
+
+msgid "takeoff_runway"
+msgstr "_Futópálya:"
+
+msgid "takeoff_runway_tooltip"
+msgstr "A felszállásra használt futópálya."
+
+msgid "takeoff_sid"
+msgstr "_SID:"
+
+msgid "takeoff_sid_tooltip"
+msgstr "Az alkalmazott szabványos műszeres indulási eljárás neve."
+
+msgid "takeoff_v1"
+msgstr "V<sub>_1</sub>:"
+
+msgid "takeoff_v1_tooltip_knots"
+msgstr "Az elhatározási sebesség csomóban."
+
+msgid "takeoff_v1_tooltip_kmph"
+msgstr "Az elhatározási sebesség km/órában."
+
+msgid "label_knots"
+msgstr "csomó"
+
+msgid "label_kmph"
+msgstr "km/h"
+
+msgid "takeoff_vr"
+msgstr "V<sub>_R</sub>:"
+
+msgid "takeoff_vr_tooltip_knots"
+msgstr "Az elemelkedési sebesség csomóban."
+
+msgid "takeoff_vr_tooltip_kmph"
+msgstr "Az elemelkedési sebesség km/órában."
+
+msgid "takeoff_v2"
+msgstr "V<sub>_2</sub>:"
+
+msgid "takeoff_v2_tooltip_knots"
+msgstr "A biztonságos emelkedési sebesség csomóban."
+
+msgid "takeoff_v2_tooltip_kmph"
+msgstr "A biztonságos emelkedési sebesség km/órában."
+
+msgid "landing_title"
+msgstr "Leszállás"
+
+msgid "landing_help"
+msgstr ""
+"Írd be a tervezett STAR és/vagy bevezetési eljárás nevét,\n"
+"a használt futópályát, a megközelítés módját, és a V<sub>Ref</sub>-et."
+
+msgid "landing_chelp"
+msgstr ""
+"A tervezett STAR és/vagy bevezetési eljárás neve, a használt\n"
+"futópálya, a megközelítés módja és a V<sub>Ref</sub> lent olvasható."
+
+msgid "landing_star"
+msgstr "_STAR:"
+
+msgid "landing_star_tooltip"
+msgstr "A tervezett szabványos érkezési eljárás neve."
+
+msgid "landing_transition"
+msgstr "_Bevezetés:"
+
+msgid "landing_transition_tooltip"
+msgstr "A tervezett bevezetési eljárás neve."
+
+msgid "landing_runway"
+msgstr "_Futópálya:"
+
+msgid "landing_runway_tooltip"
+msgstr "A leszállásra használt futópálya."
+
+msgid "landing_approach"
+msgstr "_Megközelítés típusa:"
+
+msgid "landing_approach_tooltip"
+msgstr "A megközelítgés típusa, pl. ILS vagy VISUAL."
+
+msgid "landing_vref"
+msgstr "V<sub>_Ref</sub>:"
+
+msgid "landing_vref_tooltip_knots"
+msgstr "A leszállási sebesség csomóban."
+
+msgid "landing_vref_tooltip_kmph"
+msgstr "A leszállási sebesség km/órában."
+
+msgid "flighttype_scheduled"
+msgstr "menetrendszerinti"
+
+msgid "flighttype_ot"
+msgstr "old-timer"
+
+msgid "flighttype_vip"
+msgstr "VIP"
+
+msgid "flighttype_charter"
+msgstr "charter"
+
+msgid "finish_title"
+msgstr "Lezárás"
+
+msgid "finish_help"
+msgstr ""
+"Lent olvasható némi statisztika a járat teljesítéséről.\n"
+"\n"
+"Ellenőrízd az adatokat, az előző oldalakon is, és ha\n"
+"megfelelnek, elmentheted vagy elküldheted a PIREP-et."
+
+msgid "finish_rating"
+msgstr "Pontszám:"
+
+msgid "finish_flight_time"
+msgstr "Repült idő:"
+
+msgid "finish_block_time"
+msgstr "Blokk idő:"
+
+msgid "finish_distance"
+msgstr "Repült táv:"
+
+msgid "finish_fuel"
+msgstr "Elhasznált üzemanyag:"
+
+msgid "finish_type"
+msgstr "_Típus:"
+
+msgid "finish_type_tooltip"
+msgstr "Válaszd ki a repülés típusát."
+
+msgid "finish_online"
+msgstr "_Online repülés"
+
+msgid "finish_online_tooltip"
+msgstr ""
+"Jelöld be, ha a repülésed a hálózaton történt, egyébként szűntesd "
+"meg a kijelölést."
+
+msgid "finish_gate"
+msgstr "_Érkezési kapu:"
+
+msgid "finish_gate_tooltip"
+msgstr "Válaszd ki azt a kaput vagy állóhelyet, ahová érkeztél LHBP-n."
+
+msgid "finish_newFlight"
+msgstr "_Új járat..."
+
+msgid "finish_newFlight_tooltip"
+msgstr "Kattints ide egy új járat teljesítésének elkezdéséhez."
+
+msgid "finish_newFlight_question"
+msgstr ""
+"A PIREP-et még nem mentetted el és nem is küldted el. "
+"Biztosan új járatot szeretnél kezdeni?"
+
+msgid "finish_save"
+msgstr "PIREP _mentése..."
+
+msgid "finish_save_tooltip"
+msgstr ""
+"Kattints ide, hogy a PIREP fájlba mentéséhez. "
+"A PIREP-et később be lehet tölteni és el lehet küldeni."
+
+msgid "finish_save_title"
+msgstr "PIREP mentése"
+
+msgid "finish_save_done"
+msgstr "A PIREP mentése sikerült"
+
+msgid "finish_save_failed"
+msgstr "A PIREP mentése nem sikerült"
+
+msgid "finish_save_failed_sec"
+msgstr "A részleteket lásd a debug naplóban."
+
+msgid "info_comments"
+msgstr "_Megjegyzések"
+
+msgid "info_defects"
+msgstr "Hib_ajelenségek"
+
+msgid "info_delay"
+msgstr "Késés kódok"
+
+msgid "info_delay_loading"
+msgstr "_Betöltési problémák"
+
+msgid "info_delay_vatsim"
+msgstr "_VATSIM probléma"
+
+msgid "info_delay_net"
+msgstr "_Hálózati problémák"
+
+msgid "info_delay_atc"
+msgstr "Irán_yító hibája"
+
+msgid "info_delay_system"
+msgstr "_Rendszer elszállás/fagyás"
+
+msgid "info_delay_nav"
+msgstr "Navi_gációs probléma"
+
+msgid "info_delay_traffic"
+msgstr "_Forgalmi problémák"
+
+msgid "info_delay_apron"
+msgstr "_Előtér navigációs probléma"
+
+msgid "info_delay_weather"
+msgstr "Időjárási _problémák"
+
+msgid "info_delay_personal"
+msgstr "S_zemélyes okok"
+
+msgid "statusbar_conn_tooltip"
+msgstr ""
+"A kapcsolat állapota.\n"
+"<span foreground=\"grey\">Szürke</span>: nincs kapcsolat.\n"
+"<span foreground=\"red\">Piros</span>: a kapcsolat felvétele "
+"folyamatban vagy megszakadt.\n"
+"<span foreground=\"green\">Zöld</span>: a kapcsolat él."
+
+msgid "statusbar_stage_tooltip"
+msgstr "A repülés fázisa"
+
+msgid "statusbar_time_tooltip"
+msgstr "A szimulátor ideje UTC-ben"
+
+msgid "statusbar_rating_tooltip"
+msgstr "A repülés pontszáma"
+
+msgid "statusbar_busy_tooltip"
+msgstr "A háttérfolyamatok állapota."
+
+msgid "flight_stage_boarding"
+msgstr "beszállás"
+
+msgid "flight_stage_pushback and taxi"
+msgstr "hátratolás és kigurulás"
+
+msgid "flight_stage_takeoff"
+msgstr "felszállás"
+
+msgid "flight_stage_RTO"
+msgstr "megszakított felszállás"
+
+msgid "flight_stage_climb"
+msgstr "emelkedés"
+
+msgid "flight_stage_cruise"
+msgstr "utazó"
+
+msgid "flight_stage_descent"
+msgstr "süllyedés"
+
+msgid "flight_stage_landing"
+msgstr "leszállás"
+
+msgid "flight_stage_taxi"
+msgstr "begurulás"
+
+msgid "flight_stage_parking"
+msgstr "parkolás"
+
+msgid "flight_stage_go-around"
+msgstr "átstartolás"
+
+msgid "flight_stage_end"
+msgstr "kész"
+
+msgid "statusicon_showmain"
+msgstr "Mutasd a főablakot"
+
+msgid "statusicon_showmonitor"
+msgstr "Mutasd a monitor ablakot"
+
+msgid "statusicon_quit"
+msgstr "Kilépés"
+
+msgid "statusicon_stage"
+msgstr "Fázis"
+
+msgid "statusicon_rating"
+msgstr "Pontszám"
+
+msgid "update_title"
+msgstr "Frissítés"
+
+msgid "update_needsudo"
+msgstr ""
+"Lenne mit frissíteni, de a program hozzáférési jogok\n"
+"hiányában nem tud írni a saját könyvtárába.\n"
+"\n"
+"Kattints az OK gombra, ha el szeretnél indítani egy\n"
+"segédprogramot adminisztrátori jogokkal, amely\n"
+"befejezné a frissítést, egyébként a Mégse gombra."
+
+msgid "update_manifest_progress"
+msgstr "A manifesztum letöltése..."
+
+msgid "update_manifest_done"
+msgstr "A manifesztum letöltve..."
+
+msgid "update_files_progress"
+msgstr "Fájlok letöltése..."
+
+msgid "update_files_bytes"
+msgstr "%d bájtot töltöttem le %d bájtból"
+
+msgid "update_renaming"
+msgstr "A letöltött fájlok átnevezése..."
+
+msgid "update_renamed"
+msgstr "Átneveztem a(z) %s fájlt"
+
+msgid "update_removing"
+msgstr "Fájlok törlése..."
+
+msgid "update_removed"
+msgstr "Letöröltem a(z) %s fájlt"
+
+msgid "update_writing_manifest"
+msgstr "Az új manifesztum írása"
+
+msgid "update_finished"
+msgstr "A frissítés sikerült. Kattints az OK-ra a program újraindításához."
+
+msgid "update_nothing"
+msgstr "Nem volt mit frissíteni"
+
+msgid "update_failed"
+msgstr "Nem sikerült, a részleteket lásd a debug naplóban."
+
+msgid "weighthelp_usinghelp"
+msgstr "_Használom a segítséget"
+
+msgid "weighthelp_usinghelp_tooltip"
+msgstr ""
+"Ha bejelölöd, az alábbiakban kapsz egy kis segítséget a járathoz "
+"szükséges hasznos teher megállapításához. Ha igénybe veszed ezt a "
+"szolgáltatást, ez a tény a naplóba bekerül."
+
+msgid "weighthelp_header_calculated"
+msgstr ""
+"Elvárt/\n"
+"számított"
+
+msgid "weighthelp_header_simulator"
+msgstr ""
+"Szimulátor\n"
+"adatok"
+
+msgid "weighthelp_header_simulator_tooltip"
+msgstr ""
+"Kattints erre a gombra a súlyadatoknak a szimulátortól való lekérdezéséhez. "
+"Az értékek lent jelennek meg. Ha egy érték a tűrés 10%-án belül van, akkor "
+"az <b><span foreground=\"darkgreen\">zöld</span></b> színnel jelenik meg. "
+"Ha nem fér bele a tűrésbe, akkor "
+"<b><span foreground=\"red\">piros</span></b>, egyébként "
+"<b><span foreground=\"orange\">sárga</span></b> színben olvasható."
+
+msgid "weighthelp_crew"
+msgstr "Legénység (%s):"
+
+msgid "weighthelp_pax"
+msgstr "Utasok (%s):"
+
+msgid "weighthelp_baggage"
+msgstr "Poggyász:"
+
+msgid "weighthelp_cargo"
+msgstr "Teher:"
+
+msgid "weighthelp_mail"
+msgstr "Posta:"
+
+msgid "weighthelp_payload"
+msgstr "Hasznos teher:"
+
+msgid "weighthelp_dow"
+msgstr "DOW:"
+
+msgid "weighthelp_zfw"
+msgstr "ZFW:"
+
+msgid "weighthelp_gross"
+msgstr "Teljes tömeg:"
+
+msgid "weighthelp_mzfw"
+msgstr "MZFW:"
+
+msgid "weighthelp_mtow"
+msgstr "MTOW:"
+
+msgid "weighthelp_mlw"
+msgstr "MLW:"
+
+msgid "weighthelp_busy"
+msgstr "A tömegadatok lekérdezése..."
+
+msgid "gates_fleet_title"
+msgstr "_Flotta"
+
+msgid "gates_gates_title"
+msgstr "LHBP kapuk"
+
+msgid "gates_tailno"
+msgstr "Lajstromjel"
+
+msgid "gates_planestatus"
+msgstr "Állapot"
+
+msgid "gates_refresh"
+msgstr "_Adatok frissítése"
+
+msgid "gates_refresh_tooltip"
+msgstr "Kattints erre a gombra a fenti adatok frissítéséhez"
+
+msgid "gates_planes_tooltip"
+msgstr ""
+"Ez a táblázat tartalmazza a MAVA flottája összes repülőgépének "
+"lajstromjelét és utolsó ismert helyét. Ha egy repülőgép olyan kapun áll, "
+"amelyet másik gép is elfoglal, akkor annak a repülőgépnek az adatai "
+"<b><span foreground=\"red\">piros</span></b> színnel jelennek meg."
+
+msgid "gates_gates_tooltip"
+msgstr ""
+"A MAVA repülőgépei által elfoglalt kapuk száma "
+"<b><span foreground=\"orange\">sárga</span></b> színnel, "
+"a többié feketén jelenik meg."
+
+msgid "gates_plane_away"
+msgstr "TÁVOL"
+
+msgid "gates_plane_parking"
+msgstr "PARKOL"
+
+msgid "gates_plane_unknown"
+msgstr "ISMERETLEN"
+
+msgid "chklst_title"
+msgstr "Ellenőrzőlista szerkesztő"
+
+msgid "chklst_aircraftType"
+msgstr "Repülőgép _típusa:"
+
+msgid "chklst_aircraftType_tooltip"
+msgstr "Az a típus, amelyhez tartozó ellenőrzőlista szerkesztése történik."
+
+msgid "chklst_add"
+msgstr "Listához hozzá_adás"
+
+msgid "chklst_add_tooltip"
+msgstr ""
+"A bal oldalt kiválasztott fájloknak a jobb oldali ellenőrzőlistához fűzése."
+
+msgid "chklst_remove"
+msgstr "_Törlés"
+
+msgid "chklst_remove_tooltip"
+msgstr "A kijelölt fájl(ok) törlése az ellenőrzőlistából."
+
+msgid "chklst_moveUp"
+msgstr "Mozgatás _felfelé"
+
+msgid "chklst_moveUp_tooltip"
+msgstr "Az ellenőrzőlistából kijelölt fájl(ok) eggyel feljebb mozgatása."
+
+msgid "chklst_moveDown"
+msgstr "Mozgatás _lefelé"
+
+msgid "chklst_moveDown_tooltip"
+msgstr "Az ellenőrzőlistából kijelölt fájl(ok) eggyel lejjebb mozgatása."
+
+msgid "chklst_header"
+msgstr "Ellenőrzőlista fájljai"
+
+msgid "prefs_title"
+msgstr "Beállítások"
+
+msgid "prefs_tab_general"
+msgstr "_Általános"
+
+msgid "prefs_tab_general_tooltip"
+msgstr "Általános beállítások"
+
+msgid "prefs_tab_messages"
+msgstr "_Üzenetek"
+
+msgid "prefs_tab_message_tooltip"
+msgstr ""
+"A szimulátorba és/vagy hangjelzés általi üzenetküldés be- és kikapcsolása"
+
+msgid "prefs_tab_sounds"
+msgstr "_Hangok"
+
+msgid "prefs_tab_sounds_tooltip"
+msgstr ""
+"A repülés különféle fázisai alatt lejátszandó hangokkal "
+"kapcsolatos beállítások."
+
+msgid "prefs_tab_advanced"
+msgstr "H_aladó"
+
+msgid "prefs_tab_advanced_tooltip"
+msgstr "Haladó beállítások: óvatosan módosítsd őket!"
+
+msgid "prefs_language"
+msgstr "_Nyelv:"
+
+msgid "prefs_language_tooltip"
+msgstr "A program által használt nyelv"
+
+msgid "prefs_restart"
+msgstr "Újraindítás szükséges"
+
+msgid "prefs_language_restart_sec"
+msgstr ""
+"A program nyelvének megváltoztatása csak újraindítást "
+"követően jut érvényre."
+
+msgid "prefs_lang_$system"
+msgstr "alapértelmezett"
+
+msgid "prefs_lang_en_GB"
+msgstr "angol"
+
+msgid "prefs_lang_hu_HU"
+msgstr "magyar"
+
+msgid "prefs_hideMinimizedWindow"
+msgstr "A főablak _eltüntetése minimalizáláskor"
+
+msgid "prefs_hideMinimizedWindow_tooltip"
+msgstr ""
+"Ha ezt kijelölöd, a főablak teljesen eltűnik, ha minimalizálod. "
+"A státuszikonra kattintással vagy annak menüje segítségével újra "
+"meg tudod jeleníteni."
+
+msgid "prefs_quitOnClose"
+msgstr "_Kilépés az ablakzáró gomb megnyomásakor"
+
+msgid "prefs_quitOnClose_tooltip"
+msgstr ""
+"Ha ezt kijelölöd, a program az ablakzáró gomb megnyomására kilép, "
+"ha ebbéli szándékát megerősíted. Ha nem jelölöd ki, a főablak eltűnik, "
+"de a tálcaikon a helyén marad."
+
+msgid "prefs_onlineGateSystem"
+msgstr "Az Online _Gate System használata"
+
+msgid "prefs_onlineGateSystem_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, a logger lekérdezi és frissíti az "
+"LHBP Online Gate System adatait."
+
+msgid "prefs_onlineACARS"
+msgstr "Az Online ACA_RS rendszer használata"
+
+msgid "prefs_onlineACARS_tooltip"
+msgstr ""
+"Ha ezt bejölöd, a logger folyamatosan közli a repülésed adatait a "
+"MAVA Online ACARS rendszerrel."
+
+msgid "prefs_flaretimeFromFS"
+msgstr "A ki_lebegtetés idejét vedd a szimulátorból"
+
+msgid "prefs_flaretimeFromFS_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, a kilebegtetés idejét a szimulátor által "
+"visszaadott időbélyegek alapján számolja a program."
+
+msgid "prefs_syncFSTime"
+msgstr "_Szinkronizáld a szimulátor idéjét a számítógépével"
+
+msgid "prefs_syncFSTime_tooltip"
+msgstr ""
+"Ha ez bejelölöd, a szimulátor belső óráját a program szinkronban "
+"tartja a számítógép órájával."
+
+msgid "prefs_usingFS2Crew"
+msgstr "Használom az FS_2Crew kiegészítőt"
+
+msgid "prefs_usingFS2Crew_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, a program figyelembe veszi, hogy az FS2Crew "
+"kiegészítőt használod."
+
+msgid "prefs_iasSmoothingEnabled"
+msgstr "Az _IAS átlagolása "
+
+msgid "prefs_iasSmoothingEnabledTooltip"
+msgstr ""
+"Ha bekapcsolod, az IAS értékét a program a jelzett időtartamig "
+"átlagolja, és az egyes ellenőrzéseknél ezt az átlagértéket hasznája."
+
+msgid "prefs_vsSmoothingEnabled"
+msgstr "A _vario átlagolása "
+
+msgid "prefs_vsSmoothingEnabledTooltip"
+msgstr ""
+"Ha bekapcsolod, a vario értékét a program a jelzett időtartamig "
+"átlagolja, és az egyes ellenőrzéseknél ezt az átlagértéket hasznája."
+
+msgid "prefs_smoothing_seconds"
+msgstr "másodpercig."
+
+msgid "prefs_pirepDirectory"
+msgstr "_PIREP-ek könyvtára:"
+
+msgid "prefs_pirepDirectory_tooltip"
+msgstr ""
+"Az itt megadott könyvtárt ajánlja majd fel a program a PIREP-ek mentésekor."
+
+msgid "prefs_pirepDirectory_browser_title"
+msgstr "Válaszd ki a PIREP-ek könyvtárát"
+
+msgid "prefs_frame_gui"
+msgstr "Grafikus felület"
+
+msgid "prefs_frame_online"
+msgstr "MAVA online rendszerek"
+
+msgid "prefs_frame_simulator"
+msgstr "Szimulátor"
+
+msgid "prefs_sounds_frame_bg"
+msgstr "Háttérhangok"
+
+msgid "prefs_sounds_enable"
+msgstr "Háttérhangok _engedélyezése"
+
+msgid "prefs_sounds_enable_tooltip"
+msgstr ""
+"Ha a háttérhangokat engedélyezed, a logger a repülés egyes "
+"fázisai alatt különféle hangállományokat játszik le."
+
+msgid "prefs_sounds_pilotControls"
+msgstr "_Pilóta vezérli a hangokat"
+
+msgid "prefs_sounds_pilotControls_tooltip"
+msgstr ""
+"Ha azt kijelölöd, a legtöbb háttérhang csak akkor hallható, "
+"ha a pilóta a lent megadott gyorsbillentyűt leüti. "
+"Egyébként a hangok maguktól, bizonyos feltételek teljesülése "
+"esetén szólalnak meg."
+
+msgid "prefs_sounds_pilotHotkey"
+msgstr "_Gyorsbillentyű:"
+
+msgid "prefs_sounds_pilotHotkey_tooltip"
+msgstr ""
+"A billentyű, amit az esetlegesen megadott módosítókkal együtt "
+"le kell ütni, hogy a repülés aktuális fázisához tartozó hang megszólaljon."
+
+msgid "prefs_sounds_pilotHotkeyCtrl_tooltip"
+msgstr ""
+"Ha kijelölöd, a Ctrl billentyűt is le kell nyomni a főbillentyűvel együtt."
+
+msgid "prefs_sounds_pilotHotkeyShift_tooltip"
+msgstr ""
+"Ha kijelölöd, a Shift billentyűt is le kell nyomni a főbillentyűvel együtt."
+
+msgid "prefs_sounds_approachCallouts"
+msgstr "Megközelítési _bemondások engedélyezése"
+
+msgid "prefs_sounds_approachCallouts_tooltip"
+msgstr ""
+"Ha kijelölöd, megközelítés közben egyes magasságok elérésekor "
+"a program lejátssza a megadott fájlokat."
+
+msgid "prefs_sounds_speedbrakeAtTD"
+msgstr "_Spoiler hang bekapcsolása leszálláskor"
+
+msgid "prefs_sounds_speedbrakeAtTD_tooltip"
+msgstr ""
+"Ha kijelölöd, egy, a spoilerek kibocsájtását imitáló hang "
+"hallatszik földetérés után, ha a spoilerek automatikusan kinyílnak."
+
+msgid "prefs_sounds_frame_checklists"
+msgstr "Ellenőrzőlisták"
+
+msgid "prefs_sounds_enableChecklists"
+msgstr "_Repülőgép-specifikus ellenőrzőlisták engedélyezése"
+
+msgid "prefs_sounds_enableChecklists_tooltip"
+msgstr ""
+"Ha kijelölöd, a program a lenti gyorsbillentyű megnyomásokor a használt "
+"repülőgép típushoz tartozó ellenőrzőlista következő elemét játssza le."
+
+msgid "prefs_sounds_checklistHotkey"
+msgstr "E_llenörzőlista gyorsbillentyű:"
+
+msgid "prefs_sounds_checklistHotkey_tooltip"
+msgstr ""
+"A billentyű, amit az esetlegesen megadott módosítókkal együtt le "
+"kell ütni, hogy az ellenőrzőlista következő eleme elhangozzék."
+
+msgid "prefs_sounds_checklistHotkeyCtrl_tooltip"
+msgstr ""
+"Ha kijelölöd, a Ctrl billentyűt is le kell nyomni a főbillentyűvel együtt."
+
+msgid "prefs_sounds_checklistHotkeyShift_tooltip"
+msgstr ""
+"Ha kijelölöd, a Shift billentyűt is le kell nyomni a főbillentyűvel együtt."
+
+msgid "prefs_update_auto"
+msgstr "Frissítsd a programot _automatikusan"
+
+msgid "prefs_update_auto_tooltip"
+msgstr ""
+"Ha ez be van jelölve, a program induláskor frissítést keres, és ha talál, "
+"azokat letölti és telepíti. Ez biztosítja, hogy az elküldött PIREP "
+"mindenben megfeleljen a legújabb elvárásoknak."
+
+msgid "prefs_update_auto_warning"
+msgstr ""
+"Az automatikus frissítés kikapcsolása azt okozhatja, hogy a program "
+"Nálad lévő verziója elavulttá válik, és a PIREP-jeidet így nem fogadják el."
+
+msgid "prefs_update_url"
+msgstr "Frissítés _URL-je:"
+
+msgid "prefs_update_url_tooltip"
+msgstr ""
+"Az URL, ahol a frissítéseket keresi a program. Csak akkor változtasd meg, "
+"ha biztos vagy a dolgodban!"
+
+msgid "prefs_msgs_fs"
+msgstr ""
+"Szimulátorban\n"
+"megjelenítés"
+
+msgid "prefs_msgs_sound"
+msgstr "Hangjelzés"
+
+msgid "prefs_msgs_type_loggerError"
+msgstr "_Logger hibaüzenetek"
+
+msgid "prefs_msgs_type_information"
+msgstr ""
+"_Információs üzenetek\n"
+"(pl. a repülés fázisa)"
+
+msgid "prefs_msgs_type_fault"
+msgstr ""
+"Hi_baüzenetek\n"
+"(pl. a villogó fény hiba)"
+
+msgid "prefs_msgs_type_nogo"
+msgstr ""
+"_NO GO hibaüzenetek\n"
+"(pl. MTOW NO GO)"
+
+msgid "prefs_msgs_type_gateSystem"
+msgstr ""
+"_Kapukezelő rendszer üzenetei\n"
+"(pl. a szabad kapuk listája)"
+
+msgid "prefs_msgs_type_environment"
+msgstr ""
+"Kö_rnyezeti üzenetek\n"
+"(pl. \"welcome to XY aiport\")"
+
+msgid "prefs_msgs_type_help"
+msgstr ""
+"_Segítő üzenetek\n"
+"(pl. \"don't forget to set VREF\")"
+
+msgid "prefs_msgs_type_visibility"
+msgstr "Lá_tótávolság üzenetek"
+
+msgid "loadPIREP_browser_title"
+msgstr "Válaszd ki a betöltendő PIREP-et"
+
+msgid "loadPIREP_failed"
+msgstr "Nem tudtam betölteni a PIREP-et"
+
+msgid "loadPIREP_failed_sec"
+msgstr "A részleteket lásd a debug naplóban."
+
+msgid "loadPIREP_send_title"
+msgstr "PIREP"
+
+msgid "loadPIREP_send_help"
+msgstr "A betöltött PIREP főbb adatai:"
+
+msgid "loadPIREP_send_flightno"
+msgstr "Járatszám:"
+
+msgid "loadPIREP_send_date"
+msgstr "Dátum:"
+
+msgid "loadPIREP_send_from"
+msgstr "Honnan:"
+
+msgid "loadPIREP_send_to"
+msgstr "Hová:"
+
+msgid "loadPIREP_send_rating"
+msgstr "Pontszám:"
+
+msgid "sendPIREP"
+msgstr "PIREP _elküldése..."
+
+msgid "sendPIREP_tooltip"
+msgstr "Kattints ide, hogy elküldd a PIREP-et a MAVA szerverére javításra."
+
+msgid "sendPIREP_busy"
+msgstr "PIREP küldése..."
+
+msgid "sendPIREP_success"
+msgstr "A PIREP elküldése sikeres volt."
+
+msgid "sendPIREP_success_sec"
+msgstr "Várhatod félelmet nem ismerő PIREP javítóink alapos észrevételeit! :)"
+
+msgid "sendPIREP_already"
+msgstr "Ehhez a járathoz már küldtél be PIREP-et!"
+
+msgid "sendPIREP_already_sec"
+msgstr "A korábban beküldött PIREP-et törölheted a MAVA honlapján."
+
+msgid "sendPIREP_notavail"
+msgstr "Ez a járat már nem elérhető!"
+
+msgid "sendPIREP_unknown"
+msgstr "A MAVA szervere ismeretlen hibaüzenettel tért vissza."
+
+msgid "sendPIREP_unknown_sec"
+msgstr "A debug naplóban részletesebb információt találsz."
+
+msgid "sendPIREP_failed"
+msgstr "Nem tudtam elküldeni a PIREP-et a MAVA szerverére."
+
+msgid "sendPIREP_failed_sec"
+msgstr ""
+"Lehet, hogy hálózati probléma áll fenn, amely esetben később\n"
+"újra próbálkozhatsz. Lehet azonban hiba is a loggerben:\n"
+"részletesebb információt találhatsz a debug naplóban."
+
+msgid "viewPIREP"
+msgstr "PIREP meg_tekintése..."
+
+msgid "pirepView_title"
+msgstr "PIREP megtekintése"
+
+msgid "pirepView_tab_data"
+msgstr "_Adatok"
+
+msgid "pirepView_tab_data_tooltip"
+msgstr "A járat és a repülés főbb adatai."
+
+msgid "pirepView_frame_flight"
+msgstr "Járat"
+
+msgid "pirepView_callsign"
+msgstr "Hívójel:"
+
+msgid "pirepView_tailNumber"
+msgstr "Lajstromjel:"
+
+msgid "pirepView_aircraftType"
+msgstr "Repülőgép:"
+
+msgid "pirepView_departure"
+msgstr "Indulási repülőtér:"
+
+msgid "pirepView_departure_time"
+msgstr "idő:"
+
+msgid "pirepView_arrival"
+msgstr "Érkezési repülőtér:"
+
+msgid "pirepView_arrival_time"
+msgstr "idő:"
+
+msgid "pirepView_numPassengers"
+msgstr "Utasok:"
+
+msgid "pirepView_numCrew"
+msgstr "Legénység:"
+
+msgid "pirepView_bagWeight"
+msgstr "Poggyász:"
+
+msgid "pirepView_cargoWeight"
+msgstr "Teher:"
+
+msgid "pirepView_mailWeight"
+msgstr "Posta:"
+
+msgid "pirepView_route"
+msgstr "MAVA útvonal:"
+
+msgid "pirepView_frame_route"
+msgstr "Beadott útvonal"
+
+msgid "pirepView_filedCruiseLevel"
+msgstr "Repülési szint:"
+
+msgid "pirepView_modifiedCruiseLevel"
+msgstr "módosítva:"
+
+msgid "pirepView_frame_departure"
+msgstr "Indulás"
+
+msgid "pirepView_runway"
+msgstr "Futópálya:"
+
+msgid "pirepView_sid"
+msgstr "SID:"
+
+msgid "pirepView_frame_arrival"
+msgstr "Érkezés"
+
+msgid "pirepView_star"
+msgstr "STAR:"
+
+msgid "pirepView_transition"
+msgstr "Bevezetés:"
+
+msgid "pirepView_approachType"
+msgstr "Megközelítés:"
+
+msgid "pirepView_frame_statistics"
+msgstr "Statisztika"
+
+msgid "pirepView_blockTimeStart"
+msgstr "Blokk idő kezdete:"
+
+msgid "pirepView_blockTimeEnd"
+msgstr "vége:"
+
+msgid "pirepView_flightTimeStart"
+msgstr "Repült idő kezdete:"
+
+msgid "pirepView_flightTimeEnd"
+msgstr "vége:"
+
+msgid "pirepView_flownDistance"
+msgstr "Repült táv:"
+
+msgid "pirepView_fuelUsed"
+msgstr "Üzemanyag:"
+
+msgid "pirepView_rating"
+msgstr "Pontszám:"
+
+msgid "pirepView_frame_miscellaneous"
+msgstr "Egyéb"
+
+msgid "pirepView_flightType"
+msgstr "Típus:"
+
+msgid "pirepView_online"
+msgstr "Online:"
+
+msgid "pirepView_yes"
+msgstr "igen"
+
+msgid "pirepView_no"
+msgstr "nem"
+
+msgid "pirepView_delayCodes"
+msgstr "Késés kódok:"
+
+msgid "pirepView_tab_comments"
+msgstr "_Megjegyzések és hibák"
+
+msgid "pirepView_tab_comments_tooltip"
+msgstr "Megjegyzések, és a repülés során előfordult hibajelenségek"
+
+msgid "pirepView_comments"
+msgstr "Megjegyzések"
+
+msgid "pirepView_flightDefects"
+msgstr "Hibajelenségek"
+
+msgid "pirepView_tab_log"
+msgstr "_Napló"
+
+msgid "pirepView_tab_log_tooltip"
+msgstr "A repülési napló."
+
+msgid "about_website"
+msgstr "A projekt honlapja"
+
+msgid "about_license"
+msgstr "A program köztulajdonban van."
+
+msgid "about_role_prog_test"
+msgstr "programozás, tesztelés"
+
+msgid "about_role_negotiation"
+msgstr "tárgyalások"
+
+msgid "about_role_test"
+msgstr "tesztelés"
+
+msgid "callouts_title"
+msgstr "Megközelítési bemondások szerkesztése"
+
+msgid "callouts_aircraftType"
+msgstr "Repülőgép _típusa:"
+
+msgid "callouts_aircraftType_tooltip"
+msgstr "Az a típus, amelyhez tartozó bemondások szerkesztése történik."
+
+msgid "callouts_header_altitude"
+msgstr "Magasság"
+
+msgid "callouts_header_path"
+msgstr "Bemondás-fájl"
+
+msgid "callouts_add"
+msgstr "Bemondás hozzá_adása"
+
+msgid "callouts_add_tooltip"
+msgstr "Bemondás hangfájl hozzáadása valamilyen alapértelmezett magasságal."
+
+msgid "callouts_remove"
+msgstr "_Törlés"
+
+msgid "callouts_remove_tooltip"
+msgstr "A kiválasztott bemondások törlése."
+
+msgid "callouts_altitude_clash"
+msgstr "Már tartozik bemondás ehhez a magassághoz."
+
+msgid "callouts_altitude_clash_sec"
+msgstr ""
+"Ennek ellenére beállítsam a megadott magasságoz? "
+"Ha így teszek, a másik bemondást egyúttal törlöm."

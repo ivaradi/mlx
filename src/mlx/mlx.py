@@ -62,7 +62,7 @@ def main():
     if (len(sys.argv)<=1 or sys.argv[1]!="usedeflang") and config.setupLocale():
         restart(["usedeflang"])
 
-    setLanguage(config.getLanguage())
+    setLanguage(programDirectory, config.getLanguage())
     
     from .gui.gui import GUI
     gui = GUI(programDirectory, config)

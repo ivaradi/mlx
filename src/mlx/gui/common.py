@@ -70,6 +70,10 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return unicode(text)
+
+    def text2str(text):
+        """Convert the given text, returned by xstr to a string."""
+        return str(text)
 else:
     print "Using PyGObject"
     pygobject = True
@@ -131,6 +135,10 @@ else:
     def text2unicode(str):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return _utf8Decoder(str)[0]
+
+    def text2str(text):
+        """Convert the given text, returned by xstr to a string."""
+        return _utf8Decoder(text)[0]
 
 import cairo
 
