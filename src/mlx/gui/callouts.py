@@ -290,7 +290,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
             result = dialog.run()
             dialog.hide()
 
-            if result==RESPONSETYPE_NO:
+            if result!=RESPONSETYPE_YES:
                 newAltitude = None
                 
         if newAltitude is not None:
