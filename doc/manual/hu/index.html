@@ -816,6 +816,56 @@
   ellenőrzőlistát, ha a járat megkezdésekor nem volt olyan).
   </p>
   
+  <h2><a name="calloutsEditor">Megközelítési bemondások szerkesztése</a></h2>
+
+  <img src="calloutsEditor.png" alt="The megközelítési bemondások szerkesztője"/> 
+
+  <p>
+  A megközelítési bemondások olyan, adott repülőgéptípushoz tartozó
+  hangfájlok, amelyeket a program a megközelítés során, bizonyos
+  magasságok elérésekor játszik le. E fájlok listáját szerkeszthetjük
+  a megközelítési bemondásokat szerkesztő ablakban, amelyet az 
+  <b>Eszközök/Megközelítési bemondások szeresztése...</b> menüpont
+  kiválasztásával, vagy a <b>Ctrl+M</b> billentyűkombináció 
+  leütésével jeleníthetünk meg.
+  </p>
+
+  <p>
+  Az ablak felső részén választhatjuk ki a repülőgép típusát. Alatta,
+  a bal oldalon két gombot, azoktól jobbra pedig a bemondások listáját
+  láthatjuk. A listában a fájloknak csak a neve látható, de ha az
+  egérmutatót a lista adott eleme fölött hagyjuk egy időre, megjelenik
+  a teljes elérési út. A listát mindig a magasság szerint rendezi a
+  program, de a sorrend átváltható a csökkenő és a növekvő között.
+  </p>
+
+  <p>
+  A <b>Bemondás hozzáadása</b> gomb használatakor egy fájlválasztó 
+  ablak jelenik meg. A fájl a kiválasztása után bekerül a listába
+  valamilyen magassággal, amit azonnal lehet is szerkeszteni. Ha a
+  fájl neve tartalmaz valamilyen számot, akkor az lesz a megajánlott
+  magasság, egyébként a listában szereplő legkisebb és legnagyobb
+  magasság alapján választ a program. Nem
+  tartozhat ugyanaz a magasság egynél több fájlhoz. Ha olyan
+  magasságot állítunk be, ami már szerepel listában, egy dialógus
+  ablakban erről figyelmeztetést kapunk, és választhatunk, hogy a
+  program lecserélje a másik fájlt, vagy hogy folytatjuk a
+  szerkesztést. A lista egy eleméhez tartozó magasság szerkesztéséhez
+  jelöljük ki az adott sort, majd kattintsunk a magasságra.
+  </p>
+
+  <p>
+  Ha a listából kijelölünk egy vagy több elemet, a <b>Törlés</b>
+  gombbal azok törölhetők.
+  </p>
+
+  <p>
+  A változtatásokat csak akkor jegyzi meg a program, ha azok
+  végeztével megnyomjuk az <b>OK</b> gombot. Ha azonban a járat
+  teljesítése már elkezdődött, a bemondások listájának változtatása a
+  folyamatban lévő repülés során nem tapasztalható.
+  </p>
+  
   <h2><a name="prefs">A Beállítások ablak</a></h2>
 
   </p>
@@ -963,6 +1013,13 @@
   a <i>Shift</i> emelők közül valamelyikkel vagy mindkettővel. Ha nem
   engedélyezzük a pilóta által történő vezérlést, a program
   automatikusan játssza le a hangfájlokat.
+  </p>
+
+  <p>
+  Ha a <b>Megközelítési bemondások engedélyezése</b> jelölőnégyzetet
+  kijelöljük, és a használt repülőgép típushoz 
+  <a href="#calloutsEditor">megadunk</a> megközelítési bemondásokat,
+  akkor azokat a program megközelítéskor le is fogja játszani.
   </p>
 
   <p>

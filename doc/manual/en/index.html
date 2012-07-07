@@ -812,6 +812,55 @@
   the old checklist, or no checklist if there was none).
   </p>
   
+  <h2><a name="calloutsEditor">Editing approach callouts</a></h2>
+
+  <img src="calloutsEditor.png" alt="The Approach callouts Editor"/> 
+
+  <p>
+  The approach callouts are audio files specific to aircraft types, that are
+  played back during approach when passing certain altitudes. The
+  approach callouts editor window allows editing the list of these
+  callout files for each aircraft. The window can be displayed by
+  selecting  <b>Tools/Approach Callouts Editor...</b> or by  pressing 
+  <b>Ctrl+E</b>.
+  </p>
+
+  <p>
+  The top part of the window displays the selector of the aircraft
+  type. Below it, you can find two buttons on the left, and the list
+  of the callouts with the altitudes they belong to on the right. The
+  list displays only the filename portion, but the if you hover the
+  cursor above an item, the full path will be displayed. The list is
+  always sorted according to the altitude, but you change the order
+  from descending to ascending.
+  </p>
+
+  <p>
+  The <b>Add new callout</b> button shows a file selection dialog
+  window. After selecting a file, it will be added to a list with some
+  altitude, which can be edited immediately. If the name of the file
+  contains a number that is possible as an altitude, that will be used
+  as the altitude given to the file, otherwise some meaningful default
+  is selected based on the lowest or highest altitude. 
+  There can be no two files with the same altitude. If you set an
+  altitude, which is already present in the list, a dialog box will be
+  displayed, and you can choose to replace the old file or to continue
+  editing. To edit an altitude already in the list, select that row,
+  and click on the altitude again.
+  </p>
+
+  <p>
+  If you select one or more items in the list, the <b>Remove</b>
+  button becomes available, and pressing it will remove the selected items.
+  </p>
+
+  <p>
+  Note, that any changes you make are effective only if you press
+  the <b>OK</b> button when having finished the modifications. If the
+  flight has already started, no changes made to the corresponding
+  list of callouts have any effect during the flight.
+  </p>
+  
   <h2><a name="prefs">The Preferences Window</a></h2>
 
   </p>
@@ -943,6 +992,13 @@
   A-Z) optionally combined with one or both of the <i>Ctrl</i>
   and <i>Shift</i> modifiers. If this checkbox is not checked, the
   sound files will be played automatically.
+  </p>
+
+  <p>
+  If the <b>Enable approach callouts</b> checkbox is
+  checked, and you have also <a href="#calloutsEditor">set up</a>
+  approach callouts for the aircraft being used, you will hear those 
+  callouts during approach.
   </p>
 
   <p>
