@@ -141,7 +141,7 @@ class Handler(threading.Thread):
             """Construct the periodic request."""
             self._id = id
             self._period = period
-            self._nextFire = time.time() + period
+            self._nextFire = time.time()
             self._data = data
             self._preparedData = None
             self._callback = callback
@@ -570,6 +570,7 @@ class Simulator(object):
         self._hotkeyCallback = None
 
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
+        self._fuelCallback = None
 
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
@@ -666,7 +667,7 @@ class Simulator(object):
         - the current weight of the fuel in the tank (in kgs)
         - the current total capacity of the tank (in kgs)."""
         if self._aircraftModel is None:
-            callback([])
+            self._fuelCallback = callback
         else:
             self._aircraftModel.getFuel(self._handler, callback)
 
@@ -800,6 +801,9 @@ class Simulator(object):
         timestamp = Simulator._getTimestamp(data)
 
         createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
+        if self._fuelCallback is not None:
+            self._aircraftModel.getFuel(self._handler, self._fuelCallback)
+            self._fuelCallback = None
 
         self._scroll = data[7]!=0
 
