@@ -1,14 +1,20 @@
-# Emulator for the pyuipc module
-#------------------------------------------------------------------------------
 
 import time
 
 #------------------------------------------------------------------------------
 
-# The ratio between kg and lbs
+## @package mlx.pyuipc_emu
+#
+# A very simple PyUIPC emulator.
+#
+# This is not used currently.
+
+#------------------------------------------------------------------------------
+
+## The ratio between kg and lbs
 KGTOLBS=1/0.4536
 
-# Feet to metres
+## Feet to metres
 FEETTOMETRES=0.3048
 
 #------------------------------------------------------------------------------
@@ -35,7 +41,7 @@ def interpolate(point0, point, point1, value0, value1):
 
 #------------------------------------------------------------------------------
 
-# Version constants
+## Version constants
 SIM_ANY=0
 SIM_FS98=1
 SIM_FS2K=2
@@ -47,7 +53,7 @@ SIM_FS2K4=7
 
 #------------------------------------------------------------------------------
 
-# Error constants
+## Error constants
 ERR_OK=0
 ERR_OPEN=1
 ERR_NOFS=2
@@ -67,7 +73,7 @@ ERR_SIZE=15
 
 #------------------------------------------------------------------------------
 
-# The version of FSUIPC
+## The version of FSUIPC
 fsuipc_version=0x0401
 lib_version=0x0302
 fs_version=SIM_FS2K4

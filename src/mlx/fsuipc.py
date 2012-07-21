@@ -1,6 +1,3 @@
-# Module handling the connection to FSUIPC
-
-#------------------------------------------------------------------------------
 
 import fs
 import const
@@ -21,7 +18,42 @@ else:
 
 #------------------------------------------------------------------------------
 
-# The mapping of tank types to FSUIPC offsets
+## @package mlx.fsuipc
+#
+# The module towards FSUIPC.
+#
+# This module implements the simulator interface to FSUIPC.
+#
+# The \ref Handler class is thread handling the FSUIPC requests. It can be
+# given read, periodic read and write, requests, that are executed
+# asynchronously, and a callback function is called with the result. This class
+# is used internally within the module.
+#
+# The \ref Simulator class is the actual interface to the flight simulator, and
+# an instance of it is returned by \ref mlx.fs.createSimulator. This object can
+# be used to connect to the simulator and disconnect from it, to query various
+# data and to start and stop the monitoring of the data.
+#
+# \ref AircraftModel is the base class of the aircraft models. A "model" is a
+# particular implementation of an aircraft, such as the PMDG Boeing 737NG in
+# Flight Simulator 2004. Since each type and each model has its peculiarities
+# (e.g. the different engine and fuel tank configurations), each aircraft type
+# has a generic model, that should work for most of the time. However, certain
+# models may implement various controls, gauges, etc. differently, and such
+# peculiarites can be handled in a specific subclass of \ref
+# AircraftModel. These subclasses should be registered as special ones, and if
+# the simulator detects that the aircraft's model became known or has changed,
+# it will check these special models before resorting to the generic ones.
+#
+# The models are responsible also for querying certain parameters, such as the
+# fuel tank configuration. While ideally it should be specific to a type only,
+# it is possible that the model contains different tanks, in which case some
+# tricks may be needed. See the \ref DC3Model "DC-3 (Li-2)" aircraft as an
+# example.
+
+#------------------------------------------------------------------------------
+
+## The mapping of tank types to FSUIPC offsets
 _tank2offset = { const.FUELTANK_CENTRE : 0x0b74,
                  const.FUELTANK_LEFT : 0x0b7c,
                  const.FUELTANK_RIGHT : 0x0b94,

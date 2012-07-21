@@ -1,9 +1,16 @@
-# The PIREP class collecting all information needed for a PIREP
-
-#------------------------------------------------------------------------------
 
 import const
 import cPickle as pickle
+
+#------------------------------------------------------------------------------
+
+## @package mlx.pirep
+#
+# The PIREP module.
+#
+# This module defines only one class, \ref PIREP. It is used to extract and
+# store the information needed for a PIREP. The saved PIREPs are pickled
+# instances of this class.
 
 #------------------------------------------------------------------------------
 

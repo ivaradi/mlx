@@ -1,9 +1,20 @@
-# Module to handle sound playback
-
-#------------------------------------------------------------------------------
 
 import os
 import traceback
+
+#------------------------------------------------------------------------------
+
+## @package mlx.sound
+#
+# Sound playback handling.
+#
+# This is the low level sound playback handling. The \ref initializeSound
+# function should be called to initialize the sound handling with the directory
+# containing the sound files. Then the \startSound function should be called to
+# start the playback of a certain sound file. A callback may be called when the
+# playback of a certain file has finished.
+#
+# See also the \ref mlx.soundsched module.
 
 #------------------------------------------------------------------------------
 

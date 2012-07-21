@@ -1,4 +1,3 @@
-# The main program
 
 from config import Config
 from i18n import setLanguage
@@ -6,6 +5,15 @@ from sound import initializeSound
 
 import os
 import sys
+
+#--------------------------------------------------------------------------------------
+
+## @package mlx.mlx
+#
+# The main program.
+#
+# This module contains the main program of the logger as well as the \ref
+# restart "restart" handling.
 
 #--------------------------------------------------------------------------------------
 

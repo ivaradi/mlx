@@ -1,6 +1,3 @@
-# Module related to the high-level tracking of the flight
-
-#---------------------------------------------------------------------------------------
 
 from soundsched import SoundScheduler, ChecklistScheduler
 
@@ -8,6 +5,15 @@ import const
 import util
 
 import threading
+
+#---------------------------------------------------------------------------------------
+
+## @package mlx.flight
+#
+# The global flight state.
+#
+# This module defines a single class, \ref Flight, which represents the flight
+# in progress.
 
 #---------------------------------------------------------------------------------------
 

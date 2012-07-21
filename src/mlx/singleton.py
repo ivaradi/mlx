@@ -1,7 +1,26 @@
-# Module to allow for a single instance of an application to run
 
 import os
 import time
+
+#----------------------------------------------------------------------------
+
+## @package mlx.singleton
+#
+# Allow a single instance of an application to run.
+#
+# This module implements the logic needed to detect that an instance of the
+# application is already running, and if so, notifying that instance.
+#
+# On Windows, a mutex is used to ensure that only a single instance is running,
+# since a mutex with a certain name can be created by one process only. If the
+# current process is the only instance, a named pipe is created and a thread is
+# started to listen for messages. Otherwise a message is sent to that pipe,
+# which results in calling a callback function.
+#
+# On Linux a Unix socket is created protected by a lock file, and the messages
+# from other instances are received via this socket.
+#
+# The main window is raised if another instance is started.
 
 #----------------------------------------------------------------------------
 

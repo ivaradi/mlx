@@ -1,11 +1,16 @@
-# Various utilities
 
 import math
 import time
 
 #------------------------------------------------------------------------------
 
-# The average of the radius at the poles and a the equator, in metres
+## @package mlx.util
+#
+# Utilities.
+
+#------------------------------------------------------------------------------
+
+## The average of the radius at the poles and a the equator, in metres
 #EARTH_RADIUS=6367467.4
 EARTH_RADIUS=6371000
 #EARTH_RADIUS=6378137

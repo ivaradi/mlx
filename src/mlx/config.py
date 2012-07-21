@@ -1,13 +1,22 @@
-# Configuration and related stuff
 # -*- encoding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
 
 import const
 
 import os
 import sys
 import ConfigParser
+
+## @package mlx.config
+# 
+# The handling of the configuration.
+#
+# The \ref Config class contains the main configuration and is capable of
+# loading and saving the configuration. It contains getters and setters for the
+# configuration options.
+#
+# Some parts of the configuration are not simple data items, like strings or
+# booleans, but more complicated data. These have their own class, like \ref
+# ApproachCallouts or \ref Checklist.
 
 #-------------------------------------------------------------------------------
 

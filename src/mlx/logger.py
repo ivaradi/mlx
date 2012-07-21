@@ -1,6 +1,3 @@
-# Module for the logging.
-
-#--------------------------------------------------------------------------------------
 
 from fs import sendMessage
 import const
@@ -8,6 +5,24 @@ import util
 
 import sys
 import time
+
+#--------------------------------------------------------------------------------------
+
+## @package mlx.logger
+#
+# The module for the logger.
+#
+# While the program itself is "logger", it contains an internal logger, which
+# maintains the textual log containing information on the various events and is
+# the reason why the program is called "logger".
+#
+# The log is made up of lines containing an optional timestamp and the text of
+# the message. A line can be updated after having been put into the log by
+# referring to its index.
+#
+# The logger object also maintains a separate set of faults and ensures that
+# one fault type has only one score, even if that fault has been reported
+# multiple times.
 
 #--------------------------------------------------------------------------------------
 

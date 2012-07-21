@@ -1,6 +1,3 @@
-# Module handling the download of updates
-
-#------------------------------------------------------------------------------
 
 from config import Config
 
@@ -14,6 +11,24 @@ import hashlib
 
 if os.name=="nt":
     import win32api
+
+#------------------------------------------------------------------------------
+
+## @package mlx.update
+#
+# Automatic update handling.
+#
+# The program can update itself automatically. For this purpose it maintains a
+# manifest of the files installed containing the relative paths, sizes and
+# checksums of each files. When the program starts up, this manifest file is
+# downloaded from the update server and is compared to the local one. Then the
+# updated and new files are downloaded with names that are created by appending
+# the checksum to the actual name, so as not to overwrite any existing files at
+# this stage. If all files are downloaded, the downloaded files are renamed to
+# their real names. On Windows, the old file is removed first to avoid trouble
+# with 'busy' files. If removing a file fails, the file will be moved to a
+# temporary directory, that will be removed when the program starts the next
+# time.
 
 #------------------------------------------------------------------------------
 

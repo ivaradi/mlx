@@ -1,3 +1,14 @@
+
+import fs
+import const
+import util
+from acars import ACARS
+from sound import startSound
+
+import time
+
+#---------------------------------------------------------------------------------------
+
 ## @package mlx.checks
 #
 # The classes that check the state of the aircraft.
@@ -12,16 +23,6 @@
 # There are a few special ones, such as \ref StageChecker which computes the
 # transitions from one stage of the flight to the next one. Or \ref ACARSSender
 # which sends the ACARS periodically
-
-#---------------------------------------------------------------------------------------
-
-import fs
-import const
-import util
-from acars import ACARS
-from sound import startSound
-
-import time
 
 #---------------------------------------------------------------------------------------
 

@@ -1,11 +1,18 @@
-# Internationalization support
 # -*- coding: utf-8 -*-
-
-#------------------------------------------------------------------------------
 
 import gettext
 import os
 import traceback
+
+#------------------------------------------------------------------------------
+
+## @package mlx.i18n
+#
+# Internationalization support.
+#
+# This module handles the internationalization support in the logger. It is
+# based on the GNU gettext library, and exports the \ref xstr function that
+# returns the translation for a certain key.
 
 #------------------------------------------------------------------------------
 

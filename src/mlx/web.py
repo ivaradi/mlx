@@ -1,6 +1,3 @@
-# Interface towards the websites used
-
-#------------------------------------------------------------------------------
 
 import const
 import util
@@ -15,6 +12,23 @@ import datetime
 import codecs
 import traceback
 import xml.sax
+
+#---------------------------------------------------------------------------------------
+
+## @package mlx.web
+#
+# Web interface.
+#
+# This module implements a thread that can perform (HTTP) requests
+# asynchronously. When the request is performed, a callback is called. The main
+# interface is the \ref Handler class. Each of its functions creates a \ref
+# Request subclass instance and puts it to the request queue. The handler
+# thread then takes the requests one by one, and executes them.
+#
+# This module also defines some data classes the contents of which are
+# retrieved or sent via HTTP. \ref BookedFlight contains data of a flight
+# booked on the MAVA website, \ref Fleet and \ref Plane represents the MAVA
+# fleet and the gates at Ferihegy and \ref NOTAM is a NOTAM.
 
 #---------------------------------------------------------------------------------------
 

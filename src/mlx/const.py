@@ -1,96 +1,103 @@
-# Various constants used in the logger
+
+import sys
 
 #-------------------------------------------------------------------------------
 
-# The version of the program
+## @package mlx.const
+#
+# The constants used by the program.
+
+#-------------------------------------------------------------------------------
+
+## The version of the program
 VERSION="0.6"
 
 #-------------------------------------------------------------------------------
 
-# The ratio between lbs and kg
+## The ratio between lbs and kg
 LBSTOKG=0.4536
 
-# The ratio between kgs and lbs
+## The ratio between kgs and lbs
 KGSTOLB=1/LBSTOKG
 
-# The ratio between feet and metre
+## The ratio between feet and metre
 FEETTOMETRES=0.3048
 
 #-------------------------------------------------------------------------------
 
-# The ratio between knots and km/h
+## The ratio between knots and km/h
 KNOTSTOKMPH=1.852
 
-# The ratio between km/h and knots
+## The ratio between km/h and knots
 KMPHTOKNOTS=1/1.852
 
 #-------------------------------------------------------------------------------
 
-# Flight simulator type: MS Flight Simulator 2004
+## Flight simulator type: MS Flight Simulator 2004
 SIM_MSFS9 = 1
 
-# Flight simulator type: MS Flight Simulator X
+## Flight simulator type: MS Flight Simulator X
 SIM_MSFSX = 2
 
-# Flight simulator type: X-Plane 9
+## Flight simulator type: X-Plane 9
 SIM_XPLANE9 = 3
 
-# Flight simulator type: X-Plane 10
+## Flight simulator type: X-Plane 10
 SIM_XPLANE10 = 4
 
 #-------------------------------------------------------------------------------
 
-# Aircraft type: Boeing 737-600
+## Aircraft type: Boeing 737-600
 AIRCRAFT_B736 = 1
 
-# Aircraft type: Boeing 737-700
+## Aircraft type: Boeing 737-700
 AIRCRAFT_B737 = 2
 
-# Aircraft type: Boeing 737-800
+## Aircraft type: Boeing 737-800
 AIRCRAFT_B738 = 3
 
-# Aircraft type: Boeing 737-800 (charter configuration)
+## Aircraft type: Boeing 737-800 (charter configuration)
 AIRCRAFT_B738C = 16
 
-# Aircraft type: Boeing 737-300
+## Aircraft type: Boeing 737-300
 AIRCRAFT_B733 = 4
 
-# Aircraft type: Boeing 737-400
+## Aircraft type: Boeing 737-400
 AIRCRAFT_B734 = 5
 
-# Aircraft type: Boeing 737-500
+## Aircraft type: Boeing 737-500
 AIRCRAFT_B735 = 6
 
-# Aircraft type: Dash-8 Q400
+## Aircraft type: Dash-8 Q400
 AIRCRAFT_DH8D = 7
 
-# Aircraft type: Boeing 767-200
+## Aircraft type: Boeing 767-200
 AIRCRAFT_B762 = 8
 
-# Aircraft type: Boeing 767-300
+## Aircraft type: Boeing 767-300
 AIRCRAFT_B763 = 9
 
-# Aircraft type: Canadair CRJ-200
+## Aircraft type: Canadair CRJ-200
 AIRCRAFT_CRJ2 = 10
 
-# Aircraft type: Fokker F-70
+## Aircraft type: Fokker F-70
 AIRCRAFT_F70 = 11
 
-# Aircraft type: Lisunov Li-2
+## Aircraft type: Lisunov Li-2
 AIRCRAFT_DC3 = 12
 
-# Aircraft type: Tupolev Tu-134
+## Aircraft type: Tupolev Tu-134
 AIRCRAFT_T134 = 13
 
-# Aircraft type: Tupolev Tu-154
+## Aircraft type: Tupolev Tu-154
 AIRCRAFT_T154 = 14
 
-# Aircraft type: Yakovlev Yak-40
+## Aircraft type: Yakovlev Yak-40
 AIRCRAFT_YK40 = 15
 
 #-------------------------------------------------------------------------------
 
-# The list of aircraft types that we know of
+## The list of aircraft types that we know of
 # The order is mostly from most recent to oldest considering
 # Malev's history
 aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
@@ -104,7 +111,7 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
 
 #-------------------------------------------------------------------------------
 
-# A mapping of aircraft types to their 'internal' ICAO codes (which are
+## A mapping of aircraft types to their 'internal' ICAO codes (which are
 # the same as the real ICAO codes, except in a few cases)
 icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_B737  : "B737",
@@ -125,40 +132,40 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
 
 #-------------------------------------------------------------------------------
 
-# Flight stage: boarding
+## Flight stage: boarding
 STAGE_BOARDING = 1
 
-# Flight stage: pushback, startup and taxi
+## Flight stage: pushback, startup and taxi
 STAGE_PUSHANDTAXI = 2
 
-# Flight stage: takeoff
+## Flight stage: takeoff
 STAGE_TAKEOFF = 3
 
-# Flight stage: RTO
+## Flight stage: RTO
 STAGE_RTO = 4
 
-# Flight stage: climb
+## Flight stage: climb
 STAGE_CLIMB = 5
 
-# Flight stage: cruise
+## Flight stage: cruise
 STAGE_CRUISE = 6
 
-# Flight stage: descent
+## Flight stage: descent
 STAGE_DESCENT = 7
 
-# Flight stage: landing
+## Flight stage: landing
 STAGE_LANDING = 8
 
-# Flight stage: taxi after landing
+## Flight stage: taxi after landing
 STAGE_TAXIAFTERLAND = 9
 
-# Flight stage: parking
+## Flight stage: parking
 STAGE_PARKING = 10
 
-# Flight stage: go-around
+## Flight stage: go-around
 STAGE_GOAROUND = 11
 
-# Flight stage: end
+## Flight stage: end
 STAGE_END = 12
 
 #-------------------------------------------------------------------------------
@@ -182,30 +189,30 @@ def stage2string(stage):
         
 #-------------------------------------------------------------------------------
 
-# Plane status: unknown
+## Plane status: unknown
 PLANE_UNKNOWN = 0
 
-# Plane status: at home, i.e. LHBP
+## Plane status: at home, i.e. LHBP
 PLANE_HOME = 1
 
-# Plane status: away
+## Plane status: away
 PLANE_AWAY = 2
 
-# Plane status: parking
+## Plane status: parking
 PLANE_PARKING = 3
 
 #-------------------------------------------------------------------------------
 
-# Flight type: scheduled
+## Flight type: scheduled
 FLIGHTTYPE_SCHEDULED = 0
 
-# Flight type: old-timer
+## Flight type: old-timer
 FLIGHTTYPE_OLDTIMER = 1
 
-# Flight type: VIP
+## Flight type: VIP
 FLIGHTTYPE_VIP = 2
 
-# Flight type: charter
+## Flight type: charter
 FLIGHTTYPE_CHARTER = 3
 
 #-------------------------------------------------------------------------------
@@ -229,62 +236,62 @@ def flightType2string(flightType):
 
 #-------------------------------------------------------------------------------
 
-# Delay code: loading problems
+## Delay code: loading problems
 DELAYCODE_LOADING = 0
 
-# Delay code: VATSIM problem
+## Delay code: VATSIM problem
 DELAYCODE_VATSIM = 1
 
-# Delay code: network problems
+## Delay code: network problems
 DELAYCODE_NETWORK = 2
 
-# Delay code: controller's fault
+## Delay code: controller's fault
 DELAYCODE_CONTROLLER = 3
 
-# Delay code: system crash or freeze
+## Delay code: system crash or freeze
 DELAYCODE_SYSTEM = 4
 
-# Delay code: navigation problem
+## Delay code: navigation problem
 DELAYCODE_NAVIGATION = 5
 
-# Delay code: traffic problems
+## Delay code: traffic problems
 DELAYCODE_TRAFFIC = 6
 
-# Delay code: apron navigation
+## Delay code: apron navigation
 DELAYCODE_APRON = 7
 
-# Delay code: weather problems
+## Delay code: weather problems
 DELAYCODE_WEATHER = 8
 
-# Delay code: personal reasons
+## Delay code: personal reasons
 DELAYCODE_PERSONAL = 9
 
 #-------------------------------------------------------------------------------
 
-# Message type: logger error
+## Message type: logger error
 # FIXME: cannot set the hotkey
 MESSAGETYPE_LOGGER_ERROR = 1
 
-# Message type: information
+## Message type: information
 MESSAGETYPE_INFORMATION = 2
 
-# Message type: fault messages
+## Message type: fault messages
 MESSAGETYPE_FAULT = 3
 
-# Message type: NO-GO fault messages
+## Message type: NO-GO fault messages
 MESSAGETYPE_NOGO = 4
 
-# Message type: gate system messages
+## Message type: gate system messages
 MESSAGETYPE_GATE_SYSTEM = 5
 
-# Message type: environment messages
+## Message type: environment messages
 # FIXME: flight plan closed (5 sec)
 MESSAGETYPE_ENVIRONMENT = 6
 
-# Message type: help messages
+## Message type: help messages
 MESSAGETYPE_HELP = 7
 
-# Message type: visibility messages
+## Message type: visibility messages
 MESSAGETYPE_VISIBILITY = 8
 
 #-------------------------------------------------------------------------------
@@ -316,16 +323,16 @@ def messageType2string(messageType):
 
 #-------------------------------------------------------------------------------
 
-# Message display level: none
+## Message display level: none
 MESSAGELEVEL_NONE = 0
 
-# Message display level: only message in the simulator
+## Message display level: only message in the simulator
 MESSAGELEVEL_FS = 1
 
-# Message display level: only sound
+## Message display level: only sound
 MESSAGELEVEL_SOUND = 2
 
-# Message display level: both
+## Message display level: both
 MESSAGELEVEL_BOTH = 3
 
 #-------------------------------------------------------------------------------
@@ -356,82 +363,82 @@ def string2messageLevel(str):
 
 #-------------------------------------------------------------------------------
 
-# Sound: ding
+## Sound: ding
 SOUND_DING = "ding.wav"
 
-# Sound: notify
+## Sound: notify
 SOUND_NOTIFY = "notify.wav"
 
-# Sound: NOTAM
+## Sound: NOTAM
 SOUND_NOTAM = "notam.mp3"
 
-# Sound: scream
+## Sound: scream
 SOUND_SCREAM = "sikoly.mp3"
 
-# Sound: boarding
+## Sound: boarding
 SOUND_BOARDING = "board.mp3"
 
-# Sound: Malev theme
+## Sound: Malev theme
 SOUND_MALEV = "malev.mp3"
 
-# Sound: taxi: Boeing 737 NG
+## Sound: taxi: Boeing 737 NG
 SOUND_TAXI_BOEING737NG = "737taxi.mp3"
 
-# Sound: taxi: Boeing 767
+## Sound: taxi: Boeing 767
 SOUND_TAXI_BOEING767 = "767taxi.mp3"
 
-# Sound: taxi: Fokker F70
+## Sound: taxi: Fokker F70
 SOUND_TAXI_F70 = "F70taxi.mp3"
 
-# Sound: takeoff preparation request from the captain
+## Sound: takeoff preparation request from the captain
 SOUND_CAPTAIN_TAKEOFF = "cpt_takeoff.mp3"
 
-# Sound: cruise
+## Sound: cruise
 SOUND_CRUISE = "TOC.mp3"
 
-# Sound: descent
+## Sound: descent
 SOUND_DESCENT = "TOD.mp3"
 
-# Sound: applause
+## Sound: applause
 SOUND_APPLAUSE = "taps.mp3"
 
-# Sound: speedbrake
+## Sound: speedbrake
 SOUND_SPEEDBRAKE = "speed.mp3"
 
-# Sound: taxi after landing
+## Sound: taxi after landing
 SOUND_TAXIAFTERLAND = "TaxiAfterLand.mp3"
 
 
 #-------------------------------------------------------------------------------
 
-# Fuel tank: centre
+## Fuel tank: centre
 FUELTANK_CENTRE = 1
 
-# Fuel tank: left
+## Fuel tank: left
 FUELTANK_LEFT = 2
 
-# Fuel tank: right
+## Fuel tank: right
 FUELTANK_RIGHT = 3
 
-# Fuel tank: left aux
+## Fuel tank: left aux
 FUELTANK_LEFT_AUX = 4
 
-# Fuel tank: right aux
+## Fuel tank: right aux
 FUELTANK_RIGHT_AUX = 5
 
-# Fuel tank: left tip
+## Fuel tank: left tip
 FUELTANK_LEFT_TIP = 6
 
-# Fuel tank: right tip
+## Fuel tank: right tip
 FUELTANK_RIGHT_TIP = 7
 
-# Fuel tank: external 1
+## Fuel tank: external 1
 FUELTANK_EXTERNAL1 = 8
 
-# Fuel tank: external 2
+## Fuel tank: external 2
 FUELTANK_EXTERNAL2 = 9
 
-# Fuel tank: centre2
+## Fuel tank: centre2
 FUELTANK_CENTRE2 = 10
 
 #-------------------------------------------------------------------------------
@@ -485,7 +492,7 @@ def fuelTank2logString(fuelTank):
 
 #-------------------------------------------------------------------------------
 
-# The available gates at LHBP
+## The available gates at LHBP
 lhbpGateNumbers = []
 
 for i in range(1, 7):

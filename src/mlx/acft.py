@@ -1,3 +1,17 @@
+
+import const
+import checks
+import fs
+import util
+
+import sys
+import time
+import traceback
+
+from collections import deque
+
+#---------------------------------------------------------------------------------------
+
 ## @package mlx.acft
 #
 # The simulator-independent aircraft classes.
@@ -13,19 +27,6 @@
 # \ref SmoothedValue "smoothed values" of the IAS and the VS and set these
 # values in the \ref mlx.fs.AircraftState "aircraft state" when it is received
 # from the simulator.
-
-#---------------------------------------------------------------------------------------
-
-import const
-import checks
-import fs
-import util
-
-import sys
-import time
-import traceback
-
-from collections import deque
 
 #---------------------------------------------------------------------------------------
 

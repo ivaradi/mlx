@@ -1,8 +1,14 @@
-# Module for ACARS handling
+
+import const
 
 #------------------------------------------------------------------------------
 
-import const
+## @package mlx.acars
+#
+# The handling of the ACARS.
+#
+# This module defines the \ref ACARS class that is used to extract and contain
+# the data needed to send ACARS information to the MAVA server.
 
 #------------------------------------------------------------------------------
 

@@ -1,3 +1,13 @@
+
+import const
+from sound import startSound
+
+import fsuipc
+import threading
+import time
+
+#-------------------------------------------------------------------------------
+
 ## @package mlx.fs
 #
 # The main interface to the flight simulator.
@@ -10,15 +20,9 @@
 # The simulator interface is most often used to retrieve the state of the
 # simulated aircraft. Instances of class \ref AircraftState are used for this
 # purpose.
-
-#-------------------------------------------------------------------------------
-
-import const
-from sound import startSound
-
-import fsuipc
-import threading
-import time
+#
+# This module also contains some definitions for message sending and implements
+# the timing logic itself.
 
 #-------------------------------------------------------------------------------
 

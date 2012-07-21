@@ -1,8 +1,20 @@
-# The mapping of ICAO codes to airport names
 # -*- coding: utf-8 -*-
+
+import sys
 
 #-----------------------------------------------------------------------------
 
+## @package mlx.airports
+#
+# The mapping of ICAO codes to airport names.
+#
+# This module contains the mapping of ICAO codes to airport cities and names,
+# as well as a \ref getWelcomeMessage "function" to produce a welcome message
+# for a certain airport.
+
+#-----------------------------------------------------------------------------
+
+## The mapping of the ICAO codes
 airportNames = {
     "VTBS" : ("Bangkok", "Suvarnabhumi"),
     "KJFK" : ("New York", "J. F. Kennedy"),

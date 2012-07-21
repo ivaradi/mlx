@@ -1,5 +1,3 @@
-# Simulator for the pyuipc module
-#------------------------------------------------------------------------------
 
 import const
 
@@ -15,7 +13,25 @@ import math
 
 #------------------------------------------------------------------------------
 
-# Version constants
+## @package mlx.pyuipc_sim
+#
+# Simulator of the PyUIPC module.
+#
+# This is a simulation of the PyUIPC module emulating offsets that are needed
+# by the logger.
+#
+# This module can also be run as a program, in which case it connects to an
+# already running logger (that uses this module in place of the real pyuipc),
+# and various commands can be given to query or modify the values of the
+# offsets. There is a 'help' command and completion also works.
+#
+# This module is used instead of the real PyUIPC module, if the program is not
+# running on Windows or the FORCE_PYUIPC_SIM environment variable is present.
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+## Version constants
 SIM_ANY=0
 SIM_FS98=1
 SIM_FS2K=2
@@ -28,7 +44,7 @@ SIM_FSX=8
 
 #------------------------------------------------------------------------------
 
-# Error constants
+## Error constants
 ERR_OK=0
 ERR_OPEN=1
 ERR_NOFS=2
@@ -48,7 +64,7 @@ ERR_SIZE=15
 
 #------------------------------------------------------------------------------
 
-# The version of FSUIPC
+## The version of FSUIPC
 fsuipc_version=0x0401
 lib_version=0x0302
 fs_version=SIM_FS2K4
@@ -99,49 +115,49 @@ class FSUIPCException(Exception):
 
 class Values(object):
     """The values that can be read from 'FSUIPC'."""
-    # Fuel data index: centre tank
+    ## Fuel data index: centre tank
     FUEL_CENTRE = 0
 
-    # Fuel data index: left main tank
+    ## Fuel data index: left main tank
     FUEL_LEFT = 1
 
-    # Fuel data index: right main tank
+    ## Fuel data index: right main tank
     FUEL_RIGHT = 2
 
-    # Fuel data index: left aux tank
+    ## Fuel data index: left aux tank
     FUEL_LEFT_AUX = 3
 
-    # Fuel data index: right aux tank
+    ## Fuel data index: right aux tank
     FUEL_RIGHT_AUX = 4
 
-    # Fuel data index: left tip tank
+    ## Fuel data index: left tip tank
     FUEL_LEFT_TIP = 5
 
-    # Fuel data index: right tip tank
+    ## Fuel data index: right tip tank
     FUEL_RIGHT_TIP = 6
 
-    # Fuel data index: external 1 tank
+    ## Fuel data index: external 1 tank
     FUEL_EXTERNAL_1 = 7
 
-    # Fuel data index: external 2 tank
+    ## Fuel data index: external 2 tank
     FUEL_EXTERNAL_2 = 8
 
-    # Fuel data index: centre 2 tank
+    ## Fuel data index: centre 2 tank
     FUEL_CENTRE_2 = 9
 
-    # The number of fuel tank entries
+    ## The number of fuel tank entries
     NUM_FUEL = FUEL_CENTRE_2 + 1
 
-    # Engine index: engine #1
+    ## Engine index: engine #1
     ENGINE_1 = 0
 
-    # Engine index: engine #2
+    ## Engine index: engine #2
     ENGINE_2 = 1
 
-    # Engine index: engine #3
+    ## Engine index: engine #3
     ENGINE_3 = 2
 
-    # The number of hotkey entries
+    ## The number of hotkey entries
     HOTKEY_SIZE = 56
 
     @staticmethod
