@@ -1,4 +1,15 @@
-# Module for generic flight-simulator interfaces
+## @package mlx.fs
+#
+# The main interface to the flight simulator.
+#
+# The \ref createSimulator function can be used to create an instance of
+# the class that can be used to access the simulator. It expects an instance of
+# the \ref ConnectionListener class, the member functions of which will be
+# called when something happens with the connection to the simulator.
+#
+# The simulator interface is most often used to retrieve the state of the
+# simulated aircraft. Instances of class \ref AircraftState are used for this
+# purpose.
 
 #-------------------------------------------------------------------------------
 
