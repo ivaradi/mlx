@@ -1,4 +1,17 @@
-# The various checks that may be performed during flight
+## @package mlx.checks
+#
+# The classes that check the state of the aircraft.
+#
+# During the flight the program periodically queries various data from the
+# simulator. This data is returned in instances of the \ref
+# mlx.fs.AircraftState class and passed to the various "checkers",
+# i.e. instances of subclasses of the \ref StateChecker class. These checkers
+# perform various checks to see if the aircraft's parameters are within the
+# expected limits, or some of them just logs something.
+#
+# There are a few special ones, such as \ref StageChecker which computes the
+# transitions from one stage of the flight to the next one. Or \ref ACARSSender
+# which sends the ACARS periodically
 
 #---------------------------------------------------------------------------------------
 
@@ -93,7 +106,7 @@ class ACARSSender(StateChecker):
 
     It sends the ACARS every 3 minutes to the MAVA website."""
 
-    # The interval at which ACARS is sent
+    ## The interval at which the ACARS are sent
     INTERVAL = 3*60.0
     
     def __init__(self, gui):
