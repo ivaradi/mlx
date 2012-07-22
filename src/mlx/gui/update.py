@@ -1,6 +1,3 @@
-# The GUI part of the update
-
-#-------------------------------------------------------------------------------
 
 from mlx.gui.common import *
 
@@ -12,6 +9,16 @@ import mlx.const as const
 import threading
 import os
 import sys
+
+#-------------------------------------------------------------------------------
+
+## @package mlx.gui.update
+#
+# The GUI part of the update.
+#
+# This module implements the GUI portion of the \ref mlx.update
+# "automatic update" function. The update runs in a separate thread, which puts
+# the relevant events into the Gtk event loop.
 
 #-------------------------------------------------------------------------------
 

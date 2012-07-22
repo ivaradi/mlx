@@ -1,6 +1,3 @@
-# Module for the detailed PIREP viewer
-
-#------------------------------------------------------------------------------
 
 from common import *
 
@@ -8,6 +5,18 @@ from mlx.pirep import PIREP
 from mlx.const import *
 
 import time
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.pirep
+#
+# The detailed PIREP viewer.
+#
+# The \ref PIREPViewer class is a dialog displaying all information found in a
+# PIREP. It consists of three tabs. The Data tab displays the simple,
+# itemizable data. The Comments & defects tab contains the flight comments and
+# defects, while the Log tab contains the flight log collected by the
+# \ref mlx.logger.Logger "logger".
 
 #------------------------------------------------------------------------------
 

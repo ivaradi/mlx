@@ -1,6 +1,3 @@
-# Module for editing checklists
-
-#------------------------------------------------------------------------------
 
 from common import *
 
@@ -10,6 +7,22 @@ import mlx.config as config
 
 import os
 import re
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.callouts
+#
+# Editor dialog for approach callouts.
+#
+# The dialog consists of an aircraft type selector box at the top, and a table
+# with two buttons below it. The table contains the callout files with the
+# corresponding altitudes, and is sorted according to the altitude. When a new
+# file is added, the program finds out a new altitude for it. If the file's
+# name contains numbers that are not used as altitudes yet, the most suitable
+# of those numbers will be used. Otherwise a 'usual' altitude is searched for,
+# in the direction according to the sort order, and if that fails too, the
+# altitudes are tried one-by-one. See the
+# \ref ApproachCalloutsEditor._getNewAltitude function for more details.
 
 #------------------------------------------------------------------------------
 

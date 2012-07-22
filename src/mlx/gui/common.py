@@ -1,9 +1,25 @@
-# Common things for the GUI
 
 import mlx.const as _const
 from mlx.i18n import xstr
 
 import os
+
+#-----------------------------------------------------------------------------
+
+## @package mlx.gui.common
+#
+# Common definitions and utilities for the GUI
+#
+# The main purpose of this module is to provide common definitions for things
+# that are named differently in Gtk+ 2 and 3. This way the other parts of the
+# GUI have to check the version in use very rarely. The variable \ref pygobject
+# tells which version is being used. If it is \c True, Gtk+ 3 is used via the
+# PyGObject interface. Otherwise Gtk+ 2 is used, which is the default on
+# Windows or when the \c FORCE_PYGTK environment variable is set.
+#
+# Besides this there some common utility classes and functions.
+
+#-----------------------------------------------------------------------------
 
 appIndicator = False
 

@@ -1,4 +1,3 @@
-# The main file for the GUI
 # -*- coding: utf-8 -*-
 
 from statusicon import StatusIcon
@@ -31,6 +30,16 @@ import threading
 import sys
 import datetime
 import webbrowser
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.gui
+#
+# The main GUI class.
+#
+# The \ref GUI class is the main class of the GUI. It is a connection listener,
+# and aggregates all the windows, the menu, etc. It maintains the connection to
+# the simulator as well as the flight object.
 
 #------------------------------------------------------------------------------
 

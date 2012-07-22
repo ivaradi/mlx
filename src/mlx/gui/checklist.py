@@ -1,6 +1,3 @@
-# Module for editing checklists
-
-#------------------------------------------------------------------------------
 
 from common import *
 
@@ -9,6 +6,18 @@ import mlx.const as const
 import mlx.config as config
 
 import os
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.checklist
+#
+# The checklist editor dialog.
+#
+# This module implements the checklist editor dialog. A checklist is a list of
+# sound files that are played one-by-one when requested by the user. The top
+# part of the dialog contains an aircraft type selector. Below it, on the left
+# there is a file selector, and the list of the files in the checklist to the
+# right. There are some buttons in the middle to manipulate the checklist.
 
 #------------------------------------------------------------------------------
 

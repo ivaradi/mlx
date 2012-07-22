@@ -1,11 +1,22 @@
-# Implementation of the status icon
-
-#-------------------------------------------------------------------------------
 
 from common import *
 
 import mlx.const as const
 from mlx.i18n import xstr
+
+#-------------------------------------------------------------------------------
+
+## @package mlx.gui.statusicon
+#
+# The status icon.
+#
+# This module implements that status icon displayed on the Windows or the GNOME
+# taskbar, or whatever the place for status icons is called in the used
+# environment. It works with both the more modern appindicator interface
+# (mainly found on Ubuntu), if that is available, or with the older status icon
+# support in Gtk (which is used on Windows as well). In this latter case, the
+# icon has a tooltip with the flight stage and rating information, while these
+# data are placed into the menu in case of appindicator.
 
 #-------------------------------------------------------------------------------
 

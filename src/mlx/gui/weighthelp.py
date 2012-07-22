@@ -1,11 +1,16 @@
-# The weight calculation help window
-
-#-------------------------------------------------------------------------------
 
 from mlx.gui.common import *
 
 from mlx.i18n import xstr
 from mlx.checks import PayloadChecker
+
+#-------------------------------------------------------------------------------
+
+## @package mlx.gui.weighthelp
+#
+# The weight calculation help tab.
+#
+# This module implements the tab containing the weight calculation help. 
 
 #-------------------------------------------------------------------------------
 

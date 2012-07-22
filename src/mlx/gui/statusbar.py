@@ -1,6 +1,3 @@
-# Implementation of the status bar.
-
-#-------------------------------------------------------------------------------
 
 from common import *
 
@@ -9,6 +6,16 @@ from mlx.i18n import xstr
 
 import math
 import time
+
+#-------------------------------------------------------------------------------
+
+## @package mlx.gui.statusbar
+#
+# The status bar.
+#
+# This module implements the status bar seen at the lower part of the main
+# window. It contains the icon depicting the status of the connection to the
+# simulator, the current flight stage, rating and the simulator time.
 
 #-------------------------------------------------------------------------------
 

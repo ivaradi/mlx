@@ -1,4 +1,3 @@
-# The monitoring window
 
 from mlx.gui.common import *
 
@@ -6,6 +5,15 @@ import mlx.const as const
 import mlx.util as util
 
 import time
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.monitor
+#
+# The monitoring window
+#
+# The \ref MonitorWindow class is a window containing the data received from
+# the simulator by the logger.
 
 #------------------------------------------------------------------------------
 

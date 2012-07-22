@@ -1,9 +1,19 @@
-#The Flight Info tab
 
 from common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.info
+#
+# The flight info tab.
+#
+# This module implements to \ref FlightInfo class, which is the widget for the
+# extra information related to the flight. It contains text areas for the
+# comments and the flight defects at the top next to each other, and the frame
+# for the delay codes at the bottom in the centre.
 
 #------------------------------------------------------------------------------
 

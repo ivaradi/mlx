@@ -1,6 +1,3 @@
-# Module for the preferences dialog
-
-#------------------------------------------------------------------------------
 
 from common import *
 
@@ -9,6 +6,16 @@ import mlx.const as const
 import mlx.config as config
 
 import urlparse
+
+#------------------------------------------------------------------------------
+
+## @package mlx.gui.prefs
+#
+# The preferences dialog.
+#
+# This module implements the preferences dialog, allowing the editing of the
+# configuration of the program. The preferences are grouped into tabs, each
+# containing the necessary controls to set the various options.
 
 #------------------------------------------------------------------------------
 
