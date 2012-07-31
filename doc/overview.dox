@@ -1,0 +1,53 @@
+/*! \mainpage MAVA Logger X Developers' Documentation
+ *
+ * \section intro Introduction
+ *
+ * This (partially generated) documentation describes the MAVA Logger
+ * X from a developer's perspective. Its purpose is to give enough
+ * information, so that a developer could understand how the software
+ * works in general, and easily understand the code to be able to make
+ * modifications to it.
+ *
+ * \section overview Overview
+ *
+ * The application was written in 
+ * <a href="http://python.org">Python 2</a>. The Python wrapper
+ * <a href="http://gtk.org">Gtk+</a> toolkit was used for the graphical
+ * user interface. The program is designed to run on both Windows and
+ * Linux, though as of this writing only the Windows version can be
+ * used practically. However, Linux distributions move towards Gtk+ 3
+ * as the primary toolkit, while it has no reliable port for Windows
+ * yet. Therefore it was decided to support both Gtk+ 2 and 3
+ * depending on the platform. For Gtk+ 2 the 
+ * <a href="http://pygtk.org">PyGTK</a> wrapper is used, while for Gtk+
+ * 3 the <a href="https://live.gnome.org/PyGObject">PyGObject</a>
+ * bindings. See the mlx.gui.common module for information on how the
+ * differences between these toolkits are handled.
+ *
+ * At present only Microsoft Flight Simulator 2004 and X (also,
+ * perhaps, Prepar3D) are supported, and are accessed via the
+ * <a href="http://www.schiratti.com/dowson.html">FSUIPC</a>
+ * interface. The author has created a Python mapping for it, which
+ * has been submitted for inclusion into the SDK, so it will hopefully  
+ * appear in its next version. It is planned to support X-Plane in the
+ * near future (hopefully by the end of 2012) on both Linux and
+ * Windows.
+ *
+ * \subsection overview_devenv Development environment
+ *
+ * The software is primarily being developed on Linux, but is possible
+ * to perform development on Windows as well. You need to have Python
+ * 2.7.x installed as well as one of the above mentioned wrappers for
+ * Gtk+ and Gtk+ itself. Since Python is an interpreted language,
+ * there is no need for any special build system.
+ * 
+ * Python and Gtk+ are readily available on most Linux distributions,
+ * but some links are probably useful for Windows users:
+ * \li Python has its own Windows installers: http://www.python.org/download/releases
+ * \li PyGTK provides convenient all-in-one installers including Gtk+
+ *     itself: http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/2.24
+ * \li The Windows version uses some Python extensions: http://sourceforge.net/projects/pywin32/files
+ * \li To create install packages, you also need py2exe: <a href="http://www.py2exe.org/">http://www.py2exe.org</a>,
+ * \li as well as the Nullsoft Install System: http://nsis.sourceforge.net/Main_Page
+ */
+ 
