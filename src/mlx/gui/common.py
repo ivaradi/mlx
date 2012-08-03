@@ -17,7 +17,7 @@ import os
 # PyGObject interface. Otherwise Gtk+ 2 is used, which is the default on
 # Windows or when the \c FORCE_PYGTK environment variable is set.
 #
-# Besides this there some common utility classes and functions.
+# Besides this there are some common utility classes and functions.
 
 #-----------------------------------------------------------------------------
 
