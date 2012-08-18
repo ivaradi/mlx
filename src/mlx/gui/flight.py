@@ -1734,6 +1734,7 @@ class RoutePage(Page):
     def _cruiseLevelChanged(self, spinButton):
         """Called when the cruise level has changed."""
         self._updateForwardButton()
+        self._wizard.cruiseLevelChanged()
 
     def _routeChanged(self, textBuffer):
         """Called when the route has changed."""
@@ -3083,6 +3084,10 @@ class Wizard(gtk.VBox):
     def reloadFlights(self, callback):
         """Reload the flights from the MAVA server."""
         self.login(callback, None, None, None)
+
+    def cruiseLevelChanged(self):
+        """Called when the cruise level is changed."""
+        self.gui.cruiseLevelChanged()
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""

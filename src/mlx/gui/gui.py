@@ -858,6 +858,11 @@ class GUI(fs.ConnectionListener):
             self.simulator.stopMonitoring()
             self._monitoring = False
 
+    def cruiseLevelChanged(self):
+        """Called when the cruise level is changed in the flight wizard."""
+        if self._flight is not None:
+            self._flight.cruiseLevelChanged()
+
     def _buildMenuBar(self, accelGroup):
         """Build the main menu bar."""
         menuBar = gtk.MenuBar()

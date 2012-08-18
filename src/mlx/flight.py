@@ -348,6 +348,14 @@ class Flight(object):
         self.logger.message(aircraftState.timestamp,
                             "Total fuel: %.0f kg" % (aircraftState.totalFuel,))                            
 
+    def cruiseLevelChanged(self):
+        """Called when the cruise level hass changed."""
+        if self._stage in [const.STAGE_CRUISE, const.STAGE_DESCENT,
+                           const.STAGE_LANDING]:
+            message = "Cruise altitude modified to %d feet" % \
+                      (self.cruiseAltitude,)
+            self.logger.message(self.aircraft.timestamp, message)
+
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""
         if not currentState.onTheGround:

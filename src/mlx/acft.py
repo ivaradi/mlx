@@ -171,7 +171,13 @@ class Aircraft(object):
 
         This default implementation returns True."""
         return True
-    
+
+    @property
+    def timestamp(self):
+        """Get the timestamp of the current state."""
+        return None if self._aircraftState is None \
+               else self._aircraftState.timestamp
+        
     def getFlapsSpeedLimit(self, flaps):
         """Get the speed limit for the given flaps setting."""
         return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
