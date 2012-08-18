@@ -40,7 +40,16 @@ class PIREP(object):
         Returns the PIREP object, or None on error."""
         try:
             with open(path, "rb") as f:
-                return pickle.load(f)
+                pirep = pickle.load(f)
+                if "numCrew" not in dir(pirep):
+                    pirep.numCrew = pirep.bookedFlight.numCrew
+                if "numPassengers" not in dir(pirep):
+                    pirep.numPassengers = pirep.bookedFlight.numPassengers
+                if "bagWeight" not in dir(pirep):
+                    pirep.bagWeight = pirep.bookedFlight.bagWeight
+                if "mailWeight" not in dir(pirep):
+                    pirep.mailWeight = pirep.bookedFlight.mailWeight
+                return pirep
         except Exception, e:
             print "Failed loading PIREP from %s: %s" % (path, str(e))
             return None
@@ -48,7 +57,12 @@ class PIREP(object):
     def __init__(self, flight):
         """Initialize the PIREP from the given flight."""
         self.bookedFlight = flight.bookedFlight
+
+        self.numCrew = flight.numCrew
+        self.numPassengers = flight.numPassengers
+        self.bagWeight = flight.bagWeight
         self.cargoWeight = flight.cargoWeight
+        self.mailWeight = flight.mailWeight
         
         self.filedCruiseAltitude = flight.filedCruiseAltitude
         self.cruiseAltitude = flight.cruiseAltitude

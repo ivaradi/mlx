@@ -88,9 +88,29 @@ class Flight(object):
         return self._gui.bookedFlight
 
     @property
+    def numCrew(self):
+        """Get the number of crew members on the flight."""
+        return self._gui.numCrew
+
+    @property
+    def numPassengers(self):
+        """Get the number of passengers on the flight."""
+        return self._gui.numPassengers
+
+    @property
+    def bagWeight(self):
+        """Get the baggage weight for the flight."""
+        return self._gui.bagWeight
+
+    @property
     def cargoWeight(self):
         """Get the cargo weight for the flight."""
         return self._gui.cargoWeight
+
+    @property
+    def mailWeight(self):
+        """Get the mail weight for the flight."""
+        return self._gui.mailWeight
 
     @property
     def zfw(self):

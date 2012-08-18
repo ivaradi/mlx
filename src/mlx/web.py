@@ -683,11 +683,11 @@ class SendPIREP(Request):
         data["fltnum"] = bookedFlight.callsign
         data["depap"] = bookedFlight.departureICAO
         data["arrap"] = bookedFlight.arrivalICAO
-        data["pass"] = str(bookedFlight.numPassengers)
-        data["crew"] = str(bookedFlight.numCrew)
+        data["pass"] = str(pirep.numPassengers)
+        data["crew"] = str(pirep.numCrew)
         data["cargo"] = str(pirep.cargoWeight)
-        data["bag"] = str(bookedFlight.bagWeight)
-        data["mail"] = str(bookedFlight.mailWeight)
+        data["bag"] = str(pirep.bagWeight)
+        data["mail"] = str(pirep.mailWeight)
         
         data["flttype"] = SendPIREP._flightTypes[pirep.flightType]
         data["onoff"] = "1" if pirep.online else "0"

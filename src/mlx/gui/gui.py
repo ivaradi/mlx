@@ -222,9 +222,29 @@ class GUI(fs.ConnectionListener):
         return self._wizard.bookedFlight
 
     @property
+    def numCrew(self):
+        """Get the number of crew members."""
+        return self._wizard.numCrew
+
+    @property
+    def numPassengers(self):
+        """Get the number of passengers."""
+        return self._wizard.numPassengers
+
+    @property
+    def bagWeight(self):
+        """Get the bag weight."""
+        return self._wizard.bagWeight
+
+    @property
     def cargoWeight(self):
         """Get the cargo weight."""
         return self._wizard.cargoWeight
+
+    @property
+    def mailWeight(self):
+        """Get the mail weight."""
+        return self._wizard.mailWeight
 
     @property
     def zfw(self):

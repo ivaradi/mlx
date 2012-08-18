@@ -227,7 +227,11 @@ class PIREPViewer(gtk.Dialog):
         else:
             self._rating.set_text("%.1f %%" % (rating,))
 
+        self._flownNumCrew.set_text("%d" % (pirep.numCrew,))
+        self._flownNumPassengers.set_text("%d" % (pirep.numPassengers,))
+        self._flownBagWeight.set_text("%.0f" % (pirep.bagWeight,))
         self._flownCargoWeight.set_text("%.0f" % (pirep.cargoWeight,))
+        self._flownMailWeight.set_text("%.0f" % (pirep.mailWeight,))
         self._flightType.set_text(xstr("flighttype_" + 
                                        flightType2string(pirep.flightType)))
         self._online.set_text(xstr("pirepView_" +
@@ -525,24 +529,46 @@ class PIREPViewer(gtk.Dialog):
     def _buildMiscellaneousFrame(self):
         """Build the frame for the miscellaneous data."""        
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_miscellaneous"))
+
+        table = gtk.Table(3, 2)
+        mainBox.pack_start(table, False, False, 0)
+        table.set_row_spacings(4)
+        table.set_col_spacings(8)        
         
-        dataBox = gtk.HBox()
-        mainBox.pack_start(dataBox, False, False, 0)
-        
+        self._flownNumPassengers = \
+            PIREPViewer.tableAttach(table, 0, 0,
+                                    xstr("pirepView_numPassengers"),
+                                    width = 4)
+
+        self._flownNumCrew = \
+            PIREPViewer.tableAttach(table, 1, 0,
+                                    xstr("pirepView_numCrew"),
+                                    width = 3)
+
+        self._flownBagWeight = \
+            PIREPViewer.tableAttach(table, 0, 1,
+                                    xstr("pirepView_bagWeight"),
+                                    width = 5)
+
         self._flownCargoWeight = \
-            PIREPViewer.addLabeledData(dataBox,
-                                       xstr("pirepView_cargoWeight"),
-                                       width = 6)
+            PIREPViewer.tableAttach(table, 1, 1,
+                                    xstr("pirepView_cargoWeight"),
+                                    width = 6)
+
+        self._flownMailWeight = \
+            PIREPViewer.tableAttach(table, 2, 1,
+                                    xstr("pirepView_mailWeight"),
+                                    width = 5)
 
         self._flightType = \
-            PIREPViewer.addLabeledData(dataBox,
-                                       xstr("pirepView_flightType"),
-                                       width = 15)
+            PIREPViewer.tableAttach(table, 0, 2,
+                                    xstr("pirepView_flightType"),
+                                    width = 15)
             
         self._online = \
-            PIREPViewer.addLabeledData(dataBox,
-                                       xstr("pirepView_online"),
-                                       width = 5)
+            PIREPViewer.tableAttach(table, 1, 2,
+                                    xstr("pirepView_online"),
+                                    width = 5)
 
         PIREPViewer.addVFiller(mainBox)
 

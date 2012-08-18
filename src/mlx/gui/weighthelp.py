@@ -443,12 +443,11 @@ class WeightHelp(gtk.VBox):
 
         self._gui.logger.untimedMessage("The weight calculation help function was used by the pilot")
 
-        bookedFlight = self._gui.bookedFlight
-        self._crew = bookedFlight.numCrew
-        self._pax = bookedFlight.numPassengers
-        self._bag = bookedFlight.bagWeight
+        self._crew = self._gui.numCrew
+        self._pax = self._gui.numPassengers
+        self._bag = self._gui.bagWeight
         self._cargo = self._gui.cargoWeight
-        self._mail = bookedFlight.mailWeight
+        self._mail = self._gui.mailWeight
         
         aircraft = self._gui.flight.aircraft
         self._humanWeight = aircraft.humanWeight
