@@ -621,11 +621,18 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
 
 class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
     """Check for the anti-collision light for Tuplev planes."""
-
-    def isEngineCondition(self, state):
-        """Determine if the engines are in such a state that the lights should
-        be on."""
-        return max(state.n1[1:])>5    
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""        
+        numEnginesRunning = 0
+        for n1 in state.n1:
+            if n1>5: numEnginesRunning += 1
+            
+        if flight.stage==const.STAGE_PARKING:
+            return numEnginesRunning<len(state.n1) \
+                   and state.antiCollisionLightsOn
+        else:
+            return numEnginesRunning>1 and not state.antiCollisionLightsOn or \
+                   numEnginesRunning<1 and state.antiCollisionLightsOn
 
 #---------------------------------------------------------------------------------------
 
