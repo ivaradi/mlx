@@ -485,13 +485,22 @@ msgstr ""
 "Azt is ellenőrízheted, hogy a szimulátor milyen ZFW-t jelent."
 
 msgid "payload_crew"
-msgstr "Legénység:"
+msgstr "_Legénység:"
+
+msgid "payload_crew_tooltip"
+msgstr "A legénység létszáma."
 
 msgid "payload_pax"
-msgstr "Utasok:"
+msgstr "_Utasok:"
+
+msgid "payload_pax_tooltip"
+msgstr "Az utasok száma."
 
 msgid "payload_bag"
-msgstr "Poggyász:"
+msgstr "_Poggyász:"
+
+msgid "payload_bag_tooltip"
+msgstr "A poggyász tömege."
 
 msgid "payload_cargo"
 msgstr "_Teher:"
@@ -500,7 +509,10 @@ msgid "payload_cargo_tooltip"
 msgstr "A teherszállítmány tömege."
 
 msgid "payload_mail"
-msgstr "Posta:"
+msgstr "P_osta:"
+
+msgid "payload_mail_tooltip"
+msgstr "A posta tömege."
 
 msgid "payload_zfw"
 msgstr "Kiszámolt ZFW:"

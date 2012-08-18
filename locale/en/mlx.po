@@ -482,19 +482,19 @@ msgstr ""
 "You can also query the ZFW reported by the simulator."
 
 msgid "payload_crew"
-msgstr "Crew:"
+msgstr "C_rew:"
 
 msgid "payload_crew_tooltip"
 msgstr "The number of the crew members on your flight."
 
 msgid "payload_pax"
-msgstr "Passengers:"
+msgstr "P_assengers:"
 
 msgid "payload_pax_tooltip"
 msgstr "The number of passengers on your flight."
 
 msgid "payload_bag"
-msgstr "Baggage:"
+msgstr "_Baggage:"
 
 msgid "payload_bag_tooltip"
 msgstr "The weight of the baggage on your flight."
@@ -506,7 +506,7 @@ msgid "payload_cargo_tooltip"
 msgstr "The weight of the cargo on your flight."
 
 msgid "payload_mail"
-msgstr "Mail:"
+msgstr "_Mail:"
 
 msgid "payload_mail_tooltip"
 msgstr "The weight of the mail on your flight."

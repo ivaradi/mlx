@@ -1012,6 +1012,7 @@ class PayloadPage(Page):
         self.setMainWidget(alignment)
 
         label = gtk.Label(xstr("payload_crew"))
+        label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
@@ -1023,6 +1024,7 @@ class PayloadPage(Page):
         label.set_mnemonic_widget(self._numCrew)
         
         label = gtk.Label(xstr("payload_pax"))
+        label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
@@ -1034,6 +1036,7 @@ class PayloadPage(Page):
         label.set_mnemonic_widget(self._numPassengers)
         
         label = gtk.Label(xstr("payload_bag"))
+        label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 2, 3)
 
@@ -1061,6 +1064,7 @@ class PayloadPage(Page):
         table.attach(gtk.Label("kg"), 2, 3, 3, 4)
         
         label = gtk.Label(xstr("payload_mail"))
+        label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 4, 5)
 
