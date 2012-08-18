@@ -60,12 +60,11 @@ if __name__ == "__main__":
                 for i in range(0, newSize):
                     if oldData[i]!=newData[i]: numDiffs += 1
 
-                if numDiffs<=3:
+                if numDiffs<=4:
                     print "File %s is considered to be the same in both versions with %d changes" % \
                           (path, numDiffs)
                     finalManifest.addFile(path, oldSize, oldSum)
                     copyOld = True
-                    
 
         if not copyOld:
             print ">>> File %s is being copied" % (path,)
