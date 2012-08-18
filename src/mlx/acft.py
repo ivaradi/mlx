@@ -717,7 +717,6 @@ class T154(Aircraft):
     - reverser: left, right"""
     def __init__(self, flight):
         super(T154, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.dow = 53259
         self.mtow = 98000
         self.mlw = 78000
