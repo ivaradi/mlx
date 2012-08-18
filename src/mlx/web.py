@@ -155,6 +155,7 @@ class BookedFlight(object):
                     elif key=="dest_airport": self.arrivalICAO = value
                     elif key=="planecode": self.aircraftType = \
                          self._decodeAircraftType(value)
+                    elif key=="planetype": self.aircraftTypeName = value
                     elif key=="tail_nr": self.tailNumber = value
                     elif key=="passenger": self.numPassengers = int(value)
                     elif key=="crew": self.numCrew = int(value)
@@ -166,7 +167,6 @@ class BookedFlight(object):
                     elif key=="arrival_time": arrivalTime = value
                     elif key=="foglalas_id":
                         self.id = None if value=="0" else value
-                    elif key=="planetype": pass
                     else: lineOK = False
 
                 if not lineOK:
@@ -191,6 +191,10 @@ class BookedFlight(object):
                           "route", "departureTime", "arrivalTime"]:
             if attribute not in d:
                 raise Exception("Attribute %s could not be read" % (attribute,))
+
+        if "aircraftTypeName" not in d:
+            self.aircraftTypeName = \
+                BookedFlight.TYPE2TYPECODE[self.aircraftType]
             
     def writeIntoFile(self, f):
         """Write the flight into a file."""
@@ -201,6 +205,7 @@ class BookedFlight(object):
         print >> f, "dest_airport=%s" % (self.arrivalICAO,)
         print >> f, "planecode=%s" % \
               (BookedFlight.TYPE2TYPECODE[self.aircraftType],)
+        print >> f, "planetype=%s" % (self.aircraftTypeName,)
         print >> f, "tail_nr=%s" % (self.tailNumber,)
         print >> f, "passenger=%d" % (self.numPassengers,)
         print >> f, "crew=%d" % (self.numCrew,)
@@ -221,6 +226,7 @@ class BookedFlight(object):
         line = readline(f)
         typeCode = line[:3]
         self.aircraftType = self._decodeAircraftType(typeCode)
+        self.aircraftTypeName = line[3:]
 
     def _decodeAircraftType(self, typeCode):
         """Decode the aircraft type from the given typeCode."""
@@ -844,7 +850,7 @@ class SendACARS(Request):
     
         data["pass"] = str(bookedFlight.numPassengers)
         data["callsign"] = bookedFlight.callsign
-        data["airplane"] = BookedFlight.TYPE2TYPECODE[bookedFlight.aircraftType]
+        data["airplane"] = bookedFlight.aircraftTypeName
         data["from"] = bookedFlight.departureICAO
         data["to"] = bookedFlight.arrivalICAO        
         data["lajstrom"] = bookedFlight.tailNumber
