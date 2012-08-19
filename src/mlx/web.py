@@ -670,7 +670,7 @@ class SendPIREP(Request):
     _latin2Encoder = codecs.getencoder("iso-8859-2")
 
     def __init__(self, callback, pirep):
-        """Construct the request for the given PIREP."""
+        """Construct the sending of the PIREP."""
         super(SendPIREP, self).__init__(callback)
         self._pirep = pirep
 
@@ -740,90 +740,6 @@ class SendPIREP(Request):
             f.close()
 
         return result    
-
-#------------------------------------------------------------------------------
-
-class SendPIREP(Request):
-    """A request to send a PIREP to the MAVA website."""
-    _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
-                     const.FLIGHTTYPE_OLDTIMER : "OT",
-                     const.FLIGHTTYPE_VIP : "VIP",
-                     const.FLIGHTTYPE_CHARTER : "CHARTER" }
-
-    _latin2Encoder = codecs.getencoder("iso-8859-2")
-
-    def __init__(self, callback, pirep):
-        """Construct the request for the given PIREP."""
-        super(SendPIREP, self).__init__(callback)
-        self._pirep = pirep
-
-    def run(self):
-        """Perform the sending of the PIREP."""
-        url = "http://www.virtualairlines.hu/malevacars.php"
-
-        pirep = self._pirep
-
-        data = {}
-        data["acarsdata"] = pirep.getACARSText()
-
-        bookedFlight = pirep.bookedFlight
-        data["foglalas_id"] = bookedFlight.id
-        data["repdate"] = bookedFlight.departureTime.date().strftime("%Y-%m-%d")
-        data["fltnum"] = bookedFlight.callsign
-        data["depap"] = bookedFlight.departureICAO
-        data["arrap"] = bookedFlight.arrivalICAO
-        data["pass"] = str(bookedFlight.numPassengers)
-        data["crew"] = str(bookedFlight.numCrew)
-        data["cargo"] = str(pirep.cargoWeight)
-        data["bag"] = str(bookedFlight.bagWeight)
-        data["mail"] = str(bookedFlight.mailWeight)
-        
-        data["flttype"] = SendPIREP._flightTypes[pirep.flightType]
-        data["onoff"] = "1" if pirep.online else "0"
-        data["bt_dep"] = util.getTimestampString(pirep.blockTimeStart)
-        data["bt_arr"] = util.getTimestampString(pirep.blockTimeEnd)
-        data["bt_dur"] = util.getTimeIntervalString(pirep.blockTimeEnd -
-                                                    pirep.blockTimeStart)
-        data["ft_dep"] = util.getTimestampString(pirep.flightTimeStart)
-        data["ft_arr"] = util.getTimestampString(pirep.flightTimeEnd)
-        data["ft_dur"] = util.getTimeIntervalString(pirep.flightTimeEnd -
-                                                    pirep.flightTimeStart)
-        data["timecomm"] = pirep.getTimeComment()
-        data["fuel"] = "%.0f" % (pirep.fuelUsed,)
-        data["dep_rwy"] = pirep.departureRunway
-        data["arr_rwy"] = pirep.arrivalRunway
-        data["wea_dep"] = pirep.departureMETAR
-        data["wea_arr"] = pirep.arrivalMETAR
-        data["alt"] = "FL%.0f" % (pirep.filedCruiseAltitude/100.0,)
-        if pirep.filedCruiseAltitude!=pirep.cruiseAltitude:
-            data["mod_alt"] = "FL%.0f" % (pirep.cruiseAltitude/100.0,)
-        else:
-            data["mod_alt"] = ""
-        data["sid"] = pirep.sid
-        data["navroute"] = pirep.route
-        data["star"] = pirep.getSTAR()
-        data["aprtype"] = pirep.approachType
-        data["diff"] = "2"
-        data["comment"] = SendPIREP._latin2Encoder(pirep.comments)[0]
-        data["flightdefect"] = SendPIREP._latin2Encoder(pirep.flightDefects)[0]
-        data["kritika"] = pirep.getRatingText()
-        data["flightrating"] = "%.1f" % (max(0.0, pirep.rating),)
-        data["distance"] = "%.3f" % (pirep.flownDistance,)
-        data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
-
-        f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
-        try:
-            result = Result()
-            line = f.readline().strip()
-            print "PIREP result from website:", line
-            result.success = line=="OK"
-            result.alreadyFlown = line=="MARVOLT"
-            result.notAvailable = line=="NOMORE"
-        finally:
-            f.close()
-
-        return result    
-
 #------------------------------------------------------------------------------
 
 class SendACARS(Request):
