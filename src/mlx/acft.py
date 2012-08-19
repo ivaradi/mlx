@@ -739,7 +739,7 @@ class T154(Aircraft):
 
     def _appendLightsCheckers(self):
         """Append the checkers needed for the lights."""
-        self._checkers.append(checks.TupolevAntiCollisionLightsChecker())
+        self._checkers.append(checks.AntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
 
