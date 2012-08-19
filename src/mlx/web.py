@@ -706,7 +706,7 @@ class SendPIREP(Request):
         data["ft_dur"] = util.getTimeIntervalString(pirep.flightTimeEnd -
                                                     pirep.flightTimeStart)
         data["timecomm"] = pirep.getTimeComment()
-        data["fuel"] = "%.0f" % (pirep.fuelUsed,)
+        data["fuel"] = "%.2f" % (pirep.fuelUsed,)
         data["dep_rwy"] = pirep.departureRunway
         data["arr_rwy"] = pirep.arrivalRunway
         data["wea_dep"] = pirep.departureMETAR

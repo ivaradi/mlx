@@ -229,7 +229,7 @@ class Aircraft(object):
                 self.logger.message(aircraftState.timestamp, "Block time start")
                 self._flight.logFuel(aircraftState)
                 self.logger.message(aircraftState.timestamp, 
-                                    "Zero-fuel weight: %.0f kg" % (aircraftState.zfw))
+                                    "ZFW: %.2f kg" % (aircraftState.zfw))
                 flight = self._flight
                 if flight.v1 is None or flight.vr is None or flight.v2 is None:
                     fs.sendMessage(const.MESSAGETYPE_HELP,
