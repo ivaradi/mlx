@@ -895,6 +895,9 @@ class Simulator(object):
         if aircraftName==self._aircraftName:
             return False
 
+        print "fsuipc.Simulator: new aircraft name and air file path: %s, %s" % \
+              (name, airPath)
+
         self._aircraftName = aircraftName
         needNew = self._aircraftModel is None
         needNew = needNew or\
@@ -1660,6 +1663,7 @@ class DreamwingsDH8DModel(DH8DModel):
         state.pitotHeatOn = not state.pitotHeatOn
 
         return state
+
 #------------------------------------------------------------------------------
 
 class CRJ2Model(GenericAircraftModel):
@@ -1695,6 +1699,35 @@ class F70Model(GenericAircraftModel):
     def name(self):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic Fokker 70"
+
+#------------------------------------------------------------------------------
+
+class DAF70Model(F70Model):
+    """Model for the Digital Aviation F70 implementation on FS9."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type == const.AIRCRAFT_F70 and \
+               (airPath.endswith("fokker70_2k4_v4.1.air") or
+                airPath.endswith("fokker70_2k4_v4.3.air"))
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Digital Aviation Fokker 70"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then invert the pitot heat state."""
+        state = super(DAF70Model, self).getAircraftState(aircraft,
+                                                         timestamp,
+                                                         data)
+        state.landingLightsOn = None
+        state.nav2 = None
+
+        return state
 
 #------------------------------------------------------------------------------
 
@@ -1880,5 +1913,6 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 
 AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 AircraftModel.registerSpecial(DreamwingsDH8DModel)
+AircraftModel.registerSpecial(DAF70Model)
 
 #------------------------------------------------------------------------------

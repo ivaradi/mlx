@@ -191,6 +191,8 @@ class MonitorWindow(gtk.Window):
 
         self.add(alignment)
 
+        self._previousState = None
+
         self.setData()
 
     def _createLabeledEntry(self, label, width = 8, xalign = 1.0):
@@ -248,6 +250,7 @@ class MonitorWindow(gtk.Window):
             self._navLightsOn.set_sensitive(False)
             self._antiCollisionLightsOn.set_sensitive(False)
             self._strobeLightsOn.set_sensitive(False)
+            self._landingLightsOn.set_text("LANDING")
             self._landingLightsOn.set_sensitive(False)
             self._pitotHeatOn.set_sensitive(False)
             self._parking.set_sensitive(False)
@@ -284,8 +287,8 @@ class MonitorWindow(gtk.Window):
             self._flaps.set_text("%.0f" % (aircraftState.flaps,))
             self._altimeter.set_text("%.0f" % (aircraftState.altimeter,))
             self._squawk.set_text(aircraftState.squawk)
-            self._nav1.set_text(aircraftState.nav1)
-            self._nav2.set_text(aircraftState.nav2)
+            self._nav1.set_text("-" if aircraftState.nav1 is None else aircraftState.nav1)
+            self._nav2.set_text("-" if aircraftState.nav2 is None else aircraftState.nav2)
 
             fuelStr = ""
             for (_tank, fuel) in aircraftState.fuel:
@@ -316,7 +319,16 @@ class MonitorWindow(gtk.Window):
             self._navLightsOn.set_sensitive(aircraftState.navLightsOn)
             self._antiCollisionLightsOn.set_sensitive(aircraftState.antiCollisionLightsOn)
             self._strobeLightsOn.set_sensitive(aircraftState.strobeLightsOn)
-            self._landingLightsOn.set_sensitive(aircraftState.landingLightsOn)
+
+            if self._previousState is None or \
+               ((self._previousState.landingLightsOn is None)!=
+                (aircraftState.landingLightsOn is None)):
+                if aircraftState.landingLightsOn is None:
+                    self._landingLightsOn.set_markup('<span strikethrough="true">LANDING</span>')
+                else:
+                    self._landingLightsOn.set_text("LANDING")
+            self._landingLightsOn.set_sensitive(aircraftState.landingLightsOn is True)
+            
             self._pitotHeatOn.set_sensitive(aircraftState.pitotHeatOn)
             self._parking.set_sensitive(aircraftState.parking)
             self._gearControlDown.set_sensitive(aircraftState.gearControlDown)

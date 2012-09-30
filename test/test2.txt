@@ -1,0 +1,84 @@
+set airPath="C:\Program Files\Microsoft Games\FS9\Aircraft\Cessna\fokker70_2k4_v4.3.air"
+set lights=0
+set zfw=46741 hour=7 min=50
+set latitude=47.44 longitude=19.26
+set parking=no
+set gs=10 ias=10
+set flapsControl=37.5
+set gs=60 ias=60
+set lights=21
+set gs=80 ias=80
+set gs=90 ias=90
+set gs=100 ias=100
+set gs=120 ias=120
+set onTheGround=no
+set altitude=600
+set noseGear=0
+set altitude=2000
+set flapsControl=0
+set altitude=10000
+set lights=17
+set ias=400
+set altitude=22001
+set vs=-200
+set flapsControl=87.5
+set ias=130 gs=130
+set altitude=557
+set ias=125 gs=125
+set radioAltitude=3200
+set radioAltitude=3100
+set radioAltitude=3000
+set radioAltitude=2900
+set radioAltitude=2800
+set radioAltitude=2700
+set radioAltitude=2600
+set radioAltitude=2521
+set radioAltitude=2510
+set radioAltitude=2500
+set radioAltitude=2500
+set radioAltitude=2499
+set radioAltitude=2520
+set radioAltitude=2400
+set radioAltitude=2300
+set radioAltitude=2200
+set radioAltitude=2100
+set radioAltitude=2018
+set radioAltitude=1950
+set radioAltitude=1800
+set radioAltitude=1600
+set radioAltitude=1550
+set radioAltitude=1450
+set radioAltitude=1590
+set radioAltitude=1499
+set radioAltitude=1400
+set radioAltitude=1300
+set radioAltitude=1200
+set radioAltitude=1200
+set radioAltitude=1100
+set radioAltitude=1001
+set radioAltitude=912
+set radioAltitude=832
+set radioAltitude=705
+set radioAltitude=599
+set radioAltitude=501
+set radioAltitude=412
+set radioAltitude=331
+set radioAltitude=241
+set radioAltitude=102
+set radioAltitude=90
+set noseGear=100
+set radioAltitude=80
+set radioAltitude=70
+set radioAltitude=60
+set radioAltitude=51
+set radioAltitude=42
+set radioAltitude=29
+set radioAltitude=9
+set altitude=517
+set latitude=47.49 longitude=21.62
+set onTheGround=yes
+set ias=45 gs=45
+set ias=35 gs=35
+set ias=20 gs=20
+set ias=0 gs=0
+set parking=yes

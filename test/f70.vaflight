@@ -1,0 +1,16 @@
+callsign=MA950
+date=2012-05-7
+dep_airport=LHBP
+dest_airport=LHDC
+planecode=F70
+planetype=Fokker F70
+tail_nr=HA-LON
+passenger=82
+crew=5
+bag=300
+cargo=875
+mail=125
+flight_route=NORAH L140 NARKA
+departure_time=08\:00\:00
+arrival_time=08\:40\:00
+foglalas_id=100098

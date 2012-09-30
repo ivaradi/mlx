@@ -1329,7 +1329,25 @@ class CLI(cmd.Cmd):
 
     def do_set(self, args):
         """Handle the set command."""
-        arguments = args.split()
+        arguments = []
+        inWord = False
+        inQuote = False
+        word = ""
+        for c in args:
+            if c.isspace() and not inQuote:
+                if inWord:
+                    arguments.append(word)
+                    word = ""
+                    inWord = False
+            elif c=='"':
+                inQuote = not inQuote
+            else:
+                inWord = True
+                word += c
+
+        if inWord:
+            arguments.append(word)
+            
         names = []
         data = []
         for argument in arguments:

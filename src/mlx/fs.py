@@ -214,7 +214,9 @@ class AircraftState(object):
     - navLightsOn: a boolean indicating if the navigation lights are on
     - antiCollisionLightsOn: a boolean indicating if the anti-collision lights are on
     - strobeLightsOn: a boolean indicating if the strobe lights are on
-    - landingLightsOn: a boolean indicating if the landing lights are on
+    - landingLightsOn: a boolean indicating if the landing lights are on. If
+    the detection of the state of the landing lights is unreliable, and should
+    not be considered, this is set to None.
     - pitotHeatOn: a boolean indicating if the pitot heat is on
     - parking: a boolean indicating if the parking brake is set
     - gearControlDown: a boolean indicating if the gear control is set to down
@@ -224,8 +226,10 @@ class AircraftState(object):
     - spoilersExtension: the percentage of how much the spoiler is extended
     (float) 
     - altimeter: the altimeter setting in hPa (float)
-    - nav1: the frequency of the NAV1 radio in MHz (string)
-    - nav2: the frequency of the NAV1 radio in MHz (string)
+    - nav1: the frequency of the NAV1 radio in MHz (string). Can be None, if
+    the frequency is unreliable or meaningless.
+    - nav2: the frequency of the NAV1 radio in MHz (string). Can be None, if
+    the frequency is unreliable or meaningless.
     - squawk: the transponder code (string)
     - windSpeed: the speed of the wind at the aircraft in knots (float)
     - windDirection: the direction of the wind at the aircraft in degrees (float)

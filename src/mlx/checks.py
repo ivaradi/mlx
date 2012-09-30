@@ -300,7 +300,8 @@ class SimpleChangeMixin(object):
     - _getValue(state): get the value we are interested in."""
     def _changed(self, oldState, state):
         """Determine if the value has changed."""
-        return self._getValue(oldState)!=self._getValue(state)
+        currentValue = self._getValue(state)
+        return currentValue is not None and self._getValue(oldState)!=currentValue
 
 #---------------------------------------------------------------------------------------
 
@@ -758,17 +759,18 @@ class LandingLightsChecker(PatientFaultChecker):
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return (flight.stage==const.STAGE_BOARDING and \
-                state.landingLightsOn and state.onTheGround) or \
-               (flight.stage==const.STAGE_TAKEOFF and \
-                not state.landingLightsOn and not state.onTheGround) or \
-               (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
-                                 const.STAGE_DESCENT] and \
-                state.landingLightsOn and state.altitude>12500) or \
-               (flight.stage==const.STAGE_LANDING and \
-                not state.landingLightsOn and state.onTheGround) or \
-               (flight.stage==const.STAGE_PARKING and \
-                state.landingLightsOn and state.onTheGround)
+        return state.landingLightsOn is not None and \
+               ((flight.stage==const.STAGE_BOARDING and \
+                 state.landingLightsOn and state.onTheGround) or \
+                (flight.stage==const.STAGE_TAKEOFF and \
+                 not state.landingLightsOn and not state.onTheGround) or \
+                (flight.stage in [const.STAGE_CLIMB, const.STAGE_CRUISE,
+                                  const.STAGE_DESCENT] and \
+                 state.landingLightsOn and state.altitude>12500) or \
+                (flight.stage==const.STAGE_LANDING and \
+                 not state.landingLightsOn and state.onTheGround) or \
+                (flight.stage==const.STAGE_PARKING and \
+                 state.landingLightsOn and state.onTheGround))
                
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
