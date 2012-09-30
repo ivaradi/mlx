@@ -675,7 +675,9 @@ class Simulator(object):
         """Send a message to the pilot via the simulator.
 
         duration is the number of seconds to keep the message displayed."""
-        
+
+        print "fsuipc.Simulator.sendMessage:", message
+
         if self._scroll:
             if duration==0: duration = -1
             elif duration == 1: duration = -2

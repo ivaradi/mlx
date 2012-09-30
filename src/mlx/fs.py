@@ -119,7 +119,7 @@ class MessageThread(threading.Thread):
                 self._sendMessage(messageType, text, duration, disconnect)
 
     def _sendMessage(self, messageType, text, duration, disconnect):
-        """Send the message and setup the next message time."""
+        """Send the message and setup the next message time."""        
         messageLevel = self._config.getMessageTypeLevel(messageType)
         if messageLevel==const.MESSAGELEVEL_SOUND or \
            messageLevel==const.MESSAGELEVEL_BOTH:
@@ -134,7 +134,7 @@ class MessageThread(threading.Thread):
             else:
                 self._simulator.sendMessage("[MLX] " + text,
                                             duration = duration)
-        elif disconnecte:
+        elif disconnect:
             self._simulator.disconnect()
         self._nextMessageTime = time.time() + duration
 

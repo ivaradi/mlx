@@ -90,7 +90,12 @@ class Logger(object):
         if stage==const.STAGE_END:
             self.untimedMessage("Rating: %.0f" % (self.getRating(),))
         else:
-            sendMessage(const.MESSAGETYPE_INFORMATION, "Flight stage: " + s, 3)
+            messageType = \
+               const.MESSAGETYPE_INFLIGHT  if stage in \
+               [const.STAGE_CLIMB, const.STAGE_CRUISE, \
+                const.STAGE_DESCENT, const.STAGE_LANDING] \
+                else const.MESSAGETYPE_INFORMATION
+            sendMessage(messageType, "Flight stage: " + s, 3)
         
     def fault(self, faultID, timestamp, what, score):
         """Report a fault.

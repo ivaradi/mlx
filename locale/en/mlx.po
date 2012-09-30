@@ -1455,6 +1455,9 @@ msgstr ""
 "_Information Messages\n"
 "(e.g. flight stage)"
 
+msgid "prefs_msgs_type_inflight"
+msgstr "In-f_light Stage Messages"
+
 msgid "prefs_msgs_type_fault"
 msgstr ""
 "_Fault Messages\n"

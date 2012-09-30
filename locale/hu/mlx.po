@@ -1469,6 +1469,11 @@ msgstr ""
 "_Információs üzenetek\n"
 "(pl. a repülés fázisa)"
 
+msgid "prefs_msgs_type_inflight"
+msgstr ""
+"Repülés alatti _fázis\n"
+"üzenetek"
+
 msgid "prefs_msgs_type_fault"
 msgstr ""
 "Hi_baüzenetek\n"

@@ -275,29 +275,33 @@ MESSAGETYPE_LOGGER_ERROR = 1
 ## Message type: information
 MESSAGETYPE_INFORMATION = 2
 
+## Message type: in-flight information
+MESSAGETYPE_INFLIGHT = 3
+
 ## Message type: fault messages
-MESSAGETYPE_FAULT = 3
+MESSAGETYPE_FAULT = 4
 
 ## Message type: NO-GO fault messages
-MESSAGETYPE_NOGO = 4
+MESSAGETYPE_NOGO = 5
 
 ## Message type: gate system messages
-MESSAGETYPE_GATE_SYSTEM = 5
+MESSAGETYPE_GATE_SYSTEM = 6
 
 ## Message type: environment messages
 # FIXME: flight plan closed (5 sec)
-MESSAGETYPE_ENVIRONMENT = 6
+MESSAGETYPE_ENVIRONMENT = 7
 
 ## Message type: help messages
-MESSAGETYPE_HELP = 7
+MESSAGETYPE_HELP = 8
 
 ## Message type: visibility messages
-MESSAGETYPE_VISIBILITY = 8
+MESSAGETYPE_VISIBILITY = 9
 
 #-------------------------------------------------------------------------------
 
 messageTypes = [ MESSAGETYPE_LOGGER_ERROR,
                  MESSAGETYPE_INFORMATION,
+                 MESSAGETYPE_INFLIGHT,
                  MESSAGETYPE_FAULT,
                  MESSAGETYPE_NOGO,
                  MESSAGETYPE_GATE_SYSTEM,
@@ -309,6 +313,7 @@ messageTypes = [ MESSAGETYPE_LOGGER_ERROR,
 
 _messageTypeStrings = { MESSAGETYPE_LOGGER_ERROR : "loggerError",
                         MESSAGETYPE_INFORMATION : "information",
+                        MESSAGETYPE_INFLIGHT : "inflight",
                         MESSAGETYPE_FAULT : "fault",
                         MESSAGETYPE_NOGO : "nogo",
                         MESSAGETYPE_GATE_SYSTEM : "gateSystem",
