@@ -426,6 +426,22 @@ class NAV2Logger(GenericStateChangeLogger):
 
 #---------------------------------------------------------------------------------------
 
+class ADF1Logger(GenericStateChangeLogger):
+    """Logger for the ADF1 radio setting."""
+    def __init__(self):
+        """Construct the logger."""
+        super(ADF1Logger, self).__init__("adf1", "ADF1 frequency: %s kHz")
+
+#---------------------------------------------------------------------------------------
+
+class ADF2Logger(GenericStateChangeLogger):
+    """Logger for the ADF2 radio setting."""
+    def __init__(self):
+        """Construct the logger."""
+        super(ADF2Logger, self).__init__("adf2", "ADF2 frequency: %s kHz")
+
+#---------------------------------------------------------------------------------------
+
 class SquawkLogger(GenericStateChangeLogger):
     """Logger for the squawk setting."""
     def __init__(self):

@@ -166,6 +166,15 @@ class Values(object):
         return Values._readBCD(int(frequency*100.0))
 
     @staticmethod
+    def _readADFFrequency(frequency):
+        """Convert the given frequency into a tuple of ADF BCD frequency
+        components."""
+        mainFrequency = Values._readBCD(int(math.floor(frequency))%1000)
+        extFrequency = (int(frequency/1000.0)*256) + (int(frequency*10.0)%10)
+
+        return [mainFrequency, extFrequency]
+
+    @staticmethod
     def _readBCD(value):
         """Convert the given value into BCD format."""
         bcd = (value/1000) % 10
@@ -181,6 +190,24 @@ class Values(object):
     def _writeFrequency(value):
         """Convert the given value into a frequency."""
         return (Values._writeBCD(value) + 10000) / 100.0
+
+    @staticmethod
+    def _toADFFrequency(main, ext):
+        """Convert the given values into an ADF frequency."""
+        frequency = Values._writeBCD(main)
+        frequency += 1000.0*int(ext/256)
+        frequency += (int(ext)%16)/10.0
+        return frequency
+
+    @staticmethod
+    def _writeADFFrequency(current, value, isMain):
+        """Convert the given part of an ADF frequency into the
+        whole frequency."""
+        [mainFrequency, extFrequency] = Values._readADFFrequency(current)
+        if isMain: mainFrequency = value
+        else: extFrequency = value
+        
+        return Values._toADFFrequency(mainFrequency, extFrequency)
 
     @staticmethod
     def _writeBCD(value):
@@ -256,6 +283,8 @@ class Values(object):
 
         self.nav1 = 117.3
         self.nav2 = 109.5
+        self.adf1 = 382.7
+        self.adf2 = 1540.6
         self.squawk = 2200
 
         self.windSpeed = 8.0
@@ -316,16 +345,24 @@ class Values(object):
             return int(self.ias * 128.0)
         elif offset==0x02c8:       # VS
             return int(self.vs * const.FEETTOMETRES * 256.0 / 60.0)
+        elif offset==0x02d4:       # ADF2 main
+            return Values._readADFFrequency(self.adf2)[0]
+        elif offset==0x02d6:       # ADF2 extended
+            return Values._readADFFrequency(self.adf2)[1]
         elif offset==0x030c:       # TD rate
             return int(self.tdRate * const.FEETTOMETRES * 256.0 / 60.0)
         elif offset==0x0330:       # Altimeter
             return int(self.altimeter * 16.0)
+        elif offset==0x034c:       # ADF1 main
+            return Values._readADFFrequency(self.adf1)[0]
         elif offset==0x0350:       # NAV1
             return Values._readFrequency(self.nav1)
         elif offset==0x0352:       # NAV2
             return Values._readFrequency(self.nav2)
         elif offset==0x0354:       # Squawk
             return Values._readBCD(self.squawk)
+        elif offset==0x0356:       # ADF1 extended
+            return Values._readADFFrequency(self.adf1)[1]
         elif offset==0x0366:       # On the ground
             return 1 if self.onTheGround else 0
         elif offset==0x036c:       # Stalled
@@ -545,14 +582,22 @@ class Values(object):
             self.vs = value * 60.0 / const.FEETTOMETRES / 256.0
             if not self.onTheGround:
                 self.tdRate = self.vs
+        elif offset==0x02d4:       # ADF2 main
+            self.adf2 = self._writeADFFrequency(self.adf2, value, True)
+        elif offset==0x02d6:       # ADF2 main
+            self.adf2 = self._writeADFFrequency(self.adf2, value, False)
         elif offset==0x0330:       # Altimeter
             self.altimeter = value / 16.0
+        elif offset==0x034c:       # ADF1 main
+            self.adf1 = self._writeADFFrequency(self.adf1, value, True)
         elif offset==0x0350:       # NAV1
             self.nav1 = Values._writeFrequency(value)
         elif offset==0x0352:       # NAV2
             self.nav2 = Values._writeFrequency(value)
         elif offset==0x0354:       # Squawk
             self.squawk = Values._writeBCD(value)
+        elif offset==0x0356:       # ADF1 ext
+            self.adf1 = self._writeADFFrequency(self.adf1, value, False)
         elif offset==0x0366:       # On the groud
             self.onTheGround = value!=0
             if not self.onTheGround:
@@ -1026,7 +1071,7 @@ class CLI(cmd.Cmd):
     def pyuipc2throttle(value):
         """Convert the given PyUIPC value into a throttle value."""
         return value * 100.0 / 16384.0
-        
+
     def __init__(self):
         """Construct the CLI."""
         cmd.Cmd.__init__(self)
@@ -1041,251 +1086,272 @@ class CLI(cmd.Cmd):
         self._client = Client(host)
 
         self._valueHandlers = {}
-        self._valueHandlers["year"] = (0x0240, "H",  lambda value: value,
+        self._valueHandlers["year"] = ([(0x0240, "H")],  lambda value: value,
                                       lambda word: int(word))
-        self._valueHandlers["yday"] = (0x023e, "H",  lambda value: value,
+        self._valueHandlers["yday"] = ([(0x023e, "H")],  lambda value: value,
                                        lambda word: int(word))
-        self._valueHandlers["hour"] = (0x023b, "b",  lambda value: value,
+        self._valueHandlers["hour"] = ([(0x023b, "b")],  lambda value: value,
                                        lambda word: int(word))
-        self._valueHandlers["min"] = (0x023c, "b",  lambda value: value,
+        self._valueHandlers["min"] = ([(0x023c, "b")],  lambda value: value,
                                       lambda word: int(word))
-        self._valueHandlers["sec"] = (0x023a, "b",  lambda value: value,
+        self._valueHandlers["sec"] = ([(0x023a, "b")],  lambda value: value,
                                       lambda word: int(word))
-        self._valueHandlers["acftName"] = (0x3d00, -256,  lambda value: value,
+        self._valueHandlers["acftName"] = ([(0x3d00, -256)],  lambda value: value,
                                            lambda word: word)
-        self._valueHandlers["airPath"] = (0x3c00, -256,  lambda value: value,
+        self._valueHandlers["airPath"] = ([(0x3c00, -256)],  lambda value: value,
                                           lambda word: word)
-        self._valueHandlers["latitude"] = (0x0560, "l",
+        self._valueHandlers["latitude"] = ([(0x0560, "l")],
                                            lambda value: value * 90.0 /
                                            10001750.0 / 65536.0 / 65536.0,
                                            lambda word: long(float(word) *
                                                              10001750.0 *
                                                              65536.0 * 65536.0 / 90.0))
-        self._valueHandlers["longitude"] = (0x0568, "l",
+        self._valueHandlers["longitude"] = ([(0x0568, "l")],
                                             lambda value: value * 360.0 /
                                             65536.0 / 65536.0 / 65536.0 / 65536.0,
                                             lambda word: long(float(word) *
                                                               65536.0 * 65536.0 *
                                                               65536.0 * 65536.0 /
                                                               360.0))
-        self._valueHandlers["paused"] = (0x0264, "H", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["frozen"] = (0x3364, "H", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["replay"] = (0x0628, "d", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["slew"] = (0x05dc, "H", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["overspeed"] = (0x036d, "b", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["stalled"] = (0x036c, "b", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["onTheGround"] = (0x0366, "H", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["zfw"] = (0x3bfc, "d",
+        self._valueHandlers["paused"] = ([(0x0264, "H")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["frozen"] = ([(0x3364, "H")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["replay"] = ([(0x0628, "d")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["slew"] = ([(0x05dc, "H")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["overspeed"] = ([(0x036d, "b")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["stalled"] = ([(0x036c, "b")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["onTheGround"] = ([(0x0366, "H")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["zfw"] = ([(0x3bfc, "d")],
                                       lambda value: value * const.LBSTOKG / 256.0,
                                       lambda word: int(float(word) * 256.0 *
                                                        const.KGSTOLB))
-        self._valueHandlers["grossWeight"] = (0x30c0, "f",
+        self._valueHandlers["grossWeight"] = ([(0x30c0, "f")],
                                               lambda value: value * const.LBSTOKG,
                                               lambda word: None)
-        self._valueHandlers["heading"] = (0x0580, "d",
+        self._valueHandlers["heading"] = ([(0x0580, "d")],
                                           CLI.pyuipc2degree, CLI.degree2pyuipc)
-        self._valueHandlers["pitch"] = (0x0578, "d",
+        self._valueHandlers["pitch"] = ([(0x0578, "d")],
                                         CLI.pyuipc2degree, CLI.degree2pyuipc)
-        self._valueHandlers["bank"] = (0x057c, "d",
+        self._valueHandlers["bank"] = ([(0x057c, "d")],
                                        CLI.pyuipc2degree, CLI.degree2pyuipc)
-        self._valueHandlers["ias"] = (0x02bc, "d",
+        self._valueHandlers["ias"] = ([(0x02bc, "d")],
                                       lambda value: value / 128.0,
                                       lambda word: int(float(word) * 128.0))
-        self._valueHandlers["mach"] = (0x11c6, "H",
+        self._valueHandlers["mach"] = ([(0x11c6, "H")],
                                        lambda value: value / 20480.0,
                                        lambda word: int(float(word) * 20480.0))
-        self._valueHandlers["gs"] = (0x02b4, "d",
+        self._valueHandlers["gs"] = ([(0x02b4, "d")],
                                      lambda value: value * 3600.0 / 65536.0 / 1852.0,
                                      lambda word: int(float(word) * 65536.0 *
                                                       1852.0 / 3600))
-        self._valueHandlers["tas"] = (0x02b8, "d",
+        self._valueHandlers["tas"] = ([(0x02b8, "d")],
                                      lambda value: value / 128.0,
                                      lambda word: None)
-        self._valueHandlers["vs"] = (0x02c8, "d",
+        self._valueHandlers["vs"] = ([(0x02c8, "d")],
                                      lambda value: value * 60 /                                     
                                      const.FEETTOMETRES / 256.0,
                                      lambda word: int(float(word) *
                                                       const.FEETTOMETRES *
                                                       256.0 / 60.0))
-        self._valueHandlers["tdRate"] = (0x030c, "d",
+        self._valueHandlers["tdRate"] = ([(0x030c, "d")],
                                          lambda value: value * 60 /                                     
                                          const.FEETTOMETRES / 256.0,
                                          lambda word: int(float(word) *
                                                           const.FEETTOMETRES *
                                                           256.0 / 60.0))
-        self._valueHandlers["radioAltitude"] = (0x31e4, "d",
+        self._valueHandlers["radioAltitude"] = ([(0x31e4, "d")],
                                                 lambda value: value /
                                                 const.FEETTOMETRES /
                                                 65536.0,
                                                 lambda word: int(float(word) *
                                                                  const.FEETTOMETRES *
                                                                  65536.0))
-        self._valueHandlers["altitude"] = (0x0570, "l",
+        self._valueHandlers["altitude"] = ([(0x0570, "l")],
                                            lambda value: value /
                                            const.FEETTOMETRES / 65536.0 /
                                            65536.0,
                                            lambda word: long(float(word) *
                                                              const.FEETTOMETRES *
                                                              65536.0 * 65536.0))
-        self._valueHandlers["gLoad"] = (0x11ba, "H",
+        self._valueHandlers["gLoad"] = ([(0x11ba, "H")],
                                         lambda value: value / 625.0,
                                         lambda word: int(float(word) * 625.0))
 
-        self._valueHandlers["flapsControl"] = (0x0bdc, "d",
+        self._valueHandlers["flapsControl"] = ([(0x0bdc, "d")],
                                                lambda value: value * 100.0 / 16383.0,
                                                lambda word: int(float(word) *
                                                                 16383.0 / 100.0))
-        self._valueHandlers["flaps"] = (0x0be0, "d",
+        self._valueHandlers["flaps"] = ([(0x0be0, "d")],
                                         lambda value: value * 100.0 / 16383.0,
                                         lambda word: int(float(word) *
                                                          16383.0 / 100.0))
-        self._valueHandlers["lights"] = (0x0d0c, "H",
+        self._valueHandlers["lights"] = ([(0x0d0c, "H")],
                                          lambda value: value,
                                          lambda word: int(word))
-        self._valueHandlers["pitot"] = (0x029c, "b", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["parking"] = (0x0bc8, "H", CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["gearControl"] = (0x0be8, "d",
+        self._valueHandlers["pitot"] = ([(0x029c, "b")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["parking"] = ([(0x0bc8, "H")], CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["gearControl"] = ([(0x0be8, "d")],
                                               lambda value: value * 100.0 / 16383.0,
                                               lambda word: int(float(word) *
                                                                16383.0 / 100.0))
-        self._valueHandlers["noseGear"] = (0x0bec, "d",
+        self._valueHandlers["noseGear"] = ([(0x0bec, "d")],
                                            lambda value: value * 100.0 / 16383.0,
                                            lambda word: int(float(word) *
                                                             16383.0 / 100.0))
-        self._valueHandlers["spoilersArmed"] = (0x0bcc, "d",
+        self._valueHandlers["spoilersArmed"] = ([(0x0bcc, "d")],
                                                 CLI.bool2str, CLI.str2bool)
-        self._valueHandlers["spoilers"] = (0x0bd0, "d",
+        self._valueHandlers["spoilers"] = ([(0x0bd0, "d")],
                                            lambda value: value,
                                            lambda word: int(word))
-        self._valueHandlers["qnh"] = (0x0330, "H",
+        self._valueHandlers["qnh"] = ([(0x0330, "H")],
                                       lambda value: value / 16.0,
                                       lambda word: int(float(word)*16.0))
-        self._valueHandlers["nav1"] = (0x0350, "H",
+        self._valueHandlers["nav1"] = ([(0x0350, "H")],
                                        Values._writeFrequency,
                                        lambda word: Values._readFrequency(float(word)))
-        self._valueHandlers["nav2"] = (0x0352, "H",
+        self._valueHandlers["nav2"] = ([(0x0352, "H")],
                                        Values._writeFrequency,
                                        lambda word: Values._readFrequency(float(word)))
-        self._valueHandlers["squawk"] = (0x0354, "H",
+        self._valueHandlers["adf1"] = ([(0x034c, "H"), (0x0356, "H")],
+                                       lambda values:
+                                       Values._toADFFrequency(values[0],
+                                                              values[1]),
+                                       lambda word:
+                                       Values._readADFFrequency(float(word)))
+        self._valueHandlers["adf2"] = ([(0x02d4, "H"), (0x02d6, "H")],
+                                       lambda values:
+                                       Values._toADFFrequency(values[0],
+                                                              values[1]),
+                                       lambda word:
+                                       Values._readADFFrequency(float(word)))
+        self._valueHandlers["squawk"] = ([(0x0354, "H")],
                                        Values._writeBCD,
                                        lambda word: Values._readBCD(int(word)))
-        self._valueHandlers["windSpeed"] = (0x0e90, "H",
+        self._valueHandlers["windSpeed"] = ([(0x0e90, "H")],
                                             lambda value: value,
                                             lambda word: int(word))
-        self._valueHandlers["windDirection"] = (0x0e92, "H",
+        self._valueHandlers["windDirection"] = ([(0x0e92, "H")],
                                                 lambda value: value * 360.0 / 65536.0,
                                                 lambda word: int(int(word) *
                                                                  65536.0 / 360.0))
-        self._valueHandlers["fuelWeight"] = (0x0af4, "H",
+        self._valueHandlers["fuelWeight"] = ([(0x0af4, "H")],
                                              lambda value: value / 256.0,
                                              lambda word: int(float(word)*256.0))
 
 
-        self._valueHandlers["centreLevel"] = (0x0b74, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["centreLevel"] = ([(0x0b74, "d")],
+                                              CLI.pyuipc2fuelLevel,
                                               CLI.fuelLevel2pyuipc)
-        self._valueHandlers["centreCapacity"] = (0x0b78, "d",
+        self._valueHandlers["centreCapacity"] = ([(0x0b78, "d")],
                                                  CLI.pyuipc2fuelCapacity,
                                                  CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["leftMainLevel"] = (0x0b7c, "d", CLI.pyuipc2fuelLevel,
-                                              CLI.fuelLevel2pyuipc)
-        self._valueHandlers["leftMainCapacity"] = (0x0b80, "d",
+        self._valueHandlers["leftMainLevel"] = ([(0x0b7c, "d")],
+                                                CLI.pyuipc2fuelLevel,
+                                                CLI.fuelLevel2pyuipc)
+        self._valueHandlers["leftMainCapacity"] = ([(0x0b80, "d")],
                                                    CLI.pyuipc2fuelCapacity,
                                                    CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["leftAuxLevel"] = (0x0b84, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["leftAuxLevel"] = ([(0x0b84, "d")],
+                                               CLI.pyuipc2fuelLevel,
                                                CLI.fuelLevel2pyuipc)
-        self._valueHandlers["leftAuxCapacity"] = (0x0b88, "d",
+        self._valueHandlers["leftAuxCapacity"] = ([(0x0b88, "d")],
                                                    CLI.pyuipc2fuelCapacity,
                                                   CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["leftTipLevel"] = (0x0b8c, "d", CLI.pyuipc2fuelLevel,
-                                              CLI.fuelLevel2pyuipc)
-        self._valueHandlers["leftTipCapacity"] = (0x0b90, "d",
+        self._valueHandlers["leftTipLevel"] = ([(0x0b8c, "d")],
+                                               CLI.pyuipc2fuelLevel,
+                                               CLI.fuelLevel2pyuipc)
+        self._valueHandlers["leftTipCapacity"] = ([(0x0b90, "d")],
                                                   CLI.pyuipc2fuelCapacity,
                                                   CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["rightMainLevel"] = (0x0b94, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["rightMainLevel"] = ([(0x0b94, "d")],
+                                                 CLI.pyuipc2fuelLevel,
                                                  CLI.fuelLevel2pyuipc)
-        self._valueHandlers["rightMainCapacity"] = (0x0b98, "d",
+        self._valueHandlers["rightMainCapacity"] = ([(0x0b98, "d")],
                                                     CLI.pyuipc2fuelCapacity,
                                                     CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["rightAuxLevel"] = (0x0b9c, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["rightAuxLevel"] = ([(0x0b9c, "d")], CLI.pyuipc2fuelLevel,
                                                 CLI.fuelLevel2pyuipc)
-        self._valueHandlers["rightAuxCapacity"] = (0x0ba0, "d",
+        self._valueHandlers["rightAuxCapacity"] = ([(0x0ba0, "d")],
                                                    CLI.pyuipc2fuelCapacity,
                                                    CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["rightTipLevel"] = (0x0ba4, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["rightTipLevel"] = ([(0x0ba4, "d")],
+                                                CLI.pyuipc2fuelLevel,
                                                 CLI.fuelLevel2pyuipc)
-        self._valueHandlers["rightTipCapacity"] = (0x0ba8, "d",
+        self._valueHandlers["rightTipCapacity"] = ([(0x0ba8, "d")],
                                                    CLI.pyuipc2fuelCapacity,
                                                    CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["centre2Level"] = (0x1244, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["centre2Level"] = ([(0x1244, "d")],
+                                               CLI.pyuipc2fuelLevel,
                                                CLI.fuelLevel2pyuipc)
-        self._valueHandlers["centre2Capacity"] = (0x1248, "d",
+        self._valueHandlers["centre2Capacity"] = ([(0x1248, "d")],
                                                   CLI.pyuipc2fuelCapacity,
                                                   CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["external1Level"] = (0x1254, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["external1Level"] = ([(0x1254, "d")],
+                                                 CLI.pyuipc2fuelLevel,
                                                  CLI.fuelLevel2pyuipc)
-        self._valueHandlers["external1Capacity"] = (0x1258, "d",
+        self._valueHandlers["external1Capacity"] = ([(0x1258, "d")],
                                                     CLI.pyuipc2fuelCapacity,
                                                     CLI.fuelCapacity2pyuipc)
-        self._valueHandlers["external2Level"] = (0x125c, "d", CLI.pyuipc2fuelLevel,
+        self._valueHandlers["external2Level"] = ([(0x125c, "d")],
+                                                 CLI.pyuipc2fuelLevel,
                                                  CLI.fuelLevel2pyuipc)
-        self._valueHandlers["external2Capacity"] = (0x1260, "d",
+        self._valueHandlers["external2Capacity"] = ([(0x1260, "d")],
                                                     CLI.pyuipc2fuelCapacity,
                                                     CLI.fuelCapacity2pyuipc)
 
-        self._valueHandlers["n1_1"] = (0x2000, "f", lambda value: value,
+        self._valueHandlers["n1_1"] = ([(0x2000, "f")], lambda value: value,
                                        lambda word: float(word))
-        self._valueHandlers["n1_2"] = (0x2100, "f", lambda value: value,
+        self._valueHandlers["n1_2"] = ([(0x2100, "f")], lambda value: value,
                                        lambda word: float(word))
-        self._valueHandlers["n1_3"] = (0x2200, "f", lambda value: value,
+        self._valueHandlers["n1_3"] = ([(0x2200, "f")], lambda value: value,
                                        lambda word: float(word))
 
-        self._valueHandlers["throttle_1"] = (0x088c, "H",
+        self._valueHandlers["throttle_1"] = ([(0x088c, "H")],
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
-        self._valueHandlers["throttle_2"] = (0x0924, "H",
+        self._valueHandlers["throttle_2"] = ([(0x0924, "H")],
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
-        self._valueHandlers["throttle_3"] = (0x09bc, "H",
+        self._valueHandlers["throttle_3"] = ([(0x09bc, "H")],
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
                                                             
-        self._valueHandlers["visibility"] = (0x0e8a, "H",
+        self._valueHandlers["visibility"] = ([(0x0e8a, "H")],
                                              lambda value: value*1609.344/100.0,
                                              lambda word: int(float(word)*
                                                               100.0/1609.344))
                                                             
-        self._valueHandlers["payloadCount"] = (0x13fc, "d",
+        self._valueHandlers["payloadCount"] = ([(0x13fc, "d")],
                                                lambda value: value,
                                                lambda word: int(word))
         for i in range(0, 61):
-            self._valueHandlers["payload%d" % (i,)] = (0x1400 + i * 48, "f",
+            self._valueHandlers["payload%d" % (i,)] = ([(0x1400 + i * 48, "f")],
                                                        lambda value:
                                                        value * const.LBSTOKG,
                                                        lambda word:
                                                        float(word)*const.KGSTOLB)
-        self._valueHandlers["textScrolling"] = (0x1274, "h",
+        self._valueHandlers["textScrolling"] = ([(0x1274, "h")],
                                                 CLI.bool2str, CLI.str2bool)
                                                             
-        self._valueHandlers["messageDuration"] = (0x32fa, "h",
+        self._valueHandlers["messageDuration"] = ([(0x32fa, "h")],
                                                   lambda value: value,
                                                   lambda word: int(word))
-        self._valueHandlers["message"] = (0x3380, -128,
+        self._valueHandlers["message"] = ([(0x3380, -128)],
                                           lambda value: value,
                                           lambda word: word)
 
         for i in range(0, Values.HOTKEY_SIZE):
-            self._valueHandlers["hotkey%d" % (i,)] = (0x3210 + i*4, "u",
+            self._valueHandlers["hotkey%d" % (i,)] = ([(0x3210 + i*4, "u")],
                                                       lambda value: "0x%08x" % (value,),
                                                       lambda word: long(word, 16))
 
-        self._valueHandlers["cog"] = (0x2ef8, "f", lambda value: value,
+        self._valueHandlers["cog"] = ([(0x2ef8, "f")], lambda value: value,
                                        lambda word: float(word))
 
-        self._valueHandlers["pmdg_737ng_switches"] = (0x6202, "b",
+        self._valueHandlers["pmdg_737ng_switches"] = ([(0x6202, "b")],
                                                       lambda value: value,
                                                       lambda word: int(word))
 
-        self._valueHandlers["pmdg_737ngx_lts_positionsw"] = (0x6500, "b",
+        self._valueHandlers["pmdg_737ngx_lts_positionsw"] = ([(0x6500, "b")],
                                                              lambda value: value,
                                                              lambda word: int(word))
 
@@ -1306,14 +1372,24 @@ class CLI(cmd.Cmd):
                 print >> sys.stderr, "Unknown variable: " + name
                 return False
             valueHandler = self._valueHandlers[name]
-            data.append((valueHandler[0], valueHandler[1]))
+            data += valueHandler[0]
 
         try:
-            result = self._client.read(data)
-            for i in range(0, len(result)):
+            results = self._client.read(data)
+            index = 0
+            i = 0
+            while index<len(results):
                 name = names[i]
                 valueHandler = self._valueHandlers[name]
-                print name + "=" + str(valueHandler[2](result[i]))
+                numResults = len(valueHandler[0])
+                thisResults = results[index:index+numResults]
+                value = valueHandler[1](thisResults[0] if numResults==1
+                                        else thisResults)
+
+                print name + "=" + str(value)
+
+                index += numResults
+                i+=1
         except Exception, e:
             print >> sys.stderr, "Failed to read data: " + str(e)                        
 
@@ -1363,8 +1439,13 @@ class CLI(cmd.Cmd):
 
             valueHandler = self._valueHandlers[name]
             try:
-                value = valueHandler[3](value)
-                data.append((valueHandler[0], valueHandler[1], value))
+                values = valueHandler[2](value)
+                if len(valueHandler[0])==1:
+                    values = [values]
+                index = 0
+                for (offset, type) in valueHandler[0]:
+                    data.append((offset, type, values[index]))
+                    index += 1
             except Exception, e:
                 print >> sys.stderr, "Invalid value '%s' for variable %s: %s" % \
                       (value, name, str(e))

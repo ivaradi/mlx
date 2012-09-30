@@ -230,6 +230,10 @@ class AircraftState(object):
     the frequency is unreliable or meaningless.
     - nav2: the frequency of the NAV1 radio in MHz (string). Can be None, if
     the frequency is unreliable or meaningless.
+    - adf1: the frequency of the ADF1 radio in kHz (string). Can be None, if
+    the frequency is unreliable or meaningless.
+    - adf2: the frequency of the ADF2 radio in kHz (string). Can be None, if
+    the frequency is unreliable or meaningless.
     - squawk: the transponder code (string)
     - windSpeed: the speed of the wind at the aircraft in knots (float)
     - windDirection: the direction of the wind at the aircraft in degrees (float)

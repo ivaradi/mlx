@@ -85,6 +85,8 @@ class Aircraft(object):
         
         self._checkers.append(checks.NAV1Logger())
         self._checkers.append(checks.NAV2Logger())
+        self._checkers.append(checks.ADF1Logger())
+        self._checkers.append(checks.ADF2Logger())
         self._checkers.append(checks.SquawkLogger())
 
         self._appendLightsLoggers()

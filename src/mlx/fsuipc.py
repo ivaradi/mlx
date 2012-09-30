@@ -1177,6 +1177,10 @@ class AircraftModel(object):
                       ("altimeter", 0x0330, "H"),
                       ("nav1", 0x0350, "H"),
                       ("nav2", 0x0352, "H"),
+                      ("adf1_main", 0x034c, "H"),
+                      ("adf1_ext", 0x0356, "H"),
+                      ("adf2_main", 0x02d4, "H"),
+                      ("adf2_ext", 0x02d6, "H"),
                       ("squawk", 0x0354, "H"),
                       ("windSpeed", 0x0e90, "H"),
                       ("windDirection", 0x0e92, "H"),
@@ -1226,6 +1230,15 @@ class AircraftModel(object):
         bcd = AircraftModel.convertBCD(data, 4)
         return "1" + bcd[0:2] + "." + bcd[2:4]
 
+    @staticmethod
+    def convertADFFrequency(main, ext):
+        """Convert the given ADF frequency data to a string."""
+        mainBCD = AircraftModel.convertBCD(main, 4)
+        extBCD = AircraftModel.convertBCD(ext, 4)
+
+        return (extBCD[1] if extBCD[1]!="0" else "") + \
+               mainBCD[1:] + "." + extBCD[3]
+    
     def __init__(self, flapsNotches):
         """Construct the aircraft model.
         
@@ -1349,6 +1362,12 @@ class AircraftModel(object):
            
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
         state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
+        state.adf1 = \
+            AircraftModel.convertADFFrequency(data[self._monidx_adf1_main],
+                                              data[self._monidx_adf1_ext])
+        state.adf2 = \
+            AircraftModel.convertADFFrequency(data[self._monidx_adf2_main],
+                                              data[self._monidx_adf2_ext])
         state.squawk = AircraftModel.convertBCD(data[self._monidx_squawk], 4)
 
         state.windSpeed = data[self._monidx_windSpeed]
