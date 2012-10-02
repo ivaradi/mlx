@@ -287,8 +287,9 @@ class StateChangeLogger(StateChecker):
             shouldLog = self._changed(oldState, state)
         
         if shouldLog:
-            logger.message(self._getLogTimestamp(state),
-                           self._getMessage(flight, state))
+            message = self._getMessage(flight, state)
+            if message is not None:
+                logger.message(self._getLogTimestamp(state), message)
         
 #-------------------------------------------------------------------------------
 
@@ -370,7 +371,8 @@ class TemplateMessageMixin(object):
 
     def _getMessage(self, flight, state):
         """Get the message."""
-        return self._template % (self._getValue(state),)
+        value = self._getValue(state)        
+        return None if value is None else self._template % (value,)
 
 #---------------------------------------------------------------------------------------
 
@@ -410,19 +412,48 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
 
 #---------------------------------------------------------------------------------------
 
-class NAV1Logger(GenericStateChangeLogger):
-    """Logger for the NAV1 radio setting."""
-    def __init__(self):
-        """Construct the logger."""
-        super(NAV1Logger, self).__init__("nav1", "NAV1 frequency: %s MHz")
+class NAVLogger(StateChangeLogger, DelayedChangeMixin):
+    """Logger for NAV radios.
+
+    It also logs the OBS frequency set."""
+    def __init__(self, attrName, logName):
+        """Construct the NAV logger."""
+        StateChangeLogger.__init__(self, logInitial = True)
+        DelayedChangeMixin.__init__(self)
+
+        self._attrName = attrName
+        self._logName = logName
+        
+    def _getValue(self, state):
+        """Get the value.
+
+        If both the frequency and the obs settings are available, a tuple
+        containing them is returned, otherwise None."""
+        frequency = getattr(state, self._attrName)
+        obs = getattr(state, self._attrName + "_obs")
+        return None if frequency is None or obs is None else (frequency, obs)
+
+    def _getMessage(self, flight, state):
+        """Get the message."""
+        value = self._getValue(state)
+        return None if value is None else \
+               (u"%s frequency: %s MHz [%d\u00b0]" % (self._logName, value[0], value[1]))
 
 #---------------------------------------------------------------------------------------
 
-class NAV2Logger(GenericStateChangeLogger):
+class NAV1Logger(NAVLogger):
+    """Logger for the NAV1 radio setting."""
+    def __init__(self):
+        """Construct the logger."""
+        super(NAV1Logger, self).__init__("nav1", "NAV1")
+
+#---------------------------------------------------------------------------------------
+
+class NAV2Logger(NAVLogger):
     """Logger for the NAV2 radio setting."""
     def __init__(self):
         """Construct the logger."""
-        super(NAV2Logger, self).__init__("nav2", "NAV2 frequency: %s MHz")
+        super(NAV2Logger, self).__init__("nav2", "NAV2")
 
 #---------------------------------------------------------------------------------------
 

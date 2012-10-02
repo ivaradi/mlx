@@ -228,8 +228,12 @@ class AircraftState(object):
     - altimeter: the altimeter setting in hPa (float)
     - nav1: the frequency of the NAV1 radio in MHz (string). Can be None, if
     the frequency is unreliable or meaningless.
+    - nav1_obs: the OBS setting of the NAV1 radio in degrees (int). Can be None, if
+    the value is unreliable or meaningless.
     - nav2: the frequency of the NAV1 radio in MHz (string). Can be None, if
     the frequency is unreliable or meaningless.
+    - nav2_obs: the OBS setting of the NAV2 radio in degrees (int). Can be None, if
+    the value is unreliable or meaningless.
     - adf1: the frequency of the ADF1 radio in kHz (string). Can be None, if
     the frequency is unreliable or meaningless.
     - adf2: the frequency of the ADF2 radio in kHz (string). Can be None, if

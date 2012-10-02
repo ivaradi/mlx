@@ -1176,7 +1176,9 @@ class AircraftModel(object):
                       ("spoilers", 0x0bd0, "d"),
                       ("altimeter", 0x0330, "H"),
                       ("nav1", 0x0350, "H"),
+                      ("nav1_obs", 0x0c4e, "H"),
                       ("nav2", 0x0352, "H"),
+                      ("nav2_obs", 0x035e, "H"),
                       ("adf1_main", 0x034c, "H"),
                       ("adf1_ext", 0x0356, "H"),
                       ("adf2_main", 0x02d4, "H"),
@@ -1361,7 +1363,9 @@ class AircraftModel(object):
         state.altimeter = data[self._monidx_altimeter] / 16.0
            
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
+        state.nav1_obs = data[self._monidx_nav1_obs]
         state.nav2 = AircraftModel.convertFrequency(data[self._monidx_nav2])
+        state.nav2_obs = data[self._monidx_nav2_obs]
         state.adf1 = \
             AircraftModel.convertADFFrequency(data[self._monidx_adf1_main],
                                               data[self._monidx_adf1_ext])
