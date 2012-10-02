@@ -430,7 +430,8 @@ class ADF1Logger(GenericStateChangeLogger):
     """Logger for the ADF1 radio setting."""
     def __init__(self):
         """Construct the logger."""
-        super(ADF1Logger, self).__init__("adf1", "ADF1 frequency: %s kHz")
+        super(ADF1Logger, self).__init__("adf1", "ADF1 frequency: %s kHz",
+                                         minDelay = 3.0, maxDelay = 10.0)
 
 #---------------------------------------------------------------------------------------
 
@@ -438,7 +439,8 @@ class ADF2Logger(GenericStateChangeLogger):
     """Logger for the ADF2 radio setting."""
     def __init__(self):
         """Construct the logger."""
-        super(ADF2Logger, self).__init__("adf2", "ADF2 frequency: %s kHz")
+        super(ADF2Logger, self).__init__("adf2", "ADF2 frequency: %s kHz",
+                                         minDelay = 3.0, maxDelay = 10.0)
 
 #---------------------------------------------------------------------------------------
 
