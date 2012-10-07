@@ -282,7 +282,9 @@ class Values(object):
         self.altimeter = 1013.0
 
         self.nav1 = 117.3
+        self.nav1_obs = 128
         self.nav2 = 109.5
+        self.nav2_obs = 308
         self.adf1 = 382.7
         self.adf2 = 1540.6
         self.squawk = 2200
@@ -449,6 +451,10 @@ class Values(object):
             return int(self.gearControl * 16383.0)
         elif offset==0x0bec:       # Nose gear
             return int(self.noseGear * 16383.0)
+        elif offset==0x0c4e:       # NAV1 OBS
+            return self.nav1_obs
+        elif offset==0x0c5e:       # NAV2 OBS
+            return self.nav2_obs
         elif offset==0x0d0c:       # Lights
             lights = 0
             if self.navLightsOn: lights |= 0x01
@@ -683,6 +689,10 @@ class Values(object):
             self.gearControl = value / 16383.0
         elif offset==0x0bec:       # Nose gear
             self.noseGear = value / 16383.0
+        elif offset==0x0c4e:       # NAV1 OBS
+            self.nav1_obs = value
+        elif offset==0x0c5e:       # NAV2 OBS
+            self.nav2_obs = value
         elif offset==0x0d0c:       # Lights
             self.navLightsOn = (value&0x01)!=0
             self.antiCollisionLightsOn = (value&0x02)!=0
@@ -1208,9 +1218,15 @@ class CLI(cmd.Cmd):
         self._valueHandlers["nav1"] = ([(0x0350, "H")],
                                        Values._writeFrequency,
                                        lambda word: Values._readFrequency(float(word)))
+        self._valueHandlers["nav1_obs"] = ([(0x0c4e, "H")],
+                                           lambda value: value,
+                                           lambda word: int(word))
         self._valueHandlers["nav2"] = ([(0x0352, "H")],
                                        Values._writeFrequency,
                                        lambda word: Values._readFrequency(float(word)))
+        self._valueHandlers["nav2_obs"] = ([(0x0c5e, "H")],
+                                           lambda value: value,
+                                           lambda word: int(word))
         self._valueHandlers["adf1"] = ([(0x034c, "H"), (0x0356, "H")],
                                        lambda values:
                                        Values._toADFFrequency(values[0],

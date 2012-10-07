@@ -269,8 +269,8 @@ class StateChangeLogger(StateChecker):
         Child classes should define the following functions:
         - _changed(self, oldState, state): returns a boolean indicating if the
         value has changed or not
-        - _getMessage(self, flight, state): return a strings containing the
-        message to log with the new value
+        - _getMessage(self, flight, state, forced): return a strings containing
+        the message to log with the new value
         """
         self._logInitial = logInitial    
 
@@ -287,9 +287,13 @@ class StateChangeLogger(StateChecker):
             shouldLog = self._changed(oldState, state)
         
         if shouldLog:
-            message = self._getMessage(flight, state)
-            if message is not None:
-                logger.message(self._getLogTimestamp(state), message)
+            self.logState(flight, logger, state)
+
+    def logState(self, flight, logger, state, forced = False):
+        """Log the state."""
+        message = self._getMessage(flight, state, forced)
+        if message is not None:
+            logger.message(self._getLogTimestamp(state), message)
         
 #-------------------------------------------------------------------------------
 
@@ -339,7 +343,7 @@ class DelayedChangeMixin(object):
             self._oldValue = self._getValue(oldState)
             
         newValue = self._getValue(state)
-        if self._oldValue!=newValue:
+        if self._isDifferent(self._oldValue, newValue):
             if self._firstChange is None:
                 self._firstChange = state.timestamp
             self._lastChangeState = state
@@ -358,6 +362,12 @@ class DelayedChangeMixin(object):
         return self._lastChangeState.timestamp if \
                self._lastChangeState is not None else state.timestamp
 
+    def _isDifferent(self, oldValue, newValue):
+        """Determine if the given values are different.
+
+        This default implementation checks for simple equality."""
+        return oldValue!=newValue
+
 #---------------------------------------------------------------------------------------
 
 class TemplateMessageMixin(object):
@@ -369,7 +379,7 @@ class TemplateMessageMixin(object):
         """Construct the mixin."""
         self._template = template
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message."""
         value = self._getValue(state)        
         return None if value is None else self._template % (value,)
@@ -392,6 +402,44 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
 
 #---------------------------------------------------------------------------------------
 
+class ForceableLoggerMixin(object):
+    """A mixin for loggers that can be forced to log a certain state.
+
+    The last logged state is always maintained, and when checking for a change,
+    that state is compared to the current one (which may actually be the same,
+    if a forced logging was performed for that state).
+
+    Children should implement the following functions:
+    - _hasChanged(oldState, state): the real check for a change
+    - _logState(flight, logger, state, forced): the real logging function
+    """
+    def __init__(self):
+        """Construct the mixin."""
+        self._lastLoggedState = None
+
+    def forceLog(self, flight, logger, state):
+        """Force logging the given state."""
+        self.logState(flight, logger, state, forced = True)
+
+    def logState(self, flight, logger, state, forced = False):
+        """Log the state.
+
+        It calls _logState to perform the real logging, and saves the given
+        state as the last logged one."""
+        self._logState(flight, logger, state, forced)
+        self._lastLoggedState = state
+    
+    def _changed(self, oldState, state):
+        """Check if the state has changed.
+
+        This function calls _hasChanged for the real check, and replaces
+        oldState with the stored last logged state, if any."""
+        if self._lastLoggedState is not None:
+            oldState = self._lastLoggedState
+        return self._hasChanged(oldState, state)
+
+#---------------------------------------------------------------------------------------
+
 class AltimeterLogger(StateChangeLogger, SingleValueMixin,
                       DelayedChangeMixin):
     """Logger for the altimeter setting."""
@@ -403,7 +451,7 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
         self._getLogTimestamp = lambda state: \
                                 DelayedChangeMixin._getLogTimestamp(self, state)
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
         logState = self._lastChangeState if \
                    self._lastChangeState is not None else state
@@ -412,18 +460,39 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
 
 #---------------------------------------------------------------------------------------
 
-class NAVLogger(StateChangeLogger, DelayedChangeMixin):
+class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
     """Logger for NAV radios.
 
     It also logs the OBS frequency set."""
+    @staticmethod
+    def getMessage(logName, frequency, obs):
+        """Get the message for the given NAV radio setting."""
+        message = u"%s frequency: %s MHz" % (logName, frequency)
+        if obs is not None: message += u" [%d\u00b0]" % (obs,)
+        return message
+    
     def __init__(self, attrName, logName):
         """Construct the NAV logger."""
         StateChangeLogger.__init__(self, logInitial = True)
         DelayedChangeMixin.__init__(self)
+        ForceableLoggerMixin.__init__(self)
+
+        self.logState = lambda flight, logger, state, forced = False: \
+            ForceableLoggerMixin.logState(self, flight, logger, state,
+                                          forced = forced)
+        self._getLogTimestamp = \
+            lambda state: DelayedChangeMixin._getLogTimestamp(self, state)
+        self._changed = lambda oldState, state: \
+            ForceableLoggerMixin._changed(self, oldState, state)
+        self._hasChanged = lambda oldState, state: \
+            DelayedChangeMixin._changed(self, oldState, state)
+        self._logState = lambda flight, logger, state, forced: \
+             StateChangeLogger.logState(self, flight, logger, state,
+                                        forced = forced)
 
         self._attrName = attrName
         self._logName = logName
-        
+
     def _getValue(self, state):
         """Get the value.
 
@@ -431,13 +500,21 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin):
         containing them is returned, otherwise None."""
         frequency = getattr(state, self._attrName)
         obs = getattr(state, self._attrName + "_obs")
-        return None if frequency is None or obs is None else (frequency, obs)
+        manual = getattr(state, self._attrName + "_manual")
+        return (frequency, obs, manual)
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message."""
-        value = self._getValue(state)
-        return None if value is None else \
-               (u"%s frequency: %s MHz [%d\u00b0]" % (self._logName, value[0], value[1]))
+        (frequency, obs, manual) = self._getValue(state)
+        return None if frequency is None or obs is None or \
+               (not manual and not forced) else \
+               self.getMessage(self._logName, frequency, obs)
+
+    def _isDifferent(self, oldValue, newValue):
+        """Determine if the valie has changed between the given states."""
+        (oldFrequency, oldOBS, _oldManual) = oldValue
+        (newFrequency, newOBS, _newManual) = newValue
+        return oldFrequency!=newFrequency or oldOBS!=newOBS
 
 #---------------------------------------------------------------------------------------
 
@@ -457,21 +534,40 @@ class NAV2Logger(NAVLogger):
 
 #---------------------------------------------------------------------------------------
 
-class ADF1Logger(GenericStateChangeLogger):
-    """Logger for the ADF1 radio setting."""
-    def __init__(self):
-        """Construct the logger."""
-        super(ADF1Logger, self).__init__("adf1", "ADF1 frequency: %s kHz",
-                                         minDelay = 3.0, maxDelay = 10.0)
+class ADFLogger(GenericStateChangeLogger, ForceableLoggerMixin):
+    """Base class for the ADF loggers."""
+    def __init__(self, attr, logName):
+        """Construct the ADF logger."""
+        GenericStateChangeLogger.__init__(self, attr,
+                                          "%s frequency: %%s kHz" % (logName,),
+                                          minDelay = 3.0, maxDelay = 10.0)
+        ForceableLoggerMixin.__init__(self)
+
+        self.logState = lambda flight, logger, state, forced = False: \
+            ForceableLoggerMixin.logState(self, flight, logger, state,
+                                          forced = forced)
+        self._changed = lambda oldState, state: \
+            ForceableLoggerMixin._changed(self, oldState, state)
+        self._hasChanged = lambda oldState, state: \
+            DelayedChangeMixin._changed(self, oldState, state)
+        self._logState = lambda flight, logger, state, forced: \
+             StateChangeLogger.logState(self, flight, logger, state, forced)
 
 #---------------------------------------------------------------------------------------
 
-class ADF2Logger(GenericStateChangeLogger):
+class ADF1Logger(ADFLogger):
+    """Logger for the ADF1 radio setting."""
+    def __init__(self):
+        """Construct the logger."""
+        super(ADF1Logger, self).__init__("adf1", "ADF1")
+
+#---------------------------------------------------------------------------------------
+
+class ADF2Logger(ADFLogger):
     """Logger for the ADF2 radio setting."""
     def __init__(self):
         """Construct the logger."""
-        super(ADF2Logger, self).__init__("adf2", "ADF2 frequency: %s kHz",
-                                         minDelay = 3.0, maxDelay = 10.0)
+        super(ADF2Logger, self).__init__("adf2", "ADF2")
 
 #---------------------------------------------------------------------------------------
 
@@ -493,7 +589,7 @@ class LightsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         
         self._template = template
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message from the given state."""
         return self._template % ("ON" if self._getValue(state) else "OFF")
         
@@ -538,7 +634,7 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "flapsSet")
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
         speed = state.groundSpeed if state.groundSpeed<80.0 else state.ias
         return "Flaps set to %.0f at %.0f %s" % \
@@ -554,7 +650,7 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "gearControlDown")
 
-    def _getMessage(self, flight, state):
+    def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
         return "Gears SET to %s at %.0f %s, %.0f feet" % \
             ("DOWN" if state.gearControlDown else "UP",

@@ -82,11 +82,17 @@ class Aircraft(object):
         self._checkers.append(checks.TakeOffLogger())
 
         self._checkers.append(checks.AltimeterLogger())
+
+        self._nav1Logger = checks.NAV1Logger()
+        self._checkers.append(self._nav1Logger)
+        self._nav2Logger = checks.NAV2Logger()
+        self._checkers.append(self._nav2Logger)
+
+        self._adf1Logger = checks.ADF1Logger()
+        self._checkers.append(self._adf1Logger)
+        self._adf2Logger = checks.ADF2Logger()
+        self._checkers.append(self._adf2Logger)
         
-        self._checkers.append(checks.NAV1Logger())
-        self._checkers.append(checks.NAV2Logger())
-        self._checkers.append(checks.ADF1Logger())
-        self._checkers.append(checks.ADF2Logger())
         self._checkers.append(checks.SquawkLogger())
 
         self._appendLightsLoggers()
@@ -247,7 +253,10 @@ class Aircraft(object):
                                     "Wind %03.0f degrees at %.0f knots" % \
                                     (aircraftState.windDirection, 
                                      aircraftState.windSpeed))
+                self._logRadios(aircraftState)
                 self._logV1R2()
+            elif newStage==const.STAGE_DESCENT or newStage==const.STAGE_LANDING:
+                self._logRadios(aircraftState)
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 flight = self._flight
                 bookedFlight = flight.bookedFlight
@@ -425,6 +434,17 @@ class Aircraft(object):
             fs.sendMessage(const.MESSAGETYPE_GATE_SYSTEM,
                            "Free gates: " + gateList, 20)
         
+
+    def _logRadios(self, aircraftState):
+        """Log the radios from the given aircraft state."""
+        flight = self._flight
+        logger = flight.logger
+
+        self._nav1Logger.forceLog(flight, logger, aircraftState)
+        self._nav2Logger.forceLog(flight, logger, aircraftState)
+
+        self._adf1Logger.logState(flight, logger, aircraftState)
+        self._adf2Logger.logState(flight, logger, aircraftState)
 
 #---------------------------------------------------------------------------------------
 
