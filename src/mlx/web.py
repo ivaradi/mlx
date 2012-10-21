@@ -675,13 +675,14 @@ class SendPIREP(Request):
         self._pirep = pirep
 
     def run(self):
-        """Perform the retrieval opf the METARs."""
+        """Perform the sending of the PIREP."""
         url = "http://www.virtualairlines.hu/malevacars.php"
+        #url = "http://localhost:15000"
 
         pirep = self._pirep
 
         data = {}
-        data["acarsdata"] = pirep.getACARSText()
+        data["acarsdata"] = SendPIREP._latin2Encoder(pirep.getACARSText())[0]
 
         bookedFlight = pirep.bookedFlight
         data["foglalas_id"] = bookedFlight.id
@@ -728,7 +729,8 @@ class SendPIREP(Request):
         data["distance"] = "%.3f" % (pirep.flownDistance,)
         data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
 
-        f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
+        postData = urllib.urlencode(data)
+        f = urllib2.urlopen(url, postData, timeout = 10.0)
         try:
             result = Result()
             line = f.readline().strip()
