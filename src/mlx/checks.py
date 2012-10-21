@@ -274,7 +274,7 @@ class StateChangeLogger(StateChecker):
         """
         self._logInitial = logInitial    
 
-    def _getLogTimestamp(self, state):
+    def _getLogTimestamp(self, state, forced):
         """Get the log timestamp."""
         return state.timestamp
 
@@ -293,7 +293,7 @@ class StateChangeLogger(StateChecker):
         """Log the state."""
         message = self._getMessage(flight, state, forced)
         if message is not None:
-            logger.message(self._getLogTimestamp(state), message)
+            logger.message(self._getLogTimestamp(state, forced), message)
         
 #-------------------------------------------------------------------------------
 
@@ -350,17 +350,19 @@ class DelayedChangeMixin(object):
             self._oldValue = newValue
 
         if self._firstChange is not None:
-            if state.timestamp >= min(self._lastChangeState.timestamp + self._minDelay,
+            if state.timestamp >= min(self._lastChangeState.timestamp +
+                                      self._minDelay,
                                       self._firstChange + self._maxDelay):
                 self._firstChange = None
                 return True
             
         return False
 
-    def _getLogTimestamp(self, state):
+    def _getLogTimestamp(self, state, forced):
         """Get the log timestamp."""
-        return self._lastChangeState.timestamp if \
-               self._lastChangeState is not None else state.timestamp
+        return self._lastChangeState.timestamp \
+               if not forced and self._lastChangeState is not None \
+               else state.timestamp
 
     def _isDifferent(self, oldValue, newValue):
         """Determine if the given values are different.
@@ -397,8 +399,9 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
         SingleValueMixin.__init__(self, attrName)
         DelayedChangeMixin.__init__(self, minDelay = minDelay, maxDelay = maxDelay)
         TemplateMessageMixin.__init__(self, template)
-        self._getLogTimestamp = lambda state: \
-                                DelayedChangeMixin._getLogTimestamp(self, state)
+        self._getLogTimestamp = \
+           lambda state, forced: \
+           DelayedChangeMixin._getLogTimestamp(self, state, forced)
 
 #---------------------------------------------------------------------------------------
 
@@ -448,8 +451,9 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
         StateChangeLogger.__init__(self, logInitial = True)
         SingleValueMixin.__init__(self, "altimeter")
         DelayedChangeMixin.__init__(self)
-        self._getLogTimestamp = lambda state: \
-                                DelayedChangeMixin._getLogTimestamp(self, state)
+        self._getLogTimestamp = \
+            lambda state, forced: \
+            DelayedChangeMixin._getLogTimestamp(self, state, forced)
 
     def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
@@ -481,7 +485,8 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
             ForceableLoggerMixin.logState(self, flight, logger, state,
                                           forced = forced)
         self._getLogTimestamp = \
-            lambda state: DelayedChangeMixin._getLogTimestamp(self, state)
+            lambda state, forced: \
+            DelayedChangeMixin._getLogTimestamp(self, state, forced)
         self._changed = lambda oldState, state: \
             ForceableLoggerMixin._changed(self, oldState, state)
         self._hasChanged = lambda oldState, state: \
