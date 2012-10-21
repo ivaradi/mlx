@@ -77,7 +77,8 @@ def getWelcomeMessage(icao):
     message = "Welcome to "
     if icao in airportNames:
         (town, airportName) = airportNames[icao]
-        message += town if airportName is None else (airportName + " Airport")
+        message += town if airportName is None \
+                   else (town + " " + airportName + " Airport")
     else:
         message += icao
     message += "."
@@ -91,5 +92,7 @@ if __name__ == "__main__":
     print getWelcomeMessage("LIRF")
     print getWelcomeMessage("LHDC")
     print getWelcomeMessage("LIRN")
+    print getWelcomeMessage("LHBP")
+    print getWelcomeMessage("EDDF")
 
 #-----------------------------------------------------------------------------
