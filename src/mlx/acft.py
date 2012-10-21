@@ -442,9 +442,8 @@ class Aircraft(object):
 
         self._nav1Logger.forceLog(flight, logger, aircraftState)
         self._nav2Logger.forceLog(flight, logger, aircraftState)
-
-        self._adf1Logger.logState(flight, logger, aircraftState)
-        self._adf2Logger.logState(flight, logger, aircraftState)
+        self._adf1Logger.forceLog(flight, logger, aircraftState)
+        self._adf2Logger.forceLog(flight, logger, aircraftState)
 
 #---------------------------------------------------------------------------------------
 

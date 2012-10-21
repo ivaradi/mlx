@@ -397,7 +397,8 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
         """Construct the object."""
         StateChangeLogger.__init__(self, logInitial = logInitial)
         SingleValueMixin.__init__(self, attrName)
-        DelayedChangeMixin.__init__(self, minDelay = minDelay, maxDelay = maxDelay)
+        DelayedChangeMixin.__init__(self, minDelay = minDelay,
+                                    maxDelay = maxDelay)
         TemplateMessageMixin.__init__(self, template)
         self._getLogTimestamp = \
            lambda state, forced: \
