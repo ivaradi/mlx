@@ -145,13 +145,13 @@ class Handler(threading.Thread):
             self._callback = callback
             self._extra = extra
             self._validator = validator
-            
+
         def process(self, time):
             """Process the request.
 
             Return True if the request has succeeded, False if data validation
             has failed for a reading request. An exception may also be thrown
-            if there is some lower-level communication problem."""            
+            if there is some lower-level communication problem."""
             if self._forWrite:
                 pyuipc.write(self._data)
                 Handler._callSafe(lambda: self._callback(True, self._extra))
@@ -179,7 +179,7 @@ class Handler(threading.Thread):
             self._callback = callback
             self._extra = extra
             self._validator = validator
-            
+
         @property
         def id(self):
             """Get the ID of this periodic request."""
@@ -202,7 +202,7 @@ class Handler(threading.Thread):
             lower-level communication problem."""
             if time<self._nextFire:
                 return True
-            
+
             if self._preparedData is None:
                 self._preparedData = pyuipc.prepare_data(self._data)
                 self._data = None
@@ -213,7 +213,7 @@ class Handler(threading.Thread):
             if isOK:
                 while self._nextFire <= time:
                     self._nextFire += self._period
-            
+
             return isOK
 
         def fail(self):
@@ -236,7 +236,7 @@ class Handler(threading.Thread):
 
         self._requestCondition = threading.Condition()
         self._connectionRequested = False
-        self._connected = False        
+        self._connected = False
 
         self._requests = []
         self._nextPeriodicID = 1
@@ -320,13 +320,13 @@ class Handler(threading.Thread):
             if not self._connectionRequested:
                 self._connectionRequested = True
                 self._requestCondition.notify()
-        
+
     def disconnect(self):
         """Disconnect from the flight simulator."""
         with self._requestCondition:
             self._requests = []
             if self._connectionRequested:
-                self._connectionRequested = False                
+                self._connectionRequested = False
                 self._requestCondition.notify()
 
     def clearRequests(self):
@@ -338,18 +338,18 @@ class Handler(threading.Thread):
         """Perform the operation of the thread."""
         while True:
             self._waitConnectionRequest()
-            
+
             if self._connect()>0:
                 self._handleConnection()
 
             self._disconnect()
-            
+
     def _waitConnectionRequest(self):
         """Wait for a connection request to arrive."""
         with self._requestCondition:
             while not self._connectionRequested:
                 self._requestCondition.wait()
-            
+
     def _connect(self, autoReconnection = False, attempts = 0):
         """Try to connect to the flight simulator via FSUIPC
 
@@ -360,25 +360,25 @@ class Handler(threading.Thread):
             if attempts>=self.NUM_CONNECTATTEMPTS:
                 self._connectionRequested = False
                 if autoReconnection:
-                    Handler._callSafe(lambda:     
+                    Handler._callSafe(lambda:
                                       self._connectionListener.disconnected())
                 else:
-                    Handler._callSafe(lambda:     
+                    Handler._callSafe(lambda:
                                       self._connectionListener.connectionFailed())
                 return 0
-                
+
             try:
                 attempts += 1
                 pyuipc.open(pyuipc.SIM_ANY)
                 description = "(FSUIPC version: 0x%04x, library version: 0x%04x, FS version: %d)" % \
-                    (pyuipc.fsuipc_version, pyuipc.lib_version, 
+                    (pyuipc.fsuipc_version, pyuipc.lib_version,
                      pyuipc.fs_version)
                 if not autoReconnection:
                     fsType = const.SIM_MSFSX \
                              if pyuipc.fs_version == pyuipc.SIM_FSX \
                              else const.SIM_MSFS9
-                
-                    Handler._callSafe(lambda:     
+
+                    Handler._callSafe(lambda:
                                       self._connectionListener.connected(fsType,
                                                                          description))
                 self._connected = True
@@ -388,7 +388,7 @@ class Handler(threading.Thread):
                       " (attempts: %d)" % (attempts,)
                 if attempts<self.NUM_CONNECTATTEMPTS:
                     time.sleep(self.CONNECT_INTERVAL)
-                
+
     def _handleConnection(self):
         """Handle a living connection."""
         with self._requestCondition:
@@ -411,18 +411,18 @@ class Handler(threading.Thread):
             if self._requests or \
                (timeout is not None and timeout <= 0.0):
                 return
-            
+
             self._requestCondition.wait(timeout)
-                
+
     def _disconnect(self):
         """Disconnect from the flight simulator."""
         print "fsuipc.Handler._disconnect"
         if self._connected:
             pyuipc.close()
             self._connected = False
-            
+
     def _processRequest(self, request, time, attempts):
-        """Process the given request. 
+        """Process the given request.
 
         If an exception occurs or invalid data is read too many times, we try
         to reconnect.
@@ -456,7 +456,7 @@ class Handler(threading.Thread):
                 return 0
         finally:
             self._requestCondition.acquire()
-        
+
     def _processRequests(self):
         """Process any pending requests.
 
@@ -470,7 +470,7 @@ class Handler(threading.Thread):
 
             if request.nextFire>t:
                 break
-            
+
             attempts = self._processRequest(request, t, attempts)
 
         while self._connectionRequested and self._requests:
@@ -492,7 +492,7 @@ class Simulator(object):
                  (0x023b, "b"),            # UTC hour
                  (0x023c, "b"),            # UTC minute
                  (0x023a, "b") ]           # seconds
-    
+
     normalData = timeData + \
                  [ (0x3d00, -256),           # The name of the current aircraft
                    (0x3c00, -256),           # The path of the current AIR file
@@ -501,11 +501,11 @@ class Simulator(object):
     flareData1 = [ (0x023a, "b"),            # Seconds of time
                    (0x31e4, "d"),            # Radio altitude
                    (0x02c8, "d") ]           # Vertical speed
-                   
+
     flareStartData = [ (0x0e90, "H"),        # Ambient wind speed
                        (0x0e92, "H"),        # Ambient wind direction
                        (0x0e8a, "H") ]       # Visibility
-                       
+
     flareData2 = [ (0x023a, "b"),            # Seconds of time
                    (0x0366, "H"),            # On the ground
                    (0x02c8, "d"),            # Vertical speed
@@ -525,7 +525,7 @@ class Simulator(object):
         timestamp += data[1] * 24 * 3600
         timestamp += data[2] * 3600
         timestamp += data[3] * 60
-        timestamp += data[4]        
+        timestamp += data[4]
 
         return timestamp
 
@@ -541,13 +541,13 @@ class Simulator(object):
         data.append((offset + 1, "b", modifiers))
 
         data.append((offset + 2, "b", 0))
-        
-        data.append((offset + 3, "b", 0))        
+
+        data.append((offset + 3, "b", 0))
 
     def __init__(self, connectionListener, connectAttempts = -1,
                  connectInterval = 0.2):
         """Construct the simulator.
-        
+
         The aircraft object passed must provide the following members:
         - type: one of the AIRCRAFT_XXX constants from const.py
         - modelChanged(aircraftName, modelName): called when the model handling
@@ -558,7 +558,7 @@ class Simulator(object):
           started. windSpeed is in knots, windDirection is in degrees and
           visibility is in metres. flareStart and flareStartFS are two time
           values expressed in seconds that can be used to calculate the flare
-          time. 
+          time.
        - flareFinished(flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
                        ias, pitch, bank, heading): called when the flare has
          finished, i.e. the aircraft is on the ground. flareEnd and flareEndFS
@@ -579,7 +579,7 @@ class Simulator(object):
 
         self._syncTime = False
         self._nextSyncTime = -1
-        
+
         self._normalRequestID = None
 
         self._monitoringRequested = False
@@ -629,7 +629,7 @@ class Simulator(object):
         """Request the following weights: DOW, ZFW, payload.
 
         These values will be passed to the callback function in this order, as
-        separate arguments."""        
+        separate arguments."""
         self._handler.requestRead([(0x13fc, "d")], self._handlePayloadCount,
                                   extra = callback)
 
@@ -637,16 +637,16 @@ class Simulator(object):
         """Request the time from the simulator."""
         self._handler.requestRead(Simulator.timeData, self._handleTime,
                                   extra = callback)
-                                                            
+
     def startMonitoring(self):
         """Start the periodic monitoring of the aircraft and pass the resulting
         state to the aircraft object periodically."""
-        assert not self._monitoringRequested         
+        assert not self._monitoringRequested
         self._monitoringRequested = True
 
     def stopMonitoring(self):
         """Stop the periodic monitoring of the aircraft."""
-        assert self._monitoringRequested 
+        assert self._monitoringRequested
         self._monitoringRequested = False
 
     def startFlare(self):
@@ -720,7 +720,7 @@ class Simulator(object):
         """Enable the time synchronization."""
         self._nextSyncTime = -1
         self._syncTime = True
-            
+
     def disableTimeSync(self):
         """Enable the time synchronization."""
         self._syncTime = False
@@ -739,7 +739,7 @@ class Simulator(object):
             self._hotkeySetID += 1
             self._hotkeySetGeneration = 0
             self._hotkeyCallback = callback
-            
+
             self._handler.requestRead([(0x320c, "u")],
                                       self._handleNumHotkeys,
                                       (self._hotkeySetID,
@@ -764,13 +764,13 @@ class Simulator(object):
                 self._hotkeySetID += 1
                 self._hotkeyCallback = None
                 self._clearHotkeyRequest()
-            
+
     def disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator."""
-        assert not self._monitoringRequested 
+        assert not self._monitoringRequested
 
         print "fsuipc.Simulator.disconnect", closingMessage, duration
-        
+
         self._stopNormal()
         self.clearHotkeys()
         if closingMessage is None:
@@ -786,7 +786,7 @@ class Simulator(object):
         with self._hotkeyLock:
             if self._hotkeys is not None:
                 self._hotkeySetGeneration += 1
-            
+
                 self._handler.requestRead([(0x320c, "u")],
                                           self._handleNumHotkeys,
                                           (self._hotkeySetID,
@@ -849,11 +849,11 @@ class Simulator(object):
             self._startDefaultNormal()
         elif self._monitoring and self._aircraftModel is not None and \
              not createdNewModel:
-            aircraftState = self._aircraftModel.getAircraftState(self._aircraft, 
+            aircraftState = self._aircraftModel.getAircraftState(self._aircraft,
                                                                  timestamp, data)
 
             self._checkTimeSync(aircraftState)
-        
+
             self._aircraft.handleState(aircraftState)
 
     def _checkTimeSync(self, aircraftState):
@@ -869,15 +869,15 @@ class Simulator(object):
         if seconds>30 and seconds<59:
             if self._nextSyncTime > (now - 0.49):
                 return
-            
+
             self._handler.requestWrite([(0x023a, "b", int(seconds))],
                                        self._handleTimeSynced)
-            
+
             #print "Set the seconds to ", seconds
 
             if self._nextSyncTime<0:
                 self._nextSyncTime = now
-                
+
             self._nextSyncTime += Simulator.TIME_SYNC_INTERVAL
         else:
             self._nextSyncTime = -1
@@ -885,11 +885,11 @@ class Simulator(object):
     def _handleTimeSynced(self, success, extra):
         """Callback for the time sync result."""
         pass
-        
+
     def _setAircraftName(self, timestamp, name, airPath):
         """Set the name of the aicraft and if it is different from the
         previous, create a new model for it.
-        
+
         If so, also notifty the aircraft about the change.
 
         Return if a new model was created."""
@@ -911,10 +911,10 @@ class Simulator(object):
 
         if needNew:
             self._setAircraftModel(AircraftModel.create(self._aircraft, aircraftName))
- 
-        
+
+
         self._aircraft.modelChanged(timestamp, self._latin1decoder(name)[0],
-                                    self._aircraftModel.name)        
+                                    self._aircraftModel.name)
 
         return needNew
 
@@ -924,18 +924,18 @@ class Simulator(object):
         It will be queried for the data to monitor and the monitoring request
         will be replaced by a new one."""
         self._aircraftModel = model
-        
+
         if self._monitoring:
             self._stopNormal()
             self._startMonitoring()
-            
+
     def _startMonitoring(self):
         """Start monitoring with the current aircraft model."""
         data = Simulator.normalData[:]
         self._aircraftModel.addMonitoringData(data, self._fsType)
-        
+
         self._normalRequestID = \
-            self._handler.requestPeriodicRead(1.0, data, 
+            self._handler.requestPeriodicRead(1.0, data,
                                               self._handleNormal,
                                               validator = self._validateNormal)
         self._monitoring = True
@@ -954,12 +954,12 @@ class Simulator(object):
             self._flareStartFS = data[0]
             self._handler.clearPeriodic(self._flareRequestID)
             self._flareRequestID = \
-                self._handler.requestPeriodicRead(0.1, 
+                self._handler.requestPeriodicRead(0.1,
                                                   Simulator.flareData2,
                                                   self._handleFlare2)
             self._handler.requestRead(Simulator.flareStartData,
                                       self._handleFlareStart)
-                
+
         self._addFlareRate(data[2])
 
     def _handleFlareStart(self, data, extra):
@@ -1004,7 +1004,7 @@ class Simulator(object):
         """Callback for a ZFW retrieval request."""
         zfw = data[0] * const.LBSTOKG / 256.0
         callback(zfw)
-                                                  
+
     def _handleTime(self, data, callback):
         """Callback for a time retrieval request."""
         callback(Simulator._getTimestamp(data))
@@ -1015,7 +1015,7 @@ class Simulator(object):
         data = [(0x3bfc, "d"), (0x30c0, "f")]
         for i in range(0, payloadCount):
             data.append((0x1400 + i*48, "f"))
-        
+
         self._handler.requestRead(data, self._handleWeights,
                                   extra = callback)
 
@@ -1039,7 +1039,7 @@ class Simulator(object):
             if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
                 numHotkeys = data[0]
                 print "fsuipc.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys
-                data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]        
+                data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]
                 self._handler.requestRead(data, self._handleHotkeyTable,
                                           (id, generation))
 
@@ -1092,21 +1092,21 @@ class Simulator(object):
                 self._handler.requestWrite(writeData,
                                            self._handleHotkeysWritten,
                                            (id, generation))
-            
+
     def _handleHotkeysWritten(self, success, (id, generation)):
         """Handle the result of the hotkeys having been written."""
-        with self._hotkeyLock:            
+        with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
                 data = [(offset + 3, "b") for offset in self._hotkeyOffets]
-        
+
                 self._hotkeyRequestID = \
                     self._handler.requestPeriodicRead(0.5, data,
                                                       self._handleHotkeys,
                                                       (id, generation))
 
     def _handleHotkeys(self, data, (id, generation)):
-        """Handle the hotkeys."""        
+        """Handle the hotkeys."""
         with self._hotkeyLock:
             if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
                 return
@@ -1128,14 +1128,14 @@ class Simulator(object):
             callback(id, hotkeysPressed)
 
     def _handleHotkeysCleared(self, sucess, extra):
-        """Callback for the hotkey-clearing write request."""        
+        """Callback for the hotkey-clearing write request."""
 
     def _clearHotkeyRequest(self):
         """Clear the hotkey request in the handler if there is any."""
         if self._hotkeyRequestID is not None:
             self._handler.clearPeriodic(self._hotkeyRequestID)
             self._hotkeyRequestID = None
-                                                  
+
 #------------------------------------------------------------------------------
 
 class AircraftModel(object):
@@ -1240,27 +1240,27 @@ class AircraftModel(object):
 
         return (extBCD[1] if extBCD[1]!="0" else "") + \
                mainBCD[1:] + "." + extBCD[3]
-    
+
     def __init__(self, flapsNotches):
         """Construct the aircraft model.
-        
+
         flapsNotches is a list of degrees of flaps that are available on the aircraft."""
         self._flapsNotches = flapsNotches
-    
+
     @property
     def name(self):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic"
-    
+
     def doesHandle(self, aircraft, aircraftName):
         """Determine if the model handles the given aircraft name.
-        
+
         This default implementation returns False."""
         return False
 
     def _addOffsetWithIndexMember(self, dest, offset, type, attrName = None):
         """Add the given FSUIPC offset and type to the given array and a member
-        attribute with the given name."""        
+        attribute with the given name."""
         dest.append((offset, type))
         if attrName is not None:
             setattr(self, attrName, len(dest)-1)
@@ -1274,20 +1274,20 @@ class AircraftModel(object):
         created by prepending the given prefix to this name.
         - the FSUIPC offset
         - the FSUIPC type
-        
+
         The latter two items will be appended to dest."""
         for (name, offset, type) in data:
             self._addOffsetWithIndexMember(dest, offset, type, prefix + name)
-            
+
     def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
         self._addDataWithIndexMembers(data, "_monidx_",
                                       AircraftModel.monitoringData)
-    
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data."""
         state = fs.AircraftState()
-        
+
         state.timestamp = timestamp
 
         state.latitude = data[self._monidx_latitude] * \
@@ -1296,7 +1296,7 @@ class AircraftModel(object):
         state.longitude = data[self._monidx_longitude] * \
                           360.0 / 65536.0 / 65536.0 / 65536.0 / 65536.0
         if state.longitude>180.0: state.longitude = 360.0 - state.longitude
-        
+
         state.paused = data[self._monidx_paused]!=0 or \
             data[self._monidx_frozen]!=0 or \
             data[self._monidx_replay]!=0
@@ -1308,7 +1308,7 @@ class AircraftModel(object):
 
         state.zfw = data[self._monidx_zfw] * const.LBSTOKG / 256.0
         state.grossWeight = data[self._monidx_grossWeight] * const.LBSTOKG
-        
+
         state.heading = Handler.fsuipc2PositiveDegrees(data[self._monidx_heading])
 
         state.pitch = Handler.fsuipc2Degrees(data[self._monidx_pitch])
@@ -1324,7 +1324,7 @@ class AircraftModel(object):
         state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
 
         state.gLoad = data[self._monidx_gLoad] / 625.0
-        
+
         numNotchesM1 = len(self._flapsNotches) - 1
         flapsIncrement = 16383 / numNotchesM1
         flapsControl = data[self._monidx_flapsControl]
@@ -1334,17 +1334,17 @@ class AircraftModel(object):
                 (flapsIndex+1)*flapsIncrement - flapsControl):
                 flapsIndex += 1
         state.flapsSet = self._flapsNotches[flapsIndex]
-        
+
         flapsLeft = data[self._monidx_flapsLeft]
         state.flaps = self._flapsNotches[-1]*flapsLeft/16383.0
-        
+
         lights = data[self._monidx_lights]
-        
+
         state.navLightsOn = (lights&0x01) != 0
         state.antiCollisionLightsOn = (lights&0x02) != 0
         state.landingLightsOn = (lights&0x04) != 0
         state.strobeLightsOn = (lights&0x10) != 0
-        
+
         state.pitotHeatOn = data[self._monidx_pitot]!=0
 
         state.parking = data[self._monidx_parking]!=0
@@ -1353,7 +1353,7 @@ class AircraftModel(object):
         state.gearsDown = data[self._monidx_noseGear]==16383
 
         state.spoilersArmed = data[self._monidx_spoilersArmed]!=0
-        
+
         spoilers = data[self._monidx_spoilers]
         if spoilers<=4800:
             state.spoilersExtension = 0.0
@@ -1361,7 +1361,7 @@ class AircraftModel(object):
             state.spoilersExtension = (spoilers - 4800) * 100.0 / (16383 - 4800)
 
         state.altimeter = data[self._monidx_altimeter] / 16.0
-           
+
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
         state.nav1_obs = data[self._monidx_nav1_obs]
         state.nav1_manual = True
@@ -1381,9 +1381,9 @@ class AircraftModel(object):
         if state.windDirection<0.0: state.windDirection += 360.0
 
         state.visibility = data[self._monidx_visibility]*1609.344/100.0
-        
+
         state.cog = data[self._monidx_cog]
-        
+
         return state
 
 #------------------------------------------------------------------------------
@@ -1391,7 +1391,7 @@ class AircraftModel(object):
 class GenericAircraftModel(AircraftModel):
     """A generic aircraft model that can handle the fuel levels, the N1 or RPM
     values and some other common parameters in a generic way."""
-    
+
     def __init__(self, flapsNotches, fuelTanks, numEngines, isN1 = True):
         """Construct the generic aircraft model with the given data.
 
@@ -1415,14 +1415,14 @@ class GenericAircraftModel(AircraftModel):
 
     def doesHandle(self, aircraft, aircraftName):
         """Determine if the model handles the given aircraft name.
-        
+
         This implementation returns True."""
         return True
 
     def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
         super(GenericAircraftModel, self).addMonitoringData(data, fsType)
-        
+
         self._fuelStartIndex = self._addFuelOffsets(data, "_monidx_fuelWeight")
 
         self._engineStartIndex = len(data)
@@ -1433,11 +1433,11 @@ class GenericAircraftModel(AircraftModel):
             else:
                 self._addOffsetWithIndexMember(data, 0x0898 + i * 0x98, "H")  # RPM
                 self._addOffsetWithIndexMember(data, 0x08c8 + i * 0x98, "H")  # RPM scaler
-        
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
-        Get it from the parent, and then add the data about the fuel levels and 
+        Get it from the parent, and then add the data about the fuel levels and
         the engine parameters."""
         state = super(GenericAircraftModel, self).getAircraftState(aircraft,
                                                                    timestamp,
@@ -1449,7 +1449,7 @@ class GenericAircraftModel(AircraftModel):
         state.n1 = [] if self._isN1 else None
         state.rpm = None if self._isN1 else []
         itemsPerEngine = 2 if self._isN1 else 3
-        
+
         state.reverser = []
         for i in range(self._engineStartIndex,
                        self._engineStartIndex +
@@ -1502,7 +1502,7 @@ class GenericAircraftModel(AircraftModel):
             offset = _tank2offset[tank]
             self._addOffsetWithIndexMember(data, offset, "u")    # tank level
             self._addOffsetWithIndexMember(data, offset+4, "u")  # tank capacity
-        
+
         return fuelStartIndex
 
     def _convertFuelData(self, data, index = 0, addCapacities = False):
@@ -1522,19 +1522,19 @@ class GenericAircraftModel(AircraftModel):
             capacity = data[index+1] * fuelWeight * const.LBSTOKG
             amount = data[index] * capacity / 128.0 / 65536.0
             index += 2
-            
-            result.append( (fuelTank, amount, capacity) if addCapacities 
+
+            result.append( (fuelTank, amount, capacity) if addCapacities
                            else (fuelTank, amount))
             totalFuel += amount
 
-        return (result, totalFuel)        
+        return (result, totalFuel)
 
     def _handleFuelRetrieved(self, data, callback):
         """Callback for a fuel retrieval request."""
-        (fuelData, _totalFuel) = self._convertFuelData(data, 
+        (fuelData, _totalFuel) = self._convertFuelData(data,
                                                        addCapacities = True)
         callback(fuelData)
-                                                          
+
     def _handleFuelWritten(self, success, extra):
         """Callback for a fuel setting request."""
         pass
@@ -1553,14 +1553,14 @@ class GenericModel(GenericAircraftModel):
     @property
     def name(self):
         """Get the name for this aircraft model."""
-        return "FSUIPC/Generic"    
+        return "FSUIPC/Generic"
 
 #------------------------------------------------------------------------------
 
 class B737Model(GenericAircraftModel):
     """Generic model for the Boeing 737 Classing and NG aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
-    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
+
     def __init__(self):
         """Construct the model."""
         super(B737Model, self). \
@@ -1600,9 +1600,9 @@ class PMDGBoeing737NGModel(B737Model):
     def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
         self._fsType = fsType
-        
+
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
-                
+
         self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
 
         if fsType==const.SIM_MSFSX:
@@ -1629,7 +1629,7 @@ class PMDGBoeing737NGModel(B737Model):
 
 class B767Model(GenericAircraftModel):
     """Generic model for the Boeing 767 aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
 
     def __init__(self):
         """Construct the model."""
@@ -1647,8 +1647,8 @@ class B767Model(GenericAircraftModel):
 
 class DH8DModel(GenericAircraftModel):
     """Generic model for the Bombardier  Dash 8-Q400 aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]    
-    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
+
     def __init__(self):
         """Construct the model."""
         super(DH8DModel, self). \
@@ -1695,7 +1695,7 @@ class DreamwingsDH8DModel(DH8DModel):
 
 class CRJ2Model(GenericAircraftModel):
     """Generic model for the Bombardier CRJ-200 aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
 
     def __init__(self):
         """Construct the model."""
@@ -1713,7 +1713,7 @@ class CRJ2Model(GenericAircraftModel):
 
 class F70Model(GenericAircraftModel):
     """Generic model for the Fokker F70 aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]    
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
 
     def __init__(self):
         """Construct the model."""
@@ -1761,7 +1761,7 @@ class DAF70Model(F70Model):
 class DC3Model(GenericAircraftModel):
     """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE,
-                 const.FUELTANK_RIGHT]    
+                 const.FUELTANK_RIGHT]
     # fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
     #              const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
 
@@ -1796,7 +1796,7 @@ class DC3Model(GenericAircraftModel):
             centreCapacity = rawFuelData[1][2]
             self._leftLevel = self._rightLevel = \
                 centreAmount / centreCapacity / 2.0
-            fuelData = [(const.FUELTANK_LEFT_AUX, 
+            fuelData = [(const.FUELTANK_LEFT_AUX,
                          rawFuelData[0][1], rawFuelData[0][2]),
                         (const.FUELTANK_LEFT,
                          centreAmount/2.0, centreCapacity/2.0),
@@ -1821,7 +1821,7 @@ class DC3Model(GenericAircraftModel):
         leftLevel = None
         centreLevel = None
         rightLevel = None
-        
+
         for (tank, level) in levels:
             if tank==const.FUELTANK_LEFT_AUX:
                 leftLevel = level if leftLevel is None else (leftLevel + level)
@@ -1904,7 +1904,7 @@ class T154Model(GenericAircraftModel):
 class YK40Model(GenericAircraftModel):
     """Generic model for the Yakovlev Yak-40 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
-    
+
     def __init__(self):
         """Construct the model."""
         super(YK40Model, self). \
