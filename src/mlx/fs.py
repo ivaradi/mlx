@@ -35,7 +35,7 @@ class ConnectionListener(object):
 
     def connectionFailed(self):
         """Called when the connection could not be established."""
-        print "fs.ConnectionListener.connectionFailed"        
+        print "fs.ConnectionListener.connectionFailed"
 
     def disconnected(self):
         """Called when a connection to the flight simulator has been broken."""
@@ -115,11 +115,11 @@ class MessageThread(threading.Thread):
                          duration, disconnect) = self._messages[0]
                         del self._messages[0]
 
-            if text is not None:        
+            if text is not None:
                 self._sendMessage(messageType, text, duration, disconnect)
 
     def _sendMessage(self, messageType, text, duration, disconnect):
-        """Send the message and setup the next message time."""        
+        """Send the message and setup the next message time."""
         messageLevel = self._config.getMessageTypeLevel(messageType)
         if messageLevel==const.MESSAGELEVEL_SOUND or \
            messageLevel==const.MESSAGELEVEL_BOTH:
@@ -179,7 +179,7 @@ class AircraftState(object):
     MSFS) is activated
     - overspeed: a boolean indicating if the aircraft is in overspeed
     - stalled: a boolean indicating if the aircraft is stalled
-    - onTheGround: a boolean indicating if the aircraft is on the ground    
+    - onTheGround: a boolean indicating if the aircraft is on the ground
     - zfw: the zero-fuel weight in kilograms (float)
     - grossWeight: the gross weight in kilograms (float)
     - heading: the heading of the aircraft in degrees (float)
@@ -189,7 +189,7 @@ class AircraftState(object):
     negative means bank right (float)
     - ias: the indicated airspeed in knots (float)
     - smoothedIAS: the smoothed IAS in knots (float)
-    - mach: the airspeed in mach (float)    
+    - mach: the airspeed in mach (float)
     - groundSpeed: the ground speed (float)
     - vs: the vertical speed in feet/minutes (float)
     - smoothedVS: the smoothed VS in feet/minutes (float)
@@ -224,7 +224,7 @@ class AircraftState(object):
     - spoilersArmed: a boolean indicating if the spoilers have been armed for
     automatic deployment
     - spoilersExtension: the percentage of how much the spoiler is extended
-    (float) 
+    (float)
     - altimeter: the altimeter setting in hPa (float)
     - nav1: the frequency of the NAV1 radio in MHz (string). Can be None, if
     the frequency is unreliable or meaningless.
@@ -244,7 +244,9 @@ class AircraftState(object):
     - windSpeed: the speed of the wind at the aircraft in knots (float)
     - windDirection: the direction of the wind at the aircraft in degrees (float)
     - visibility: the visibility in metres (float)
-    - cog: the centre of gravity 
+    - cog: the centre of gravity
+    - xpdrC: a boolean indicating whether the transponder is in C mode, or
+      None, if the state cannot be read properly
 
     FIXME: needed when taxiing only:
     - payload weight
@@ -252,6 +254,5 @@ class AircraftState(object):
     FIXME: needed rarely:
     - latitude, longitude
     - transporter
-    - visibility 
+    - visibility
     """
-    

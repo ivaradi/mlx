@@ -185,7 +185,7 @@ class Values(object):
         bcd <<= 4
         bcd |= value % 10
         return bcd
-        
+
     @staticmethod
     def _writeFrequency(value):
         """Convert the given value into a frequency."""
@@ -206,7 +206,7 @@ class Values(object):
         [mainFrequency, extFrequency] = Values._readADFFrequency(current)
         if isMain: mainFrequency = value
         else: extFrequency = value
-        
+
         return Values._toADFFrequency(mainFrequency, extFrequency)
 
     @staticmethod
@@ -221,7 +221,7 @@ class Values(object):
         bcd += (value>>0) & 0x0f
 
         return bcd
-        
+
     def __init__(self):
         """Construct the values with defaults."""
         self._timeOffset = 0
@@ -234,7 +234,7 @@ class Values(object):
 
         self.latitude = 47.5
         self.longitude = 19.05
-        
+
         self.paused = False
         self.frozen = False
         self.replay = False
@@ -242,9 +242,9 @@ class Values(object):
         self.overspeed = False
         self.stalled = False
         self.onTheGround = True
-        
+
         self.zfw = 50000.0
-        
+
         self.fuelWeights = [0.0, 3000.0, 3000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         # Wikipedia: "Jet fuel", Jet A-1 density at 15*C .804kg/l -> 6.7 pounds/gallon
         self.fuelWeight = 6.70970518
@@ -292,7 +292,7 @@ class Values(object):
         self.windSpeed = 8.0
         self.windDirection = 300.0
         self.visibility = 10000
-        
+
         self.n1 = [0.0, 0.0, 0.0]
         self.throttles = [0.0, 0.0, 0.0]
 
@@ -312,6 +312,8 @@ class Values(object):
 
         self.pmdg_737ng_switches = 0
         self.pmdg_737ngx_lts_positionsw = 0
+
+        self.xpdrC = False
 
     def read(self, offset, type):
         """Read the value at the given offset."""
@@ -446,7 +448,7 @@ class Values(object):
                            flapsIncrement /
                            (self.flapsNotches[index+1] - self.flapsNotches[index]))
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
-            return self.flaps * 16383.0 / self.flapsNotches[-1]        
+            return self.flaps * 16383.0 / self.flapsNotches[-1]
         elif offset==0x0be8:       # Gear control
             return int(self.gearControl * 16383.0)
         elif offset==0x0bec:       # Nose gear
@@ -503,7 +505,7 @@ class Values(object):
         elif offset==0x30c0:       # Gross weight
             return (self.zfw + sum(self.fuelWeights)) * const.KGSTOLB
         elif offset==0x31e4:       # Radio altitude
-            # FIXME: if self.radioAltitude is None, calculate from the 
+            # FIXME: if self.radioAltitude is None, calculate from the
             # altitude with some, perhaps random, ground altitude
             # value
             radioAltitude = (self.altitude - 517) \
@@ -550,6 +552,8 @@ class Values(object):
             return self.pmdg_737ng_switches
         elif offset==0x6500:       # PMDG 737NGX lights position SW
             return self.pmdg_737ngx_lts_positionsw
+        elif offset==0x7b91:       # Transponder standby
+            return 0 if self.xpdrC else 1
         else:
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
@@ -696,8 +700,8 @@ class Values(object):
         elif offset==0x0d0c:       # Lights
             self.navLightsOn = (value&0x01)!=0
             self.antiCollisionLightsOn = (value&0x02)!=0
-            self.landingLightsOn = (value&0x04)!=0 
-            self.strobeLightsOn = (value&0x10)!=0 
+            self.landingLightsOn = (value&0x04)!=0
+            self.strobeLightsOn = (value&0x10)!=0
         elif offset==0x0e8a:       # Visibility
             self.visibility = value * 1609.344 / 100.0
         elif offset==0x0e90:       # Wind speed
@@ -780,22 +784,24 @@ class Values(object):
             self.pmdg_737ng_switches = value
         elif offset==0x6500:       # PMDG 737NGX lights position SW
             self.pmdg_737ngx_lts_positionsw = value
+        elif offset==0x7b91:       # Transponder standby
+            self.xpdrC = value==0
         else:
             print "Unhandled offset: %04x" % (offset,)
             raise FSUIPCException(ERR_DATA)
-        
+
     def _readUTC(self):
         """Read the UTC time.
-        
+
         The current offset is added to it."""
         return time.gmtime(time.time() + self._timeOffset)
-        
+
     def _getFuelLevel(self, index):
         """Get the fuel level for the fuel tank with the given
         index."""
         return 0 if self.fuelCapacities[index]==0.0 else \
             int(self.fuelWeights[index] * 65536.0 * 128.0 / self.fuelCapacities[index])
-    
+
     def _getFuelCapacity(self, index):
         """Get the capacity of the fuel tank with the given index."""
         return int(self.fuelCapacities[index] * const.KGSTOLB  / self.fuelWeight)
@@ -810,7 +816,7 @@ class Values(object):
         tm = self._readUTC()
         tm1 = tm[:index] + (value,) + tm[(index+1):]
         self._timeOffset += calendar.timegm(tm1) - calendar.timegm(tm)
-    
+
     def _setThrottle(self, index, value):
         """Set the throttle value for the given index."""
         self.throttles[index] = value / 16383.0
@@ -819,7 +825,7 @@ class Values(object):
         """Set the fuel level for the fuel tank with the given index."""
         self.fuelWeights[index] = self.fuelCapacities[index] * float(value) / \
                                   65536.0 / 128.0
-    
+
     def _setFuelCapacity(self, index, value):
         """Set the capacity of the fuel tank with the given index."""
         self.fuelCapacities[index] = value * self.fuelWeight * const.LBSTOKG
@@ -829,7 +835,7 @@ class Values(object):
         pressure = 101325 * math.pow(1 - 2.25577e-5 * self.altitude *
                                       const.FEETTOMETRES,
                                       5.25588)
-        temperature = 15 - self.altitude * 6.5 * const.FEETTOMETRES / 1000.0 
+        temperature = 15 - self.altitude * 6.5 * const.FEETTOMETRES / 1000.0
         temperature += 273.15  # Celsius -> Kelvin
         airDensity = pressure / (temperature * 287.05)
         #print "pressure:", pressure, "temperature:", temperature, "airDensity:", airDensity
@@ -867,7 +873,7 @@ def prepare_data(pattern, forRead = True, checkOpened = True):
         return pattern
     else:
         raise FSUIPCException(ERR_NOTOPEN)
-        
+
 #------------------------------------------------------------------------------
 
 def read(data, checkOpened = True):
@@ -876,7 +882,7 @@ def read(data, checkOpened = True):
         return [values.read(offset, type) for (offset, type) in data]
     else:
         raise FSUIPCException(ERR_NOTOPEN)
-            
+
 #------------------------------------------------------------------------------
 
 def write(data, checkOpened = True):
@@ -886,7 +892,7 @@ def write(data, checkOpened = True):
             values.write(offset, value, type)
     else:
         raise FSUIPCException(ERR_NOTOPEN)
-            
+
 #------------------------------------------------------------------------------
 
 def close():
@@ -923,9 +929,9 @@ class Server(threading.Thread):
 
         serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         serverSocket.bind(("", PORT))
-    
+
         serverSocket.listen(5)
-    
+
         while True:
             (clientSocket, clientAddress) = serverSocket.accept()
             thread = threading.Thread(target = self._process, args=(clientSocket,))
@@ -935,12 +941,12 @@ class Server(threading.Thread):
         """Process the commands arriving on the given socket."""
         socketFile = clientSocket.makefile()
         try:
-            while True:                
+            while True:
                 (length,) = struct.unpack("I", clientSocket.recv(4))
                 data = clientSocket.recv(length)
                 (call, args) = cPickle.loads(data)
                 exception = None
-                
+
                 try:
                     if call==CALL_READ:
                         result = read(args[0], checkOpened = False)
@@ -976,7 +982,7 @@ class Server(threading.Thread):
             except:
                 pass
             clientSocket.close()
-                   
+
 #------------------------------------------------------------------------------
 
 class Client(object):
@@ -1012,7 +1018,7 @@ class Client(object):
     def quit(self):
         """Quit from the simulator."""
         data = cPickle.dumps((CALL_QUIT, None))
-        self._socket.send(struct.pack("I", len(data)) + data)        
+        self._socket.send(struct.pack("I", len(data)) + data)
 
     def _call(self, command, data):
         """Perform a call with the given command and data."""
@@ -1036,7 +1042,7 @@ class CLI(cmd.Cmd):
     def str2bool(s):
         """Convert the given string to a PyUIPC boolean value (i.e. 0 or 1)."""
         return 1 if s in ["yes", "true", "on"] else 0
-    
+
     @staticmethod
     def bool2str(value):
         """Convert the PyUIPC boolean value (i.e. 0 or 1) into a string."""
@@ -1046,7 +1052,7 @@ class CLI(cmd.Cmd):
     def degree2pyuipc(degree):
         """Convert the given degree (as a string) into a PyUIPC value."""
         return int(float(degree) * 65536.0 * 65536.0 / 360.0)
-        
+
     @staticmethod
     def pyuipc2degree(value):
         """Convert the given PyUIPC value into a degree."""
@@ -1056,27 +1062,27 @@ class CLI(cmd.Cmd):
     def fuelLevel2pyuipc(level):
         """Convert the given percentage value (as a string) into a PyUIPC value."""
         return int(float(level) * 128.0 * 65536.0 / 100.0)
-        
+
     @staticmethod
     def pyuipc2fuelLevel(value):
         """Convert the PyUIPC value into a percentage value."""
         return value * 100.0 / 128.0 / 65536.0
-        
+
     @staticmethod
     def fuelCapacity2pyuipc(capacity):
         """Convert the given capacity value (as a string) into a PyUIPC value."""
         return int(capacity)
-        
+
     @staticmethod
     def pyuipc2fuelCapacity(value):
         """Convert the given capacity value into a PyUIPC value."""
         return value
-        
+
     @staticmethod
     def throttle2pyuipc(throttle):
         """Convert the given throttle value (as a string) into a PyUIPC value."""
         return int(float(throttle) * 16384.0 / 100.0)
-        
+
     @staticmethod
     def pyuipc2throttle(value):
         """Convert the given PyUIPC value into a throttle value."""
@@ -1085,7 +1091,7 @@ class CLI(cmd.Cmd):
     def __init__(self):
         """Construct the CLI."""
         cmd.Cmd.__init__(self)
-        
+
         self.use_rawinput = True
         self.intro = "\nPyUIPC simulator command prompt\n"
         self.prompt = "PyUIPC> "
@@ -1157,13 +1163,13 @@ class CLI(cmd.Cmd):
                                      lambda value: value / 128.0,
                                      lambda word: None)
         self._valueHandlers["vs"] = ([(0x02c8, "d")],
-                                     lambda value: value * 60 /                                     
+                                     lambda value: value * 60 /
                                      const.FEETTOMETRES / 256.0,
                                      lambda word: int(float(word) *
                                                       const.FEETTOMETRES *
                                                       256.0 / 60.0))
         self._valueHandlers["tdRate"] = ([(0x030c, "d")],
-                                         lambda value: value * 60 /                                     
+                                         lambda value: value * 60 /
                                          const.FEETTOMETRES / 256.0,
                                          lambda word: int(float(word) *
                                                           const.FEETTOMETRES *
@@ -1330,12 +1336,12 @@ class CLI(cmd.Cmd):
         self._valueHandlers["throttle_3"] = ([(0x09bc, "H")],
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
-                                                            
+
         self._valueHandlers["visibility"] = ([(0x0e8a, "H")],
                                              lambda value: value*1609.344/100.0,
                                              lambda word: int(float(word)*
                                                               100.0/1609.344))
-                                                            
+
         self._valueHandlers["payloadCount"] = ([(0x13fc, "d")],
                                                lambda value: value,
                                                lambda word: int(word))
@@ -1347,7 +1353,7 @@ class CLI(cmd.Cmd):
                                                        float(word)*const.KGSTOLB)
         self._valueHandlers["textScrolling"] = ([(0x1274, "h")],
                                                 CLI.bool2str, CLI.str2bool)
-                                                            
+
         self._valueHandlers["messageDuration"] = ([(0x32fa, "h")],
                                                   lambda value: value,
                                                   lambda word: int(word))
@@ -1370,6 +1376,9 @@ class CLI(cmd.Cmd):
         self._valueHandlers["pmdg_737ngx_lts_positionsw"] = ([(0x6500, "b")],
                                                              lambda value: value,
                                                              lambda word: int(word))
+        self._valueHandlers["xpdrC"] = ([(0x7b91, "b")],
+                                        lambda value: value,
+                                        lambda word: int(word))
 
     def default(self, line):
         """Handle unhandle commands."""
@@ -1382,7 +1391,7 @@ class CLI(cmd.Cmd):
     def do_get(self, args):
         """Handle the get command."""
         names = args.split()
-        data = []        
+        data = []
         for name in names:
             if name not in self._valueHandlers:
                 print >> sys.stderr, "Unknown variable: " + name
@@ -1407,7 +1416,7 @@ class CLI(cmd.Cmd):
                 index += numResults
                 i+=1
         except Exception, e:
-            print >> sys.stderr, "Failed to read data: " + str(e)                        
+            print >> sys.stderr, "Failed to read data: " + str(e)
 
         return False
 
@@ -1439,7 +1448,7 @@ class CLI(cmd.Cmd):
 
         if inWord:
             arguments.append(word)
-            
+
         names = []
         data = []
         for argument in arguments:
@@ -1466,7 +1475,7 @@ class CLI(cmd.Cmd):
                 print >> sys.stderr, "Invalid value '%s' for variable %s: %s" % \
                       (value, name, str(e))
                 return False
-                
+
         try:
             self._client.write(data)
             print "Data written"
@@ -1507,7 +1516,7 @@ class CLI(cmd.Cmd):
             print "Connection closed"
         except Exception, e:
             print >> sys.stderr, "Failed to close the connection: " + str(e)
-        
+
     def do_failopen(self, args):
         """Enable/disable the failing of opens."""
         try:
@@ -1515,7 +1524,7 @@ class CLI(cmd.Cmd):
             self._client.failOpen(value)
             print "Opening will%s fail" % ("" if value else " not",)
         except Exception, e:
-            print >> sys.stderr, "Failed to set open failure: " + str(e)        
+            print >> sys.stderr, "Failed to set open failure: " + str(e)
 
     def help_failopen(self, usage = False):
         """Help for the failopen command"""
@@ -1529,7 +1538,7 @@ class CLI(cmd.Cmd):
             else: return []
         else:
             return ["yes", "no"]
-        
+
     def do_quit(self, args):
         """Handle the quit command."""
         self._client.quit()
@@ -1541,6 +1550,6 @@ if __name__ == "__main__":
     CLI().cmdloop()
 else:
     server = Server()
-    server.start()    
+    server.start()
 
 #------------------------------------------------------------------------------

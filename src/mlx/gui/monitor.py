@@ -22,7 +22,7 @@ class MonitorWindow(gtk.Window):
     def __init__(self, gui, iconDirectory):
         """Construct the monitor window."""
         super(MonitorWindow, self).__init__()
-        
+
         self._gui = gui
 
         self.set_resizable(False)
@@ -47,19 +47,19 @@ class MonitorWindow(gtk.Window):
 
         self._paused = gtk.Label("PAUSED")
         table.attach(self._paused, 2, 4, 0, 1)
-        
+
         self._trickMode = gtk.Label("TRICKMODE")
         table.attach(self._trickMode, 4, 6, 0, 1, xoptions = 0)
-        
+
         self._overspeed = gtk.Label("OVERSPEED")
         table.attach(self._overspeed, 6, 8, 0, 1)
-        
+
         self._stalled = gtk.Label("STALLED")
         table.attach(self._stalled, 8, 10, 0, 1)
-        
+
         self._onTheGround = gtk.Label("ONTHEGROUND")
         table.attach(self._onTheGround, 10, 12, 0, 1)
-        
+
         (label, self._zfw) = self._createLabeledEntry("ZFW:", 6)
         table.attach(label, 0, 1, 1, 2)
         table.attach(self._zfw, 1, 2, 1, 2)
@@ -187,6 +187,9 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 6, 7, 6, 7)
         table.attach(self._position, 7, 10, 6, 7)
 
+        self._xpdrC = gtk.Label("XPDR CHARLIE")
+        table.attach(self._xpdrC, 10, 12, 6, 7)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -201,7 +204,7 @@ class MonitorWindow(gtk.Window):
         Return a tuple consisting of:
         - the box
         - the entry."""
-        
+
         alignment = gtk.Alignment(xalign = 1.0, yalign = 0.5, xscale = 1.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 0,
                               padding_left = 0, padding_right = 16)
@@ -261,6 +264,7 @@ class MonitorWindow(gtk.Window):
             self._windSpeed.set_text("-")
             self._windDirection.set_text("-")
             self._position.set_text("-")
+            self._xpdrC.set_sensitive(False)
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -293,7 +297,7 @@ class MonitorWindow(gtk.Window):
             fuelStr = ""
             for (_tank, fuel) in aircraftState.fuel:
                 if fuelStr: fuelStr += ", "
-                fuelStr += "%.0f" % (fuel,)                
+                fuelStr += "%.0f" % (fuel,)
             self._fuel.set_text(fuelStr)
 
             if aircraftState.n1 is not None:
@@ -328,7 +332,7 @@ class MonitorWindow(gtk.Window):
                 else:
                     self._landingLightsOn.set_text("LANDING")
             self._landingLightsOn.set_sensitive(aircraftState.landingLightsOn is True)
-            
+
             self._pitotHeatOn.set_sensitive(aircraftState.pitotHeatOn)
             self._parking.set_sensitive(aircraftState.parking)
             self._gearControlDown.set_sensitive(aircraftState.gearControlDown)
@@ -339,5 +343,6 @@ class MonitorWindow(gtk.Window):
             self._windDirection.set_text("%03.0f" % (aircraftState.windDirection,))
             self._position.set_text(util.getCoordinateString((aircraftState.latitude,
                                                               aircraftState.longitude)))
+            self._xpdrC.set_sensitive(aircraftState.xpdrC)
 
 #------------------------------------------------------------------------------

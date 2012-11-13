@@ -1187,7 +1187,8 @@ class AircraftModel(object):
                       ("windSpeed", 0x0e90, "H"),
                       ("windDirection", 0x0e92, "H"),
                       ("visibility", 0x0e8a, "H"),
-                      ("cog", 0x2ef8, "f")]
+                      ("cog", 0x2ef8, "f"),
+                      ("xpdrC", 0x7b91, "b")]
 
     specialModels = []
 
@@ -1383,6 +1384,8 @@ class AircraftModel(object):
         state.visibility = data[self._monidx_visibility]*1609.344/100.0
 
         state.cog = data[self._monidx_cog]
+
+        state.xpdrC = data[self._monidx_xpdrC]==0
 
         return state
 
