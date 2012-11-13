@@ -250,7 +250,7 @@ class Aircraft(object):
                                     "Takeoff weight: %.0f kg, MTOW: %.0f kg" % \
                                     (aircraftState.grossWeight, self.mtow))
                 self.logger.message(aircraftState.timestamp,
-                                    "Wind %03.0f degrees at %.0f knots" % \
+                                    "Wind %03.0f/%.0f" % \
                                     (aircraftState.windDirection,
                                      aircraftState.windSpeed))
                 self._logRadios(aircraftState)
@@ -303,7 +303,7 @@ class Aircraft(object):
         """Called when the flare has started."""
         self.logger.message(self._aircraftState.timestamp, "The flare has begun")
         self.logger.message(self._aircraftState.timestamp,
-                            "Wind %03.0f degrees at %.0f knots" % \
+                            "Wind %03.0f/%.0f" % \
                             (windDirection, windSpeed))
         self.logger.message(self._aircraftState.timestamp,
                             "Visibility: %.0f metres" % (visibility,))

@@ -472,7 +472,7 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
     @staticmethod
     def getMessage(logName, frequency, obs):
         """Get the message for the given NAV radio setting."""
-        message = u"%s frequency: %s MHz" % (logName, frequency)
+        message = u"%s: %s" % (logName, frequency)
         if obs is not None: message += u" (%d\u00b0)" % (obs,)
         return message
 
@@ -545,7 +545,7 @@ class ADFLogger(GenericStateChangeLogger, ForceableLoggerMixin):
     def __init__(self, attr, logName):
         """Construct the ADF logger."""
         GenericStateChangeLogger.__init__(self, attr,
-                                          "%s frequency: %%s kHz" % (logName,),
+                                          "%s: %%s" % (logName,),
                                           minDelay = 3.0, maxDelay = 10.0)
         ForceableLoggerMixin.__init__(self)
 
@@ -643,7 +643,7 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
     def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
         speed = state.groundSpeed if state.groundSpeed<80.0 else state.ias
-        return "Flaps set to %.0f at %.0f %s" % \
+        return "Flaps %.0f - %.0f %s" % \
                (state.flapsSet, flight.speedFromKnots(speed),
                 flight.getEnglishSpeedUnit())
 
