@@ -50,7 +50,7 @@ class SmoothedValue(object):
     def get(self):
         """Get the average."""
         return self._sum / len(self._deque)
-        
+
 #---------------------------------------------------------------------------------------
 
 class Aircraft(object):
@@ -64,7 +64,7 @@ class Aircraft(object):
         """Construct the aircraft for the given type."""
         self._flight = flight
         self._aircraftState = None
-       
+
         self._maxVS = -10000.0
         self._minVS = 10000.0
 
@@ -92,7 +92,7 @@ class Aircraft(object):
         self._checkers.append(self._adf1Logger)
         self._adf2Logger = checks.ADF2Logger()
         self._checkers.append(self._adf2Logger)
-        
+
         self._checkers.append(checks.SquawkLogger())
 
         self._appendLightsLoggers()
@@ -138,11 +138,11 @@ class Aircraft(object):
 
         timeout = 5.0 + config.realIASSmoothingLength - 1
         self._checkers.append(checks.OverspeedChecker(timeout = timeout))
-                              
+
         self._checkers.append(checks.StallChecker())
 
         self._checkers.append(checks.PitotChecker())
-        
+
         self._checkers.append(checks.ReverserChecker())
 
         if flight.aircraftType is not None and config.enableApproachCallouts:
@@ -185,7 +185,7 @@ class Aircraft(object):
         """Get the timestamp of the current state."""
         return None if self._aircraftState is None \
                else self._aircraftState.timestamp
-        
+
     def getFlapsSpeedLimit(self, flaps):
         """Get the speed limit for the given flaps setting."""
         return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
@@ -228,7 +228,7 @@ class Aircraft(object):
             traceback.print_exc()
         finally:
             self._aircraftState = aircraftState
-    
+
     def setStage(self, aircraftState, newStage):
         """Set the given stage as the new one and do whatever should be
         done."""
@@ -236,7 +236,7 @@ class Aircraft(object):
             if newStage==const.STAGE_PUSHANDTAXI:
                 self.logger.message(aircraftState.timestamp, "Block time start")
                 self._flight.logFuel(aircraftState)
-                self.logger.message(aircraftState.timestamp, 
+                self.logger.message(aircraftState.timestamp,
                                     "ZFW: %.2f kg" % (aircraftState.zfw))
                 flight = self._flight
                 if flight.v1 is None or flight.vr is None or flight.v2 is None:
@@ -246,12 +246,12 @@ class Aircraft(object):
             elif newStage==const.STAGE_TAKEOFF:
                 self.logger.message(aircraftState.timestamp,
                                     "Flight time start")
-                self.logger.message(aircraftState.timestamp, 
+                self.logger.message(aircraftState.timestamp,
                                     "Takeoff weight: %.0f kg, MTOW: %.0f kg" % \
                                     (aircraftState.grossWeight, self.mtow))
                 self.logger.message(aircraftState.timestamp,
                                     "Wind %03.0f degrees at %.0f knots" % \
-                                    (aircraftState.windDirection, 
+                                    (aircraftState.windDirection,
                                      aircraftState.windSpeed))
                 self._logRadios(aircraftState)
                 self._logV1R2()
@@ -285,7 +285,7 @@ class Aircraft(object):
                                     util.getTimeIntervalString(flightLength))
                 self.logger.message(aircraftState.timestamp,
                                     "Flown distance: %.2f NM" % \
-                                    (self._flight.flownDistance,))                
+                                    (self._flight.flownDistance,))
                 blockLength = self._flight.blockTimeEnd - self._flight.blockTimeStart
                 self.logger.message(aircraftState.timestamp,
                                     "Block time: " +
@@ -298,7 +298,7 @@ class Aircraft(object):
         closely to determine flare time."""
         self.flight.simulator.startFlare()
 
-    def flareStarted(self, windSpeed, windDirection, visibility, 
+    def flareStarted(self, windSpeed, windDirection, visibility,
                      flareStart, flareStartFS):
         """Called when the flare has started."""
         self.logger.message(self._aircraftState.timestamp, "The flare has begun")
@@ -313,7 +313,7 @@ class Aircraft(object):
         self._logVRef()
         self.flight.flareStarted(flareStart, flareStartFS)
         fs.sendMessage(const.MESSAGETYPE_INFORMATION, "Flare-time", 3)
-         
+
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
                       ias, pitch, bank, heading):
         """Called when the flare has finished."""
@@ -322,7 +322,7 @@ class Aircraft(object):
                                                                  tdRate)
         self.logger.message(self._aircraftState.timestamp,
                             "Flaretime: %.3f (from %s)" % \
-                            (flareTime, 
+                            (flareTime,
                              "the simulator" if flareTimeFromFS else "real time",))
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown rate: %.0f feet/min" % (tdRate,))
@@ -340,7 +340,7 @@ class Aircraft(object):
                             "Touchdown bank: %.1f degrees" % (bank,))
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown heading: %03.0f degrees" % (heading,))
-        self.logger.message(self._aircraftState.timestamp, 
+        self.logger.message(self._aircraftState.timestamp,
                            "Centre of gravity:  %.1f%%" % \
                             (self._aircraftState.cog*100.0,))
 
@@ -433,7 +433,7 @@ class Aircraft(object):
                     gateList += gateNumber
             fs.sendMessage(const.MESSAGETYPE_GATE_SYSTEM,
                            "Free gates: " + gateList, 20)
-        
+
 
     def _logRadios(self, aircraftState):
         """Log the radios from the given aircraft state."""
@@ -454,7 +454,7 @@ class Boeing737(Aircraft):
     structure:
     - fuel: left, centre, right
     - n1: left, right
-    - reverser: left, right"""    
+    - reverser: left, right"""
     def __init__(self, flight):
         super(Boeing737, self).__init__(flight)
         self._checkers.append(checks.ThrustChecker())
@@ -604,7 +604,7 @@ class B762(Boeing767):
 class B763(Boeing767):
     """Boeing 767-300 aircraft."""
     def __init__(self, flight):
-        super(B763, self).__init__(cflight)
+        super(B763, self).__init__(flight)
         self.dow = 91311
         self.mtow = 181436
         self.mlw = 137892
@@ -713,7 +713,7 @@ class T134(Aircraft):
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
         return False
-    
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -751,7 +751,7 @@ class T154(Aircraft):
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
         return False
-    
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -790,7 +790,7 @@ class YK40(Aircraft):
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
         return False
-    
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
