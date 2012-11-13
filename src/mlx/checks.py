@@ -36,7 +36,7 @@ class StateChecker(object):
 
         This default implementation raises a NotImplementedError."""
         raise NotImplementedError()
-    
+
 #---------------------------------------------------------------------------------------
 
 class StageChecker(StateChecker):
@@ -82,7 +82,7 @@ class StageChecker(StateChecker):
             elif (state.altitude+2000) > flight.cruiseAltitude:
                 aircraft.setStage(state, const.STAGE_CRUISE)
         elif stage==const.STAGE_LANDING:
-            if state.onTheGround and state.groundSpeed<50.0:
+            if state.onTheGround and state.groundSpeed<25.0:
                 aircraft.setStage(state, const.STAGE_TAXIAFTERLAND)
             elif not state.gearsDown:
                 aircraft.setStage(state, const.STAGE_GOAROUND)
@@ -109,7 +109,7 @@ class ACARSSender(StateChecker):
 
     ## The interval at which the ACARS are sent
     INTERVAL = 3*60.0
-    
+
     def __init__(self, gui):
         """Construct the ACARS sender."""
         self._gui = gui
@@ -118,10 +118,10 @@ class ACARSSender(StateChecker):
     def check(self, flight, aircraft, logger, oldState, state):
         """If the time has come to send the ACARS, send it."""
         now = time.time()
-        
+
         if self._lastSent is not None and \
            (self._lastSent + ACARSSender.INTERVAL)>now:
-            return 
+            return
 
         acars = ACARS(self._gui, state)
         self._gui.webHandler.sendACARS(self._acarsCallback, acars)
@@ -134,7 +134,7 @@ class ACARSSender(StateChecker):
                              else self._lastSent + ACARSSender.INTERVAL
         else:
             print "Failed to send the ACARS"
-        
+
 #---------------------------------------------------------------------------------------
 
 class TakeOffLogger(StateChecker):
@@ -142,7 +142,7 @@ class TakeOffLogger(StateChecker):
     def __init__(self):
         """Construct the logger."""
         self._onTheGround = True
-    
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Log the cruise speed if necessary."""
         if flight.stage==const.STAGE_TAKEOFF and \
@@ -155,7 +155,7 @@ class TakeOffLogger(StateChecker):
                            "Takeoff heading: %03.0f degrees" % (state.heading,))
             logger.message(state.timestamp,
                            "Takeoff pitch: %.1f degrees" % (state.pitch,))
-            logger.message(state.timestamp, 
+            logger.message(state.timestamp,
                            "Centre of gravity:  %.1f%%" % (state.cog*100.0,))
             self._onTheGround = False
 
@@ -166,7 +166,7 @@ class CruiseSpeedLogger(StateChecker):
     def __init__(self):
         """Construct the logger."""
         self._lastTime = None
-    
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Log the cruise speed if necessary."""
         if flight.stage==const.STAGE_CRUISE and \
@@ -190,7 +190,7 @@ class SpoilerLogger(StateChecker):
         """Construct the logger."""
         self._logged = False
         self._spoilersExtension = None
-    
+
     def check(self, flight, aircraft, logger, oldState, state):
         """Log the cruise speed if necessary."""
         if flight.stage==const.STAGE_LANDING and not self._logged:
@@ -237,7 +237,7 @@ class ApproachCalloutsPlayer(StateChecker):
 
     It tracks the altitude during the descent and landing phases and
     if the altitude crosses one that has a callout associated with and
-    the vertical speed is negative, that callout will be played."""    
+    the vertical speed is negative, that callout will be played."""
     def __init__(self, approachCallouts):
         """Construct the approach callouts player."""
         self._approachCallouts = approachCallouts
@@ -272,7 +272,7 @@ class StateChangeLogger(StateChecker):
         - _getMessage(self, flight, state, forced): return a strings containing
         the message to log with the new value
         """
-        self._logInitial = logInitial    
+        self._logInitial = logInitial
 
     def _getLogTimestamp(self, state, forced):
         """Get the log timestamp."""
@@ -285,7 +285,7 @@ class StateChangeLogger(StateChecker):
             shouldLog = self._logInitial
         else:
             shouldLog = self._changed(oldState, state)
-        
+
         if shouldLog:
             self.logState(flight, logger, state)
 
@@ -294,7 +294,7 @@ class StateChangeLogger(StateChecker):
         message = self._getMessage(flight, state, forced)
         if message is not None:
             logger.message(self._getLogTimestamp(state, forced), message)
-        
+
 #-------------------------------------------------------------------------------
 
 class SimpleChangeMixin(object):
@@ -320,7 +320,7 @@ class SingleValueMixin(object):
     def _getValue(self, state):
         """Get the value of the attribute from the state."""
         return getattr(state, self._attrName)
-    
+
 #---------------------------------------------------------------------------------------
 
 class DelayedChangeMixin(object):
@@ -336,12 +336,12 @@ class DelayedChangeMixin(object):
         self._oldValue = None
         self._firstChange = None
         self._lastChangeState = None
-        
+
     def _changed(self, oldState, state):
         """Determine if the value has changed."""
         if self._oldValue is None:
             self._oldValue = self._getValue(oldState)
-            
+
         newValue = self._getValue(state)
         if self._isDifferent(self._oldValue, newValue):
             if self._firstChange is None:
@@ -355,7 +355,7 @@ class DelayedChangeMixin(object):
                                       self._firstChange + self._maxDelay):
                 self._firstChange = None
                 return True
-            
+
         return False
 
     def _getLogTimestamp(self, state, forced):
@@ -383,7 +383,7 @@ class TemplateMessageMixin(object):
 
     def _getMessage(self, flight, state, forced):
         """Get the message."""
-        value = self._getValue(state)        
+        value = self._getValue(state)
         return None if value is None else self._template % (value,)
 
 #---------------------------------------------------------------------------------------
@@ -432,7 +432,7 @@ class ForceableLoggerMixin(object):
         state as the last logged one."""
         self._logState(flight, logger, state, forced)
         self._lastLoggedState = state
-    
+
     def _changed(self, oldState, state):
         """Check if the state has changed.
 
@@ -475,7 +475,7 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
         message = u"%s frequency: %s MHz" % (logName, frequency)
         if obs is not None: message += u" (%d\u00b0)" % (obs,)
         return message
-    
+
     def __init__(self, attrName, logName):
         """Construct the NAV logger."""
         StateChangeLogger.__init__(self, logInitial = True)
@@ -592,13 +592,13 @@ class LightsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
         """Construct the logger."""
         StateChangeLogger.__init__(self)
         SingleValueMixin.__init__(self, attrName)
-        
+
         self._template = template
 
     def _getMessage(self, flight, state, forced):
         """Get the message from the given state."""
         return self._template % ("ON" if self._getValue(state) else "OFF")
-        
+
 #---------------------------------------------------------------------------------------
 
 class AnticollisionLightsLogger(LightsLogger):
@@ -740,7 +740,7 @@ class PatientFaultChecker(FaultChecker):
                 self._faultStarted = state.timestamp
         else:
             self._faultStarted = None
-                
+
 #---------------------------------------------------------------------------------------
 
 class AntiCollisionLightsChecker(PatientFaultChecker):
@@ -774,11 +774,11 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
 class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
     """Check for the anti-collision light for Tuplev planes."""
     def isCondition(self, flight, aircraft, oldState, state):
-        """Check if the fault condition holds."""        
+        """Check if the fault condition holds."""
         numEnginesRunning = 0
         for n1 in state.n1:
             if n1>5: numEnginesRunning += 1
-            
+
         if flight.stage==const.STAGE_PARKING:
             return numEnginesRunning<len(state.n1) \
                    and state.antiCollisionLightsOn
@@ -815,7 +815,7 @@ class FlapsRetractChecker(SimpleFaultChecker):
     def __init__(self):
         """Construct the flaps checker."""
         self._timeStart = None
-    
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds.
 
@@ -890,7 +890,7 @@ class GLoadChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         return state.gLoad>2.0 and (flight.stage!=const.STAGE_LANDING or \
                                     state.radioAltitude>=50)
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         flight.handleFault(GLoadChecker, state.timestamp,
@@ -922,14 +922,14 @@ class LandingLightsChecker(PatientFaultChecker):
                  not state.landingLightsOn and state.onTheGround) or \
                 (flight.stage==const.STAGE_PARKING and \
                  state.landingLightsOn and state.onTheGround))
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         score = 0 if flight.stage==const.STAGE_LANDING else 1
         message = "Landing lights were %s" % (("on" if state.landingLightsOn else "off"),)
         flight.handleFault(LandingLightsChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, message),
-                           score)   
+                           score)
 
 #---------------------------------------------------------------------------------------
 
@@ -1017,7 +1017,7 @@ class NavLightsChecker(PatientFaultChecker):
         return flight.stage!=const.STAGE_BOARDING and \
                flight.stage!=const.STAGE_PARKING and \
                not state.navLightsOn
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         flight.handleFault(NavLightsChecker, state.timestamp,
@@ -1036,12 +1036,12 @@ class OverspeedChecker(PatientFaultChecker):
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return state.overspeed
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         flight.handleFault(OverspeedChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, "Overspeed"),
-                           20)        
+                           20)
 
 #---------------------------------------------------------------------------------------
 
@@ -1053,14 +1053,14 @@ class PayloadChecker(SimpleFaultChecker):
     def isZFWFaulty(aircraftZFW, flightZFW):
         """Check if the given aircraft's ZFW is outside of the limits."""
         return aircraftZFW < (flightZFW - PayloadChecker.TOLERANCE) or \
-               aircraftZFW > (flightZFW + PayloadChecker.TOLERANCE)        
-    
+               aircraftZFW > (flightZFW + PayloadChecker.TOLERANCE)
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return not flight.entranceExam and \
                flight.stage==const.STAGE_PUSHANDTAXI and \
                PayloadChecker.isZFWFaulty(state.zfw, flight.zfw)
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         flight.handleNoGo(PayloadChecker, state.timestamp,
@@ -1079,7 +1079,7 @@ class PitotChecker(PatientFaultChecker):
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return state.groundSpeed>80 and not state.pitotHeatOn
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         score = 2 if flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
@@ -1087,7 +1087,7 @@ class PitotChecker(PatientFaultChecker):
                                       const.STAGE_LANDING] else 0
         flight.handleFault(PitotChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, "Pitot heat was off"),
-                           score)   
+                           score)
 
 #---------------------------------------------------------------------------------------
 
@@ -1098,7 +1098,7 @@ class ReverserChecker(SimpleFaultChecker):
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
             state.groundSpeed<60 and max(state.reverser)
-                           
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         message = "Reverser used below %.0f %s" % \
@@ -1116,7 +1116,7 @@ class SpeedChecker(SimpleFaultChecker):
         return flight.stage in [const.STAGE_PUSHANDTAXI,
                                 const.STAGE_TAXIAFTERLAND] and \
             state.groundSpeed>50
-                           
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         message = "Taxi speed over %.0f %s" % \
@@ -1135,14 +1135,14 @@ class StallChecker(PatientFaultChecker):
         return flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
                                 const.STAGE_CRUISE, const.STAGE_DESCENT,
                                 const.STAGE_LANDING] and state.stalled
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         score = 40 if flight.stage in [const.STAGE_TAKEOFF,
                                        const.STAGE_LANDING] else 30
         flight.handleFault(StallChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, "Stalled"),
-                           score)   
+                           score)
 
 #---------------------------------------------------------------------------------------
 
@@ -1159,7 +1159,7 @@ class StrobeLightsChecker(PatientFaultChecker):
                   not state.strobeLightsOn and not state.onTheGround) or \
                   (flight.stage==const.STAGE_PARKING and \
                    state.strobeLightsOn and state.onTheGround)
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         message = "Strobe lights were %s" % (("on" if state.strobeLightsOn else "off"),)
@@ -1177,7 +1177,7 @@ class ThrustChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         return flight.stage==const.STAGE_TAKEOFF and \
                state.n1 is not None and max(state.n1)>97
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         flight.handleFault(ThrustChecker, state.timestamp,
@@ -1208,7 +1208,7 @@ class VSChecker(SimpleFaultChecker):
                                         VSChecker.TOLERANCE)) or \
                (altitude<10000 and vs < (VSChecker.BELOW10000 *
                                          VSChecker.TOLERANCE))
-               
+
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         vs = state.smoothedVS
