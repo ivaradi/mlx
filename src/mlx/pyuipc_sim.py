@@ -315,6 +315,12 @@ class Values(object):
 
         self.xpdrC = False
 
+        self.apMaster = False
+        self.apHeadingHold = False
+        self.apHeading = 124
+        self.apAltitudeHold = False
+        self.apAltitude = 7000
+
     def read(self, offset, type):
         """Read the value at the given offset."""
         try:
@@ -389,6 +395,16 @@ class Values(object):
             return 1 if self.slew else 0
         elif offset==0x0628:       # Replay
             return 1 if self.replay else 0
+        elif offset==0x07bc:       # AP Master switch
+            return 1 if self.apMaster else 0
+        elif offset==0x07c8:       # AP heading hold
+            return 1 if self.apHeadingHold else 0
+        elif offset==0x07cc:       # AP heading
+            return int(self.apHeading * 65536.0 / 360.0)
+        elif offset==0x07d0:       # AP altitude hold
+            return 1 if self.apAltitudeHold else 0
+        elif offset==0x07d4:       # AP altitude
+            return int(self.apAltitude * const.FEETTOMETRES * 65536.0)
         elif offset==0x088c:       # Engine #1 throttle
             return self._getThrottle(self.ENGINE_1)
         elif offset==0x0924:       # Engine #2 throttle
@@ -633,6 +649,16 @@ class Values(object):
             self.slew = value!=0
         elif offset==0x0628:       # Replay
             self.replay = value!=0
+        elif offset==0x07bc:       # AP Master switch
+            self.apMaster = value!=0
+        elif offset==0x07c8:       # AP heading hold
+            self.apHeadingHold = value!=0
+        elif offset==0x07cc:       # AP heading
+            self.apHeading = value * 360.0 / 65536.0
+        elif offset==0x07d0:       # AP altitude hold
+            self.apAltitudeHold = value!=0
+        elif offset==0x07d4:       # AP altitude
+            self.apAltitude = value / const.FEETTOMETRES / 65536.0
         elif offset==0x088c:       # Engine #1 throttle
             self._setThrottle(self.ENGINE_1, value)
         elif offset==0x0924:       # Engine #2 throttle
@@ -1056,7 +1082,7 @@ class CLI(cmd.Cmd):
     @staticmethod
     def pyuipc2degree(value):
         """Convert the given PyUIPC value into a degree."""
-        return valie * 360.0 / 65536.0 / 65536.0
+        return value * 360.0 / 65536.0 / 65536.0
 
     @staticmethod
     def fuelLevel2pyuipc(level):
@@ -1087,6 +1113,26 @@ class CLI(cmd.Cmd):
     def pyuipc2throttle(value):
         """Convert the given PyUIPC value into a throttle value."""
         return value * 100.0 / 16384.0
+
+    @staticmethod
+    def heading2pyuipc(heading):
+        """Convert the given heading (as a string) into a PyUIPC value."""
+        return int(float(heading) * 65536.0 / 360.0)
+
+    @staticmethod
+    def pyuipc2heading(value):
+        """Convert the given PyUIPC value into a heading."""
+        return value * 360.0 / 65536.0
+
+    @staticmethod
+    def altitude2pyuipc(altitude):
+        """Convert the given altitude (as a string) into a PyUIPC value."""
+        return int(float(altitude) * const.FEETTOMETRES * 65536.0)
+
+    @staticmethod
+    def pyuipc2altitude(value):
+        """Convert the given PyUIPC value into an altitude."""
+        return value / const.FEETTOMETRES / 65536.0
 
     def __init__(self):
         """Construct the CLI."""
@@ -1379,6 +1425,19 @@ class CLI(cmd.Cmd):
         self._valueHandlers["xpdrC"] = ([(0x7b91, "b")],
                                         lambda value: value,
                                         lambda word: int(word))
+
+        self._valueHandlers["apMaster"] = ([(0x07bc, "u")],
+                                           CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["apHeadingHold"] = ([(0x07c8, "u")],
+                                                CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["apHeading"] = ([(0x07cc, "H")],
+                                            CLI.pyuipc2heading,
+                                            CLI.heading2pyuipc)
+        self._valueHandlers["apAltitudeHold"] = ([(0x07d0, "u")],
+                                                 CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["apAltitude"] = ([(0x07d4, "H")],
+                                             CLI.pyuipc2altitude,
+                                             CLI.altitude2pyuipc)
 
     def default(self, line):
         """Handle unhandle commands."""
