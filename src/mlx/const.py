@@ -186,7 +186,7 @@ _stageStrings = { STAGE_BOARDING : "boarding",
 def stage2string(stage):
     """Convert the given stage to a lower-case string."""
     return _stageStrings[stage] if stage in _stageStrings else None
-        
+
 #-------------------------------------------------------------------------------
 
 ## Plane status: unknown
@@ -232,7 +232,7 @@ _flightTypeStrings = { FLIGHTTYPE_SCHEDULED : "scheduled",
 def flightType2string(flightType):
     """Get the string equivalent of the given flight type."""
     return _flightTypeStrings[flightType] \
-           if flightType in _flightTypeStrings else None    
+           if flightType in _flightTypeStrings else None
 
 #-------------------------------------------------------------------------------
 
@@ -324,7 +324,7 @@ _messageTypeStrings = { MESSAGETYPE_LOGGER_ERROR : "loggerError",
 def messageType2string(messageType):
     """Get the string equivalent of the given message type."""
     return _messageTypeStrings[messageType] \
-           if messageType in _messageTypeStrings else None    
+           if messageType in _messageTypeStrings else None
 
 #-------------------------------------------------------------------------------
 
@@ -357,7 +357,7 @@ _messageLevelStrings = { MESSAGELEVEL_NONE : "none",
 def messageLevel2string(messageLevel):
     """Get the string equivalent of the given message level."""
     return _messageLevelStrings[messageLevel] \
-           if messageLevel in _messageLevelStrings else None    
+           if messageLevel in _messageLevelStrings else None
 
 def string2messageLevel(str):
     """Get the message level for the given string."""
@@ -475,7 +475,7 @@ _fuelTankStrings = { FUELTANK_CENTRE : "centre",
 def fuelTank2string(fuelTank):
     """Get the string equivalent of the given fuelTank."""
     return _fuelTankStrings[fuelTank] \
-           if fuelTank in _fuelTankStrings else None    
+           if fuelTank in _fuelTankStrings else None
 
 #-------------------------------------------------------------------------------
 
@@ -524,4 +524,3 @@ for i in range(60, 84):
 languages = ["$system", "en_GB", "hu_HU"]
 
 #-------------------------------------------------------------------------------
-

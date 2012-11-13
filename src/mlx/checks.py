@@ -926,8 +926,32 @@ class LandingLightsChecker(PatientFaultChecker):
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         score = 0 if flight.stage==const.STAGE_LANDING else 1
-        message = "Landing lights were %s" % (("on" if state.landingLightsOn else "off"),)
+        message = "Landing lights were %s" % \
+                  (("on" if state.landingLightsOn else "off"),)
         flight.handleFault(LandingLightsChecker, state.timestamp,
+                           FaultChecker._appendDuring(flight, message),
+                           score)
+
+#---------------------------------------------------------------------------------------
+
+class TransponderChecker(PatientFaultChecker):
+    """Check if the transponder is used properly."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.xpdrC is not None and \
+               ((state.xpdrC and flight.stage in
+                 [const.STAGE_BOARDING, const.STAGE_PARKING]) or \
+                (not state.xpdrC and flight.stage in
+                 [const.STAGE_TAKEOFF, const.STAGE_RTO, const.STAGE_CLIMB,
+                  const.STAGE_CRUISE, const.STAGE_DESCENT,
+                  const.STAGE_LANDING, const.STAGE_GOAROUND]))
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        score = 0
+        message = "Transponder was %s" % \
+                  (("mode C" if state.xpdrC else "standby"),)
+        flight.handleFault(TransponderChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, message),
                            score)
 

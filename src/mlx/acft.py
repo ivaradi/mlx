@@ -118,6 +118,8 @@ class Aircraft(object):
 
         self._appendLightsCheckers()
 
+        self._checkers.append(checks.TransponderChecker())
+
         self._checkers.append(checks.BankChecker())
 
         self._checkers.append(checks.FlapsRetractChecker())
