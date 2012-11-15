@@ -247,12 +247,15 @@ class AircraftState(object):
     - cog: the centre of gravity
     - xpdrC: a boolean indicating whether the transponder is in C mode, or
       None, if the state cannot be read properly
-
-    FIXME: needed when taxiing only:
-    - payload weight
-
-    FIXME: needed rarely:
-    - latitude, longitude
-    - transporter
-    - visibility
+    - apMaster: a boolean indicating whether the autopilot is switched on, or
+      None, if the state cannot be read properly
+    - apHeadingHold: a boolean indicating whether the autopilot's heading hold
+      mode is switched on, or None, if the state cannot be read properly
+    - apHeading: the autopilot heading value in degrees (float),
+      or None, if the state cannot be read properly
+    - apAltitudeHold: a boolean indicating whether the autopilot's altitude hold
+      mode is switched on, or None, if the state cannot be read properly
+    - apAltitude: the autopilot altitude value in feet (float),
+      or None, if the state cannot be read properly
     """
+

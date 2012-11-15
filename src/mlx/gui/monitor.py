@@ -36,7 +36,7 @@ class MonitorWindow(gtk.Window):
         alignment.set_padding(padding_top = 4, padding_bottom = 10,
                               padding_left = 16, padding_right = 16)
 
-        table = gtk.Table(rows = 7, columns = 12)
+        table = gtk.Table(rows = 7, columns = 14)
         table.set_homogeneous(False)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -190,6 +190,23 @@ class MonitorWindow(gtk.Window):
         self._xpdrC = gtk.Label("XPDR CHARLIE")
         table.attach(self._xpdrC, 10, 12, 6, 7)
 
+        self._apMaster = gtk.Label("AP MASTER")
+        table.attach(self._apMaster, 0, 1, 7, 8)
+
+        self._apHeadingHold = gtk.Label("AP HDG HOLD")
+        table.attach(self._apHeadingHold, 1, 2, 7, 8)
+
+        (label, self._apHeading) = self._createLabeledEntry("AP HDG:", 5)
+        table.attach(label, 2, 3, 7, 8)
+        table.attach(self._apHeading, 3, 4, 7, 8)
+
+        self._apAltitudeHold = gtk.Label("AP ALT HOLD")
+        table.attach(self._apAltitudeHold, 5, 6, 7, 8)
+
+        (label, self._apAltitude) = self._createLabeledEntry("AP ALT:", 10)
+        table.attach(label, 6, 7, 7, 8)
+        table.attach(self._apAltitude, 7, 8, 7, 8)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -265,6 +282,11 @@ class MonitorWindow(gtk.Window):
             self._windDirection.set_text("-")
             self._position.set_text("-")
             self._xpdrC.set_sensitive(False)
+            self._apMaster.set_sensitive(False)
+            self._apHeadingHold.set_sensitive(False)
+            self._apHeading.set_text("-")
+            self._apAltitudeHold.set_sensitive(False)
+            self._apAltitude.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -344,5 +366,11 @@ class MonitorWindow(gtk.Window):
             self._position.set_text(util.getCoordinateString((aircraftState.latitude,
                                                               aircraftState.longitude)))
             self._xpdrC.set_sensitive(aircraftState.xpdrC)
+
+            self._apMaster.set_sensitive(aircraftState.apMaster)
+            self._apHeadingHold.set_sensitive(aircraftState.apHeadingHold)
+            self._apHeading.set_text("%03.0f" % (aircraftState.apHeading,))
+            self._apAltitudeHold.set_sensitive(aircraftState.apAltitudeHold)
+            self._apAltitude.set_text("%5.0f" % (aircraftState.apAltitude,))
 
 #------------------------------------------------------------------------------

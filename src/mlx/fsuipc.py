@@ -1188,7 +1188,12 @@ class AircraftModel(object):
                       ("windDirection", 0x0e92, "H"),
                       ("visibility", 0x0e8a, "H"),
                       ("cog", 0x2ef8, "f"),
-                      ("xpdrC", 0x7b91, "b")]
+                      ("xpdrC", 0x7b91, "b"),
+                      ("apMaster", 0x07bc, "d"),
+                      ("apHeadingHold", 0x07c8, "d"),
+                      ("apHeading", 0x07cc, "H"),
+                      ("apAltitudeHold", 0x07d0, "d"),
+                      ("apAltitude", 0x07d4, "u")]
 
     specialModels = []
 
@@ -1386,6 +1391,13 @@ class AircraftModel(object):
         state.cog = data[self._monidx_cog]
 
         state.xpdrC = data[self._monidx_xpdrC]==0
+
+        state.apMaster = data[self._monidx_apMaster]!=0
+        state.apHeadingHold = data[self._monidx_apHeadingHold]!=0
+        state.apHeading = data[self._monidx_apHeading] * 360.0 / 65536.0
+        state.apAltitudeHold = data[self._monidx_apAltitudeHold]!=0
+        state.apAltitude = data[self._monidx_apAltitude] / \
+                           const.FEETTOMETRES / 65536.0
 
         return state
 
