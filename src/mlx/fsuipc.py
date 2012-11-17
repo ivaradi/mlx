@@ -1619,6 +1619,12 @@ class PMDGBoeing737NGModel(B737Model):
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
         self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
+        self._addOffsetWithIndexMember(data, 0x6216, "b", "_pmdgidx_xpdr")
+        self._addOffsetWithIndexMember(data, 0x6227, "b", "_pmdgidx_ap")
+        self._addOffsetWithIndexMember(data, 0x6228, "b", "_pmdgidx_aphdgsel")
+        self._addOffsetWithIndexMember(data, 0x622a, "b", "_pmdgidx_apalthold")
+        self._addOffsetWithIndexMember(data, 0x622c, "H", "_pmdgidx_aphdg")
+        self._addOffsetWithIndexMember(data, 0x622e, "H", "_pmdgidx_apalt")
 
         if fsType==const.SIM_MSFSX:
             print "FSX detected, adding position lights switch offset"
@@ -1634,6 +1640,17 @@ class PMDGBoeing737NGModel(B737Model):
                                                                    data)
         if data[self._pmdgidx_switches]&0x01==0x01:
             state.altimeter = 1013.25
+
+        state.xpdrC = data[self._pmdgidx_xpdr]==4
+
+        state.apMaster = data[self._pmdgidx_ap]&0x02==0x02
+
+        state.apHeadingHold = data[self._pmdgidx_aphdgsel]==2
+        state.apHeading = data[self._pmdgidx_aphdg]
+
+        apalthold = data[self._pmdgidx_apalthold]
+        state.apAltitudeHold = apalthold>=3 and apalthold<=6
+        state.apAltitude = data[self._pmdgidx_apalt]
 
         if self._fsType==const.SIM_MSFSX:
             state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
