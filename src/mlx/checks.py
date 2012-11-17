@@ -1189,7 +1189,7 @@ class NavLightsChecker(PatientFaultChecker):
         """Check if the fault condition holds."""
         return flight.stage!=const.STAGE_BOARDING and \
                flight.stage!=const.STAGE_PARKING and \
-               not state.navLightsOn
+               state.navLightsOn is False
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""

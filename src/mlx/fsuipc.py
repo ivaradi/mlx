@@ -1788,6 +1788,7 @@ class DAF70Model(F70Model):
         state = super(DAF70Model, self).getAircraftState(aircraft,
                                                          timestamp,
                                                          data)
+        state.navLightsOn = None
         state.landingLightsOn = None
         state.nav2_manual = aircraft.flight.stage!=const.STAGE_CRUISE
 
