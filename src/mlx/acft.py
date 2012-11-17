@@ -102,6 +102,7 @@ class Aircraft(object):
         self._checkers.append(checks.GearsLogger())
         self._checkers.append(checks.CruiseSpeedLogger())
         self._checkers.append(checks.SpoilerLogger())
+        self._checkers.append(checks.APLogger())
 
         if config.isMessageTypeFS(const.MESSAGETYPE_VISIBILITY):
             self._checkers.append(checks.VisibilityChecker())

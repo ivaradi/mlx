@@ -665,6 +665,154 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
 
 #---------------------------------------------------------------------------------------
 
+class APLogger(StateChangeLogger, DelayedChangeMixin):
+    """Log the state of the autopilot."""
+    @staticmethod
+    def _logBoolean(logger, timestamp, what, value):
+        """Log a boolean value.
+
+        what is the name of the value that is being logged."""
+        message = what + " "
+        if value is None:
+            message += "cannot be detected, will not log"
+        else:
+            message += "is " + ("ON" if value else "OFF")
+        logger.message(timestamp, message)
+
+    @staticmethod
+    def _logNumeric(logger, timestamp, what, format, value):
+        """Log a numerical value."""
+        message = what
+        if value is None:
+            message += u" cannot be detected, will not log"
+        else:
+            message += u": " + format % (value,)
+        logger.message(timestamp, message)
+
+    @staticmethod
+    def _logAPMaster(logger, timestamp, state):
+        """Log the AP master state."""
+        APLogger._logBoolean(logger, timestamp, "AP master",
+                             state.apMaster)
+
+    @staticmethod
+    def _logAPHeadingHold(logger, timestamp, state):
+        """Log the AP heading hold state."""
+        APLogger._logBoolean(logger, timestamp, "AP heading hold",
+                             state.apHeadingHold)
+
+    @staticmethod
+    def _logAPHeading(logger, timestamp, state):
+        """Log the AP heading."""
+        APLogger._logNumeric(logger, timestamp, u"AP heading",
+                             u"%03.0f\u00b0", state.apHeading)
+
+    @staticmethod
+    def _logAPAltitudeHold(logger, timestamp, state):
+        """Log the AP altitude hold state."""
+        APLogger._logBoolean(logger, timestamp, "AP altitude hold",
+                             state.apAltitudeHold)
+
+    @staticmethod
+    def _logAPAltitude(logger, timestamp, state):
+        """Log the AP heading."""
+        APLogger._logNumeric(logger, timestamp, u"AP altitude",
+                             u"%.0f ft", state.apAltitude)
+
+    def __init__(self):
+        """Construct the state logger."""
+        StateChangeLogger.__init__(self)
+        DelayedChangeMixin.__init__(self)
+        self._lastLoggedState = None
+
+    def _getValue(self, state):
+        """Convert the relevant values from the given state into a tuple."""
+        return (state.apMaster,
+                state.apHeadingHold, state.apHeading,
+                state.apAltitudeHold, state.apAltitude)
+
+    def _isDifferent(self, oldValue, newValue):
+        """Determine if the given old and new values are different (enough) to
+        be logged."""
+        (oldAPMaster, oldAPHeadingHold, oldAPHeading,
+         oldAPAltitudeHold, oldAPAltitude) = oldValue
+        (apMaster, apHeadingHold, apHeading,
+         apAltitudeHold, apAltitude) = newValue
+
+        if apMaster is not None and apMaster!=oldAPMaster:
+            return True
+        if apMaster is False:
+            return False
+
+        if apHeadingHold is not None and apHeadingHold!=oldAPHeadingHold:
+            return True
+        if apHeadingHold is not False and apHeading is not None and \
+            apHeading!=oldAPHeading:
+            return True
+
+        if apAltitudeHold is not None and apAltitudeHold!=oldAPAltitudeHold:
+            return True
+        if apAltitudeHold is not False and apAltitude is not None and \
+            apAltitude!=oldAPAltitude:
+            return True
+
+        return False
+
+    def logState(self, flight, logger, state):
+        """Log the autopilot state."""
+        timestamp = DelayedChangeMixin._getLogTimestamp(self, state, False)
+        if self._lastLoggedState is None:
+            self._logAPMaster(logger, timestamp, state)
+            if state.apMaster is not False or state.apHeadingHold is None:
+                self._logAPHeadingHold(logger, timestamp, state)
+            if state.apMaster is not False and \
+               (state.apHeadingHold is not False or state.apHeading is None):
+                self._logAPHeading(logger, timestamp, state)
+            if state.apMaster is not False or state.apAltitudeHold is None:
+                self._logAPAltitudeHold(logger, timestamp, state)
+            if state.apMaster is not False and \
+               (state.apAltitudeHold is not False or state.apAltitude is None):
+                self._logAPAltitude(logger, timestamp, state)
+            self._firstCall = False
+        else:
+            oldState = self._lastLoggedState
+
+            apMasterTurnedOn = False
+            if state.apMaster is not None and state.apMaster!=oldState.apMaster:
+                apMasterTurnedOn = state.apMaster
+                self._logAPMaster(logger, timestamp, state)
+
+            if state.apMaster is not False:
+                apHeadingHoldTurnedOn = False
+                if state.apHeadingHold is not None and \
+                   (state.apHeadingHold!=oldState.apHeadingHold or
+                    apMasterTurnedOn):
+                    apHeadingHoldTurnedOn = state.apHeadingHold
+                    self._logAPHeadingHold(logger, timestamp, state)
+
+                if state.apHeadingHold is not False and \
+                   state.apHeading is not None and \
+                   (state.apHeading!=oldState.apHeading or apMasterTurnedOn or
+                    apHeadingHoldTurnedOn):
+                    self._logAPHeading(logger, timestamp, state)
+
+                apAltitudeHoldTurnedOn = False
+                if state.apAltitudeHold is not None and \
+                   (state.apAltitudeHold!=oldState.apAltitudeHold or
+                    apMasterTurnedOn):
+                    apAltitudeHoldTurnedOn = state.apAltitudeHold
+                    self._logAPAltitudeHold(logger, timestamp, state)
+
+                if state.apAltitudeHold is not False and \
+                   state.apAltitude is not None and \
+                   (state.apAltitude!=oldState.apAltitude or apMasterTurnedOn or
+                    apAltitudeHoldTurnedOn):
+                    self._logAPAltitude(logger, timestamp, state)
+
+        self._lastLoggedState = state
+
+#---------------------------------------------------------------------------------------
+
 class FaultChecker(StateChecker):
     """Base class for checkers that look for faults."""
     @staticmethod
