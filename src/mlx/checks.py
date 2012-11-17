@@ -156,7 +156,8 @@ class TakeOffLogger(StateChecker):
             logger.message(state.timestamp,
                            "Takeoff pitch: %.1f degrees" % (state.pitch,))
             logger.message(state.timestamp,
-                           "Centre of gravity:  %.1f%%" % (state.cog*100.0,))
+                           "CG/Trim: %.1f%%/%.2f" % \
+                           (state.cog*100.0, state.elevatorTrim))
             self._onTheGround = False
 
 #---------------------------------------------------------------------------------------

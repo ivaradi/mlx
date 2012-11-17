@@ -10,6 +10,7 @@ import time
 import calendar
 import sys
 import codecs
+import math
 
 if os.name == "nt" and "FORCE_PYUIPC_SIM" not in os.environ:
     import pyuipc
@@ -1193,7 +1194,8 @@ class AircraftModel(object):
                       ("apHeadingHold", 0x07c8, "d"),
                       ("apHeading", 0x07cc, "H"),
                       ("apAltitudeHold", 0x07d0, "d"),
-                      ("apAltitude", 0x07d4, "u")]
+                      ("apAltitude", 0x07d4, "u"),
+                      ("elevatorTrim", 0x2ea0, "f")]
 
     specialModels = []
 
@@ -1398,6 +1400,9 @@ class AircraftModel(object):
         state.apAltitudeHold = data[self._monidx_apAltitudeHold]!=0
         state.apAltitude = data[self._monidx_apAltitude] / \
                            const.FEETTOMETRES / 65536.0
+
+
+        state.elevatorTrim = data[self._monidx_elevatorTrim] * 180.0 / math.pi
 
         return state
 

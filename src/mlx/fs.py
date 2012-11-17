@@ -257,5 +257,6 @@ class AircraftState(object):
       mode is switched on, or None, if the state cannot be read properly
     - apAltitude: the autopilot altitude value in feet (float),
       or None, if the state cannot be read properly
+    - elevatorTrim: a float value indicating the deflection of the elevator
+      trim in degrees
     """
-
