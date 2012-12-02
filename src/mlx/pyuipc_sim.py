@@ -321,6 +321,8 @@ class Values(object):
         self.apAltitudeHold = False
         self.apAltitude = 7000
 
+        self.elevatorTrim = 0.0
+
     def read(self, offset, type):
         """Read the value at the given offset."""
         try:
@@ -516,6 +518,8 @@ class Values(object):
             return self.n1[self.ENGINE_2]
         elif offset==0x2200:       # Engine #3 N1
             return self.n1[self.ENGINE_3]
+        elif offset==0x2ea0:       # Elevator trim
+            return self.elevatorTrim * math.pi / 180.0
         elif offset==0x2ef8:       # Centre of Gravity
             return self.cog
         elif offset==0x30c0:       # Gross weight
@@ -764,6 +768,8 @@ class Values(object):
             self.n1[self.ENGINE_2] = value
         elif offset==0x2200:       # Engine #3 N1
             self.n1[self.ENGINE_3] = value
+        elif offset==0x2ea0:       # Elevator trim
+            self.elevatorTrim = value * 180.0 / math.pi
         elif offset==0x2ef8:       # Centre of Gravity
             self.cog = value
         elif offset==0x30c0:       # Gross weight
@@ -1438,6 +1444,11 @@ class CLI(cmd.Cmd):
         self._valueHandlers["apAltitude"] = ([(0x07d4, "H")],
                                              CLI.pyuipc2altitude,
                                              CLI.altitude2pyuipc)
+
+        self._valueHandlers["trim"] = ([(0x2ea0, "f")],
+                                       lambda value: value * 180.0 / math.pi,
+                                       lambda word:
+                                       float(word) * math.pi / 180.0)
 
     def default(self, line):
         """Handle unhandle commands."""
