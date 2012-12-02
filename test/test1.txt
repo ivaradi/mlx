@@ -1,3 +1,5 @@
+set onTheGround=yes
+set gs=0
 set xpdrC=1
 set lights=0
 set noseGear=100
@@ -6,6 +8,7 @@ set zfw=46741 hour=7 min=50
 set latitude=47.44 longitude=19.26
 set nav1=115.9
 set adf1=382
+set parking=yes
 set parking=no
 set gs=10 ias=10
 set flapsControl=37.5

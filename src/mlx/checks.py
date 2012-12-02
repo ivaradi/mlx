@@ -55,8 +55,7 @@ class StageChecker(StateChecker):
                (not state.trickMode and state.groundSpeed>5.0):
                 aircraft.setStage(state, const.STAGE_PUSHANDTAXI)
         elif stage==const.STAGE_PUSHANDTAXI or stage==const.STAGE_RTO:
-            if state.landingLightsOn or state.strobeLightsOn or \
-               state.groundSpeed>80.0:
+            if state.landingLightsOn or state.strobeLightsOn:
                 aircraft.setStage(state, const.STAGE_TAKEOFF)
         elif stage==const.STAGE_TAKEOFF:
             if not state.gearsDown or \
@@ -1284,6 +1283,16 @@ class ReverserChecker(SimpleFaultChecker):
 
 class SpeedChecker(SimpleFaultChecker):
     """Check if the speed is in the prescribed limits."""
+    @staticmethod
+    def logSpeedFault(flight, state):
+        """Log the speed fault."""
+        message = "Taxi speed over %.0f %s" % \
+                  (flight.speedFromKnots(50), flight.getEnglishSpeedUnit())
+        flight.handleFault((SpeedChecker, flight.stage), state.timestamp,
+                           FaultChecker._appendDuring(flight, message),
+                           FaultChecker._getLinearScore(50, 80, 10, 15,
+                                                        state.groundSpeed))
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_PUSHANDTAXI,
@@ -1292,12 +1301,55 @@ class SpeedChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        message = "Taxi speed over %.0f %s" % \
-                  (flight.speedFromKnots(50), flight.getEnglishSpeedUnit())
-        flight.handleFault(SpeedChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight, message),
-                           FaultChecker._getLinearScore(50, 80, 10, 15,
-                                                        state.groundSpeed))
+        self.logSpeedFault(flight, state)
+
+#---------------------------------------------------------------------------------------
+
+class NoStrobeSpeedChecker(StateChecker):
+    """Checker for the ground speed of aircraft that have no strobe lights by
+    which to detect the takeoff stage.
+
+    If, during the PUSHANDTAXI stage the speed exceeds 50 knots, the state as
+    saved as a provisional takeoff state. If the speed then decreases below 50
+    knots, or the plane remains on the ground for more than 20 seconds, a taxi
+    speed error is logged with the highest ground speed detected.
+
+    If the plane becomes airborne within 20 seconds, the stage becomes TAKEOFF,
+    and the previously saved takeoff state is logged.
+
+    During the TAXIAFTERLAND stage, speed is checked as in case of
+    SpeedChecker."""
+    def __init__(self):
+        """Initialize the speed checker."""
+        self._takeoffState = None
+        self._highestSpeedState = None
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Check the state as described above."""
+        if flight.stage==const.STAGE_PUSHANDTAXI:
+            self._checkPushAndTaxi(flight, aircraft, state)
+        elif flight.stage==const.STAGE_TAXIAFTERLAND:
+            if state.groundSpeed>50:
+                SpeedChecker.logSpeedFault(flight, state)
+
+    def _checkPushAndTaxi(self, flight, aircraft, state):
+        """Check the speed during the push and taxi stage."""
+        if state.groundSpeed>50:
+            if self._takeoffState is None:
+                self._takeoffState = state
+                self._highestSpeedState = state
+            else:
+                if state.groundSpeed>self._highestSpeedState.groundSpeed:
+                    self._highestSpeedState = state
+
+                if state.timestamp > (self._takeoffState.timestamp + 20):
+                    SpeedChecker.logSpeedFault(flight, self._highestSpeedState)
+                elif not state.onTheGround:
+                    aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
+                    self._takeoffState = None
+        elif self._takeoffState is not None:
+            SpeedChecker.logSpeedFault(flight, self._highestSpeedState)
+            self._takeoffState = None
 
 #---------------------------------------------------------------------------------------
 

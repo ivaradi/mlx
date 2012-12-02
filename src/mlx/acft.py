@@ -137,6 +137,7 @@ class Aircraft(object):
         self._checkers.append(checks.PayloadChecker())
 
         self._checkers.append(checks.SpeedChecker())
+        #self._checkers.append(checks.NoStrobeSpeedChecker())
         self._checkers.append(checks.VSChecker())
 
         timeout = 5.0 + config.realIASSmoothingLength - 1
