@@ -65,29 +65,29 @@ class Page(gtk.Alignment):
         eventBox = gtk.EventBox()
 
         alignment = gtk.Alignment(xalign = 0.0, xscale = 0.0)
-        
+
         titleLabel = gtk.Label(title)
         titleLabel.modify_font(pango.FontDescription("bold 24"))
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 6, padding_right = 0)
-                              
+
         alignment.add(titleLabel)
         eventBox.add(alignment)
-        
+
         self._vbox.pack_start(eventBox, False, False, 0)
 
         self._titleEventBox = eventBox
         self._titleLabel = titleLabel
 
-        mainBox = gtk.VBox()        
+        mainBox = gtk.VBox()
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
-                                  xscale = 1.0, yscale = 1.0)        
+                                  xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 16, padding_bottom = 16,
                               padding_left = 16, padding_right = 16)
         alignment.add(mainBox)
         self._vbox.pack_start(alignment, True, True, 0)
-        
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 16,
@@ -101,7 +101,7 @@ class Page(gtk.Alignment):
             longerHelp = help
         else:
             longerHelp = completedHelp
-        
+
         self._helpLabel = gtk.Label(completedHelp)
         # FIXME: should be a constant in common
         self._helpLabel.set_justify(gtk.Justification.CENTER if pygobject
@@ -113,7 +113,7 @@ class Page(gtk.Alignment):
         self._mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                             xscale = 1.0, yscale = 1.0)
         mainBox.pack_start(self._mainAlignment, True, True, 0)
-                                            
+
         buttonAlignment =  gtk.Alignment(xalign = 1.0, xscale=0.0, yscale = 0.0)
         buttonAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                     padding_left = 16, padding_right = 16)
@@ -186,7 +186,7 @@ class Page(gtk.Alignment):
 
         self._titleEventBox.modify_bg(0, style.bg[3])
         self._titleLabel.modify_fg(0, style.fg[3])
-    
+
     def initialize(self):
         """Initialize the page.
 
@@ -231,7 +231,7 @@ class Page(gtk.Alignment):
     def goBack(self):
         """Go to the page we were invoked from."""
         assert self._fromPage is not None
-        
+
         self._wizard.setCurrentPage(self._fromPage, finalize = False)
 
     def flightEnded(self):
@@ -244,7 +244,7 @@ class Page(gtk.Alignment):
     def _cancelFlight(self, button):
         """Called when the Cancel flight button is clicked."""
         self._wizard.gui.cancelFlight()
-    
+
 #-----------------------------------------------------------------------------
 
 class LoginPage(Page):
@@ -327,7 +327,7 @@ class LoginPage(Page):
         self._pilotID.set_text(config.pilotID)
         self._password.set_text(config.password)
         self._rememberButton.set_active(config.rememberPassword)
-        self._setControls(None)    
+        self._setControls(None)
 
     def _setControls(self, entry = None):
         """Set the sensitivity of the various controls.
@@ -371,7 +371,7 @@ class LoginPage(Page):
 
             config.pilotID = self._pilotID.get_text()
 
-            rememberPassword = self._rememberButton.get_active()                
+            rememberPassword = self._rememberButton.get_active()
             config.password = result.password if rememberPassword else ""
 
             config.rememberPassword = rememberPassword
@@ -385,7 +385,7 @@ class FlightSelectionPage(Page):
     """The page to select the flight."""
     def __init__(self, wizard):
         """Construct the flight selection page."""
-        help = xstr("flightsel_help") 
+        help = xstr("flightsel_help")
         completedHelp = xstr("flightsel_chelp")
         super(FlightSelectionPage, self).__init__(wizard, xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
@@ -415,7 +415,7 @@ class FlightSelectionPage(Page):
         self._flightListPopupMenu = None
 
         flightSelection = self._flightList.get_selection()
-        flightSelection.connect("changed", self._selectionChanged)        
+        flightSelection.connect("changed", self._selectionChanged)
 
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._flightList)
@@ -449,7 +449,7 @@ class FlightSelectionPage(Page):
                                           tooltip = xstr("flightsel_load_tooltip"))
         self._loadButton.connect("clicked", self._loadButtonClicked)
         self._loadDialog = None
-        
+
         self._button = self.addNextButton(sensitive = False,
                                           clicked =  self._forwardClicked)
 
@@ -461,7 +461,7 @@ class FlightSelectionPage(Page):
         self._loadButton.set_sensitive(True)
         self._refreshButton.set_sensitive(self._wizard.loggedIn)
         self._buildFlights()
-            
+
     def finalize(self):
         """Finalize the page."""
         self._flightList.set_sensitive(False)
@@ -520,7 +520,7 @@ class FlightSelectionPage(Page):
                 dialog.format_secondary_markup(secondary)
                 dialog.run()
                 dialog.hide()
-                
+
     def _refreshClicked(self, button):
         """Called when the refresh button is clicked."""
         self._wizard.reloadFlights(self._refreshCallback)
@@ -550,7 +550,7 @@ class FlightSelectionPage(Page):
             try:
                 with open(fileName, "rt") as f:
                     bookedFlight.readFromFile(f)
-                self._addFlight(bookedFlight)                
+                self._addFlight(bookedFlight)
             except Exception, e:
                 print "Failed to load flight:", str(e)
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
@@ -562,8 +562,8 @@ class FlightSelectionPage(Page):
                 secondary = xstr("flightsel_load_failed_sec")
                 dialog.format_secondary_markup(secondary)
                 dialog.run()
-                dialog.hide()                
-            
+                dialog.hide()
+
     def _forwardClicked(self, button):
         """Called when the forward button was clicked."""
         if self._completed:
@@ -581,7 +581,7 @@ class FlightSelectionPage(Page):
         flight = self._getSelectedFlight()
         self._wizard._bookedFlight = flight
         self._wizard.gui.enableFlightInfo()
-        
+
         self._updateDepartureGate()
 
     def _getSelectedFlight(self):
@@ -590,7 +590,7 @@ class FlightSelectionPage(Page):
         (listStore, iter) = selection.get_selected()
         path = listStore.get_path(iter)
         [index] = path.get_indices() if pygobject else path
-        
+
         return self._flights[index]
 
     def _listButtonPressed(self, widget, event):
@@ -609,7 +609,7 @@ class FlightSelectionPage(Page):
             menu.popup(None, None, None, None, event.button, event.time)
         else:
             menu.popup(None, None, None, event.button, event.time)
-        
+
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
         flight = self._wizard._bookedFlight
@@ -624,7 +624,7 @@ class FlightSelectionPage(Page):
         else:
             self._nextDistance = 2
             self._wizard.jumpPage(2)
-            
+
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
@@ -653,7 +653,7 @@ class FlightSelectionPage(Page):
         """Get the dialog to load a flight file."""
         if self._saveDialog is not None:
             return self._saveDialog
-        
+
         gui = self._wizard.gui
         dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_save_title"),
@@ -662,28 +662,28 @@ class FlightSelectionPage(Page):
                                                   RESPONSETYPE_CANCEL,
                                                   gtk.STOCK_OK, RESPONSETYPE_OK),
                                        parent = gui.mainWindow)
-        dialog.set_modal(True)            
+        dialog.set_modal(True)
         dialog.set_do_overwrite_confirmation(True)
 
         filter = gtk.FileFilter()
         filter.set_name(xstr("flightsel_filter_flights"))
         filter.add_pattern("*.vaflight")
         dialog.add_filter(filter)
-            
+
         filter = gtk.FileFilter()
         filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         dialog.add_filter(filter)
 
         self._saveDialog = dialog
-        
-        return dialog        
-    
+
+        return dialog
+
     def _getLoadDialog(self):
         """Get the dialog to load a flight file."""
         if self._loadDialog is not None:
             return self._loadDialog
-        
+
         gui = self._wizard.gui
         dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_load_title"),
@@ -692,21 +692,21 @@ class FlightSelectionPage(Page):
                                                   RESPONSETYPE_CANCEL,
                                                   gtk.STOCK_OK, RESPONSETYPE_OK),
                                        parent = gui.mainWindow)
-        dialog.set_modal(True)            
+        dialog.set_modal(True)
 
         filter = gtk.FileFilter()
         filter.set_name(xstr("flightsel_filter_flights"))
         filter.add_pattern("*.vaflight")
         dialog.add_filter(filter)
-            
+
         filter = gtk.FileFilter()
         filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         dialog.add_filter(filter)
 
         self._loadDialog = dialog
-        
-        return dialog        
+
+        return dialog
 
     def _getListPopupMenu(self):
         """Get the flight list popup menu."""
@@ -720,7 +720,7 @@ class FlightSelectionPage(Page):
             menuItem.show()
 
             menu.append(menuItem)
-        
+
             menuItem = gtk.MenuItem()
             menuItem.set_label(xstr("flightsel_popup_save"))
             menuItem.set_use_underline(True)
@@ -737,12 +737,12 @@ class FlightSelectionPage(Page):
         """Called when the Select menu item is activated in the popup menu."""
         if not self._completed:
             self._flightSelected()
-    
+
     def _popupSave(self, menuItem):
         """Called when the Save menu item is activated in the popup menu."""
         if not self._completed:
             self._saveSelected()
-    
+
 #-----------------------------------------------------------------------------
 
 class GateSelectionPage(Page):
@@ -752,7 +752,7 @@ class GateSelectionPage(Page):
         """Construct the gate selection page."""
         super(GateSelectionPage, self).__init__(wizard, xstr("gatesel_title"),
                                                 xstr("gatesel_help"))
-        
+
         self._listStore = gtk.ListStore(str)
         self._gateList = gtk.TreeView(self._listStore)
         column = gtk.TreeViewColumn(None, gtk.CellRendererText(),
@@ -778,12 +778,12 @@ class GateSelectionPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
         alignment.add(scrolledWindow)
 
-        self.setMainWidget(alignment)        
+        self.setMainWidget(alignment)
 
         self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
-        
+
         self._button = self.addNextButton(sensitive = False,
                                           clicked = self._forwardClicked)
 
@@ -830,7 +830,7 @@ class GateSelectionPage(Page):
 
         self._wizard.updatePlane(self._planeUpdated,
                                  self._wizard._bookedFlight.tailNumber,
-                                 const.PLANE_HOME, gateNumber)        
+                                 const.PLANE_HOME, gateNumber)
 
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
@@ -854,7 +854,7 @@ class GateSelectionPage(Page):
             self._wizard.nextPage()
         else:
             self.activate()
-            
+
 #-----------------------------------------------------------------------------
 
 class ConnectPage(Page):
@@ -868,7 +868,7 @@ class ConnectPage(Page):
         super(ConnectPage, self).__init__(wizard, xstr("connect_title"),
                                           xstr("connect_help"),
                                           completedHelp = xstr("connect_chelp"))
-        
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
@@ -961,7 +961,7 @@ class ConnectPage(Page):
 
         aircraftType = aircraftNames[bookedFlight.aircraftType]
         self._aircraft.set_markup("<b>" + aircraftType + "</b>")
-        
+
         self._tailNumber.set_markup("<b>" + bookedFlight.tailNumber + "</b>")
 
         icao = bookedFlight.departureICAO
@@ -1022,19 +1022,19 @@ class PayloadPage(Page):
         self._numCrew.set_tooltip_text(xstr("payload_crew_tooltip"))
         table.attach(self._numCrew, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._numCrew)
-        
+
         label = gtk.Label(xstr("payload_pax"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
-        self._numPassengers = IntegerEntry(defaultValue = 0)        
+        self._numPassengers = IntegerEntry(defaultValue = 0)
         self._numPassengers.set_width_chars(6)
         self._numPassengers.connect("integer-changed", self._weightChanged)
         self._numPassengers.set_tooltip_text(xstr("payload_pax_tooltip"))
         table.attach(self._numPassengers, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._numPassengers)
-        
+
         label = gtk.Label(xstr("payload_bag"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1048,7 +1048,7 @@ class PayloadPage(Page):
         label.set_mnemonic_widget(self._bagWeight)
 
         table.attach(gtk.Label("kg"), 2, 3, 2, 3)
-        
+
         label = gtk.Label(xstr("payload_cargo"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1062,7 +1062,7 @@ class PayloadPage(Page):
         label.set_mnemonic_widget(self._cargoWeight)
 
         table.attach(gtk.Label("kg"), 2, 3, 3, 4)
-        
+
         label = gtk.Label(xstr("payload_mail"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -1076,7 +1076,7 @@ class PayloadPage(Page):
         label.set_mnemonic_widget(self._mailWeight)
 
         table.attach(gtk.Label("kg"), 2, 3, 4, 5)
-        
+
         label = gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
         label.set_alignment(0.0, 0.5)
         label.set_use_markup(True)
@@ -1111,12 +1111,12 @@ class PayloadPage(Page):
     def numCrew(self):
         """The number of the crew members on the flight."""
         return self._numCrew.get_int()
-        
+
     @property
     def numPassengers(self):
         """The number of the passengers on the flight."""
         return self._numPassengers.get_int()
-        
+
     @property
     def bagWeight(self):
         """Get the bag weight entered."""
@@ -1147,7 +1147,7 @@ class PayloadPage(Page):
         self._cargoWeight.set_sensitive(True)
         self._mailWeight.set_int(bookedFlight.mailWeight)
         self._mailWeight.set_sensitive(True)
-        
+
         self._simulatorZFW.set_text("-")
         self._simulatorZFWValue = None
         self._zfwButton.set_sensitive(True)
@@ -1170,7 +1170,7 @@ class PayloadPage(Page):
         zfw += self._cargoWeight.get_int()
         zfw += self._mailWeight.get_int()
         return zfw
-        
+
     def _updateCalculatedZFW(self):
         """Update the calculated ZFW"""
         zfw = self.calculateZFW()
@@ -1186,7 +1186,7 @@ class PayloadPage(Page):
     def _weightChanged(self, entry, weight):
         """Called when one of the weight values or humanm counts has changed."""
         self._updateCalculatedZFW()
-            
+
     def _zfwRequested(self, button):
         """Called when the ZFW is requested from the simulator."""
         self._zfwButton.set_sensitive(False)
@@ -1217,7 +1217,7 @@ class PayloadPage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
 #-----------------------------------------------------------------------------
 
 class TimePage(Page):
@@ -1245,7 +1245,7 @@ class TimePage(Page):
         self._departure = gtk.Label()
         self._departure.set_alignment(0.0, 0.5)
         table.attach(self._departure, 1, 2, 0, 1)
-        
+
         label = gtk.Label(xstr("time_arrival"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
@@ -1318,13 +1318,13 @@ class TimePage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         if not self._completed:
             gui = self._wizard.gui
             gui.beginBusy(xstr("fuel_get_busy"))
-            
+
             gui.simulator.getFuel(self._handleFuel)
         else:
             self._wizard.nextPage()
@@ -1338,7 +1338,7 @@ class TimePage(Page):
         self._wizard.gui.endBusy()
         self._wizard._fuelData = fuelData
         self._wizard.nextPage()
-        
+
 #-----------------------------------------------------------------------------
 
 class FuelTank(gtk.VBox):
@@ -1372,7 +1372,7 @@ class FuelTank(gtk.VBox):
         self._tankFigure.connect("button_press_event", self._buttonPressed)
         self._tankFigure.connect("motion_notify_event", self._motionNotify)
         self._tankFigure.connect("scroll-event", self._scrolled)
-        
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
         alignment.add(self._tankFigure)
@@ -1392,7 +1392,7 @@ class FuelTank(gtk.VBox):
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
-        alignment.add(self._expectedButton) 
+        alignment.add(self._expectedButton)
         self.pack_start(alignment, False, False, 4)
 
     def setCurrent(self, currentWeight):
@@ -1420,7 +1420,7 @@ class FuelTank(gtk.VBox):
         context = eventOrContext if pygobject else tankFigure.window.cairo_create()
         (xOffset, yOffset) = (0, 0) if pygobject \
                              else (tankFigure.allocation.x, tankFigure.allocation.y)
-        
+
         width = tankFigure.get_allocated_width() if pygobject \
                 else tankFigure.allocation.width
         height = tankFigure.get_allocated_height() if pygobject \
@@ -1488,17 +1488,17 @@ class FuelTank(gtk.VBox):
                 (self._rectangleInnerBottom - self._rectangleInnerTop)
         level = min(1.0, max(0.0, level))
         self._expectedButton.set_value(level * self.capacity)
-        
+
     def _buttonPressed(self, tankFigure, event):
         """Called when a button is pressed in the figure.
 
         The expected level will be set there."""
         if self._enabled and event.button==1:
             self._setExpectedFromY(event.y)
-        
+
     def _motionNotify(self, tankFigure, event):
         """Called when the mouse pointer moves within the area of a tank figure."""
-        if self._enabled and event.state==BUTTON1_MASK:            
+        if self._enabled and event.state==BUTTON1_MASK:
             self._setExpectedFromY(event.y)
 
     def _scrolled(self, tankFigure, event):
@@ -1511,18 +1511,18 @@ class FuelTank(gtk.VBox):
                 if event.direction==SCROLL_DOWN:
                     increment *= -1
                 self._expectedButton.spin(SPIN_USER_DEFINED, increment)
-        
+
     def _expectedChanged(self, spinButton):
         """Called when the expected value has changed."""
         self.expectedWeight = spinButton.get_value_as_int()
-        self._redraw()        
+        self._redraw()
 
 #-----------------------------------------------------------------------------
 
 class FuelPage(Page):
     """The page containing the fuel tank filling."""
     _pumpStep = 0.02
-    
+
     def __init__(self, wizard):
         """Construct the page."""
         super(FuelPage, self).__init__(wizard, xstr("fuel_title"),
@@ -1557,7 +1557,7 @@ class FuelPage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         if not self._completed:
@@ -1565,7 +1565,7 @@ class FuelPage(Page):
             self._wizard.gui.beginBusy(xstr("fuel_pump_busy"))
             self._pump()
         else:
-            self._wizard.nextPage()        
+            self._wizard.nextPage()
 
     def _setupTanks(self, tankData):
         """Setup the tanks for the given data."""
@@ -1585,7 +1585,7 @@ class FuelPage(Page):
             self._fuelTable.attach(fuelTank, index, index+1, 0, 1)
             self._fuelTanks.append(fuelTank)
             index += 1
-            
+
         self._fuelAlignment.add(self._fuelTable)
         self.show_all()
 
@@ -1623,7 +1623,7 @@ class FuelPage(Page):
             self._wizard.gui.simulator.setFuelLevel([(fuelTank.fuelTank,
                                                       currentLevel)])
             gobject.timeout_add(50, self._pump)
-        
+
 #-----------------------------------------------------------------------------
 
 class RoutePage(Page):
@@ -1693,13 +1693,13 @@ class RoutePage(Page):
         routeWindow.add(self._route)
 
         label.set_mnemonic_widget(self._route)
-        routeBox.pack_start(routeWindow, True, True, 0)        
+        routeBox.pack_start(routeWindow, True, True, 0)
 
         mainBox.pack_start(routeBox, True, True, 8)
 
         self.addCancelFlightButton()
 
-        self._backButton = self.addPreviousButton(clicked = self._backClicked)        
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
@@ -1734,7 +1734,7 @@ class RoutePage(Page):
         """Update the sensitivity of the forward button."""
         self._button.set_sensitive(self._cruiseLevel.get_value_as_int()>=50 and \
                                    self._getRoute()!="")
-                                   
+
     def _cruiseLevelChanged(self, spinButton):
         """Called when the cruise level has changed."""
         self._updateForwardButton()
@@ -1763,7 +1763,7 @@ class RoutePage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the Forward button is clicked."""
         if self._completed:
@@ -1823,7 +1823,7 @@ class BriefingPage(Page):
     def __init__(self, wizard, departure):
         """Construct the briefing page."""
         self._departure = departure
-        
+
         title = xstr("briefing_title") % (1 if departure else 2,
                                           xstr("briefing_departure")
                                           if departure
@@ -1859,7 +1859,7 @@ class BriefingPage(Page):
         alignment.add(scrolledWindow)
         self._notamsFrame.add(alignment)
         mainBox.pack_start(self._notamsFrame, True, True, 4)
-        
+
         self._metarFrame = gtk.Frame()
         self._metarFrame.set_label(xstr("briefing_metar_init"))
         scrolledWindow = gtk.ScrolledWindow()
@@ -1896,7 +1896,7 @@ class BriefingPage(Page):
         """Get the METAR on the page."""
         buffer = self._metar.get_buffer()
         return buffer.get_text(buffer.get_start_iter(),
-                               buffer.get_end_iter(), True)        
+                               buffer.get_end_iter(), True)
 
     def setMETAR(self, metar):
         """Set the metar."""
@@ -1956,7 +1956,7 @@ class BriefingPage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         if not self._departure:
@@ -2024,7 +2024,7 @@ class TakeoffPage(Page):
         self._runway.connect("changed", self._upperChanged)
         table.attach(self._runway, 1, 3, 0, 1)
         label.set_mnemonic_widget(self._runway)
-        
+
         label = gtk.Label(xstr("takeoff_sid"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -2036,7 +2036,7 @@ class TakeoffPage(Page):
         self._sid.connect("changed", self._upperChanged)
         table.attach(self._sid, 1, 3, 1, 2)
         label.set_mnemonic_widget(self._sid)
-        
+
         label = gtk.Label(xstr("takeoff_v1"))
         label.set_use_markup(True)
         label.set_use_underline(True)
@@ -2052,7 +2052,7 @@ class TakeoffPage(Page):
 
         self._v1Unit = gtk.Label(xstr("label_knots"))
         table.attach(self._v1Unit, 3, 4, 2, 3)
-        
+
         label = gtk.Label(xstr("takeoff_vr"))
         label.set_use_markup(True)
         label.set_use_underline(True)
@@ -2065,10 +2065,10 @@ class TakeoffPage(Page):
         self._vr.connect("integer-changed", self._valueChanged)
         table.attach(self._vr, 2, 3, 3, 4)
         label.set_mnemonic_widget(self._vr)
-        
+
         self._vrUnit = gtk.Label(xstr("label_knots"))
         table.attach(self._vrUnit, 3, 4, 3, 4)
-        
+
         label = gtk.Label(xstr("takeoff_v2"))
         label.set_use_markup(True)
         label.set_use_underline(True)
@@ -2081,7 +2081,7 @@ class TakeoffPage(Page):
         self._v2.connect("integer-changed", self._valueChanged)
         table.attach(self._v2, 2, 3, 4, 5)
         label.set_mnemonic_widget(self._v2)
-        
+
         self._v2Unit = gtk.Label(xstr("label_knots"))
         table.attach(self._v2Unit, 3, 4, 4, 5)
 
@@ -2141,7 +2141,7 @@ class TakeoffPage(Page):
 
         self._button.set_sensitive(False)
         self._forwardAllowed = False
-        
+
     def allowForward(self):
         """Allow going to the next page."""
         self._forwardAllowed = True
@@ -2153,7 +2153,7 @@ class TakeoffPage(Page):
         self._v1.reset()
         self._vr.reset()
         self._v2.reset()
-        
+
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
         sensitive = self._forwardAllowed and \
@@ -2169,17 +2169,17 @@ class TakeoffPage(Page):
     def _valueChanged(self, widget, arg = None):
         """Called when the value of some widget has changed."""
         self._updateForwardButton()
-        
+
     def _upperChanged(self, entry, arg = None):
         """Called when the value of some entry widget has changed and the value
         should be converted to uppercase."""
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
-        
+
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard.gui.flight.aircraft.updateV1R2()
@@ -2322,7 +2322,7 @@ class LandingPage(Page):
         super(LandingPage, self).reset()
         self._vref.reset()
         self._flightEnded = False
-        
+
     def activate(self):
         """Called when the page is activated."""
         self._starButton.set_sensitive(True)
@@ -2370,8 +2370,8 @@ class LandingPage(Page):
         active = button.get_active()
         self._transition.set_sensitive(active)
         if active:
-            self._transition.grab_focus()        
-        self._updateForwardButton()    
+            self._transition.grab_focus()
+        self._updateForwardButton()
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
@@ -2399,7 +2399,7 @@ class LandingPage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-        
+
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard.gui.flight.aircraft.updateVRef()
@@ -2424,12 +2424,12 @@ class FinishPage(Page):
                      ("flighttype_ot", const.FLIGHTTYPE_OLDTIMER),
                      ("flighttype_vip", const.FLIGHTTYPE_VIP),
                      ("flighttype_charter", const.FLIGHTTYPE_CHARTER) ]
-    
+
     def __init__(self, wizard):
         """Construct the finish page."""
         super(FinishPage, self).__init__(wizard, xstr("finish_title"),
                                          xstr("finish_help"))
-        
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
@@ -2491,7 +2491,7 @@ class FinishPage(Page):
         self._distanceFlown.set_use_markup(True)
         labelAlignment.add(self._distanceFlown)
         table.attach(labelAlignment, 1, 2, 3, 4)
-        
+
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_fuel"))
         labelAlignment.add(label)
@@ -2526,7 +2526,7 @@ class FinishPage(Page):
         flightTypeAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         flightTypeAlignment.add(self._flightType)
         table.attach(flightTypeAlignment, 1, 2, 5, 6)
-        label.set_mnemonic_widget(self._flightType)        
+        label.set_mnemonic_widget(self._flightType)
 
         self._onlineFlight = gtk.CheckButton(xstr("finish_online"))
         self._onlineFlight.set_use_underline(True)
@@ -2549,7 +2549,7 @@ class FinishPage(Page):
         self._gate.pack_start(renderer, True)
         self._gate.add_attribute(renderer, "text", 0)
         self._gate.set_tooltip_text(xstr("finish_gate_tooltip"))
-        self._gate.connect("changed", self._gateChanged)               
+        self._gate.connect("changed", self._gateChanged)
         gateAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
         gateAlignment.add(self._gate)
         table.attach(gateAlignment, 1, 2, 7, 8)
@@ -2572,12 +2572,12 @@ class FinishPage(Page):
 
         self._pirepSaved = False
         self._pirepSent = False
-        
+
         self._sendButton = self.addButton(xstr("sendPIREP"), default = True,
                                           sensitive = False,
                                           clicked = self._sendClicked,
                                           tooltip = xstr("sendPIREP_tooltip"))
-        
+
     @property
     def flightType(self):
         """Get the flight type."""
@@ -2604,14 +2604,14 @@ class FinishPage(Page):
         flightLength = flight.flightTimeEnd - flight.flightTimeStart
         self._flightTime.set_markup("<b>%s</b>" % \
                                     (util.getTimeIntervalString(flightLength),))
-        
+
         blockLength = flight.blockTimeEnd - flight.blockTimeStart
         self._blockTime.set_markup("<b>%s</b>" % \
                                    (util.getTimeIntervalString(blockLength),))
 
         self._distanceFlown.set_markup("<b>%.2f NM</b>" % \
                                        (flight.flownDistance,))
-        
+
         self._fuelUsed.set_markup("<b>%.0f kg</b>" % \
                                   (flight.startFuel - flight.endFuel,))
 
@@ -2643,7 +2643,7 @@ class FinishPage(Page):
         sensitive = self._flightType.get_active()>=0 and \
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0)
-        
+
         self._saveButton.set_sensitive(sensitive)
         self._sendButton.set_sensitive(sensitive and
                                        self._wizard.bookedFlight.id is not None)
@@ -2672,7 +2672,7 @@ class FinishPage(Page):
             dialog.hide()
             if result!=RESPONSETYPE_YES:
                 return
-            
+
         gui.reset()
 
     def _saveClicked(self, button):
@@ -2698,7 +2698,7 @@ class FinishPage(Page):
                 dialog.set_current_folder(pirepDirectory)
         else:
             dialog.set_current_folder(os.path.dirname(self._lastSavePath))
-            
+
         dialog.set_current_name(fileName)
         result = dialog.run()
         dialog.hide()
@@ -2707,7 +2707,7 @@ class FinishPage(Page):
             pirep = PIREP(gui.flight)
 
             self._lastSavePath = text2unicode(dialog.get_filename())
-            
+
             if pirep.save(self._lastSavePath):
                 type = MESSAGETYPE_INFO
                 message = xstr("finish_save_done")
@@ -2717,7 +2717,7 @@ class FinishPage(Page):
                 type = MESSAGETYPE_ERROR
                 message = xstr("finish_save_failed")
                 secondary = xstr("finish_save_failed_sec")
-                
+
             dialog = gtk.MessageDialog(parent = gui.mainWindow,
                                        type = type, message_format = message)
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -2743,12 +2743,12 @@ class FinishPage(Page):
                                            parent = gui.mainWindow)
             dialog.set_modal(True)
             dialog.set_do_overwrite_confirmation(True)
-            
+
             filter = gtk.FileFilter()
             filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
-            
+
             filter = gtk.FileFilter()
             filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
@@ -2757,7 +2757,7 @@ class FinishPage(Page):
             self._savePIREPDialog = dialog
 
         return self._savePIREPDialog
-        
+
 
     def _sendClicked(self, button):
         """Called when the Send button is clicked."""
@@ -2773,10 +2773,10 @@ class FinishPage(Page):
            returned and result.success:
             bookedFlight = self._wizard.bookedFlight
             if bookedFlight.arrivalICAO=="LHBP":
-                iter = self._gate.get_active_iter()                
+                iter = self._gate.get_active_iter()
                 gateNumber = None if iter is None \
                              else self._gatesModel.get_value(iter, 0)
-                
+
                 status = const.PLANE_PARKING if gateNumber is None \
                          else const.PLANE_HOME
             else:
@@ -2790,7 +2790,7 @@ class FinishPage(Page):
     def _planeUpdated(self, success):
         """Callback for the plane updating."""
         pass
-        
+
 #-----------------------------------------------------------------------------
 
 class Wizard(gtk.VBox):
@@ -2809,7 +2809,7 @@ class Wizard(gtk.VBox):
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
         self._pages.append(ConnectPage(self))
-        self._payloadPage = PayloadPage(self) 
+        self._payloadPage = PayloadPage(self)
         self._pages.append(self._payloadPage)
         self._payloadIndex = len(self._pages)
         self._pages.append(TimePage(self))
@@ -2821,9 +2821,9 @@ class Wizard(gtk.VBox):
         self._arrivalBriefingPage = BriefingPage(self, False)
         self._pages.append(self._arrivalBriefingPage)
         self._arrivalBriefingIndex = len(self._pages)
-        self._takeoffPage = TakeoffPage(self) 
+        self._takeoffPage = TakeoffPage(self)
         self._pages.append(self._takeoffPage)
-        self._landingPage = LandingPage(self) 
+        self._landingPage = LandingPage(self)
         self._pages.append(self._landingPage)
         self._finishPage = FinishPage(self)
         self._pages.append(self._finishPage)
@@ -2858,7 +2858,7 @@ class Wizard(gtk.VBox):
     def loggedIn(self):
         """Indicate if there was a successful login."""
         return self._loginResult is not None
-        
+
     @property
     def loginResult(self):
         """Get the login result."""
@@ -3036,7 +3036,7 @@ class Wizard(gtk.VBox):
                 print "Downloading arrival METAR again"
                 self.gui.webHandler.getMETARs(self._arrivalMETARCallback,
                                               [self._bookedFlight.arrivalICAO])
-            
+
         elif stage==const.STAGE_END:
             for page in self._pages:
                 page.flightEnded()
@@ -3050,7 +3050,7 @@ class Wizard(gtk.VBox):
 
         self._fleet = None
         self._fleetCallback = None
-        
+
         self._bookedFlight = None
         self._departureGate = "-"
         self._fuelData = None
@@ -3062,7 +3062,7 @@ class Wizard(gtk.VBox):
         firstPage = 0 if self._loginResult is None else 1
         for page in self._pages[firstPage:]:
             page.reset()
-        
+
         self.setCurrentPage(firstPage)
 
     def login(self, callback, pilotID, password, entranceExam):
@@ -3080,7 +3080,7 @@ class Wizard(gtk.VBox):
             busyMessage = xstr("login_busy")
 
         self.gui.beginBusy(busyMessage)
-        
+
         self.gui.webHandler.login(self._loginResultCallback,
                                   pilotID, password,
                                   entranceExam = entranceExam)
@@ -3136,7 +3136,7 @@ class Wizard(gtk.VBox):
             secondary = xstr("reload_failconn_sec") if isReload \
                         else xstr("login_failconn_sec")
             dialog.format_secondary_markup(secondary)
-            
+
             dialog.run()
             dialog.hide()
 
@@ -3155,7 +3155,7 @@ class Wizard(gtk.VBox):
         if self._fleetCallback is not None:
             self._fleetCallback(fleet)
         self._fleetCallback = None
-        
+
     def updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the given plane's gate information."""
         self.gui.updatePlane(tailNumber, status, gateNumber = gateNumber,
@@ -3168,7 +3168,7 @@ class Wizard(gtk.VBox):
     def _arrivalMETARCallback(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
         gobject.idle_add(self._handleArrivalMETAR, returned, result)
-    
+
     def _handleArrivalMETAR(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
         icao = self._bookedFlight.arrivalICAO
@@ -3176,6 +3176,6 @@ class Wizard(gtk.VBox):
             metar = result.metars[icao]
             if metar!="":
                 self._arrivalBriefingPage.setMETAR(metar)
-    
+
 #-----------------------------------------------------------------------------
 
