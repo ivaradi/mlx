@@ -89,7 +89,7 @@ class GUI(fs.ConnectionListener):
 
     def build(self, iconDirectory):
         """Build the GUI."""
-        
+
         self._mainWindow = window = gtk.Window()
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
@@ -111,7 +111,7 @@ class GUI(fs.ConnectionListener):
 
         self._notebook = gtk.Notebook()
         mainVBox.pack_start(self._notebook, True, True, 4)
-        
+
         self._wizard = Wizard(self)
         label = gtk.Label(xstr("tab_flight"))
         label.set_use_underline(True)
@@ -130,9 +130,9 @@ class GUI(fs.ConnectionListener):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_weight_help_tooltip"))
         self._notebook.append_page(self._weightHelp, label)
-        
+
         (logWidget, self._logView)  = self._buildLogWidget()
-        addFaultTag(self._logView.get_buffer())        
+        addFaultTag(self._logView.get_buffer())
         label = gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_log_tooltip"))
@@ -143,7 +143,7 @@ class GUI(fs.ConnectionListener):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_gates_tooltip"))
         self._notebook.append_page(self._fleetGateStatus, label)
-        
+
         (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
         self._debugLogWidget.show_all()
 
@@ -185,17 +185,17 @@ class GUI(fs.ConnectionListener):
     def mainWindow(self):
         """Get the main window of the GUI."""
         return self._mainWindow
-        
+
     @property
     def logger(self):
         """Get the logger used by us."""
         return self._logger
-        
+
     @property
     def simulator(self):
         """Get the simulator used by us."""
         return self._simulator
-        
+
     @property
     def flight(self):
         """Get the flight being performed."""
@@ -210,7 +210,7 @@ class GUI(fs.ConnectionListener):
     def loggedIn(self):
         """Indicate if the user has logged in properly."""
         return self._wizard.loggedIn
-        
+
     @property
     def loginResult(self):
         """Get the result of the login."""
@@ -250,12 +250,12 @@ class GUI(fs.ConnectionListener):
     def zfw(self):
         """Get Zero-Fuel Weight calculated for the current flight."""
         return self._wizard.zfw
-        
+
     @property
     def filedCruiseAltitude(self):
         """Get cruise altitude filed for the current flight."""
         return self._wizard.filedCruiseAltitude
-        
+
     @property
     def cruiseAltitude(self):
         """Get cruise altitude set for the current flight."""
@@ -270,7 +270,7 @@ class GUI(fs.ConnectionListener):
     def departureMETAR(self):
         """Get the METAR of the deprature airport."""
         return self._wizard.departureMETAR
-        
+
     @property
     def arrivalMETAR(self):
         """Get the METAR of the deprature airport."""
@@ -280,7 +280,7 @@ class GUI(fs.ConnectionListener):
     def departureRunway(self):
         """Get the name of the departure runway."""
         return self._wizard.departureRunway
-        
+
     @property
     def sid(self):
         """Get the SID."""
@@ -290,17 +290,17 @@ class GUI(fs.ConnectionListener):
     def v1(self):
         """Get the V1 speed calculated for the flight."""
         return self._wizard.v1
-        
+
     @property
     def vr(self):
         """Get the Vr speed calculated for the flight."""
         return self._wizard.vr
-        
+
     @property
     def v2(self):
         """Get the V2 speed calculated for the flight."""
         return self._wizard.v2
-        
+
     @property
     def arrivalRunway(self):
         """Get the arrival runway."""
@@ -325,7 +325,7 @@ class GUI(fs.ConnectionListener):
     def vref(self):
         """Get the Vref speed calculated for the flight."""
         return self._wizard.vref
-        
+
     @property
     def flightType(self):
         """Get the flight type."""
@@ -359,7 +359,7 @@ class GUI(fs.ConnectionListener):
                                     self.config.updateURL,
                                     self._mainWindow)
             self._updater.start()
-        
+
         singleton.raiseCallback = self.raiseCallback
         gtk.main()
         singleton.raiseCallback = None
@@ -397,14 +397,14 @@ class GUI(fs.ConnectionListener):
         dialog = gtk.MessageDialog(parent = self._mainWindow,
                                    type = MESSAGETYPE_ERROR,
                                    message_format = xstr("conn_failed"))
-    
+
         dialog.set_title(WINDOW_TITLE_BASE)
         dialog.format_secondary_markup(xstr("conn_failed_sec"))
-        
+
         dialog.add_button(xstr("button_cancel"), 0)
         dialog.add_button(xstr("button_tryagain"), 1)
         dialog.set_default_response(1)
-        
+
         result = dialog.run()
         dialog.hide()
         if result == 1:
@@ -412,7 +412,7 @@ class GUI(fs.ConnectionListener):
             self._simulator.reconnect()
         else:
             self.reset()
-        
+
     def disconnected(self):
         """Called when we have disconnected from the simulator."""
         self._connected = False
@@ -421,7 +421,7 @@ class GUI(fs.ConnectionListener):
         gobject.idle_add(self._disconnected)
 
     def _disconnected(self):
-        """Called when we have disconnected from the simulator unexpectedly."""        
+        """Called when we have disconnected from the simulator unexpectedly."""
         self._statusbar.updateConnection(self._connecting, self._connected)
 
         dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
@@ -459,7 +459,7 @@ class GUI(fs.ConnectionListener):
         dialog.set_title(WINDOW_TITLE_BASE)
         result = dialog.run()
         dialog.hide()
-        
+
         if result==RESPONSETYPE_YES:
             self.reset()
 
@@ -506,25 +506,32 @@ class GUI(fs.ConnectionListener):
         self._weightHelp.disable()
 
         return True
-            
-    def addFlightLogLine(self, timeStr, line, isFault = False):
-        """Write the given message line to the log."""
-        gobject.idle_add(self._writeLog,
-                         formatFlightLogLine(timeStr, line),
-                         self._logView, isFault)
 
-    def updateFlightLogLine(self, index, timeStr, line):
-        """Update the line with the given index."""
-        gobject.idle_add(self._updateFlightLogLine, index,
-                         formatFlightLogLine(timeStr, line))
+    def insertFlightLogLine(self, index, timestampString, text, isFault):
+        """Insert the flight log line with the given data."""
+        gobject.idle_add(self._insertFlightLogLine, index,
+                         formatFlightLogLine(timestampString, text),
+                         isFault)
 
-    def _updateFlightLogLine(self, index, line):
-        """Replace the contents of the given line in the log."""
+    def _insertFlightLogLine(self, index, line, isFault):
+        """Perform the real insertion.
+
+        To be called from the event loop."""
+        buffer = self._logView.get_buffer()
+        lineIter = buffer.get_iter_at_line(index)
+        insertTextBuffer(buffer, lineIter, line, isFault = isFault)
+        self._logView.scroll_mark_onscreen(buffer.get_insert())
+
+    def removeFlightLogLine(self, index):
+        """Remove the flight log line with the given index."""
+        gobject.idle_add(self._removeFlightLogLine, index)
+
+    def _removeFlightLogLine(self, index):
+        """Perform the real removal."""
         buffer = self._logView.get_buffer()
         startIter = buffer.get_iter_at_line(index)
-        endIter = buffer.get_iter_at_line(index + 1)
+        endIter = buffer.get_iter_at_line(index+1)
         buffer.delete(startIter, endIter)
-        buffer.insert(startIter, line)
         self._logView.scroll_mark_onscreen(buffer.get_insert())
 
     def check(self, flight, aircraft, logger, oldState, state):
@@ -590,7 +597,7 @@ class GUI(fs.ConnectionListener):
         elif (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
              (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
             self._mainWindow.present()
-            
+
     def raiseCallback(self):
         """Callback for the singleton handling code."""
         gobject.idle_add(self.raiseMainWindow)
@@ -629,7 +636,7 @@ class GUI(fs.ConnectionListener):
         else:
             self._mainWindow.present()
         self._mainWindow.deiconify()
-            
+
     def toggleMainWindow(self):
         """Toggle the main window."""
         if self._mainWindow.get_visible():
@@ -678,7 +685,7 @@ class GUI(fs.ConnectionListener):
         """Flush any text to the standard error that could not be logged."""
         if self._stdioText:
             sys.__stderr__.write(self._stdioText)
-            
+
     def writeStdIO(self, text):
         """Write the given text into standard I/O log."""
         with self._stdioLock:
@@ -757,7 +764,7 @@ class GUI(fs.ConnectionListener):
         self._updatePlaneTailNumber = tailNumber
         self._updatePlaneStatus = status
         self._updatePlaneGateNumber = gateNumber
-        
+
         self.webHandler.updatePlane(self._updatePlaneResultCallback,
                                     tailNumber, status, gateNumber)
 
@@ -798,7 +805,7 @@ class GUI(fs.ConnectionListener):
             text = self._stdioText
             self._stdioText = ""
         if not text: return
-            
+
         lines = text.splitlines()
         if text[-1]=="\n":
             text = ""
@@ -808,7 +815,7 @@ class GUI(fs.ConnectionListener):
 
         now = datetime.datetime.now()
         timeStr = "%02d:%02d:%02d: " % (now.hour, now.minute, now.second)
-            
+
         for line in lines:
             #print >> sys.__stdout__, line
             if self._stdioStartingLine:
@@ -832,19 +839,19 @@ class GUI(fs.ConnectionListener):
         self._flight.aircraftType = aircraftType
         self._flight.aircraft = acft.Aircraft.create(self._flight)
         self._flight.aircraft._checkers.append(self)
-        
+
         if self._simulator is None:
             self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
             fs.setupMessageSending(self.config, self._simulator)
             self._setupTimeSync()
-        
+
         self._flight.simulator = self._simulator
 
         self.beginBusy(xstr("connect_busy"))
         self._statusbar.updateConnection(self._connecting, self._connected)
 
         self._connecting = True
-        self._simulator.connect(self._flight.aircraft)        
+        self._simulator.connect(self._flight.aircraft)
 
     def startMonitoring(self):
         """Start monitoring."""
@@ -866,7 +873,7 @@ class GUI(fs.ConnectionListener):
     def _buildMenuBar(self, accelGroup):
         """Build the main menu bar."""
         menuBar = gtk.MenuBar()
-        
+
         fileMenuItem = gtk.MenuItem(xstr("menu_file"))
         fileMenu = gtk.Menu()
         fileMenuItem.set_submenu(fileMenu)
@@ -964,7 +971,7 @@ class GUI(fs.ConnectionListener):
         helpMenu.append(manualMenuItem)
 
         helpMenu.append(gtk.SeparatorMenuItem())
-        
+
         aboutMenuItem = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
         aboutMenuItem.set_use_stock(True)
         aboutMenuItem.set_label(xstr("menu_help_about"))
@@ -981,7 +988,7 @@ class GUI(fs.ConnectionListener):
         if menuItem.get_active():
             label = gtk.Label(xstr("tab_debug_log"))
             label.set_use_underline(True)
-            label.set_tooltip_text(xstr("tab_debug_log_tooltip"))        
+            label.set_tooltip_text(xstr("tab_debug_log_tooltip"))
             self._debugLogPage = self._notebook.append_page(self._debugLogWidget, label)
             self._notebook.set_current_page(self._debugLogPage)
         else:
@@ -1036,7 +1043,7 @@ class GUI(fs.ConnectionListener):
             dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()
             dialog.hide()
-        
+
         if result==RESPONSETYPE_YES:
             self._statusIcon.destroy()
             return gtk.main_quit()
@@ -1051,11 +1058,11 @@ class GUI(fs.ConnectionListener):
     def _editChecklist(self, menuItem):
         """Callback for editing the checklists."""
         self._checklistEditor.run()
-        
+
     def _editApproachCallouts(self, menuItem):
         """Callback for editing the approach callouts."""
         self._approachCalloutsEditor.run()
-        
+
     def _editPreferences(self, menuItem):
         """Callback for editing the preferences."""
         self._clearHotkeys()
@@ -1083,7 +1090,7 @@ class GUI(fs.ConnectionListener):
             pirepDirectory = self.config.pirepDirectory
             if pirepDirectory is not None:
                 dialog.set_current_folder(pirepDirectory)
-        
+
         result = dialog.run()
         dialog.hide()
 
@@ -1131,13 +1138,13 @@ class GUI(fs.ConnectionListener):
                                                       gtk.STOCK_OK, RESPONSETYPE_OK),
                                            parent = self._mainWindow)
             dialog.set_modal(True)
-            
+
 
             filter = gtk.FileFilter()
             filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
-            
+
             filter = gtk.FileFilter()
             filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
@@ -1183,7 +1190,7 @@ class GUI(fs.ConnectionListener):
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
-        
+
         label = gtk.Label(bookedFlight.callsign)
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1196,7 +1203,7 @@ class GUI(fs.ConnectionListener):
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
-        
+
         label = gtk.Label(str(bookedFlight.departureTime.date()))
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1209,7 +1216,7 @@ class GUI(fs.ConnectionListener):
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 2, 3)
-        
+
         label = gtk.Label(bookedFlight.departureICAO)
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1222,7 +1229,7 @@ class GUI(fs.ConnectionListener):
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 3, 4)
-        
+
         label = gtk.Label(bookedFlight.arrivalICAO)
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1242,7 +1249,7 @@ class GUI(fs.ConnectionListener):
             label.set_markup('<b><span foreground="red">NO GO</span></b>')
         else:
             label.set_text("%.1f %%" % (rating,))
-        
+
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
@@ -1251,9 +1258,9 @@ class GUI(fs.ConnectionListener):
         dialog.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
         dialog.add_button(xstr("viewPIREP"), 1)
         dialog.add_button(xstr("sendPIREP"), RESPONSETYPE_OK)
-        
+
         return dialog
-                            
+
     def sendPIREP(self, pirep, callback = None):
         """Send the given PIREP."""
         self.beginBusy(xstr("sendPIREP_busy"))
@@ -1286,7 +1293,7 @@ class GUI(fs.ConnectionListener):
             print "PIREP sending failed", result
             messageFormat = xstr("sendPIREP_failed")
             secondaryMarkup = xstr("sendPIREP_failed_sec")
-        
+
         dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                    type = type, message_format = messageFormat)
         dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -1364,11 +1371,11 @@ class GUI(fs.ConnectionListener):
             dialog = gtk.AboutDialog()
             dialog.set_transient_for(self._mainWindow)
             dialog.set_modal(True)
-            
+
             logoPath = os.path.join(self._programDirectory, "logo.png")
             logo = pixbuf_new_from_file(logoPath)
             dialog.set_logo(logo)
-                                
+
             dialog.set_program_name(PROGRAM_NAME)
             dialog.set_version(const.VERSION)
             dialog.set_copyright("(c) 2012 by István Váradi")
@@ -1395,5 +1402,5 @@ class GUI(fs.ConnectionListener):
         return self._aboutDialog
 
     def _showAboutURL(self, dialog, link, user_data):
-        """Show the about URL."""        
+        """Show the about URL."""
         webbrowser.open(url = link, new = 1)

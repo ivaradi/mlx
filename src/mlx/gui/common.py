@@ -296,7 +296,7 @@ def addFaultTag(buffer):
     faultTag = gtk.TextTag(name = "fault")
     faultTag.set_property("foreground", "red")
     faultTag.set_property("weight", WEIGHT_BOLD)
-    buffer.get_tag_table().add(faultTag)    
+    buffer.get_tag_table().add(faultTag)
 
 #------------------------------------------------------------------------------
 
@@ -304,10 +304,17 @@ def appendTextBuffer(buffer, text, isFault = False):
     """Append the given line at the end of the given text buffer.
 
     If isFault is set, use the tag named 'fault'."""
+    insertTextBuffer(buffer, buffer.get_end_iter(), text, isFault)
+
+#------------------------------------------------------------------------------
+
+def insertTextBuffer(buffer, iter, text, isFault = False):
+    """Insert the given line into the given text buffer at the given iterator.
+
+    If isFault is set, use the tag named 'fault'."""
     if isFault:
-        buffer.insert_with_tags_by_name(buffer.get_end_iter(), text,
-                                        "fault")
+        buffer.insert_with_tags_by_name(iter, text, "fault")
     else:
-        buffer.insert(buffer.get_end_iter(), text)
+        buffer.insert(iter, text)
 
 #------------------------------------------------------------------------------

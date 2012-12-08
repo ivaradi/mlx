@@ -53,7 +53,7 @@ class PIREP(object):
         except Exception, e:
             print "Failed loading PIREP from %s: %s" % (path, str(e))
             return None
-        
+
     def __init__(self, flight):
         """Initialize the PIREP from the given flight."""
         self.bookedFlight = flight.bookedFlight
@@ -63,7 +63,7 @@ class PIREP(object):
         self.bagWeight = flight.bagWeight
         self.cargoWeight = flight.cargoWeight
         self.mailWeight = flight.mailWeight
-        
+
         self.filedCruiseAltitude = flight.filedCruiseAltitude
         self.cruiseAltitude = flight.cruiseAltitude
         self.route = flight.route
@@ -85,7 +85,7 @@ class PIREP(object):
         self.comments = flight.comments
         self.flightDefects = flight.flightDefects
         self.delayCodes = flight.delayCodes
-        
+
         self.blockTimeStart = flight.blockTimeStart
         self.flightTimeStart = flight.flightTimeStart
         self.flightTimeEnd = flight.flightTimeEnd
@@ -97,7 +97,7 @@ class PIREP(object):
         self.rating = logger.getRating()
         self.logLines = logger.lines
         self.faultLineIndexes = logger.faultLineIndexes
-        
+
     def getACARSText(self):
         """Get the ACARS text.
 
@@ -120,12 +120,12 @@ class PIREP(object):
             (timeStr, line) = self.logLines[index]
             if timeStr is not None:
                 text += PIREP._formatLine(timeStr, line)
-                text += "\n"            
+                text += "\n"
 
         text += "\n[Flight Rating: %.1f]" % (max(0.0, self.rating),)
 
         return text
-    
+
     def getTimeComment(self):
         """Get the time comment.
 

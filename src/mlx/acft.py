@@ -258,7 +258,7 @@ class Aircraft(object):
                                     (aircraftState.windDirection,
                                      aircraftState.windSpeed))
                 self._logRadios(aircraftState)
-                self._logV1R2()
+                self._logV1R2(aircraftState)
             elif newStage==const.STAGE_DESCENT or newStage==const.STAGE_LANDING:
                 self._logRadios(aircraftState)
             elif newStage==const.STAGE_TAXIAFTERLAND:
@@ -395,7 +395,7 @@ class Aircraft(object):
         else:
             return str(speed) + " " + self._flight.getEnglishSpeedUnit()
 
-    def _logV1R2(self):
+    def _logV1R2(self, state = None):
         """Log the V1, Vr and V2 value either newly, or by updating the
         corresponding line."""
         message = "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
@@ -404,8 +404,10 @@ class Aircraft(object):
                    self._speedToLog(self._flight.v2))
 
         if self._v1r2LineIndex is None:
+            if state is None:
+                state = self._aircraftState
             self._v1r2LineIndex = \
-                self.logger.message(self._aircraftState.timestamp, message)
+                self.logger.message(state.timestamp, message)
         else:
             self.logger.updateLine(self._v1r2LineIndex, message)
 
