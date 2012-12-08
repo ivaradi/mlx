@@ -1291,7 +1291,8 @@ class SpeedChecker(SimpleFaultChecker):
         flight.handleFault((SpeedChecker, flight.stage), state.timestamp,
                            FaultChecker._appendDuring(flight, message),
                            FaultChecker._getLinearScore(50, 80, 10, 15,
-                                                        state.groundSpeed))
+                                                        state.groundSpeed),
+                           updatePrevious = True)
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""

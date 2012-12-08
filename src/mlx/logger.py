@@ -95,13 +95,25 @@ class Logger(object):
             """Get the fault score of the entry, if it is a fault."""
             return self._faultScore
 
-        def copy(self, text = None):
+        def copy(self, timestamp = None, clearTimestamp = False, text = None,
+                 faultScore = None):
             """Create a copy of this entry with the given values changed."""
-            return Logger.Entry(self._timestamp,
+            assert faultScore is None or self._faultID is not None
+
+            return Logger.Entry(None if clearTimestamp
+                                else self._timestamp if timestamp is None
+                                else timestamp,
+
                                 self._text if text is None else text,
+
                                 showTimestamp = self._showTimestamp,
+
                                 faultID = self._faultID,
-                                faultScore = self._faultScore,
+
+                                faultScore =
+                                self._faultScore if faultScore is None
+                                else faultScore,
+
                                 id = self._id)
 
         def __cmp__(self, other):
@@ -150,6 +162,10 @@ class Logger(object):
                     break
 
             return len(entries)>0
+
+        def getLatestEntry(self):
+            """Get the entry with the highest score."""
+            return self._entries[0]
 
     # FIXME: shall we use const.stage2string() instead?
     _stages = { const.STAGE_BOARDING : "Boarding",
@@ -230,7 +246,8 @@ class Logger(object):
                 else const.MESSAGETYPE_INFORMATION
             sendMessage(messageType, "Flight stage: " + s, 3)
 
-    def fault(self, faultID, timestamp, what, score):
+    def fault(self, faultID, timestamp, what, score,
+              updatePrevious = False):
         """Report a fault.
 
         faultID as a unique ID for the given kind of fault. If another fault of
@@ -238,16 +255,32 @@ class Logger(object):
         the score is greater than last time. This ID can be, e.g. the checker
         the report comes from.
 
+        If updatePrevious is True, and an instance of the given fault is
+        already in the log, only that instance will be updated with the new
+        timestamp and score. If there are several instances, the latest one
+        (with the highest score) will be updated. If updatePrevious is True,
+        and the new score is not greater than the latest one, the ID of the
+        latest one is returned.
+
         Returns an ID of the fault, or -1 if it was not logged."""
-        if faultID in self._faults:
-            if score<=self._faults[faultID].score:
-                return -1
+        fault = self._faults[faultID] if faultID in self._faults else None
+
+        if fault is not None and score<=fault.score:
+            return fault.getLatestEntry().id if updatePrevious else -1
 
         text = "%s (NO GO)" % (what) if score==Logger.NO_GO_SCORE \
                else "%s (%.1f)" % (what, score)
 
-        id = self._addEntry(Logger.Entry(timestamp, text, faultID = faultID,
-                                         faultScore = score))
+        if updatePrevious and fault is not None:
+            latestEntry = fault.getLatestEntry()
+            id = latestEntry.id
+            newEntry = latestEntry.copy(timestamp = timestamp,
+                                        text = text,
+                                        faultScore = score)
+            self._updateEntry(id, newEntry)
+        else:
+            id = self._addEntry(Logger.Entry(timestamp, text, faultID = faultID,
+                                             faultScore = score))
 
         (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
                                   if score==Logger.NO_GO_SCORE \
