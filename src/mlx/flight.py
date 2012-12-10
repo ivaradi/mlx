@@ -19,7 +19,7 @@ import threading
 
 class Flight(object):
     """The object with the global flight state.
-    
+
     It is also the hub for the other main objects participating in the handling of
     the flight."""
     def __init__(self, logger, gui):
@@ -232,11 +232,11 @@ class Flight(object):
     def handleState(self, oldState, currentState):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)
-        
+
         self.endFuel = currentState.totalFuel
         if self.startFuel is None:
             self.startFuel = self.endFuel
-        
+
         self._soundScheduler.schedule(currentState,
                                       self._pilotHotkeyPressed)
         self._pilotHotkeyPressed = False
@@ -292,7 +292,7 @@ class Flight(object):
 
     def flareFinished(self, flareEnd, flareEndFS, tdRate):
         """Called when the flare time has ended.
-        
+
         Return a tuple of the following items:
         - a boolean indicating if FS time is used
         - the flare time
@@ -328,7 +328,7 @@ class Flight(object):
 
     def speedToKnots(self, speed):
         """Convert the given speed expressed in the flight's speed unit into
-        knots."""        
+        knots."""
         return speed if self.speedInKnots else speed * const.KMPHTOKNOTS
 
     def getEnglishSpeedUnit(self):
@@ -345,10 +345,10 @@ class Flight(object):
         for (tank, amount) in aircraftState.fuel:
             if fuelStr: fuelStr += " - "
             fuelStr += "%s=%.0f kg" % (const.fuelTank2logString(tank), amount)
-            
+
         self.logger.message(aircraftState.timestamp, "Fuel: " + fuelStr)
         self.logger.message(aircraftState.timestamp,
-                            "Total fuel: %.0f kg" % (aircraftState.totalFuel,))                            
+                            "Total fuel: %.0f kg" % (aircraftState.totalFuel,))
 
     def cruiseLevelChanged(self):
         """Called when the cruise level hass changed."""
@@ -379,7 +379,7 @@ class Flight(object):
                self._previousLatitude is not None and \
                self._previousLongitude is not None:
                 self.flownDistance += self._getDistance(currentState)
-                
+
             self._lastDistanceTime = None
 
     def _getDistance(self, currentState):
