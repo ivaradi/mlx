@@ -766,6 +766,15 @@ msgstr "A biztonságos emelkedési sebesség csomóban."
 msgid "takeoff_v2_tooltip_kmph"
 msgstr "A biztonságos emelkedési sebesség km/órában."
 
+msgid "takeoff_rto"
+msgstr "_Megszakított felszállás"
+
+msgid "takeoff_rto_tooltip"
+msgstr ""
+"Ha valamelyik strobe fénnyel nem rendelkező repülőgépet "
+"vezeted, itt jelezheted, ha megszakítottad a felszállást. "
+"Ne felejts magyarázattal szolgálni a megjegyzések között!"
+
 msgid "landing_title"
 msgstr "Leszállás"
 

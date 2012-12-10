@@ -302,6 +302,11 @@ class GUI(fs.ConnectionListener):
         return self._wizard.v2
 
     @property
+    def rtoIndicated(self):
+        """Get whether the pilot has indicated than an RTO has occured."""
+        return self._wizard.rtoIndicated
+
+    @property
     def arrivalRunway(self):
         """Get the arrival runway."""
         return self._wizard.arrivalRunway
@@ -340,6 +345,11 @@ class GUI(fs.ConnectionListener):
     def comments(self):
         """Get the comments."""
         return self._flightInfo.comments
+
+    @property
+    def hasComments(self):
+        """Indicate whether there is a comment."""
+        return self._flightInfo.hasComments
 
     @property
     def flightDefects(self):
@@ -727,6 +737,17 @@ class GUI(fs.ConnectionListener):
             self.webHandler.getFleet(self._fleetResultCallback)
         else:
             callback(self._fleet)
+
+    def updateRTO(self, inLoop = False):
+        """Indicate that the RTO state should be updated."""
+        if inLoop:
+            self._wizard.updateRTO()
+        else:
+            gobject.idle_add(self.updateRTO, True)
+
+    def rtoToggled(self, indicated):
+        """Called when the user has toggled the RTO checkbox."""
+        self._flight.rtoToggled(indicated)
 
     def _fleetResultCallback(self, returned, result):
         """Called when the fleet has been queried."""

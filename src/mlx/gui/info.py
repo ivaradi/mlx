@@ -32,7 +32,7 @@ class FlightInfo(gtk.VBox):
                  (const.DELAYCODE_APRON, xstr("info_delay_apron")),
                  (const.DELAYCODE_WEATHER, xstr("info_delay_weather")),
                  (const.DELAYCODE_PERSONAL, xstr("info_delay_personal")) ]
-    
+
     @staticmethod
     def _createCommentArea(label):
         """Create a comment area.
@@ -49,7 +49,7 @@ class FlightInfo(gtk.VBox):
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
-        
+
         scroller = gtk.ScrolledWindow()
         # FIXME: these should be constants
         scroller.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
@@ -79,6 +79,7 @@ class FlightInfo(gtk.VBox):
 
         (frame, self._comments) = FlightInfo._createCommentArea(xstr("info_comments"))
         commentsBox.pack_start(frame, True, True, 8)
+        self._comments.get_buffer().connect("changed", self._commentsChanged)
 
         (frame, self._flightDefects) = \
              FlightInfo._createCommentArea(xstr("info_defects"))
@@ -129,7 +130,12 @@ class FlightInfo(gtk.VBox):
         buffer = self._comments.get_buffer()
         return text2unicode(buffer.get_text(buffer.get_start_iter(),
                                             buffer.get_end_iter(), True))
-    
+
+    @property
+    def hasComments(self):
+        """Get whether there is any text in comments field."""
+        return self._comments.get_buffer().get_char_count()>0
+
     @property
     def flightDefects(self):
         """Get the flight defects."""
@@ -146,13 +152,13 @@ class FlightInfo(gtk.VBox):
             if self._delayCodeWidgets[index].get_active():
                 codes.append(delayCodes[index][0])
         return codes
-            
+
     def enable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
         self._flightDefects.set_sensitive(True)
         self._delayTable.set_sensitive(True)
-        
+
     def disable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(False)
@@ -166,3 +172,7 @@ class FlightInfo(gtk.VBox):
 
         for widget in self._delayCodeWidgets:
             widget.set_active(False)
+
+    def _commentsChanged(self, textbuffer):
+        """Called when the comments have changed."""
+        self._gui.updateRTO(inLoop = True)

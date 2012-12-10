@@ -765,6 +765,15 @@ msgstr "The takeoff safety speed in knots."
 msgid "takeoff_v2_tooltip_kmph"
 msgstr "The takeoff safety speed in km/h."
 
+msgid "takeoff_rto"
+msgstr "R_ejected takeoff"
+
+msgid "takeoff_rto_tooltip"
+msgstr ""
+"If you fly one of the aircraft the have no strobe lights, "
+"you can indicate here that you have aborted the takeoff. "
+"Don't forget to provide an explanation in the comments."
+
 msgid "landing_title"
 msgstr "Landing"
 

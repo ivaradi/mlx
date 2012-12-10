@@ -1284,15 +1284,17 @@ class ReverserChecker(SimpleFaultChecker):
 class SpeedChecker(SimpleFaultChecker):
     """Check if the speed is in the prescribed limits."""
     @staticmethod
-    def logSpeedFault(flight, state):
+    def logSpeedFault(flight, state, stage = None, updateID = None):
         """Log the speed fault."""
         message = "Taxi speed over %.0f %s" % \
                   (flight.speedFromKnots(50), flight.getEnglishSpeedUnit())
-        flight.handleFault((SpeedChecker, flight.stage), state.timestamp,
-                           FaultChecker._appendDuring(flight, message),
-                           FaultChecker._getLinearScore(50, 80, 10, 15,
-                                                        state.groundSpeed),
-                           updatePrevious = True)
+        if stage is None:
+            stage = flight.stage
+        score = FaultChecker._getLinearScore(50, 80, 10, 15, state.groundSpeed)
+        return flight.handleFault((SpeedChecker, stage), state.timestamp,
+                                  FaultChecker._appendDuring(flight, message),
+                                  score, updatePrevious = updateID is None,
+                                  updateID = updateID)
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
@@ -1313,7 +1315,8 @@ class NoStrobeSpeedChecker(StateChecker):
     If, during the PUSHANDTAXI stage the speed exceeds 50 knots, the state as
     saved as a provisional takeoff state. If the speed then decreases below 50
     knots, or the plane remains on the ground for more than 20 seconds, a taxi
-    speed error is logged with the highest ground speed detected.
+    speed error is logged with the highest ground speed detected. This state is
+    also stored in the flight object as a possible
 
     If the plane becomes airborne within 20 seconds, the stage becomes TAKEOFF,
     and the previously saved takeoff state is logged.
@@ -1344,12 +1347,12 @@ class NoStrobeSpeedChecker(StateChecker):
                     self._highestSpeedState = state
 
                 if state.timestamp > (self._takeoffState.timestamp + 20):
-                    SpeedChecker.logSpeedFault(flight, self._highestSpeedState)
+                    flight.setRTOState(self._highestSpeedState)
                 elif not state.onTheGround:
                     aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
                     self._takeoffState = None
         elif self._takeoffState is not None:
-            SpeedChecker.logSpeedFault(flight, self._highestSpeedState)
+            flight.setRTOState(self._highestSpeedState)
             self._takeoffState = None
 
 #---------------------------------------------------------------------------------------

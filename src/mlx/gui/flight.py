@@ -2006,7 +2006,7 @@ class TakeoffPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 4)
+        table = gtk.Table(6, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2085,6 +2085,12 @@ class TakeoffPage(Page):
         self._v2Unit = gtk.Label(xstr("label_knots"))
         table.attach(self._v2Unit, 3, 4, 4, 5)
 
+        self._rto = gtk.CheckButton(xstr("takeoff_rto"))
+        self._rto.set_use_underline(True)
+        self._rto.set_tooltip_text(xstr("takeoff_rto_tooltip"))
+        self._rto.connect("toggled", self._rtoToggled)
+        table.attach(self._rto, 2, 4, 5, 6, ypadding = 8)
+
         self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
@@ -2116,6 +2122,11 @@ class TakeoffPage(Page):
         """Get the v2 speed."""
         return self._v2.get_int()
 
+    @property
+    def rtoIndicated(self):
+        """Get whether the pilot has indicated if there was an RTO."""
+        return self._rto.get_active()
+
     def activate(self):
         """Activate the page."""
         self._runway.set_text("")
@@ -2139,6 +2150,9 @@ class TakeoffPage(Page):
         self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip" + i18nSpeedUnit))
         self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip" + i18nSpeedUnit))
 
+        self._rto.set_active(False)
+        self._rto.set_sensitive(False)
+
         self._button.set_sensitive(False)
         self._forwardAllowed = False
 
@@ -2153,6 +2167,12 @@ class TakeoffPage(Page):
         self._v1.reset()
         self._vr.reset()
         self._v2.reset()
+
+    def setRTOEnabled(self, enabled):
+        """Set the RTO checkbox enabled or disabled."""
+        if not enabled:
+            self._rto.set_active(False)
+        self._rto.set_sensitive(enabled)
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
@@ -2175,6 +2195,10 @@ class TakeoffPage(Page):
         should be converted to uppercase."""
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
+
+    def _rtoToggled(self, button):
+        """Called when the RTO check button is toggled."""
+        self._wizard.rtoToggled(button.get_active())
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -2972,6 +2996,11 @@ class Wizard(gtk.VBox):
         return self._takeoffPage.v2
 
     @property
+    def rtoIndicated(self):
+        """Get whether the pilot has indicated that an RTO has occured."""
+        return self._takeoffPage.rtoIndicated
+
+    @property
     def arrivalRunway(self):
         """Get the arrival runway."""
         return self._landingPage.runway
@@ -3161,6 +3190,20 @@ class Wizard(gtk.VBox):
         self.gui.updatePlane(tailNumber, status, gateNumber = gateNumber,
                              callback = callback)
 
+    def updateRTO(self):
+        """Update the RTO state.
+
+        The RTO checkbox will be enabled if the flight has an RTO state and the
+        comments field contains some text."""
+        flight = self.gui.flight
+        rtoEnabled = flight is not None and flight.hasRTO and \
+                     self.gui.hasComments
+        self._takeoffPage.setRTOEnabled(rtoEnabled)
+
+    def rtoToggled(self, indicated):
+        """Called when the RTO indication has changed."""
+        self.gui.rtoToggled(indicated)
+
     def _connectSimulator(self):
         """Connect to the simulator."""
         self.gui.connectSimulator(self._bookedFlight.aircraftType)
@@ -3178,4 +3221,3 @@ class Wizard(gtk.VBox):
                 self._arrivalBriefingPage.setMETAR(metar)
 
 #-----------------------------------------------------------------------------
-

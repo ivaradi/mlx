@@ -96,10 +96,8 @@ class Logger(object):
             return self._faultScore
 
         def copy(self, timestamp = None, clearTimestamp = False, text = None,
-                 faultScore = None):
+                 faultID = None, faultScore = None, clearFault = False):
             """Create a copy of this entry with the given values changed."""
-            assert faultScore is None or self._faultID is not None
-
             return Logger.Entry(None if clearTimestamp
                                 else self._timestamp if timestamp is None
                                 else timestamp,
@@ -108,10 +106,14 @@ class Logger(object):
 
                                 showTimestamp = self._showTimestamp,
 
-                                faultID = self._faultID,
+                                faultID =
+                                None if clearFault
+                                else self._faultID if faultID is None
+                                else faultID,
 
                                 faultScore =
-                                self._faultScore if faultScore is None
+                                None if clearFault
+                                else self._faultScore if faultScore is None
                                 else faultScore,
 
                                 id = self._id)
@@ -247,7 +249,7 @@ class Logger(object):
             sendMessage(messageType, "Flight stage: " + s, 3)
 
     def fault(self, faultID, timestamp, what, score,
-              updatePrevious = False):
+              updatePrevious = False, updateID = None):
         """Report a fault.
 
         faultID as a unique ID for the given kind of fault. If another fault of
@@ -261,6 +263,9 @@ class Logger(object):
         (with the highest score) will be updated. If updatePrevious is True,
         and the new score is not greater than the latest one, the ID of the
         latest one is returned.
+
+        If updateID is given, the log entry with the given ID will be
+        'upgraded' to be a fault with the given data.
 
         Returns an ID of the fault, or -1 if it was not logged."""
         fault = self._faults[faultID] if faultID in self._faults else None
@@ -278,14 +283,21 @@ class Logger(object):
                                         text = text,
                                         faultScore = score)
             self._updateEntry(id, newEntry)
+        elif updateID is not None:
+            id = updateID
+            newEntry = self._entries[id].copy(timestamp = timestamp,
+                                              text = text, faultID = faultID,
+                                              faultScore = score)
+            self._updateEntry(id, newEntry)
         else:
             id = self._addEntry(Logger.Entry(timestamp, text, faultID = faultID,
                                              faultScore = score))
 
-        (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
-                                  if score==Logger.NO_GO_SCORE \
-                                  else (const.MESSAGETYPE_FAULT, 5)
-        sendMessage(messageType, text, duration)
+        if updateID is None:
+            (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
+                                      if score==Logger.NO_GO_SCORE \
+                                      else (const.MESSAGETYPE_FAULT, 5)
+            sendMessage(messageType, text, duration)
 
         return id
 
@@ -309,6 +321,12 @@ class Logger(object):
 
         Note, that it does not change the status of the line as a fault!"""
         self._updateEntry(id, self._entries[id].copy(text = line))
+
+    def clearFault(self, id, text):
+        """Update the line with the given ID to contain the given string,
+        and clear its fault state."""
+        newEntry = self._entries[id].copy(text = text, clearFault = True)
+        self._updateEntry(id, newEntry)
 
     def _addEntry(self, entry):
         """Add the given entry to the log.

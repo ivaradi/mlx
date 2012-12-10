@@ -1,5 +1,6 @@
 
 from soundsched import SoundScheduler, ChecklistScheduler
+from checks import SpeedChecker
 
 import const
 import util
@@ -43,6 +44,9 @@ class Flight(object):
         self.flightTimeStart = None
         self.flightTimeEnd = None
         self.blockTimeEnd = None
+
+        self._rtoState = None
+        self._rtoLogEntryID = None
 
         self._lastDistanceTime = None
         self._previousLatitude = None
@@ -229,6 +233,16 @@ class Flight(object):
         return self.aircraft.speedInKnots if self.aircraft is not None \
                else True
 
+    @property
+    def hasRTO(self):
+        """Determine if we have an RTO state."""
+        return self._rtoState is not None
+
+    @property
+    def rtoState(self):
+        """Get the RTO state."""
+        return self._rtoState
+
     def handleState(self, oldState, currentState):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)
@@ -269,21 +283,51 @@ class Flight(object):
             return False
 
     def handleFault(self, faultID, timestamp, what, score,
-                    updatePrevious = False):
+                    updatePrevious = False, updateID = None):
         """Handle the given fault.
 
         faultID as a unique ID for the given kind of fault. If another fault of
         this ID has been reported earlier, it will be reported again only if
         the score is greater than last time. This ID can be, e.g. the checker
         the report comes from."""
-        self.logger.fault(faultID, timestamp, what, score,
-                          updatePrevious = updatePrevious)
+        id = self.logger.fault(faultID, timestamp, what, score,
+                               updatePrevious = updatePrevious,
+                               updateID = updateID)
         self._gui.setRating(self.logger.getRating())
+        return id
 
     def handleNoGo(self, faultID, timestamp, what, shortReason):
         """Handle a No-Go fault."""
         self.logger.noGo(faultID, timestamp, what)
         self._gui.setNoGo(shortReason)
+
+    def setRTOState(self, state):
+        """Set the state that might be used as the RTO state.
+
+        If there has been no RTO state, the GUI is notified that from now on
+        the user may select to report an RTO."""
+        hadNoRTOState = self._rtoState is None
+
+        self._rtoState = state
+        self._rtoLogEntryID = \
+            SpeedChecker.logSpeedFault(self, state,
+                                       stage = const.STAGE_PUSHANDTAXI)
+
+        if hadNoRTOState:
+            self._gui.updateRTO()
+
+    def rtoToggled(self, indicated):
+        """Called when the user has toggled the RTO indication."""
+        if self._rtoState is not None:
+            if indicated:
+                self.logger.clearFault(self._rtoLogEntryID,
+                                       "RTO at %d knots" %
+                                       (self._rtoState.groundSpeed,))
+                self._gui.setRating(self.logger.getRating())
+            else:
+                SpeedChecker.logSpeedFault(self, self._rtoState,
+                                           stage = const.STAGE_PUSHANDTAXI,
+                                           updateID = self._rtoLogEntryID)
 
     def flareStarted(self, flareStart, flareStartFS):
         """Called when the flare time has started."""
