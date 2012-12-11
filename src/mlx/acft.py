@@ -136,8 +136,7 @@ class Aircraft(object):
         self._checkers.append(checks.MZFWChecker())
         self._checkers.append(checks.PayloadChecker())
 
-        #self._checkers.append(checks.SpeedChecker())
-        self._checkers.append(checks.NoStrobeSpeedChecker())
+        self._appendSpeedChecker()
         self._checkers.append(checks.VSChecker())
 
         timeout = 5.0 + config.realIASSmoothingLength - 1
@@ -387,6 +386,12 @@ class Aircraft(object):
         self._checkers.append(checks.NavLightsChecker())
         self._checkers.append(checks.StrobeLightsChecker())
 
+    def _appendSpeedChecker(self):
+        """Append the speed checker.
+
+        This default implementation used the SpeedChecker."""
+        self._checkers.append(checks.SpeedChecker())
+
     def _speedToLog(self, speed):
         """Convert the given speed (being either None or expressed in the
         flight's speed unit into a string."""
@@ -474,6 +479,12 @@ class Boeing737(Aircraft):
                                  25 : 190,
                                  30 : 175,
                                  40 : 162 }
+
+    # def _appendSpeedChecker(self):
+    #     """Append the NoStrobeSpeedChecker to the checkers.
+
+    #     FOR TESTING ONLY, THIS FUNCTION SHOULD NORMALLY BE COMMENTED OUT!!!"""
+    #     self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
@@ -731,6 +742,10 @@ class T134(Aircraft):
         self._checkers.append(checks.TupolevAntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
+
+    def _appendSpeedChecker(self):
+        """Append the NoStrobeSpeedChecker to the checkers."""
+        self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
