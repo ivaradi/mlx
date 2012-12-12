@@ -324,10 +324,16 @@ class Flight(object):
                                        "RTO at %d knots" %
                                        (self._rtoState.groundSpeed,))
                 self._gui.setRating(self.logger.getRating())
+                if self._stage == const.STAGE_PUSHANDTAXI:
+                    self.setStage(self.aircraft.state.timestamp,
+                                  const.STAGE_RTO)
             else:
                 SpeedChecker.logSpeedFault(self, self._rtoState,
                                            stage = const.STAGE_PUSHANDTAXI,
                                            updateID = self._rtoLogEntryID)
+                if self._stage == const.STAGE_RTO:
+                    self.setStage(self.aircraft.state.timestamp,
+                                  const.STAGE_PUSHANDTAXI)
 
     def flareStarted(self, flareStart, flareStartFS):
         """Called when the flare time has started."""

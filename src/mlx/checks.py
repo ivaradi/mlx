@@ -1299,6 +1299,7 @@ class SpeedChecker(SimpleFaultChecker):
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_PUSHANDTAXI,
+                                const.STAGE_RTO,
                                 const.STAGE_TAXIAFTERLAND] and \
             state.groundSpeed>50
 
@@ -1330,7 +1331,8 @@ class NoStrobeSpeedChecker(StateChecker):
 
     def check(self, flight, aircraft, logger, oldState, state):
         """Check the state as described above."""
-        if flight.stage==const.STAGE_PUSHANDTAXI:
+        if flight.stage==const.STAGE_PUSHANDTAXI or \
+           flight.stage==const.STAGE_RTO:
             self._checkPushAndTaxi(flight, aircraft, state)
         elif flight.stage==const.STAGE_TAXIAFTERLAND:
             if state.groundSpeed>50:
