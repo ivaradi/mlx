@@ -954,7 +954,8 @@ class FlapsRetractChecker(SimpleFaultChecker):
         """Check if the fault condition holds.
 
         FIXME: check if this really is the intention (FlapsRetractedMistake.java)"""
-        if (flight.stage==const.STAGE_TAKEOFF and not state.onTheGround) or \
+        if (flight.stage==const.STAGE_TAKEOFF and not state.onTheGround and
+            aircraft.type!=const.AIRCRAFT_F70) or \
            (flight.stage==const.STAGE_LANDING and state.onTheGround):
             if self._timeStart is None:
                 self._timeStart = state.timestamp
