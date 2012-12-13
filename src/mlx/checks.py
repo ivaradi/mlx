@@ -423,7 +423,8 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
     def __init__(self, attrName, template, logInitial = True,
                  excludedStages = None, minDelay = 0.0, maxDelay = 0.0):
         """Construct the object."""
-        StateChangeLogger.__init__(self, logInitial = logInitial)
+        StateChangeLogger.__init__(self, logInitial = logInitial,
+                                   excludedStages = excludedStages)
         SingleValueMixin.__init__(self, attrName)
         DelayedChangeMixin.__init__(self, minDelay = minDelay,
                                     maxDelay = maxDelay)
