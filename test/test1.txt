@@ -12,6 +12,8 @@ set parking=yes
 set parking=no
 set gs=10 ias=10
 set flapsControl=37.5
+set nav2=112.3
+set adf1=540
 set xpdrC=0
 set gs=60 ias=60
 set lights=21
@@ -23,6 +25,7 @@ set onTheGround=no
 set altitude=600
 set noseGear=0
 set altitude=2000
+set nav1=111.5
 set flapsControl=0
 set altitude=10000
 set lights=17
@@ -30,6 +33,7 @@ set ias=400
 set altitude=22001
 set vs=-200
 set nav1=116.3
+set adf2=540
 set flapsControl=87.5
 set ias=130 gs=130
 set altitude=557

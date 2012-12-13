@@ -260,11 +260,14 @@ class ApproachCalloutsPlayer(StateChecker):
 class StateChangeLogger(StateChecker):
     """Base class for classes the instances of which check if a specific change has
     occured in the aircraft's state, and log such change."""
-    def __init__(self, logInitial = True):
+    def __init__(self, logInitial = True, excludedStages = None):
         """Construct the logger.
 
         If logInitial is True, the initial value will be logged, not just the
         changes later.
+
+        If excludedStages is given, it should be a list containing those stages
+        during which the changes should not be logged.
 
         Child classes should define the following functions:
         - _changed(self, oldState, state): returns a boolean indicating if the
@@ -273,6 +276,7 @@ class StateChangeLogger(StateChecker):
         the message to log with the new value
         """
         self._logInitial = logInitial
+        self._excludedStages = [] if excludedStages is None else excludedStages
 
     def _getLogTimestamp(self, state, forced):
         """Get the log timestamp."""
@@ -280,6 +284,9 @@ class StateChangeLogger(StateChecker):
 
     def check(self, flight, aircraft, logger, oldState, state):
         """Check if the state has changed, and if so, log the new state."""
+        if flight.stage in self._excludedStages:
+            return
+
         shouldLog = False
         if oldState is None:
             shouldLog = self._logInitial
@@ -414,7 +421,7 @@ class GenericStateChangeLogger(StateChangeLogger, SingleValueMixin,
     """Base for generic state change loggers that monitor a single value in the
     state possibly with a delay and the logged message comes from a template"""
     def __init__(self, attrName, template, logInitial = True,
-                 minDelay = 0.0, maxDelay = 0.0):
+                 excludedStages = None, minDelay = 0.0, maxDelay = 0.0):
         """Construct the object."""
         StateChangeLogger.__init__(self, logInitial = logInitial)
         SingleValueMixin.__init__(self, attrName)
@@ -460,6 +467,10 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
     """Logger for NAV radios.
 
     It also logs the OBS radial set."""
+    excludedStages = [const.STAGE_BOARDING, const.STAGE_PUSHANDTAXI,
+                      const.STAGE_RTO, const.STAGE_TAXIAFTERLAND,
+                      const.STAGE_PARKING]
+
     @staticmethod
     def getMessage(logName, frequency, obs):
         """Get the message for the given NAV radio setting."""
@@ -469,7 +480,8 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
 
     def __init__(self, attrName, logName):
         """Construct the NAV logger."""
-        StateChangeLogger.__init__(self, logInitial = True)
+        StateChangeLogger.__init__(self, logInitial = False,
+                                   excludedStages = self.excludedStages)
         DelayedChangeMixin.__init__(self)
 
         self._getLogTimestamp = \
@@ -526,6 +538,9 @@ class ADFLogger(GenericStateChangeLogger, ForceableLoggerMixin):
         """Construct the ADF logger."""
         GenericStateChangeLogger.__init__(self, attr,
                                           "%s: %%s" % (logName,),
+                                          logInitial = False,
+                                          excludedStages =
+                                          NAVLogger.excludedStages,
                                           minDelay = 3.0, maxDelay = 10.0)
 
 #---------------------------------------------------------------------------------------
