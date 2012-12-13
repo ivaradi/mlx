@@ -1249,12 +1249,13 @@ class PitotChecker(PatientFaultChecker):
 #---------------------------------------------------------------------------------------
 
 class ReverserChecker(SimpleFaultChecker):
-    """Check if the reverser is not used below 60 knots."""
+    """Check if the reverser is not used below the speed prescribed for the
+    aircraft."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
-            state.groundSpeed<60 and max(state.reverser)
+            state.groundSpeed<aircraft.reverseMinSpeed and max(state.reverser)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""

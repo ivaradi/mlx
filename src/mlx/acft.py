@@ -73,6 +73,8 @@ class Aircraft(object):
 
         self.humanWeight = 82.0
 
+        self.reverseMinSpeed = 60
+
         self._checkers = []
 
         config = flight.config
@@ -674,6 +676,7 @@ class F70(Aircraft):
                                  15 : 220,
                                  25 : 220,
                                  42 : 180 }
+        self.reverseMinSpeed = 50
 
 #---------------------------------------------------------------------------------------
 
@@ -726,6 +729,7 @@ class T134(Aircraft):
         self.flapSpeedLimits = { 10 : 450,
                                  20 : 400,
                                  30 : 300 }
+        self.reverseMinSpeed = 50
 
     @property
     def speedInKnots(self):
@@ -768,6 +772,7 @@ class T154(Aircraft):
         self.flapSpeedLimits = { 15 : 227,
                                  28 : 194,
                                  45 : 162 }
+        self.reverseMinSpeed = 50
 
     @property
     def speedInKnots(self):
