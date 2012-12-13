@@ -93,10 +93,7 @@ class StageChecker(StateChecker):
                 self._flareStarted = True
                 aircraft.prepareFlare()
         elif stage==const.STAGE_TAXIAFTERLAND:
-            if state.parking:
-                aircraft.setStage(state, const.STAGE_PARKING)
-        elif stage==const.STAGE_PARKING:
-            if aircraft.checkFlightEnd(state):
+            if state.parking and aircraft.checkFlightEnd(state):
                 aircraft.setStage(state, const.STAGE_END)
 
 #---------------------------------------------------------------------------------------

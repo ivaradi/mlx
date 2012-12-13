@@ -273,9 +273,10 @@ class Flight(object):
                 self.flightTimeStart = timestamp
             elif stage==const.STAGE_TAXIAFTERLAND:
                 self.flightTimeEnd = timestamp
-            elif stage==const.STAGE_PARKING:
-                self.blockTimeEnd = timestamp
+            # elif stage==const.STAGE_PARKING:
+            #     self.blockTimeEnd = timestamp
             elif stage==const.STAGE_END:
+                self.blockTimeEnd = timestamp
                 with self._endCondition:
                     self._endCondition.notify()
             return True

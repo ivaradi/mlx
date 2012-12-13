@@ -279,10 +279,11 @@ class Aircraft(object):
                 self.logger.message(aircraftState.timestamp,
                                     "Vertical speed range: %.0f..%.0f feet/min" % \
                                     (self._minVS, self._maxVS))
-            elif newStage==const.STAGE_PARKING:
-                self.logger.message(aircraftState.timestamp, "Block time end")
+            # elif newStage==const.STAGE_PARKING:
+            #     self.logger.message(aircraftState.timestamp, "Block time end")
             elif newStage==const.STAGE_END:
                 flightLength = self._flight.flightTimeEnd - self._flight.flightTimeStart
+                self.logger.message(aircraftState.timestamp, "Block time end")
                 self.logger.message(aircraftState.timestamp,
                                     "Flight time: " +
                                     util.getTimeIntervalString(flightLength))
