@@ -1393,6 +1393,7 @@ class AircraftModel(object):
         state.cog = data[self._monidx_cog]
 
         state.xpdrC = data[self._monidx_xpdrC]==0
+        state.autoXPDR = False
 
         state.apMaster = data[self._monidx_apMaster]!=0
         state.apHeadingHold = data[self._monidx_apHeadingHold]!=0
@@ -1791,6 +1792,7 @@ class DAF70Model(F70Model):
         state.navLightsOn = None
         state.landingLightsOn = None
         state.nav2_manual = aircraft.flight.stage!=const.STAGE_CRUISE
+        self.autoXPDR = True
 
         return state
 

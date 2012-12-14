@@ -1069,15 +1069,33 @@ class LandingLightsChecker(PatientFaultChecker):
 
 class TransponderChecker(PatientFaultChecker):
     """Check if the transponder is used properly."""
+    def __init__(self):
+        """Construct the transponder checker."""
+        super(TransponderChecker, self).__init__()
+        self._liftOffTime = None
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
+        if state.onTheGround:
+            self._liftOffTime = None
+        elif self._liftOffTime is None:
+            self._liftOffTime = state.timestamp
+
         return state.xpdrC is not None and \
                ((state.xpdrC and flight.stage in
                  [const.STAGE_BOARDING, const.STAGE_PARKING]) or \
-                (not state.xpdrC and flight.stage in
-                 [const.STAGE_TAKEOFF, const.STAGE_RTO, const.STAGE_CLIMB,
-                  const.STAGE_CRUISE, const.STAGE_DESCENT,
-                  const.STAGE_LANDING, const.STAGE_GOAROUND]))
+                (not state.xpdrC and
+                 (flight.stage in
+                  [const.STAGE_CRUISE, const.STAGE_DESCENT,
+                   const.STAGE_LANDING, const.STAGE_GOAROUND] or \
+                  ((not state.autoXPDR or \
+                    (self._liftOffTime is not None and
+                     state.timestamp > (self._liftOffTime+8))) and \
+                   flight.stage in
+                   [const.STAGE_TAKEOFF, const.STAGE_RTO, const.STAGE_CLIMB])
+                  )
+                 )
+                )
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""

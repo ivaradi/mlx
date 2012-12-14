@@ -249,6 +249,8 @@ class AircraftState(object):
     - cog: the centre of gravity
     - xpdrC: a boolean indicating whether the transponder is in C mode, or
       None, if the state cannot be read properly
+    - autoXPDR: a boolean indicating whether the transponder is turned on
+      automatically if the aircraft becomes airborne
     - apMaster: a boolean indicating whether the autopilot is switched on, or
       None, if the state cannot be read properly
     - apHeadingHold: a boolean indicating whether the autopilot's heading hold
