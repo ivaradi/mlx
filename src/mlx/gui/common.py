@@ -73,6 +73,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
 
+    WEIGHT_NORMAL = pango.WEIGHT_NORMAL
     WEIGHT_BOLD = pango.WEIGHT_BOLD
 
     WINDOW_STATE_ICONIFIED = gdk.WINDOW_STATE_ICONIFIED
@@ -137,6 +138,7 @@ else:
 
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
+    WEIGHT_NORMAL = pango.Weight.NORMAL
     WEIGHT_BOLD = pango.Weight.BOLD
 
     WINDOW_STATE_ICONIFIED = gdk.WindowState.ICONIFIED
@@ -293,10 +295,7 @@ def formatFlightLogLine(timeStr, line):
 
 def addFaultTag(buffer):
     """Add a tag named 'fault' to the given buffer."""
-    faultTag = gtk.TextTag(name = "fault")
-    faultTag.set_property("foreground", "red")
-    faultTag.set_property("weight", WEIGHT_BOLD)
-    buffer.get_tag_table().add(faultTag)
+    buffer.create_tag("fault", foreground="red", weight=WEIGHT_BOLD)
 
 #------------------------------------------------------------------------------
 
@@ -311,10 +310,17 @@ def appendTextBuffer(buffer, text, isFault = False):
 def insertTextBuffer(buffer, iter, text, isFault = False):
     """Insert the given line into the given text buffer at the given iterator.
 
-    If isFault is set, use the tag named 'fault'."""
+    If isFault is set, use the tag named 'fault' else use the tag named
+    'normal'."""
+    line = iter.get_line()
+
+    buffer.insert(iter, text)
+
+    iter0 = buffer.get_iter_at_line(line)
+    iter1 = buffer.get_iter_at_line(line+1)
     if isFault:
-        buffer.insert_with_tags_by_name(iter, text, "fault")
+        buffer.apply_tag_by_name("fault", iter0, iter1)
     else:
-        buffer.insert(iter, text)
+        buffer.remove_all_tags(iter0, iter1)
 
 #------------------------------------------------------------------------------
