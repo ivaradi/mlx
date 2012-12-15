@@ -42,6 +42,9 @@ class Flight(object):
 
         self.blockTimeStart = None
         self.flightTimeStart = None
+        self.climbTimeStart = None
+        self.cruiseTimeStart = None
+        self.descentTimeStart = None
         self.flightTimeEnd = None
         self.blockTimeEnd = None
 
@@ -264,6 +267,7 @@ class Flight(object):
 
         Returns if the stage has really changed."""
         if stage!=self._stage:
+            self._logStageDuration(timestamp, stage)
             self._stage = stage
             self._gui.setStage(stage)
             self.logger.stage(timestamp, stage)
@@ -271,6 +275,12 @@ class Flight(object):
                 self.blockTimeStart = timestamp
             elif stage==const.STAGE_TAKEOFF:
                 self.flightTimeStart = timestamp
+            elif stage==const.STAGE_CLIMB:
+                self.climbTimeStart = timestamp
+            elif stage==const.STAGE_CRUISE:
+                self.cruiseTimeStart = timestamp
+            elif stage==const.STAGE_DESCENT:
+                self.descentTimeStart = timestamp
             elif stage==const.STAGE_TAXIAFTERLAND:
                 self.flightTimeEnd = timestamp
             # elif stage==const.STAGE_PARKING:
@@ -437,5 +447,32 @@ class Flight(object):
         """Get the distance between the previous and the current state."""
         return util.getDistCourse(self._previousLatitude, self._previousLongitude,
                                   currentState.latitude, currentState.longitude)[0]
+
+    def _logStageDuration(self, timestamp, stage):
+        """Log the duration of the stage preceding the given one."""
+        what = None
+        startTime = None
+
+        if stage==const.STAGE_TAKEOFF:
+            what = "Pushback and taxi"
+            startTime = self.blockTimeStart
+        elif stage==const.STAGE_CRUISE:
+            what = "Climb"
+            startTime = self.climbTimeStart
+        elif stage==const.STAGE_DESCENT:
+            what = "Cruise"
+            startTime = self.cruiseTimeStart
+        elif stage==const.STAGE_LANDING:
+            what = "Descent"
+            startTime = self.descentTimeStart
+        elif stage==const.STAGE_END:
+            what = "Taxi after landing"
+            startTime = self.flightTimeEnd
+
+        if what is not None and startTime is not None:
+            duration = timestamp - startTime
+            self.logger.message(timestamp,
+                                "%s time: %s" % \
+                                (what, util.getTimeIntervalString(duration)))
 
 #---------------------------------------------------------------------------------------
