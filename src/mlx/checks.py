@@ -152,6 +152,8 @@ class TakeOffLogger(StateChecker):
             logger.message(state.timestamp,
                            "Takeoff pitch: %.1f degrees" % (state.pitch,))
             logger.message(state.timestamp,
+                           "Takeoff flaps: %.0f" % (state.flapsSet))
+            logger.message(state.timestamp,
                            "CG/Trim: %.1f%%/%.2f" % \
                            (state.cog*100.0, state.elevatorTrim))
             self._onTheGround = False
@@ -619,7 +621,12 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
     """Logger for the flaps setting."""
     def __init__(self):
         """Construct the logger."""
-        StateChangeLogger.__init__(self, logInitial = True)
+        StateChangeLogger.__init__(self, logInitial = True,
+                                   excludedStages =
+                                   [const.STAGE_BOARDING,
+                                    const.STAGE_PUSHANDTAXI,
+                                    const.STAGE_RTO,
+                                    const.STAGE_TAKEOFF])
         SingleValueMixin.__init__(self, "flapsSet")
 
     def _getMessage(self, flight, state, forced):
