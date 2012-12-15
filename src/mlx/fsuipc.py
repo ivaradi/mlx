@@ -1370,6 +1370,9 @@ class AircraftModel(object):
 
         state.altimeter = data[self._monidx_altimeter] / 16.0
 
+        state.ils = None
+        state.ils_obs = None
+        state.ils_manual = False
         state.nav1 = AircraftModel.convertFrequency(data[self._monidx_nav1])
         state.nav1_obs = data[self._monidx_nav1_obs]
         state.nav1_manual = True
@@ -1382,6 +1385,7 @@ class AircraftModel(object):
         state.adf2 = \
             AircraftModel.convertADFFrequency(data[self._monidx_adf2_main],
                                               data[self._monidx_adf2_ext])
+
         state.squawk = AircraftModel.convertBCD(data[self._monidx_squawk], 4)
 
         state.windSpeed = data[self._monidx_windSpeed]
@@ -1791,8 +1795,20 @@ class DAF70Model(F70Model):
                                                          data)
         state.navLightsOn = None
         state.landingLightsOn = None
-        state.nav2_manual = aircraft.flight.stage!=const.STAGE_CRUISE
-        self.autoXPDR = True
+
+        state.ils = state.nav1
+        state.ils_obs = state.nav1_obs
+        state.ils_manual = state.nav1_manual
+
+        state.nav1 = state.nav2
+        state.nav1_obs = state.nav2_obs
+        state.nav1_manual = aircraft.flight.stage!=const.STAGE_CRUISE
+
+        state.nav2 = None
+        state.nav2_obs = None
+        state.nav2_manual = False
+
+        state.autoXPDR = True
 
         return state
 

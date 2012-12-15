@@ -85,6 +85,8 @@ class Aircraft(object):
 
         self._checkers.append(checks.AltimeterLogger())
 
+        self._ilsLogger = checks.ILSLogger()
+        self._checkers.append(self._ilsLogger)
         self._nav1Logger = checks.NAV1Logger()
         self._checkers.append(self._nav1Logger)
         self._nav2Logger = checks.NAV2Logger()
@@ -454,6 +456,7 @@ class Aircraft(object):
         flight = self._flight
         logger = flight.logger
 
+        self._ilsLogger.forceLog(flight, logger, aircraftState)
         self._nav1Logger.forceLog(flight, logger, aircraftState)
         self._nav2Logger.forceLog(flight, logger, aircraftState)
         self._adf1Logger.forceLog(flight, logger, aircraftState)

@@ -516,6 +516,14 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
 
 #---------------------------------------------------------------------------------------
 
+class ILSLogger(NAVLogger):
+    """Logger for the ILS radio setting."""
+    def __init__(self):
+        """Construct the logger."""
+        super(ILSLogger, self).__init__("ils", "ILS")
+
+#---------------------------------------------------------------------------------------
+
 class NAV1Logger(NAVLogger):
     """Logger for the NAV1 radio setting."""
     def __init__(self):
