@@ -63,6 +63,10 @@ class Aircraft(object):
     def __init__(self, flight):
         """Construct the aircraft for the given type."""
         self._flight = flight
+
+        self._name = None
+        self._modelName = None
+
         self._aircraftState = None
 
         self._maxVS = -10000.0
@@ -200,9 +204,10 @@ class Aircraft(object):
 
     def modelChanged(self, timestamp, aircraftName, modelName):
         """Called when the simulator's aircraft changes."""
-        self._flight.logger.message(timestamp,
-                                    "Aircraft: name='%s', model='%s'" % \
-                                    (aircraftName, modelName))
+        self._name = aircraftName
+        self._modelName = modelName
+        if self._flight.stage is not None:
+            self._logNameAndModel(timestamp)
 
     def handleState(self, aircraftState):
         """Called when the state of the aircraft changes.
@@ -239,6 +244,9 @@ class Aircraft(object):
     def setStage(self, aircraftState, newStage):
         """Set the given stage as the new one and do whatever should be
         done."""
+        if newStage==const.STAGE_BOARDING:
+            self._logNameAndModel(aircraftState.timestamp)
+
         if self._flight.setStage(aircraftState.timestamp, newStage):
             if newStage==const.STAGE_PUSHANDTAXI:
                 self.logger.message(aircraftState.timestamp, "Block time start")
@@ -461,6 +469,13 @@ class Aircraft(object):
         self._nav2Logger.forceLog(flight, logger, aircraftState)
         self._adf1Logger.forceLog(flight, logger, aircraftState)
         self._adf2Logger.forceLog(flight, logger, aircraftState)
+
+    def _logNameAndModel(self, timestamp):
+        """Log the aircraft's name and model with taking the timestamp from the
+        given state."""
+        self._flight.logger.message(timestamp,
+                                    "Aircraft: name='%s', model='%s'" % \
+                                    (self._name, self._modelName))
 
 #---------------------------------------------------------------------------------------
 
