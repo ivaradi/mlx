@@ -1957,6 +1957,54 @@ class T154Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
+class PTT154Model(T154Model):
+    """Project Tupolev Tu-154."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        print "PTT154Model.doesHandle", aircraft.type, name, airPath
+        return aircraft.type==const.AIRCRAFT_T154 and \
+               name.find("Tu-154")!=-1 and \
+               os.path.basename(airPath).startswith("154b_")
+
+    def __init__(self):
+        """Construct the model."""
+        super(PTT154Model, self).__init__()
+        self._adf1 = None
+        self._adf2 = None
+        self._lastValue = None
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Project Tupolev Tu-154"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get an aircraft state object for the given monitoring data.
+
+        This removes the reverser value for the middle engine."""
+        state = super(PTT154Model, self).getAircraftState(aircraft, timestamp, data)
+
+        adf1 = state.adf1
+        if self._adf1 is None:
+            self._adf1 = self._adf2 = adf1
+        elif adf1 != self._lastValue and adf1 != self._adf1 and \
+             adf1 != self._adf2:
+            if self._lastValue==self._adf2:
+                self._adf1 = adf1
+            else:
+                self._adf2 = adf1
+
+        self._lastValue = adf1
+        state.adf1 = self._adf1
+        state.adf2 = self._adf2
+
+        return state
+
+
+#------------------------------------------------------------------------------
+
 class YK40Model(GenericAircraftModel):
     """Generic model for the Yakovlev Yak-40 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
@@ -1997,5 +2045,6 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 AircraftModel.registerSpecial(DreamwingsDH8DModel)
 AircraftModel.registerSpecial(DAF70Model)
+AircraftModel.registerSpecial(PTT154Model)
 
 #------------------------------------------------------------------------------
