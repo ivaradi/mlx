@@ -201,6 +201,9 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 2, 3, 7, 8)
         table.attach(self._apHeading, 3, 4, 7, 8)
 
+        self._xpdrC = gtk.Label("XPDR C")
+        table.attach(self._xpdrC, 4, 5, 7, 8)
+
         self._apAltitudeHold = gtk.Label("AP ALT HOLD")
         table.attach(self._apAltitudeHold, 5, 6, 7, 8)
 
@@ -208,8 +211,13 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 6, 7, 7, 8)
         table.attach(self._apAltitude, 7, 8, 7, 8)
 
-        self._xpdrC = gtk.Label("XPDR CHARLIE")
-        table.attach(self._xpdrC, 10, 12, 7, 8)
+        (label, self._adf1) = self._createLabeledEntry("ADF1:", 5)
+        table.attach(label, 8, 9, 7, 8)
+        table.attach(self._adf1, 9, 10, 7, 8)
+
+        (label, self._adf2) = self._createLabeledEntry("ADF2:", 5)
+        table.attach(label, 10, 11, 7, 8)
+        table.attach(self._adf2, 11, 12, 7, 8)
 
         alignment.add(table)
 
@@ -289,9 +297,11 @@ class MonitorWindow(gtk.Window):
             self._apMaster.set_sensitive(False)
             self._apHeadingHold.set_sensitive(False)
             self._apHeading.set_text("-")
+            self._xpdrC.set_sensitive(False)
             self._apAltitudeHold.set_sensitive(False)
             self._apAltitude.set_text("-")
-            self._xpdrC.set_sensitive(False)
+            self._adf1.set_text("-")
+            self._adf2.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -374,9 +384,11 @@ class MonitorWindow(gtk.Window):
             self._apMaster.set_sensitive(aircraftState.apMaster)
             self._apHeadingHold.set_sensitive(aircraftState.apHeadingHold)
             self._apHeading.set_text("%03.0f" % (aircraftState.apHeading,))
+            self._xpdrC.set_sensitive(aircraftState.xpdrC)
             self._apAltitudeHold.set_sensitive(aircraftState.apAltitudeHold)
             self._apAltitude.set_text("%5.0f" % (aircraftState.apAltitude,))
 
-            self._xpdrC.set_sensitive(aircraftState.xpdrC)
+            self._adf1.set_text("-" if aircraftState.adf1 is None else aircraftState.adf1)
+            self._adf2.set_text("-" if aircraftState.adf2 is None else aircraftState.adf2)
 
 #------------------------------------------------------------------------------
