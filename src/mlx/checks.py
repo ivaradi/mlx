@@ -110,9 +110,13 @@ class ACARSSender(StateChecker):
         """Construct the ACARS sender."""
         self._gui = gui
         self._lastSent = None
+        self._sending = False
 
     def check(self, flight, aircraft, logger, oldState, state):
         """If the time has come to send the ACARS, send it."""
+        if self._sending:
+            return
+
         now = time.time()
 
         if self._lastSent is not None and \
@@ -130,6 +134,7 @@ class ACARSSender(StateChecker):
                              else self._lastSent + ACARSSender.INTERVAL
         else:
             print "Failed to send the ACARS"
+        self._sending = False
 
 #---------------------------------------------------------------------------------------
 
