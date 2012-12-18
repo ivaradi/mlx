@@ -77,10 +77,10 @@
          Abort
      ${Endif}
 
-     ${NSD_CreateLabel} 0 0 100% 24u "If you select the option below, the program will be installed in a way that it can be used besides another, already existing installation. Read the manual on how to set up this secondary version to avoid conflicting with the primary one."
+     ${NSD_CreateLabel} 0 0 100% 32u "If you select the option below, the program will be installed in a way that it can be used besides another, already existing installation. Its default configuration will be such that it does not conflict with another logger running as a primary one. Normally, you should leave this unchecked."
      Pop $Variable
 
-     ${NSD_CreateCheckBox} 12 54 100% 12u "Install as secondary"
+     ${NSD_CreateCheckBox} 12 62 100% 12u "Install as a secondary copy"
      Pop $Secondary
      ${NSD_SetState} $Secondary $Secondary_State
      GetFunctionAddress $Variable onSecondaryClicked
