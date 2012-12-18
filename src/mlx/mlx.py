@@ -69,8 +69,9 @@ def main():
     config = Config()
     config.load()
 
-    if (len(sys.argv)<=1 or sys.argv[1]!="usedeflang") and config.setupLocale():
-        restart(["usedeflang"] + (["secondary"] if secondaryInstallation else []))
+    secondaryArgs = ["secondary"] if secondaryInstallation else []
+    if "usedeflang" not in sys.argv and config.setupLocale():
+        restart(["usedeflang"] + secondaryArgs)
 
     setLanguage(programDirectory, config.getLanguage())
 
@@ -94,7 +95,7 @@ def main():
     config.save()
 
     if gui.toRestart:
-        restart()
+        restart(secondaryArgs)
 
 #--------------------------------------------------------------------------------------
 
