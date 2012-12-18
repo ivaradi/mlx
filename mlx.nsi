@@ -49,7 +49,6 @@
 ;--------------------------------
 ;Pages
 
-
   !insertmacro MUI_PAGE_LICENSE "license.txt"
   Page custom optionsPage ;optionsPageLeave
   !insertmacro MUI_PAGE_COMPONENTS
@@ -68,7 +67,7 @@
   !insertmacro MUI_UNPAGE_INSTFILES
 
   Function optionsPage
-     !insertmacro MUI_HEADER_TEXT "Installation Options" "Choose the options for the installation"
+     !insertmacro MUI_HEADER_TEXT $(InstallOpts_Title) $(InstallOpts_SubTitle)
 
      nsDialogs::Create 1018
      Pop $Variable
@@ -77,10 +76,10 @@
          Abort
      ${Endif}
 
-     ${NSD_CreateLabel} 0 0 100% 32u "If you select the option below, the program will be installed in a way that it can be used besides another, already existing installation. Its default configuration will be such that it does not conflict with another logger running as a primary one. Normally, you should leave this unchecked."
+     ${NSD_CreateLabel} 0 0 100% 32u $(InstallOpts_SecondaryExpl)
      Pop $Variable
 
-     ${NSD_CreateCheckBox} 12 62 100% 12u "Install as a secondary copy"
+     ${NSD_CreateCheckBox} 12 62 100% 12u $(InstallOpts_Secondary)
      Pop $Secondary
      ${NSD_SetState} $Secondary $Secondary_State
      GetFunctionAddress $Variable onSecondaryClicked
@@ -105,6 +104,7 @@
 ;Languages
 
   !insertmacro MUI_LANGUAGE "English"
+  !insertmacro MUI_LANGUAGE "Hungarian"
 
 ;--------------------------------
 ;Installer Sections
@@ -145,12 +145,25 @@ SectionEnd
 ;Descriptions
 
   ;Language strings
-  LangString DESC_SecMLX ${LANG_ENGLISH} "MAVA Logger X."
+  LangString DESC_SecMLX ${LANG_ENGLISH} "The MAVA Logger X application itself."
+  LangString DESC_SecMLX ${LANG_HUNGARIAN} "Maga a MAVA Logger X alkalmazás."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecMLX} $(DESC_SecMLX)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+  LangString InstallOpts_Title ${LANG_ENGLISH} "Installation Options"
+  LangString InstallOpts_Title ${LANG_HUNGARIAN} "Telepítési beállítások"
+
+  LangString InstallOpts_SubTitle ${LANG_ENGLISH} "Choose the options for the installation"
+  LangString InstallOpts_SubTitle ${LANG_HUNGARIAN} "Válassza ki a telepítés beállításait"
+
+  LangString InstallOpts_SecondaryExpl ${LANG_ENGLISH} "If you select the option below, the program will be installed in a way that it can be used besides another, already existing installation. Its default configuration will be such that it does not conflict with another logger running as a primary one. Normally, you should leave this unchecked."
+  LangString InstallOpts_SecondaryExpl ${LANG_HUNGARIAN} "Az alábbi opció kijelölésével a programot úgy fogjuk telepíteni, hogy azt egy másik mellett, azzal egyidejûen lehessen használni. Az alapértelmezett konfigurációja elkerüli a másik futó loggerrel való ütközést. Általában azonban ezt az opciót nem kell kijelölni."
+
+  LangString InstallOpts_Secondary ${LANG_ENGLISH} "Install as a secondary copy"
+  LangString InstallOpts_Secondary ${LANG_HUNGARIAN} "Telepítés másodlagos példányként"
 
 ;--------------------------------
 ;Uninstaller Section
