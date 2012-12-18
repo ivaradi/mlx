@@ -80,5 +80,6 @@ setup(name = "mlx",
 
 if os.name=="nt":
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
-    with open(os.path.join(scriptdir, "dist", "Uninstall.conf")) as f:
-        print >> f, "startMenuFolder=MAVA Logger X"
+    with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
+        print >> f, "StartMenuFolder=MAVA Logger X"
+        print >> f, "LinkName=MAVA Logger X"
