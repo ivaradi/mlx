@@ -1078,7 +1078,8 @@ class LandingLightsChecker(PatientFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
-        score = 0 if flight.stage==const.STAGE_LANDING else 1
+        score = 0 if flight.stage in [const.STAGE_TAKEOFF,
+                                      const.STAGE_LANDING] else 1
         message = "Landing lights were %s" % \
                   (("on" if state.landingLightsOn else "off"),)
         flight.handleFault(LandingLightsChecker, state.timestamp,
