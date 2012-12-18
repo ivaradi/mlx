@@ -1,13 +1,15 @@
 # -*- encoding: utf-8 -*-
 
 import const
+from util import secondaryInstallation
 
 import os
 import sys
+import traceback
 import ConfigParser
 
 ## @package mlx.config
-# 
+#
 # The handling of the configuration.
 #
 # The \ref Config class contains the main configuration and is capable of
@@ -21,7 +23,8 @@ import ConfigParser
 #-------------------------------------------------------------------------------
 
 configPath = os.path.join(os.path.expanduser("~"),
-                          "mlx.config" if os.name=="nt" else ".mlxrc")
+                          "mlx.config" if os.name=="nt" else ".mlxrc") + \
+                          ("-secondary" if secondaryInstallation else "")
 
 #-------------------------------------------------------------------------------
 
@@ -53,7 +56,7 @@ class Hotkey(object):
     def __ne__(self, other):
         """Check if the given hotkey is not equal to the other one."""
         return not self==other
-        
+
     def __str__(self):
         """Construct the hotkey to a string."""
         s = ""
@@ -68,7 +71,7 @@ class Checklist(object):
     """A checklist for a certain aircraft type."""
     # The name of the section of the checklists
     SECTION="checklists"
-    
+
     @staticmethod
     def fromConfig(config, aircraftType):
         """Create a checklist for the given aircraft type from the given
@@ -107,7 +110,7 @@ class Checklist(object):
     def __ne__(self, other):
         """Determine if the checklist is not equal to the given other one."""
         return not self==other
-        
+
     def __len__(self):
         """Get the length of the file list."""
         return len(self._fileList)
@@ -126,7 +129,7 @@ class ApproachCallouts(object):
     """The approach callouts for a certain aircraft type."""
     # The name of the section of the approach callouts
     SECTION="callouts"
-    
+
     @staticmethod
     def fromConfig(config, aircraftType):
         """Create a checklist for the given aircraft type from the given
@@ -144,7 +147,7 @@ class ApproachCallouts(object):
             else:
                 break
 
-        return ApproachCallouts(mapping)    
+        return ApproachCallouts(mapping)
 
     def __init__(self, mapping = None):
         """Construct the check list with the given mapping of altitudes to
@@ -210,7 +213,7 @@ class Config(object):
     DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
 
     _messageTypesSection = "messageTypes"
-    
+
     def __init__(self):
         """Construct the configuration with default values."""
 
@@ -221,8 +224,8 @@ class Config(object):
         self._language = ""
         self._hideMinimizedWindow = True
         self._quitOnClose = False
-        self._onlineGateSystem = True
-        self._onlineACARS = True
+        self._onlineGateSystem = not secondaryInstallation
+        self._onlineACARS = not secondaryInstallation
         self._flareTimeFromFS = False
         self._syncFSTime = False
         self._usingFS2Crew = False
@@ -231,7 +234,7 @@ class Config(object):
 
         self._pirepDirectory = None
 
-        self._enableSounds = True
+        self._enableSounds = not secondaryInstallation
 
         self._pilotControlsSounds = True
         self._pilotHotkey = Hotkey(ctrl = True, shift = False, key = "0")
@@ -241,9 +244,11 @@ class Config(object):
 
         self._enableChecklists = False
         self._checklistHotkey = Hotkey(ctrl = True, shift = True, key = "0")
-                
-        self._autoUpdate = True        
+
+        self._autoUpdate = True
         self._updateURL = Config.DEFAULT_UPDATE_URL
+        if secondaryInstallation:
+            self._updateURL += "/exp"
 
         self._messageTypeLevels = {}
 
@@ -252,7 +257,7 @@ class Config(object):
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = Checklist()
             self._approachCallouts[aircraftType] = ApproachCallouts()
-            
+
         self._modified = False
 
     @property
@@ -314,7 +319,7 @@ class Config(object):
         if hideMinimizedWindow!=self._hideMinimizedWindow:
             self._hideMinimizedWindow = hideMinimizedWindow
             self._modified = True
-    
+
     @property
     def quitOnClose(self):
         """Get whether the application should quit when the close button is
@@ -328,7 +333,7 @@ class Config(object):
         if quitOnClose!=self._quitOnClose:
             self._quitOnClose = quitOnClose
             self._modified = True
-    
+
     @property
     def onlineGateSystem(self):
         """Get whether the online gate system should be used."""
@@ -461,7 +466,7 @@ class Config(object):
         level = self.getMessageTypeLevel(messageType)
         return level==const.MESSAGELEVEL_FS or \
                level==const.MESSAGELEVEL_BOTH
-        
+
     def setMessageTypeLevel(self, messageType, level):
         """Set the level of the given message type."""
         if messageType not in self._messageTypeLevels or \
@@ -481,7 +486,7 @@ class Config(object):
             self._enableSounds = enableSounds
             self._modified = True
 
-    @property 
+    @property
     def pilotControlsSounds(self):
         """Get whether the pilot controls the background sounds."""
         return self._pilotControlsSounds
@@ -528,7 +533,7 @@ class Config(object):
         if speedbrakeAtTD!=self._speedbrakeAtTD:
             self._speedbrakeAtTD = speedbrakeAtTD
             self._modified = True
-        
+
     @property
     def enableChecklists(self):
         """Get whether aircraft-specific checklists should be played."""
@@ -599,8 +604,12 @@ class Config(object):
 
     def load(self):
         """Load the configuration from its default location."""
-        config = ConfigParser.RawConfigParser()
-        config.read(configPath)
+        try:
+            config = ConfigParser.RawConfigParser()
+            config.read(configPath)
+        except:
+            traceback.print_exc()
+            return
 
         self._pilotID = self._get(config, "login", "id", "")
         self._password = self._get(config, "login", "password", "")
@@ -614,12 +623,13 @@ class Config(object):
                                                      True)
         self._quitOnClose = self._getBoolean(config, "general",
                                              "quitOnClose", False)
-        
+
         self._onlineGateSystem = self._getBoolean(config, "general",
                                                   "onlineGateSystem",
-                                                  True)
+                                                  not secondaryInstallation)
         self._onlineACARS = self._getBoolean(config, "general",
-                                             "onlineACARS", True)
+                                             "onlineACARS",
+                                             not secondaryInstallation)
         self._flareTimeFromFS = self._getBoolean(config, "general",
                                                  "flareTimeFromFS",
                                                  False)
@@ -643,8 +653,8 @@ class Config(object):
             self._messageTypeLevels[messageType] = \
                 self._getMessageTypeLevel(config, messageType)
 
-        self._enableSounds = self._getBoolean(config, "sounds",
-                                              "enable", True)
+        self._enableSounds = self._getBoolean(config, "sounds", "enable",
+                                              not secondaryInstallation)
         self._pilotControlsSounds = self._getBoolean(config, "sounds",
                                                      "pilotControls", True)
         self._pilotHotkey.set(self._get(config, "sounds",
@@ -658,10 +668,11 @@ class Config(object):
                                                   "enableChecklists", False)
         self._checklistHotkey.set(self._get(config, "sounds",
                                             "checklistHotkey", "CS0"))
-            
+
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
         self._updateURL = self._get(config, "update", "url",
-                                    Config.DEFAULT_UPDATE_URL)
+                                    Config.DEFAULT_UPDATE_URL +
+                                    ("/exp" if secondaryInstallation else ""))
 
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = \
@@ -713,7 +724,7 @@ class Config(object):
         for messageType in const.messageTypes:
             if messageType in self._messageTypeLevels:
                 option = self._getMessageTypeLevelOptionName(messageType)
-                level = self._messageTypeLevels[messageType]                
+                level = self._messageTypeLevels[messageType]
                 config.set(Config._messageTypesSection, option,
                            const.messageLevel2string(level))
 
@@ -732,7 +743,7 @@ class Config(object):
                    "yes" if self._enableChecklists else "no")
         config.set("sounds", "checklistHotkey",
                    str(self._checklistHotkey))
-        
+
         config.add_section("update")
         config.set("update", "auto",
                    "yes" if self._autoUpdate else "no")
@@ -759,7 +770,7 @@ class Config(object):
         return config.getboolean(section, option) \
                if config.has_option(section, option) \
                else default
-    
+
     def _get(self, config, section, option, default):
         """Get the given option as a string, if found in the given config,
         otherwise the default."""
@@ -773,11 +784,13 @@ class Config(object):
         if config.has_option(Config._messageTypesSection, option):
             value = config.get(Config._messageTypesSection, option)
             return const.string2messageLevel(value)
+        elif secondaryInstallation:
+            return const.MESSAGELEVEL_NONE
         elif messageType in [const.MESSAGETYPE_LOGGER_ERROR,
                              const.MESSAGETYPE_FAULT,
                              const.MESSAGETYPE_NOGO,
                              const.MESSAGETYPE_GATE_SYSTEM,
-                             const.MESSAGETYPE_HELP]:            
+                             const.MESSAGETYPE_HELP]:
             return const.MESSAGELEVEL_BOTH
         else:
             return const.MESSAGELEVEL_FS

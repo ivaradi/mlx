@@ -2,6 +2,7 @@
 from config import Config
 from i18n import setLanguage
 from sound import initializeSound
+from util import secondaryInstallation
 
 import os
 import sys
@@ -50,7 +51,7 @@ def restart(args = []):
     args = [programPath] + args
 
     instance.close()
-    os.execv(programPath, args)    
+    os.execv(programPath, args)
 
 #--------------------------------------------------------------------------------------
 
@@ -59,7 +60,8 @@ def main():
     from singleton import SingleInstance, raiseCallbackWrapper
 
     global instance
-    instance = SingleInstance("mlx", raiseCallbackWrapper)
+    instance = SingleInstance("mlx" + ("-secondary" if secondaryInstallation
+                                       else ""), raiseCallbackWrapper)
     if not instance: return
 
     programDirectory = os.path.dirname(sys.argv[0])
@@ -68,13 +70,13 @@ def main():
     config.load()
 
     if (len(sys.argv)<=1 or sys.argv[1]!="usedeflang") and config.setupLocale():
-        restart(["usedeflang"])
+        restart(["usedeflang"] + (["secondary"] if secondaryInstallation else []))
 
     setLanguage(programDirectory, config.getLanguage())
-    
+
     from .gui.gui import GUI
     gui = GUI(programDirectory, config)
-    
+
     sys.stdout = StdIOHandler(gui)
     sys.stderr = StdIOHandler(gui)
 

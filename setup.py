@@ -38,14 +38,14 @@ if os.name=="nt":
         path = os.path.join("share", "themes", "MS-Windows", "gtk-2.0")
         data_files.append((os.path.join("library", path),
                            glob(os.path.join(gtkRuntimeDir, path, "*"))))
-        
+
         path = os.path.join("share", "locale", "hu", "LC_MESSAGES")
         data_files.append((os.path.join("library", path),
                            glob(os.path.join(gtkRuntimeDir, path, "*"))))
         path = os.path.join("share", "icons", "hicolor")
         data_files.append((os.path.join("library", path),
                            glob(os.path.join(gtkRuntimeDir, path, "*"))))
-        
+
     with open("mlx-common.nsh", "wt") as f:
             print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
             f.close()
@@ -80,3 +80,5 @@ setup(name = "mlx",
 
 if os.name=="nt":
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
+    with open(os.path.join(scriptdir, "dist", "Uninstall.conf")) as f:
+        print >> f, "startMenuFolder=MAVA Logger X"

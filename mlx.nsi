@@ -4,10 +4,18 @@
 ;Include Modern UI
 
   !include "MUI.nsh"
+  !include "nsDialogs.nsh"
+  !include "TextFunc.nsh"
   !include "mlx-common.nsh"
 
 ;--------------------------------
 ;General
+
+  Var ApplicationName
+
+  Function .onInit
+    StrCpy $ApplicationName "Mava Logger X"
+  FunctionEnd
 
   ;Name and file
   Name "MAVA Logger X"
@@ -16,9 +24,6 @@
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\MAVA Logger X"
-  
-  ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\MAVA Logger X" ""
 
   ;Vista redirects $SMPROGRAMS to all users without this
   RequestExecutionLevel admin
@@ -28,6 +33,11 @@
 
   Var MUI_TEMP
   Var STARTMENU_FOLDER
+  Var Variable
+  Var Secondary
+  Var Secondary_State
+  Var LinkName
+  Var Parameters
 
 ;--------------------------------
 ;Interface Settings
@@ -39,25 +49,61 @@
 ;--------------------------------
 ;Pages
 
+
   !insertmacro MUI_PAGE_LICENSE "license.txt"
+  Page custom optionsPage ;optionsPageLeave
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
 
   ;Start Menu Folder Page Configuration
-  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\MAVA Logger X" 
-  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-  
+  ;!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU"
+  ;!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\MAVA Logger X"
+  ;!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
   !insertmacro MUI_PAGE_INSTFILES
-  
+
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
-  
+
+  Function optionsPage
+     !insertmacro MUI_HEADER_TEXT "Installation Options" "Choose the options for the installation"
+
+     nsDialogs::Create 1018
+     Pop $Variable
+
+     ${If} $Variable == error
+         Abort
+     ${Endif}
+
+     ${NSD_CreateLabel} 0 0 100% 24u "If you select the option below, the program will be installed in a way that it can be used besides another, already existing installation. Read the manual on how to set up this secondary version to avoid conflicting with the primary one."
+     Pop $Variable
+
+     ${NSD_CreateCheckBox} 12 54 100% 12u "Install as secondary"
+     Pop $Secondary
+     ${NSD_SetState} $Secondary $Secondary_State
+     GetFunctionAddress $Variable onSecondaryClicked
+     nsDialogs::onClick $Secondary $Variable
+
+     nsDialogs::Show
+  FunctionEnd
+
+  Function onSecondaryClicked
+     Pop $Secondary
+     ${NSD_GetState} $Secondary $Secondary_State
+     ${If} $Secondary_State == ${BST_CHECKED}
+         StrCpy $INSTDIR "$PROGRAMFILES\MAVA Logger X (Secondary)"
+         StrCpy $STARTMENU_FOLDER "MAVA Logger X (Secondary)"
+     ${Else}
+         StrCpy $INSTDIR "$PROGRAMFILES\MAVA Logger X"
+         StrCpy $STARTMENU_FOLDER "MAVA Logger X"
+     ${EndIf}
+  FunctionEnd
+
 ;--------------------------------
 ;Languages
- 
+
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
@@ -66,22 +112,32 @@
 Section "MAVA Logger X" SecMLX
 
   SetOutPath "$INSTDIR"
-  
+
+  ${If} $Secondary_State == ${BST_CHECKED}
+    StrCpy $LinkName "MAVA Logger X (Secondary)"
+    StrCpy $Parameters "secondary"
+  ${Else}
+    StrCpy $LinkName "MAVA Logger X"
+    StrCpy $Parameters ""
+  ${EndIf}
+
   ;ADD YOUR OWN FILES HERE...
   File /r dist\*.*
 
-  ;Store installation folder
-  WriteRegStr HKCU "Software\MAVA Logger X" "" $INSTDIR
-  
+  ;Create the uninstaller config file
+  ${ConfigWrite} "$INSTDIR\Uninstall.conf" "StartMenuFolder=" "$STARTMENU_FOLDER" $Variable
+  ${ConfigWrite} "$INSTDIR\Uninstall.conf" "LinkName=" "$LinkName" $Variable
+
   ;Create uninstaller
+
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\MAVA Logger X.lnk" "$INSTDIR\runmlx.exe"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\MAVA Logger X.lnk" "$INSTDIR\runmlx.exe" "$Parameters"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-    CreateShortCut "$DESKTOP\MAVA Logger X.lnk" "$INSTDIR\runmlx.exe"
+    CreateShortCut "$DESKTOP\$LinkName.lnk" "$INSTDIR\runmlx.exe" "$Parameters"
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
@@ -101,26 +157,26 @@ SectionEnd
 
 Section "Uninstall"
 
+  ;Read the uninstaller config file
+  ${ConfigRead} "$INSTDIR\Uninstall.conf" "StartMenuFolder=" $MUI_TEMP
+  ${ConfigRead} "$INSTDIR\Uninstall.conf" "LinkName=" $LinkName
+
   RMDir /r "$INSTDIR"
 
-  !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
-    
-  Delete "$DESKTOP\MAVA Logger X.lnk"
+  Delete "$DESKTOP\$LinkName.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\MAVA Logger X.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  
+
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
- 
+
   startMenuDeleteLoop:
     ClearErrors
     RMDir $MUI_TEMP
     GetFullPathName $MUI_TEMP "$MUI_TEMP\.."
-    
+
     IfErrors startMenuDeleteLoopDone
-  
+
     StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
   startMenuDeleteLoopDone:
-
-  DeleteRegKey /ifempty HKCU "Software\MAVA Logger X"
 SectionEnd

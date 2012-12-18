@@ -1,6 +1,7 @@
 
 import math
 import time
+import sys
 
 #------------------------------------------------------------------------------
 
@@ -25,13 +26,13 @@ def getDegMinSec(degrees):
     - the minutes as an integer
     - the seconds as an integer
     - 1.0 if the value was non-negative, -1.0 if it was negative."""
-    
+
     if degrees<0:
         degrees = -degrees
         mul = -1.0
     else:
         mul = 1.0
-        
+
     deg = int(degrees)
     min = int((degrees*60.0)%60.0)
     sec = int((degrees*3600.0)%60.0)
@@ -124,7 +125,7 @@ def getDistCourse(latitude1, longitude1, latitude2, longitude2):
     """Get the distance and course between the two geographical coordinates.
 
     This function calculates the rhumb distance."""
-    
+
     latitude1 = math.radians(latitude1)
     longitude1 = math.radians(longitude1)
 
@@ -159,3 +160,7 @@ def visibility2String(visibility):
     """Convert the given visibility expressed in metres into a string."""
     return "%.0f metres" % (visibility,) if visibility<10000 \
            else "%.1f kilometres" % (visibility/1000.0,)
+
+#------------------------------------------------------------------------------
+
+secondaryInstallation="secondary" in sys.argv

@@ -2,6 +2,8 @@
 import mlx.const as _const
 from mlx.i18n import xstr
 
+from mlx.util import secondaryInstallation
+
 import os
 
 #-----------------------------------------------------------------------------
@@ -261,6 +263,8 @@ gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
 PROGRAM_NAME = "MAVA Logger X"
 
 WINDOW_TITLE_BASE = PROGRAM_NAME + " " + _const.VERSION
+if secondaryInstallation:
+    WINDOW_TITLE_BASE += " (" + xstr("secondary") + ")"
 
 #------------------------------------------------------------------------------
 
