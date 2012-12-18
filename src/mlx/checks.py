@@ -123,6 +123,7 @@ class ACARSSender(StateChecker):
            (self._lastSent + ACARSSender.INTERVAL)>now:
             return
 
+        self._sending = True
         acars = ACARS(self._gui, state)
         self._gui.webHandler.sendACARS(self._acarsCallback, acars)
 
