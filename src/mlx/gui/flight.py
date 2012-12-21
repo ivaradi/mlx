@@ -4,6 +4,7 @@ from mlx.gui.common import *
 import mlx.const as const
 import mlx.fs as fs
 import mlx.acft as acft
+from mlx.flight import Flight
 from mlx.checks import PayloadChecker
 import mlx.util as util
 from mlx.pirep import PIREP
@@ -1654,7 +1655,6 @@ class RoutePage(Page):
         self._cruiseLevel.set_numeric(True)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
         label.set_mnemonic_widget(self._cruiseLevel)
-        self._filedCruiseLevel = 240
 
         levelBox.pack_start(self._cruiseLevel, False, False, 8)
 
@@ -1705,11 +1705,6 @@ class RoutePage(Page):
     @property
     def filedCruiseLevel(self):
         """Get the filed cruise level."""
-        return self._filedCruiseLevel
-
-    @property
-    def cruiseLevel(self):
-        """Get the cruise level."""
         return self._cruiseLevel.get_value_as_int()
 
     @property
@@ -1720,7 +1715,6 @@ class RoutePage(Page):
     def activate(self):
         """Setup the route from the booked flight."""
         self._cruiseLevel.set_value(240)
-        self._filedCruiseLevel = 240
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
         self._updateForwardButton()
 
@@ -1738,7 +1732,6 @@ class RoutePage(Page):
     def _cruiseLevelChanged(self, spinButton):
         """Called when the cruise level has changed."""
         self._updateForwardButton()
-        self._wizard.cruiseLevelChanged()
 
     def _routeChanged(self, textBuffer):
         """Called when the route has changed."""
@@ -1770,7 +1763,6 @@ class RoutePage(Page):
             self._wizard.nextPage()
         else:
             bookedFlight = self._wizard._bookedFlight
-            self._filedCruiseLevel = self.cruiseLevel
             self._wizard.gui.beginBusy(xstr("route_down_notams"))
             self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
                                                   bookedFlight.departureICAO,
@@ -2207,6 +2199,120 @@ class TakeoffPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard.gui.flight.aircraft.updateV1R2()
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
+class CruisePage(Page):
+    """The page containing the flight level that might change during flight."""
+    def __init__(self, wizard):
+        """Construct the page."""
+        super(CruisePage, self).__init__(wizard, xstr("cruise_title"),
+                                         xstr("cruise_help"))
+
+        self._loggable = False
+        self._loggedCruiseLevel = 240
+        self._activated = False
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+                                  xscale = 0.0, yscale = 1.0)
+
+        mainBox = gtk.VBox()
+        alignment.add(mainBox)
+        self.setMainWidget(alignment)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 0.0, yscale = 0.0)
+        mainBox.pack_start(alignment, False, False, 16)
+
+        levelBox = gtk.HBox()
+
+        label = gtk.Label(xstr("route_level"))
+        label.set_use_underline(True)
+        levelBox.pack_start(label, True, True, 0)
+
+        self._cruiseLevel = gtk.SpinButton()
+        self._cruiseLevel.set_increments(step = 10, page = 100)
+        self._cruiseLevel.set_range(min = 50, max = 500)
+        self._cruiseLevel.set_tooltip_text(xstr("cruise_route_level_tooltip"))
+        self._cruiseLevel.set_numeric(True)
+        self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
+        label.set_mnemonic_widget(self._cruiseLevel)
+
+        levelBox.pack_start(self._cruiseLevel, False, False, 8)
+
+        self._updateButton = gtk.Button(xstr("cruise_route_level_update"));
+        self._updateButton.set_use_underline(True)
+        self._updateButton.set_tooltip_text(xstr("cruise_route_level_update_tooltip"))
+        self._updateButton.connect("clicked", self._updateButtonClicked)
+
+        levelBox.pack_start(self._updateButton, False, False, 16)
+
+        mainBox.pack_start(levelBox, False, False, 0)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 0.0, yscale = 1.0)
+        mainBox.pack_start(alignment, True, True, 0)
+
+        self.addCancelFlightButton()
+
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
+
+    @property
+    def activated(self):
+        """Determine if the page is already activated or not."""
+        return self._activated
+
+    @property
+    def cruiseLevel(self):
+        """Get the cruise level."""
+        return self._loggedCruiseLevel
+
+    @property
+    def loggableCruiseLevel(self):
+        """Get the cruise level which should be logged."""
+        return self._cruiseLevel.get_value_as_int()
+
+    def setLoggable(self, loggable):
+        """Set whether the cruise altitude can be logged."""
+        self._loggable = loggable
+        self._updateButtons()
+
+    def activate(self):
+        """Setup the route from the booked flight."""
+        self._loggedCruiseLevel = self._wizard.filedCruiseLevel
+        self._cruiseLevel.set_value(self._loggedCruiseLevel)
+        self._activated = True
+
+    def reset(self):
+        """Reset the page."""
+        self._loggable = False
+        self._activated = False
+        super(CruisePage, self).reset()
+
+    def _updateButtons(self):
+        """Update the sensitivity of the buttons."""
+        self._updateButton.set_sensitive(self._loggable and
+                                         self.loggableCruiseLevel!=
+                                         self._loggedCruiseLevel)
+
+    def _cruiseLevelChanged(self, spinButton):
+        """Called when the cruise level has changed."""
+        self._updateButtons()
+
+    def _updateButtonClicked(self, button):
+        """Called when the update button is clicked."""
+        if self._wizard.cruiseLevelChanged():
+            self._loggedCruiseLevel = self.loggableCruiseLevel
+            self._updateButtons()
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+
+    def _forwardClicked(self, button):
+        """Called when the Forward button is clicked."""
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -2847,6 +2953,8 @@ class Wizard(gtk.VBox):
         self._arrivalBriefingIndex = len(self._pages)
         self._takeoffPage = TakeoffPage(self)
         self._pages.append(self._takeoffPage)
+        self._cruisePage = CruisePage(self)
+        self._pages.append(self._cruisePage)
         self._landingPage = LandingPage(self)
         self._pages.append(self._landingPage)
         self._finishPage = FinishPage(self)
@@ -2946,6 +3054,11 @@ class Wizard(gtk.VBox):
                else self._payloadPage.calculateZFW()
 
     @property
+    def filedCruiseLevel(self):
+        """Get the filed cruise level."""
+        return self._routePage.filedCruiseLevel
+
+    @property
     def filedCruiseAltitude(self):
         """Get the filed cruise altitude."""
         return self._routePage.filedCruiseLevel * 100
@@ -2953,7 +3066,17 @@ class Wizard(gtk.VBox):
     @property
     def cruiseAltitude(self):
         """Get the cruise altitude."""
-        return self._routePage.cruiseLevel * 100
+        level = self._cruisePage.cruiseLevel if self._cruisePage.activated \
+                else self._routePage.filedCruiseLevel
+        return level * 100
+
+    @property
+    def loggableCruiseAltitude(self):
+        """Get the cruise altitude that can be logged."""
+        if self._cruisePage.activated:
+            return self._cruisePage.loggableCruiseLevel * 100
+        else:
+            return 0
 
     @property
     def route(self):
@@ -3058,6 +3181,9 @@ class Wizard(gtk.VBox):
 
     def setStage(self, stage):
         """Set the flight stage to the given one."""
+        if stage!=const.STAGE_END:
+            self._cruisePage.setLoggable(Flight.canLogCruiseAltitude(stage))
+
         if stage==const.STAGE_TAKEOFF:
             self._takeoffPage.allowForward()
         elif stage==const.STAGE_LANDING:
@@ -3120,7 +3246,7 @@ class Wizard(gtk.VBox):
 
     def cruiseLevelChanged(self):
         """Called when the cruise level is changed."""
-        self.gui.cruiseLevelChanged()
+        return self.gui.cruiseLevelChanged()
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""

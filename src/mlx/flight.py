@@ -23,6 +23,13 @@ class Flight(object):
 
     It is also the hub for the other main objects participating in the handling of
     the flight."""
+    @staticmethod
+    def canLogCruiseAltitude(stage):
+        """Determine if the cruise altitude can be logged in the given
+        stage."""
+        return stage in [const.STAGE_CRUISE, const.STAGE_DESCENT,
+                         const.STAGE_LANDING]
+
     def __init__(self, logger, gui):
         """Construct the flight."""
         self._stage = None
@@ -413,11 +420,13 @@ class Flight(object):
 
     def cruiseLevelChanged(self):
         """Called when the cruise level hass changed."""
-        if self._stage in [const.STAGE_CRUISE, const.STAGE_DESCENT,
-                           const.STAGE_LANDING]:
+        if self.canLogCruiseAltitude(self._stage):
             message = "Cruise altitude modified to %d feet" % \
-                      (self.cruiseAltitude,)
+                      (self._gui.loggableCruiseAltitude,)
             self.logger.message(self.aircraft.timestamp, message)
+            return True
+        else:
+            return False
 
     def _updateFlownDistance(self, currentState):
         """Update the flown distance."""

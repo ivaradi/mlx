@@ -641,20 +641,19 @@ msgstr "Útvonal"
 
 msgid "route_help"
 msgstr ""
-"Állítsd be az utazószintet lent, és ha szükséges,\n"
+"Állítsd be a beadandó utazószintet lent, és ha szükséges,\n"
 "módosítsd az útvonaltervet."
 
 msgid "route_chelp"
 msgstr ""
-"Ha szükséges, lent módosíthatod az utazószintet és\n"
-"az útvonaltervet repülés közben is.\n"
-"Ha így teszel, légy szíves a megjegyzés mezőben ismertesd ennek okát."
+"Ha szükséges, lent módosíthatod az útvonaltervet repülés közben is.\n"
+"Ha így teszel, a megjegyzés mezőben ismertesd ennek okát."
 
 msgid "route_level"
 msgstr "_Utazószint:"
 
 msgid "route_level_tooltip"
-msgstr "Az utazószint."
+msgstr "A beadandó utazószint."
 
 msgid "route_route"
 msgstr "Út_vonal"
@@ -777,6 +776,30 @@ msgstr ""
 "Ha valamelyik strobe fénnyel nem rendelkező repülőgépet "
 "vezeted, itt jelezheted, ha megszakítottad a felszállást. "
 "Ne felejts magyarázattal szolgálni a megjegyzések között!"
+
+msgid "cruise_title"
+msgstr "Utazó"
+
+msgid "cruise_help"
+msgstr ""
+"Ha az utazószint változik, az új értéket itt írhatod be.\n"
+"Az érték tényleges naplózásához nyomd meg a <b>Frissít</b> gombot,\n"
+"amikor eléred a megadott szintet."
+
+msgid "cruise_route_level_tooltip"
+msgstr ""
+"Az utazószint, ha változik. A nyilakkal a szint 10-zel növelhető ill. "
+"csökkenthethő, vagy beírhatod a konkrét számot."
+
+msgid "cruise_route_level_update"
+msgstr "_Frissít"
+
+msgid "cruise_route_level_update_tooltip"
+msgstr ""
+"Nyomd meg ezt a gombot, hogy a tőle balra lévő mezőben megadott "
+"utazószint belekerüljön a naplóba. A gomb csak akkor aktív, ha az "
+"utoljára naplózottól eltér az érték, és ha a repülésnek olyan fázisában "
+"vagy, amelyben az utazószint naplózható."
 
 msgid "landing_title"
 msgstr "Leszállás"

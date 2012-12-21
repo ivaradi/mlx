@@ -640,13 +640,12 @@ msgstr "Route"
 
 msgid "route_help"
 msgstr ""
-"Set your cruise flight level below, and\n"
+"Set your cruise flight level to be filed below, and\n"
 "if necessary, edit the flight plan."
 
 msgid "route_chelp"
 msgstr ""
-"If necessary, you can modify the cruise level and\n"
-"the flight plan below during flight.\n"
+"If necessary, you can modify he flight plan below during flight.\n"
 "If so, please, add a comment on why the modification became necessary."
 
 msgid "route_level"
@@ -654,7 +653,7 @@ msgstr "_Cruise level:"
 
 msgid "route_level_tooltip"
 msgstr ""
-"The cruise flight level. Click on the arrows to increment "
+"The cruise flight level to file. Click on the arrows to increment "
 "or decrement by 10, or enter the number on the keyboard."
 
 msgid "route_route"
@@ -776,6 +775,30 @@ msgstr ""
 "If you fly one of the aircraft the have no strobe lights, "
 "you can indicate here that you have aborted the takeoff. "
 "Don't forget to provide an explanation in the comments."
+
+msgid "cruise_title"
+msgstr "Cruise"
+
+msgid "cruise_help"
+msgstr ""
+"If your cruise altitude changes, you can enter the new value below.\n"
+"To actually log the value, press the <b>Update</b> button,\n"
+"when you reach the specified level."
+
+msgid "cruise_route_level_tooltip"
+msgstr ""
+"The cruise flight level, if changes. Click on the arrows to increment "
+"or decrement by 10, or enter the number on the keyboard."
+
+msgid "cruise_route_level_update"
+msgstr "_Update"
+
+msgid "cruise_route_level_update_tooltip"
+msgstr ""
+"Click this button to log the cruise level set in the field to the left. "
+"The button is active only, if the value is different from the level "
+"logged last, and if you are in a flight stage during which logging "
+"is possible."
 
 msgid "landing_title"
 msgstr "Landing"

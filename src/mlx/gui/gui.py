@@ -262,6 +262,11 @@ class GUI(fs.ConnectionListener):
         return self._wizard.cruiseAltitude
 
     @property
+    def loggableCruiseAltitude(self):
+        """Get the cruise altitude that can be logged."""
+        return self._wizard.loggableCruiseAltitude
+
+    @property
     def route(self):
         """Get the flight route."""
         return self._wizard.route
@@ -889,7 +894,9 @@ class GUI(fs.ConnectionListener):
     def cruiseLevelChanged(self):
         """Called when the cruise level is changed in the flight wizard."""
         if self._flight is not None:
-            self._flight.cruiseLevelChanged()
+            return self._flight.cruiseLevelChanged()
+        else:
+            return False
 
     def _buildMenuBar(self, accelGroup):
         """Build the main menu bar."""
