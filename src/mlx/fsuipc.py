@@ -1396,7 +1396,7 @@ class AircraftModel(object):
 
         state.cog = data[self._monidx_cog]
 
-        state.xpdrC = data[self._monidx_xpdrC]==0
+        state.xpdrC = data[self._monidx_xpdrC]!=1
         state.autoXPDR = False
 
         state.apMaster = data[self._monidx_apMaster]!=0
