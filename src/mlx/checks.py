@@ -480,7 +480,7 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
     @staticmethod
     def getMessage(logName, frequency, obs):
         """Get the message for the given NAV radio setting."""
-        message = u"%s: %s" % (logName, frequency)
+        message = u"%-5s %s" % (logName + ":", frequency)
         if obs is not None: message += u" (%03d\u00b0)" % (obs,)
         return message
 
