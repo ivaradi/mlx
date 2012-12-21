@@ -778,7 +778,7 @@ msgid "takeoff_derate_tupolev"
 msgstr "Névleges/felszállási:"
 
 msgid "takeoff_derate_tooltip"
-msgstr "Írd be a felszállási teljesítménycsökkentés értékét."
+msgstr "Írjad be a felszállási teljesítménycsökkentés értékét."
 
 msgid "takeoff_rto"
 msgstr "_Megszakított felszállás"
