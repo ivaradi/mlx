@@ -1677,7 +1677,7 @@ class B767Model(GenericAircraftModel):
         """Construct the model."""
         super(B767Model, self). \
             __init__(flapsNotches = [0, 1, 5, 15, 20, 25, 30],
-                     fuelTanks = Boeing767Model.fuelTanks,
+                     fuelTanks = B767Model.fuelTanks,
                      numEngines = 2)
 
     @property
@@ -2033,7 +2033,7 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
                    const.AIRCRAFT_DH8D  : DH8DModel,
                    const.AIRCRAFT_B762  : B767Model,
                    const.AIRCRAFT_B763  : B767Model,
-                   const.AIRCRAFT_CRJ2  : B767Model,
+                   const.AIRCRAFT_CRJ2  : CRJ2Model,
                    const.AIRCRAFT_F70   : F70Model,
                    const.AIRCRAFT_DC3   : DC3Model,
                    const.AIRCRAFT_T134  : T134Model,
