@@ -182,6 +182,11 @@ class Flight(object):
         return self._gui.v2
 
     @property
+    def derate(self):
+        """Get the derate value of the flight."""
+        return self._gui.derate
+
+    @property
     def star(self):
         """Get the STAR planned."""
         return self._gui.star

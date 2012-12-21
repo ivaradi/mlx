@@ -2,6 +2,7 @@
 import const
 import checks
 import fs
+from i18n import xstr
 import util
 
 import sys
@@ -73,6 +74,7 @@ class Aircraft(object):
         self._minVS = 10000.0
 
         self._v1r2LineIndex = None
+        self._derateLineID = None
         self._vrefLineIndex = None
 
         self.humanWeight = 82.0
@@ -197,6 +199,26 @@ class Aircraft(object):
         return None if self._aircraftState is None \
                else self._aircraftState.timestamp
 
+    @property
+    def derateLabels(self):
+        """Get the strings related to the derate entry.
+
+        It returns a tuple of two items:
+        - the label before the entry field,
+        - the label after the entry field, which can be None.
+
+        If both labels are None, the derate value will not be logged or
+        queried. This is the default."""
+        return (None, None)
+
+    @property
+    def derateTemplate(self):
+        """Get the template for logging the derate value.
+
+        If it returns None (which is the default), no derate value will be
+        logged."""
+        return None
+
     def getFlapsSpeedLimit(self, flaps):
         """Get the speed limit for the given flaps setting."""
         return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
@@ -270,6 +292,7 @@ class Aircraft(object):
                                      aircraftState.windSpeed))
                 self._logRadios(aircraftState)
                 self._logV1R2(aircraftState)
+                self._logDerate(aircraftState)
             elif newStage==const.STAGE_DESCENT or newStage==const.STAGE_LANDING:
                 self._logRadios(aircraftState)
             elif newStage==const.STAGE_TAXIAFTERLAND:
@@ -379,6 +402,12 @@ class Aircraft(object):
         if self._v1r2LineIndex is not None:
             self._logV1R2()
 
+    def updateDerate(self):
+        """Update the derate value from the flight, if the these values
+        have already been logged."""
+        if self._derateLineID is not None:
+            self._logDerate()
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights.
 
@@ -428,6 +457,23 @@ class Aircraft(object):
                 self.logger.message(state.timestamp, message)
         else:
             self.logger.updateLine(self._v1r2LineIndex, message)
+
+    def _logDerate(self, state = None):
+        """Log the derate values either newly or by updating the corresponding
+        line."""
+        derateTemplate = self.derateTemplate
+        if derateTemplate is None:
+            return
+
+        derate = self._flight.derate
+        message = derateTemplate % ("-" if derate is None else derate)
+        if self._derateLineID is None:
+            if state is None:
+                state = self._aircraftState
+            self._derateLineID = \
+                self.logger.message(state.timestamp, message)
+        else:
+            self.logger.updateLine(self._derateLineID, message)
 
     def updateVRef(self):
         """Update the Vref value from the flight, if the Vref value has already
@@ -500,6 +546,16 @@ class Boeing737(Aircraft):
                                  25 : 190,
                                  30 : 175,
                                  40 : 162 }
+
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_boeing"), "%")
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Derate calculated by the pilot: %s %%"
 
     # def _appendSpeedChecker(self):
     #     """Append the NoStrobeSpeedChecker to the checkers.
@@ -626,6 +682,16 @@ class Boeing767(Aircraft):
                                  25 : 185,
                                  30 : 175 }
 
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_boeing"), "%")
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Derate calculated by the pilot: %s %%"
+
 #---------------------------------------------------------------------------------------
 
 class B762(Boeing767):
@@ -696,6 +762,16 @@ class F70(Aircraft):
                                  42 : 180 }
         self.reverseMinSpeed = 50
 
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return ("EPR", None)
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "EPR calculated by the pilot: %s"
+
 #---------------------------------------------------------------------------------------
 
 class DC3(Aircraft):
@@ -750,6 +826,16 @@ class T134(Aircraft):
         self.reverseMinSpeed = 50
 
     @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_tupolev"), None)
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Nominal/takeoff power calculated by the pilot: %s"
+
+    @property
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
         return False
@@ -797,6 +883,16 @@ class T154(Aircraft):
         """Indicate if the speed is in knots."""
         return False
 
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_tupolev"), None)
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Nominal/takeoff power calculated by the pilot: %s"
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -810,7 +906,6 @@ class T154(Aircraft):
         self._checkers.append(checks.NavLightsChecker())
 
 #---------------------------------------------------------------------------------------
-
 
 class YK40(Aircraft):
     """Yakovlev Yak-40 aircraft.
@@ -835,6 +930,16 @@ class YK40(Aircraft):
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
         return False
+
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_tupolev"), None)
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Nominal/takeoff power calculated by the pilot: %s"
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""

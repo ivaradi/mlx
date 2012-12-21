@@ -768,6 +768,18 @@ msgstr "A biztonságos emelkedési sebesség csomóban."
 msgid "takeoff_v2_tooltip_kmph"
 msgstr "A biztonságos emelkedési sebesség km/órában."
 
+msgid "takeoff_derate"
+msgstr "Teljesítménycsökkentés:"
+
+msgid "takeoff_derate_boeing"
+msgstr "Teljesítménycsökkentés:"
+
+msgid "takeoff_derate_tupolev"
+msgstr "Névleges/felszállási:"
+
+msgid "takeoff_derate_tooltip"
+msgstr "Írd be a felszállási teljesítménycsökkentés értékét."
+
 msgid "takeoff_rto"
 msgstr "_Megszakított felszállás"
 

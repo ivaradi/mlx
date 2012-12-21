@@ -307,6 +307,11 @@ class GUI(fs.ConnectionListener):
         return self._wizard.v2
 
     @property
+    def derate(self):
+        """Get the derate value calculated for the flight."""
+        return self._wizard.derate
+
+    @property
     def rtoIndicated(self):
         """Get whether the pilot has indicated than an RTO has occured."""
         return self._wizard.rtoIndicated

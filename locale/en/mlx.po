@@ -767,6 +767,18 @@ msgstr "The takeoff safety speed in knots."
 msgid "takeoff_v2_tooltip_kmph"
 msgstr "The takeoff safety speed in km/h."
 
+msgid "takeoff_derate"
+msgstr "Derate:"
+
+msgid "takeoff_derate_boeing"
+msgstr "Der_ate:"
+
+msgid "takeoff_derate_tupolev"
+msgstr "N_ominal/takeoff:"
+
+msgid "takeoff_derate_tooltip"
+msgstr "Enter the takeoff derate parameter."
+
 msgid "takeoff_rto"
 msgstr "R_ejected takeoff"
 

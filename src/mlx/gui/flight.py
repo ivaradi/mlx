@@ -1998,7 +1998,7 @@ class TakeoffPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(6, 4)
+        table = gtk.Table(7, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2043,6 +2043,7 @@ class TakeoffPage(Page):
         label.set_mnemonic_widget(self._v1)
 
         self._v1Unit = gtk.Label(xstr("label_knots"))
+        self._v1Unit.set_alignment(0.0, 0.5)
         table.attach(self._v1Unit, 3, 4, 2, 3)
 
         label = gtk.Label(xstr("takeoff_vr"))
@@ -2059,6 +2060,7 @@ class TakeoffPage(Page):
         label.set_mnemonic_widget(self._vr)
 
         self._vrUnit = gtk.Label(xstr("label_knots"))
+        self._vrUnit.set_alignment(0.0, 0.5)
         table.attach(self._vrUnit, 3, 4, 3, 4)
 
         label = gtk.Label(xstr("takeoff_v2"))
@@ -2075,13 +2077,35 @@ class TakeoffPage(Page):
         label.set_mnemonic_widget(self._v2)
 
         self._v2Unit = gtk.Label(xstr("label_knots"))
+        self._v2Unit.set_alignment(0.0, 0.5)
         table.attach(self._v2Unit, 3, 4, 4, 5)
+
+        self._hasDerate = False
+
+        self._derateLabel = gtk.Label()
+        self._derateLabel.set_use_underline(True)
+        self._derateLabel.set_markup(xstr("takeoff_derate_tupolev"))
+        self._derateLabel.set_alignment(0.0, 0.5)
+        table.attach(self._derateLabel, 0, 1, 5, 6)
+
+        self._derate = gtk.Entry()
+        self._derate.set_width_chars(10)
+        self._derate.set_tooltip_text(xstr("takeoff_derate_tooltip"))
+        self._derate.set_alignment(1.0)
+        self._derate.connect("changed", self._derateChanged)
+        table.attach(self._derate, 1, 3, 5, 6)
+        self._derateLabel.set_mnemonic_widget(self._derate)
+
+        self._derateUnit = gtk.Label("")
+        self._derateUnit.set_use_markup(True)
+        self._derateUnit.set_alignment(0.0, 0.5)
+        table.attach(self._derateUnit, 3, 4, 5, 6)
 
         self._rto = gtk.CheckButton(xstr("takeoff_rto"))
         self._rto.set_use_underline(True)
         self._rto.set_tooltip_text(xstr("takeoff_rto_tooltip"))
         self._rto.connect("toggled", self._rtoToggled)
-        table.attach(self._rto, 2, 4, 5, 6, ypadding = 8)
+        table.attach(self._rto, 2, 4, 6, 7, ypadding = 8)
 
         self.addCancelFlightButton()
 
@@ -2115,6 +2139,15 @@ class TakeoffPage(Page):
         return self._v2.get_int()
 
     @property
+    def derate(self):
+        """Get the derate value, if any."""
+        if self._hasDerate:
+            derate = self._derate.get_text()
+            return derate if derate else None
+        else:
+            return None
+
+    @property
     def rtoIndicated(self):
         """Get whether the pilot has indicated if there was an RTO."""
         return self._rto.get_active()
@@ -2142,6 +2175,26 @@ class TakeoffPage(Page):
         self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip" + i18nSpeedUnit))
         self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip" + i18nSpeedUnit))
 
+        (derateLabel, derateUnit) = \
+             self._wizard.gui.flight.aircraft.derateLabels
+
+        self._hasDerate = derateLabel is not None
+
+        if self._hasDerate:
+            self._derateLabel.set_markup(derateLabel)
+            self._derateLabel.set_use_underline(True)
+            self._derateUnit.set_markup("" if derateUnit is None
+                                        else derateUnit)
+        else:
+            self._derateLabel.set_markup(xstr("takeoff_derate"))
+            self._derateUnit.set_text("")
+
+        self._derate.set_text("")
+
+        self._derateLabel.set_sensitive(self._hasDerate)
+        self._derate.set_sensitive(self._hasDerate)
+        self._derateUnit.set_sensitive(self._hasDerate)
+
         self._rto.set_active(False)
         self._rto.set_sensitive(False)
 
@@ -2160,6 +2213,8 @@ class TakeoffPage(Page):
         self._vr.reset()
         self._v2.reset()
 
+        self._hasDerate = False
+
     def setRTOEnabled(self, enabled):
         """Set the RTO checkbox enabled or disabled."""
         if not enabled:
@@ -2175,7 +2230,8 @@ class TakeoffPage(Page):
                     self.vr is not None and \
                     self.v2 is not None and \
                     self.v1 <= self.vr and \
-                    self.vr <= self.v2
+                    self.vr <= self.v2 and \
+                    (not self._hasDerate or self._derate.get_text()!="")
         self._button.set_sensitive(sensitive)
 
     def _valueChanged(self, widget, arg = None):
@@ -2188,6 +2244,10 @@ class TakeoffPage(Page):
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
 
+    def _derateChanged(self, entry):
+        """Called when the value of the derate is changed."""
+        self._updateForwardButton()
+
     def _rtoToggled(self, button):
         """Called when the RTO check button is toggled."""
         self._wizard.rtoToggled(button.get_active())
@@ -2199,6 +2259,8 @@ class TakeoffPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
         self._wizard.gui.flight.aircraft.updateV1R2()
+        if self._hasDerate:
+            self._wizard.gui.flight.aircraft.updateDerate()
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -3117,6 +3179,11 @@ class Wizard(gtk.VBox):
     def v2(self):
         """Get the V2 speed."""
         return self._takeoffPage.v2
+
+    @property
+    def derate(self):
+        """Get the derate value."""
+        return self._takeoffPage.derate
 
     @property
     def rtoIndicated(self):
