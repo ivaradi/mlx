@@ -24,13 +24,13 @@ class Hotkey(gtk.HBox):
 
     # Constant to denote that the status of the Ctrl modifier is changed
     CHANGED_CTRL = 1
-    
+
     # Constant to denote that the status of the Shift modifier is changed
     CHANGED_SHIFT = 2
-    
+
     # Constant to denote that the value of the key is changed
     CHANGED_KEY = 3
-    
+
     def __init__(self, labelText, tooltips):
         """Construct the hotkey widget.
 
@@ -41,7 +41,7 @@ class Hotkey(gtk.HBox):
         - the control check box, and
         - the shift check box."""
         super(Hotkey, self).__init__()
-        
+
         label = gtk.Label(labelText)
         label.set_use_underline(True)
         labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
@@ -55,7 +55,7 @@ class Hotkey(gtk.HBox):
         self._ctrl.set_tooltip_text(tooltips[1])
         self._ctrl.connect("toggled", self._ctrlToggled)
         self.pack_start(self._ctrl, False, False, 4)
-            
+
         self._shift = gtk.CheckButton("Shift")
         self._shift.set_tooltip_text(tooltips[2])
         self._shift.connect("toggled", self._shiftToggled)
@@ -120,7 +120,7 @@ class Hotkey(gtk.HBox):
         if iter is None:
             iter = hotkeyModel.get_iter_first()
 
-        self._hotkey.set_active_iter(iter)            
+        self._hotkey.set_active_iter(iter)
 
         self._setting = False
 
@@ -177,7 +177,7 @@ class Preferences(gtk.Dialog):
         self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
         self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
         self.set_resizable(False)
-        
+
         self._gui = gui
         self._settingFromConfig = False
 
@@ -237,7 +237,7 @@ class Preferences(gtk.Dialog):
         self._flareTimeFromFS.set_active(config.flareTimeFromFS)
         self._syncFSTime.set_active(config.syncFSTime)
         self._usingFS2Crew.set_active(config.usingFS2Crew)
-        
+
         self._setSmoothing(self._iasSmoothingEnabled, self._iasSmoothingLength,
                            config.iasSmoothingLength)
         self._setSmoothing(self._vsSmoothingEnabled, self._vsSmoothingLength,
@@ -246,6 +246,9 @@ class Preferences(gtk.Dialog):
         pirepDirectory = config.pirepDirectory
         self._pirepDirectory.set_text("" if pirepDirectory is None
                                       else pirepDirectory)
+        self._pirepAutoSave.set_active(config.pirepAutoSave)
+        if not pirepDirectory:
+            self._pirepAutoSave.set_sensitive(False)
 
         for messageType in const.messageTypes:
             level = config.getMessageTypeLevel(messageType)
@@ -262,7 +265,7 @@ class Preferences(gtk.Dialog):
         self._enableApproachCallouts.set_active(config.enableApproachCallouts)
         self._speedbrakeAtTD.set_active(config.speedbrakeAtTD)
 
-        self._enableChecklists.set_active(config.enableChecklists)        
+        self._enableChecklists.set_active(config.enableChecklists)
         self._checklistHotkey.set(config.checklistHotkey)
 
         self._autoUpdate.set_active(config.autoUpdate)
@@ -288,6 +291,7 @@ class Preferences(gtk.Dialog):
         config.vsSmoothingLength = self._getSmoothing(self._vsSmoothingEnabled,
                                                        self._vsSmoothingLength)
         config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
+        config.pirepAutoSave = self._pirepAutoSave.get_active()
 
         for messageType in const.messageTypes:
             fsButtonActive = self._msgFSCheckButtons[messageType].get_active()
@@ -323,7 +327,7 @@ class Preferences(gtk.Dialog):
         mainAlignment.add(mainBox)
 
         guiBox = self._createFrame(mainBox, xstr("prefs_frame_gui"))
-        
+
         languageBox = gtk.HBox()
         guiBox.pack_start(languageBox, False, False, 4)
 
@@ -338,7 +342,7 @@ class Preferences(gtk.Dialog):
                                        language])
 
         self._languageComboBox = languageComboBox = \
-            gtk.ComboBox(model = self._languageList)                   
+            gtk.ComboBox(model = self._languageList)
         cell = gtk.CellRendererText()
         languageComboBox.pack_start(cell, True)
         languageComboBox.add_attribute(cell, 'text', 0)
@@ -361,7 +365,7 @@ class Preferences(gtk.Dialog):
         self._quitOnClose.set_tooltip_text(xstr("prefs_quitOnClose_tooltip"))
         guiBox.pack_start(self._quitOnClose, False, False, 4)
 
-        onlineBox = self._createFrame(mainBox, xstr("prefs_frame_online"))        
+        onlineBox = self._createFrame(mainBox, xstr("prefs_frame_online"))
 
         self._onlineGateSystem = gtk.CheckButton(xstr("prefs_onlineGateSystem"))
         self._onlineGateSystem.set_use_underline(True)
@@ -379,7 +383,7 @@ class Preferences(gtk.Dialog):
         self._flareTimeFromFS.set_use_underline(True)
         self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
         simulatorBox.pack_start(self._flareTimeFromFS, False, False, 4)
-                                       
+
         self._syncFSTime = gtk.CheckButton(xstr("prefs_syncFSTime"))
         self._syncFSTime.set_use_underline(True)
         self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
@@ -389,7 +393,7 @@ class Preferences(gtk.Dialog):
         self._usingFS2Crew.set_use_underline(True)
         self._usingFS2Crew.set_tooltip_text(xstr("prefs_usingFS2Crew_tooltip"))
         simulatorBox.pack_start(self._usingFS2Crew, False, False, 4)
-        
+
         (iasSmoothingBox, self._iasSmoothingEnabled,
          self._iasSmoothingLength) = \
            self._createSmoothingBox(xstr("prefs_iasSmoothingEnabled"),
@@ -411,6 +415,7 @@ class Preferences(gtk.Dialog):
 
         self._pirepDirectory = gtk.Entry()
         self._pirepDirectory.set_tooltip_text(xstr("prefs_pirepDirectory_tooltip"))
+        self._pirepDirectory.connect("changed", self._pirepDirectoryChanged)
         label.set_mnemonic_widget(self._pirepDirectory)
         pirepBox.pack_start(self._pirepDirectory, True, True, 4)
 
@@ -418,7 +423,12 @@ class Preferences(gtk.Dialog):
         self._pirepDirectoryButton.connect("clicked",
                                            self._pirepDirectoryButtonClicked)
         pirepBox.pack_start(self._pirepDirectoryButton, False, False, 4)
-        
+
+        self._pirepAutoSave = gtk.CheckButton(xstr("prefs_pirepAutoSave"))
+        self._pirepAutoSave.set_use_underline(True)
+        self._pirepAutoSave.set_tooltip_text(xstr("prefs_pirepAutoSave_tooltip"))
+        mainBox.pack_start(self._pirepAutoSave, False, False, 0)
+
         return mainAlignment
 
     def _createFrame(self, mainBox, label):
@@ -481,7 +491,7 @@ class Preferences(gtk.Dialog):
                 iter = self._languageList.iter_next(iter)
 
     def _getLanguage(self):
-        """Get the language selected by the user."""        
+        """Get the language selected by the user."""
         iter = self._languageComboBox.get_active_iter()
         (lang,) = self._languageList.get(iter, 1)
         return "" if lang=="$system" else lang
@@ -513,7 +523,7 @@ class Preferences(gtk.Dialog):
         length is the absolute value of the value."""
         smoothingEnabled.set_active(smoothing>=2)
         smoothingLength.set_value(abs(smoothing))
-        
+
     def _getSmoothing(self, smoothingEnabled, smoothingLength):
         """Get the smoothing value from the given controls.
 
@@ -523,7 +533,7 @@ class Preferences(gtk.Dialog):
         if not smoothingEnabled.get_active():
             value *= -1
         return value
-        
+
     def _pirepDirectoryButtonClicked(self, button):
         """Called when the PIREP directory button is clicked."""
         dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
@@ -538,13 +548,21 @@ class Preferences(gtk.Dialog):
         directory = self._pirepDirectory.get_text()
         if directory:
             dialog.select_filename(directory)
-        
+
         result = dialog.run()
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
             self._pirepDirectory.set_text(text2unicode(dialog.get_filename()))
-        
+
+    def _pirepDirectoryChanged(self, entry):
+        """Called when the PIREP directory is changed."""
+        if self._pirepDirectory.get_text():
+            self._pirepAutoSave.set_sensitive(True)
+        else:
+            self._pirepAutoSave.set_active(False)
+            self._pirepAutoSave.set_sensitive(False)
+
     def _buildMessages(self):
         """Build the page for the message settings."""
 
@@ -560,19 +578,19 @@ class Preferences(gtk.Dialog):
         table.set_col_spacings(32)
         table.set_homogeneous(False)
         mainBox.pack_start(table, False, False, 4)
-        
+
         label = gtk.Label(xstr("prefs_msgs_fs"))
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 1, 2, 0, 1)
-        
+
         label = gtk.Label(xstr("prefs_msgs_sound"))
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 2, 3, 0, 1)
 
         self._msgFSCheckButtons = {}
-        self._msgSoundCheckButtons = {}        
+        self._msgSoundCheckButtons = {}
         row = 1
         for messageType in const.messageTypes:
             messageTypeStr = const.messageType2string(messageType)
@@ -588,12 +606,12 @@ class Preferences(gtk.Dialog):
             alignment.add(fsCheckButton)
             table.attach(alignment, 1, 2, row, row+1)
             self._msgFSCheckButtons[messageType] = fsCheckButton
-            
+
             soundCheckButton = gtk.CheckButton()
             alignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
                                       xalign = 0.5, yalign = 0.5)
             alignment.add(soundCheckButton)
-            table.attach(alignment, 2, 3, row, row+1)            
+            table.attach(alignment, 2, 3, row, row+1)
             self._msgSoundCheckButtons[messageType] = soundCheckButton
 
             mnemonicWidget = gtk.Label("")
@@ -664,14 +682,14 @@ class Preferences(gtk.Dialog):
                                    [xstr("prefs_sounds_pilotHotkey_tooltip"),
                                     xstr("prefs_sounds_pilotHotkeyCtrl_tooltip"),
                                     xstr("prefs_sounds_pilotHotkeyShift_tooltip")])
-        
+
         backgroundBox.pack_start(self._pilotHotkey, False, False, 4)
 
         self._enableApproachCallouts = gtk.CheckButton(xstr("prefs_sounds_approachCallouts"))
         self._enableApproachCallouts.set_use_underline(True)
         self._enableApproachCallouts.set_tooltip_text(xstr("prefs_sounds_approachCallouts_tooltip"))
         backgroundBox.pack_start(self._enableApproachCallouts, False, False, 4)
-        
+
         self._speedbrakeAtTD = gtk.CheckButton(xstr("prefs_sounds_speedbrakeAtTD"))
         self._speedbrakeAtTD.set_use_underline(True)
         self._speedbrakeAtTD.set_tooltip_text(xstr("prefs_sounds_speedbrakeAtTD_tooltip"))
@@ -688,7 +706,7 @@ class Preferences(gtk.Dialog):
 
         checklistBox = gtk.VBox()
         checklistAlignment.add(checklistBox)
-        
+
         self._enableChecklists = gtk.CheckButton(xstr("prefs_sounds_enableChecklists"))
         self._enableChecklists.set_use_underline(True)
         self._enableChecklists.set_tooltip_text(xstr("prefs_sounds_enableChecklists_tooltip"))
@@ -773,7 +791,7 @@ class Preferences(gtk.Dialog):
         self._autoUpdate.connect("toggled", self._autoUpdateToggled)
         self._autoUpdate.set_tooltip_text(xstr("prefs_update_auto_tooltip"))
         self._warnedAutoUpdate = False
-        
+
         updateURLBox = gtk.HBox()
         mainBox.pack_start(updateURLBox, False, False, 4)
         label = gtk.Label(xstr("prefs_update_url"))
@@ -813,7 +831,7 @@ class Preferences(gtk.Dialog):
             dialog.run()
             dialog.hide()
             self._warnedAutoUpdate = True
-            
+
     def _updateURLChanged(self, entry):
         """Called when the update URL is changed."""
         self._setOKButtonSensitivity()

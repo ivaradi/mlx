@@ -1359,6 +1359,12 @@ msgstr "The directory that will be offered by default when saving a PIREP."
 msgid "prefs_pirepDirectory_browser_title"
 msgstr "Select PIREP directory"
 
+msgid "prefs_pirepAutoSave"
+msgstr "Sav_e PIREP automatically"
+
+msgid "prefs_pirepAutoSave_tooltip"
+msgstr "If this is enabled, the PIREP will be automatically saved at the end of the flight, when all mandatory data are present. You can still modify the data later, and save it again manually."
+
 msgid "prefs_frame_gui"
 msgstr "GUI"
 

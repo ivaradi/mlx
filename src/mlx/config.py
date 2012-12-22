@@ -233,6 +233,7 @@ class Config(object):
         self._vsSmoothingLength = -2
 
         self._pirepDirectory = None
+        self._pirepAutoSave = False
 
         self._enableSounds = not secondaryInstallation
 
@@ -452,6 +453,23 @@ class Config(object):
            (pirepDirectory!="" or self._pirepDirectory is not None):
             self._pirepDirectory = None if pirepDirectory=="" \
                                    else pirepDirectory
+            if self._pirepDirectory is None:
+                self._pirepAutoSave = False
+            self._modified = True
+
+    @property
+    def pirepAutoSave(self):
+        """Get whether the PIREP should be saved automatically when it becomes
+        saveable."""
+        return self._pirepAutoSave
+
+    @pirepAutoSave.setter
+    def pirepAutoSave(self, pirepAutoSave):
+        """Set whether the PIREP should be saved automatically when it becomes
+        saveable."""
+        pirepAutoSave = pirepAutoSave and self._pirepDirectory is not None
+        if pirepAutoSave!=self._pirepAutoSave:
+            self._pirepAutoSave = pirepAutoSave
             self._modified = True
 
     def getMessageTypeLevel(self, messageType):
@@ -648,6 +666,11 @@ class Config(object):
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
+        self._pirepAutoSave = self._get(config, "general",
+                                        "pirepAutoSave", False)
+        self._pirepAutoSave = self._pirepAutoSave and \
+                              self._pirepAutoSave is not None
+
         self._messageTypeLevels = {}
         for messageType in const.messageTypes:
             self._messageTypeLevels[messageType] = \
@@ -719,6 +742,8 @@ class Config(object):
 
         if self._pirepDirectory is not None:
             config.set("general", "pirepDirectory", self._pirepDirectory)
+        config.set("general", "pirepAutoSave",
+                   "yes" if self._pirepAutoSave else "no")
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:

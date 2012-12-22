@@ -1401,6 +1401,12 @@ msgstr ""
 msgid "prefs_pirepDirectory_browser_title"
 msgstr "Válaszd ki a PIREP-ek könyvtárát"
 
+msgid "prefs_pirepAutoSave"
+msgstr "PIREP men_tése automatikusan"
+
+msgid "prefs_pirepAutoSave_tooltip"
+msgstr "Ha bekapcsolod, a program automatikusan elmenti a PIREP-et a repülés végén, ha már minden kötelezően megadandó adat ki van töltve. Az adatok a későbbiek során is módosíthatók, és a PIREP kézzel is elmenthető."
+
 msgid "prefs_frame_gui"
 msgstr "Grafikus felület"
 
