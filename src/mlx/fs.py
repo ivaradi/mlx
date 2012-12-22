@@ -268,4 +268,7 @@ class AircraftState(object):
       or None, if the state cannot be read properly
     - elevatorTrim: a float value indicating the deflection of the elevator
       trim in degrees
+    - antiIceOn: a boolean value indicating if some anti-ice system is turned
+      on. It may be None, if the state of the anti-ice system cannot be read
+      reliably
     """

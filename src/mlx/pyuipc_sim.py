@@ -323,6 +323,12 @@ class Values(object):
 
         self.elevatorTrim = 0.0
 
+        self.eng1DeIce = False
+        self.eng2DeIce = False
+        self.eng3DeIce = False
+        self.propDeIce = False
+        self.structDeIce = False
+
     def read(self, offset, type):
         """Read the value at the given offset."""
         try:
@@ -409,10 +415,16 @@ class Values(object):
             return int(self.apAltitude * const.FEETTOMETRES * 65536.0)
         elif offset==0x088c:       # Engine #1 throttle
             return self._getThrottle(self.ENGINE_1)
+        elif offset==0x08b2:       # Engine #1 de-ice
+            return 1 if self.eng1DeIce else 0
         elif offset==0x0924:       # Engine #2 throttle
             return self._getThrottle(self.ENGINE_2)
+        elif offset==0x094a:       # Engine #2 de-ice
+            return 1 if self.eng2DeIce else 0
         elif offset==0x09bc:       # Engine #3 throttle
             return self._getThrottle(self.ENGINE_3)
+        elif offset==0x09e2:       # Engine #3 de-ice
+            return 1 if self.eng3DeIce else 0
         elif offset==0x0af4:       # Fuel weight
             return int(self.fuelWeight * 256.0)
         elif offset==0x0b74:       # Centre tank level
@@ -558,6 +570,10 @@ class Values(object):
                 raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             return self.messageDuration
+        elif offset==0x337c:       # Prop de-ice
+            return 1 if self.propDeIce else 0
+        elif offset==0x337d:       # Structural de-ice
+            return 1 if self.structDeIce else 0
         elif offset==0x3380:       # Message
             return self.message
         elif offset==0x3364:       # Frozen
@@ -665,10 +681,16 @@ class Values(object):
             self.apAltitude = value / const.FEETTOMETRES / 65536.0
         elif offset==0x088c:       # Engine #1 throttle
             self._setThrottle(self.ENGINE_1, value)
+        elif offset==0x08b2:       # Engine #1 de-ice
+            self.eng1DeIce = value!=0
         elif offset==0x0924:       # Engine #2 throttle
             self._setThrottle(self.ENGINE_2, value)
+        elif offset==0x094a:       # Engine #2 de-ice
+            self.eng2DeIce = value!=0
         elif offset==0x09bc:       # Engine #3 throttle
             self._setThrottle(self.ENGINE_3, value)
+        elif offset==0x09e2:       # Engine #3 de-ice
+            self.eng3DeIce = value!=0
         elif offset==0x0af4:       # Fuel weight
             self.fuelWeight = value / 256.0
         elif offset==0x0b74:       # Centre tank level
@@ -802,10 +824,14 @@ class Values(object):
                 raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             self.messageDuration = value
-        elif offset==0x3380:       # Message
-            self.message = value
         elif offset==0x3364:       # Frozen
             self.frozen = value!=0
+        elif offset==0x337c:       # Propeller de-ice
+            self.propDeIce = value!=0
+        elif offset==0x337d:       # Structural de-ice
+            self.structDeIce = value!=0
+        elif offset==0x3380:       # Message
+            self.message = value
         elif offset==0x3bfc:       # ZFW
             self.zfw = value * const.LBSTOKG / 256.0
         elif offset==0x3c00:       # Path of the current AIR file
@@ -1449,6 +1475,17 @@ class CLI(cmd.Cmd):
                                        lambda value: value * 180.0 / math.pi,
                                        lambda word:
                                        float(word) * math.pi / 180.0)
+
+        self._valueHandlers["eng1Deice"] = ([(0x08b2, "H")],
+                                            CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["eng2Deice"] = ([(0x094a, "H")],
+                                            CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["eng3Deice"] = ([(0x09e2, "H")],
+                                            CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["propDeice"] = ([(0x337c, "b")],
+                                            CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["structDeice"] = ([(0x337d, "b")],
+                                              CLI.bool2str, CLI.str2bool)
 
     def default(self, line):
         """Handle unhandle commands."""

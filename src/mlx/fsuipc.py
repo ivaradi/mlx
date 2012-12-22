@@ -1195,7 +1195,11 @@ class AircraftModel(object):
                       ("apHeading", 0x07cc, "H"),
                       ("apAltitudeHold", 0x07d0, "d"),
                       ("apAltitude", 0x07d4, "u"),
-                      ("elevatorTrim", 0x2ea0, "f")]
+                      ("elevatorTrim", 0x2ea0, "f"),
+                      ("eng1DeIce", 0x08b2, "H"),
+                      ("eng2DeIce", 0x094a, "H"),
+                      ("propDeIce", 0x337c, "b"),
+                      ("structDeIce", 0x337d, "b")]
 
     specialModels = []
 
@@ -1408,6 +1412,11 @@ class AircraftModel(object):
 
 
         state.elevatorTrim = data[self._monidx_elevatorTrim] * 180.0 / math.pi
+
+        state.antiIceOn = data[self._monidx_eng1DeIce]!=0 or \
+                          data[self._monidx_eng2DeIce]!=0 or \
+                          data[self._monidx_propDeIce]!=0 or \
+                          data[self._monidx_structDeIce]!=0
 
         return state
 

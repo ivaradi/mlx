@@ -58,7 +58,10 @@ class MonitorWindow(gtk.Window):
         table.attach(self._stalled, 8, 10, 0, 1)
 
         self._onTheGround = gtk.Label("ONTHEGROUND")
-        table.attach(self._onTheGround, 10, 12, 0, 1)
+        table.attach(self._onTheGround, 10, 11, 0, 1)
+
+        self._antiIceOn = gtk.Label("ANTI-ICE")
+        table.attach(self._antiIceOn, 11, 12, 0, 1)
 
         (label, self._zfw) = self._createLabeledEntry("ZFW:", 6)
         table.attach(label, 0, 1, 1, 2)
@@ -258,6 +261,7 @@ class MonitorWindow(gtk.Window):
             self._overspeed.set_sensitive(False)
             self._stalled.set_sensitive(False)
             self._onTheGround.set_sensitive(False)
+            self._antiIceOn.set_sensitive(False)
             self._zfw.set_text("-")
             self._grossWeight.set_text("-")
             self._heading.set_text("-")
@@ -310,6 +314,7 @@ class MonitorWindow(gtk.Window):
             self._overspeed.set_sensitive(aircraftState.overspeed)
             self._stalled.set_sensitive(aircraftState.stalled)
             self._onTheGround.set_sensitive(aircraftState.onTheGround)
+            self._antiIceOn.set_sensitive(aircraftState.antiIceOn)
             self._zfw.set_text("%.0f" % (aircraftState.zfw,))
             self._grossWeight.set_text("%.0f" % (aircraftState.grossWeight,))
             self._heading.set_text("%03.0f" % (aircraftState.heading,))
