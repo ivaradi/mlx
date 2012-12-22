@@ -953,11 +953,17 @@ msgstr "PIREP mentése"
 msgid "finish_save_done"
 msgstr "A PIREP mentése sikerült"
 
+msgid "finish_save_done_sec"
+msgstr "Elérési út: %s"
+
 msgid "finish_save_failed"
 msgstr "A PIREP mentése nem sikerült"
 
 msgid "finish_save_failed_sec"
-msgstr "A részleteket lásd a debug naplóban."
+msgstr "A hiba: %s."
+
+msgid "finish_autosave_busy"
+msgstr "A PIREP automatikus mentése..."
 
 msgid "info_comments"
 msgstr "_Megjegyzések"

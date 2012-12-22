@@ -47,11 +47,13 @@ class GUI(fs.ConnectionListener):
     """The main GUI class."""
     _authors = [ (u"Váradi", u"István", "prog_test"),
                  (u"Galyassy", u"Tamás", "negotiation"),
-                 (u"Petrovszki", u"Gábor", "test"),
-                 (u"Zsebényi-Loksa", u"Gergely", "test"),
                  (u"Kurják", u"Ákos", "test"),
                  (u"Nagy", u"Dániel", "test"),
-                 (u"Radó", u"Iván", "test") ]
+                 (u"Radó", u"Iván", "test"),
+                 (u"Petrovszki", u"Gábor", "test"),
+                 (u"Serfőző", u"Tamás", "test"),
+                 (u"Szebenyi", u"Bálint", "test"),
+                 (u"Zsebényi-Loksa", u"Gergely", "test") ]
 
     def __init__(self, programDirectory, config):
         """Construct the GUI."""

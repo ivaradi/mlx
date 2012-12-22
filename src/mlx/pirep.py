@@ -154,7 +154,8 @@ class PIREP(object):
         try:
             with open(path, "wb") as f:
                 pickle.dump(self, f)
-            return True
+            return None
         except Exception, e:
-            print "Failed saving PIREP to %s: %s" % (path, str(e))
-            return False
+            error = str(e)
+            #print u"Failed saving PIREP to %s: %s" % (path, error)
+            return error

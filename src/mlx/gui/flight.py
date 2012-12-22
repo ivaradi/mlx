@@ -14,6 +14,7 @@ import mlx.web as web
 
 import datetime
 import time
+import os
 
 #-----------------------------------------------------------------------------
 
@@ -2871,6 +2872,16 @@ class FinishPage(Page):
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0)
 
+        wasSensitive = self._saveButton.get_sensitive()
+
+        gui = self._wizard.gui
+        config = gui.config
+        if config.pirepAutoSave and sensitive and not wasSensitive:
+            self._lastSavePath = os.path.join(config.pirepDirectory,
+                                              self._getDefaultPIREPName())
+            self._lastSavePath = text2unicode(self._lastSavePath)
+            self._savePIREP(automatic = True)
+
         self._saveButton.set_sensitive(sensitive)
         self._sendButton.set_sensitive(sensitive and
                                        self._wizard.bookedFlight.id is not None)
@@ -2902,8 +2913,8 @@ class FinishPage(Page):
 
         gui.reset()
 
-    def _saveClicked(self, button):
-        """Called when the Save PIREP button is clicked."""
+    def _getDefaultPIREPName(self):
+        """Get the default name of the PIREP."""
         gui = self._wizard.gui
 
         bookedFlight = gui.bookedFlight
@@ -2911,11 +2922,17 @@ class FinishPage(Page):
 
         pilotID = self._wizard.pilotID
         if pilotID: pilotID += " "
-        fileName = "%s%s %02d%02d %s-%s.pirep" % \
-                   (pilotID, str(bookedFlight.departureTime.date()),
-                    tm.tm_hour, tm.tm_min,
-                    bookedFlight.departureICAO,
-                    bookedFlight.arrivalICAO)
+        return "%s%s %02d%02d %s-%s.pirep" % \
+               (pilotID, str(bookedFlight.departureTime.date()),
+                tm.tm_hour, tm.tm_min,
+                bookedFlight.departureICAO, bookedFlight.arrivalICAO)
+
+
+    def _saveClicked(self, button):
+        """Called when the Save PIREP button is clicked."""
+        gui = self._wizard.gui
+
+        fileName = self._getDefaultPIREPName()
 
         dialog = self._getSaveDialog()
 
@@ -2931,29 +2948,45 @@ class FinishPage(Page):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            pirep = PIREP(gui.flight)
-
             self._lastSavePath = text2unicode(dialog.get_filename())
+            self._savePIREP()
 
-            if pirep.save(self._lastSavePath):
-                type = MESSAGETYPE_INFO
-                message = xstr("finish_save_done")
-                secondary = None
-                self._pirepSaved = True
+    def _savePIREP(self, automatic = False):
+        """Perform the saving of the PIREP."""
+
+        gui = self._wizard.gui
+
+        if automatic:
+            gui.beginBusy(xstr("finish_autosave_busy"))
+
+        pirep = PIREP(gui.flight)
+        error = pirep.save(self._lastSavePath)
+
+        if automatic:
+            gui.endBusy()
+
+        if error:
+            type = MESSAGETYPE_ERROR
+            message = xstr("finish_save_failed")
+            secondary = xstr("finish_save_failed_sec") % (text2unicode(error),)
+        else:
+            type = MESSAGETYPE_INFO
+            message = xstr("finish_save_done")
+            if automatic:
+                secondary = xstr("finish_save_done_sec") % (self._lastSavePath,)
             else:
-                type = MESSAGETYPE_ERROR
-                message = xstr("finish_save_failed")
-                secondary = xstr("finish_save_failed_sec")
+                secondary = None
+            self._pirepSaved = True
 
-            dialog = gtk.MessageDialog(parent = gui.mainWindow,
-                                       type = type, message_format = message)
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-            dialog.set_title(WINDOW_TITLE_BASE)
-            if secondary is not None:
-                dialog.format_secondary_markup(secondary)
+        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                   type = type, message_format = message)
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.set_title(WINDOW_TITLE_BASE)
+        if secondary is not None:
+            dialog.format_secondary_markup(secondary)
 
-            dialog.run()
-            dialog.hide()
+        dialog.run()
+        dialog.hide()
 
     def _getSaveDialog(self):
         """Get the PIREP saving dialog.

@@ -950,11 +950,17 @@ msgstr "Save PIREP into"
 msgid "finish_save_done"
 msgstr "The PIREP was saved successfully"
 
+msgid "finish_save_done_sec"
+msgstr "Path: %s"
+
 msgid "finish_save_failed"
 msgstr "Failed to save the PIREP"
 
 msgid "finish_save_failed_sec"
-msgstr "See the debug log for the details."
+msgstr "Error: %s."
+
+msgid "finish_autosave_busy"
+msgstr "Saving PIREP automatically..."
 
 msgid "info_comments"
 msgstr "_Comments"
