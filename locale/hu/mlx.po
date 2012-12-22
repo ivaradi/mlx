@@ -780,6 +780,12 @@ msgstr "Névleges/felszállási:"
 msgid "takeoff_derate_tooltip"
 msgstr "Írd be a felszállási teljesítménycsökkentés értékét."
 
+msgid "takeoff_antiice"
+msgstr "Jé_gtelenítés bekapcsolva"
+
+msgid "takeoff_antiice_tooltip"
+msgstr "Itt jelezheted, hogy a repülőgép jégtelenítő rendszerét bekapcsoltad felszállás előtt. Ha a repülőgép megfelelően jelzi a jégtelenítő rendszer állapotát a logger felé, ezt a jelölődobozt a program automatikusan kezeli. A kijelölést a későbbiek során szabadon módosíthatod, ami a logban is megjelenik."
+
 msgid "takeoff_rto"
 msgstr "_Megszakított felszállás"
 
@@ -858,6 +864,12 @@ msgstr "A leszállási sebesség csomóban."
 
 msgid "landing_vref_tooltip_kmph"
 msgstr "A leszállási sebesség km/órában."
+
+msgid "landing_antiice"
+msgstr "Jé_gtelenítés bekapcsolva"
+
+msgid "landing_antiice_tooltip"
+msgstr "Itt jelezheted, hogy a repülőgép jégtelenítő rendszerét bekapcsoltad leszállás előtt. Ha a repülőgép megfelelően jelzi a jégtelenítő rendszer állapotát a logger felé, ezt a jelölődobozt a program automatikusan kezeli. A kijelölést a későbbiek során szabadon módosíthatod, ami a logban is megjelenik."
 
 msgid "flighttype_scheduled"
 msgstr "menetrendszerinti"

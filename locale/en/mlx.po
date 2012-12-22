@@ -779,6 +779,12 @@ msgstr "N_ominal/takeoff:"
 msgid "takeoff_derate_tooltip"
 msgstr "Enter the takeoff derate parameter."
 
+msgid "takeoff_antiice"
+msgstr "Anti-i_ce system on"
+
+msgid "takeoff_antiice_tooltip"
+msgstr "Indicate if you have turned on or off the anti-ice system of your aircraft before takeoff. If your aircraft indicates the status of the anti-ice system towards the logger correctly, this checkbox will be handled automatically, though you can still override it later, and it will be reflected in the log."
+
 msgid "takeoff_rto"
 msgstr "R_ejected takeoff"
 
@@ -857,6 +863,12 @@ msgstr "The landing reference speed in knots."
 
 msgid "landing_vref_tooltip_kmph"
 msgstr "The landing reference speed in km/h."
+
+msgid "landing_antiice"
+msgstr "Anti-i_ce system on"
+
+msgid "landing_antiice_tooltip"
+msgstr "Indicate if you have turned on or off the anti-ice system of your aircraft before landing. If your aircraft indicates the status of the anti-ice system towards the logger correctly, this checkbox will be handled automatically, though you can still override it later, and it will be reflected in the log."
 
 msgid "flighttype_scheduled"
 msgstr "scheduled"

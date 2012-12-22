@@ -75,7 +75,9 @@ class Aircraft(object):
 
         self._v1r2LineIndex = None
         self._derateLineID = None
+        self._takeoffAntiIceLineID = None
         self._vrefLineIndex = None
+        self._landingAntiIceLineID = None
 
         self.humanWeight = 82.0
 
@@ -293,6 +295,7 @@ class Aircraft(object):
                 self._logRadios(aircraftState)
                 self._logV1R2(aircraftState)
                 self._logDerate(aircraftState)
+                self._logTakeoffAntiIce(aircraftState)
             elif newStage==const.STAGE_DESCENT or newStage==const.STAGE_LANDING:
                 self._logRadios(aircraftState)
             elif newStage==const.STAGE_TAXIAFTERLAND:
@@ -350,6 +353,7 @@ class Aircraft(object):
                             "Altimeter setting: %.0f hPa" % \
                             (self._aircraftState.altimeter,))
         self._logVRef()
+        self._logLandingAntiIce(self._aircraftState)
         self.flight.flareStarted(flareStart, flareStartFS)
         fs.sendMessage(const.MESSAGETYPE_INFORMATION, "Flare-time", 3)
 
@@ -407,6 +411,11 @@ class Aircraft(object):
         have already been logged."""
         if self._derateLineID is not None:
             self._logDerate()
+
+    def updateTakeoffAntiIce(self):
+        """Update the take-off anti-ice setting."""
+        if self._takeoffAntiIceLineID is not None:
+            self._logTakeoffAntiIce()
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights.
@@ -475,6 +484,25 @@ class Aircraft(object):
         else:
             self.logger.updateLine(self._derateLineID, message)
 
+    def _logTakeoffAntiIce(self, state = None):
+        """Log the take-off anti-ice setting either newly or by updating the
+        corresponding line."""
+        antiIceOn = self._flight.takeoffAntiIceOn
+        if state is not None:
+            antiIceOn = antiIceOn or state.antiIceOn is True
+            self._flight.takeoffAntiIceOn = antiIceOn
+
+        message = "Anti-ice was turned %s" % \
+                  ("ON" if antiIceOn else "OFF")
+
+        if self._takeoffAntiIceLineID is None:
+            if state is None:
+                state = self._aircraftState
+            self._takeoffAntiIceLineID = \
+                self.logger.message(state.timestamp, message)
+        else:
+            self.logger.updateLine(self._takeoffAntiIceLineID, message)
+
     def updateVRef(self):
         """Update the Vref value from the flight, if the Vref value has already
         been logged."""
@@ -491,6 +519,30 @@ class Aircraft(object):
                 self.logger.message(self._aircraftState.timestamp, message)
         else:
             self.logger.updateLine(self._vrefLineIndex, message)
+
+    def updateLandingAntiIce(self):
+        """Update the landing anti-ice setting."""
+        if self._landingAntiIceLineID is not None:
+            self._logLandingAntiIce()
+
+    def _logLandingAntiIce(self, state = None):
+        """Log the landing anti-ice setting either newly or by updating the
+        corresponding line."""
+        antiIceOn = self._flight.landingAntiIceOn
+        if state is not None:
+            antiIceOn = antiIceOn or state.antiIceOn is True
+            self._flight.landingAntiIceOn = antiIceOn
+
+        message = "Anti-ice was turned %s" % \
+                  ("ON" if antiIceOn else "OFF")
+
+        if self._landingAntiIceLineID is None:
+            if state is None:
+                state = self._aircraftState
+            self._landingAntiIceLineID = \
+                self.logger.message(state.timestamp, message)
+        else:
+            self.logger.updateLine(self._landingAntiIceLineID, message)
 
     def _fleetRetrieved(self, fleet):
         """Callback for the fleet retrieval result."""

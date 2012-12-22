@@ -1998,7 +1998,7 @@ class TakeoffPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 4)
+        table = gtk.Table(8, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2101,11 +2101,16 @@ class TakeoffPage(Page):
         self._derateUnit.set_alignment(0.0, 0.5)
         table.attach(self._derateUnit, 3, 4, 5, 6)
 
+        self._antiIceOn = gtk.CheckButton(xstr("takeoff_antiice"))
+        self._antiIceOn.set_use_underline(True)
+        self._antiIceOn.set_tooltip_text(xstr("takeoff_antiice_tooltip"))
+        table.attach(self._antiIceOn, 2, 4, 6, 7)
+
         self._rto = gtk.CheckButton(xstr("takeoff_rto"))
         self._rto.set_use_underline(True)
         self._rto.set_tooltip_text(xstr("takeoff_rto_tooltip"))
         self._rto.connect("toggled", self._rtoToggled)
-        table.attach(self._rto, 2, 4, 6, 7, ypadding = 8)
+        table.attach(self._rto, 2, 4, 7, 8, ypadding = 8)
 
         self.addCancelFlightButton()
 
@@ -2146,6 +2151,16 @@ class TakeoffPage(Page):
             return derate if derate else None
         else:
             return None
+
+    @property
+    def antiIceOn(self):
+        """Get whether the anti-ice system has been turned on."""
+        return self._antiIceOn.get_active()
+
+    @antiIceOn.setter
+    def antiIceOn(self, value):
+        """Set the anti-ice indicator."""
+        self._antiIceOn.set_active(value)
 
     @property
     def rtoIndicated(self):
@@ -2212,8 +2227,8 @@ class TakeoffPage(Page):
         self._v1.reset()
         self._vr.reset()
         self._v2.reset()
-
         self._hasDerate = False
+        self._antiIceOn.set_active(False)
 
     def setRTOEnabled(self, enabled):
         """Set the RTO checkbox enabled or disabled."""
@@ -2258,9 +2273,11 @@ class TakeoffPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        self._wizard.gui.flight.aircraft.updateV1R2()
+        aircraft = self._wizard.gui.flight.aircraft
+        aircraft.updateV1R2()
         if self._hasDerate:
-            self._wizard.gui.flight.aircraft.updateDerate()
+            aircraft.updateDerate()
+        aircraft.updateTakeoffAntiIce()
         self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
@@ -2392,7 +2409,7 @@ class LandingPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 5)
+        table = gtk.Table(6, 5)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2461,17 +2478,22 @@ class LandingPage(Page):
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 5, 6)
+        table.attach(label, 1, 2, 4, 5)
 
         self._vref = IntegerEntry()
         self._vref.set_width_chars(5)
         self._vref.set_tooltip_markup(xstr("landing_vref_tooltip_knots"))
         self._vref.connect("integer-changed", self._vrefChanged)
-        table.attach(self._vref, 3, 4, 5, 6)
+        table.attach(self._vref, 3, 4, 4, 5)
         label.set_mnemonic_widget(self._vref)
 
         self._vrefUnit = gtk.Label(xstr("label_knots"))
-        table.attach(self._vrefUnit, 4, 5, 5, 6)
+        table.attach(self._vrefUnit, 4, 5, 4, 5)
+
+        self._antiIceOn = gtk.CheckButton(xstr("landing_antiice"))
+        self._antiIceOn.set_use_underline(True)
+        self._antiIceOn.set_tooltip_text(xstr("landing_antiice_tooltip"))
+        table.attach(self._antiIceOn, 3, 5, 5, 6)
 
         self.addCancelFlightButton()
 
@@ -2509,10 +2531,21 @@ class LandingPage(Page):
         """Return the landing reference speed."""
         return self._vref.get_int()
 
+    @property
+    def antiIceOn(self):
+        """Get whether the anti-ice system has been turned on."""
+        return self._antiIceOn.get_active()
+
+    @antiIceOn.setter
+    def antiIceOn(self, value):
+        """Set the anti-ice indicator."""
+        self._antiIceOn.set_active(value)
+
     def reset(self):
         """Reset the page if the wizard is reset."""
         super(LandingPage, self).reset()
         self._vref.reset()
+        self._antiIceOn.set_active(False)
         self._flightEnded = False
 
     def activate(self):
@@ -2594,7 +2627,9 @@ class LandingPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        self._wizard.gui.flight.aircraft.updateVRef()
+        aircraft = self._wizard.gui.flight.aircraft
+        aircraft.updateVRef()
+        aircraft.updateLandingAntiIce()
         if self._wizard.gui.config.onlineGateSystem and \
            self._wizard.loggedIn and not self._completed and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
@@ -3186,6 +3221,16 @@ class Wizard(gtk.VBox):
         return self._takeoffPage.derate
 
     @property
+    def takeoffAntiIceOn(self):
+        """Get whether the anti-ice system was on during take-off."""
+        return self._takeoffPage.antiIceOn
+
+    @takeoffAntiIceOn.setter
+    def takeoffAntiIceOn(self, value):
+        """Set anti-ice on indicator."""
+        self._takeoffPage.antiIceOn = value
+
+    @property
     def rtoIndicated(self):
         """Get whether the pilot has indicated that an RTO has occured."""
         return self._takeoffPage.rtoIndicated
@@ -3214,6 +3259,16 @@ class Wizard(gtk.VBox):
     def vref(self):
         """Get the Vref speed."""
         return self._landingPage.vref
+
+    @property
+    def landingAntiIceOn(self):
+        """Get whether the anti-ice system was on during landing."""
+        return self._landingPage.antiIceOn
+
+    @landingAntiIceOn.setter
+    def landingAntiIceOn(self, value):
+        """Set anti-ice on indicator."""
+        self._landingPage.antiIceOn = value
 
     @property
     def flightType(self):

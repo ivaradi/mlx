@@ -312,6 +312,16 @@ class GUI(fs.ConnectionListener):
         return self._wizard.derate
 
     @property
+    def takeoffAntiIceOn(self):
+        """Get whether the anti-ice system was on during take-off."""
+        return self._wizard.takeoffAntiIceOn
+
+    @takeoffAntiIceOn.setter
+    def takeoffAntiIceOn(self, value):
+        """Set the anti-ice on indicator."""
+        gobject.idle_add(self._setTakeoffAntiIceOn, value)
+
+    @property
     def rtoIndicated(self):
         """Get whether the pilot has indicated than an RTO has occured."""
         return self._wizard.rtoIndicated
@@ -340,6 +350,16 @@ class GUI(fs.ConnectionListener):
     def vref(self):
         """Get the Vref speed calculated for the flight."""
         return self._wizard.vref
+
+    @property
+    def landingAntiIceOn(self):
+        """Get whether the anti-ice system was on during landing."""
+        return self._wizard.landingAntiIceOn
+
+    @landingAntiIceOn.setter
+    def landingAntiIceOn(self, value):
+        """Set the anti-ice on indicator."""
+        gobject.idle_add(self._setLandingAntiIceOn, value)
 
     @property
     def flightType(self):
@@ -1437,3 +1457,11 @@ class GUI(fs.ConnectionListener):
     def _showAboutURL(self, dialog, link, user_data):
         """Show the about URL."""
         webbrowser.open(url = link, new = 1)
+
+    def _setTakeoffAntiIceOn(self, value):
+        """Set the anti-ice on indicator."""
+        self._wizard.takeoffAntiIceOn = value
+
+    def _setLandingAntiIceOn(self, value):
+        """Set the anti-ice on indicator."""
+        self._wizard.landingAntiIceOn = value

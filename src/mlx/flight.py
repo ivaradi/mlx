@@ -182,6 +182,16 @@ class Flight(object):
         return self._gui.v2
 
     @property
+    def takeoffAntiIceOn(self):
+        """Get whether the anti-ice system was on during takeoff."""
+        return self._gui.takeoffAntiIceOn
+
+    @takeoffAntiIceOn.setter
+    def takeoffAntiIceOn(self, value):
+        """Set whether the anti-ice system was on during takeoff."""
+        self._gui.takeoffAntiIceOn = value
+
+    @property
     def derate(self):
         """Get the derate value of the flight."""
         return self._gui.derate
@@ -210,6 +220,16 @@ class Flight(object):
     def vref(self):
         """Get the VRef speed of the flight."""
         return self._gui.vref
+
+    @property
+    def landingAntiIceOn(self):
+        """Get whether the anti-ice system was on during landing."""
+        return self._gui.landingAntiIceOn
+
+    @landingAntiIceOn.setter
+    def landingAntiIceOn(self, value):
+        """Set whether the anti-ice system was on during landing."""
+        self._gui.landingAntiIceOn = value
 
     @property
     def tdRate(self):

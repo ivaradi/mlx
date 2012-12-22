@@ -16,6 +16,8 @@ set lights=3
 set n1_1=25
 set n1_2=25
 set pitot=yes
+set eng1Deice=yes
+set eng2Deice=yes
 set gs=10 ias=10
 set flapsControl=37.5
 set nav2=112.3
