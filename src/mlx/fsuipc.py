@@ -1373,6 +1373,7 @@ class AircraftModel(object):
             state.spoilersExtension = (spoilers - 4800) * 100.0 / (16383 - 4800)
 
         state.altimeter = data[self._monidx_altimeter] / 16.0
+        state.altimeterReliable = True
 
         state.ils = None
         state.ils_obs = None
@@ -1804,6 +1805,8 @@ class DAF70Model(F70Model):
                                                          data)
         state.navLightsOn = None
         state.landingLightsOn = None
+
+        state.altimeterReliable = False
 
         state.ils = state.nav1
         state.ils_obs = state.nav1_obs
