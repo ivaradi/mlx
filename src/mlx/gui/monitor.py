@@ -314,7 +314,7 @@ class MonitorWindow(gtk.Window):
             self._overspeed.set_sensitive(aircraftState.overspeed)
             self._stalled.set_sensitive(aircraftState.stalled)
             self._onTheGround.set_sensitive(aircraftState.onTheGround)
-            self._antiIceOn.set_sensitive(aircraftState.antiIceOn)
+            self._antiIceOn.set_sensitive(aircraftState.antiIceOn is True)
             self._zfw.set_text("%.0f" % (aircraftState.zfw,))
             self._grossWeight.set_text("%.0f" % (aircraftState.grossWeight,))
             self._heading.set_text("%03.0f" % (aircraftState.heading,))
@@ -362,7 +362,7 @@ class MonitorWindow(gtk.Window):
                 reverserStr += "ON" if reverser else "OFF"
             self._reverser.set_text(reverserStr)
 
-            self._navLightsOn.set_sensitive(aircraftState.navLightsOn)
+            self._navLightsOn.set_sensitive(aircraftState.navLightsOn is True)
             self._antiCollisionLightsOn.set_sensitive(aircraftState.antiCollisionLightsOn)
             self._strobeLightsOn.set_sensitive(aircraftState.strobeLightsOn)
 
@@ -386,12 +386,14 @@ class MonitorWindow(gtk.Window):
             self._position.set_text(util.getCoordinateString((aircraftState.latitude,
                                                               aircraftState.longitude)))
             self._elevatorTrim.set_text("%.2f" % (aircraftState.elevatorTrim,))
-            self._apMaster.set_sensitive(aircraftState.apMaster)
-            self._apHeadingHold.set_sensitive(aircraftState.apHeadingHold)
-            self._apHeading.set_text("%03.0f" % (aircraftState.apHeading,))
-            self._xpdrC.set_sensitive(aircraftState.xpdrC)
-            self._apAltitudeHold.set_sensitive(aircraftState.apAltitudeHold)
-            self._apAltitude.set_text("%5.0f" % (aircraftState.apAltitude,))
+            self._apMaster.set_sensitive(aircraftState.apMaster is True)
+            self._apHeadingHold.set_sensitive(aircraftState.apHeadingHold is True)
+            self._apHeading.set_text("-" if aircraftState.apHeading is None
+                                     else "%03.0f" % (aircraftState.apHeading,))
+            self._xpdrC.set_sensitive(aircraftState.xpdrC is True)
+            self._apAltitudeHold.set_sensitive(aircraftState.apAltitudeHold is True)
+            self._apAltitude.set_text("-" if aircraftState.apAltitude is None
+                                      else "%5.0f" % (aircraftState.apAltitude,))
 
             self._adf1.set_text("-" if aircraftState.adf1 is None else aircraftState.adf1)
             self._adf2.set_text("-" if aircraftState.adf2 is None else aircraftState.adf2)
