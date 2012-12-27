@@ -587,7 +587,6 @@ class Boeing737(Aircraft):
     - reverser: left, right"""
     def __init__(self, flight):
         super(Boeing737, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
 
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 260,
@@ -725,7 +724,6 @@ class Boeing767(Aircraft):
 
     def __init__(self, flight):
         super(Boeing767, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 255,
                                  5 : 235,
@@ -778,7 +776,6 @@ class CRJ2(Aircraft):
     - reverser: left, right."""
     def __init__(self, flight):
         super(CRJ2, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.dow = 14549
         self.mtow = 22995
         self.mlw = 21319
@@ -801,7 +798,6 @@ class F70(Aircraft):
     - reverser: left, right."""
     def __init__(self, flight):
         super(F70, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.dow = 24283
         self.mtow = 38100 # FIXME: differentiate by registration number,
                           # MTOW of HA-LMF: 41955
@@ -866,7 +862,6 @@ class T134(Aircraft):
     - reverser: left, right."""
     def __init__(self, flight):
         super(T134, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.dow = 29500
         self.mtow = 49000
         self.mlw = 43000
@@ -973,7 +968,6 @@ class YK40(Aircraft):
     - reverser: left, right"""
     def __init__(self, flight):
         super(YK40, self).__init__(flight)
-        self._checkers.append(checks.ThrustChecker())
         self.dow = 9400
         self.mtow = 17200
         self.mlw = 16800
