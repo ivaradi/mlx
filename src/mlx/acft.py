@@ -957,6 +957,10 @@ class T154(Aircraft):
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
 
+    def _appendSpeedChecker(self):
+        """Append the NoStrobeSpeedChecker to the checkers."""
+        self._checkers.append(checks.NoStrobeSpeedChecker())
+
 #---------------------------------------------------------------------------------------
 
 class YK40(Aircraft):
@@ -1004,6 +1008,10 @@ class YK40(Aircraft):
         self._checkers.append(checks.AntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
+
+    def _appendSpeedChecker(self):
+        """Append the NoStrobeSpeedChecker to the checkers."""
+        self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
