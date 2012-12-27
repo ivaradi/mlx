@@ -2,6 +2,7 @@
 import math
 import time
 import sys
+import codecs
 
 #------------------------------------------------------------------------------
 
@@ -164,3 +165,11 @@ def visibility2String(visibility):
 #------------------------------------------------------------------------------
 
 secondaryInstallation="secondary" in sys.argv
+
+#------------------------------------------------------------------------------
+
+_utf8decoder = codecs.getdecoder("utf-8")
+
+def utf2unicode(text):
+    """Convert the given text from UTF-8 encoding to unicode."""
+    return unicode(_utf8decoder(text)[0])

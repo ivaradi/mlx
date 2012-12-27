@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import const
-from util import secondaryInstallation
+from util import secondaryInstallation, utf2unicode
 
 import os
 import sys
@@ -787,7 +787,8 @@ class Config(object):
                 config.write(f)
             self._modified = False
         except Exception, e:
-            print >> sys.stderr, "Failed to update config: " + str(e)
+            print >> sys.stderr, "Failed to update config: " + \
+                                 utf2unicode(str(e))
 
     def _getBoolean(self, config, section, option, default):
         """Get the given option as a boolean, if found in the given config,

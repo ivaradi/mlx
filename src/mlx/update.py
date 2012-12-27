@@ -1,5 +1,6 @@
 
 from config import Config
+from util import utf2unicode
 
 import os
 import sys
@@ -205,7 +206,7 @@ def readLocalManifest(directory):
         with open(manifestPath, "rt") as f:
             manifest.readFrom(f)
     except Exception, e:
-        print "Error reading the manifest, ignoring:", str(e)
+        print "Error reading the manifest, ignoring:", utf2unicode(str(e))
         manifest = Manifest()
 
     return manifest
@@ -227,8 +228,9 @@ def prepareUpdate(directory, updateURL, listener):
         updateManifest.readFrom(f)
 
     except Exception, e:
-        print >> sys.stderr, "Error downloading manifest:", str(e)
-        listener.failed(str(e))
+        error = utf2unicode(str(e))
+        print >> sys.stderr, "Error downloading manifest:", error
+        listener.failed(error)
         return None
     finally:
         if f is not None: f.close()
@@ -290,7 +292,7 @@ def removeFile(toremoveDir, directory, path):
             toremoveDir = getToremoveDir(toremoveDir, directory)
             os.rename(path, os.path.join(toremoveDir, sum.hexdigest()))
         except Exception, e:
-            print "Cannot remove file " + path + ": " + str(e)    
+            print "Cannot remove file " + path + ": " + utf2unicode(str(e))
 
 #------------------------------------------------------------------------------
 
@@ -369,8 +371,9 @@ def updateFiles(directory, updateURL, listener,
         
         listener.done()
     except Exception, e:
-        print >> sys.stderr, "Error:", str(e)
-        listener.failed(str(e))        
+        error = utf2unicode(str(e))
+        print >> sys.stderr, "Error:", error
+        listener.failed(error)
 
 #------------------------------------------------------------------------------
 
@@ -431,7 +434,7 @@ def processMLXUpdate(buffer, listener):
                 listener.failed(words[1])
         except Exception, e:
             print >> sys.stderr, "Failed to parse line '%s': %s" % \
-                  (line, str(e))                
+                  (line, utf2unicode(str(e)))
 
     return buffer
 
@@ -487,8 +490,9 @@ def sudoUpdate(directory, updateURL, listener, manifest):
             process.wait()
         
     except Exception, e:
-        print >> sys.stderr, "Failed updating:", str(e)
-        listener.failed(str(e))
+        error = utf2unicode(str(e))
+        print >> sys.stderr, "Failed updating:", error
+        listener.failed(error)
     finally:
         if serverSocket is not None:
             try:

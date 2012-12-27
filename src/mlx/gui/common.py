@@ -95,6 +95,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     def text2str(text):
         """Convert the given text, returned by xstr to a string."""
         return str(text)
+
 else:
     print "Using PyGObject"
     pygobject = True
@@ -105,7 +106,7 @@ else:
     from gi.repository import AppIndicator3 as appindicator
     from gi.repository import Pango as pango
     appIndicator = True
-    
+
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR
     MESSAGETYPE_QUESTION = gtk.MessageType.QUESTION
     MESSAGETYPE_INFO = gtk.MessageType.INFO
@@ -155,7 +156,7 @@ else:
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
-    
+
     def text2unicode(str):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
         return _utf8Decoder(str)[0]
@@ -181,7 +182,7 @@ class FlightStatusHandler(object):
         self._rating = 100
         self._noGoReason = None
         self._updateFlightStatus()
-        
+
     def setStage(self, stage):
         """Set the stage of the flight."""
         if stage!=self._stage:
@@ -232,7 +233,7 @@ class IntegerEntry(gtk.Entry):
             self._currentInteger = value
             self.emit("integer-changed", self._currentInteger)
         self._set_text()
-    
+
     def _handle_changed(self, widget):
         """Handle the changed signal."""
         if self._selfSetting:
@@ -252,7 +253,7 @@ class IntegerEntry(gtk.Entry):
         self.set_text("" if self._currentInteger is None
                       else str(self._currentInteger))
         self._selfSetting = False
-                
+
 #------------------------------------------------------------------------------
 
 gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,

@@ -511,7 +511,7 @@ class FlightSelectionPage(Page):
                 with open(fileName, "wt") as f:
                     flight.writeIntoFile(f)
             except Exception, e:
-                print "Failed to save flight:", str(e)
+                print "Failed to save flight:", util.utf2unicode(str(e))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
@@ -554,7 +554,7 @@ class FlightSelectionPage(Page):
                     bookedFlight.readFromFile(f)
                 self._addFlight(bookedFlight)
             except Exception, e:
-                print "Failed to load flight:", str(e)
+                print "Failed to load flight:", util.utf2unicode(str(e))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =

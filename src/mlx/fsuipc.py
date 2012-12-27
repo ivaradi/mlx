@@ -103,7 +103,7 @@ class Handler(threading.Thread):
         try:
             return fun()
         except Exception, e:
-            print >> sys.stderr, str(e)
+            print >> sys.stderr, util.utf2unicode(str(e))
             return None
 
     # The number of times a read is attempted
@@ -385,7 +385,8 @@ class Handler(threading.Thread):
                 self._connected = True
                 return attempts
             except Exception, e:
-                print "fsuipc.Handler._connect: connection failed: " + str(e) + \
+                print "fsuipc.Handler._connect: connection failed: " + \
+                      util.utf2unicode(str(e)) + \
                       " (attempts: %d)" % (attempts,)
                 if attempts<self.NUM_CONNECTATTEMPTS:
                     time.sleep(self.CONNECT_INTERVAL)
@@ -445,7 +446,8 @@ class Handler(threading.Thread):
                     needReconnect = True
             except Exception as e:
                 print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
-                      str(e) + "), reconnecting (attempts=%d)." % (attempts,)
+                      util.utf2unicode(str(e)) + \
+                      "), reconnecting (attempts=%d)." % (attempts,)
                 needReconnect = True
 
             if needReconnect:
@@ -894,6 +896,9 @@ class Simulator(object):
         If so, also notifty the aircraft about the change.
 
         Return if a new model was created."""
+        name = self._latin1decoder(name)[0]
+        airPath = self._latin1decoder(airPath)[0]
+
         aircraftName = (name, airPath)
         if aircraftName==self._aircraftName:
             return False
@@ -911,11 +916,10 @@ class Simulator(object):
                 specialModel is not self._aircraftModel.__class__
 
         if needNew:
-            self._setAircraftModel(AircraftModel.create(self._aircraft, aircraftName))
+            self._setAircraftModel(AircraftModel.create(self._aircraft,
+                                                        aircraftName))
 
-
-        self._aircraft.modelChanged(timestamp, self._latin1decoder(name)[0],
-                                    self._aircraftModel.name)
+        self._aircraft.modelChanged(timestamp, name, self._aircraftModel.name)
 
         return needNew
 

@@ -1,4 +1,6 @@
 
+from util import utf2unicode
+
 import os
 import traceback
 
@@ -114,7 +116,8 @@ if os.name=="nt":
                         self._mci.send("close " + alias)
                         print "Closed", alias
                     except Exception, e:
-                        print "Failed closing " + alias + ":", str(e)
+                        print "Failed closing " + alias + ":",
+                        print utf2unicode(str(e))
                         success = False
 
                     if finishCallback is not None:
@@ -142,7 +145,8 @@ if os.name=="nt":
                             self._pending.sort()
                         print "Started to play", path
                     except Exception, e:
-                        print "Failed to start playing " + path + ":", str(e)                        
+                        print "Failed to start playing " + path + ":",
+                        print utf2unicode(str(e))
                         (finishCallback, extra) = finishData
                         if finishCallback is not None:
                             try:

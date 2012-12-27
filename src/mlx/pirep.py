@@ -1,4 +1,6 @@
 
+from util import utf2unicode
+
 import const
 import cPickle as pickle
 
@@ -51,7 +53,8 @@ class PIREP(object):
                     pirep.mailWeight = pirep.bookedFlight.mailWeight
                 return pirep
         except Exception, e:
-            print "Failed loading PIREP from %s: %s" % (path, str(e))
+            print "Failed loading PIREP from %s: %s" % (path,
+                                                        utf2unicode(str(e)))
             return None
 
     def __init__(self, flight):
@@ -156,6 +159,6 @@ class PIREP(object):
                 pickle.dump(self, f)
             return None
         except Exception, e:
-            error = str(e)
-            #print u"Failed saving PIREP to %s: %s" % (path, error)
+            error = utf2unicode(str(e))
+            print u"Failed saving PIREP to %s: %s" % (path, error)
             return error

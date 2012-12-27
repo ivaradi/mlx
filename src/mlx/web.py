@@ -464,7 +464,7 @@ class Request(object):
         try:
             self._callback(returned, result)
         except Exception, e:
-            print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + str(e)
+            print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + util.utf2unicode(str(e))
             traceback.print_exc()
 
 #------------------------------------------------------------------------------

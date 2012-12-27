@@ -1,4 +1,6 @@
 
+from util import utf2unicode
+
 import os
 import time
 
@@ -71,12 +73,14 @@ if os.name=="nt":
                             else:
                                 print "singleton._PipeServer.run: failed to read from the pipe"
                     except Exception, e:
-                        print "singleton._PipeServer.run: exception:", str(e)
+                        print "singleton._PipeServer.run: exception:",
+                        print utf2unicode(str(e))
                     finally:
                         win32pipe.DisconnectNamedPipe(handle)
                         win32file.CloseHandle(handle)
             except Exception, e:
-                print "singleton._PipeServer.run: fatal exception:", str(e)
+                print "singleton._PipeServer.run: fatal exception:",
+                print utf2unicode(str(e))
                             
         def _createPipe(self):
             """Create the pipe."""
@@ -140,7 +144,8 @@ if os.name=="nt":
                     f.close()
                     return
                 except Exception, e:
-                    print "SingleInstance._notifySingleton: failed:", str(e)
+                    print "SingleInstance._notifySingleton: failed:",
+                    print utf2unicode(str(e))
                     time.sleep(0.5)
         
         def __nonzero__(self):
@@ -189,7 +194,8 @@ else:     # os.name=="nt"
                     s.recv(64)
                     self._raiseCallback()
             except Exception, e:
-                print "singleton._SocketServer.run: fatal exception:", str(e)            
+                print "singleton._SocketServer.run: fatal exception:",
+                print utf2unicode(str(e))
     
     class SingleInstance(object):
         """Creating an instance of this object checks if only one instance of
@@ -253,7 +259,8 @@ else:     # os.name=="nt"
                     s.close()
                     return
                 except Exception, e:
-                    print "singleton.SingleInstance._notifySingleton: failed:", str(e)
+                    print "singleton.SingleInstance._notifySingleton: failed:",
+                    print utf2unicode(str(e))
                     time.sleep(0.5)
 
         def __nonzero__(self):
