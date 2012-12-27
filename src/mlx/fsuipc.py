@@ -1559,12 +1559,13 @@ class GenericAircraftModel(AircraftModel):
         totalFuel = 0
         for fuelTank in self._fuelTanks:
             capacity = data[index+1] * fuelWeight * const.LBSTOKG
-            amount = data[index] * capacity / 128.0 / 65536.0
-            index += 2
+            if capacity>=1.0:
+                amount = data[index] * capacity / 128.0 / 65536.0
+                index += 2
 
-            result.append( (fuelTank, amount, capacity) if addCapacities
-                           else (fuelTank, amount))
-            totalFuel += amount
+                result.append( (fuelTank, amount, capacity) if addCapacities
+                               else (fuelTank, amount))
+                totalFuel += amount
 
         return (result, totalFuel)
 
