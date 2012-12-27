@@ -157,7 +157,7 @@ class StatusIcon(FlightStatusHandler):
                 else xstr("flight_stage_" + const.stage2string(self._stage))
         
         if self._noGoReason is None:
-            rating = "%.0f%%" % (self._rating,)
+            rating = "%.1f%%" % (self._rating,)
         else:
             rating = self._noGoReason
 

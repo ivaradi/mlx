@@ -146,7 +146,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._stageLabel.set_text(text)
     
         if self._noGoReason is None:
-            rating = "%.0f%%" % (self._rating,)
+            rating = "%.1f%%" % (self._rating,)
         else:
             rating = '<span foreground="red">' + self._noGoReason + '</span>'
         self._ratingLabel.set_markup(rating)
