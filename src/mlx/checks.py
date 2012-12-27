@@ -1443,7 +1443,9 @@ class ThrustChecker(SimpleFaultChecker):
         flight.handleFault(ThrustChecker, state.timestamp,
                            FaultChecker._appendDuring(flight,
                                                       "Thrust setting was too high (>97%)"),
-                           FaultChecker._getLinearScore(97, 110, 0, 10, max(state.n1)))
+                           FaultChecker._getLinearScore(97, 110, 0, 10,
+                                                        max(state.n1)),
+                           updatePrevious = True)
 
 #---------------------------------------------------------------------------------------
 
