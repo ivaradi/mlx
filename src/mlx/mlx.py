@@ -3,6 +3,7 @@ from config import Config
 from i18n import setLanguage
 from sound import initializeSound
 from util import secondaryInstallation
+from const import VERSION
 
 import os
 import sys
@@ -80,6 +81,10 @@ def main():
 
     sys.stdout = StdIOHandler(gui)
     sys.stderr = StdIOHandler(gui)
+
+    print "MAVA Logger X " + VERSION + " debug log"
+    print "The initial configuration:"
+    config.log()
 
     initializeSound(os.path.join(programDirectory, "sounds"))
 

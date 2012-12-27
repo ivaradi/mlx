@@ -786,6 +786,10 @@ class Config(object):
             with os.fdopen(fd, "wt") as f:
                 config.write(f)
             self._modified = False
+
+            print "Configuration saved:"
+            self.log()
+
         except Exception, e:
             print >> sys.stderr, "Failed to update config: " + \
                                  utf2unicode(str(e))
@@ -861,5 +865,59 @@ class Config(object):
         else:
             locale.setlocale(locale.LC_ALL, "")
             return locale.getdefaultlocale()[0]
+
+    def log(self):
+        """Log the configuration by printing the values"""
+        print "  pilot ID:", self._pilotID
+        print "  rememberPassword:", self._rememberPassword
+
+        print "  language:", self._language
+
+        print "  hideMinimizedWindow:", self._hideMinimizedWindow
+        print "  quitOnClose:", self._quitOnClose
+
+        print "  onlineGateSystem:", self._onlineGateSystem
+        print "  onlineACARS:", self._onlineACARS
+
+        print "  flareTimeFromFS:", self._flareTimeFromFS
+        print "  syncFSTime:", self._syncFSTime
+        print "  usingFS2Crew:", self._usingFS2Crew
+
+        print "  iasSmoothingLength:", self._iasSmoothingLength
+        print "  vsSmoothingLength:", self._vsSmoothingLength
+
+        print "  pirepDirectory:", self._pirepDirectory
+        print "  pirepAutoSave:", self._pirepAutoSave
+
+        print "  enableSounds:", self._enableSounds
+
+        print "  pilotControlsSounds:", self._pilotControlsSounds
+        print "  pilotHotkey:", str(self._pilotHotkey)
+
+        print "  enableApproachCallouts:", self._enableApproachCallouts
+        print "  speedbrakeAtTD:", self._speedbrakeAtTD
+
+        print "  enableChecklists:", self._enableChecklists
+        print "  checklistHotkey:", str(self._checklistHotkey)
+
+        print "  autoUpdate:", self._autoUpdate
+        print "  updateURL:", self._updateURL
+
+        print "  messageTypeLevels:"
+        for (type, level) in self._messageTypeLevels.iteritems():
+            print "    %s: %s" % (const.messageType2string(type),
+                                  const.messageLevel2string(level))
+
+        print "  checklists:"
+        for (type, checklist) in self._checklists.iteritems():
+            print "    %s:" % (const.icaoCodes[type],)
+            for path in checklist:
+                print "      " + path
+
+        print "  approachCallouts:"
+        for (type, approachCallouts) in self._approachCallouts.iteritems():
+            print "    %s:" % (const.icaoCodes[type],)
+            for (altitude, path) in approachCallouts:
+                print "      %d: %s" % (altitude, path)
 
 #-------------------------------------------------------------------------------

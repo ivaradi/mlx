@@ -356,10 +356,12 @@ class LoginPage(Page):
 
     def _offlineClicked(self, button):
         """Called when the offline button was clicked."""
+        print "mlx.flight.LoginPage: offline flight selected"
         self._wizard.nextPage()
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
+        print "mlx.flight.LoginPage: logged in"
         self._wizard.login(self._handleLoginResult,
                            self._pilotID.get_text(),
                            self._password.get_text(),
