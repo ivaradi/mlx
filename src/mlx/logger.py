@@ -151,7 +151,7 @@ class Logger(object):
             The entries will be sorted."""
             entries = self._entries
             entries.append(entry)
-            entries.sort(key = Logger.Entry.faultScore, reverse = True)
+            entries.sort(key = lambda entry: entry.faultScore, reverse = True)
 
         def removeEntry(self, entry):
             """Remove the given entry.
