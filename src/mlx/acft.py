@@ -288,6 +288,7 @@ class Aircraft(object):
                 self.logger.message(aircraftState.timestamp,
                                     "Takeoff weight: %.0f kg, MTOW: %.0f kg" % \
                                     (aircraftState.grossWeight, self.mtow))
+                self._logQNH(aircraftState)
                 self.logger.message(aircraftState.timestamp,
                                     "Wind %03.0f/%.0f" % \
                                     (aircraftState.windDirection,
@@ -298,6 +299,8 @@ class Aircraft(object):
                 self._logTakeoffAntiIce(aircraftState)
             elif newStage==const.STAGE_DESCENT or newStage==const.STAGE_LANDING:
                 self._logRadios(aircraftState)
+                if newStage==const.STAGE_LANDING:
+                    self._logQNH(aircraftState)
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 flight = self._flight
                 bookedFlight = flight.bookedFlight
@@ -349,9 +352,7 @@ class Aircraft(object):
                             (windDirection, windSpeed))
         self.logger.message(self._aircraftState.timestamp,
                             "Visibility: %.0f metres" % (visibility,))
-        self.logger.message(self._aircraftState.timestamp,
-                            "Altimeter setting: %.0f hPa" % \
-                            (self._aircraftState.altimeter,))
+        self._logQNH(self._aircraftState)
         self._logVRef()
         self._logLandingAntiIce(self._aircraftState)
         self.flight.flareStarted(flareStart, flareStartFS)
@@ -567,6 +568,12 @@ class Aircraft(object):
         self._nav2Logger.forceLog(flight, logger, aircraftState)
         self._adf1Logger.forceLog(flight, logger, aircraftState)
         self._adf2Logger.forceLog(flight, logger, aircraftState)
+
+    def _logQNH(self, aircraftState):
+        """Log the current QNH along with the altimeter setting."""
+        self.logger.message(aircraftState.timestamp,
+                            "QNH: %.2f hPa, altimeter: %.2f hPa" % \
+                            (aircraftState.qnh, aircraftState.altimeter))
 
     def _logNameAndModel(self, timestamp):
         """Log the aircraft's name and model with taking the timestamp from the

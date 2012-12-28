@@ -1,3 +1,5 @@
+set qnh=1004
+set altimeter=1013
 set n1_1=0
 set n1_2=0
 set onTheGround=yes
@@ -23,6 +25,7 @@ set flapsControl=37.5
 set nav2=112.3
 set adf1=540
 set xpdrC=0
+set altimeter=1004
 set lights=23
 set gs=60 ias=60
 set gs=80 ias=80
@@ -39,14 +42,17 @@ set noseGear=0
 set altitude=2000
 set nav1=111.5
 set flapsControl=0
+set altimeter=1013.25
 set altitude=10000
 set lights=19
 set ias=400
 set altitude=22001
 set vs=-200
 set altitude=15000
+set qnh=1007
 set nav1=116.3
 set altitude=10000
+set altimeter=1007
 set adf2=540
 set ias=160 gs=170
 set flapsControl=87.5

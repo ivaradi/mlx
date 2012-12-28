@@ -464,7 +464,7 @@ class AltimeterLogger(StateChangeLogger, SingleValueMixin,
         """Get the message to log on a change."""
         logState = self._lastChangeState if \
                    self._lastChangeState is not None else state
-        message = "Altimeter: %.0f hPa at %.0f feet" % \
+        message = "Altimeter: %.2f hPa at %.0f feet" % \
                   (logState.altimeter, logState.altitude)
         if not logState.altimeterReliable:
             message += " (u/r)"
