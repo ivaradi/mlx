@@ -36,7 +36,7 @@ class MonitorWindow(gtk.Window):
         alignment.set_padding(padding_top = 4, padding_bottom = 10,
                               padding_left = 16, padding_right = 16)
 
-        table = gtk.Table(rows = 7, columns = 14)
+        table = gtk.Table(rows = 9, columns = 14)
         table.set_homogeneous(False)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -222,6 +222,10 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 10, 11, 7, 8)
         table.attach(self._adf2, 11, 12, 7, 8)
 
+        (label, self._qnh) = self._createLabeledEntry("QNH:", 7)
+        table.attach(label, 0, 1, 8, 9)
+        table.attach(self._qnh, 1, 2, 8, 9)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -306,6 +310,7 @@ class MonitorWindow(gtk.Window):
             self._apAltitude.set_text("-")
             self._adf1.set_text("-")
             self._adf2.set_text("-")
+            self._qnh.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -335,6 +340,7 @@ class MonitorWindow(gtk.Window):
             self._squawk.set_text(aircraftState.squawk)
             self._nav1.set_text("-" if aircraftState.nav1 is None else aircraftState.nav1)
             self._nav2.set_text("-" if aircraftState.nav2 is None else aircraftState.nav2)
+            self._qnh.set_text("%.0f" % (aircraftState.qnh,))
 
             fuelStr = ""
             for (_tank, fuel) in aircraftState.fuel:

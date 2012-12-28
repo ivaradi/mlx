@@ -228,6 +228,7 @@ class AircraftState(object):
     - spoilersExtension: the percentage of how much the spoiler is extended
     (float)
     - altimeter: the altimeter setting in hPa (float)
+    - qnh: the QNH in hPa (float)
     - altimeterReliable: a boolean indicating if the altimeter setting is
     reliable
     - ils: the frequency of the ILS radio in MHz (string). Can be None, if

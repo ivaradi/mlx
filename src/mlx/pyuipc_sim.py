@@ -280,6 +280,7 @@ class Values(object):
         self.spoilers = 0.0
 
         self.altimeter = 1013.0
+        self.qnh = 1011.2
 
         self.nav1 = 117.3
         self.nav1_obs = 128
@@ -500,6 +501,8 @@ class Values(object):
             return int(self.windSpeed)
         elif offset==0x0e92:       # Wind direction
             return int(self.windDirection * 65536.0 / 360.0)
+        elif offset==0x0ec6:       # QNH
+            return int(self.qnh * 16.0)
         elif offset==0x11ba:       # G-Load
             return int(self.gLoad * 625.0)
         elif offset==0x11c6:       # Mach
@@ -760,6 +763,8 @@ class Values(object):
             self.windSpeed = value
         elif offset==0x0e92:       # Wind direction
             self.windDirection = value * 360.0 / 65536.0
+        elif offset==0x0ec6:       # QNH
+            self.qnh = value / 16.0
         elif offset==0x11ba:       # G-Load
             self.gLoad = value / 625.0
         elif offset==0x11c6:       # Mach
@@ -1296,7 +1301,10 @@ class CLI(cmd.Cmd):
         self._valueHandlers["spoilers"] = ([(0x0bd0, "d")],
                                            lambda value: value,
                                            lambda word: int(word))
-        self._valueHandlers["qnh"] = ([(0x0330, "H")],
+        self._valueHandlers["altimeter"] = ([(0x0330, "H")],
+                                            lambda value: value / 16.0,
+                                            lambda word: int(float(word)*16.0))
+        self._valueHandlers["qnh"] = ([(0x0ec6, "H")],
                                       lambda value: value / 16.0,
                                       lambda word: int(float(word)*16.0))
         self._valueHandlers["nav1"] = ([(0x0350, "H")],

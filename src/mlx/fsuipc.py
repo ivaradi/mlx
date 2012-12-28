@@ -1180,6 +1180,7 @@ class AircraftModel(object):
                       ("spoilersArmed", 0x0bcc, "d"),
                       ("spoilers", 0x0bd0, "d"),
                       ("altimeter", 0x0330, "H"),
+                      ("qnh", 0x0ec6, "H"),
                       ("nav1", 0x0350, "H"),
                       ("nav1_obs", 0x0c4e, "H"),
                       ("nav2", 0x0352, "H"),
@@ -1378,6 +1379,7 @@ class AircraftModel(object):
 
         state.altimeter = data[self._monidx_altimeter] / 16.0
         state.altimeterReliable = True
+        state.qnh = data[self._monidx_qnh] / 16.0
 
         state.ils = None
         state.ils_obs = None
