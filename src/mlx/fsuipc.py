@@ -1563,11 +1563,11 @@ class GenericAircraftModel(AircraftModel):
             capacity = data[index+1] * fuelWeight * const.LBSTOKG
             if capacity>=1.0:
                 amount = data[index] * capacity / 128.0 / 65536.0
-                index += 2
 
                 result.append( (fuelTank, amount, capacity) if addCapacities
                                else (fuelTank, amount))
                 totalFuel += amount
+            index += 2
 
         return (result, totalFuel)
 
