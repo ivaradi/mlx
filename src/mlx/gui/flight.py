@@ -184,10 +184,16 @@ class Page(gtk.Alignment):
 
     def setStyle(self):
         """Set the styles of some of the items on the page."""
-        style = self.get_style() if pygobject else self.rc_get_style()
-
-        self._titleEventBox.modify_bg(0, style.bg[3])
-        self._titleLabel.modify_fg(0, style.fg[3])
+        if pygobject:
+            context = self.get_style_context()
+            color = context.get_background_color(gtk.StateFlags.SELECTED)
+            self._titleEventBox.modify_bg(0, color.to_color())
+            color = context.get_color(gtk.StateFlags.SELECTED)
+            self._titleLabel.modify_fg(0, color.to_color())
+        else:
+            style = self.rc_get_style()
+            self._titleEventBox.modify_bg(0, style.bg[3])
+            self._titleLabel.modify_fg(0, style.fg[3])
 
     def initialize(self):
         """Initialize the page.
