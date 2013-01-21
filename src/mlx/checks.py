@@ -1377,11 +1377,11 @@ class NoStrobeSpeedChecker(StateChecker):
                 if state.groundSpeed>self._highestSpeedState.groundSpeed:
                     self._highestSpeedState = state
 
-                if state.timestamp > (self._takeoffState.timestamp + 20):
-                    flight.setRTOState(self._highestSpeedState)
-                elif not state.onTheGround:
+                if not state.onTheGround:
                     aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
                     self._takeoffState = None
+                elif state.timestamp > (self._takeoffState.timestamp + 30):
+                    flight.setRTOState(self._highestSpeedState)
         elif self._takeoffState is not None:
             flight.setRTOState(self._highestSpeedState)
             self._takeoffState = None
