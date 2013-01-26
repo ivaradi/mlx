@@ -598,7 +598,11 @@ class LightsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
 
     def _getMessage(self, flight, state, forced):
         """Get the message from the given state."""
-        return self._template % ("ON" if self._getValue(state) else "OFF")
+        value = self._getValue(state)
+        if value is None:
+            return None
+        else:
+            return self._template % ("ON" if value else "OFF")
 
 #---------------------------------------------------------------------------------------
 
