@@ -1076,7 +1076,8 @@ class LandingLightsChecker(PatientFaultChecker):
                                   const.STAGE_DESCENT] and \
                  state.landingLightsOn and state.altitude>12500) or \
                 (flight.stage==const.STAGE_LANDING and \
-                 not state.landingLightsOn and not state.onTheGround) or \
+                 not state.landingLightsOn and state.onTheGround and
+                 state.groundSpeed>50.0) or \
                 (flight.stage==const.STAGE_PARKING and \
                  state.landingLightsOn and state.onTheGround))
 

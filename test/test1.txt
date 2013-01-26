@@ -67,12 +67,14 @@ set radioAltitude=29
 set radioAltitude=9
 set altitude=517
 set latitude=47.49 longitude=21.62
+set lights=23
 set onTheGround=yes
 set n1_1=-10
 set n1_2=-10
 set n1_1=0
 set n1_2=0
 set ias=45 gs=45
+set lights=19
 set ias=35 gs=35
 set ias=20 gs=20
 set xpdrC=1
