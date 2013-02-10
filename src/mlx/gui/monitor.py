@@ -385,7 +385,7 @@ class MonitorWindow(gtk.Window):
             self._parking.set_sensitive(aircraftState.parking)
             self._gearControlDown.set_sensitive(aircraftState.gearControlDown)
             self._gearsDown.set_sensitive(aircraftState.gearsDown)
-            self._spoilersArmed.set_sensitive(aircraftState.spoilersArmed)
+            self._spoilersArmed.set_sensitive(aircraftState.spoilersArmed is True)
             self._spoilersExtension.set_text("%.0f" % (aircraftState.spoilersExtension,))
             self._windSpeed.set_text("%.0f" % (aircraftState.windSpeed,))
             self._windDirection.set_text("%03.0f" % (aircraftState.windDirection,))
