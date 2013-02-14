@@ -217,6 +217,29 @@ class Handler(threading.Thread):
             firing times."""
             return cmp(self._nextFire, other._nextFire)
 
+    class ShowMessageRequest(object):
+        """Request to show a message in the simulator window."""
+        def __init__(self, handler, message, duration, callback, extra):
+            """Construct the request."""
+            self._handler = handler
+            self._message = message
+            self._duration = duration
+            self._callback = callback
+            self._extra = extra
+
+        def process(self, time):
+            """Process the request.
+
+            Return True if the request has succeeded. An exception may also be
+            thrown if there is some lower-level communication problem."""
+            self._handler._xplane.showMessage(self._message, self._duration)
+            Handler._callSafe(lambda: self._callback(True, self._extra))
+            return True
+
+        def fail(self):
+            """Handle the failure of this request."""
+            Handler._callSafe(lambda: self._callback(False, self._extra))
+
     def __init__(self, connectionListener,
                  connectAttempts = -1, connectInterval = 0.2):
         """Construct the handler with the given connection listener."""
@@ -301,6 +324,14 @@ class Handler(threading.Thread):
                     del self._periodicRequests[i]
                     return True
         return False
+
+    def requestShowMessage(self, message, duration, callback, extra = None):
+        """Request showing a message in the simulator."""
+        with self._requestCondition:
+            self._requests.append(Handler.ShowMessageRequest(self,
+                                                             message, duration,
+                                                             callback, extra))
+            self._requestCondition.notify()
 
     def connect(self):
         """Initiate the connection to the flight simulator."""
@@ -672,23 +703,10 @@ class Simulator(object):
         """Send a message to the pilot via the simulator.
 
         duration is the number of seconds to keep the message displayed."""
-
-        # TODO: implement this for X-Plane
         print "xplra.Simulator.sendMessage:", message
-        pass
-        # if self._scroll:
-        #     if duration==0: duration = -1
-        #     elif duration == 1: duration = -2
-        #     else: duration = -duration
-
-        # data = [(0x3380, -1 - len(message), message),
-        #         (0x32fa, 'h', duration)]
-
-        # #if _disconnect:
-        # #    print "xplra.Simulator.sendMessage(disconnect)", message
-
-        # self._handler.requestWrite(data, self._handleMessageSent,
-        #                            extra = _disconnect)
+        self._handler.requestShowMessage(message, duration,
+                                         self._handleMessageSent,
+                                         extra = _disconnect)
 
     def getFuel(self, callback):
         """Get the fuel information for the current model.
