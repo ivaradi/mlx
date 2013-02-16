@@ -14,6 +14,7 @@ import math
 from xplra import XPlane, MultiGetter, MultiSetter
 from xplra import TYPE_INT, TYPE_FLOAT, TYPE_DOUBLE
 from xplra import TYPE_FLOAT_ARRAY, TYPE_INT_ARRAY, TYPE_BYTE_ARRAY
+from xplra import HOTKEY_MODIFIER_SHIFT, HOTKEY_MODIFIER_CONTROL
 
 #------------------------------------------------------------------------------
 
@@ -29,6 +30,200 @@ from xplra import TYPE_FLOAT_ARRAY, TYPE_INT_ARRAY, TYPE_BYTE_ARRAY
 _hgin2hpa = 1013.25 / 29.92
 
 _mps2knots = 3600.0 / 1852
+
+#------------------------------------------------------------------------------
+
+class Request(object):
+    """Base class for one-shot requests."""
+    def __init__(self, handler, callback, extra):
+        """Construct the request."""
+        self._handler = handler
+        self._callback = callback
+        self._extra = extra
+        self._result = None
+
+    def process(self, time):
+        """Process the request.
+
+        Return True if the request has succeeded, False if data validation
+        has failed for a reading request. An exception may also be thrown
+        if there is some lower-level communication problem."""
+        if self._process(time):
+            Handler._callSafe(lambda: self._callback(self._result,
+                                                     self._extra))
+            return True
+        else:
+            return False
+
+    def fail(self):
+        """Handle the failure of this request."""
+        Handler._callSafe(lambda: self._callback(False, self._extra))
+
+class DataRequest(Request):
+    """A simple, one-shot data read or write request."""
+    def __init__(self, handler, forWrite, data, callback, extra,
+                 validator = None):
+        """Construct the request."""
+        super(DataRequest, self).__init__(handler, callback, extra)
+
+        self._forWrite = forWrite
+        self._validator = validator
+
+        xplane = handler._xplane
+        self._multiBuffer = xplane.createMultiSetter() if forWrite \
+                            else xplane.createMultiGetter()
+
+        Handler._setupMultiBuffer(self._multiBuffer,
+                                  [(d[0], d[1]) for d in data])
+
+        if forWrite:
+            index = 0
+            for (_, _, value) in data:
+                self._multiBuffer[index] = value
+                index += 1
+
+
+    def fail(self):
+        """Handle the failure of this request."""
+        if self._forWrite:
+            super(DataRequest, self).fail()
+        else:
+            Handler._callSafe(lambda: self._callback(None, self._extra))
+
+    def _process(self, time):
+        """Process the request."""
+        if self._forWrite:
+            self._multiBuffer.execute()
+            self._result = True
+            return True
+        elif Handler._performRead(self._multiBuffer,
+                                  self._extra, self._validator):
+            self._result = self._multiBuffer
+            return True
+        else:
+            return False
+
+class ShowMessageRequest(Request):
+    """Request to show a message in the simulator window."""
+    def __init__(self, handler, message, duration, callback, extra):
+        """Construct the request."""
+        super(ShowMessageRequest, self).__init__(handler,
+                                                         callback, extra)
+        self._message = message
+        self._duration = duration
+
+    def _process(self, time):
+        """Process the request."""
+        self._handler._xplane.showMessage(self._message, self._duration)
+        self._result = True
+        return True
+
+class RegisterHotkeysRequest(Request):
+    """Request to register hotkeys with the simulator."""
+    def __init__(self, handler, hotkeyCodes, callback, extra):
+        """Construct the request."""
+        super(RegisterHotkeysRequest, self).__init__(handler,
+                                                     callback,
+                                                     extra)
+        self._hotkeyCodes = hotkeyCodes
+
+    def _process(self, time):
+        """Process the request."""
+        self._handler._xplane.registerHotkeys(self._hotkeyCodes)
+        self._result = True
+        return True
+
+class UnregisterHotkeysRequest(Request):
+    """Request to register hotkeys with the simulator."""
+    def _process(self, time):
+        """Process the request."""
+        self._handler._xplane.unregisterHotkeys()
+        self._result = True
+        return True
+
+class PeriodicRequest(object):
+    """A periodic request."""
+    def __init__(self, handler, id, period, callback, extra):
+        """Construct the periodic request."""
+        self._handler = handler
+        self._id = id
+        self._period = period
+        self._nextFire = time.time()
+        self._callback = callback
+        self._extra = extra
+        self._result = None
+
+    @property
+    def id(self):
+        """Get the ID of this periodic request."""
+        return self._id
+
+    @property
+    def nextFire(self):
+        """Get the next firing time."""
+        return self._nextFire
+
+    def process(self, now):
+        """Check if this request should be executed, and if so, do so.
+
+        now is the time at which the request is being executed. If this
+        function is called too early, nothing is done, and True is
+        returned.
+
+        Return True if the request has succeeded, False if data validation
+        has failed. An exception may also be thrown if there is some
+        lower-level communication problem."""
+        if now<self._nextFire:
+            return True
+
+        isOK = self._process(time)
+
+        if isOK:
+            Handler._callSafe(lambda: self._callback(self._result,
+                                                     self._extra))
+            now = time.time()
+            while self._nextFire <= now:
+                self._nextFire += self._period
+
+        return isOK
+
+    def fail(self):
+        """Handle the failure of this request."""
+        pass
+
+    def __cmp__(self, other):
+        """Compare two periodic requests. They are ordered by their next
+        firing times."""
+        return cmp(self._nextFire, other._nextFire)
+
+class PeriodicDataRequest(PeriodicRequest):
+    """A periodic request."""
+    def __init__(self, handler, id, period, data, callback, extra,
+                 validator):
+        """Construct the periodic request."""
+        super(PeriodicDataRequest, self).__init__(handler, id, period,
+                                                  callback, extra)
+        self._validator = validator
+        self._multiGetter = handler._xplane.createMultiGetter()
+        Handler._setupMultiBuffer(self._multiGetter, data)
+
+    def _process(self, now):
+        """Process the request."""
+        if Handler._performRead(self._multiGetter,
+                                self._extra, self._validator):
+            self._result = self._multiGetter
+            return True
+        else:
+            return False
+
+#------------------------------------------------------------------------------
+
+class HotkeysStateRequest(PeriodicRequest):
+    """Periodic hotkey query request."""
+    def _process(self, now):
+        """Process the request."""
+        self._result = self._handler._xplane.queryHotkeys()
+        return True
 
 #------------------------------------------------------------------------------
 
@@ -96,7 +291,7 @@ class Handler(threading.Thread):
 
 
     @staticmethod
-    def _performRead(multiGetter, callback, extra, validator):
+    def _performRead(multiGetter, extra, validator):
         """Perform a read request.
 
         If there is a validator, that will be called with the return values,
@@ -111,134 +306,10 @@ class Handler(threading.Thread):
             multiGetter.execute()
             if validator is None or \
                Handler._callSafe(lambda: validator(multiGetter, extra)):
-                Handler._callSafe(lambda: callback(multiGetter, extra))
                 return True
             else:
                 attemptsLeft -= 1
         return False
-
-    class Request(object):
-        """A simple, one-shot request."""
-        def __init__(self, handler, forWrite, data, callback, extra,
-                     validator = None):
-            """Construct the request."""
-            self._forWrite = forWrite
-            self._callback = callback
-            self._extra = extra
-            self._validator = validator
-
-            xplane = handler._xplane
-            self._multiBuffer = xplane.createMultiSetter() if forWrite \
-                                else xplane.createMultiGetter()
-
-            Handler._setupMultiBuffer(self._multiBuffer,
-                                      [(d[0], d[1]) for d in data])
-
-            if forWrite:
-                index = 0
-                for (_, _, value) in data:
-                    self._multiBuffer[index] = value
-                    index += 1
-
-        def process(self, time):
-            """Process the request.
-
-            Return True if the request has succeeded, False if data validation
-            has failed for a reading request. An exception may also be thrown
-            if there is some lower-level communication problem."""
-            if self._forWrite:
-                self._multiBuffer.execute()
-                Handler._callSafe(lambda: self._callback(True, self._extra))
-                return True
-            else:
-                return Handler._performRead(self._multiBuffer, self._callback,
-                                            self._extra, self._validator)
-
-        def fail(self):
-            """Handle the failure of this request."""
-            if self._forWrite:
-                Handler._callSafe(lambda: self._callback(False, self._extra))
-            else:
-                Handler._callSafe(lambda: self._callback(None, self._extra))
-
-    class PeriodicRequest(object):
-        """A periodic request."""
-        def __init__(self, handler, id, period, data, callback, extra,
-                     validator):
-            """Construct the periodic request."""
-            self._id = id
-            self._period = period
-            self._nextFire = time.time()
-            self._callback = callback
-            self._extra = extra
-            self._validator = validator
-
-            self._multiGetter = handler._xplane.createMultiGetter()
-            Handler._setupMultiBuffer(self._multiGetter, data)
-
-        @property
-        def id(self):
-            """Get the ID of this periodic request."""
-            return self._id
-
-        @property
-        def nextFire(self):
-            """Get the next firing time."""
-            return self._nextFire
-
-        def process(self, time):
-            """Check if this request should be executed, and if so, do so.
-
-            time is the time at which the request is being executed. If this
-            function is called too early, nothing is done, and True is
-            returned.
-
-            Return True if the request has succeeded, False if data validation
-            has failed. An exception may also be thrown if there is some
-            lower-level communication problem."""
-            if time<self._nextFire:
-                return True
-
-            isOK = Handler._performRead(self._multiGetter, self._callback,
-                                        self._extra, self._validator)
-
-            if isOK:
-                while self._nextFire <= time:
-                    self._nextFire += self._period
-
-            return isOK
-
-        def fail(self):
-            """Handle the failure of this request."""
-            pass
-
-        def __cmp__(self, other):
-            """Compare two periodic requests. They are ordered by their next
-            firing times."""
-            return cmp(self._nextFire, other._nextFire)
-
-    class ShowMessageRequest(object):
-        """Request to show a message in the simulator window."""
-        def __init__(self, handler, message, duration, callback, extra):
-            """Construct the request."""
-            self._handler = handler
-            self._message = message
-            self._duration = duration
-            self._callback = callback
-            self._extra = extra
-
-        def process(self, time):
-            """Process the request.
-
-            Return True if the request has succeeded. An exception may also be
-            thrown if there is some lower-level communication problem."""
-            self._handler._xplane.showMessage(self._message, self._duration)
-            Handler._callSafe(lambda: self._callback(True, self._extra))
-            return True
-
-        def fail(self):
-            """Handle the failure of this request."""
-            Handler._callSafe(lambda: self._callback(False, self._extra))
 
     def __init__(self, connectionListener,
                  connectAttempts = -1, connectInterval = 0.2):
@@ -275,9 +346,9 @@ class Handler(threading.Thread):
         It will be called in the handler's thread!
         """
         with self._requestCondition:
-            self._requests.append(Handler.Request(self, False, data,
-                                                  callback, extra,
-                                                  validator))
+            self._requests.append(DataRequest(self, False, data,
+                                              callback, extra,
+                                              validator))
             self._requestCondition.notify()
 
     def requestWrite(self, data, callback, extra = None):
@@ -294,7 +365,7 @@ class Handler(threading.Thread):
         It will be called in the handler's thread!
         """
         with self._requestCondition:
-            request = Handler.Request(self, True, data, callback, extra)
+            request = DataRequest(self, True, data, callback, extra)
             #print "xplane.Handler.requestWrite", request
             self._requests.append(request)
             self._requestCondition.notify()
@@ -310,8 +381,9 @@ class Handler(threading.Thread):
         with self._requestCondition:
             id = self._nextPeriodicID
             self._nextPeriodicID += 1
-            request = Handler.PeriodicRequest(self, id, period, data, callback,
-                                              extra, validator)
+            request = PeriodicDataRequest(self, id, period,
+                                          data, callback,
+                                          extra, validator)
             self._periodicRequests.append(request)
             self._requestCondition.notify()
             return id
@@ -328,9 +400,33 @@ class Handler(threading.Thread):
     def requestShowMessage(self, message, duration, callback, extra = None):
         """Request showing a message in the simulator."""
         with self._requestCondition:
-            self._requests.append(Handler.ShowMessageRequest(self,
-                                                             message, duration,
-                                                             callback, extra))
+            self._requests.append(ShowMessageRequest(self,
+                                                     message, duration,
+                                                     callback, extra))
+            self._requestCondition.notify()
+
+    def registerHotkeys(self, hotkeys, callback, extra = None):
+        """Request registering the given hotkeys."""
+        with self._requestCondition:
+            self._requests.append(RegisterHotkeysRequest(self, hotkeys,
+                                                         callback, extra))
+            self._requestCondition.notify()
+
+    def requestHotkeysState(self, period, callback, extra = None):
+        """Request a periodic query of the hotkey status."""
+        with self._requestCondition:
+            id = self._nextPeriodicID
+            self._nextPeriodicID += 1
+            request = HotkeysStateRequest(self, id, period, callback, extra)
+            self._periodicRequests.append(request)
+            self._requestCondition.notify()
+            return id
+
+    def unregisterHotkeys(self, callback, extra = None):
+        """Request unregistering the hotkeys."""
+        with self._requestCondition:
+            self._requests.append(UnregisterHotkeysRequest(self,
+                                                           callback, extra))
             self._requestCondition.notify()
 
     def connect(self):
@@ -556,19 +652,12 @@ class Simulator(object):
         return timestamp
 
     @staticmethod
-    def _appendHotkeyData(data, offset, hotkey):
-        """Append the data for the given hotkey to the given array, that is
-        intended to be passed to requestWrite call on the handler."""
-        data.append((offset + 0, "b", ord(hotkey.key)))
-
-        modifiers = 0
-        if hotkey.ctrl: modifiers |= 0x02
-        if hotkey.shift: modifiers |= 0x01
-        data.append((offset + 1, "b", modifiers))
-
-        data.append((offset + 2, "b", 0))
-
-        data.append((offset + 3, "b", 0))
+    def _getHotkeyCode(hotkey):
+        """Get the hotkey code for the given hot key."""
+        code = ord(hotkey.key)
+        if hotkey.shift: code |= HOTKEY_MODIFIER_SHIFT
+        if hotkey.ctrl: code |= HOTKEY_MODIFIER_CONTROL
+        return code
 
     def __init__(self, connectionListener, connectAttempts = -1,
                  connectInterval = 0.2):
@@ -618,7 +707,7 @@ class Simulator(object):
         self._flareStartFS = None
 
         self._hotkeyLock = threading.Lock()
-        self._hotkeys = None
+        self._hotkeyCodes = None
         self._hotkeySetID = 0
         self._hotkeySetGeneration = 0
         self._hotkeyOffets = None
@@ -748,22 +837,21 @@ class Simulator(object):
         callback is function expecting two arguments:
         - the ID of the hotkey set as returned by this function,
         - the list of the indexes of the hotkeys that were pressed."""
-        pass
-        # TODO: implement hotkey handling for X-Plane
-        # with self._hotkeyLock:
-        #     assert self._hotkeys is None
+        with self._hotkeyLock:
+            assert self._hotkeyCodes is None
 
-        #     self._hotkeys = hotkeys
-        #     self._hotkeySetID += 1
-        #     self._hotkeySetGeneration = 0
-        #     self._hotkeyCallback = callback
+            self._hotkeyCodes = \
+              [self._getHotkeyCode(hotkey) for hotkey in hotkeys]
+            self._hotkeySetID += 1
+            self._hotkeySetGeneration = 0
+            self._hotkeyCallback = callback
 
-        #     self._handler.requestRead([(0x320c, "u")],
-        #                               self._handleNumHotkeys,
-        #                               (self._hotkeySetID,
-        #                                self._hotkeySetGeneration))
+            self._handler.registerHotkeys(self._hotkeyCodes,
+                                          self._handleHotkeysRegistered,
+                                          (self._hotkeySetID,
+                                           self._hotkeySetGeneration))
 
-        #     return self._hotkeySetID
+            return self._hotkeySetID
 
     def clearHotkeys(self):
         """Clear the current hotkey set.
@@ -776,13 +864,12 @@ class Simulator(object):
         check that in the callback function. Right before calling
         clearHotkeys(), this stored ID should be cleared so that the check
         fails for sure."""
-        pass
-        # with self._hotkeyLock:
-        #     if self._hotkeys is not None:
-        #         self._hotkeys = None
-        #         self._hotkeySetID += 1
-        #         self._hotkeyCallback = None
-        #         self._clearHotkeyRequest()
+        with self._hotkeyLock:
+            if self._hotkeyCodes is not None:
+                self._hotkeyCodes = None
+                self._hotkeySetID += 1
+                self._hotkeyCallback = None
+                self._clearHotkeyRequest()
 
     def disconnect(self, closingMessage = None, duration = 3):
         """Disconnect from the simulator."""
@@ -802,15 +889,15 @@ class Simulator(object):
         """Called when a connection has been established to the flight
         simulator of the given type."""
         self._fsType = fsType
-        # TODO: implement hotkey handling for X-Plane
-        # with self._hotkeyLock:
-        #     if self._hotkeys is not None:
-        #         self._hotkeySetGeneration += 1
+        with self._hotkeyLock:
+            if self._hotkeyCodes is not None:
+                self._hotkeySetGeneration += 1
 
-        #         self._handler.requestRead([(0x320c, "u")],
-        #                                   self._handleNumHotkeys,
-        #                                   (self._hotkeySetID,
-        #                                    self._hotkeySetGeneration))
+                self._handler.registerHotkeys(self._hotkeyCodes,
+                                              self._handleHotkeysRegistered,
+                                              (self._hotkeySetID,
+                                               self._hotkeySetGeneration))
+
         self._connectionListener.connected(fsType, descriptor)
 
     def connectionFailed(self):
@@ -1023,80 +1110,15 @@ class Simulator(object):
         if disconnect:
             self._handler.disconnect()
 
-    def _handleNumHotkeys(self, data, (id, generation)):
-        """Handle the result of the query of the number of hotkeys"""
-        pass
-        # TODO: implement hotkey handling for X-Plane
-        # with self._hotkeyLock:
-        #     if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
-        #         numHotkeys = data[0]
-        #         print "xplra.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys
-        #         data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]
-        #         self._handler.requestRead(data, self._handleHotkeyTable,
-        #                                   (id, generation))
-
-    def _setupHotkeys(self, data):
-        """Setup the hiven hotkeys and return the data to be written.
-
-        If there were hotkeys set previously, they are reused as much as
-        possible. Any of them not reused will be cleared."""
-        # TODO: implement hotkey handling for X-Plane
-        hotkeys = self._hotkeys
-        numHotkeys = len(hotkeys)
-
-        oldHotkeyOffsets = set([] if self._hotkeyOffets is None else
-                               self._hotkeyOffets)
-
-        self._hotkeyOffets = []
-        numOffsets = 0
-
-        while oldHotkeyOffsets:
-            offset = oldHotkeyOffsets.pop()
-            self._hotkeyOffets.append(offset)
-            numOffsets += 1
-
-            if numOffsets>=numHotkeys:
-                break
-
-        for i in range(0, len(data)):
-            if numOffsets>=numHotkeys:
-                break
-
-            if data[i]==0:
-                self._hotkeyOffets.append(0x3210 + i*4)
-                numOffsets += 1
-
-        writeData = []
-        for i in range(0, numOffsets):
-            Simulator._appendHotkeyData(writeData,
-                                        self._hotkeyOffets[i],
-                                        hotkeys[i])
-
-        for offset in oldHotkeyOffsets:
-            writeData.append((offset, "u", long(0)))
-
-        return writeData
-
-    def _handleHotkeyTable(self, data, (id, generation)):
-        """Handle the result of the query of the hotkey table."""
-        with self._hotkeyLock:
-            if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
-                writeData = self._setupHotkeys(data)
-                self._handler.requestWrite(writeData,
-                                           self._handleHotkeysWritten,
-                                           (id, generation))
-
-    def _handleHotkeysWritten(self, success, (id, generation)):
+    def _handleHotkeysRegistered(self, success, (id, generation)):
         """Handle the result of the hotkeys having been written."""
         with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
-                data = [(offset + 3, "b") for offset in self._hotkeyOffets]
-
                 self._hotkeyRequestID = \
-                    self._handler.requestPeriodicRead(0.5, data,
-                                                      self._handleHotkeys,
-                                                      (id, generation))
+                  self._handler.requestHotkeysState(0.5,
+                                                    self._handleHotkeys,
+                                                    (id, generation))
 
     def _handleHotkeys(self, data, (id, generation)):
         """Handle the hotkeys."""
@@ -1113,21 +1135,18 @@ class Simulator(object):
                 hotkeysPressed.append(i)
 
         if hotkeysPressed:
-            data = []
-            for index in hotkeysPressed:
-                data.append((offsets[index]+3, "b", int(0)))
-            self._handler.requestWrite(data, self._handleHotkeysCleared)
-
             callback(id, hotkeysPressed)
-
-    def _handleHotkeysCleared(self, sucess, extra):
-        """Callback for the hotkey-clearing write request."""
 
     def _clearHotkeyRequest(self):
         """Clear the hotkey request in the handler if there is any."""
         if self._hotkeyRequestID is not None:
+            self._handler.unregisterHotkeys(self._hotkeysUnregistered)
             self._handler.clearPeriodic(self._hotkeyRequestID)
             self._hotkeyRequestID = None
+
+    def _hotkeysUnregistered(self):
+        """Called when the hotkeys have been unregistered."""
+        pass
 
 #------------------------------------------------------------------------------
 
