@@ -1123,7 +1123,7 @@ class Simulator(object):
 
         hotkeysPressed = []
         for i in range(0, len(data)):
-            if data[i]!=0:
+            if data[i]:
                 hotkeysPressed.append(i)
 
         if hotkeysPressed:
