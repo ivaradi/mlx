@@ -1136,7 +1136,7 @@ class Simulator(object):
             self._handler.clearPeriodic(self._hotkeyRequestID)
             self._hotkeyRequestID = None
 
-    def _hotkeysUnregistered(self):
+    def _hotkeysUnregistered(self, result, extra):
         """Called when the hotkeys have been unregistered."""
         pass
 
