@@ -165,25 +165,121 @@ if os.name=="nt":
 
     def startSound(name, finishCallback = None, extra = None):
         """Start playing back the given sound.
-        
+
         name should be the name of a sound file relative to the sound directory
         given in initializeSound."""
         _thread.requestSound(name, finishCallback = finishCallback,
                              extra = extra)
-        
+
 #------------------------------------------------------------------------------
 
 else: # os.name!="nt"
-    def initializeSound(soundsDirectory):
-        """Initialize the sound handling with the given directory containing
-        the sound files."""
-        pass
+    import threading
+    try:
+        import pyglet
 
-    def startSound(name, finishCallback = None, extra = None):
-        """Start playing back the given sound.
+        class SoundThread(threading.Thread):
+            """A thread executing the pyglet event loop that directs the
+            playback of the sound files."""
+            class Player(pyglet.media.ManagedSoundPlayer):
+                """Player which handles the end-of-stream condition
+                properly."""
 
-        FIXME: it does not do anything currently, but it should."""
-        print "sound.startSound:", name
+                def __init__(self, finishCallback, extra):
+                    """Construct the player with the given data."""
+                    super(SoundThread.Player, self).__init__()
+
+                    self._finishCallback = finishCallback
+                    self._extra = extra
+
+                def _on_eos(self):
+                    if self._finishCallback is not None:
+                        self._finishCallback(True, self._extra)
+                    return super(SoundThread.Player, self)._on_eos()
+
+            class EventLoop(pyglet.app.EventLoop):
+                """Own implementation of the event loop that collects the
+                requested sound files and plays them."""
+
+                def __init__(self, soundsDirectory):
+                    """Construct the event loop."""
+                    super(SoundThread.EventLoop, self).__init__()
+
+                    self._soundsDirectory = soundsDirectory
+
+                    self._lock = threading.Lock()
+                    self._requestedSounds = []
+
+                def startSound(self, name, finishCallback, extra):
+                    """Add the sound with the given name"""
+                    with self._lock:
+                        path = os.path.join(self._soundsDirectory, name)
+                        self._requestedSounds.append( (path,
+                                                       finishCallback, extra) )
+
+                def idle(self):
+                    """The idle callback."""
+                    with self._lock:
+                        requestedSounds = self._requestedSounds
+                        self._requestedSounds = []
+
+                    for (path, finishCallback, extra) in requestedSounds:
+                        try:
+                            media = pyglet.media.load(path)
+                            player = SoundThread.Player(finishCallback, extra)
+                            player.queue(media)
+                            player.play()
+                        except Exception, e:
+                            print "mlx.SoundThread.EventLoop.idle: " + str(e)
+                            if finishCallback is not None:
+                                finishCallback(False, extra)
+
+                    timeout = super(SoundThread.EventLoop, self).idle()
+                    return 0.1 if timeout is None else min(timeout, 0.1)
+
+            def __init__(self, soundsDirectory):
+                """Construct the sound playing thread with the given
+                directory."""
+                super(SoundThread, self).__init__()
+
+                self.daemon = True
+                self.eventLoop = SoundThread.EventLoop(soundsDirectory)
+
+            def run(self):
+                """Run the event loop."""
+                self.eventLoop.run()
+
+            def startSound(self, name, finishCallback = None, extra = None):
+                """Start the playback of the given sound."""
+                self.eventLoop.startSound(name, finishCallback, extra)
+
+        _thread = None
+
+        def initializeSound(soundsDirectory):
+            """Initialize the sound handling with the given directory containing
+            the sound files."""
+            global _thread
+            _thread = SoundThread(soundsDirectory)
+            _thread.start()
+
+
+        def startSound(name, finishCallback = None, extra = None):
+            """Start playing back the given sound."""
+            _thread.startSound(name, finishCallback = finishCallback,
+                               extra = extra)
+
+    except:
+        print "The pyglet library is missing from your system. It is needed for sound playback on Linux"
+        def initializeSound(soundsDirectory):
+            """Initialize the sound handling with the given directory containing
+            the sound files."""
+            pass
+
+        def startSound(name, finishCallback = None, extra = None):
+            """Start playing back the given sound.
+
+            FIXME: it does not do anything currently, but it should."""
+            print "sound.startSound:", name
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -191,7 +287,7 @@ else: # os.name!="nt"
 if __name__ == "__main__":
     def callback(result, extra):
         print "callback", result, extra
-    
+
     initializeSound("e:\\home\\vi\\tmp")
     startSound("malev.mp3", finishCallback = callback, extra="malev.mp3")
     time.sleep(5)
