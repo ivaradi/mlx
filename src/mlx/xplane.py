@@ -1708,6 +1708,7 @@ class FJSDH8DModel(DH8DModel):
                                                            data)
         state.antiCollisionLightsOn = \
           state.antiCollisionLightsOn or state.strobeLightsOn
+        state.cog = 100.0 * (state.cog / 0.0254 + 21.504) / 94.512
 
         return state
 
