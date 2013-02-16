@@ -745,8 +745,10 @@ class Simulator(object):
 
         These values will be passed to the callback function in this order, as
         separate arguments."""
-        # TODO: implement this for X-Plane
-        self._handler.requestRead([(0x13fc, "d")], self._handlePayloadCount,
+        data = [ ("sim/aircraft/weight/acf_m_empty", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_total", TYPE_FLOAT) ]
+        self._handler.requestRead(data, self._handleWeights,
                                   extra = callback)
 
     def requestTime(self, callback):
@@ -1086,22 +1088,12 @@ class Simulator(object):
         """Callback for a time retrieval request."""
         callback(Simulator._getTimestamp(data))
 
-    def _handlePayloadCount(self, data, callback):
-        """Callback for the payload count retrieval request."""
-        payloadCount = data[0]
-        data = [(0x3bfc, "d"), (0x30c0, "f")]
-        for i in range(0, payloadCount):
-            data.append((0x1400 + i*48, "f"))
-
-        self._handler.requestRead(data, self._handleWeights,
-                                  extra = callback)
-
     def _handleWeights(self, data, callback):
         """Callback for the weights retrieval request."""
-        zfw = data[0] * const.LBSTOKG / 256.0
-        grossWeight = data[1] * const.LBSTOKG
-        payload = sum(data[2:]) * const.LBSTOKG
-        dow = zfw - payload
+        dow = data[0]
+        payload = data[1]
+        zfw = dow + payload
+        grossWeight = data[2]
         callback(dow, payload, zfw, grossWeight)
 
     def _handleMessageSent(self, success, disconnect):
