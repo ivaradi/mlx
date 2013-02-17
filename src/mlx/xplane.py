@@ -11,7 +11,7 @@ import sys
 import codecs
 import math
 
-from xplra import XPlane, MultiGetter, MultiSetter
+from xplra import XPlane, MultiGetter, MultiSetter, ProtocolException
 from xplra import TYPE_INT, TYPE_FLOAT, TYPE_DOUBLE
 from xplra import TYPE_FLOAT_ARRAY, TYPE_INT_ARRAY, TYPE_BYTE_ARRAY
 from xplra import HOTKEY_MODIFIER_SHIFT, HOTKEY_MODIFIER_CONTROL
@@ -96,12 +96,17 @@ class DataRequest(Request):
             self._multiBuffer.execute()
             self._result = True
             return True
-        elif Handler._performRead(self._multiBuffer,
-                                  self._extra, self._validator):
-            self._result = self._multiBuffer
+
+        try:
+            if Handler._performRead(self._multiBuffer,
+                                    self._extra, self._validator):
+                self._result = self._multiBuffer
+                return True
+            else:
+                return False
+        except ProtocolException, e:
+            self._result = None
             return True
-        else:
-            return False
 
 class ShowMessageRequest(Request):
     """Request to show a message in the simulator window."""
@@ -303,7 +308,12 @@ class Handler(threading.Thread):
         some lower-level communication problem."""
         attemptsLeft = Handler.NUM_READATTEMPTS
         while attemptsLeft>0:
-            multiGetter.execute()
+            try:
+                multiGetter.execute()
+            except ProtocolException, e:
+                print "xplane.Handler._performRead: " + str(e)
+                raise
+
             if validator is None or \
                Handler._callSafe(lambda: validator(multiGetter, extra)):
                 return True
@@ -717,6 +727,13 @@ class Simulator(object):
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
         self._fuelCallback = None
 
+        self._hasXFMC = None
+
+    @property
+    def hasXFMC(self):
+        """Indicate if the simulator has the X-FMC plugin."""
+        return self._hasXFMC
+
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft
@@ -891,6 +908,10 @@ class Simulator(object):
         """Called when a connection has been established to the flight
         simulator of the given type."""
         self._fsType = fsType
+
+        self._handler.requestRead([("xfmc/Status", TYPE_INT)],
+                                  self._xfmcStatusRead)
+
         with self._hotkeyLock:
             if self._hotkeyCodes is not None:
                 self._hotkeySetGeneration += 1
@@ -910,6 +931,7 @@ class Simulator(object):
 
     def disconnected(self):
         """Called when a connection to the flight simulator has been broken."""
+        self._hasXFMC = None
         with self._hotkeyLock:
             self._clearHotkeyRequest()
         self._connectionListener.disconnected()
@@ -928,6 +950,12 @@ class Simulator(object):
         self._handler.clearPeriodic(self._normalRequestID)
         self._normalRequestID = None
         self._monitoring = False
+
+    def _xfmcStatusRead(self, data, extra):
+        """Called when the xfmc/Status dataref is read or not."""
+        self._hasXFMC = data is not None
+        print "xplane.Simulator: XFMC is %savailable" % \
+          ("" if self._hasXFMC else "not ")
 
     def _handleNormal(self, data, extra):
         """Handle the reply to the normal request.
@@ -1007,6 +1035,7 @@ class Simulator(object):
         It will be queried for the data to monitor and the monitoring request
         will be replaced by a new one."""
         self._aircraftModel = model
+        model.simulator = self
 
         if self._monitoring:
             self._stopNormal()
@@ -1301,11 +1330,22 @@ class AircraftModel(object):
 
         flapsNotches is a list of degrees of flaps that are available on the aircraft."""
         self._flapsNotches = flapsNotches
+        self._simulator = None
 
     @property
     def name(self):
         """Get the name for this aircraft model."""
         return "X-Plane/Generic"
+
+    @property
+    def simulator(self):
+        """Get the simulator this aircraft model works for."""
+        return self._simulator
+
+    @simulator.setter
+    def simulator(self, simulator):
+        """Get the simulator this aircraft model works for."""
+        self._simulator = simulator
 
     def doesHandle(self, aircraft, aircraftInfo):
         """Determine if the model handles the given aircraft name.
@@ -1339,10 +1379,17 @@ class AircraftModel(object):
         """Add the model-specific monitoring data to the given array."""
         self._addDataWithIndexMembers(data, "_monidx_",
                                       AircraftModel.monitoringData)
+        if self.simulator.hasXFMC:
+            print "xplane.AircraftModel.addMonitoringData: adding XFMC status dataref"""
+            self._addDatarefWithIndexMember(data, "xfmc/Status", TYPE_INT,
+                                            attrName = "_monidx_xfmcStatus")
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data."""
         state = fs.AircraftState()
+
+        xfmcLNAVOn = self.simulator.hasXFMC and \
+                     (data[self._monidx_xfmcStatus]&0x03==0x03)
 
         state.timestamp = timestamp
 
@@ -1411,7 +1458,7 @@ class AircraftModel(object):
         state.nav1_manual = True
         state.nav2 = self._convertFrequency(data[self._monidx_nav2])
         state.nav2_obs = self._convertOBS(data[self._monidx_nav2_obs])
-        state.nav2_manual = True
+        state.nav2_manual = not xfmcLNAVOn
         state.adf1 = str(data[self._monidx_adf1])
         state.adf2 = str(data[self._monidx_adf2])
 
@@ -1430,8 +1477,13 @@ class AircraftModel(object):
 
         state.apMaster = data[self._monidx_apMaster]==2
         apState = data[self._monidx_apState]
-        state.apHeadingHold = (apState&0x00002)!=0
-        state.apHeading = data[self._monidx_apHeading]
+        if xfmcLNAVOn:
+           state.apHeadingHold = None
+           state.apHeading = None
+        else:
+            state.apHeadingHold = (apState&0x00002)!=0
+            state.apHeading = data[self._monidx_apHeading]
+
         state.apAltitudeHold = (apState&0x04000)!=0
         state.apAltitude = data[self._monidx_apAltitude]
 
@@ -1691,8 +1743,9 @@ class FJSDH8DModel(DH8DModel):
         """Determine if this model handler handles the aircraft with the given
         name."""
         return aircraft.type==const.AIRCRAFT_DH8D and \
-            description.find("Dash 8 Q400")!=-1 and \
-            liveryPath.startswith("Aircraft/Heavy Metal/Dash 8 Q400")
+          description.find("Dash 8 Q400")!=-1 and \
+          ((author=="2012" and tailnum=="N62890") or \
+           author.find("Jack Skieczius")!=-1)
 
     @property
     def name(self):

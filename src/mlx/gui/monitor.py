@@ -408,6 +408,6 @@ class MonitorWindow(gtk.Window):
 
             self._adf1.set_text("-" if aircraftState.adf1 is None else aircraftState.adf1)
             self._adf2.set_text("-" if aircraftState.adf2 is None else aircraftState.adf2)
-            self._cog.set_text("%.2f%%" % (aircraftState.cog,))
+            self._cog.set_text("%.2f%%" % (aircraftState.cog*100.0,))
 
 #------------------------------------------------------------------------------
