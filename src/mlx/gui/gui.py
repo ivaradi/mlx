@@ -67,6 +67,7 @@ class GUI(fs.ConnectionListener):
         self._logger = logger.Logger(self)
         self._flight = None
         self._simulator = None
+        self._fsType = None
         self._monitoring = False
 
         self._fleet = None
@@ -202,6 +203,11 @@ class GUI(fs.ConnectionListener):
     def flight(self):
         """Get the flight being performed."""
         return self._flight
+
+    @property
+    def fsType(self):
+        """Get the flight simulator type."""
+        return self._fsType
 
     @property
     def entranceExam(self):
@@ -424,6 +430,7 @@ class GUI(fs.ConnectionListener):
         if not self._reconnecting:
             self._wizard.connected(fsType, descriptor)
         self._reconnecting = False
+        self._fsType = fsType
         self._listenHotkeys()
 
     def connectionFailed(self):

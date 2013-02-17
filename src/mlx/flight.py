@@ -87,6 +87,11 @@ class Flight(object):
         return self._stage
 
     @property
+    def fsType(self):
+        """Get the flight simulator type."""
+        return self._gui.fsType
+
+    @property
     def loggedIn(self):
         """Indicate if the user has logged in properly."""
         return self._gui.loggedIn

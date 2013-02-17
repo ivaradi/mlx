@@ -114,7 +114,7 @@ class BookedFlight(object):
 
         departureTime = readline(f)
         self.departureTime = BookedFlight.getDateTime(date, departureTime)
-                                               
+
         arrivalTime = readline(f)
         self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
         if self.arrivalTime<self.departureTime:
@@ -129,23 +129,23 @@ class BookedFlight(object):
         date = None
         departureTime = None
         arrivalTime = None
-        
+
         line = f.readline()
-        lineNumber = 0    
+        lineNumber = 0
         while line:
             lineNumber += 1
             line = line.strip()
-            
+
             hashIndex = line.find("#")
             if hashIndex>=0: line = line[:hashIndex]
             if line:
                 equalIndex = line.find("=")
                 lineOK = equalIndex>0
-                
+
                 if lineOK:
-                    key = line[:equalIndex].strip()                    
+                    key = line[:equalIndex].strip()
                     value = line[equalIndex+1:].strip().replace("\:", ":")
-                    
+
                     lineOK = key and value
 
                 if lineOK:
@@ -195,7 +195,7 @@ class BookedFlight(object):
         if "aircraftTypeName" not in d:
             self.aircraftTypeName = \
                 BookedFlight.TYPE2TYPECODE[self.aircraftType]
-            
+
     def writeIntoFile(self, f):
         """Write the flight into a file."""
         print >> f, "callsign=%s" % (self.callsign,)
@@ -234,7 +234,7 @@ class BookedFlight(object):
             return self.TYPECODE2TYPE[typeCode]
         else:
             raise Exception("Invalid aircraft type code: '" + typeCode + "'")
-        
+
     def __repr__(self):
         """Get a representation of the flight."""
         s = "<Flight: %s-%s, %s, %s-%s," % (self.departureICAO,
@@ -247,7 +247,7 @@ class BookedFlight(object):
               self.bagWeight, self.cargoWeight, self.mailWeight)
         s += ">"
         return s
-        
+
 #------------------------------------------------------------------------------
 
 class Plane(object):
@@ -278,7 +278,7 @@ class Plane(object):
 
     def __repr__(self):
         """Get the representation of the plane object."""
-        s = "<Plane: %s %s" % (self.tailNumber, 
+        s = "<Plane: %s %s" % (self.tailNumber,
                                "home" if self.status==const.PLANE_HOME else \
                                "away" if self.status==const.PLANE_AWAY else \
                                "parking" if self.status==const.PLANE_PARKING \
@@ -287,7 +287,7 @@ class Plane(object):
             s += " (gate " + self.gateNumber + ")"
         s += ">"
         return s
-        
+
 
 #------------------------------------------------------------------------------
 
@@ -322,19 +322,19 @@ class Fleet(object):
             if p.status==const.PLANE_HOME and p.gateNumber:
                 gateNumbers.add(p.gateNumber)
         return gateNumbers
-    
+
     def updatePlane(self, tailNumber, status, gateNumber = None):
         """Update the status of the given plane."""
         if tailNumber in self._planes:
             plane = self._planes[tailNumber]
             plane.status = status
             plane.gateNumber = gateNumber
-    
+
     def __iter__(self):
         """Get an iterator over the planes."""
         for plane in self._planes.itervalues():
             yield plane
-        
+
     def __getitem__(self, tailNumber):
         """Get the plane with the given tail number.
 
@@ -344,7 +344,7 @@ class Fleet(object):
     def __repr__(self):
         """Get the representation of the fleet object."""
         return self._planes.__repr__()
-        
+
 #------------------------------------------------------------------------------
 
 class NOTAM(object):
@@ -370,7 +370,7 @@ class NOTAM(object):
         s += ": " + self.notice
         s += ">"
         return s
-    
+
 #------------------------------------------------------------------------------
 
 class NOTAMHandler(xml.sax.handler.ContentHandler):
@@ -388,18 +388,18 @@ class NOTAMHandler(xml.sax.handler.ContentHandler):
            "B" not in attrs or not attrs["B"] or \
            "E" not in attrs or not attrs["E"]:
             return
-        
+
         icao = attrs["A"]
         if icao not in self._notams:
             return
-        
+
         begin = datetime.datetime.strptime(attrs["B"], "%Y-%m-%d %H:%M:%S")
 
         c = attrs["C"] if "C" in attrs else None
         end = datetime.datetime.strptime(c, "%Y-%m-%d %H:%M:%S") if c else None
-        
+
         permanent = attrs["C_flag"]=="PERM" if "C_flag" in attrs else False
-        
+
         repeatCycle = attrs["D"] if "D" in attrs else None
 
         self._notams[icao].append(NOTAM(begin, attrs["E"], end = end,
@@ -472,7 +472,7 @@ class Request(object):
 class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
-    
+
     def __init__(self, callback, pilotID, password, entranceExam):
         """Construct the login request with the given pilot ID and
         password."""
@@ -487,7 +487,7 @@ class Login(Request):
         md5 = hashlib.md5()
         md5.update(self._pilotID)
         pilotID = md5.hexdigest()
-        
+
         md5 = hashlib.md5()
         md5.update(self._password)
         password = md5.hexdigest()
@@ -523,7 +523,7 @@ class Login(Request):
             else:
                 result.pilotName = self.iso88592decoder(readline(f))[0]
                 result.exams = readline(f)
-                
+
                 while True:
                     line = readline(f)
                     if not line or line == "#ENDPIREP": break
@@ -539,12 +539,12 @@ class Login(Request):
         f.close()
 
         return result
-        
+
 #------------------------------------------------------------------------------
 
 class GetFleet(Request):
     """Request to get the fleet from the website."""
-    
+
     def __init__(self, callback):
         """Construct the fleet request."""
         super(GetFleet, self).__init__(callback)
@@ -557,7 +557,7 @@ class GetFleet(Request):
         result = Result()
         result.fleet = Fleet(f)
         f.close()
-        
+
         return result
 
 #------------------------------------------------------------------------------
@@ -584,15 +584,15 @@ class UpdatePlane(Request):
         data = urllib.urlencode([("lajstrom", self._tailNumber),
                                  ("status", status),
                                  ("kapu", gateNumber)])
-        
+
         f = urllib2.urlopen(url, data, timeout = 10.0)
         line = readline(f)
-        
+
         result = Result()
         result.success = line == "OK"
 
         return result
-            
+
 #------------------------------------------------------------------------------
 
 class GetNOTAMs(Request):
@@ -627,7 +627,7 @@ class GetNOTAMs(Request):
 #------------------------------------------------------------------------------
 
 class GetMETARs(Request):
-    """Get the METARs from the NOAA website for certain airport ICAOs."""    
+    """Get the METARs from the NOAA website for certain airport ICAOs."""
 
     def __init__(self, callback, airports):
         """Construct the request for the given airports."""
@@ -638,7 +638,7 @@ class GetMETARs(Request):
         """Perform the retrieval opf the METARs."""
         url = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?"
         data = urllib.urlencode([ ("dataSource" , "metars"),
-                                  ("requestType",  "retrieve"), 
+                                  ("requestType",  "retrieve"),
                                   ("format", "csv"),
                                   ("stationString", " ".join(self._airports)),
                                   ("hoursBeforeNow", "24"),
@@ -651,7 +651,7 @@ class GetMETARs(Request):
             for line in iter(f.readline, ""):
                 if len(line)>5 and line[4]==' ':
                     icao = line[0:4]
-                    if icao in self._airports:                        
+                    if icao in self._airports:
                         result.metars[icao] = line.strip().split(",")[0]
         finally:
             f.close()
@@ -695,7 +695,7 @@ class SendPIREP(Request):
         data["cargo"] = str(pirep.cargoWeight)
         data["bag"] = str(pirep.bagWeight)
         data["mail"] = str(pirep.mailWeight)
-        
+
         data["flttype"] = SendPIREP._flightTypes[pirep.flightType]
         data["onoff"] = "1" if pirep.online else "0"
         data["bt_dep"] = util.getTimestampString(pirep.blockTimeStart)
@@ -741,7 +741,7 @@ class SendPIREP(Request):
         finally:
             f.close()
 
-        return result    
+        return result
 #------------------------------------------------------------------------------
 
 class SendACARS(Request):
@@ -756,7 +756,7 @@ class SendACARS(Request):
     def run(self):
         """Perform the sending of the ACARS."""
         print "Sending the online ACARS"
-        
+
         url = "http://www.virtualairlines.hu/acars2/acarsonline.php"
 
         acars = self._acars
@@ -765,12 +765,12 @@ class SendACARS(Request):
         data = {}
         data["pid"] = acars.pid
         data["pilot"] = SendACARS._latin2Encoder(acars.pilotName)[0]
-    
+
         data["pass"] = str(bookedFlight.numPassengers)
         data["callsign"] = bookedFlight.callsign
         data["airplane"] = bookedFlight.aircraftTypeName
         data["from"] = bookedFlight.departureICAO
-        data["to"] = bookedFlight.arrivalICAO        
+        data["to"] = bookedFlight.arrivalICAO
         data["lajstrom"] = bookedFlight.tailNumber
 
         data["block_time"] = acars.getBlockTimeText()
@@ -778,7 +778,7 @@ class SendACARS(Request):
         data["latitude"] = str(acars.state.latitude)
         data["altitude"] = str(acars.state.altitude)
         data["speed"] = str(acars.state.groundSpeed)
-        
+
         data["event"] = acars.getEventText()
 
         f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
@@ -787,7 +787,7 @@ class SendACARS(Request):
         finally:
             f.close()
 
-        return result    
+        return result
 
 #------------------------------------------------------------------------------
 
@@ -812,15 +812,15 @@ class Handler(threading.Thread):
     def getFleet(self, callback):
         """Enqueue a fleet retrieval request."""
         self._addRequest(GetFleet(callback))
-        
+
     def updatePlane(self, callback, tailNumber, status, gateNumber = None):
-        """Update the status of the given plane."""        
+        """Update the status of the given plane."""
         self._addRequest(UpdatePlane(callback, tailNumber, status, gateNumber))
 
     def getNOTAMs(self, callback, departureICAO, arrivalICAO):
         """Get the NOTAMs for the given two airports."""
         self._addRequest(GetNOTAMs(callback, departureICAO, arrivalICAO))
-        
+
     def getMETARs(self, callback, airports):
         """Get the METARs for the given airports."""
         self._addRequest(GetMETARs(callback, airports))
@@ -832,7 +832,7 @@ class Handler(threading.Thread):
     def sendACARS(self, callback, acars):
         """Send the given ACARS"""
         self._addRequest(SendACARS(callback, acars))
-        
+
     def run(self):
         """Process the requests."""
         while True:
@@ -843,7 +843,7 @@ class Handler(threading.Thread):
                 del self._requests[0]
 
             request.perform()
-    
+
     def _addRequest(self, request):
         """Add the given request to the queue."""
         with self._requestCondition:
@@ -854,10 +854,10 @@ class Handler(threading.Thread):
 
 if __name__ == "__main__":
     import time
-    
+
     def callback(returned, result):
         print returned, unicode(result)
-        
+
     handler = Handler()
     handler.start()
 
@@ -865,15 +865,15 @@ if __name__ == "__main__":
     #handler.getFleet(callback)
     # Plane: HA-LEG home (gate 67)
     #handler.updatePlane(callback, "HA-LQC", const.PLANE_AWAY, "72")
-    #time.sleep(3)    
+    #time.sleep(3)
     #handler.getFleet(callback)
     #time.sleep(3)
 
     #handler.getNOTAMs(callback, "LHBP", "EPWA")
     #handler.getMETARs(callback, ["LHBP", "EPWA"])
     #time.sleep(5)
-    
+
     handler.updatePlane(callback, "HA-LON", const.PLANE_AWAY, "")
-    time.sleep(3)    
+    time.sleep(3)
 
 #------------------------------------------------------------------------------
