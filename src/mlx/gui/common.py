@@ -72,6 +72,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
 
     SHADOW_IN = gtk.SHADOW_IN
+    SHADOW_NONE = gtk.SHADOW_NONE
 
     POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
 
@@ -85,6 +86,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SORT_DESCENDING = gtk.SORT_DESCENDING
 
     EVENT_BUTTON_PRESS = gdk.BUTTON_PRESS
+
+    TREE_VIEW_COLUMN_FIXED = gtk.TREE_VIEW_COLUMN_FIXED
 
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
@@ -138,6 +141,7 @@ else:
     SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
 
     SHADOW_IN = gtk.ShadowType.IN
+    SHADOW_NONE = gtk.ShadowType.NONE
 
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
@@ -151,6 +155,8 @@ else:
     SORT_DESCENDING = gtk.SortType.DESCENDING
 
     EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
+
+    TREE_VIEW_COLUMN_FIXED = gtk.TreeViewColumnSizing.FIXED
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

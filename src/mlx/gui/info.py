@@ -1,6 +1,8 @@
 
 from common import *
 
+from mlx.gui.delaycodes import DelayCodeTable
+
 from mlx.i18n import xstr
 import mlx.const as const
 
@@ -97,25 +99,36 @@ class FlightInfo(gtk.VBox):
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
-        self._delayTable = table = gtk.Table(5, 2)
-        table.set_col_spacings(16)
 
-        row = 0
-        column = 0
+        # self._delayTable = table = gtk.Table(5, 2)
+        # table.set_col_spacings(16)
 
-        self._delayCodeWidgets = []
-        for (_code, label) in FlightInfo._delayCodes():
-            button = gtk.CheckButton(label)
-            button.set_use_underline(True)
-            table.attach(button, column, column + 1, row, row + 1)
-            self._delayCodeWidgets.append(button)
-            if column==0:
-                column += 1
-            else:
-                row += 1
-                column = 0
+        # row = 0
+        # column = 0
 
-        alignment.add(table)
+        # self._delayCodeWidgets = []
+        # for (_code, label) in FlightInfo._delayCodes():
+        #     button = gtk.CheckButton(label)
+        #     button.set_use_underline(True)
+        #     table.attach(button, column, column + 1, row, row + 1)
+        #     self._delayCodeWidgets.append(button)
+        #     if column==0:
+        #         column += 1
+        #     else:
+        #         row += 1
+        #         column = 0
+        self._delayTable = table = DelayCodeTable()
+        self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow.add(table)
+        scrolledWindow.set_size_request(400, 150)
+        scrolledWindow.set_policy(gtk.PolicyType.ALWAYS if pygobject
+                                  else gtk.POLICY_AUTOMATIC,
+                                  gtk.PolicyType.ALWAYS if pygobject
+                                  else gtk.POLICY_AUTOMATIC)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                       else gtk.SHADOW_IN)
+
+        alignment.add(scrolledWindow)
         frame.add(alignment)
 
         self._delayAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
@@ -157,13 +170,13 @@ class FlightInfo(gtk.VBox):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
         self._flightDefects.set_sensitive(True)
-        self._delayTable.set_sensitive(True)
+        self._delayWindow.set_sensitive(True)
 
     def disable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(False)
         self._flightDefects.set_sensitive(False)
-        self._delayTable.set_sensitive(False)
+        self._delayWindow.set_sensitive(False)
 
     def reset(self):
         """Reset the flight info tab."""
