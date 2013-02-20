@@ -121,12 +121,8 @@ class FlightInfo(gtk.VBox):
         self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(table)
         scrolledWindow.set_size_request(400, 150)
-        scrolledWindow.set_policy(gtk.PolicyType.ALWAYS if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.ALWAYS if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                       else gtk.SHADOW_IN)
+        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scrolledWindow.set_shadow_type(SHADOW_IN)
 
         alignment.add(scrolledWindow)
         frame.add(alignment)
