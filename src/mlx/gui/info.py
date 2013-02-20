@@ -167,12 +167,14 @@ class FlightInfo(gtk.VBox):
         self._comments.set_sensitive(True)
         self._flightDefects.set_sensitive(True)
         self._delayWindow.set_sensitive(True)
+        self._delayTable.setStyle()
 
     def disable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(False)
         self._flightDefects.set_sensitive(False)
         self._delayWindow.set_sensitive(False)
+        self._delayTable.setStyle()
 
     def reset(self):
         """Reset the flight info tab."""
