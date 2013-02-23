@@ -974,36 +974,6 @@ msgstr "Hib_ajelenségek"
 msgid "info_delay"
 msgstr "Késés kódok"
 
-msgid "info_delay_loading"
-msgstr "_Betöltési problémák"
-
-msgid "info_delay_vatsim"
-msgstr "_VATSIM probléma"
-
-msgid "info_delay_net"
-msgstr "_Hálózati problémák"
-
-msgid "info_delay_atc"
-msgstr "Irán_yító hibája"
-
-msgid "info_delay_system"
-msgstr "_Rendszer elszállás/fagyás"
-
-msgid "info_delay_nav"
-msgstr "Navi_gációs probléma"
-
-msgid "info_delay_traffic"
-msgstr "_Forgalmi problémák"
-
-msgid "info_delay_apron"
-msgstr "_Előtér navigációs probléma"
-
-msgid "info_delay_weather"
-msgstr "Időjárási _problémák"
-
-msgid "info_delay_personal"
-msgstr "S_zemélyes okok"
-
 msgid "statusbar_conn_tooltip"
 msgstr ""
 "A kapcsolat állapota.\n"

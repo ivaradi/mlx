@@ -184,11 +184,22 @@ else: # pygobject
 
 #------------------------------------------------------------------------------
 
+class CheckButton(gtk.CheckButton):
+    """A check button that contains a reference to a row in the delay code
+    data table."""
+    def __init__(self, delayCodeRow):
+        """Construct the check button."""
+        super(CheckButton, self).__init__()
+        self.delayCodeRow = delayCodeRow
+
+#------------------------------------------------------------------------------
+
 CAPTION = 1
 
 DELAYCODE = 2
 
-_data1 = ( ["Num", "Code", "Title", "Description"],
+_data1 = ( lambda row: row[0].strip(),
+           ["Num", "Code", "Title", "Description"],
            [ (CAPTION, "Others"),
              (DELAYCODE, ("      6", "OA  ", "NO GATES/STAND AVAILABLE",
                           "Due to own airline activity")),
@@ -202,9 +213,10 @@ _data1 = ( ["Num", "Code", "Title", "Description"],
              (DELAYCODE, ("13", "PE", "CHECK-IN ERROR",
                           "Error with passenger or baggage details")) ] )
 
-_data2 = ( ["MA", "IATA", "Description"],
+_data2 = ( lambda row: row[0].strip(),
+           ["MA", "IATA", "Description"],
            [ (CAPTION, "Passenger and baggage"),
-             (DELAYCODE, ("    012", "01",
+             (DELAYCODE, ("    012", "01   ",
                           "Late shipping of parts and/or materials")),
              (DELAYCODE, ("    111", "11",
                           "Check-in reopened for late passengers")),
@@ -222,15 +234,17 @@ class DelayCodeTable(DelayCodeTableBase):
         """Construct the delay code table."""
         super(DelayCodeTable, self).__init__()
 
+        self._delayCodeData = None
+
         self._treeView = None
 
-        self._listStore = gtk.ListStore(str, str)
-        self._treeView = gtk.TreeView(self._listStore)
+        self._treeView = gtk.TreeView(gtk.ListStore(str, str))
         self._treeView.set_rules_hint(True)
 
         self.pack_start(self._treeView, False, False, 0)
 
         self._alignments = []
+        self._checkButtons = []
 
         self._eventBox = gtk.EventBox()
 
@@ -243,6 +257,19 @@ class DelayCodeTable(DelayCodeTableBase):
         self.pack_start(self._viewport, True, True, 0)
 
         self._previousWidth = 0
+
+    @property
+    def delayCodes(self):
+        """Get a list of the delay codes checked by the user."""
+        codes = []
+
+        if self._delayCodeData is not None:
+            codeExtractor = self._delayCodeData[0]
+            for checkButton in self._checkButtons:
+                if checkButton.get_active():
+                    codes.append(codeExtractor(checkButton.delayCodeRow))
+
+        return codes
 
     def allocate_column_sizes(self, allocation):
         """Allocate the column sizes."""
@@ -262,11 +289,13 @@ class DelayCodeTable(DelayCodeTableBase):
         else:
             data = _data2
 
+        self._delayCodeData = data
+
         columns = self._treeView.get_columns()
         for column in columns:
             self._treeView.remove_column(column)
 
-        (headers, rows) = data
+        (_extractor, headers, rows) = data
         numColumns = len(headers) + 1
         numRows = len(rows)
 
@@ -286,6 +315,7 @@ class DelayCodeTable(DelayCodeTableBase):
         self._eventBox.add(self._table)
 
         self._alignments = []
+        self._checkButtons = []
 
         firstDelayCodeRow = True
         for i in range(0, numRows):
@@ -300,8 +330,10 @@ class DelayCodeTable(DelayCodeTableBase):
                 self._table.attach(alignment, 1, numColumns, i, i+1)
                 self._table.set_row_spacing(i, 8)
             elif type==DELAYCODE:
+                checkButton = CheckButton(elements)
+                self._checkButtons.append(checkButton)
                 alignment = Alignment(xalign = 0.5, yalign = 0.5, xscale = 1.0)
-                alignment.add(gtk.CheckButton())
+                alignment.add(checkButton)
                 self._table.attach(alignment, 0, 1, i, i+1)
                 if firstDelayCodeRow:
                     self._alignments.append(alignment)

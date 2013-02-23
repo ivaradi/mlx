@@ -22,20 +22,6 @@ import mlx.const as const
 class FlightInfo(gtk.VBox):
     """The flight info tab."""
     @staticmethod
-    def _delayCodes():
-        """Get an array of delay codes."""
-        return [ (const.DELAYCODE_LOADING, xstr("info_delay_loading")),
-                 (const.DELAYCODE_VATSIM, xstr("info_delay_vatsim")),
-                 (const.DELAYCODE_NETWORK, xstr("info_delay_net")),
-                 (const.DELAYCODE_CONTROLLER, xstr("info_delay_atc")),
-                 (const.DELAYCODE_SYSTEM, xstr("info_delay_system")),
-                 (const.DELAYCODE_NAVIGATION, xstr("info_delay_nav")),
-                 (const.DELAYCODE_TRAFFIC, xstr("info_delay_traffic")),
-                 (const.DELAYCODE_APRON, xstr("info_delay_apron")),
-                 (const.DELAYCODE_WEATHER, xstr("info_delay_weather")),
-                 (const.DELAYCODE_PERSONAL, xstr("info_delay_personal")) ]
-
-    @staticmethod
     def _createCommentArea(label):
         """Create a comment area.
 
@@ -53,13 +39,9 @@ class FlightInfo(gtk.VBox):
                               padding_left = 8, padding_right = 8)
 
         scroller = gtk.ScrolledWindow()
-        # FIXME: these should be constants
-        scroller.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                            else gtk.POLICY_AUTOMATIC,
-                            gtk.PolicyType.AUTOMATIC if pygobject
-                            else gtk.POLICY_AUTOMATIC)
-        scroller.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                 else gtk.SHADOW_IN)
+        scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scroller.set_shadow_type(SHADOW_IN)
+
         comments = gtk.TextView()
         comments.set_wrap_mode(WRAP_WORD)
         scroller.add(comments)
@@ -99,25 +81,7 @@ class FlightInfo(gtk.VBox):
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
-
-        # self._delayTable = table = gtk.Table(5, 2)
-        # table.set_col_spacings(16)
-
-        # row = 0
-        # column = 0
-
-        # self._delayCodeWidgets = []
-        # for (_code, label) in FlightInfo._delayCodes():
-        #     button = gtk.CheckButton(label)
-        #     button.set_use_underline(True)
-        #     table.attach(button, column, column + 1, row, row + 1)
-        #     self._delayCodeWidgets.append(button)
-        #     if column==0:
-        #         column += 1
-        #     else:
-        #         row += 1
-        #         column = 0
-        self._delayTable = table = DelayCodeTable()
+        self._delayCodeTable = table = DelayCodeTable()
         self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(table)
         scrolledWindow.set_size_request(400, 150)
@@ -155,35 +119,28 @@ class FlightInfo(gtk.VBox):
     @property
     def delayCodes(self):
         """Get the list of delay codes checked by the user."""
-        codes =  []
-        delayCodes = FlightInfo._delayCodes()
-        for index in range(0, len(delayCodes)):
-            if self._delayCodeWidgets[index].get_active():
-                codes.append(delayCodes[index][0])
-        return codes
+        return self._delayCodeTable.delayCodes
 
     def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
         self._flightDefects.set_sensitive(True)
-        self._delayTable.setType(aircraftType)
+        self._delayCodeTable.setType(aircraftType)
         self._delayWindow.set_sensitive(True)
-        self._delayTable.setStyle()
+        self._delayCodeTable.setStyle()
 
     def disable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(False)
         self._flightDefects.set_sensitive(False)
         self._delayWindow.set_sensitive(False)
-        self._delayTable.setStyle()
+        self._delayCodeTable.setStyle()
 
     def reset(self):
         """Reset the flight info tab."""
         self._comments.get_buffer().set_text("")
         self._flightDefects.get_buffer().set_text("")
-        self._delayTable.reset()
-        # for widget in self._delayCodeWidgets:
-        #     widget.set_active(False)
+        self._delayCodeTable.reset()
 
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""

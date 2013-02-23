@@ -240,7 +240,7 @@ class PIREPViewer(gtk.Dialog):
         delayCodes = ""
         for code in pirep.delayCodes:
             if delayCodes: delayCodes += ", "
-            delayCodes += PIREP.delayCodeNames[code]
+            delayCodes += code
         
         self._delayCodes.get_buffer().set_text(delayCodes)        
 

@@ -971,36 +971,6 @@ msgstr "Flight _defects"
 msgid "info_delay"
 msgstr "Delay codes"
 
-msgid "info_delay_loading"
-msgstr "L_oading problems"
-
-msgid "info_delay_vatsim"
-msgstr "_VATSIM problem"
-
-msgid "info_delay_net"
-msgstr "_Net problems"
-
-msgid "info_delay_atc"
-msgstr "Controll_er's fault"
-
-msgid "info_delay_system"
-msgstr "S_ystem crash/freeze"
-
-msgid "info_delay_nav"
-msgstr "Naviga_tion problem"
-
-msgid "info_delay_traffic"
-msgstr "T_raffic problems"
-
-msgid "info_delay_apron"
-msgstr "_Apron navigation problem"
-
-msgid "info_delay_weather"
-msgstr "_Weather problems"
-
-msgid "info_delay_personal"
-msgstr "_Personal reasons"
-
 msgid "statusbar_conn_tooltip"
 msgstr ""
 "The state of the connection.\n"
