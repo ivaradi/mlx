@@ -77,14 +77,14 @@ class FlightInfo(gtk.VBox):
         label.set_use_underline(True)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0.0, yscale = 0.0)
+                                  xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
         self._delayCodeTable = table = DelayCodeTable()
         self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(table)
-        scrolledWindow.set_size_request(600, 175)
+        scrolledWindow.set_size_request(-1, 185)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scrolledWindow.set_shadow_type(SHADOW_IN)
 
@@ -92,8 +92,10 @@ class FlightInfo(gtk.VBox):
         frame.add(alignment)
 
         self._delayAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                             xscale = 0.0, yscale = 0.0)
+                                             xscale = 1.0, yscale = 1.0)
         self._delayAlignment.add(frame)
+        self._delayAlignment.set_padding(padding_top = 0, padding_bottom = 0,
+                                         padding_left = 8, padding_right = 8)
 
         self.pack_start(self._delayAlignment, False, False, 8)
 
