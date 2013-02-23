@@ -201,7 +201,7 @@ DELAYCODE = 2
 _data1 = ( lambda row: row[0].strip(),
            ["Num", "Code", "Title", "Description"],
            [ (CAPTION, "Others"),
-             (DELAYCODE, ("      6", "OA  ", "NO GATES/STAND AVAILABLE",
+             (DELAYCODE, ("        6", "OA     ", "NO GATES/STAND AVAILABLE",
                           "Due to own airline activity")),
              (DELAYCODE, ("9", "SG", "SCHEDULED GROUND TIME",
                           "Planned turnaround time less than declared minimum")),
@@ -216,13 +216,13 @@ _data1 = ( lambda row: row[0].strip(),
 _data2 = ( lambda row: row[0].strip(),
            ["MA", "IATA", "Description"],
            [ (CAPTION, "Passenger and baggage"),
-             (DELAYCODE, ("    012", "01   ",
+             (DELAYCODE, (" 012", "01   ",
                           "Late shipping of parts and/or materials")),
-             (DELAYCODE, ("    111", "11",
+             (DELAYCODE, (" 111", "11",
                           "Check-in reopened for late passengers")),
-             (DELAYCODE, ("    121", "12",
+             (DELAYCODE, (" 121", "12",
                           "Check-in not completed by flight closure time")),
-             (DELAYCODE, ("    132", "13",
+             (DELAYCODE, (" 132", "13",
                           "Error with passenger or baggage details"))
             ])
 
@@ -235,8 +235,6 @@ class DelayCodeTable(DelayCodeTableBase):
         super(DelayCodeTable, self).__init__()
 
         self._delayCodeData = None
-
-        self._treeView = None
 
         self._treeView = gtk.TreeView(gtk.ListStore(str, str))
         self._treeView.set_rules_hint(True)
@@ -276,9 +274,11 @@ class DelayCodeTable(DelayCodeTableBase):
         if allocation.width!=self._previousWidth:
             self._previousWidth = allocation.width
             index = 0
+            lastIndex = len(self._alignments) - 1
             for alignment in self._alignments:
                 column = self._treeView.get_column(index)
-                width = alignment.allocatedWidth + (8 if index==0 else 16)
+                width = alignment.allocatedWidth
+                width += 8 if (index==0 or index==lastIndex) else 16
                 column.set_fixed_width(width)
                 index += 1
 
@@ -327,24 +327,29 @@ class DelayCodeTable(DelayCodeTableBase):
                 label.set_use_markup(True)
                 label.set_alignment(0.0, 0.5)
                 alignment.add(label)
-                self._table.attach(alignment, 1, numColumns, i, i+1)
+                self._table.attach(alignment, 1, numColumns, i, i+1,
+                                   yoptions = FILL)
                 self._table.set_row_spacing(i, 8)
             elif type==DELAYCODE:
                 checkButton = CheckButton(elements)
                 self._checkButtons.append(checkButton)
                 alignment = Alignment(xalign = 0.5, yalign = 0.5, xscale = 1.0)
                 alignment.add(checkButton)
-                self._table.attach(alignment, 0, 1, i, i+1)
+                self._table.attach(alignment, 0, 1, i, i+1,
+                                   xoptions = FILL, yoptions = FILL)
                 if firstDelayCodeRow:
                     self._alignments.append(alignment)
 
-                for j in range(0, len(elements)):
+                for j in range(0, numColumns-1):
                     label = gtk.Label(elements[j])
                     label.set_alignment(1.0 if j==0 else 0.0, 0.5)
                     alignment = Alignment(xalign = 0.5, yalign = 0.5,
                                           xscale = 1.0)
                     alignment.add(label)
-                    self._table.attach(alignment, j+1, j+2, i, i+1)
+                    xoptions = FILL
+                    if j==(numColumns-2): xoptions |= EXPAND
+                    self._table.attach(alignment, j+1, j+2, i, i+1,
+                                       xoptions = xoptions, yoptions = FILL)
                     if firstDelayCodeRow:
                         self._alignments.append(alignment)
                 firstDelayCodeRow = False

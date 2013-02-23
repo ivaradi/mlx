@@ -89,6 +89,9 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
 
     TREE_VIEW_COLUMN_FIXED = gtk.TREE_VIEW_COLUMN_FIXED
 
+    FILL = gtk.FILL
+    EXPAND = gtk.EXPAND
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -157,6 +160,9 @@ else:
     EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
 
     TREE_VIEW_COLUMN_FIXED = gtk.TreeViewColumnSizing.FIXED
+
+    FILL = gtk.AttachOptions.FILL
+    EXPAND = gtk.AttachOptions.EXPAND
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

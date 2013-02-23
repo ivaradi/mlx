@@ -84,7 +84,7 @@ class FlightInfo(gtk.VBox):
         self._delayCodeTable = table = DelayCodeTable()
         self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(table)
-        scrolledWindow.set_size_request(400, 150)
+        scrolledWindow.set_size_request(600, 175)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scrolledWindow.set_shadow_type(SHADOW_IN)
 
