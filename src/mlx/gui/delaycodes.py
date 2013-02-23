@@ -4,6 +4,8 @@
 
 from mlx.gui.common import *
 
+import mlx.const as const
+
 #------------------------------------------------------------------------------
 
 if pygobject:
@@ -161,10 +163,10 @@ else: # pygobject
 
         def setStyle(self):
             """Set the style of the event box from the treeview."""
-            style = self._treeView.rc_get_style()
-            self._eventBox.modify_bg(0, style.bg[2])
-            self._eventBox.modify_fg(0, style.fg[2])
-
+            if self._treeView is not None:
+                style = self._treeView.rc_get_style()
+                self._eventBox.modify_bg(0, style.bg[2])
+                self._eventBox.modify_fg(0, style.fg[2])
 
     class Alignment(gtk.Alignment):
         """An alignment that remembers the width it was given."""
@@ -186,19 +188,31 @@ CAPTION = 1
 
 DELAYCODE = 2
 
-_data = ( ["Num", "Code", "Reason", "Description"],
-          [ (CAPTION, "Others"),
-            (DELAYCODE, ("      6", "OA  ", "NO GATES/STAND AVAILABLE",
-                         "Due to own airline activity")),
-            (DELAYCODE, ("9", "SG", "SCHEDULED GROUND TIME",
-                         "Planned turnaround time less than declared minimum")),
-            (CAPTION, "Passenger and baggage"),
-            (DELAYCODE, ("11", "PD", "LATE CHECK-IN",
-                         "Check-in reopened for late passengers")),
-            (DELAYCODE, ("12", "PL", "LATE CHECK-IN",
-                         "Check-in not completed by flight closure time")),
-            (DELAYCODE, ("13", "PE", "CHECK-IN ERROR",
-                         "Error with passenger or baggage details")) ] )
+_data1 = ( ["Num", "Code", "Title", "Description"],
+           [ (CAPTION, "Others"),
+             (DELAYCODE, ("      6", "OA  ", "NO GATES/STAND AVAILABLE",
+                          "Due to own airline activity")),
+             (DELAYCODE, ("9", "SG", "SCHEDULED GROUND TIME",
+                          "Planned turnaround time less than declared minimum")),
+             (CAPTION, "Passenger and baggage"),
+             (DELAYCODE, ("11", "PD", "LATE CHECK-IN",
+                          "Check-in reopened for late passengers")),
+             (DELAYCODE, ("12", "PL", "LATE CHECK-IN",
+                          "Check-in not completed by flight closure time")),
+             (DELAYCODE, ("13", "PE", "CHECK-IN ERROR",
+                          "Error with passenger or baggage details")) ] )
+
+_data2 = ( ["MA", "IATA", "Description"],
+           [ (CAPTION, "Passenger and baggage"),
+             (DELAYCODE, ("    012", "01",
+                          "Late shipping of parts and/or materials")),
+             (DELAYCODE, ("    111", "11",
+                          "Check-in reopened for late passengers")),
+             (DELAYCODE, ("    121", "12",
+                          "Check-in not completed by flight closure time")),
+             (DELAYCODE, ("    132", "13",
+                          "Error with passenger or baggage details"))
+            ])
 
 #------------------------------------------------------------------------------
 
@@ -208,13 +222,53 @@ class DelayCodeTable(DelayCodeTableBase):
         """Construct the delay code table."""
         super(DelayCodeTable, self).__init__()
 
-        (headers, rows) = _data
-        numColumns = len(headers) + 1
-        numRows = len(rows)
+        self._treeView = None
 
         self._listStore = gtk.ListStore(str, str)
         self._treeView = gtk.TreeView(self._listStore)
         self._treeView.set_rules_hint(True)
+
+        self.pack_start(self._treeView, False, False, 0)
+
+        self._alignments = []
+
+        self._eventBox = gtk.EventBox()
+
+        self._table = None
+
+        self._viewport = self._createViewport()
+        self._viewport.add(self._eventBox)
+        self._viewport.set_shadow_type(SHADOW_NONE)
+
+        self.pack_start(self._viewport, True, True, 0)
+
+        self._previousWidth = 0
+
+    def allocate_column_sizes(self, allocation):
+        """Allocate the column sizes."""
+        if allocation.width!=self._previousWidth:
+            self._previousWidth = allocation.width
+            index = 0
+            for alignment in self._alignments:
+                column = self._treeView.get_column(index)
+                width = alignment.allocatedWidth + (8 if index==0 else 16)
+                column.set_fixed_width(width)
+                index += 1
+
+    def setType(self, aircraftType):
+        """Setup the delay code table according to the given aircraft type."""
+        if aircraftType==const.AIRCRAFT_B736:
+            data = _data1
+        else:
+            data = _data2
+
+        columns = self._treeView.get_columns()
+        for column in columns:
+            self._treeView.remove_column(column)
+
+        (headers, rows) = data
+        numColumns = len(headers) + 1
+        numRows = len(rows)
 
         column = gtk.TreeViewColumn("", gtk.CellRendererText())
         column.set_sizing(TREE_VIEW_COLUMN_FIXED)
@@ -225,16 +279,13 @@ class DelayCodeTable(DelayCodeTableBase):
             column.set_sizing(TREE_VIEW_COLUMN_FIXED)
             self._treeView.append_column(column)
 
-        self.pack_start(self._treeView, False, False, 0)
-
-        self._alignments = []
-
-        self._eventBox = gtk.EventBox()
-
         self._table = gtk.Table(numRows, numColumns)
         self._table.set_homogeneous(False)
         self._table.set_col_spacings(16)
         self._table.set_row_spacings(4)
+        self._eventBox.add(self._table)
+
+        self._alignments = []
 
         firstDelayCodeRow = True
         for i in range(0, numRows):
@@ -266,25 +317,16 @@ class DelayCodeTable(DelayCodeTableBase):
                         self._alignments.append(alignment)
                 firstDelayCodeRow = False
 
-        self._viewport = self._createViewport()
-        self._eventBox.add(self._table)
-        self._viewport.add(self._eventBox)
-        self._viewport.set_shadow_type(SHADOW_NONE)
-
-        self.pack_start(self._viewport, True, True, 0)
-
         self._previousWidth = 0
+        self.show_all()
 
-    def allocate_column_sizes(self, allocation):
-        """Allocate the column sizes."""
-        if allocation.width!=self._previousWidth:
-            self._previousWidth = allocation.width
-            index = 0
-            for alignment in self._alignments:
-                column = self._treeView.get_column(index)
-                width = alignment.allocatedWidth + (8 if index==0 else 16)
-                column.set_fixed_width(width)
-                index += 1
-
+    def reset(self):
+        """Reset the delay code table."""
+        columns = self._treeView.get_columns()
+        for column in columns:
+            self._treeView.remove_column(column)
+        self._eventBox.remove(self._table)
+        self._table = None
+        self.show_all()
 
 #------------------------------------------------------------------------------

@@ -162,10 +162,11 @@ class FlightInfo(gtk.VBox):
                 codes.append(delayCodes[index][0])
         return codes
 
-    def enable(self):
+    def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
         self._flightDefects.set_sensitive(True)
+        self._delayTable.setType(aircraftType)
         self._delayWindow.set_sensitive(True)
         self._delayTable.setStyle()
 
@@ -180,9 +181,9 @@ class FlightInfo(gtk.VBox):
         """Reset the flight info tab."""
         self._comments.get_buffer().set_text("")
         self._flightDefects.get_buffer().set_text("")
-
-        for widget in self._delayCodeWidgets:
-            widget.set_active(False)
+        self._delayTable.reset()
+        # for widget in self._delayCodeWidgets:
+        #     widget.set_active(False)
 
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""

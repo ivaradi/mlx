@@ -590,7 +590,7 @@ class FlightSelectionPage(Page):
         """Called when a flight has been selected."""
         flight = self._getSelectedFlight()
         self._wizard._bookedFlight = flight
-        self._wizard.gui.enableFlightInfo()
+        self._wizard.gui.enableFlightInfo(flight.aircraftType)
 
         self._updateDepartureGate()
 
