@@ -2,6 +2,8 @@
 
 #------------------------------------------------------------------------------
 
+from dcdata import CAPTION, DELAYCODE, getTable
+
 from mlx.gui.common import *
 
 import mlx.const as const
@@ -194,37 +196,37 @@ class CheckButton(gtk.CheckButton):
 
 #------------------------------------------------------------------------------
 
-CAPTION = 1
+# CAPTION = 1
 
-DELAYCODE = 2
+# DELAYCODE = 2
 
-_data1 = ( lambda row: row[0].strip(),
-           ["Num", "Code", "Title", "Description"],
-           [ (CAPTION, "Others"),
-             (DELAYCODE, ("        6", "OA     ", "NO GATES/STAND AVAILABLE",
-                          "Due to own airline activity")),
-             (DELAYCODE, ("9", "SG", "SCHEDULED GROUND TIME",
-                          "Planned turnaround time less than declared minimum")),
-             (CAPTION, "Passenger and baggage"),
-             (DELAYCODE, ("11", "PD", "LATE CHECK-IN",
-                          "Check-in reopened for late passengers")),
-             (DELAYCODE, ("12", "PL", "LATE CHECK-IN",
-                          "Check-in not completed by flight closure time")),
-             (DELAYCODE, ("13", "PE", "CHECK-IN ERROR",
-                          "Error with passenger or baggage details")) ] )
+# _data1 = ( lambda row: row[0].strip(),
+#            ["Num", "Code", "Title", "Description"],
+#            [ (CAPTION, "Others"),
+#              (DELAYCODE, ("        6", "OA     ", "NO GATES/STAND AVAILABLE",
+#                           "Due to own airline activity")),
+#              (DELAYCODE, ("9", "SG", "SCHEDULED GROUND TIME",
+#                           "Planned turnaround time less than declared minimum")),
+#              (CAPTION, "Passenger and baggage"),
+#              (DELAYCODE, ("11", "PD", "LATE CHECK-IN",
+#                           "Check-in reopened for late passengers")),
+#              (DELAYCODE, ("12", "PL", "LATE CHECK-IN",
+#                           "Check-in not completed by flight closure time")),
+#              (DELAYCODE, ("13", "PE", "CHECK-IN ERROR",
+#                           "Error with passenger or baggage details")) ] )
 
-_data2 = ( lambda row: row[0].strip(),
-           ["MA", "IATA", "Description"],
-           [ (CAPTION, "Passenger and baggage"),
-             (DELAYCODE, (" 012", "01   ",
-                          "Late shipping of parts and/or materials")),
-             (DELAYCODE, (" 111", "11",
-                          "Check-in reopened for late passengers")),
-             (DELAYCODE, (" 121", "12",
-                          "Check-in not completed by flight closure time")),
-             (DELAYCODE, (" 132", "13",
-                          "Error with passenger or baggage details"))
-            ])
+# _data2 = ( lambda row: row[0].strip(),
+#            ["MA", "IATA", "Description"],
+#            [ (CAPTION, "Passenger and baggage"),
+#              (DELAYCODE, (" 012", "01   ",
+#                           "Late shipping of parts and/or materials")),
+#              (DELAYCODE, (" 111", "11",
+#                           "Check-in reopened for late passengers")),
+#              (DELAYCODE, (" 121", "12",
+#                           "Check-in not completed by flight closure time")),
+#              (DELAYCODE, (" 132", "13",
+#                           "Error with passenger or baggage details"))
+#             ])
 
 #------------------------------------------------------------------------------
 
@@ -284,12 +286,9 @@ class DelayCodeTable(DelayCodeTableBase):
 
     def setType(self, aircraftType):
         """Setup the delay code table according to the given aircraft type."""
-        if aircraftType==const.AIRCRAFT_B736:
-            data = _data1
-        else:
-            data = _data2
-
-        self._delayCodeData = data
+        self._delayCodeData = data = getTable(aircraftType)
+        if data is None:
+            return
 
         columns = self._treeView.get_columns()
         for column in columns:
@@ -342,7 +341,7 @@ class DelayCodeTable(DelayCodeTableBase):
 
                 for j in range(0, numColumns-1):
                     label = gtk.Label(elements[j])
-                    label.set_alignment(1.0 if j==0 else 0.0, 0.5)
+                    label.set_alignment(0.0, 0.5)
                     alignment = Alignment(xalign = 0.5, yalign = 0.5,
                                           xscale = 1.0)
                     alignment.add(label)
