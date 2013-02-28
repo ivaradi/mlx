@@ -231,7 +231,7 @@
  *    created, and it should be registered at the bottom of the file,
  *    as the other models are.
  * -# \c src/mlx/gui/common.py: this file contains a dictionary called
- *    \ref mlx.gui.common.aircraftNames. Add the new type it it. It
+ *    \c mlx.gui.common.aircraftNames. Add the new type it it. It
  *    contains the mapping from the type constants to their
  *    language-specific names. The string ID is "aircraft_" followed by
  *    the lower-cased ICAO code.
