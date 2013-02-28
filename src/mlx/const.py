@@ -95,6 +95,9 @@ AIRCRAFT_T154 = 14
 ## Aircraft type: Yakovlev Yak-40
 AIRCRAFT_YK40 = 15
 
+## Aircraft type: British Aerospace BAe-146
+AIRCRAFT_B462 = 16
+
 #-------------------------------------------------------------------------------
 
 ## The list of aircraft types that we know of
@@ -107,7 +110,8 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
                  AIRCRAFT_B762, AIRCRAFT_B763,
                  AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
                  AIRCRAFT_T154, AIRCRAFT_T134,
-                 AIRCRAFT_YK40, AIRCRAFT_DC3]
+                 AIRCRAFT_YK40, AIRCRAFT_DC3,
+                 AIRCRAFT_B462]
 
 #-------------------------------------------------------------------------------
 
@@ -128,7 +132,8 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_DC3   : "DC3",
               AIRCRAFT_T134  : "T134",
               AIRCRAFT_T154  : "T154",
-              AIRCRAFT_YK40  : "YK40" }
+              AIRCRAFT_YK40  : "YK40",
+              AIRCRAFT_B462  : "B462" }
 
 #-------------------------------------------------------------------------------
 

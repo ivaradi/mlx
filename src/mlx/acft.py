@@ -1016,6 +1016,28 @@ class YK40(Aircraft):
 
 #---------------------------------------------------------------------------------------
 
+class B462(Aircraft):
+    """British Aerospace BAe-146 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: left, centre, right
+    - n1: left outer, left inner, right inner, right outer
+    - reverser: empty (the plane has no reversers)"""
+    def __init__(self, flight):
+        super(B462, self).__init__(flight)
+        self.dow = 25706
+        self.mtow = 43998
+        self.mlw = 38599
+        self.mzfw = 33792
+        self.gearSpeedLimit = 210
+        self.flapSpeedLimits = { 18 : 217,
+                                 24 : 180,
+                                 30 : 170,
+                                 33 : 150 }
+
+#---------------------------------------------------------------------------------------
+
 mostFuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
                  const.FUELTANK_LEFT_AUX,
                  const.FUELTANK_CENTRE,
@@ -1039,7 +1061,8 @@ _classes = { const.AIRCRAFT_B736  : B736,
              const.AIRCRAFT_DC3   : DC3,
              const.AIRCRAFT_T134  : T134,
              const.AIRCRAFT_T154  : T154,
-             const.AIRCRAFT_YK40  : YK40 }
+             const.AIRCRAFT_YK40  : YK40,
+             const.AIRCRAFT_B462  : B462 }
 
 #---------------------------------------------------------------------------------------
 

@@ -157,6 +157,9 @@ class Values(object):
     ## Engine index: engine #3
     ENGINE_3 = 2
 
+    ## Engine index: engine #4
+    ENGINE_4 = 3
+
     ## The number of hotkey entries
     HOTKEY_SIZE = 56
 
@@ -294,8 +297,8 @@ class Values(object):
         self.windDirection = 300.0
         self.visibility = 10000
 
-        self.n1 = [0.0, 0.0, 0.0]
-        self.throttles = [0.0, 0.0, 0.0]
+        self.n1 = [0.0, 0.0, 0.0, 0.0]
+        self.throttles = [0.0, 0.0, 0.0, 0.0]
 
         self.payloadCount = 1
         self.payload = []
@@ -327,6 +330,7 @@ class Values(object):
         self.eng1DeIce = False
         self.eng2DeIce = False
         self.eng3DeIce = False
+        self.eng4DeIce = False
         self.propDeIce = False
         self.structDeIce = False
 
@@ -426,6 +430,10 @@ class Values(object):
             return self._getThrottle(self.ENGINE_3)
         elif offset==0x09e2:       # Engine #3 de-ice
             return 1 if self.eng3DeIce else 0
+        elif offset==0x0a54:       # Engine #4 throttle
+            return self._getThrottle(self.ENGINE_4)
+        elif offset==0x0a7a:       # Engine #4 de-ice
+            return 1 if self.eng4DeIce else 0
         elif offset==0x0af4:       # Fuel weight
             return int(self.fuelWeight * 256.0)
         elif offset==0x0b74:       # Centre tank level
@@ -532,6 +540,8 @@ class Values(object):
         elif offset==0x2100:       # Engine #2 N1
             return self.n1[self.ENGINE_2]
         elif offset==0x2200:       # Engine #3 N1
+            return self.n1[self.ENGINE_3]
+        elif offset==0x2300:       # Engine #4 N1
             return self.n1[self.ENGINE_3]
         elif offset==0x2ea0:       # Elevator trim
             return self.elevatorTrim * math.pi / 180.0
@@ -694,6 +704,10 @@ class Values(object):
             self._setThrottle(self.ENGINE_3, value)
         elif offset==0x09e2:       # Engine #3 de-ice
             self.eng3DeIce = value!=0
+        elif offset==0x0a54:       # Engine #4 throttle
+            self._setThrottle(self.ENGINE_4, value)
+        elif offset==0x0a7a:       # Engine #4 de-ice
+            self.eng4DeIce = value!=0
         elif offset==0x0af4:       # Fuel weight
             self.fuelWeight = value / 256.0
         elif offset==0x0b74:       # Centre tank level
@@ -795,6 +809,8 @@ class Values(object):
             self.n1[self.ENGINE_2] = value
         elif offset==0x2200:       # Engine #3 N1
             self.n1[self.ENGINE_3] = value
+        elif offset==0x2300:       # Engine #4 N1
+            self.n1[self.ENGINE_4] = value
         elif offset==0x2ea0:       # Elevator trim
             self.elevatorTrim = value * 180.0 / math.pi
         elif offset==0x2ef8:       # Centre of Gravity
@@ -1412,6 +1428,8 @@ class CLI(cmd.Cmd):
                                        lambda word: float(word))
         self._valueHandlers["n1_3"] = ([(0x2200, "f")], lambda value: value,
                                        lambda word: float(word))
+        self._valueHandlers["n1_4"] = ([(0x2300, "f")], lambda value: value,
+                                       lambda word: float(word))
 
         self._valueHandlers["throttle_1"] = ([(0x088c, "H")],
                                              CLI.pyuipc2throttle,
@@ -1420,6 +1438,9 @@ class CLI(cmd.Cmd):
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
         self._valueHandlers["throttle_3"] = ([(0x09bc, "H")],
+                                             CLI.pyuipc2throttle,
+                                             CLI.throttle2pyuipc)
+        self._valueHandlers["throttle_4"] = ([(0x0a54, "H")],
                                              CLI.pyuipc2throttle,
                                              CLI.throttle2pyuipc)
 
@@ -1489,6 +1510,8 @@ class CLI(cmd.Cmd):
         self._valueHandlers["eng2Deice"] = ([(0x094a, "H")],
                                             CLI.bool2str, CLI.str2bool)
         self._valueHandlers["eng3Deice"] = ([(0x09e2, "H")],
+                                            CLI.bool2str, CLI.str2bool)
+        self._valueHandlers["eng4Deice"] = ([(0x0a7a, "H")],
                                             CLI.bool2str, CLI.str2bool)
         self._valueHandlers["propDeice"] = ([(0x337c, "b")],
                                             CLI.bool2str, CLI.str2bool)

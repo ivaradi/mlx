@@ -10,11 +10,11 @@
  *
  * Note, that to be able to understand the code most effectively, it
  * is important to either use the application actively, or to read its
- * user documentation carefully. 
+ * user documentation carefully.
  *
  * \section overview Overview
  *
- * The application was written in 
+ * The application was written in
  * <a href="http://python.org">Python 2</a>. The Python wrapper
  * <a href="http://gtk.org">Gtk+</a> toolkit was used for the graphical
  * user interface. The program is designed to run on both Windows and
@@ -22,7 +22,7 @@
  * used practically. However, Linux distributions move towards Gtk+ 3
  * as the primary toolkit, while it has no reliable port for Windows
  * yet. Therefore it was decided to support both Gtk+ 2 and 3
- * depending on the platform. For Gtk+ 2 the 
+ * depending on the platform. For Gtk+ 2 the
  * <a href="http://pygtk.org">PyGTK</a> wrapper is used, while for Gtk+
  * 3 the <a href="https://live.gnome.org/PyGObject">PyGObject</a>
  * bindings. See the mlx.gui.common module for information on how the
@@ -32,7 +32,7 @@
  * perhaps, Prepar3D) are supported, and are accessed via the
  * <a href="http://www.schiratti.com/dowson.html">FSUIPC</a>
  * interface. The author has created a Python mapping for it, which
- * has been submitted for inclusion into the SDK, so it will hopefully  
+ * has been submitted for inclusion into the SDK, so it will hopefully
  * appear in its next version. It is planned to support X-Plane in the
  * near future (hopefully by the end of 2012) on both Linux and
  * Windows.
@@ -44,7 +44,7 @@
  * 2.7.x installed as well as one of the above mentioned wrappers for
  * Gtk+ and Gtk+ itself. Since Python is an interpreted language,
  * there is no need for any special build system.
- * 
+ *
  * Python and Gtk+ are readily available on most Linux distributions,
  * but some links are probably useful for Windows users:
  * \li Python has its own Windows installers: http://www.python.org/download/releases
@@ -53,7 +53,7 @@
  * \li The Windows version uses some Python extensions: http://sourceforge.net/projects/pywin32/files
  * \li To create install packages, you also need py2exe: <a href="http://www.py2exe.org/">http://www.py2exe.org</a>,
  * \li as well as the Nullsoft Install System: http://nsis.sourceforge.net/Main_Page
- * 
+ *
  * The install package can be created by running the \c makeinst.bat
  * file. It contains some absolute paths, so check those befure
  * running the batch file. Windows is needed currently to create an
@@ -80,7 +80,7 @@
  * -# No GUI operations should be executed directly from another
  *    thread. Instead, use \c gobject.idle_add to "inject" the
  *    operation into the main thread.
- * -# To ensure the responsiveness of the GUI, only operations 
+ * -# To ensure the responsiveness of the GUI, only operations
  *    that take a short time should be executed in the GUI thread.
  *
  * \subsection arch_buslog Business Logic
@@ -97,12 +97,12 @@
  * \ref mlx.fsuipc.Simulator "Simulator" class, so if another
  * simulator is to be supported, a class with the same (or at least
  * sufficiently similar) public interface should be implemented.
- *              
+ *
  * The most important function of the program is the
  * continuous monitoring of the aircraft's parameters and some other
  * data. The monitoring is started using the \ref
  * mlx.fsuipc.Simulator.startMonitoring "startMonitoring" function of
- * the simulator object. If started, it calls the \ref 
+ * the simulator object. If started, it calls the \ref
  * mlx.acft.Aircraft.handleState "handleState" function of the
  * mlx.acft.Aircraft instance used. The mlx.acft module contains one
  * child class of \ref mlx.acft.Aircraft "Aircraft" for each aircraft
@@ -113,19 +113,19 @@
  * Upon calling its \c handleState function, it calculates the
  * smoothed values of IAS and VS, and then calls each "checker". A
  * checker is an instance of a subclass of mlx.checks.StateChecker,
- * which checks a one or a few parameters that are important from some 
+ * which checks a one or a few parameters that are important from some
  * aspect of the correct execution of a flight. For example, a checker
- * may check if the \ref mlx.checks.StrobeLightsChecker 
+ * may check if the \ref mlx.checks.StrobeLightsChecker
  * "strobe lights" are switched on and off at the right stages of the
  * flight. But some checkers simply log some \ref
  * mlx.checks.AltimeterLogger "value" whenever it changes
  * in an "interesting" way, or \ref mlx.checks.ACARSSender "send the
- * ACARS" periodically. 
+ * ACARS" periodically.
  *
  * There is also a \ref mlx.checks.StageCheker "checker" which
  * detects the changes in the stage of the flight, and calls the
  * \ref mlx.acft.Aircraft.setStage "setStage" function of the
- * aircraft, if there is a change. It first calls the  
+ * aircraft, if there is a change. It first calls the
  * \ref mlx.flight.Flight "flight"'s \ref mlx.flight.Flight.setStage
  * "setStage" function, which notifies the GUI and the \ref
  * mlx.logger.Logger "logger" of this change, and records the block
@@ -138,36 +138,112 @@
  * flown distance and the amount of fuel used, and calls the \ref
  * mlx.soundsched.SoundScheduler "sound scheduler" to check if some
  * backround sound should be played. If the check list hotkey is
- * pressed, the \ref mlx.soundsched.ChecklistScheduler 
+ * pressed, the \ref mlx.soundsched.ChecklistScheduler
  * "checklist scheduler" is notified too.
  *
  * As mentioned, there is a \ref mlx.logger.Logger "logger" in the
  * application, which contains the textual log lines as well as the
- * faults and their scores. 
+ * faults and their scores.
  *
  * The business logic part contains many other components, but they
  * are quite simple and are built around the principles mentioned
  * above. Consult the documentation and the code of the relevant
  * modules for more information.
  *
- * \subsection arch_gui GUI     
+ * \subsection arch_gui GUI
  *
  * As mentioned, the GUI is implemented using Gtk+. This toolkit
  * provides the Glade graphical user interface designer, but due to
  * the requirement of supporting both Gtk+ 2 and 3, and due to a so-so
  * experience with Glade in an earlier project, it was decided to not
  * use it. Instead, the GUI elements are created and handled by
- * hand-written code. 
+ * hand-written code.
  *
  * The central class of the graphical user interface is
  * mlx.gui.gui.GUI. Upon creation, it creates the rest of the GUI,
  * sets up the menus and shortcuts, etc. It also maintains the
  * connection to the simulator and creates the \ref mlx.flight.Flight
  * "flight" and \ref mlx.flight.Aircraft "aircraft" objects as
- * needed. 
+ * needed.
  *
  * To understand the operation of the GUI, one should be familiar with
  * Gtk+, but otherwise it is pretty straighforward. See the
- * documentation of the relevant modules for more information. 
+ * documentation of the relevant modules for more information.
+ *
+ * \section newtype Adding a new aircraft type
+ *
+ * While new aircraft types will probably not be added too often, here
+ * is a checklist about what should be modified when such a
+ * requirement arises.
+ *
+ * First, it is worth to know what data you need to add the new type:
+ *
+ * \li the aircraft's type name and its ICAO code
+ * \li the following weights: DOW, MZFW, MTOW, MLW
+ * \li the flap settings and their speed limits
+ * \li the speed limit for extending/retracting the gear (VLE)
+ * \li the number and types of the fuel tanks
+ * \li the type code the MAVA website uses to identify the type
+ * \li if the plane has reversers, what is the operating limit speed,
+ *     if any
+ * \li does the plane support the notion of a takeoff derate, and if
+ *     so, what data should be given
+ * \li what lights does the plane have
+ *
+ * If you have the data, you can add the type by modifying the source
+ * files as per the checklist below:
+ *
+ * -# \c src/mlx/const.py: look for the constants named AIRCRAFT_xxx.
+ *    Add the new type at the end of the list of those constants, with
+ *    a number 1 greater than the number of the last existing
+ *    type. The part of the constant's name after the underscore (xxx
+ *    above) should be the ICAO code of the aircraft type.
+ * -# \c src/mlx/const.py: below this list of constants, you can find
+ *    an array named \c aircraftTypes. Add the type constant to it.
+ * -# \c src/mlx/const.py: further below you can find a dictionary
+ *    mapping te aircraft type to the corresponding ICAO codes. Add
+ *    the new type to it.
+ * -# \c src/mlx/acft.py: add a new subclass of \ref
+ *    mlx.acft.Aircraft. Its name should be the ICAO code. Check an
+ *    existing aircraft and add the same variables containing the
+ *    weights, the flap speed limits and the gear speed limit. There
+ *    may be some other member variables or functions that should be
+ * -# \c src/mlx/acft.py: there is a dictionary named \c _classes
+ *    towards the end of the file. Add the type to it.
+ * -# \c src/mlx/web.py: the \ref mlx.web.BookedFlight class contains
+ *    two dictionaries, the mapping between the types and the values the MAVA
+ *    website uses to identify the type. Add the appropriate values
+ *    here.
+ * -# \c src/mlx/fsuipc.py: add a subclass of \ref
+ *    mlx.fsuipc.GenericAircraftModel for the new type named the ICAO
+ *    code of the type followed by the word \c Model. Implement its
+ *    constructor to supply the base class with the flaps notches
+ *    (starting with 0), the array of constants describing the fuel
+ *    tanks the model has, and the number of engines. Also implement
+ *    the name of the model, which should be something like
+ *    "FSUIPC/Generic ...". If necessary implement other functions or
+ *    set other members.
+ * -# \c src/mlx/fsuipc.py: add the new type and model class to the
+ *    dictionary named \c _genericModels towards the end of the file.
+ * -# \c src/mlx/fsuipc.py: if you have a model that has some
+ *    non-generic characteristics, create a specific class for
+ *    it. This class should be a subclass of the generic class
+ *    created, and it should be registered at the bottom of the file,
+ *    as the other models are.
+ * -# \c src/mlx/gui/common.py: this file contains a dictionary called
+ *    \ref mlx.gui.common.aircraftNames. Add the new type it it. It
+ *    contains the mapping from the type constants to their
+ *    language-specific names. The string ID is "aircraft_" followed by
+ *    the lower-cased ICAO code.
+ * -# \c locale/hu/mlx.po, locale/en/mlx.po: the beginning of this
+ *    file contains mapping from the string ID previously used to the
+ *    actual name of the aircraft. Add the new type as appropriate.
+ * -# \c dcdatagen.py: this program generates some source and message
+ *    files related to the delay codes. Currently there are two
+ *    tables, one for old-timer types and the other for the "modern" types.
+ *    The file contains a list of lists called \c typeGroups. Add the
+ *    type's ICAO code the appropriate list.
+ *
+ * When all the changes have been made, run \c make in the root
+ * directory to update some source files.
  */
- 

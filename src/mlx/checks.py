@@ -1303,6 +1303,7 @@ class ReverserChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
+            state.reverser and \
             state.groundSpeed<aircraft.reverseMinSpeed and max(state.reverser)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
