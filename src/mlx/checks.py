@@ -1117,7 +1117,9 @@ class TransponderChecker(PatientFaultChecker):
                 (not state.xpdrC and
                  (flight.stage in
                   [const.STAGE_CRUISE, const.STAGE_DESCENT,
-                   const.STAGE_LANDING, const.STAGE_GOAROUND] or \
+                   const.STAGE_GOAROUND] or \
+                  (flight.stage==const.STAGE_LANDING  and
+                   state.groundSpeed>50.0) or \
                   ((not state.autoXPDR or \
                     (self._liftOffTime is not None and
                      state.timestamp > (self._liftOffTime+8))) and \
