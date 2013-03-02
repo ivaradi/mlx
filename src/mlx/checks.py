@@ -1049,8 +1049,8 @@ class GLoadChecker(SimpleFaultChecker):
     """Check if the G-load does not exceed 2 except during flare."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return state.gLoad>2.0 and (flight.stage!=const.STAGE_LANDING or \
-                                    state.radioAltitude>=50)
+        return state.gLoad>2.0 and not state.onTheGround and \
+          (flight.stage!=const.STAGE_LANDING or state.radioAltitude>=50)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
