@@ -1036,6 +1036,16 @@ class B462(Aircraft):
                                  30 : 170,
                                  33 : 150 }
 
+    @property
+    def derateLabels(self):
+        """Get the derate strings for this type."""
+        return (xstr("takeoff_derate_b462"), None)
+
+    @property
+    def derateTemplate(self):
+        """Get the derate template for this aicraft type."""
+        return "Derate enabled: %s"
+
 #---------------------------------------------------------------------------------------
 
 mostFuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,

@@ -779,6 +779,9 @@ msgstr "Der_ate:"
 msgid "takeoff_derate_tupolev"
 msgstr "N_ominal/takeoff:"
 
+msgid "takeoff_derate_b462"
+msgstr "Der_ate (yes/no):"
+
 msgid "takeoff_derate_tooltip"
 msgstr "Enter the takeoff derate parameter."
 

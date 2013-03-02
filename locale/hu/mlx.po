@@ -780,6 +780,9 @@ msgstr "Teljesítménycsökkentés:"
 msgid "takeoff_derate_tupolev"
 msgstr "Névleges/felszállási:"
 
+msgid "takeoff_derate_b462"
+msgstr "Teljesítménycsökkentés (yes/no):"
+
 msgid "takeoff_derate_tooltip"
 msgstr "Írd be a felszállási teljesítménycsökkentés értékét."
 
