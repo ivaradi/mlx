@@ -151,7 +151,7 @@ class Aircraft(object):
         self._appendSpeedChecker()
         self._checkers.append(checks.VSChecker())
 
-        timeout = 5.0 + config.realIASSmoothingLength - 1
+        timeout = 30.0 + config.realIASSmoothingLength - 1
         self._checkers.append(checks.OverspeedChecker(timeout = timeout))
 
         self._checkers.append(checks.StallChecker())

@@ -1236,7 +1236,7 @@ class NavLightsChecker(PatientFaultChecker):
 
 class OverspeedChecker(PatientFaultChecker):
     """Check if Vne has been exceeded."""
-    def __init__(self, timeout = 5.0):
+    def __init__(self, timeout = 30.0):
         """Construct the checker."""
         super(OverspeedChecker, self).__init__(timeout = timeout)
 
