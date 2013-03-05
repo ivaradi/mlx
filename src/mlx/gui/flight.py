@@ -367,7 +367,7 @@ class LoginPage(Page):
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
-        print "mlx.flight.LoginPage: logged in"
+        print "mlx.flight.LoginPage: logging in"
         self._wizard.login(self._handleLoginResult,
                            self._pilotID.get_text(),
                            self._password.get_text(),
@@ -590,7 +590,7 @@ class FlightSelectionPage(Page):
         """Called when a flight has been selected."""
         flight = self._getSelectedFlight()
         self._wizard._bookedFlight = flight
-        self._wizard.gui.enableFlightInfo()
+        self._wizard.gui.enableFlightInfo(flight.aircraftType)
 
         self._updateDepartureGate()
 

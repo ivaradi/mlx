@@ -62,7 +62,8 @@ class BookedFlight(object):
                       "LI2"  : const.AIRCRAFT_DC3,
                       "TU3"  : const.AIRCRAFT_T134,
                       "TU5"  : const.AIRCRAFT_T154,
-                      "YK4"  : const.AIRCRAFT_YK40 }
+                      "YK4"  : const.AIRCRAFT_YK40,
+                      "146"  : const.AIRCRAFT_B462 }
 
     TYPE2TYPECODE = { const.AIRCRAFT_B736  : "736",
                       const.AIRCRAFT_B737  : "73G",
@@ -79,7 +80,8 @@ class BookedFlight(object):
                       const.AIRCRAFT_DC3   : "LI2",
                       const.AIRCRAFT_T134  : "TU3",
                       const.AIRCRAFT_T154  : "TU5",
-                      const.AIRCRAFT_YK40  : "YK4" }
+                      const.AIRCRAFT_YK40  : "YK4",
+                      const.AIRCRAFT_B462  : "146" }
 
     @staticmethod
     def getDateTime(date, time):

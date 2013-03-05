@@ -2042,6 +2042,33 @@ class YK40Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
+class B462Model(GenericAircraftModel):
+    """Generic model for the British Aerospace BAe 146-200 aircraft."""
+    fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE,
+                 const.FUELTANK_RIGHT]
+
+    def __init__(self):
+        """Construct the model."""
+        super(B462Model, self). \
+            __init__(flapsNotches = [0, 18, 24, 30, 33],
+                     fuelTanks = B462Model.fuelTanks,
+                     numEngines = 4)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Generic British Aerospace 146"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get an aircraft state object for the given monitoring data.
+
+        This removes the reverser value for the middle engine."""
+        state = super(B462Model, self).getAircraftState(aircraft, timestamp, data)
+        state.reverser = []
+        return state
+
+#------------------------------------------------------------------------------
+
 _genericModels = { const.AIRCRAFT_B736  : B737Model,
                    const.AIRCRAFT_B737  : B737Model,
                    const.AIRCRAFT_B738  : B737Model,
@@ -2057,7 +2084,8 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
                    const.AIRCRAFT_DC3   : DC3Model,
                    const.AIRCRAFT_T134  : T134Model,
                    const.AIRCRAFT_T154  : T154Model,
-                   const.AIRCRAFT_YK40  : YK40Model }
+                   const.AIRCRAFT_YK40  : YK40Model,
+                   const.AIRCRAFT_B462  : B462Model }
 
 #------------------------------------------------------------------------------
 

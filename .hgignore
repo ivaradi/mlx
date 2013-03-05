@@ -5,3 +5,6 @@ dist/.+
 build/.+
 mlx-common.nsh
 locale/.+/LC_MESSAGES
+locale/.+/mlx_delay.po
+src/mlx/gui/dcdata.py
+xplra.py

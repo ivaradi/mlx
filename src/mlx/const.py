@@ -10,7 +10,7 @@ import sys
 #-------------------------------------------------------------------------------
 
 ## The version of the program
-VERSION="0.15"
+VERSION="0.16"
 
 #-------------------------------------------------------------------------------
 
@@ -95,6 +95,9 @@ AIRCRAFT_T154 = 14
 ## Aircraft type: Yakovlev Yak-40
 AIRCRAFT_YK40 = 15
 
+## Aircraft type: British Aerospace BAe-146
+AIRCRAFT_B462 = 16
+
 #-------------------------------------------------------------------------------
 
 ## The list of aircraft types that we know of
@@ -107,7 +110,8 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
                  AIRCRAFT_B762, AIRCRAFT_B763,
                  AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
                  AIRCRAFT_T154, AIRCRAFT_T134,
-                 AIRCRAFT_YK40, AIRCRAFT_DC3]
+                 AIRCRAFT_YK40, AIRCRAFT_DC3,
+                 AIRCRAFT_B462]
 
 #-------------------------------------------------------------------------------
 
@@ -128,7 +132,8 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_DC3   : "DC3",
               AIRCRAFT_T134  : "T134",
               AIRCRAFT_T154  : "T154",
-              AIRCRAFT_YK40  : "YK40" }
+              AIRCRAFT_YK40  : "YK40",
+              AIRCRAFT_B462  : "B462" }
 
 #-------------------------------------------------------------------------------
 
@@ -233,38 +238,6 @@ def flightType2string(flightType):
     """Get the string equivalent of the given flight type."""
     return _flightTypeStrings[flightType] \
            if flightType in _flightTypeStrings else None
-
-#-------------------------------------------------------------------------------
-
-## Delay code: loading problems
-DELAYCODE_LOADING = 0
-
-## Delay code: VATSIM problem
-DELAYCODE_VATSIM = 1
-
-## Delay code: network problems
-DELAYCODE_NETWORK = 2
-
-## Delay code: controller's fault
-DELAYCODE_CONTROLLER = 3
-
-## Delay code: system crash or freeze
-DELAYCODE_SYSTEM = 4
-
-## Delay code: navigation problem
-DELAYCODE_NAVIGATION = 5
-
-## Delay code: traffic problems
-DELAYCODE_TRAFFIC = 6
-
-## Delay code: apron navigation
-DELAYCODE_APRON = 7
-
-## Delay code: weather problems
-DELAYCODE_WEATHER = 8
-
-## Delay code: personal reasons
-DELAYCODE_PERSONAL = 9
 
 #-------------------------------------------------------------------------------
 

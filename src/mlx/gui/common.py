@@ -72,6 +72,7 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
 
     SHADOW_IN = gtk.SHADOW_IN
+    SHADOW_NONE = gtk.SHADOW_NONE
 
     POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
 
@@ -85,6 +86,11 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     SORT_DESCENDING = gtk.SORT_DESCENDING
 
     EVENT_BUTTON_PRESS = gdk.BUTTON_PRESS
+
+    TREE_VIEW_COLUMN_FIXED = gtk.TREE_VIEW_COLUMN_FIXED
+
+    FILL = gtk.FILL
+    EXPAND = gtk.EXPAND
 
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
@@ -138,6 +144,7 @@ else:
     SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
 
     SHADOW_IN = gtk.ShadowType.IN
+    SHADOW_NONE = gtk.ShadowType.NONE
 
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
 
@@ -151,6 +158,11 @@ else:
     SORT_DESCENDING = gtk.SortType.DESCENDING
 
     EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
+
+    TREE_VIEW_COLUMN_FIXED = gtk.TreeViewColumnSizing.FIXED
+
+    FILL = gtk.AttachOptions.FILL
+    EXPAND = gtk.AttachOptions.EXPAND
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 
@@ -285,7 +297,8 @@ aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
                   _const.AIRCRAFT_DC3   : xstr("aircraft_dc3"),
                   _const.AIRCRAFT_T134  : xstr("aircraft_t134"),
                   _const.AIRCRAFT_T154  : xstr("aircraft_t154"),
-                  _const.AIRCRAFT_YK40  : xstr("aircraft_yk40") }
+                  _const.AIRCRAFT_YK40  : xstr("aircraft_yk40"),
+                  _const.AIRCRAFT_B462  : xstr("aircraft_b462") }
 
 #------------------------------------------------------------------------------
 

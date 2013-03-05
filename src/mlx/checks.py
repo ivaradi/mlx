@@ -1053,8 +1053,8 @@ class GLoadChecker(SimpleFaultChecker):
     """Check if the G-load does not exceed 2 except during flare."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return state.gLoad>2.0 and (flight.stage!=const.STAGE_LANDING or \
-                                    state.radioAltitude>=50)
+        return state.gLoad>2.0 and not state.onTheGround and \
+          (flight.stage!=const.STAGE_LANDING or state.radioAltitude>=50)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
@@ -1121,7 +1121,9 @@ class TransponderChecker(PatientFaultChecker):
                 (not state.xpdrC and
                  (flight.stage in
                   [const.STAGE_CRUISE, const.STAGE_DESCENT,
-                   const.STAGE_LANDING, const.STAGE_GOAROUND] or \
+                   const.STAGE_GOAROUND] or \
+                  (flight.stage==const.STAGE_LANDING  and
+                   state.groundSpeed>50.0) or \
                   ((not state.autoXPDR or \
                     (self._liftOffTime is not None and
                      state.timestamp > (self._liftOffTime+8))) and \
@@ -1238,7 +1240,7 @@ class NavLightsChecker(PatientFaultChecker):
 
 class OverspeedChecker(PatientFaultChecker):
     """Check if Vne has been exceeded."""
-    def __init__(self, timeout = 5.0):
+    def __init__(self, timeout = 30.0):
         """Construct the checker."""
         super(OverspeedChecker, self).__init__(timeout = timeout)
 
@@ -1307,6 +1309,7 @@ class ReverserChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
+            state.reverser and \
             state.groundSpeed<aircraft.reverseMinSpeed and max(state.reverser)
 
     def logFault(self, flight, aircraft, logger, oldState, state):

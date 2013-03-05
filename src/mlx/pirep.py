@@ -18,17 +18,6 @@ import cPickle as pickle
 
 class PIREP(object):
     """A pilot's report of a flight."""
-    delayCodeNames = { const.DELAYCODE_LOADING : "Loading Problems",
-                       const.DELAYCODE_NETWORK : "Net Problems",
-                       const.DELAYCODE_SYSTEM : "System Crash/Freezing",
-                       const.DELAYCODE_TRAFFIC : "Traffic Problems",
-                       const.DELAYCODE_WEATHER : "Weather Problems",
-                       const.DELAYCODE_VATSIM : "VATSIM Problem",
-                       const.DELAYCODE_CONTROLLER : "Controller's Fault",
-                       const.DELAYCODE_NAVIGATION : "Navigation Problem",
-                       const.DELAYCODE_APRON : "Apron Navigation Problems",
-                       const.DELAYCODE_PERSONAL : "Personal Reasons" }
-
     @staticmethod
     def _formatLine(timeStr, line):
         """Format the given time string and line as needed for the ACARS and
@@ -139,7 +128,7 @@ class PIREP(object):
             s = ""
             for code in self.delayCodes:
                 if s: s += ", "
-                s += PIREP.delayCodeNames[code]
+                s += code
             return s
 
     def getSTAR(self):

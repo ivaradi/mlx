@@ -492,9 +492,9 @@ class GUI(fs.ConnectionListener):
         else:
             self.reset()
 
-    def enableFlightInfo(self):
+    def enableFlightInfo(self, aircraftType):
         """Enable the flight info tab."""
-        self._flightInfo.enable()
+        self._flightInfo.enable(aircraftType)
 
     def cancelFlight(self):
         """Cancel the current file, if the user confirms it."""
