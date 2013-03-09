@@ -1746,8 +1746,6 @@ class DreamwingsDH8DModel(DH8DModel):
         state = super(DreamwingsDH8DModel, self).getAircraftState(aircraft,
                                                                   timestamp,
                                                                   data)
-        state.pitotHeatOn = not state.pitotHeatOn
-
         return state
 
 #------------------------------------------------------------------------------
