@@ -1739,6 +1739,12 @@ class DreamwingsDH8DModel(DH8DModel):
         """Get the name for this aircraft model."""
         return "FSUIPC/Dreamwings Bombardier Dash 8-Q400"
 
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super(DreamwingsDH8DModel, self).addMonitoringData(data, fsType)
+
+        self._addOffsetWithIndexMember(data, 0x132c, "d", "_dwdh8d_navgps")
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
@@ -1746,6 +1752,9 @@ class DreamwingsDH8DModel(DH8DModel):
         state = super(DreamwingsDH8DModel, self).getAircraftState(aircraft,
                                                                   timestamp,
                                                                   data)
+        if data[self._dwdh8d_navgps]==1:
+            state.apHeading = None
+
         return state
 
 #------------------------------------------------------------------------------
