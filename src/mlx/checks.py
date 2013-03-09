@@ -939,7 +939,8 @@ class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
         for n1 in state.n1:
             if n1>5: numEnginesRunning += 1
 
-        if flight.stage==const.STAGE_PARKING:
+        if flight.stage==const.STAGE_PARKING or \
+           (flight.stage==const.STAGE_TAXIAFTERLAND and state.parking):
             return numEnginesRunning<len(state.n1) \
                    and state.antiCollisionLightsOn
         else:
