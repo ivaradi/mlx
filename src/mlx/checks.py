@@ -1353,11 +1353,11 @@ class NoStrobeSpeedChecker(StateChecker):
 
     If, during the PUSHANDTAXI stage the speed exceeds 50 knots, the state as
     saved as a provisional takeoff state. If the speed then decreases below 50
-    knots, or the plane remains on the ground for more than 20 seconds, a taxi
+    knots, or the plane remains on the ground for more than 40 seconds, a taxi
     speed error is logged with the highest ground speed detected. This state is
     also stored in the flight object as a possible
 
-    If the plane becomes airborne within 20 seconds, the stage becomes TAKEOFF,
+    If the plane becomes airborne within 40 seconds, the stage becomes TAKEOFF,
     and the previously saved takeoff state is logged.
 
     During the TAXIAFTERLAND stage, speed is checked as in case of
@@ -1389,7 +1389,7 @@ class NoStrobeSpeedChecker(StateChecker):
                 if not state.onTheGround:
                     aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
                     self._takeoffState = None
-                elif state.timestamp > (self._takeoffState.timestamp + 30):
+                elif state.timestamp > (self._takeoffState.timestamp + 40):
                     flight.setRTOState(self._highestSpeedState)
         elif self._takeoffState is not None:
             flight.setRTOState(self._highestSpeedState)
