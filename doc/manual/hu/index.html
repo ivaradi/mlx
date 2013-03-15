@@ -52,8 +52,10 @@
     felengedjük a parkoló fékeket vagy a guruló sebesség meghaladja az
     5 csomót, a program ebbe a fázisba lép.</li>
     <li><b>felszállás</b>: Ha kigurulás közben vagy megszakított
-    felszállás után felkapcsoljuk a leszálló fényeket és/vagy a
-    villogót, vagy a guruló sebesség meghaladja a 80 csomót.</li>
+    felszállás után felkapcsoljuk a villogót. Ha a repülőgép nem
+    rendelkezik ilyennel, a program 50 csomós sebesség túllépésekor
+    elkezd figyelni, és ha 30 másodpercen belül elemelkdünk,
+    tevékenységünket felszállásnak veszi.</li>
     <li><b>emelkedés</b>: Ha felszállás közben behúzzuk a futóműveket
     vagy elérjük a reptérhez viszonyított 3000 láb magasságot.</li>
     <li><b>megszakított felszállás</b>: Ha felszállás közben még a
@@ -69,7 +71,6 @@
     <li><b>átstartolás</b>: Ha leszállás közben visszahúzzuk a futóműveket.</li>
     <li><b>begurulás</b>: Ha leszállás után a repülőgép a földön gurul
     és a sebessége 50 csomó alá csökken.</li>
-    <li><b>parkolás</b>: Ha begurulás után behúzzuk a parkoló féket.</li>
     <li><b>vége</b>: Ha parkolás közben a gázturbinák N<sub>1</sub>
     paramétere 0,5 alá, vagy a dugattyús motorok fordulatszáma
     0-ra csökken. Ez a járat teljesítésének utolsó fázisa.</li>
@@ -78,7 +79,7 @@
   <p>
   A szimuláció élményének javítására a program a járat teljesítésének
   egyes szakaszaiban megfelelő beállítás esetén
-  különféle <a href="#prefsSounds">hang</a> állományokat, mint például 
+  különféle <a href="#prefsSounds">hang</a> állományokat, mint például
   a légiutaskísérők bejentéseit, játssza le. Ezen állományok a
   programhoz tartoznak, és vagy automatikusan kerülnek lejátszásra,
   vagy ha megnyomunk egy gyorsbillentyűt a szimulátorban. Emellett
@@ -86,14 +87,14 @@
   típusokhoz <a href="#checklistEditor">ellenőrzőlistákat</a>
   állíthatunk össze. Az ellenőrzőlistákat alkotó hangfelvételeket egy
   másik gyorsbillentyű lenyomásával játszhatjuk le egyenként. Ezzel
-  kapcsolatban további tudnivalók az 
+  kapcsolatban további tudnivalók az
   <a href="#prefsSounds">alábbiakban</a> olvashatók.
   </p>
 
   <p><a name="onlineACARSSystem"/>
   A Malév Virtual rendelkezik egy <i>Online ACARS rendszerrel</i>,
   amelyik a <a href="http://virtualairlines.hu">MAVA honlapján</a>
-  valamint egy 
+  valamint egy
   <a href="http://virtualairlines.hu/acars2/show.html">térképen</a>
   is megjeleníti a folyamatban lévő járatok állapotát.
   </p>
@@ -104,14 +105,14 @@
   repülőgépek helyét. Egy adott repülőgép tartózkodhat a budapesti
   ferihegyi repülőtéren, amikor is az adatbázis tartalmazza, hogy
   a gép melyik kapun vagy állóhelyen áll. Ha ez a helyzet, és
-  Ferihegyről indul az éppen teljesített járat, a program 
+  Ferihegyről indul az éppen teljesített járat, a program
   <a href="#connectPage">megjeleníti</a> a kapu vagy állóhely számát,
   és a szimulátorban javasolt a megjelelölt pozícióra állítani a
   gépet. Ha Ferihegyről indulunk, de a repülőgép máshol van (például
-  egy másik járat teljesítése miatt), 
+  egy másik járat teljesítése miatt),
   <a href="#gateSelectionPage">kiválaszthatjuk</a>, hogy honnan
   szeretnénk indulni. Az Online kapukezelő rendszer adatbázisa külön
-  is <a href="#gatesTab">megjeleníthető</a> a programban. 
+  is <a href="#gatesTab">megjeleníthető</a> a programban.
   </p>
 
   <p>
@@ -175,7 +176,7 @@
   </p>
 
   <p>
-  Az alkalmazásból a <b>Fájl/Kilépés</b> menüpont választásával vagy a 
+  Az alkalmazásból a <b>Fájl/Kilépés</b> menüpont választásával vagy a
   <b>Ctrl+K</b> billentyűkombinációval is kiléphetünk.
   </p>
 
@@ -183,7 +184,7 @@
   Ha elindítjuk a programot, de az már fut, akkor a már futó példány
   főablaka jelenik meg ahelyett, hogy új példány indulna el.
   </p>
-  
+
   <h2><a name="mainWindow">A főablak</a></h2>
 
   <p>
@@ -192,7 +193,7 @@
   több tudnivaló. Az ablak középső része több fülből áll, amelyek
   használatát a lentiekben részletesen leírjuk.
   </p>
-  
+
   <a name="mainWindowShot"/>
   <div align="center"><img src="mainWindow.png" alt="The main window"/></div>
 
@@ -202,7 +203,7 @@
   folyamatosan figyeli a repülőgép paramétereit, kommunikálnia kell a
   szimulátorral. E kommunikációs csatorna állapotát az ikon színe jelzi.
   </p>
- 
+
   <p>
   Ha az szürke, a program nem áll kapcsolatban a szimulátorral. Ez
   normális a járat teljesítése előtt és azután. Ha az ikon zöld színű,
@@ -251,11 +252,11 @@
 
   <p>
   A járat fül a legfontosabb. A sok programban megtalálható
-  varázslókhoz hasonlóan lapok sorozatából áll. E lapok nagy része a 
+  varázslókhoz hasonlóan lapok sorozatából áll. E lapok nagy része a
   a repülés előkészítésének lépésein vezet végig, míg az utolsó
   néhányon olyan adatokat adhatunk meg, amelyek szükségesek a repülés
   kiértékeléséhez és az összeállított PIREP-nek a MAVA szerverére való
-  elküldéséhez. 
+  elküldéséhez.
   </p>
 
   <p>
@@ -265,7 +266,7 @@
   információk és az esetleges adatbeviteli eszközök. Alul, jobb
   oldalon pedig a gombsor látható.
   </p>
-  
+
   <p>
   A legötbb lap két gombot tartalmaz: <b>Előre</b>
   és <b>Vissza</b>. Ezekkel lehet mozogni a lapok között. A legtöbb
@@ -279,7 +280,7 @@
   Sok lap tartalmaz még egy <b>Járat megszakítása</b> feliratú gombot
   is. Erre kattintva az aktuális járat megszakítható és ha ebbéli
   szándékunkat megerősítettük, visszakerülünk
-  a <a href="#flightSelectionPage">járatválasztás</a> oldalra, ha 
+  a <a href="#flightSelectionPage">járatválasztás</a> oldalra, ha
   korábban bejelentkeztünk a MAVA szerverére, vagy a bejelentkezés
   oldalra egyébként.
   </p>
@@ -320,13 +321,13 @@
   Ha Internet kapcsolat nélkül szeretnénk repülni, használjuk
   az <b>Offline repülés</b> gombot. Ezzel egyből a következő lapra
   kerülünk anélkül, hogy a program megpróbálna belépni a MAVA
-  szerverére. 
+  szerverére.
   </p>
-  
+
   <h4><a name="flightSelectionPage">A <i>Járatválasztás</i> oldal</a></h4>
 
   <img src="flightSelection.png" alt="A járatválasztás oldal"/>
-  
+
   <p>
   Ezen az oldalon a korábban a MAVA honlapján foglalt járatok listáját
   találjuk, amenyiben
@@ -365,9 +366,9 @@
   </p>
 
   <h4><a name="gateSelectionPage">Az <i>LHBP kapuválasztás</i> oldal</a></h4>
-  
+
   <img src="gateSelection.png" alt="Az LHBP kapuválasztás oldal"/>
-  
+
   <p>
   Ez az oldal csak akkor jelenik meg, ha a járat a budapesti
   ferihegyi repülőtérről indul és nem lehet eldönteni, hogy annak
@@ -382,7 +383,7 @@
   <h4><a name="connectPage">A <i>Kapcsolódás a szimulátorhoz</i> oldal</a></h4>
 
   <img src="connect.png" alt="A Kapcsolódás a szimulátorhoz oldal"/>
-  
+
   <p>
   Ez az oldal a járat néhány fontos adatát tartalmazza, mint a
   használandó repülőgép típusát és lajstromjelét, az induló
@@ -399,7 +400,7 @@
   kísérlet tehető, míg a <b>Mégse</b> gombbal visszamehetünk a
   járatválasztó vagy a bejelentkező oldalra.
   </p>
-  
+
   <p>
   A kapcsolat sikeres létrehozása után a járat követése még nem
   kezdődik el azonnal, de a logger már ekkor is lekérdezhet bizonyos
@@ -408,13 +409,14 @@
 
   <h4><a name="payloadPage">A <i>Terhelés</i> oldal</a></h4>
 
-  <img src="payload.png" alt="A Terhelés oldal"/>
-  
+  <img src="payload.png" alt="A Terhelés oldal"/><!-- TODO : update -->
+
   <p>
   Ezen az oldalon a járattal szállított hasznos teher összetevőit
-  láthatjuk valamint a kiszámított Zero-Fuel Weight (ZFW) értékét. Itt
-  adhatjuk meg a teherszállítmány tömegét. A <b>ZFW a
-  szimulátorból</b> gomb megnyomásának hatására a program a
+  láthatjuk valamint a kiszámított Zero-Fuel Weight (ZFW) értékét. Az
+  összes bemeneti adat szerkeszthető, de általában csak a
+  teherszállítmány tömegét szükséges megadni, ha az 0-tól eltérő.
+  A <b>ZFW a szimulátorból</b> gomb megnyomásának hatására a program a
   szimulátorból lekérdezi a ZFW értékét és megjeleníti azt. Ha az
   túlzottan eltér a számított értéktől, akkor ez utóbbi piros színnel
   jelenik meg. Állítsuk be a szimulátorban a hasznos terhet. Ha ezt
@@ -426,13 +428,13 @@
   gombot. Ekkor a <a href="#helpTab"><i>Segítség</i></a> fül használhatóvá
   válik, ls igénybe is vehetjük, ha a szimulátorban nem sikerült
   megfelelően beállítani a hasznos terhet. A fül részletesebb leírását
-  lásd az <a href="#helpTab">alábbiakban</a>. 
+  lásd az <a href="#helpTab">alábbiakban</a>.
   </p>
 
   <h4><a name="timePage">A <i>Menetrend</i> oldal</a></h4>
 
   <img src="time.png" alt="A Menetrend oldal"/>
-  
+
   <p>
   Ez az oldal tartalmazza a járat indulási és érkezési idejét
   UTC-ben. Az <b>Idő a szimulátorból</b> gomb megnyomásának hatására a
@@ -440,7 +442,7 @@
   valós fényviszonyainak megjelenítése érdekében a szimulátor idejének
   meg kell egyeznie a járatéval. Javasolt az időt az indulási idő
   előtt 15 perccel korábbra állítani, hogy legyen elég időnk a repülés
-  előkészítésére. 
+  előkészítésére.
   </p>
 
   <p>
@@ -451,7 +453,7 @@
   <h4><a name="fuelPage">Az <i>Üzemanyag</i> oldal</a></h4>
 
   <img src="fuel.png" alt="Az Üzemanyag oldal"/>
-  
+
   <p>
   Ezen az oldalon a repülőgép üzemanyagtartályainak grafikus képét
   láthatjuk. A sárgás szín az egyes tartályok aktuális
@@ -480,9 +482,9 @@
   </p>
 
   <h4><a name="routePage">Az <i>Útvonal</i> oldal</a></h4>
-  
+
   <img src="route.png" alt="Az Útvonal oldal"/>
-  
+
   <p>
   Ezen az oldalon az utazószintet és az útvonaltervet láthatjuk és
   szerkeszthetjük. Az utazószint kezdeti értéke FL240, de az útvonalat
@@ -499,9 +501,9 @@
   </p>
 
   <h4><a name="briefingPage">Az <i>Eligazítás</i> oldalak</a></h4>
-  
+
   <img src="briefing.png" alt="Az Eligazítás oldalak"/>
-  
+
   <p>
   Ezen a két oldalon az induló illetve az érkező repülőtér NOTAM-jait
   és METAR-ját olvashatjuk. A METAR-t szerkeszthetjük ha a hálózatról
@@ -510,20 +512,20 @@
   leszállási fázisba való belépéskor, hacsak előtte nem szerkesztettük
   azt. A METAR-ok a repülés teljes időtartama alatt szerkeszthetők. Ha
   azonban így teszünk, annak okát a <a href="#flightInfoTab"><i>Járat
-  info</i></a> fül <i>Megjegyzések</i> rovatában jelezzük. 
+  info</i></a> fül <i>Megjegyzések</i> rovatában jelezzük.
   </p>
 
   <p>
   A második (az érkezési repülőtérhez tartozó) eligazítási oldalon
   a megfelelő gomb megnyomásával erősítsük meg, hogy készen állunk a
-  repülésre. Ezzel elkezdődik a járat teljesítésének követése a  
+  repülésre. Ezzel elkezdődik a járat teljesítésének követése a
   beszállás fázissal.
   </p>
-  
+
   <h4><a name="takeoffPage">A <i>Felszállás</i> oldal</a></h4>
 
-  <img src="takeoff.png" alt="A Felszállás oldal"/>
-  
+  <img src="takeoff.png" alt="A Felszállás oldal"/><!-- TODO : update -->
+
   <p>
   Ezen az oldalon kell beírni a felszállásra használt futópálya
   számát, az alkalmazott szabványos műszeres indulási eljárást,
@@ -537,13 +539,45 @@
   </p>
 
   <p>
+  A flotta legtöbb típusának esetében meg kell adni a felszállási
+  teljesítménycsökkentés mértékét is. Ennek pontos formája és értéke a
+  típustól függ.
+  </p>
+
+  <p>
+  Azt is kiválaszthatjuk, hogy bekapcsoltunk-e valamilyen
+  jegesedésgátló berendezést (a pitot csövek fűtésétől eltekintve). A
+  legtöbb repülőgépnél azonban a program tudja érzékelni a beállítást,
+  és ha a jegedesedésgátló be van kapcsolva, a jelölődoboz
+  automatikusan kijelölésre kerül. Ha mi magunk kijelöljük, a program
+  magától nem szüntetni meg a kijelölést (hacsak nem ébred öntudatra
+  majd valamikor).
+
+  <p>
   A következő oldalra felszállás után az <b>Előre</b> gomb
   megnyomásával léphetünk tovább, ha minden adatot beírtunk.
   </p>
 
+  <h4><a name="cruisePage">Az <i>Utazó</i> oldal</a></h4>
+
+  <img src="cruise.png" alt="Az Utazó oldalon"/><!-- TODO: create -->
+
+  <p>
+  Ezen az oldalon az <a href="#routePage">Útvonal oldal</a>on
+  beállított utazószint látható. Ha a légtérre vonatkozó előírások,
+  step climb, vagy bármely más megalapozott ok miatt módosítani kell
+  az utazószintent, itt kell megadni az új értéket, majd annak
+  elérésekor megnyomni a <b>Frissít</b> gombot.
+  </p>
+
+  <p>
+  Ha már tervezzük a leszállást, az <b>Előre</b> gomb megnyomásával a
+  következő oldalra léphetünk.
+  </p>
+
   <h4><a name="landingPage">A <i>Leszállás</i> oldal</a></h4>
 
-  <img src="landing.png" alt="A Leszállás oldal"/> 
+  <img src="landing.png" alt="A Leszállás oldal"/><!-- TODO: update -->
 
   <p>
   Ezen az oldalon a tervbe vett szabványos érkezési és/vagy bevezetési
@@ -558,13 +592,20 @@
   </p>
 
   <p>
+  Ez az oldal is tartalmaz egy, a jegesedésgátló berendezések
+  működésére vonatkozó kijelölődobozt, amelyre ugyanazok érvényések,
+  mint a <a href="#takeoffPage">Felszállás oldal</a>on található
+  társára.
+  </p>
+
+  <p>
   Ha minden adatot megadtunk, nyomjuk meg az <b>Előre</b> gombot. Ez
   csak akkor használható, ha a járat teljesítése véget ért.
   </p>
 
   <h4><a name="finishPage">A <i>Lezárás</i> oldal</a></h4>
 
-  <img src="finish.png" alt="A Lezárás oldal"/> 
+  <img src="finish.png" alt="A Lezárás oldal"/>
 
   <p>
   Ez a járat varázsló utolsó oldala. Tartalmazza a járat
@@ -578,6 +619,12 @@
   hogy online repülés volt-e. Ha a ferihegyi repülőtérre érkezünk, ki
   kell választani annak a kapunak vagy állóhelynek a számát, ahol a
   repülőgépet leparkoltuk.
+  </p>
+
+  <p>
+  Ha minden szükséges adatot megadtunk és a programot megfelelően
+  <a href="#prefsGeneral">konfiguráltuk</a>, a PIREP automatikusan
+  elmentődik.
   </p>
 
   <p>
@@ -597,18 +644,18 @@
   járat kezdésekor a <a href="#flightSelectionPage">járatválasztás
   oldalra</a> kerülünk, ha korábban sikeresen bejelentkeztünk a MAVA
   szerverére, egyébként pedig a <a href="#loginPage">bejelentkezés
-  oldalra</a>. 
+  oldalra</a>.
   </p>
-  
+
   <h3><a name="flightInfoTab">A Járat info fül</a></h3>
 
-  <img src="flightInfoTab.png" alt="A Járat info fül"/> 
+  <img src="flightInfoTab.png" alt="A Járat info fül"/>
 
   <p>
   Ezen az oldalon további információt adhatunk a járattal
   kapcsolatban, ha szükséges.
   </p>
-  
+
   <p>
   A <i>Megjegyzések</i> szövegmezőbe olyan információt írhatunk be,
   amit szeretnénk a PIREP javító tudomására hozni. Például, hogy miért
@@ -630,7 +677,7 @@
 
   <h3><a name="helpTab">A Segítség fül</a></h3>
 
-  <img src="helpTab.png" alt="A Segítség fül"/> 
+  <img src="helpTab.png" alt="A Segítség fül"/>
 
   <p>
   Ez a fül segít a repülőgép hasznos terhének kiszámításában. Azután
@@ -659,10 +706,10 @@
   program, így hozzávetőlegesen azt is ellenőrizhetjük, hogy a
   maximumokat nem fogjuk-e túllépni a repülés során.
   </p>
-  
+
   <h3><a name="logTab">A Napló fül</a></h3>
 
-  <img src="logTab.png" alt="A Napló fül"/> 
+  <img src="logTab.png" alt="A Napló fül"/>
 
   <p>
   Ez a repülési napló, amit a PIREP javítók elemezni fognak. A
@@ -685,7 +732,7 @@
 
   <h3><a name="gatesTab">A Kapuk fül</a></h3>
 
-  <img src="gatesTab.png" alt="A Kapuk fül"/> 
+  <img src="gatesTab.png" alt="A Kapuk fül"/>
 
   <p>
   Ez a fül a MAVA <a href="#onlineGateSystem">online kapukezelő
@@ -717,7 +764,7 @@
 
   <h3><a name="debugLog">A Debug napló</a></h3>
 
-  <img src="debugLogTab.png" alt="A Debug napló fül"/> 
+  <img src="debugLogTab.png" alt="A Debug napló fül"/>
 
   <p>
   Ez a fül alapértelmezésben nem látható, de a <b>Nézet/Mutasd a
@@ -726,7 +773,7 @@
   napló, ami hibakereséshez lehet hasznos. Ha valamilyen problémát
   tapasztalunk a program működésével kapcsolatban, e napló tartalmát
   is mellékeljük a hibajelentéshez. Sokban segíthet a megoldás
-  megtalálásában. 
+  megtalálásában.
   </p>
 
   <h2><a name="loadingPIREPs">PIREP-ek betöltése</a></h2>
@@ -751,7 +798,7 @@
   </p>
 
   <div align="center">
-    <img src="pirepLoaded.png" alt="A betöltött PIREP ablaka"/> 
+    <img src="pirepLoaded.png" alt="A betöltött PIREP ablaka"/>
   </div>
 
   <p>
@@ -767,12 +814,12 @@
   </p>
 
   <div align="center">
-    <img src="pirepViewer.png" alt="PIREP megtekintő ablak"/> 
+    <img src="pirepViewer.png" alt="PIREP megtekintő ablak"/>
   </div>
 
   <h2><a name="checklistEditor">Ellenőrzőlisták szerkeszése</a></h2>
 
-  <img src="checklistEditor.png" alt="Ellenőrzőlista szerkesztő"/> 
+  <img src="checklistEditor.png" alt="Ellenőrzőlista szerkesztő"/>
 
   <p>
   Egy ellenőrzőlista tulajdonképpen hangfájlok listája. Ha az
@@ -815,18 +862,18 @@
   ellenőrzőlistát hallhatjuk, vagy egyáltalán nem kapunk
   ellenőrzőlistát, ha a járat megkezdésekor nem volt olyan).
   </p>
-  
+
   <h2><a name="calloutsEditor">Megközelítési bemondások szerkesztése</a></h2>
 
-  <img src="calloutsEditor.png" alt="The megközelítési bemondások szerkesztője"/> 
+  <img src="calloutsEditor.png" alt="The megközelítési bemondások szerkesztője"/>
 
   <p>
   A megközelítési bemondások olyan, adott repülőgéptípushoz tartozó
   hangfájlok, amelyeket a program a megközelítés során, bizonyos
   magasságok elérésekor játszik le. E fájlok listáját szerkeszthetjük
-  a megközelítési bemondásokat szerkesztő ablakban, amelyet az 
+  a megközelítési bemondásokat szerkesztő ablakban, amelyet az
   <b>Eszközök/Megközelítési bemondások szeresztése...</b> menüpont
-  kiválasztásával, vagy a <b>Ctrl+M</b> billentyűkombináció 
+  kiválasztásával, vagy a <b>Ctrl+M</b> billentyűkombináció
   leütésével jeleníthetünk meg.
   </p>
 
@@ -840,7 +887,7 @@
   </p>
 
   <p>
-  A <b>Bemondás hozzáadása</b> gomb használatakor egy fájlválasztó 
+  A <b>Bemondás hozzáadása</b> gomb használatakor egy fájlválasztó
   ablak jelenik meg. A fájl a kiválasztása után bekerül a listába
   valamilyen magassággal, amit azonnal lehet is szerkeszteni. Ha a
   fájl neve tartalmaz valamilyen számot, akkor az lesz a megajánlott
@@ -865,7 +912,7 @@
   teljesítése már elkezdődött, a bemondások listájának változtatása a
   folyamatban lévő repülés során nem tapasztalható.
   </p>
-  
+
   <h2><a name="prefs">A Beállítások ablak</a></h2>
 
   </p>
@@ -876,10 +923,10 @@
   módosítani. Az ablakban több fül található a paraméterek logikus
   csoportosítása céljából.
   </p>
-  
+
   <h3><a name="prefsGeneral">Az <i>Általános</i> fül<a></h3>
-  
-  <img src="prefsGeneral.png" alt="A Beállítások ablak Általános füle"/> 
+
+  <img src="prefsGeneral.png" alt="A Beállítások ablak Általános füle"/><!-- TODO: update -->
 
   <p>
   Itt néhány általános beállítás található, amelyek a program
@@ -934,9 +981,16 @@
   a beállítást azonnal figyelembe veszi a program.
   </p>
 
+  <p>
+  Ha a <b>PIREP mentése automatikusan</b> jelölődobozt kijelöljük, a
+  PIREP-et a program automatikusan elmenti a feljebb megadott
+  könyvtárba, ha befejezetük a járatot és megadtunk minden szükséges
+  adatot.
+  </p>
+
   <h3><a name="prefsMessages">Az <i>Üzenetek</i> fül</a></h3>
- 
-  <img src="prefsMessages.png" alt="A Beállítások ablak Üzenetek füle"/> 
+
+  <img src="prefsMessages.png" alt="A Beállítások ablak Üzenetek füle"/><!-- TODO: update -->
 
   <p>
   A program bizonyos események megtörténtekor azokról üzenetet tud
@@ -953,6 +1007,8 @@
     hibákról szóló üzenetek.</li>
     <li><b>Információs üzenetek</b>: informatív üzenetek, például a
     repülés fázisairól, az ellenőrzőlisták végéről, stb.</li>
+    <li><b>Repülés alatti fázis üzenetek</b>: a repülés olyan
+    fázisairól szóló üzenetek, amelyekben a levegőben vagyunk.</li>
     <li><b>Hibaüzenetek</b>: a program által észlelt, de még nem NO GO
     kategóriájú hibákról szóló üzenetek.</li>
     <li><b>NO GO hibaüzenetek</b>: a program által észlelt NO GO
@@ -961,7 +1017,7 @@
     az <a href="#onlineGateSystem">online kapukezelő rendszerrel</a>
     kapcsolatos üzenetek. Ha például leszállunk Ferihegyen, a program
     megjeleníti a nem foglalt kapuk és állóhelyek listáját, így
-    irányítás hiányában is el tudjuk dönteni, hová álljunk.</li> 
+    irányítás hiányában is el tudjuk dönteni, hová álljunk.</li>
     <li><b>Környezeti üzenetek</b>: egyéb üzenetek, például a repülés
     végén a célrepülőtéren üdvözlő üzenet.</li>
     <li><b>Segítő üzenetek</b>: segítő üzenetek, például a
@@ -987,12 +1043,12 @@
   </p>
 
   <h3><a name="prefsSounds">A <i>Hangok</i> fül</a></h3>
-  
-  <img src="prefsSounds.png" alt="A Beállítások ablak Hangok füle"/> 
+
+  <img src="prefsSounds.png" alt="A Beállítások ablak Hangok füle"/>
 
   <p>
   Ezen a fülön állíthatjuk be, hogy az alkalmazás hogyan játssza le a
-  hangfájlokat. 
+  hangfájlokat.
   </p>
 
   <p>
@@ -1017,7 +1073,7 @@
 
   <p>
   Ha a <b>Megközelítési bemondások engedélyezése</b> jelölőnégyzetet
-  kijelöljük, és a használt repülőgép típushoz 
+  kijelöljük, és a használt repülőgép típushoz
   <a href="#calloutsEditor">megadunk</a> megközelítési bemondásokat,
   akkor azokat a program megközelítéskor le is fogja játszani.
   </p>
@@ -1040,7 +1096,7 @@
 
   <h3><a name="prefsAdvanced">A <i>Haladó</i> fül</a></h3>
 
-  <img src="prefsAdvanced.png" alt="A Beállítások ablak Haladó füle"/> 
+  <img src="prefsAdvanced.png" alt="A Beállítások ablak Haladó füle"/>
 
   <p>
   Ezen a fülön olyan beállítások vannak, amelyeket normális esetben
@@ -1057,7 +1113,7 @@
 
   <h2><a name="monitorWindow">A Monitor ablak</a></h2>
 
-  <img src="monitorWindow.png" alt="A Monitor ablak"/> 
+  <img src="monitorWindow.png" alt="A Monitor ablak"/><!-- TODO: update -->
 
   <p>
   A monitor ablakot elsősorban hibakeresésre lehet
@@ -1069,5 +1125,5 @@
   kiolvasott adatok átalakításával, vagy a már átalakított értékek
   feldolgozásával van-e.
   </p>
-  
+
 </html>
