@@ -55,14 +55,16 @@ class StageChecker(StateChecker):
                (not state.trickMode and state.groundSpeed>5.0):
                 aircraft.setStage(state, const.STAGE_PUSHANDTAXI)
         elif stage==const.STAGE_PUSHANDTAXI or stage==const.STAGE_RTO:
-            if state.strobeLightsOn:
+            if state.strobeLightsOn or \
+              (state.strobeLightsOn is None and state.xpdrC):
                 aircraft.setStage(state, const.STAGE_TAKEOFF)
         elif stage==const.STAGE_TAKEOFF:
             if not state.gearsDown or \
                (state.radioAltitude>3000.0 and state.vs>0):
                 aircraft.setStage(state, const.STAGE_CLIMB)
             elif not state.landingLightsOn and \
-                 not state.strobeLightsOn and \
+                 (state.strobeLightsOn is False or
+                  (state.strobeLightsOn is None and not state.xpdrC)) and \
                  state.onTheGround and \
                  state.groundSpeed<50.0:
                 aircraft.setStage(state, const.STAGE_RTO)
@@ -939,7 +941,8 @@ class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
         for n1 in state.n1:
             if n1>5: numEnginesRunning += 1
 
-        if flight.stage==const.STAGE_PARKING:
+        if flight.stage==const.STAGE_PARKING or \
+           (flight.stage==const.STAGE_TAXIAFTERLAND and state.parking):
             return numEnginesRunning<len(state.n1) \
                    and state.antiCollisionLightsOn
         else:
@@ -1356,11 +1359,11 @@ class NoStrobeSpeedChecker(StateChecker):
 
     If, during the PUSHANDTAXI stage the speed exceeds 50 knots, the state as
     saved as a provisional takeoff state. If the speed then decreases below 50
-    knots, or the plane remains on the ground for more than 20 seconds, a taxi
+    knots, or the plane remains on the ground for more than 40 seconds, a taxi
     speed error is logged with the highest ground speed detected. This state is
     also stored in the flight object as a possible
 
-    If the plane becomes airborne within 20 seconds, the stage becomes TAKEOFF,
+    If the plane becomes airborne within 40 seconds, the stage becomes TAKEOFF,
     and the previously saved takeoff state is logged.
 
     During the TAXIAFTERLAND stage, speed is checked as in case of
@@ -1392,7 +1395,7 @@ class NoStrobeSpeedChecker(StateChecker):
                 if not state.onTheGround:
                     aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
                     self._takeoffState = None
-                elif state.timestamp > (self._takeoffState.timestamp + 30):
+                elif state.timestamp > (self._takeoffState.timestamp + 40):
                     flight.setRTOState(self._highestSpeedState)
         elif self._takeoffState is not None:
             flight.setRTOState(self._highestSpeedState)

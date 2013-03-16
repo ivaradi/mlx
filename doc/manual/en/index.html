@@ -34,16 +34,16 @@
 
   <p>
   Besides the faults the program also monitors many other parameters,
-  which are recorded in a textual <a href="#logTab"><i>log</i></a>. 
+  which are recorded in a textual <a href="#logTab"><i>log</i></a>.
   This log is sent as a part of your PIREP
-  (<b>PI</b>lot's <b>REP</b>ort), and will be   analyzed, and possibly 
+  (<b>PI</b>lot's <b>REP</b>ort), and will be   analyzed, and possibly
   commented on by more experienced pilots of  Malév Virtual. This way
   you can perfect the way you execute your flights.
   </p>
 
   <p><a name="flightStages"/>
   The application breaks up your flight into
-  several <i>stage</i>s. The advancement from one stage to another is 
+  several <i>stage</i>s. The advancement from one stage to another is
   detected automatically. These stages and the conditions under which
   they are entered are as follows:
   <ol>
@@ -52,9 +52,11 @@
     <li><b>push-back and taxi</b>: If you release the parking brakes
     or your ground speed becomes 5 knots or greater during the
     boarding stage, your flight enters this stage.</li>
-    <li><b>takeoff</b>: If you turn on the landing and/or the strobe
-    lights or your ground speed exceeds 80 knots during taxi or after
-    a rejected takeoff (RTO).</li>
+    <li><b>takeoff</b>: If you turn on the strobe lights
+    during taxi or after a rejected takeoff (RTO). If your plane has
+    not strobe lights, the program will track your status after
+    exceeding 50 knots during the <i>taxi</i> stage, and if you lift
+    off within less than 40 seconds, it will be considered a takeoff.</li>
     <li><b>climb</b>: When you retract the gears or you reach 3000
     feet altitude AGL with a positive climb rate after takeoff.</li>
     <li><b>RTO</b>: If you switch off both the landing and the
@@ -69,23 +71,22 @@
     <li><b>go-around</b>: If you retract the gears during landing.</li>
     <li><b>taxi after landing</b>: When the aircraft is in the
     ground and its ground speed is below 50 knots after landing.</li>
-    <li><b>parking</b>: If the parking brake is activated after taxi.</li>
     <li><b>end</b>: If the N<sub>1</sub> of the turbines becomes
     less than 0.5, or the RPM of the piston engines becomes 0 during
     parking. This is the final stage.</li>
   </ol>
 
   <p>
-  To enhance the simulation, the program can play various 
+  To enhance the simulation, the program can play various
   <a href="#prefsSounds">sound</a> files
   during the various stages of your flight, such as the announcements
   made by the flight attendants. These files are supplied with the
   application, and they can be played automatically, or when you press
   a certain hotkey in the flight simulator. You can also organize
   pre-recorded sound files
-  into <a href="#checklistEditor">checklists</a> for the each aircraft 
+  into <a href="#checklistEditor">checklists</a> for the each aircraft
   type, and these files can also be played back one-by-one when you
-  repeatedly press a key combination in the simulator. See 
+  repeatedly press a key combination in the simulator. See
   <a href="#prefsSounds">below</a> for more information on this.
   </p>
 
@@ -93,7 +94,7 @@
   Malév Virtual have implemented an <i>Online ACARS System</i>, which
   displays the status of the flights in progress. The data appears on
   the front page of the <a href="http://virtualairlines.hu">MAVA
-  website</a> and also on a 
+  website</a> and also on a
   <a href="http://virtualairlines.hu/acars2/show.html">map</a>.
   </p>
 
@@ -107,9 +108,9 @@
   flight from Ferihegy, and you are recommended to place your aircraft
   at the indicated gate or stand in the simulator. If your flight
   begins at Ferihegy and the aircraft is away (usually due to someone
-  else's flight), you can <a href="#gateSelectionPage">select</a> 
+  else's flight), you can <a href="#gateSelectionPage">select</a>
   from which gate or stand you start your flight. The database of the
-  Online Gate System can also be <a href="#gatesTab">displayed</a> 
+  Online Gate System can also be <a href="#gatesTab">displayed</a>
   by using the application.
   </p>
 
@@ -164,10 +165,10 @@
   the window will be displayed. If you hover the mouse pointer over
   the icon, the flight stage and the current rating will be
   displayed. The tray icon has a right-button menu as well with the
-  following items: 
+  following items:
   <ul>
     <li><b>Show main window</b>: displays or hides the main window.</li>
-    <li><b>Show monitor window</b>: displays or hides the 
+    <li><b>Show monitor window</b>: displays or hides the
       <a href="#monitorWindow">monitor window</a>.</li>
     <li><b>Quit</b>: quit the application. A confirmation window will
     be displayed.</li>
@@ -184,7 +185,7 @@
   window of the already running instance will be displayed instead of
   starting a new instance of the program.
   </p>
-  
+
   <h2><a name="mainWindow">The Main Window</a></h2>
 
   <p>
@@ -193,7 +194,7 @@
   detail later. The content area consists of several tabs the use of
   which is described below.
   </p>
-  
+
   <a name="mainWindowShot"/>
   <div align="center"><img src="mainWindow.png" alt="The main window"/></div>
 
@@ -204,7 +205,7 @@
   aircraft, it needs to communicate with the simulator. The icon's
   colour indicates the health of this communication channel.
   </p>
- 
+
   <p>
   If it is grey, the program is not connected. This is normal before
   and after the flight. If it is green, the connection is alive and
@@ -225,7 +226,7 @@
   you, unfortunately, have to restart the flight. Do not forget to
   notify the author if this happens. In this case, try to copy and
   save the <a href="#debugLog">debug log</a> and send it with your bug
-  report.  
+  report.
   </p>
 
   <p>
@@ -270,7 +271,7 @@
   entry areas for the page. Finally, you can find the button row at
   the bottom.
   </p>
-  
+
   <p>
   Most of the pages contain two buttons: <b>Next</b> and
   <b>Previous</b>. These help in navigating between the pages. In most
@@ -284,7 +285,7 @@
   <p>
   Many of the pages also contain a <b>Cancel flight</b>
   button. Clicking this button will allow you to cancel the flight and
-  go back to the <a href="#flightSelectionPage">flight selection</a> 
+  go back to the <a href="#flightSelectionPage">flight selection</a>
   if you have logged in to the MAVA server, or to the login page, after
   a confirmation of your intent.
   </p>
@@ -292,7 +293,7 @@
   <h4><a name="loginPage">The <i>Login</i> Page</a></h4>
 
   <p>
-  The program starts with the Login page (see the 
+  The program starts with the Login page (see the
   <a href="#mainWindowShot">picture</a> above) where you can enter the
   your pilot's ID and password for the MAVA website. Both data are
   given to you when joining Malév Virtual. The pilot's ID usually
@@ -303,8 +304,8 @@
   If you check <b>Remember password</b>, the password will be saved by
   the program, so you don't have to enter it all the time. Note,
   however, that the password is saved in a readable form into a
-  configuration file, so you this possibility only if your home
-  directory can be  accessed only by people you trust. The pilot's ID
+  configuration file, so use this possibility only if your home
+  directory can be accessed only by people you trust. The pilot's ID
   is saved anyway.
   </p>
 
@@ -324,11 +325,11 @@
   the <b>Fly offline</b> button. This immediately takes you to the
   next page, without trying to log in to the MAVA server.
   </p>
-  
+
   <h4><a name="flightSelectionPage">The <i>Flight selection</i> Page</a></h4>
 
   <img src="flightSelection.png" alt="The Flight selection page"/>
-  
+
   <p>
   This page displays the list of the flight you have booked previously
   on the MAVA website, if you have <a href="#loginPage">logged in</a>
@@ -365,9 +366,9 @@
   </p>
 
   <h4><a name="gateSelectionPage">The <i>LHBP gate selection</i> Page</a></h4>
-  
+
   <img src="gateSelection.png" alt="The LHBP gate selection page"/>
-  
+
   <p>
   This page is displayed after the flight selection page only if your
   flight starts at the Budapest Ferihegy Airport and the number of the
@@ -382,7 +383,7 @@
   <h4><a name="connectPage">The <i>Connect to the simulator</i> Page</a></h4>
 
   <img src="connect.png" alt="The Connect to the simulator page"/>
-  
+
   <p>
   This page displays some important information about your flight,
   such as the type and tail number of the aircraft to use, the
@@ -397,7 +398,7 @@
   displayed about it, and you can <b>Try again</b> the connection
   or <b>Cancel</b> to go back to the flight selection or to the login page.
   </p>
-  
+
   <p>
   Note, that after a successful connection, the monitoring of your
   flight does not begin immediately, but some data can be queried by
@@ -407,11 +408,12 @@
   <h4><a name="payloadPage">The <i>Payload</i> Page</a></h4>
 
   <img src="payload.png" alt="The Payload page"/>
-  
+
   <p>
   This page displays the components of the flight's payload and the
-  calculated Zero-Fuel Weight (ZFW). You can enter here the cargo
-  weight you determined for your flight. You can also press the <b>ZFW
+  calculated Zero-Fuel Weight (ZFW). You can modify all input data,
+  but generally it is needed to enter the cargo weight you determined
+  for the flight, if it is different from 0. You can also press the <b>ZFW
   from FS</b> button, which queries the ZFW from the simulator and
   displays the retrieved value. If the ZFW calculated from the payload
   data differs too much from the queried one, the calculated value is
@@ -424,13 +426,13 @@
   button. At this point, the <a href="#helpTab"><i>Help</i> tab</a>
   becomes available, which you can use if you have failed to set up
   the correct payload in the simulator. See a more detailed
-  description of it <a href="#helpTab">below</a>. 
+  description of it <a href="#helpTab">below</a>.
   </p>
 
   <h4><a name="timePage">The <i>Time</i> Page</a></h4>
 
   <img src="time.png" alt="The Time page"/>
-  
+
   <p>
   This page displays the departure and arrival times of your
   flight in UTC. Press the <b>Time from FS</b> button to query the
@@ -450,12 +452,12 @@
   <h4><a name="fuelPage">The <i>Fuel</i> Page</a></h4>
 
   <img src="fuel.png" alt="The Fuel page"/>
-  
+
   <p>
   This page contains a graphical representation of the fuel tanks of
   your aircraft. The yellowish colour represents the current level of
   the fuel in the tank, and turquoise slider is the expected level,
-  which is also displayed numerically (in kilograms) below each graph. 
+  which is also displayed numerically (in kilograms) below each graph.
   </p>
 
   <p>
@@ -477,13 +479,13 @@
   start. The progress is represented by the yellowish fuel bars
   growing or shrinking (fuel may be pumped out of a tank as
   well). This is a relatively quick process and should finish within a
-  few seconds. 
+  few seconds.
   </p>
 
   <h4><a name="routePage">The <i>Route</i> Page</a></h4>
-  
+
   <img src="route.png" alt="The Route page"/>
-  
+
   <p>
   This page displays the cruise level and the flight plan route. The
   cruise level starts out at FL240, but the route comes from the
@@ -500,9 +502,9 @@
   </p>
 
   <h4><a name="briefingPage">The <i>Briefing</i> Pages</a></h4>
-  
+
   <img src="briefing.png" alt="The Briefing page"/>
-  
+
   <p>
   These pages display the NOTAMs and the METAR for the departure and
   the arrival airports. You can edit the METAR if your network
@@ -520,11 +522,11 @@
   clicking the button. This begins the monitoring of your flight with
   the boarding stage.
   </p>
-  
+
   <h4><a name="takeoffPage">The <i>Takeoff</i> Page</a></h4>
 
   <img src="takeoff.png" alt="The Takeoff page"/>
-  
+
   <p>
   On this page you have to enter the name of the departure runway, the
   name of the Standard Instrument Departure procedure you follow after
@@ -539,18 +541,49 @@
   </p>
 
   <p>
+  For most aircraft in the fleet you should also enter the takeoff
+  derate setting. Its exact format and value depends on the type.
+  </p>
+
+  <p>
+  You can also select here whether you have turned on any anti-ice
+  systems (apart from the pitot heat). However, for most aircraft, the
+  logger can detect the setting, and if anti-icing is turned on, the
+  check box will be checked automatically. If you have checked it
+  yourself, it will not be unchecked by the program (unless it gains
+  self-awareness sometime in the future).
+  </p>
+
+  <p>
   You can proceed to the next page after takeoff, and if all data has
   been entered, by pressing the <b>Next</b> button.
   </p>
 
+  <h4><a name="cruisePage">The <i>Cruise</i> Page</a></h4>
+
+  <img src="cruise.png" alt="The Cruise page"/>
+
+  <p>
+  This page displays your cruise altitude as set on the
+  <a href="#routePage">Route page</a>. If you need to modify your
+  cruise level due to airspace requirements, step climb or any other
+  justified reason, you can set the new level here and then press
+  the <b>Update</b> button when you have reached the specified level.
+  </p>
+
+  <p>
+  If you are preparing for landing, you can press the <b>Next</b>
+  button to go to the next page.
+  </p>
+
   <h4><a name="landingPage">The <i>Landing</i> Page</a></h4>
 
-  <img src="landing.png" alt="The Landing page"/> 
+  <img src="landing.png" alt="The Landing page"/>
 
   <p>
   On this page you have to enter the name of the STAR and/or
   transition you planned to follow (even if you get a different one,
-  or simply vectors from ATC, in which case add a 
+  or simply vectors from ATC, in which case add a
   <a href="#flightInfoTab">comment</a> about it),
   the approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>,
   etc.), the name of the landing runway, and the landing reference speed,
@@ -560,13 +593,18 @@
   </p>
 
   <p>
+  This page also contains a checkbox for the anti-ice system, which is
+  handled the same way as the one on
+  the <a href="#takeoffPage">Takeoff page</a>.
+
+  <p>
   When you have entered all data, press the <b>Next</b> button. It is
   active only, if the flight has ended.
   </p>
 
   <h4><a name="finishPage">The <i>Finish</i> Page</a></h4>
 
-  <img src="finish.png" alt="The Finish page"/> 
+  <img src="finish.png" alt="The Finish page"/>
 
   <p>
   This is the final page of the flight wizard. It contains a summary
@@ -581,6 +619,12 @@
   not. If you arrive at the Budapest Ferihegy Airport, and are using
   the Online Gate System, you also need to specify the number of the
   gate or stand you have parked you aircraft at.
+  </p>
+
+  <p>
+  If all necessary data has been entered, and the program is so
+  <a href="#prefsGeneral">configured<a>, it will automatically save
+  the PIREP.
   </p>
 
   <p>
@@ -600,18 +644,18 @@
   to the <a href="#flightSelectionPage">flight selection page</a>, if
   you have logged in to the MAVA server, or to
   the <a href="#loginPage">login page</a>, if your flight has been an
-  offline flight.  
+  offline flight.
   </p>
-  
+
   <h3><a name="flightInfoTab">The Flight info Tab</a></h3>
 
-  <img src="flightInfoTab.png" alt="The Flight info tab"/> 
+  <img src="flightInfoTab.png" alt="The Flight info tab"/>
 
   <p>
-  This tab allows one to enter some additional information about the 
+  This tab allows one to enter some additional information about the
   flight, if necessary.
   </p>
-  
+
   <p>
   The <i>Comments</i> text area should contain any general information
   that you would like the PIREP reviewer to know about. For example,
@@ -627,13 +671,15 @@
   </p>
 
   <p>
-  In the <i>Delay codes</i> area you can mark one or more reasons why
-  the flight was delayed, if it was. The options are self-explanatory.
+  In the <i>Delay codes</i> table you can mark one or more reasons why
+  the flight was delayed, if it was. This table is available only if you
+  have already selected the flight, since its contents depend on the
+  type of the aircraft being flown.
   </p>
 
   <h3><a name="helpTab">The Help Tab</a></h3>
 
-  <img src="helpTab.png" alt="The Help tab"/> 
+  <img src="helpTab.png" alt="The Help tab"/>
 
   <p>
   This tab provides some help for calculating and setting the payload
@@ -652,7 +698,7 @@
   set in the simulator as the airplane's payload weight. By pressing
   the <b>Simulator data</b> button, the data coming from the simulator
   can be queried and displayed. If the data is out of the tolerances,
-  it is displayed in red, otherwise in green. 
+  it is displayed in red, otherwise in green.
   </p>
 
   <p>
@@ -660,10 +706,10 @@
   aircraft, so it can be checked or estimated if you will remain within
   those maximums during the flight.
   </p>
-  
+
   <h3><a name="logTab">The Log Tab</a></h3>
 
-  <img src="logTab.png" alt="The Log tab"/> 
+  <img src="logTab.png" alt="The Log tab"/>
 
   <p>
   This is the main log of your flight that will be analyzed by the
@@ -686,7 +732,7 @@
 
   <h3><a name="gatesTab">The Gates Tab</a></h3>
 
-  <img src="gatesTab.png" alt="The Gates tab"/> 
+  <img src="gatesTab.png" alt="The Gates tab"/>
 
   <p>
   This tab displays information retrieved from
@@ -720,7 +766,7 @@
 
   <h3><a name="debugLog">The Debug log</a></h3>
 
-  <img src="debugLogTab.png" alt="The Debug log tab"/> 
+  <img src="debugLogTab.png" alt="The Debug log tab"/>
 
   <p>
   This tab is not visible by default, but can be displayed by
@@ -752,7 +798,7 @@
   </p>
 
   <div align="center">
-    <img src="pirepLoaded.png" alt="The loaded PIREP window"/> 
+    <img src="pirepLoaded.png" alt="The loaded PIREP window"/>
   </div>
 
   <p>
@@ -762,16 +808,16 @@
   groups the data into three tabs. The <i>Data</i> tab contains the
   itemized data of the flight. The <i>Comments & defects</i> tab
   displays the comments and or flight defects entered by the
-  user. The <i>Log</i> tab contains the flight log. 
+  user. The <i>Log</i> tab contains the flight log.
   </p>
 
   <div align="center">
-    <img src="pirepViewer.png" alt="The PIREP Viewer"/> 
+    <img src="pirepViewer.png" alt="The PIREP Viewer"/>
   </div>
 
   <h2><a name="checklistEditor">Editing checklists</a></h2>
 
-  <img src="checklistEditor.png" alt="The Checklist Editor"/> 
+  <img src="checklistEditor.png" alt="The Checklist Editor"/>
 
   <p>
   The checklists are lists of audio files. When checklist playback is
@@ -795,7 +841,7 @@
   dragging it with the mouse. You can also select one or more files
   from the list. Then you can remove them with the <b>Remove</b>
   button, or move them up or down by pressing <b>Move up</b>
-  and <b>Move down</b>. 
+  and <b>Move down</b>.
   </p>
 
   <p>
@@ -811,17 +857,17 @@
   checklist have any effect during the flight (i.e. you will still use
   the old checklist, or no checklist if there was none).
   </p>
-  
+
   <h2><a name="calloutsEditor">Editing approach callouts</a></h2>
 
-  <img src="calloutsEditor.png" alt="The Approach callouts Editor"/> 
+  <img src="calloutsEditor.png" alt="The Approach callouts Editor"/>
 
   <p>
   The approach callouts are audio files specific to aircraft types, that are
   played back during approach when passing certain altitudes. The
   approach callouts editor window allows editing the list of these
   callout files for each aircraft. The window can be displayed by
-  selecting  <b>Tools/Approach Callouts Editor...</b> or by  pressing 
+  selecting  <b>Tools/Approach Callouts Editor...</b> or by  pressing
   <b>Ctrl+E</b>.
   </p>
 
@@ -841,7 +887,7 @@
   altitude, which can be edited immediately. If the name of the file
   contains a number that is possible as an altitude, that will be used
   as the altitude given to the file, otherwise some meaningful default
-  is selected based on the lowest or highest altitude. 
+  is selected based on the lowest or highest altitude.
   There can be no two files with the same altitude. If you set an
   altitude, which is already present in the list, a dialog box will be
   displayed, and you can choose to replace the old file or to continue
@@ -860,7 +906,7 @@
   flight has already started, no changes made to the corresponding
   list of callouts have any effect during the flight.
   </p>
-  
+
   <h2><a name="prefs">The Preferences Window</a></h2>
 
   </p>
@@ -870,10 +916,10 @@
   don't have to change for every flight. This window consists of
   tabs grouping the options logically.
   </p>
-  
+
   <h3><a name="prefsGeneral">The <i>General</i> Tab<a></h3>
-  
-  <img src="prefsGeneral.png" alt="The General Tab of Preferences"/> 
+
+  <img src="prefsGeneral.png" alt="The General Tab of Preferences"/>
 
   <p>
   These are some general settings for various parts of the
@@ -920,9 +966,15 @@
   immediately.
   </p>
 
+  <p>
+  If the <b>Save PIREP automatically</b> check box is checked, and you
+  have finished your flight and entered all required data, the PIREP
+  will be saved automatically into the directory given above.
+  </p>
+
   <h3><a name="prefsMessages">The <i>Messages</i> Tab</a></h3>
- 
-  <img src="prefsMessages.png" alt="The Messages Tab of Preferences"/> 
+
+  <img src="prefsMessages.png" alt="The Messages Tab of Preferences"/>
 
   <p>
   The program can display messages about certain events in the
@@ -940,13 +992,14 @@
     internal working of the logger.</li>
     <li><b>Information Messages</b>: informational messages about,
     e.g., the flight stage, the end of an audio checklist, etc.</li>
+    <li><b>In-flight Stage Message</b>: messages about the flight stage for those stage when the plane is not on the ground</li>
     <li><b>Fault Messages</b>: messages about the non-NO GO faults the program detects.</li>
     <li><b>NO GO Fault Messages</b>: messages about the NO GO faults the program detects</li>
-    <li><b>Gate System Messages</b>: messages related to the 
+    <li><b>Gate System Messages</b>: messages related to the
     <a href="#onlineGateSystem">Online Gate System</a>. For example,
     when you have landed at Ferihegy, it can display the list of the
     available gates so that you can choose where to park, if there is
-    no ATC available.</li> 
+    no ATC available.</li>
     <li><b>Environment Messages</b>: other messages, e.g. the welcome
     message when the flight has ended.</li>
     <li><b>Help Messages</b>: help messages, e.g. warning about
@@ -969,8 +1022,8 @@
   </p>
 
   <h3><a name="prefsSounds">The <i>Sounds</i> Tab</a></h3>
-  
-  <img src="prefsSounds.png" alt="The Sounds Tab of Preferences"/> 
+
+  <img src="prefsSounds.png" alt="The Sounds Tab of Preferences"/>
 
   <p>
   This tab controls how the sounds are played by the application.
@@ -997,7 +1050,7 @@
   <p>
   If the <b>Enable approach callouts</b> checkbox is
   checked, and you have also <a href="#calloutsEditor">set up</a>
-  approach callouts for the aircraft being used, you will hear those 
+  approach callouts for the aircraft being used, you will hear those
   callouts during approach.
   </p>
 
@@ -1013,12 +1066,12 @@
   available only if the <b>Enable aircraft-specific checklist</b>
   checkbox is selected. In this case another hotkey should be
   specified. If you press this hotkey, the next file from the
-  checklist will be played. 
+  checklist will be played.
   </p>
 
   <h3><a name="prefsAdvanced">The <i>Advanced</i> Tab</a></h3>
 
-  <img src="prefsAdvanced.png" alt="The Advanced Tab of Preferences"/> 
+  <img src="prefsAdvanced.png" alt="The Advanced Tab of Preferences"/>
 
   <p>
   This tab contains some settings that you normally should not
@@ -1034,7 +1087,7 @@
 
   <h2><a name="monitorWindow">The Monitor Window</a></h2>
 
-  <img src="monitorWindow.png" alt="The Monitor Window"/> 
+  <img src="monitorWindow.png" alt="The Monitor Window"/>
 
   <p>
   The monitor window can be used when debugging the program. You can
@@ -1047,5 +1100,5 @@
   when the translated data is being evaluated by other parts of the
   program.
   </p>
-  
+
 </html>

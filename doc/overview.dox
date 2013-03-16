@@ -122,7 +122,7 @@
  * in an "interesting" way, or \ref mlx.checks.ACARSSender "send the
  * ACARS" periodically.
  *
- * There is also a \ref mlx.checks.StageCheker "checker" which
+ * There is also a \ref mlx.checks.StageChecker "checker" which
  * detects the changes in the stage of the flight, and calls the
  * \ref mlx.acft.Aircraft.setStage "setStage" function of the
  * aircraft, if there is a change. It first calls the
@@ -163,7 +163,7 @@
  * mlx.gui.gui.GUI. Upon creation, it creates the rest of the GUI,
  * sets up the menus and shortcuts, etc. It also maintains the
  * connection to the simulator and creates the \ref mlx.flight.Flight
- * "flight" and \ref mlx.flight.Aircraft "aircraft" objects as
+ * "flight" and \ref mlx.acft.Aircraft "aircraft" objects as
  * needed.
  *
  * To understand the operation of the GUI, one should be familiar with

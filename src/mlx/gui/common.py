@@ -14,7 +14,7 @@ import os
 #
 # The main purpose of this module is to provide common definitions for things
 # that are named differently in Gtk+ 2 and 3. This way the other parts of the
-# GUI have to check the version in use very rarely. The variable \ref pygobject
+# GUI have to check the version in use very rarely. The variable \c pygobject
 # tells which version is being used. If it is \c True, Gtk+ 3 is used via the
 # PyGObject interface. Otherwise Gtk+ 2 is used, which is the default on
 # Windows or when the \c FORCE_PYGTK environment variable is set.
