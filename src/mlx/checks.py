@@ -1377,6 +1377,8 @@ class NoStrobeSpeedChecker(StateChecker):
         elif flight.stage==const.STAGE_TAXIAFTERLAND:
             if state.groundSpeed>50:
                 SpeedChecker.logSpeedFault(flight, state)
+        else:
+            self._takeoffState = None
 
     def _checkPushAndTaxi(self, flight, aircraft, state):
         """Check the speed during the push and taxi stage."""
@@ -1421,7 +1423,8 @@ class StrobeLightsChecker(PatientFaultChecker):
     """Check if the strobe lights are used properly."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return (flight.stage==const.STAGE_BOARDING and \
+        return state.strobeLightsOn is not None and \
+              ((flight.stage==const.STAGE_BOARDING and \
                 state.strobeLightsOn and state.onTheGround) or \
                 (flight.stage==const.STAGE_TAKEOFF and \
                  not state.strobeLightsOn and not state.gearsDown) or \
@@ -1429,7 +1432,7 @@ class StrobeLightsChecker(PatientFaultChecker):
                                    const.STAGE_DESCENT] and \
                   not state.strobeLightsOn and not state.onTheGround) or \
                   (flight.stage==const.STAGE_PARKING and \
-                   state.strobeLightsOn and state.onTheGround)
+                   state.strobeLightsOn and state.onTheGround))
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
