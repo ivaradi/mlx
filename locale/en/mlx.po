@@ -132,6 +132,12 @@ msgstr "_Preferences"
 msgid "menu_tools_prefs_key"
 msgstr "p"
 
+msgid "menu_tools_bugreport"
+msgstr "_Report bug"
+
+msgid "menu_tools_bugreport_key"
+msgstr "b"
+
 msgid "menu_view"
 msgstr "View"
 

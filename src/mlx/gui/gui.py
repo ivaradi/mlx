@@ -986,6 +986,17 @@ class GUI(fs.ConnectionListener):
         prefsMenuItem.connect("activate", self._editPreferences)
         toolsMenu.append(prefsMenuItem)
 
+        toolsMenu.append(gtk.SeparatorMenuItem())
+
+        bugReportMenuItem = gtk.ImageMenuItem(gtk.STOCK_PASTE)
+        bugReportMenuItem.set_use_stock(True)
+        bugReportMenuItem.set_label(xstr("menu_tools_bugreport"))
+        bugReportMenuItem.add_accelerator("activate", accelGroup,
+                                          ord(xstr("menu_tools_bugreport_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
+        bugReportMenuItem.connect("activate", self._reportBug)
+        toolsMenu.append(bugReportMenuItem)
+
         viewMenuItem = gtk.MenuItem(xstr("menu_view"))
         viewMenu = gtk.Menu()
         viewMenuItem.set_submenu(viewMenu)
@@ -1124,6 +1135,10 @@ class GUI(fs.ConnectionListener):
         self._preferences.run(self.config)
         self._setupTimeSync()
         self._listenHotkeys()
+
+    def _reportBug(self, menuItem):
+        """Callback for reporting a bug."""
+
 
     def _setupTimeSync(self):
         """Enable or disable the simulator time synchronization based on the

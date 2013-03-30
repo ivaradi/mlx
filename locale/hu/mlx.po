@@ -132,6 +132,12 @@ msgstr "_Beállítások"
 msgid "menu_tools_prefs_key"
 msgstr "b"
 
+msgid "menu_tools_bugreport"
+msgstr "_Hibajelentés"
+
+msgid "menu_tools_bugreport_key"
+msgstr "h"
+
 msgid "menu_view"
 msgstr "Nézet"
 
