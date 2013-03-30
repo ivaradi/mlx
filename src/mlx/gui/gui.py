@@ -13,6 +13,7 @@ from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
 from mlx.gui.callouts import ApproachCalloutsEditor
 from mlx.gui.pirep import PIREPViewer
+from mlx.gui.bugreport import BugReportDialog
 
 import mlx.const as const
 import mlx.fs as fs
@@ -107,6 +108,7 @@ class GUI(fs.ConnectionListener):
         self._preferences = Preferences(self)
         self._checklistEditor = ChecklistEditor(self)
         self._approachCalloutsEditor = ApproachCalloutsEditor(self)
+        self._bugreportDialog = BugReportDialog(self)
 
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
@@ -1138,7 +1140,7 @@ class GUI(fs.ConnectionListener):
 
     def _reportBug(self, menuItem):
         """Callback for reporting a bug."""
-
+        self._bugreportDialog.run()
 
     def _setupTimeSync(self):
         """Enable or disable the simulator time synchronization based on the
