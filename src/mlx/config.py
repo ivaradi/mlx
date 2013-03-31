@@ -666,10 +666,8 @@ class Config(object):
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
-        self._pirepAutoSave = self._get(config, "general",
-                                        "pirepAutoSave", False)
-        self._pirepAutoSave = self._pirepAutoSave and \
-                              self._pirepAutoSave is not None
+        self._pirepAutoSave = self._getBoolean(config, "general",
+                                               "pirepAutoSave", False)
 
         self._messageTypeLevels = {}
         for messageType in const.messageTypes:
