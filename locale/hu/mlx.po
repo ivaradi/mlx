@@ -1847,3 +1847,25 @@ msgstr "_E-mail (nem kötelező):"
 
 msgid "bugreport_email_tooltip"
 msgstr "Ha itt megadod az e-mail címed, a hibajelentés állapotáról értesítéseket fogsz kapni a megadott címre."
+
+msgid "sendBugReport_busy"
+msgstr "Hibajelentés küldése..."
+
+msgid "sendBugReport_success"
+msgstr "A hibajelentést elküldtem."
+
+msgid "sendBugReport_success_sec"
+msgstr ""
+"A jelentést elemezzük és felvesszük veled a kapcsolatot "
+"amilyen hamar csak lehet."
+
+msgid "sendBugReport_error"
+msgstr "Nem sikerült elküldeni a hibajelentést."
+
+msgid "sendBugReport_siteerror_sec"
+msgstr ""
+"A web szerver visszautasította a hibajelentést. "
+"Vedd fel a kapcsolatot a program szerzőjével."
+
+msgid "sendBugReport_error_sec"
+msgstr "Valamilyen kommunikációs probléma adódott, próbáld újra később."

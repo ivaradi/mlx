@@ -96,11 +96,18 @@ class BugReportDialog(gtk.Dialog):
 
     def run(self):
         """Run the checklist editor dialog."""
+        self.set_sensitive(True)
+        self._description.set_sensitive(True)
         self._updateButtons()
         self._sendButton.grab_default()
         self.show_all()
         response = super(BugReportDialog, self).run()
-        self.hide()
+
+        print "response", response, RESPONSETYPE_ACCEPT
+        if response==RESPONSETYPE_ACCEPT:
+            self._send()
+        else:
+            self.hide()
 
     def _summaryChanged(self, entry):
         """Called when the summary has changed."""
@@ -109,3 +116,28 @@ class BugReportDialog(gtk.Dialog):
     def _updateButtons(self):
         """Update the sensitivity of the buttoms."""
         self._sendButton.set_sensitive(self._summary.get_text()!="")
+
+    def _send(self):
+        """Send the bug report."""
+        descriptionBuffer = self._description.get_buffer()
+        description = \
+          descriptionBuffer.get_text(descriptionBuffer.get_start_iter(),
+                                     descriptionBuffer.get_end_iter(),
+                                     False)
+        self.set_sensitive(False)
+        self._gui.sendBugReport(self._summary.get_text(),
+                                description,
+                                self._email.get_text(),
+                                self._bugReportSent)
+
+    def _bugReportSent(self, returned, result):
+        """Called when the bug report was sent."""
+        self.set_sensitive(True)
+        self._description.set_sensitive(True)
+        if returned and result.success:
+            self.hide()
+            self._summary.set_text("")
+            self._description.get_buffer().set_text("")
+            self._email.set_text("")
+        else:
+            self.run()

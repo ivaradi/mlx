@@ -1832,3 +1832,25 @@ msgstr "_E-mail (optional):"
 
 msgid "bugreport_email_tooltip"
 msgstr "If you enter your e-mail here, you will get status updates about your bug report to this address."
+
+msgid "sendBugReport_busy"
+msgstr "Sending bug report..."
+
+msgid "sendBugReport_success"
+msgstr "Bug report sent successfully."
+
+msgid "sendBugReport_success_sec"
+msgstr ""
+"The report will be analysed and you will be contacted "
+"as soon as possible."
+
+msgid "sendBugReport_error"
+msgstr "Failed to send the bug report."
+
+msgid "sendBugReport_siteerror_sec"
+msgstr ""
+"The website refused to process the bug report. "
+"Contact the logger's author."
+
+msgid "sendBugReport_error_sec"
+msgstr "There was some communication error, try again later."

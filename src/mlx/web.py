@@ -793,6 +793,28 @@ class SendACARS(Request):
 
 #------------------------------------------------------------------------------
 
+class SendBugReport(Request):
+    """A request to send a bug report to the project homepage."""
+    _latin2Encoder = codecs.getencoder("iso-8859-2")
+
+    def __init__(self, callback, summary, description, email):
+        """Construct the request for the given bug report."""
+        super(SendBugReport, self).__init__(callback)
+        self._summary = summary
+        self._description = description
+        self._email = email
+
+    def run(self):
+        """Perform the sending of the bug report."""
+        time.sleep(3)
+
+        result = Result()
+        result.success = True
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -834,6 +856,10 @@ class Handler(threading.Thread):
     def sendACARS(self, callback, acars):
         """Send the given ACARS"""
         self._addRequest(SendACARS(callback, acars))
+
+    def sendBugReport(self, callback, summary, description, email):
+        """Send a bug report with the given data."""
+        self._addRequest(SendBugReport(callback, summary, description, email))
 
     def run(self):
         """Process the requests."""
