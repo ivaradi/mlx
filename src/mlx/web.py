@@ -12,6 +12,7 @@ import datetime
 import codecs
 import traceback
 import xml.sax
+import xmlrpclib
 
 #---------------------------------------------------------------------------------------
 
@@ -806,9 +807,17 @@ class SendBugReport(Request):
 
     def run(self):
         """Perform the sending of the bug report."""
-        time.sleep(3)
+        serverProxy = xmlrpclib.ServerProxy("http://mlx.varadiistvan.hu/rpc")
 
         result = Result()
+
+        attributes = {}
+        if self._email:
+            attributes["reporter"] = self._email
+
+        id = serverProxy.ticket.create(self._summary, self._description,
+                                       attributes, True)
+        print "Created ticket with ID:", id
         result.success = True
 
         return result
