@@ -1384,6 +1384,19 @@ class GUI(fs.ConnectionListener):
 
     def sendBugReport(self, summary, description, email, callback = None):
         """Send the bug report with the given data."""
+        description += "\n\n" + ("=" * 40)
+        description += "\n\nThe contents of the log:\n\n"
+
+        for (timestampString, text) in self._logger.lines:
+            description += unicode(formatFlightLogLine(timestampString, text))
+
+        description += "\n\n" + ("=" * 40)
+        description += "\n\nThe contents of the debug log:\n\n"
+
+        buffer = self._debugLogView.get_buffer()
+        description += buffer.get_text(buffer.get_start_iter(),
+                                       buffer.get_end_iter(), True)
+
         self.beginBusy(xstr("sendBugReport_busy"))
         self._sendBugReportCallback = callback
         self.webHandler.sendBugReport(self._bugReportSentCallback,

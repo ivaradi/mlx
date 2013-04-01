@@ -124,10 +124,11 @@ class BugReportDialog(gtk.Dialog):
           descriptionBuffer.get_text(descriptionBuffer.get_start_iter(),
                                      descriptionBuffer.get_end_iter(),
                                      False)
+        description = text2unicode(description)
         self.set_sensitive(False)
-        self._gui.sendBugReport(self._summary.get_text(),
+        self._gui.sendBugReport(text2unicode(self._summary.get_text()),
                                 description,
-                                self._email.get_text(),
+                                text2unicode(self._email.get_text()),
                                 self._bugReportSent)
 
     def _bugReportSent(self, returned, result):
