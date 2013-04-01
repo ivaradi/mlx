@@ -810,14 +810,15 @@ class SendBugReport(Request):
         serverProxy = xmlrpclib.ServerProxy("http://mlx.varadiistvan.hu/rpc")
 
         result = Result()
+        result.success = False
 
         attributes = {}
         if self._email:
             attributes["reporter"] = self._email
 
-        id = serverProxy.ticket.create(self._summary, self._description,
-                                       attributes, True)
-        print "Created ticket with ID:", id
+        result.ticketID = serverProxy.ticket.create(self._summary, self._description,
+                                                    attributes, True)
+        print "Created ticket with ID:", result.ticketID
         result.success = True
 
         return result

@@ -1837,12 +1837,13 @@ msgid "sendBugReport_busy"
 msgstr "Sending bug report..."
 
 msgid "sendBugReport_success"
-msgstr "Bug report sent successfully."
+msgstr "Bug report #%d created successfully."
 
 msgid "sendBugReport_success_sec"
 msgstr ""
 "The report will be analysed and you will be contacted "
-"as soon as possible."
+"as soon as possible. Write down the ID above, so that "
+"you could refer to it later."
 
 msgid "sendBugReport_error"
 msgstr "Failed to send the bug report."

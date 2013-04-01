@@ -1414,7 +1414,7 @@ class GUI(fs.ConnectionListener):
         if returned:
             if result.success:
                 type = MESSAGETYPE_INFO
-                messageFormat = xstr("sendBugReport_success")
+                messageFormat = xstr("sendBugReport_success") % (result.ticketID,)
                 secondaryMarkup = xstr("sendBugReport_success_sec")
             else:
                 messageFormat = xstr("sendBugReport_error")

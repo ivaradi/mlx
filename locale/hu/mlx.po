@@ -1852,12 +1852,13 @@ msgid "sendBugReport_busy"
 msgstr "Hibajelentés küldése..."
 
 msgid "sendBugReport_success"
-msgstr "A hibajelentést elküldtem."
+msgstr "A %d. számú hibajelentés létrehozva."
 
 msgid "sendBugReport_success_sec"
 msgstr ""
 "A jelentést elemezzük és felvesszük veled a kapcsolatot "
-"amilyen hamar csak lehet."
+"amilyen hamar csak lehet. A fenti számot jegyezd fel, "
+"hogy a későbbiekben hivatkozhass rá."
 
 msgid "sendBugReport_error"
 msgstr "Nem sikerült elküldeni a hibajelentést."
