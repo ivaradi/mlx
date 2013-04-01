@@ -63,6 +63,7 @@ class BugReportDialog(gtk.Dialog):
 
         self._description = description = gtk.TextView()
         description.set_tooltip_text(xstr("bugreport_description_tooltip"))
+        description.set_wrap_mode(WRAP_WORD)
         label.set_mnemonic_widget(description)
 
         scrolledWindow = gtk.ScrolledWindow()
