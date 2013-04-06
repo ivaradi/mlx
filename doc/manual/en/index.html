@@ -53,8 +53,10 @@
     or your ground speed becomes 5 knots or greater during the
     boarding stage, your flight enters this stage.</li>
     <li><b>takeoff</b>: If you turn on the strobe lights
-    during taxi or after a rejected takeoff (RTO). If your plane has
-    not strobe lights, the program will track your status after
+    during taxi or after a rejected takeoff (RTO). If your plane's
+    strobe lights cannot be detected properly, switching the transponder
+    to mode C causes the program to enter into this stage. If your plane has
+    no strobe lights, the program will track your status after
     exceeding 50 knots during the <i>taxi</i> stage, and if you lift
     off within less than 40 seconds, it will be considered a takeoff.</li>
     <li><b>climb</b>: When you retract the gears or you reach 3000
@@ -127,6 +129,12 @@
   because the program can be extended with new checks or more refined
   checks, and if you are using too old a version, the PIREP reviewers
   may refuse your flight.
+  </p>
+
+  <p>
+  The program also includes a built-in <a href="#bugReportWindow">bug
+  reporting</a> facility, which can be used to report any trouble
+  encountered while using it.
   </p>
 
   <h3><a name="gui">Graphical User Interface</a></h3>
@@ -1083,6 +1091,41 @@
   the application may tell you to change this something else, e.g. to
   test some development version. Or it may need to be changed due to
   organizational reasons, such as moving to a new server, etc.
+  </p>
+
+  <h2><a name="bugReportWindow">The Bug Report Window</a></h2>
+
+  <img src="bugreport.png" alt="The Bug Report Window"/>
+
+  <p>
+  The bug reporting window can be used to report any non-fatal bugs
+  that occur during using the program. Bugs can be reported to
+  appropriate topic in the MAVA forum, via e-mail or tickets created
+  by hand on the project's website. However, utilizing this window not
+  only creates the ticket, it also includes automatically the texts of
+  the log and the debug log, making the life of the developers
+  easier. Of course, it might happen that the program crashes in a way
+  which makes this window inaccessible or to work incorrectly, in
+  which case you must resort to the other possibilities.
+  </p>
+
+  <p>
+  The bug report window can be displayed by selecting <b>Tools/Report
+  bug</b> or by pressing <b>Ctrl+B</b>. The summary must be entered
+  and it should be a short, one-sentence description or title of the
+  problem. The <i>Description</i> part is not mandatory, but if you
+  can think of any useful additional information, you might give it
+  here. As the program automatically appends the log and the debug to
+  the description, you should not copy them here. You can also give
+  your e-mail address to receive automatic notifications of the status
+  of your bug report, but consider that your e-mail address will then
+  appear on the project's website in the bug report.
+  </p>
+
+  <p>
+  By pressing <i>Send...</i>, you can create the bug report. If it is
+  successful, you will receive a message telling so and including the
+  ticket's ID that you may refer to later.
   </p>
 
   <h2><a name="monitorWindow">The Monitor Window</a></h2>

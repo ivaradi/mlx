@@ -90,6 +90,9 @@ msgstr "_No"
 msgid "button_browse"
 msgstr "Browse..."
 
+msgid "button_send"
+msgstr "_Send..."
+
 msgid "button_cancelFlight"
 msgstr "Cancel flight"
 
@@ -131,6 +134,12 @@ msgstr "_Preferences"
 
 msgid "menu_tools_prefs_key"
 msgstr "p"
+
+msgid "menu_tools_bugreport"
+msgstr "_Report bug"
+
+msgid "menu_tools_bugreport_key"
+msgstr "b"
 
 msgid "menu_view"
 msgstr "View"
@@ -1800,3 +1809,49 @@ msgstr ""
 msgid "callouts_open_title"
 msgstr "Select a callout file"
 
+msgid "bugreport_title"
+msgstr "Bug Report"
+
+msgid "bugreport_summary"
+msgstr "S_ummary:"
+
+msgid "bugreport_summary_tooltip"
+msgstr "Enter a short, one-sentence description of the bug"
+
+msgid "bugreport_description"
+msgstr "_Description:"
+
+msgid "bugreport_description_tooltip"
+msgstr ""
+"Enter any further information you consider relevant. "
+"The log and the debug log will be automatically appended to the bug report, "
+"so there is no need to copy those here."
+
+msgid "bugreport_email"
+msgstr "_E-mail (optional):"
+
+msgid "bugreport_email_tooltip"
+msgstr "If you enter your e-mail here, you will get status updates about your bug report to this address."
+
+msgid "sendBugReport_busy"
+msgstr "Sending bug report..."
+
+msgid "sendBugReport_success"
+msgstr "Bug report #%d created successfully."
+
+msgid "sendBugReport_success_sec"
+msgstr ""
+"The report will be analysed and you will be contacted "
+"as soon as possible. Write down the ID above, so that "
+"you could refer to it later."
+
+msgid "sendBugReport_error"
+msgstr "Failed to send the bug report."
+
+msgid "sendBugReport_siteerror_sec"
+msgstr ""
+"The website refused to process the bug report. "
+"Contact the logger's author."
+
+msgid "sendBugReport_error_sec"
+msgstr "There was some communication error, try again later."

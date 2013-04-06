@@ -375,7 +375,7 @@ class MonitorWindow(gtk.Window):
 
             self._navLightsOn.set_sensitive(aircraftState.navLightsOn is True)
             self._antiCollisionLightsOn.set_sensitive(aircraftState.antiCollisionLightsOn)
-            self._strobeLightsOn.set_sensitive(aircraftState.strobeLightsOn)
+            self._strobeLightsOn.set_sensitive(aircraftState.strobeLightsOn is True)
 
             if self._previousState is None or \
                ((self._previousState.landingLightsOn is None)!=

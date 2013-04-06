@@ -13,6 +13,7 @@ from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
 from mlx.gui.callouts import ApproachCalloutsEditor
 from mlx.gui.pirep import PIREPViewer
+from mlx.gui.bugreport import BugReportDialog
 
 import mlx.const as const
 import mlx.fs as fs
@@ -84,6 +85,7 @@ class GUI(fs.ConnectionListener):
         self._stdioStartingLine = True
 
         self._sendPIREPCallback = None
+        self._sendBugReportCallback = None
 
         self.webHandler = web.Handler()
         self.webHandler.start()
@@ -108,6 +110,7 @@ class GUI(fs.ConnectionListener):
         self._preferences = Preferences(self)
         self._checklistEditor = ChecklistEditor(self)
         self._approachCalloutsEditor = ApproachCalloutsEditor(self)
+        self._bugReportDialog = BugReportDialog(self)
 
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
@@ -993,6 +996,17 @@ class GUI(fs.ConnectionListener):
         prefsMenuItem.connect("activate", self._editPreferences)
         toolsMenu.append(prefsMenuItem)
 
+        toolsMenu.append(gtk.SeparatorMenuItem())
+
+        bugReportMenuItem = gtk.ImageMenuItem(gtk.STOCK_PASTE)
+        bugReportMenuItem.set_use_stock(True)
+        bugReportMenuItem.set_label(xstr("menu_tools_bugreport"))
+        bugReportMenuItem.add_accelerator("activate", accelGroup,
+                                          ord(xstr("menu_tools_bugreport_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
+        bugReportMenuItem.connect("activate", self._reportBug)
+        toolsMenu.append(bugReportMenuItem)
+
         viewMenuItem = gtk.MenuItem(xstr("menu_view"))
         viewMenu = gtk.Menu()
         viewMenuItem.set_submenu(viewMenu)
@@ -1131,6 +1145,10 @@ class GUI(fs.ConnectionListener):
         self._preferences.run(self.config)
         self._setupTimeSync()
         self._listenHotkeys()
+
+    def _reportBug(self, menuItem):
+        """Callback for reporting a bug."""
+        self._bugReportDialog.run()
 
     def _setupTimeSync(self):
         """Enable or disable the simulator time synchronization based on the
@@ -1368,6 +1386,62 @@ class GUI(fs.ConnectionListener):
 
         callback = self._sendPIREPCallback
         self._sendPIREPCallback = None
+        if callback is not None:
+            callback(returned, result)
+
+    def sendBugReport(self, summary, description, email, callback = None):
+        """Send the bug report with the given data."""
+        description += "\n\n" + ("=" * 40)
+        description += "\n\nThe contents of the log:\n\n"
+
+        for (timestampString, text) in self._logger.lines:
+            description += unicode(formatFlightLogLine(timestampString, text))
+
+        description += "\n\n" + ("=" * 40)
+        description += "\n\nThe contents of the debug log:\n\n"
+
+        buffer = self._debugLogView.get_buffer()
+        description += buffer.get_text(buffer.get_start_iter(),
+                                       buffer.get_end_iter(), True)
+
+        self.beginBusy(xstr("sendBugReport_busy"))
+        self._sendBugReportCallback = callback
+        self.webHandler.sendBugReport(self._bugReportSentCallback,
+                                      summary, description, email)
+
+    def _bugReportSentCallback(self, returned, result):
+        """Callback function for the bug report sending result."""
+        gobject.idle_add(self._handleBugReportSent, returned, result)
+
+    def _handleBugReportSent(self, returned, result):
+        """Callback for the bug report sending result."""
+        self.endBusy()
+        secondaryMarkup = None
+        type = MESSAGETYPE_ERROR
+        if returned:
+            if result.success:
+                type = MESSAGETYPE_INFO
+                messageFormat = xstr("sendBugReport_success") % (result.ticketID,)
+                secondaryMarkup = xstr("sendBugReport_success_sec")
+            else:
+                messageFormat = xstr("sendBugReport_error")
+                secondaryMarkup = xstr("sendBugReport_siteerror_sec")
+        else:
+            messageFormat = xstr("sendBugReport_error")
+            secondaryMarkup = xstr("sendBugReport_error_sec")
+
+        dialog = gtk.MessageDialog(parent = self._wizard.gui._bugReportDialog,
+                                   type = type, message_format = messageFormat)
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.set_title(WINDOW_TITLE_BASE)
+        if secondaryMarkup is not None:
+            dialog.format_secondary_markup(secondaryMarkup)
+
+        dialog.run()
+        dialog.hide()
+
+        callback = self._sendBugReportCallback
+        self._sendBugReportCallback = None
         if callback is not None:
             callback(returned, result)
 

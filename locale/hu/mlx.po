@@ -90,6 +90,9 @@ msgstr "_Nem"
 msgid "button_browse"
 msgstr "Keresés..."
 
+msgid "button_send"
+msgstr "_Küldés..."
+
 msgid "button_cancelFlight"
 msgstr "Járat megszakítása"
 
@@ -131,6 +134,12 @@ msgstr "_Beállítások"
 
 msgid "menu_tools_prefs_key"
 msgstr "b"
+
+msgid "menu_tools_bugreport"
+msgstr "_Hibajelentés"
+
+msgid "menu_tools_bugreport_key"
+msgstr "h"
 
 msgid "menu_view"
 msgstr "Nézet"
@@ -1815,3 +1824,49 @@ msgstr ""
 msgid "callouts_open_title"
 msgstr "Válaszd ki a bemondás fájlt"
 
+msgid "bugreport_title"
+msgstr "Hibajelentés"
+
+msgid "bugreport_summary"
+msgstr "_Összefoglalás:"
+
+msgid "bugreport_summary_tooltip"
+msgstr "A hiba rövid, egymondatos leírása"
+
+msgid "bugreport_description"
+msgstr "_Leírás:"
+
+msgid "bugreport_description_tooltip"
+msgstr ""
+"Írj le minden egyéb, fontosnak ítélt információt. "
+"A naplót és a debug naplót a program automatikusan csatolja a "
+"hibajelentéshez, így azokat ide nem kell bemásolni."
+
+msgid "bugreport_email"
+msgstr "_E-mail (nem kötelező):"
+
+msgid "bugreport_email_tooltip"
+msgstr "Ha itt megadod az e-mail címed, a hibajelentés állapotáról értesítéseket fogsz kapni a megadott címre."
+
+msgid "sendBugReport_busy"
+msgstr "Hibajelentés küldése..."
+
+msgid "sendBugReport_success"
+msgstr "A %d. számú hibajelentés létrehozva."
+
+msgid "sendBugReport_success_sec"
+msgstr ""
+"A jelentést elemezzük és felvesszük veled a kapcsolatot "
+"amilyen hamar csak lehet. A fenti számot jegyezd fel, "
+"hogy a későbbiekben hivatkozhass rá."
+
+msgid "sendBugReport_error"
+msgstr "Nem sikerült elküldeni a hibajelentést."
+
+msgid "sendBugReport_siteerror_sec"
+msgstr ""
+"A web szerver visszautasította a hibajelentést. "
+"Vedd fel a kapcsolatot a program szerzőjével."
+
+msgid "sendBugReport_error_sec"
+msgstr "Valamilyen kommunikációs probléma adódott, próbáld újra később."
