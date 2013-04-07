@@ -96,7 +96,7 @@ class MessageThread(threading.Thread):
         """Quit the thread."""
         with self._requestCondition:
             self._toQuit = True
-            self._requestCondition.notifty()
+            self._requestCondition.notify()
         self.join()
 
     def run(self):

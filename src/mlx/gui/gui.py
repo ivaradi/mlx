@@ -519,6 +519,8 @@ class GUI(fs.ConnectionListener):
         """Reset the GUI."""
         self._disconnect()
 
+        self._simulator = None
+
         self._flightInfo.reset()
         self._flightInfo.disable()
         self.resetFlightStatus()
@@ -893,7 +895,7 @@ class GUI(fs.ConnectionListener):
             self._writeLog(text, self._debugLogView)
             self._stdioStartingLine = False
 
-    def connectSimulator(self, aircraftType):
+    def connectSimulator(self, aircraftType, simulatorType):
         """Connect to the simulator for the first time."""
         self._logger.reset()
 
@@ -904,7 +906,7 @@ class GUI(fs.ConnectionListener):
         self._flight.aircraft._checkers.append(self)
 
         if self._simulator is None:
-            self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
+            self._simulator = fs.createSimulator(simulatorType, self)
             fs.setupMessageSending(self.config, self._simulator)
             self._setupTimeSync()
 
