@@ -502,7 +502,7 @@ class Handler(threading.Thread):
                 description = "(X-Plane version: %d, XPLM version: %d, XPLRA version: %03d)" % \
                   (xplaneVersion, xplmVersion, xplraVersion)
                 if not autoReconnection:
-                    fsType = const.SIM_XPLANE10 if xplraVersion>=10000 else const.SIM_XPLANE9
+                    fsType = const.SIM_XPLANE10 if xplaneVersion>=10000 else const.SIM_XPLANE9
 
                     Handler._callSafe(lambda:
                                       self._connectionListener.connected(fsType,
