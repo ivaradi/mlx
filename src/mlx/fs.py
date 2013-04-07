@@ -4,10 +4,8 @@ from sound import startSound
 
 import os
 
-if os.name=="nt" or "FORCE_PYUIPC_SIM" in os.environ:
-    import fsuipc as sim
-else:
-    import xplane as sim
+import fsuipc
+import xplane
 
 import threading
 import time
@@ -61,9 +59,12 @@ def createSimulator(type, connectionListener):
     The returned object should provide the following members:
     FIXME: add info
     """
-    assert type in [const.SIM_MSFS9, const.SIM_MSFSX], \
-           "Only MS Flight Simulator 2004 and X are supported"
-    return sim.Simulator(connectionListener, connectAttempts = 3)
+    if type in [const.SIM_MSFS9, const.SIM_MSFSX]:
+        return fsuipc.Simulator(connectionListener, connectAttempts = 3)
+    elif type in [const.SIM_XPLANE9, const.SIM_XPLANE10]:
+        return xplane.Simulator(connectionListener, connectAttempts = 3)
+    else:
+        "Only MS Flight Simulator 2004 and X or X-Plane 9 and 10 are supported"
 
 #-------------------------------------------------------------------------------
 
