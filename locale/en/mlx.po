@@ -474,10 +474,10 @@ msgid "connect_sim"
 msgstr "Simulator:"
 
 msgid "connect_sim_msfs"
-msgstr "FS_9/FSX"
+msgstr "_MS FS"
 
 msgid "connect_sim_xplane"
-msgstr "_X-Plane 9/10"
+msgstr "_X-Plane"
 
 msgid "button_connect"
 msgstr "_Connect"
