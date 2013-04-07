@@ -1017,8 +1017,9 @@ class ConnectPage(Page):
         self._departureGate.set_markup(gate)
 
         if self._selectSimulator:
-            self._selectMSFS.set_active(os.name=="nt")
-            self._selectXPlane.set_active(os.name!="nt")
+            config = self._wizard.gui.config
+            self._selectMSFS.set_active(config.defaultMSFS)
+            self._selectXPlane.set_active(not config.defaultMSFS)
 
     def finalize(self):
         """Finalize the page."""
@@ -1039,7 +1040,12 @@ class ConnectPage(Page):
                                             else const.SIM_XPLANE10
         else:
             simulatorType = const.SIM_MSFS9 if os.name=="nt" \
-                                            else const.SIM_XPLANE10
+              else const.SIM_XPLANE10
+
+        config = self._wizard.gui.config
+        config.defaultMSFS = simulatorType == const.SIM_MSFS9
+        config.save()
+
         self._wizard._connectSimulator(simulatorType)
 
     def _forwardClicked(self, button):
