@@ -1744,7 +1744,7 @@ class FJSDH8DModel(DH8DModel):
         name."""
         return aircraft.type==const.AIRCRAFT_DH8D and \
           description.find("Dash 8 Q400")!=-1 and \
-          ((author=="2012" and tailnum=="N62890") or \
+          ((author in ["2012", "2013"] and tailnum=="N62890") or \
            author.find("Jack Skieczius")!=-1)
 
     @property
