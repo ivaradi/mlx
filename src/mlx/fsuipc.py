@@ -1263,6 +1263,7 @@ class AircraftModel(object):
 
         flapsNotches is a list of degrees of flaps that are available on the aircraft."""
         self._flapsNotches = flapsNotches
+        self._xpdrReliable = False
 
     @property
     def name(self):
@@ -1407,7 +1408,11 @@ class AircraftModel(object):
 
         state.cog = data[self._monidx_cog]
 
-        state.xpdrC = data[self._monidx_xpdrC]!=1
+        if not self._xpdrReliable:
+            self._xpdrReliable = data[self._monidx_xpdrC]!=0
+
+        state.xpdrC = data[self._monidx_xpdrC]!=1 \
+                      if self._xpdrReliable else None
         state.autoXPDR = False
 
         state.apMaster = data[self._monidx_apMaster]!=0
