@@ -783,7 +783,7 @@ msgid "takeoff_derate"
 msgstr "Derate:"
 
 msgid "takeoff_derate_boeing"
-msgstr "Der_ate:"
+msgstr "Der_ated thrust:"
 
 msgid "takeoff_derate_tupolev"
 msgstr "N_ominal/takeoff:"
