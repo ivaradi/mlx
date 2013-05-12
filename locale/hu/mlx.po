@@ -793,7 +793,7 @@ msgid "takeoff_derate"
 msgstr "Teljesítménycsökkentés:"
 
 msgid "takeoff_derate_boeing"
-msgstr "Teljesítménycsökkentés:"
+msgstr "Csökkentett teljesítmény:"
 
 msgid "takeoff_derate_tupolev"
 msgstr "Névleges/felszállási:"
