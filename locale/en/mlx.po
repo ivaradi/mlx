@@ -785,14 +785,32 @@ msgstr "Derate:"
 msgid "takeoff_derate_boeing"
 msgstr "Der_ated thrust:"
 
+msgid "takeoff_derate_boeing_tooltip"
+msgstr "Enter the percentage of the takeoff power."
+
+msgid "takeoff_derate_epr_tooltip"
+msgstr "Enter the EPR value used for takeoff."
+
 msgid "takeoff_derate_tupolev"
-msgstr "N_ominal/takeoff:"
+msgstr "Thrust setting:"
+
+msgid "takeoff_derate_tupolev_nominal"
+msgstr "_nominal"
+
+msgid "takeoff_derate_tupolev_nominal_tooltip"
+msgstr "Select this if the takeoff thrust setting is nominal."
+
+msgid "takeoff_derate_tupolev_takeoff"
+msgstr "_takeoff"
+
+msgid "takeoff_derate_tupolev_takeoff_tooltip"
+msgstr "Select this if the takeoff thrust setting is takeoff."
 
 msgid "takeoff_derate_b462"
-msgstr "Der_ate (yes/no):"
+msgstr "Der_ate enabled"
 
-msgid "takeoff_derate_tooltip"
-msgstr "Enter the takeoff derate parameter."
+msgid "takeoff_derate_b462_tooltip"
+msgstr "Check this if derate is enabled for takeoff."
 
 msgid "takeoff_antiice"
 msgstr "Anti-i_ce system on"
