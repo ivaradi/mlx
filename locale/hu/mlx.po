@@ -790,19 +790,37 @@ msgid "takeoff_v2_tooltip_kmph"
 msgstr "A biztonságos emelkedési sebesség km/órában."
 
 msgid "takeoff_derate"
-msgstr "Teljesítménycsökkentés:"
+msgstr "Teljesítmény:"
 
 msgid "takeoff_derate_boeing"
-msgstr "Csökkentett teljesítmény:"
+msgstr "_Teljesítmény:"
+
+msgid "takeoff_derate_boeing_tooltip"
+msgstr "Írd be, hogy hány százalék a felszállási teljesítmény."
+
+msgid "takeoff_derate_epr_tooltip"
+msgstr "Írd be a felszálláskor használt EPR értéket."
 
 msgid "takeoff_derate_tupolev"
-msgstr "Névleges/felszállási:"
+msgstr "Üzemmód:"
+
+msgid "takeoff_derate_tupolev_nominal"
+msgstr "n_ominális"
+
+msgid "takeoff_derate_tupolev_nominal_tooltip"
+msgstr "Ha a felszálláshoz használt üzemmód beállítása nominális, válaszd ezt."
+
+msgid "takeoff_derate_tupolev_takeoff"
+msgstr "f_elszállási"
+
+msgid "takeoff_derate_tupolev_takeoff_tooltip"
+msgstr "Ha a felszálláshoz használt üzemmód beállítása felszállási, válaszd ezt."
 
 msgid "takeoff_derate_b462"
-msgstr "Teljesítménycsökkentés (yes/no):"
+msgstr "_Csökkentett teljesítmény"
 
-msgid "takeoff_derate_tooltip"
-msgstr "Írd be a felszállási teljesítménycsökkentés értékét."
+msgid "takeoff_derate_b462_tooltip"
+msgstr "Jelöld ezt be, ha a felszállás csökkentett teljesítménnyel történik."
 
 msgid "takeoff_antiice"
 msgstr "Jé_gtelenítés bekapcsolva"

@@ -31,6 +31,35 @@ from collections import deque
 
 #---------------------------------------------------------------------------------------
 
+# Derate type: no derate possible
+DERATE_NONE = 0
+
+# Derate type: Boeing, i.e. a percentage value.
+# For logging, the percentage value is expected as a string (i.e. whatever the
+# pilot enters into the text field).
+DERATE_BOEING = 1
+
+# Derate type: EPR, i.e. an EPR value.
+# For logging, the EPR value is expected as a string (i.e. whatever the pilot
+# enters into the text field).
+DERATE_EPR = 2
+
+# Derate type: Tupolev, i.e. nominal or takeoff
+# For logging, one of the DERATE_TUPOLEV_xxx values are expected.
+DERATE_TUPOLEV = 3
+
+# Tupolev derate value: nominal
+DERATE_TUPOLEV_NOMINAL = 1
+
+# Tupolev derate value: takeoff
+DERATE_TUPOLEV_TAKEOFF = 2
+
+# Derate type: BAe-146, i.e. enabled or not
+# For logging, a boolean is expected.
+DERATE_B462 = 4
+
+#---------------------------------------------------------------------------------------
+
 class SmoothedValue(object):
     """A smoothed value."""
     def __init__(self):
@@ -202,23 +231,35 @@ class Aircraft(object):
                else self._aircraftState.timestamp
 
     @property
-    def derateLabels(self):
-        """Get the strings related to the derate entry.
+    def derateType(self):
+        """Get the derate type for this aircraft.
 
-        It returns a tuple of two items:
-        - the label before the entry field,
-        - the label after the entry field, which can be None.
+        This default implementation returns DERATE_NONE."""
+        return DERATE_NONE
 
-        If both labels are None, the derate value will not be logged or
-        queried. This is the default."""
-        return (None, None)
+    def getDerateLine(self, value):
+        """Get the log line for the given derate value.
 
-    @property
-    def derateTemplate(self):
-        """Get the template for logging the derate value.
+        It uses the the derate type and produces the standard message for
+        each. This children need not override it, although they can."""
+        dt = self.derateType
 
-        If it returns None (which is the default), no derate value will be
-        logged."""
+        if dt==DERATE_BOEING:
+            return "Derate calculated by the pilot: %s %%" % \
+              ("-" if value is None else value,)
+        elif dt==DERATE_EPR:
+            return "EPR calculated by the pilot: %s" % \
+              ("-" if value is None else value,)
+        elif dt==DERATE_TUPOLEV:
+            return "Thrust setting calculated by the pilot: %s" % \
+              ("-" if value is None else
+               "nominal" if value==DERATE_TUPOLEV_NOMINAL else "takeoff",)
+        elif dt==DERATE_B462:
+            return "Derate setting: %s" % \
+              ("-" if value is None else "enabled" if value else "disabled",)
+        elif dt!=DERATE_NONE:
+            print "mlx.acft.getDerateLine: invalid derate type: " + dt
+
         return None
 
     def getFlapsSpeedLimit(self, flaps):
@@ -471,19 +512,19 @@ class Aircraft(object):
     def _logDerate(self, state = None):
         """Log the derate values either newly or by updating the corresponding
         line."""
-        derateTemplate = self.derateTemplate
-        if derateTemplate is None:
+        dt = self.derateType
+        if dt==DERATE_NONE:
             return
 
-        derate = self._flight.derate
-        message = derateTemplate % ("-" if derate is None else derate)
-        if self._derateLineID is None:
-            if state is None:
-                state = self._aircraftState
-            self._derateLineID = \
-                self.logger.message(state.timestamp, message)
-        else:
-            self.logger.updateLine(self._derateLineID, message)
+        message = self.getDerateLine(self._flight.derate)
+        if message is not None:
+            if self._derateLineID is None:
+                if state is None:
+                    state = self._aircraftState
+                self._derateLineID = \
+                  self.logger.message(state.timestamp, message)
+            else:
+                self.logger.updateLine(self._derateLineID, message)
 
     def _logTakeoffAntiIce(self, state = None):
         """Log the take-off anti-ice setting either newly or by updating the
@@ -606,14 +647,9 @@ class Boeing737(Aircraft):
                                  40 : 162 }
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_boeing"), "%")
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Derate calculated by the pilot: %s %%"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_BOEING
 
     # def _appendSpeedChecker(self):
     #     """Append the NoStrobeSpeedChecker to the checkers.
@@ -740,14 +776,9 @@ class Boeing767(Aircraft):
                                  30 : 175 }
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_boeing"), "%")
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Derate calculated by the pilot: %s %%"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_BOEING
 
 #---------------------------------------------------------------------------------------
 
@@ -818,14 +849,9 @@ class F70(Aircraft):
         self.reverseMinSpeed = 50
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return ("EPR", None)
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "EPR calculated by the pilot: %s"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_EPR
 
 #---------------------------------------------------------------------------------------
 
@@ -880,14 +906,9 @@ class T134(Aircraft):
         self.reverseMinSpeed = 50
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_tupolev"), None)
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Nominal/takeoff power calculated by the pilot: %s"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_TUPOLEV
 
     @property
     def speedInKnots(self):
@@ -938,14 +959,9 @@ class T154(Aircraft):
         return False
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_tupolev"), None)
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Nominal/takeoff power calculated by the pilot: %s"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_TUPOLEV
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
@@ -989,14 +1005,9 @@ class YK40(Aircraft):
         return False
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_tupolev"), None)
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Nominal/takeoff power calculated by the pilot: %s"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_TUPOLEV
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
@@ -1037,14 +1048,9 @@ class B462(Aircraft):
                                  33 : 150 }
 
     @property
-    def derateLabels(self):
-        """Get the derate strings for this type."""
-        return (xstr("takeoff_derate_b462"), None)
-
-    @property
-    def derateTemplate(self):
-        """Get the derate template for this aicraft type."""
-        return "Derate enabled: %s"
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_B462
 
 #---------------------------------------------------------------------------------------
 

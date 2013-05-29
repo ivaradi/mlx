@@ -2140,7 +2140,7 @@ class TakeoffPage(Page):
         self._v2Unit.set_alignment(0.0, 0.5)
         table.attach(self._v2Unit, 3, 4, 4, 5)
 
-        self._hasDerate = False
+        self._derateType = acft.DERATE_NONE
 
         self._derateLabel = gtk.Label()
         self._derateLabel.set_use_underline(True)
@@ -2148,18 +2148,12 @@ class TakeoffPage(Page):
         self._derateLabel.set_alignment(0.0, 0.5)
         table.attach(self._derateLabel, 0, 1, 5, 6)
 
-        self._derate = gtk.Entry()
-        self._derate.set_width_chars(10)
-        self._derate.set_tooltip_text(xstr("takeoff_derate_tooltip"))
-        self._derate.set_alignment(1.0)
-        self._derate.connect("changed", self._derateChanged)
-        table.attach(self._derate, 1, 3, 5, 6)
-        self._derateLabel.set_mnemonic_widget(self._derate)
-
-        self._derateUnit = gtk.Label("")
-        self._derateUnit.set_use_markup(True)
-        self._derateUnit.set_alignment(0.0, 0.5)
-        table.attach(self._derateUnit, 3, 4, 5, 6)
+        self._derate = gtk.Alignment()
+        table.attach(self._derate, 2, 4, 5, 6)
+        self._derateWidget = None
+        self._derateEntry = None
+        self._derateUnit = None
+        self._derateButtons = None
 
         self._antiIceOn = gtk.CheckButton(xstr("takeoff_antiice"))
         self._antiIceOn.set_use_underline(True)
@@ -2206,9 +2200,20 @@ class TakeoffPage(Page):
     @property
     def derate(self):
         """Get the derate value, if any."""
-        if self._hasDerate:
-            derate = self._derate.get_text()
+        if self._derateWidget is None:
+            return None
+        if self._derateType==acft.DERATE_BOEING:
+            derate = self._derateEntry.get_text()
             return derate if derate else None
+        elif self._derateType==acft.DERATE_EPR:
+            derate = self._derateWidget.get_text()
+            return derate if derate else None
+        elif self._derateType==acft.DERATE_TUPOLEV:
+            return acft.DERATE_TUPOLEV_NOMINAL \
+                   if self._derateButtons[0].get_active() \
+                   else acft.DERATE_TUPOLEV_TAKEOFF
+        elif self._derateType==acft.DERATE_B462:
+            return self._derateWidget.get_active()
         else:
             return None
 
@@ -2250,25 +2255,9 @@ class TakeoffPage(Page):
         self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip" + i18nSpeedUnit))
         self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip" + i18nSpeedUnit))
 
-        (derateLabel, derateUnit) = \
-             self._wizard.gui.flight.aircraft.derateLabels
+        self._derateType = self._wizard.gui.flight.aircraft.derateType
 
-        self._hasDerate = derateLabel is not None
-
-        if self._hasDerate:
-            self._derateLabel.set_markup(derateLabel)
-            self._derateLabel.set_use_underline(True)
-            self._derateUnit.set_markup("" if derateUnit is None
-                                        else derateUnit)
-        else:
-            self._derateLabel.set_markup(xstr("takeoff_derate"))
-            self._derateUnit.set_text("")
-
-        self._derate.set_text("")
-
-        self._derateLabel.set_sensitive(self._hasDerate)
-        self._derate.set_sensitive(self._hasDerate)
-        self._derateUnit.set_sensitive(self._hasDerate)
+        self._setupDerateWidget()
 
         self._rto.set_active(False)
         self._rto.set_sensitive(False)
@@ -2306,7 +2295,8 @@ class TakeoffPage(Page):
                     self.v2 is not None and \
                     self.v1 <= self.vr and \
                     self.vr <= self.v2 and \
-                    (not self._hasDerate or self._derate.get_text()!="")
+                    (self._derateType==acft.DERATE_NONE or
+                     self.derate is not None)
         self._button.set_sensitive(sensitive)
 
     def _valueChanged(self, widget, arg = None):
@@ -2335,10 +2325,99 @@ class TakeoffPage(Page):
         """Called when the forward button is clicked."""
         aircraft = self._wizard.gui.flight.aircraft
         aircraft.updateV1R2()
-        if self._hasDerate:
+        if self.derate is not None:
             aircraft.updateDerate()
         aircraft.updateTakeoffAntiIce()
         self._wizard.nextPage()
+
+    def _setupDerateWidget(self):
+        """Setup the derate widget."""
+        if self._derateWidget is not None:
+            self._derate.remove(self._derateWidget)
+
+        if self._derateType==acft.DERATE_BOEING:
+            self._derateLabel.set_text(xstr("takeoff_derate_boeing"))
+            self._derateLabel.set_use_underline(True)
+            self._derateLabel.set_sensitive(True)
+
+            self._derateEntry = gtk.Entry()
+            self._derateEntry.set_width_chars(7)
+            self._derateEntry.set_tooltip_text(xstr("takeoff_derate_boeing_tooltip"))
+            self._derateEntry.set_alignment(1.0)
+            self._derateEntry.connect("changed", self._derateChanged)
+            self._derateLabel.set_mnemonic_widget(self._derateEntry)
+
+            self._derateUnit = gtk.Label("%")
+            self._derateUnit.set_alignment(0.0, 0.5)
+
+            self._derateWidget = gtk.Table(3, 1)
+            self._derateWidget.set_row_spacings(4)
+            self._derateWidget.set_col_spacings(16)
+            self._derateWidget.set_homogeneous(False)
+
+            self._derateWidget.attach(self._derateEntry, 0, 2, 0, 1)
+            self._derateWidget.attach(self._derateUnit, 2, 3, 0, 1)
+
+            self._derate.add(self._derateWidget)
+        elif self._derateType==acft.DERATE_EPR:
+            self._derateLabel.set_text("_EPR:")
+            self._derateLabel.set_use_underline(True)
+            self._derateLabel.set_sensitive(True)
+
+            self._derateWidget = gtk.Entry()
+            self._derateWidget.set_width_chars(7)
+            self._derateWidget.set_tooltip_text(xstr("takeoff_derate_epr_tooltip"))
+            self._derateWidget.set_alignment(1.0)
+            self._derateWidget.connect("changed", self._derateChanged)
+            self._derateLabel.set_mnemonic_widget(self._derateWidget)
+
+            self._derate.add(self._derateWidget)
+        elif self._derateType==acft.DERATE_TUPOLEV:
+            self._derateLabel.set_text(xstr("takeoff_derate_tupolev"))
+            self._derateLabel.set_use_underline(True)
+            self._derateLabel.set_sensitive(True)
+
+            if pygobject:
+                nominal = gtk.RadioButton.\
+                  new_with_label_from_widget(None,
+                                             xstr("takeoff_derate_tupolev_nominal"))
+            else:
+                nominal = gtk.RadioButton(None,
+                                          xstr("takeoff_derate_tupolev_nominal"))
+            nominal.set_use_underline(True)
+            nominal.set_tooltip_text(xstr("takeoff_derate_tupolev_nominal_tooltip"))
+            nominal.connect("toggled", self._derateChanged)
+
+            if pygobject:
+                takeoff = gtk.RadioButton.\
+                  new_with_label_from_widget(nominal,
+                                             xstr("takeoff_derate_tupolev_takeoff"))
+            else:
+                takeoff = gtk.RadioButton(nominal,
+                                          xstr("takeoff_derate_tupolev_takeoff"))
+
+            takeoff.set_use_underline(True)
+            takeoff.set_tooltip_text(xstr("takeoff_derate_tupolev_takeoff_tooltip"))
+            takeoff.connect("toggled", self._derateChanged)
+
+            self._derateButtons = [nominal, takeoff]
+
+            self._derateWidget = gtk.HBox()
+            self._derateWidget.pack_start(nominal, False, False, 4)
+            self._derateWidget.pack_start(takeoff, False, False, 4)
+
+            self._derate.add(self._derateWidget)
+        elif self._derateType==acft.DERATE_B462:
+            self._derateLabel.set_text("")
+
+            self._derateWidget = gtk.CheckButton(xstr("takeoff_derate_b462"))
+            self._derateWidget.set_tooltip_text(xstr("takeoff_derate_b462_tooltip"))
+            self._derateWidget.set_use_underline(True)
+            self._derate.add(self._derateWidget)
+        else:
+            self._derateWidget = None
+            self._derateLabel.set_text("")
+            self._derateLabel.set_sensitive(False)
 
 #-----------------------------------------------------------------------------
 
