@@ -909,8 +909,8 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
     """Check for the anti-collision light being off at high N1 values."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return (flight.stage!=const.STAGE_PARKING or \
-                not flight.config.usingFS2Crew) and \
+        return (not flight.config.usingFS2Crew or not state.parking or
+                flight.stage!=const.STAGE_TAXIAFTERLAND) and \
                 not state.antiCollisionLightsOn and \
                 self.isEngineCondition(state)
 
