@@ -640,7 +640,7 @@ class NavLightsLogger(LightsLogger):
 
 #---------------------------------------------------------------------------------------
 
-class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
+class FlapsLogger(StateChangeLogger, SingleValueMixin, DelayedChangeMixin):
     """Logger for the flaps setting."""
     def __init__(self):
         """Construct the logger."""
@@ -651,12 +651,19 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
                                     const.STAGE_RTO,
                                     const.STAGE_TAKEOFF])
         SingleValueMixin.__init__(self, "flapsSet")
+        DelayedChangeMixin.__init__(self)
+        self._getLogTimestamp = \
+            lambda state, forced: \
+            DelayedChangeMixin._getLogTimestamp(self, state, forced)
 
     def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
-        speed = state.groundSpeed if state.groundSpeed<80.0 else state.ias
+        logState = self._lastChangeState if \
+                   self._lastChangeState is not None else state
+        speed = logState.groundSpeed if logState.groundSpeed<80.0 \
+                else logState.ias
         return "Flaps %.0f - %.0f %s" % \
-               (state.flapsSet, flight.speedFromKnots(speed),
+               (logState.flapsSet, flight.speedFromKnots(speed),
                 flight.getEnglishSpeedUnit())
 
 #---------------------------------------------------------------------------------------
@@ -909,8 +916,8 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
     """Check for the anti-collision light being off at high N1 values."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return (flight.stage!=const.STAGE_PARKING or \
-                not flight.config.usingFS2Crew) and \
+        return (not flight.config.usingFS2Crew or not state.parking or
+                flight.stage!=const.STAGE_TAXIAFTERLAND) and \
                 not state.antiCollisionLightsOn and \
                 self.isEngineCondition(state)
 
@@ -1125,13 +1132,13 @@ class TransponderChecker(PatientFaultChecker):
                  (flight.stage in
                   [const.STAGE_CRUISE, const.STAGE_DESCENT,
                    const.STAGE_GOAROUND] or \
-                  (flight.stage==const.STAGE_LANDING  and
+                  (flight.stage==const.STAGE_LANDING and
                    state.groundSpeed>50.0) or \
                   ((not state.autoXPDR or \
                     (self._liftOffTime is not None and
                      state.timestamp > (self._liftOffTime+8))) and \
-                   flight.stage in
-                   [const.STAGE_TAKEOFF, const.STAGE_RTO, const.STAGE_CLIMB])
+                   ((flight.stage==const.STAGE_TAKEOFF and
+                     not state.onTheGround) or flight.stage==const.STAGE_CLIMB))
                   )
                  )
                 )
