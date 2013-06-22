@@ -68,6 +68,7 @@ class GUI(fs.ConnectionListener):
         self._logger = logger.Logger(self)
         self._flight = None
         self._simulator = None
+        self._fsType = None
         self._monitoring = False
 
         self._fleet = None
@@ -205,6 +206,11 @@ class GUI(fs.ConnectionListener):
     def flight(self):
         """Get the flight being performed."""
         return self._flight
+
+    @property
+    def fsType(self):
+        """Get the flight simulator type."""
+        return self._fsType
 
     @property
     def entranceExam(self):
@@ -427,6 +433,7 @@ class GUI(fs.ConnectionListener):
         if not self._reconnecting:
             self._wizard.connected(fsType, descriptor)
         self._reconnecting = False
+        self._fsType = fsType
         self._listenHotkeys()
 
     def connectionFailed(self):
@@ -511,6 +518,8 @@ class GUI(fs.ConnectionListener):
     def reset(self):
         """Reset the GUI."""
         self._disconnect()
+
+        self._simulator = None
 
         self._flightInfo.reset()
         self._flightInfo.disable()
@@ -886,7 +895,7 @@ class GUI(fs.ConnectionListener):
             self._writeLog(text, self._debugLogView)
             self._stdioStartingLine = False
 
-    def connectSimulator(self, aircraftType):
+    def connectSimulator(self, aircraftType, simulatorType):
         """Connect to the simulator for the first time."""
         self._logger.reset()
 
@@ -897,7 +906,7 @@ class GUI(fs.ConnectionListener):
         self._flight.aircraft._checkers.append(self)
 
         if self._simulator is None:
-            self._simulator = fs.createSimulator(const.SIM_MSFS9, self)
+            self._simulator = fs.createSimulator(simulatorType, self)
             fs.setupMessageSending(self.config, self._simulator)
             self._setupTimeSync()
 

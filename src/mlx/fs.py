@@ -2,7 +2,11 @@
 import const
 from sound import startSound
 
+import os
+
 import fsuipc
+import xplane
+
 import threading
 import time
 
@@ -55,9 +59,12 @@ def createSimulator(type, connectionListener):
     The returned object should provide the following members:
     FIXME: add info
     """
-    assert type in [const.SIM_MSFS9, const.SIM_MSFSX], \
-           "Only MS Flight Simulator 2004 and X are supported"
-    return fsuipc.Simulator(connectionListener, connectAttempts = 3)
+    if type in [const.SIM_MSFS9, const.SIM_MSFSX]:
+        return fsuipc.Simulator(connectionListener, connectAttempts = 3)
+    elif type in [const.SIM_XPLANE9, const.SIM_XPLANE10]:
+        return xplane.Simulator(connectionListener, connectAttempts = 3)
+    else:
+        "Only MS Flight Simulator 2004 and X or X-Plane 9 and 10 are supported"
 
 #-------------------------------------------------------------------------------
 
@@ -89,7 +96,7 @@ class MessageThread(threading.Thread):
         """Quit the thread."""
         with self._requestCondition:
             self._toQuit = True
-            self._requestCondition.notifty()
+            self._requestCondition.notify()
         self.join()
 
     def run(self):

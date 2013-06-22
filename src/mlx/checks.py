@@ -963,7 +963,10 @@ class BankChecker(SimpleFaultChecker):
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         if flight.stage==const.STAGE_CRUISE:
-            bankLimit = 30
+            isDH8DXplane = flight.aircraftType==const.AIRCRAFT_DH8D and \
+                           (flight.fsType==const.SIM_XPLANE10 or
+                            flight.fsType==const.SIM_XPLANE9)
+            bankLimit = 35 if isDH8DXplane else 30
         elif flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
                               const.STAGE_DESCENT, const.STAGE_LANDING]:
             bankLimit = 35
@@ -974,8 +977,9 @@ class BankChecker(SimpleFaultChecker):
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
+        message = "Bank too steep (%.1f)" % (state.bank,)
         flight.handleFault(BankChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight, "Bank too steep"),
+                           FaultChecker._appendDuring(flight, message),
                            2)
 
 #---------------------------------------------------------------------------------------

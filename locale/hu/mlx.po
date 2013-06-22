@@ -472,6 +472,15 @@ msgstr "Repülőtér:"
 msgid "connect_gate"
 msgstr "Kapu:"
 
+msgid "connect_sim"
+msgstr "Szimulátor:"
+
+msgid "connect_sim_msfs"
+msgstr "_MS FS"
+
+msgid "connect_sim_xplane"
+msgstr "_X-Plane"
+
 msgid "button_connect"
 msgstr "K_apcsolódás"
 

@@ -235,6 +235,8 @@ class Config(object):
         self._pirepDirectory = None
         self._pirepAutoSave = False
 
+        self._defaultMSFS = os.name=="nt"
+
         self._enableSounds = not secondaryInstallation
 
         self._pilotControlsSounds = True
@@ -472,6 +474,18 @@ class Config(object):
             self._pirepAutoSave = pirepAutoSave
             self._modified = True
 
+    @property
+    def defaultMSFS(self):
+        """Get if the default simulator type is MS FS."""
+        return self._defaultMSFS
+
+    @defaultMSFS.setter
+    def defaultMSFS(self, defaultMSFS):
+        """Set if the default simulator type is MS FS."""
+        if defaultMSFS!=self._defaultMSFS:
+            self._defaultMSFS = defaultMSFS
+            self._modified = True
+
     def getMessageTypeLevel(self, messageType):
         """Get the level for the given message type."""
         return self._messageTypeLevels[messageType] \
@@ -703,6 +717,9 @@ class Config(object):
             self._approachCallouts[aircraftType] = \
                 ApproachCallouts.fromConfig(config, aircraftType)
 
+        self._defaultMSFS = self._getBoolean(config, "general",
+                                             "defaultMSFS", os.name=="nt")
+
         self._modified = False
 
     def save(self):
@@ -744,6 +761,9 @@ class Config(object):
             config.set("general", "pirepDirectory", self._pirepDirectory)
         config.set("general", "pirepAutoSave",
                    "yes" if self._pirepAutoSave else "no")
+
+        config.set("general", "defaultMSFS",
+                   "yes" if self._defaultMSFS else "no")
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:
@@ -888,6 +908,8 @@ class Config(object):
 
         print "  pirepDirectory:", self._pirepDirectory
         print "  pirepAutoSave:", self._pirepAutoSave
+
+        print "  defaultMSFS:", self._defaultMSFS
 
         print "  enableSounds:", self._enableSounds
 

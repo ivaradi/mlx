@@ -226,6 +226,10 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 0, 1, 8, 9)
         table.attach(self._qnh, 1, 2, 8, 9)
 
+        (label, self._cog) = self._createLabeledEntry("CoG:", 7)
+        table.attach(label, 2, 3, 8, 9)
+        table.attach(self._cog, 3, 4, 8, 9)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -311,6 +315,7 @@ class MonitorWindow(gtk.Window):
             self._adf1.set_text("-")
             self._adf2.set_text("-")
             self._qnh.set_text("-")
+            self._cog.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -385,7 +390,7 @@ class MonitorWindow(gtk.Window):
             self._parking.set_sensitive(aircraftState.parking)
             self._gearControlDown.set_sensitive(aircraftState.gearControlDown)
             self._gearsDown.set_sensitive(aircraftState.gearsDown)
-            self._spoilersArmed.set_sensitive(aircraftState.spoilersArmed)
+            self._spoilersArmed.set_sensitive(aircraftState.spoilersArmed is True)
             self._spoilersExtension.set_text("%.0f" % (aircraftState.spoilersExtension,))
             self._windSpeed.set_text("%.0f" % (aircraftState.windSpeed,))
             self._windDirection.set_text("%03.0f" % (aircraftState.windDirection,))
@@ -403,5 +408,6 @@ class MonitorWindow(gtk.Window):
 
             self._adf1.set_text("-" if aircraftState.adf1 is None else aircraftState.adf1)
             self._adf2.set_text("-" if aircraftState.adf2 is None else aircraftState.adf2)
+            self._cog.set_text("%.2f%%" % (aircraftState.cog*100.0,))
 
 #------------------------------------------------------------------------------

@@ -470,6 +470,15 @@ msgstr "Airport:"
 msgid "connect_gate"
 msgstr "Gate:"
 
+msgid "connect_sim"
+msgstr "Simulator:"
+
+msgid "connect_sim_msfs"
+msgstr "_MS FS"
+
+msgid "connect_sim_xplane"
+msgstr "_X-Plane"
+
 msgid "button_connect"
 msgstr "_Connect"
 

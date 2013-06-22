@@ -879,10 +879,12 @@ class ConnectPage(Page):
                                           xstr("connect_help"),
                                           completedHelp = xstr("connect_chelp"))
 
+        self._selectSimulator = os.name=="nt" or "FORCE_SELECT_SIM" in os.environ
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(5, 2)
+        table = gtk.Table(7 if self._selectSimulator else 5, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(True)
@@ -949,6 +951,39 @@ class ConnectPage(Page):
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
+        if self._selectSimulator:
+            labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0, yalign=0.5)
+            label = gtk.Label(xstr("connect_sim"))
+            labelAlignment.add(label)
+            table.attach(labelAlignment, 0, 1, 5, 7)
+
+            selectAlignment = gtk.Alignment(xalign=0.0, xscale=0.0, yalign=0.5)
+
+            selectBox = gtk.HBox()
+            if pygobject:
+                self._selectMSFS = \
+                  gtk.RadioButton.new_with_mnemonic_from_widget(None,
+                                                                xstr("connect_sim_msfs"))
+            else:
+                self._selectMSFS = gtk.RadioButton(None,
+                                                   xstr("connect_sim_msfs"))
+
+            selectBox.pack_start(self._selectMSFS, False, False, 0);
+
+            if pygobject:
+                self._selectXPlane = \
+                  gtk.RadioButton.new_with_mnemonic_from_widget(self._selectMSFS,
+                                                                xstr("connect_sim_xplane"))
+            else:
+                self._selectXPlane = gtk.RadioButton(self._selectMSFS,
+                                                     xstr("connect_sim_xplane"))
+
+            selectBox.pack_start(self._selectXPlane, False, False, 8);
+
+            selectAlignment.add(selectBox)
+            table.attach(selectAlignment, 1, 2, 5, 7)
+
+
         self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
@@ -981,6 +1016,11 @@ class ConnectPage(Page):
             gate = "<b>" + gate + "</b>"
         self._departureGate.set_markup(gate)
 
+        if self._selectSimulator:
+            config = self._wizard.gui.config
+            self._selectMSFS.set_active(config.defaultMSFS)
+            self._selectXPlane.set_active(not config.defaultMSFS)
+
     def finalize(self):
         """Finalize the page."""
         self._button.set_label(xstr("button_next"))
@@ -995,7 +1035,18 @@ class ConnectPage(Page):
 
     def _connectClicked(self, button):
         """Called when the Connect button is pressed."""
-        self._wizard._connectSimulator()
+        if self._selectSimulator:
+            simulatorType = const.SIM_MSFS9 if self._selectMSFS.get_active() \
+                                            else const.SIM_XPLANE10
+        else:
+            simulatorType = const.SIM_MSFS9 if os.name=="nt" \
+              else const.SIM_XPLANE10
+
+        config = self._wizard.gui.config
+        config.defaultMSFS = simulatorType == const.SIM_MSFS9
+        config.save()
+
+        self._wizard._connectSimulator(simulatorType)
 
     def _forwardClicked(self, button):
         """Called when the Forward button is pressed."""
@@ -3572,9 +3623,10 @@ class Wizard(gtk.VBox):
         """Called when the RTO indication has changed."""
         self.gui.rtoToggled(indicated)
 
-    def _connectSimulator(self):
+    def _connectSimulator(self, simulatorType):
         """Connect to the simulator."""
-        self.gui.connectSimulator(self._bookedFlight.aircraftType)
+        self.gui.connectSimulator(self._bookedFlight.aircraftType,
+                                  simulatorType)
 
     def _arrivalMETARCallback(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
