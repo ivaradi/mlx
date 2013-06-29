@@ -496,7 +496,7 @@ class Aircraft(object):
     def _logV1R2(self, state = None):
         """Log the V1, Vr and V2 value either newly, or by updating the
         corresponding line."""
-        message = "Speeds calculated by the pilot: V1: %s, VR: %s, V2: %s" % \
+        message = "Calc. TO speeds: V1: %s, VR: %s, V2: %s" % \
                   (self._speedToLog(self._flight.v1),
                    self._speedToLog(self._flight.vr),
                    self._speedToLog(self._flight.v2))
