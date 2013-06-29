@@ -662,9 +662,14 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, DelayedChangeMixin):
                    self._lastChangeState is not None else state
         speed = logState.groundSpeed if logState.groundSpeed<80.0 \
                 else logState.ias
-        return "Flaps %.0f - %.0f %s" % \
+        message = "Flaps %.0f - %.0f %s" % \
                (logState.flapsSet, flight.speedFromKnots(speed),
                 flight.getEnglishSpeedUnit())
+
+        if flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING]:
+            message += ", %.0f ft AGL" % (logState.radioAltitude,)
+
+        return message
 
 #---------------------------------------------------------------------------------------
 
@@ -677,10 +682,11 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
 
     def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
-        return "Gears SET to %s at %.0f %s, %.0f feet" % \
+        return "Gears SET to %s at %.0f %s, %.0f ft, %.0f ft AGL" % \
             ("DOWN" if state.gearControlDown else "UP",
              flight.speedFromKnots(state.ias),
-             flight.getEnglishSpeedUnit(), state.altitude)
+             flight.getEnglishSpeedUnit(),
+             state.altitude, state.radioAltitude)
 
 #---------------------------------------------------------------------------------------
 

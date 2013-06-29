@@ -7,6 +7,7 @@ set gs=0
 set xpdrC=1
 set lights=1
 set noseGear=100
+set gearControl=100
 set flapsControl=0
 set zfw=46741 hour=7 min=50
 set latitude=47.44 longitude=19.26
@@ -42,6 +43,7 @@ set gs=120 ias=120
 set onTheGround=no
 set altitude=600
 
+set gearControl=0
 set noseGear=0
 set altitude=2000
 set nav1=111.5
@@ -68,6 +70,7 @@ set altitude=3500
 set ias=125 gs=125
 set radioAltitude=3200
 set radioAltitude=1100
+set gearControl=100
 set noseGear=100
 set radioAltitude=50
 set radioAltitude=29
