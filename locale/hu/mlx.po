@@ -805,7 +805,7 @@ msgid "takeoff_derate_tupolev"
 msgstr "Üzemmód:"
 
 msgid "takeoff_derate_tupolev_nominal"
-msgstr "n_ominális"
+msgstr "név_leges"
 
 msgid "takeoff_derate_tupolev_nominal_tooltip"
 msgstr "Ha a felszálláshoz használt üzemmód beállítása nominális, válaszd ezt."
