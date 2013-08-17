@@ -64,7 +64,7 @@ class StageChecker(StateChecker):
                 aircraft.setStage(state, const.STAGE_CLIMB)
             elif not state.landingLightsOn and \
                  (state.strobeLightsOn is False or
-                  (state.strobeLightsOn is None and not state.xpdrC)) and \
+                  (state.strobeLightsOn is None and state.xpdrC is False)) and \
                  state.onTheGround and \
                  state.groundSpeed<50.0:
                 aircraft.setStage(state, const.STAGE_RTO)

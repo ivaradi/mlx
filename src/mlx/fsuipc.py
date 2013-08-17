@@ -2004,7 +2004,7 @@ class PTT154Model(T154Model):
         name."""
         print "PTT154Model.doesHandle", aircraft.type, name, airPath
         return aircraft.type==const.AIRCRAFT_T154 and \
-               name.find("Tu-154")!=-1 and \
+               (name.find("Tu-154")!=-1 or name.find("Tu154B")) and \
                os.path.basename(airPath).startswith("154b_")
 
     def __init__(self):
@@ -2013,11 +2013,20 @@ class PTT154Model(T154Model):
         self._adf1 = None
         self._adf2 = None
         self._lastValue = None
+        self._fsType = None
 
     @property
     def name(self):
         """Get the name for this aircraft model."""
         return "FSUIPC/Project Tupolev Tu-154"
+
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array.
+
+        It only stores the flight simulator type."""
+        self._fsType = fsType
+
+        super(PTT154NGModel, self).addMonitoringData(data, fsType)
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data.
@@ -2038,6 +2047,9 @@ class PTT154Model(T154Model):
         self._lastValue = adf1
         state.adf1 = self._adf1
         state.adf2 = self._adf2
+
+        if self._fsType==const.SIM_MSFSX:
+            state.xpdrC = None
 
         return state
 
