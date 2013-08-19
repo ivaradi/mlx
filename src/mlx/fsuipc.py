@@ -2004,7 +2004,7 @@ class PTT154Model(T154Model):
         name."""
         print "PTT154Model.doesHandle", aircraft.type, name, airPath
         return aircraft.type==const.AIRCRAFT_T154 and \
-               (name.find("Tu-154")!=-1 or name.find("Tu154B")) and \
+               (name.find("Tu-154")!=-1 or name.find("Tu154B")!=-1) and \
                os.path.basename(airPath).startswith("154b_")
 
     def __init__(self):
@@ -2026,7 +2026,7 @@ class PTT154Model(T154Model):
         It only stores the flight simulator type."""
         self._fsType = fsType
 
-        super(PTT154NGModel, self).addMonitoringData(data, fsType)
+        super(PTT154Model, self).addMonitoringData(data, fsType)
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data.
