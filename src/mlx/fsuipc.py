@@ -3,6 +3,7 @@ import fs
 import const
 import util
 import acft
+from watchdog import Watchdog
 
 import threading
 import os
@@ -243,6 +244,8 @@ class Handler(threading.Thread):
         self._nextPeriodicID = 1
         self._periodicRequests = []
 
+        self._watchdogClient = Watchdog.get().addClient(2.0, "fsuipc.Handler")
+
         self.daemon = True
 
     def requestRead(self, data, callback, extra = None, validator = None):
@@ -440,6 +443,7 @@ class Handler(threading.Thread):
 
         needReconnect = False
         try:
+            self._watchdogClient.set()
             try:
                 if not request.process(time):
                     print "fsuipc.Handler._processRequest: FSUIPC returned invalid data too many times, reconnecting"
@@ -458,6 +462,7 @@ class Handler(threading.Thread):
             else:
                 return 0
         finally:
+            self._watchdogClient.clear()
             self._requestCondition.acquire()
 
     def _processRequests(self):

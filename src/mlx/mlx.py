@@ -4,6 +4,7 @@ from i18n import setLanguage
 from sound import initializeSound
 from util import secondaryInstallation
 from const import VERSION
+from watchdog import Watchdog
 
 import os
 import sys
@@ -89,6 +90,8 @@ def main():
     initializeSound(os.path.join(programDirectory, "sounds"))
 
     try:
+        Watchdog().start()
+
         gui.build(programDirectory)
 
         gui.run()
