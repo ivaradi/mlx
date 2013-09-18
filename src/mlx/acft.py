@@ -112,6 +112,8 @@ class Aircraft(object):
 
         self.reverseMinSpeed = 60
 
+        self.needNoStrobeSpeedCheck = False
+
         self._checkers = []
 
         config = flight.config
@@ -177,7 +179,8 @@ class Aircraft(object):
         self._checkers.append(checks.MZFWChecker())
         self._checkers.append(checks.PayloadChecker())
 
-        self._appendSpeedChecker()
+        self._checkers.append(checks.NoStrobeSpeedChecker())
+        self._checkers.append(checks.SpeedChecker())
         self._checkers.append(checks.VSChecker())
 
         timeout = 30.0 + config.realIASSmoothingLength - 1
@@ -479,12 +482,6 @@ class Aircraft(object):
         self._checkers.append(checks.NavLightsChecker())
         self._checkers.append(checks.StrobeLightsChecker())
 
-    def _appendSpeedChecker(self):
-        """Append the speed checker.
-
-        This default implementation used the SpeedChecker."""
-        self._checkers.append(checks.SpeedChecker())
-
     def _speedToLog(self, speed):
         """Convert the given speed (being either None or expressed in the
         flight's speed unit into a string."""
@@ -650,12 +647,6 @@ class Boeing737(Aircraft):
     def derateType(self):
         """Get the derate type for this type."""
         return DERATE_BOEING
-
-    # def _appendSpeedChecker(self):
-    #     """Append the NoStrobeSpeedChecker to the checkers.
-
-    #     FOR TESTING ONLY, THIS FUNCTION SHOULD NORMALLY BE COMMENTED OUT!!!"""
-    #     self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
@@ -905,6 +896,8 @@ class T134(Aircraft):
                                  30 : 300 }
         self.reverseMinSpeed = 50
 
+        self.needNoStrobeSpeedCheck = True
+
     @property
     def derateType(self):
         """Get the derate type for this type."""
@@ -926,10 +919,6 @@ class T134(Aircraft):
         self._checkers.append(checks.TupolevAntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
-
-    def _appendSpeedChecker(self):
-        """Append the NoStrobeSpeedChecker to the checkers."""
-        self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
@@ -953,6 +942,8 @@ class T154(Aircraft):
                                  45 : 162 }
         self.reverseMinSpeed = 50
 
+        self.needNoStrobeSpeedCheck = True
+
     @property
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
@@ -974,10 +965,6 @@ class T154(Aircraft):
         self._checkers.append(checks.AntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
-
-    def _appendSpeedChecker(self):
-        """Append the NoStrobeSpeedChecker to the checkers."""
-        self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 
@@ -999,6 +986,8 @@ class YK40(Aircraft):
         self.flapSpeedLimits = { 20 : 165,
                                  35 : 135 }
 
+        self.needNoStrobeSpeedCheck = True
+
     @property
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
@@ -1020,10 +1009,6 @@ class YK40(Aircraft):
         self._checkers.append(checks.AntiCollisionLightsChecker())
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
-
-    def _appendSpeedChecker(self):
-        """Append the NoStrobeSpeedChecker to the checkers."""
-        self._checkers.append(checks.NoStrobeSpeedChecker())
 
 #---------------------------------------------------------------------------------------
 

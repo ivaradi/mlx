@@ -1341,6 +1341,13 @@ class ReverserChecker(SimpleFaultChecker):
 class SpeedChecker(SimpleFaultChecker):
     """Check if the speed is in the prescribed limits."""
     @staticmethod
+    def needNoStrobe(aircraft, state):
+        """Determine if the given aircraft and state needs a strobeless speed
+        checking."""
+        return aircraft.needNoStrobeSpeedCheck or \
+               (state.strobeLightsOn is None and state.xpdrC is None)
+
+    @staticmethod
     def logSpeedFault(flight, state, stage = None, updateID = None):
         """Log the speed fault."""
         message = "Taxi speed over %.0f %s" % \
@@ -1355,9 +1362,10 @@ class SpeedChecker(SimpleFaultChecker):
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return flight.stage in [const.STAGE_PUSHANDTAXI,
-                                const.STAGE_RTO,
-                                const.STAGE_TAXIAFTERLAND] and \
+        return not self.needNoStrobe(aircraft, state) and \
+            flight.stage in [const.STAGE_PUSHANDTAXI,
+                             const.STAGE_RTO,
+                             const.STAGE_TAXIAFTERLAND] and \
             state.groundSpeed>50
 
     def logFault(self, flight, aircraft, logger, oldState, state):
@@ -1388,14 +1396,15 @@ class NoStrobeSpeedChecker(StateChecker):
 
     def check(self, flight, aircraft, logger, oldState, state):
         """Check the state as described above."""
-        if flight.stage==const.STAGE_PUSHANDTAXI or \
-           flight.stage==const.STAGE_RTO:
-            self._checkPushAndTaxi(flight, aircraft, state)
-        elif flight.stage==const.STAGE_TAXIAFTERLAND:
-            if state.groundSpeed>50:
-                SpeedChecker.logSpeedFault(flight, state)
-        else:
-            self._takeoffState = None
+        if SpeedChecker.needNoStrobe(aircraft, state):
+            if flight.stage==const.STAGE_PUSHANDTAXI or \
+               flight.stage==const.STAGE_RTO:
+                self._checkPushAndTaxi(flight, aircraft, state)
+            elif flight.stage==const.STAGE_TAXIAFTERLAND:
+                if state.groundSpeed>50:
+                    SpeedChecker.logSpeedFault(flight, state)
+            else:
+                self._takeoffState = None
 
     def _checkPushAndTaxi(self, flight, aircraft, state):
         """Check the speed during the push and taxi stage."""

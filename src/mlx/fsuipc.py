@@ -1625,6 +1625,20 @@ class B737Model(GenericAircraftModel):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic Boeing 737"
 
+    # Note: the function below should be enabled if testing the speed-based
+    # takeoff on Linux
+    # def getAircraftState(self, aircraft, timestamp, data):
+    #     """Get the aircraft state.
+
+    #     Get it from the parent, and then check some PMDG-specific stuff."""
+    #     state = super(B737Model, self).getAircraftState(aircraft,
+    #                                                     timestamp,
+    #                                                     data)
+    #     state.strobeLightsOn = None
+    #     state.xpdrC = None
+
+    #     return state
+
 #------------------------------------------------------------------------------
 
 class PMDGBoeing737NGModel(B737Model):
@@ -1689,14 +1703,21 @@ class PMDGBoeing737NGModel(B737Model):
             state.apHeadingHold = data[self._pmdgidx_aphdgsel]==2
             apalthold = data[self._pmdgidx_apalthold]
             state.apAltitudeHold = apalthold>=3 and apalthold<=6
+            state.xpdrC = data[self._pmdgidx_xpdr]==4
+
+            # Uncomment the following to test the speed-based takeoff
+            # state.strobeLightsOn = None
+            # state.xpdrC = None
         else:
             state.apMaster = data[self._pmdgidx_cmda]!=0
             state.apHeadingHold = data[self._pmdgidx_aphdgsel]!=0
             state.apAltitudeHold = data[self._pmdgidx_apalthold]!=0
-            #state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
-            state.strobeLightsOn = None
 
-        state.xpdrC = data[self._pmdgidx_xpdr]==4
+            # state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
+            # state.xpdrC = data[self._pmdgidx_xpdr]==4
+            state.strobeLightsOn = None
+            state.xpdrC = None
+
         state.apHeading = data[self._pmdgidx_aphdg]
         state.apAltitude = data[self._pmdgidx_apalt]
 
