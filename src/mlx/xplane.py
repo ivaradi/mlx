@@ -732,13 +732,6 @@ class Simulator(object):
         self._latin1decoder = codecs.getdecoder("iso-8859-1")
         self._fuelCallback = None
 
-        self._hasXFMC = None
-
-    @property
-    def hasXFMC(self):
-        """Indicate if the simulator has the X-FMC plugin."""
-        return self._hasXFMC
-
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft
@@ -914,9 +907,6 @@ class Simulator(object):
         simulator of the given type."""
         self._fsType = fsType
 
-        self._handler.requestRead([("xfmc/Status", TYPE_INT)],
-                                  self._xfmcStatusRead)
-
         with self._hotkeyLock:
             if self._hotkeyCodes is not None:
                 self._hotkeySetGeneration += 1
@@ -936,7 +926,6 @@ class Simulator(object):
 
     def disconnected(self):
         """Called when a connection to the flight simulator has been broken."""
-        self._hasXFMC = None
         with self._hotkeyLock:
             self._clearHotkeyRequest()
         self._connectionListener.disconnected()
@@ -955,12 +944,6 @@ class Simulator(object):
         self._handler.clearPeriodic(self._normalRequestID)
         self._normalRequestID = None
         self._monitoring = False
-
-    def _xfmcStatusRead(self, data, extra):
-        """Called when the xfmc/Status dataref is read or not."""
-        self._hasXFMC = data is not None
-        print "xplane.Simulator: XFMC is %savailable" % \
-          ("" if self._hasXFMC else "not ")
 
     def _handleNormal(self, data, extra):
         """Handle the reply to the normal request.
@@ -1290,7 +1273,12 @@ class AircraftModel(object):
                        ("surfaceHeat",
                         "sim/cockpit/switches/anti_ice_surf_heat", TYPE_INT),
                        ("propHeat",
-                        "sim/cockpit/switches/anti_ice_prop_heat", TYPE_INT) ]
+                        "sim/cockpit/switches/anti_ice_prop_heat", TYPE_INT),
+                       ("autopilotOn",
+                        "sim/cockpit2/autopilot/autopilot_on", TYPE_INT),
+                       ("apHeadingMode",
+                        "sim/cockpit2/autopilot/heading_mode", TYPE_INT)]
+
 
     specialModels = []
 
@@ -1384,17 +1372,13 @@ class AircraftModel(object):
         """Add the model-specific monitoring data to the given array."""
         self._addDataWithIndexMembers(data, "_monidx_",
                                       AircraftModel.monitoringData)
-        if self.simulator.hasXFMC:
-            print "xplane.AircraftModel.addMonitoringData: adding XFMC status dataref"""
-            self._addDatarefWithIndexMember(data, "xfmc/Status", TYPE_INT,
-                                            attrName = "_monidx_xfmcStatus")
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get an aircraft state object for the given monitoring data."""
         state = fs.AircraftState()
 
-        xfmcLNAVOn = self.simulator.hasXFMC and \
-                     (data[self._monidx_xfmcStatus]&0x03==0x03)
+        lnavOn = data[self._monidx_autopilotOn]!=0 and \
+                 data[self._monidx_apHeadingMode]==2
 
         state.timestamp = timestamp
 
@@ -1463,7 +1447,7 @@ class AircraftModel(object):
         state.nav1_manual = True
         state.nav2 = self._convertFrequency(data[self._monidx_nav2])
         state.nav2_obs = self._convertOBS(data[self._monidx_nav2_obs])
-        state.nav2_manual = not xfmcLNAVOn
+        state.nav2_manual = not lnavOn
         state.adf1 = str(data[self._monidx_adf1])
         state.adf2 = str(data[self._monidx_adf2])
 
@@ -1482,7 +1466,7 @@ class AircraftModel(object):
 
         state.apMaster = data[self._monidx_apMaster]==2
         apState = data[self._monidx_apState]
-        if xfmcLNAVOn:
+        if lnavOn:
            state.apHeadingHold = None
            state.apHeading = None
         else:
