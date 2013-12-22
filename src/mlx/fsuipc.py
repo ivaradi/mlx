@@ -2036,9 +2036,6 @@ class PTT154Model(T154Model):
     def __init__(self):
         """Construct the model."""
         super(PTT154Model, self).__init__()
-        self._adf1 = None
-        self._adf2 = None
-        self._lastValue = None
         self._fsType = None
 
     @property
@@ -2059,20 +2056,6 @@ class PTT154Model(T154Model):
 
         This removes the reverser value for the middle engine."""
         state = super(PTT154Model, self).getAircraftState(aircraft, timestamp, data)
-
-        adf1 = state.adf1
-        if self._adf1 is None:
-            self._adf1 = self._adf2 = adf1
-        elif adf1 != self._lastValue and adf1 != self._adf1 and \
-             adf1 != self._adf2:
-            if self._lastValue==self._adf2:
-                self._adf1 = adf1
-            else:
-                self._adf2 = adf1
-
-        self._lastValue = adf1
-        state.adf1 = self._adf1
-        state.adf2 = self._adf2
 
         if self._fsType==const.SIM_MSFSX:
             state.xpdrC = None
