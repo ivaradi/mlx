@@ -150,7 +150,7 @@ library/encodings/latin_1.pyc	2111	52427573ccbfd06220b67d5a9dd1376e
 library/mlx/update.pyc	16952	2bfcf72827b67c8c6e82f88910662318
 library/unittest/case.pyc	37758	1d2235e74c246b562c5c00ddf73c621a
 library/encodings/euc_jp.pyc	1646	c0d60e6d08161643bd7dbe651063f334
-library/mlx/acft.pyc	35652	dd72c137496e1567d95ba5ddaa722db2
+library/mlx/acft.pyc	35652	f8a2b445040db12a956a5ad19c9f962f
 library/gobject._gobject.pyd	113152	3d05dd191361f83aa247b62c700fa04e
 doc/manual/hu/checklistEditor.png	27863	8c750892a52dc10ca654a9d0b2765358
 library/bisect.pyc	2971	ad8ce3e265b404ed3971b842106f8179
@@ -171,7 +171,7 @@ library/encodings/tis_620.pyc	2748	5969b4db4f967b11ae7992cdfbf5890e
 library/encodings/cp855.pyc	8071	0a4259ba854c24186f2ce61d85883b4a
 Microsoft.VC90.CRT/msvcr90.dll	655872	e7d91d008fe76423962b91c43c88e4eb
 sounds/ding.wav	80856	18e639792d3767436ac6955eb60e4f54
-library/mlx/checks.pyc	59307	1a2fc7ae662b76238310227a919a6d03
+library/mlx/checks.pyc	59496	0ff54f376d6dc9992300332db1ebd038
 doc/manual/en/statusIcon2.png	5875	71fc121823dee0a4c00715fac1b5665c
 doc/manual/en/pirepViewer.png	25098	7c545e70b995ac0f9fcae93fe5d0e899
 library/libpangowin32-1.0-0.dll	108945	d07f128828225b7cc38e9e590eb3ba8a

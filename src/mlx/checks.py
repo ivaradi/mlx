@@ -931,7 +931,8 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
         """Log the fault."""
         flight.handleFault(AntiCollisionLightsChecker, state.timestamp,
                            FaultChecker._appendDuring(flight,
-                                                      "Anti-collision lights were off"),
+                                                      "Anti-collision lights were %s" %
+                                                      ("on" if state.antiCollisionLightsOn else "off",)),
                            1)
 
     def isEngineCondition(self, state):
@@ -954,15 +955,8 @@ class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
         for n1 in state.n1:
             if n1>5: numEnginesRunning += 1
 
-        print "TupolevAntiCollisionLightsChecker: n1", state.n1,
-        print ", numEnginesRunning:", numEnginesRunning,
-        print ", stage:", flight.stage,
-        print ", antiCollisionLightsOn:", state.antiCollisionLightsOn,
-        print ", parking:", state.parking,
-        print
-
         if flight.stage==const.STAGE_PARKING or \
-           (flight.stage==const.STAGE_TAXIAFTERLAND and state.parking):
+           flight.stage==const.STAGE_TAXIAFTERLAND:
             return numEnginesRunning<len(state.n1) \
                    and state.antiCollisionLightsOn
         else:
