@@ -2234,6 +2234,8 @@ class TakeoffPage(Page):
 
     def activate(self):
         """Activate the page."""
+        print "TakeoffPage.activate"
+
         self._runway.set_text("")
         self._runway.set_sensitive(True)
         self._sid.set_text("")
@@ -2267,11 +2269,14 @@ class TakeoffPage(Page):
 
     def allowForward(self):
         """Allow going to the next page."""
+        print "TakeoffPage.allowForward"
         self._forwardAllowed = True
         self._updateForwardButton()
 
     def reset(self):
         """Reset the page if the wizard is reset."""
+        print "TakeoffPage.reset"
+
         super(TakeoffPage, self).reset()
         self._v1.reset()
         self._vr.reset()
@@ -2287,6 +2292,7 @@ class TakeoffPage(Page):
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
+
         sensitive = self._forwardAllowed and \
                     self._runway.get_text()!="" and \
                     self._sid.get_text()!="" and \
@@ -2297,20 +2303,27 @@ class TakeoffPage(Page):
                     self.vr <= self.v2 and \
                     (self._derateType==acft.DERATE_NONE or
                      self.derate is not None)
+
+        print "TakeoffPage._updateForwardButton: forwardAllowed:", self._forwardAllowed, ", sensitive:", sensitive
+
         self._button.set_sensitive(sensitive)
 
     def _valueChanged(self, widget, arg = None):
         """Called when the value of some widget has changed."""
+        print "TakeoffPage._valueChanged"
+
         self._updateForwardButton()
 
     def _upperChanged(self, entry, arg = None):
         """Called when the value of some entry widget has changed and the value
         should be converted to uppercase."""
+        print "TakeoffPage._upperChanged"
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
 
     def _derateChanged(self, entry):
         """Called when the value of the derate is changed."""
+        print "TakeoffPage._derateChanged"
         self._updateForwardButton()
 
     def _rtoToggled(self, button):
