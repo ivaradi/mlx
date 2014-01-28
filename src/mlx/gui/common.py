@@ -92,6 +92,8 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
     FILL = gtk.FILL
     EXPAND = gtk.EXPAND
 
+    UPDATE_IF_VALID = gtk.UPDATE_IF_VALID
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -163,6 +165,8 @@ else:
 
     FILL = gtk.AttachOptions.FILL
     EXPAND = gtk.AttachOptions.EXPAND
+
+    UPDATE_IF_VALID = gtk.SpinButtonUpdatePolicy.IF_VALID
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

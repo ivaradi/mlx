@@ -1710,7 +1710,7 @@ class RoutePage(Page):
 
         self._cruiseLevel = gtk.SpinButton()
         self._cruiseLevel.set_increments(step = 10, page = 100)
-        self._cruiseLevel.set_range(min = 50, max = 500)
+        self._cruiseLevel.set_range(min = 0, max = 500)
         self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
         self._cruiseLevel.set_numeric(True)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
@@ -1774,7 +1774,8 @@ class RoutePage(Page):
 
     def activate(self):
         """Setup the route from the booked flight."""
-        self._cruiseLevel.set_value(240)
+        self._cruiseLevel.set_value(0)
+        self._cruiseLevel.set_text("")
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
         self._updateForwardButton()
 
