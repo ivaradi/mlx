@@ -3723,10 +3723,6 @@ class Wizard(gtk.VBox):
         """Handle the login result."""
         self.gui.endBusy()
         returned = True
-        result.pilotID = "P096"
-        result.password = "V5fwj"
-        result.loggedIn = True
-        result.flights = []
         isReload = self._loginResult is not None
         if returned:
             if result.loggedIn:
