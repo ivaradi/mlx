@@ -941,6 +941,15 @@ msgstr "Pontszám:"
 msgid "finish_dep_time"
 msgstr "Indulási idő:"
 
+msgid "finish_dep_time_tooltip"
+msgstr ""
+"Ez a tényleges és a menetrend szerinti indulási idő, az utóbbi zárójelben. "
+"Ha a kettő között 15 percnél nagyobb az eltérés, a szöveg <span foreground=\"red\">piros</span>. "
+"Ebben az esetben csak akkor tudod elküldeni vagy elmenteni a PIREP-et, ha kiválasztasz egy késési kódot, "
+"vagy a megjegyzés rovatban leírod az eltérés okát. "
+"Ha a két érték több mint 5, de kevesebb mint 15 perccel tér el, a szöveg <span foreground=\"orange\">narancssárga</span>. "
+"Ilyenkor is célszerű magyarázattal szolgálni, de nem kötelező."
+
 msgid "finish_flight_time"
 msgstr "Repült idő:"
 
@@ -949,6 +958,15 @@ msgstr "Blokk idő:"
 
 msgid "finish_arr_time"
 msgstr "Érkezési idő:"
+
+msgid "finish_arr_time_tooltip"
+msgstr ""
+"Ez a tényleges és a menetrend szerinti érkezési idő, az utóbbi zárójelben. "
+"Ha a kettő között 15 percnél nagyobb az eltérés, a szöveg <span foreground=\"red\">piros</span>. "
+"Ebben az esetben csak akkor tudod elküldeni vagy elmenteni a PIREP-et, ha kiválasztasz egy késési kódot, "
+"vagy a megjegyzés rovatban leírod az eltérés okát. "
+"Ha a két érték több mint 5, de kevesebb mint 15 perccel tér el, a szöveg <span foreground=\"orange\">narancssárga</span>. "
+"Ilyenkor is célszerű magyarázattal szolgálni, de nem kötelező."
 
 msgid "finish_distance"
 msgstr "Repült táv:"

@@ -940,6 +940,15 @@ msgstr "Flight rating:"
 msgid "finish_dep_time"
 msgstr "Departure time:"
 
+msgid "finish_dep_time_tooltip"
+msgstr ""
+"This is your actual departure time with the scheduled one in braces. "
+"If the two differ by more than 15 minutes, the text is <span foreground=\"red\">red</span>. "
+"In this case, you can only send or save your PIREP, if you select either a delay code "
+"or write a comment explaining the difference. "
+"If the two differ by more than 5 minutes, but less than 15, the text is <span foreground=\"orange\">orange</span>. "
+"It is recommended to provide an explanation in this case too, but it is not mandatory."
+
 msgid "finish_flight_time"
 msgstr "Flight time:"
 
@@ -948,6 +957,15 @@ msgstr "Block time:"
 
 msgid "finish_arr_time"
 msgstr "Arrival time:"
+
+msgid "finish_arr_time_tooltip"
+msgstr ""
+"This is your actual arrival time with the scheduled one in braces. "
+"If the two differ by more than 15 minutes, the text is <span foreground=\"red\">red</span>. "
+"In this case, you can only send or save your PIREP, if you select either a delay code "
+"or write a comment explaining the difference. "
+"If the two differ by more than 5 minutes, but less than 15, the text is <span foreground=\"orange\">orange</span>."
+"It is recommended to provide an explanation in this case too, but it is not mandatory."
 
 msgid "finish_distance"
 msgstr "Distance flown:"

@@ -2847,6 +2847,7 @@ class FinishPage(Page):
         self._depTime.set_width_chars(13)
         self._depTime.set_alignment(0.0, 0.5)
         self._depTime.set_use_markup(True)
+        self._depTime.set_tooltip_markup(xstr("finish_dep_time_tooltip"))
         labelAlignment.add(self._depTime)
         table.attach(labelAlignment, 1, 2, row, row+1)
 
@@ -2892,6 +2893,7 @@ class FinishPage(Page):
         self._arrTime.set_width_chars(13)
         self._arrTime.set_alignment(0.0, 0.5)
         self._arrTime.set_use_markup(True)
+        self._arrTime.set_tooltip_markup(xstr("finish_arr_time_tooltip"))
         labelAlignment.add(self._arrTime)
         table.attach(labelAlignment, 1, 2, row, row+1)
 
