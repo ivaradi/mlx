@@ -104,7 +104,7 @@ class Page(gtk.Alignment):
         else:
             longerHelp = completedHelp
 
-        self._helpLabel = gtk.Label(completedHelp)
+        self._helpLabel = gtk.Label(longerHelp)
         # FIXME: should be a constant in common
         self._helpLabel.set_justify(gtk.Justification.CENTER if pygobject
                                     else gtk.JUSTIFY_CENTER)
@@ -2813,7 +2813,7 @@ class FinishPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(8, 2)
+        table = gtk.Table(10, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2844,7 +2844,7 @@ class FinishPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._depTime = gtk.Label()
-        self._depTime.set_width_chars(10)
+        self._depTime.set_width_chars(13)
         self._depTime.set_alignment(0.0, 0.5)
         self._depTime.set_use_markup(True)
         labelAlignment.add(self._depTime)
@@ -2889,7 +2889,7 @@ class FinishPage(Page):
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._arrTime = gtk.Label()
-        self._arrTime.set_width_chars(10)
+        self._arrTime.set_width_chars(13)
         self._arrTime.set_alignment(0.0, 0.5)
         self._arrTime.set_use_markup(True)
         labelAlignment.add(self._arrTime)
@@ -3380,21 +3380,43 @@ class Wizard(gtk.VBox):
         self._finishPage = FinishPage(self)
         self._pages.append(self._finishPage)
 
+        self._requestedWidth = None
+        self._requestedHeight = None
+
+        self.connect("size-allocate", self._sizeAllocate)
+
+        for page in self._pages:
+            page.show_all()
+            page.setStyle()
+
+        self._initialize()
+
+    def _sizeAllocate(self, widget, allocation):
+        if self._requestedWidth is not None and \
+           self._requestedHeight is not None:
+           return
+
+        if self._currentPage is not None:
+            self.remove(self._pages[self._currentPage])
+
         maxWidth = 0
         maxHeight = 0
         for page in self._pages:
-            page.show_all()
+            self.add(page)
+            self.show_all()
             pageSizeRequest = page.size_request()
             width = pageSizeRequest.width if pygobject else pageSizeRequest[0]
             height = pageSizeRequest.height if pygobject else pageSizeRequest[1]
             maxWidth = max(maxWidth, width)
             maxHeight = max(maxHeight, height)
-            page.setStyle()
-        maxWidth += 16
-        maxHeight += 32
-        self.set_size_request(maxWidth, maxHeight)
+            self.remove(page)
 
-        self._initialize()
+        if self._currentPage is not None:
+            self.add(self._pages[self._currentPage])
+
+        self._requestedWidth = maxWidth
+        self._requestedHeight = maxHeight
+        self.set_size_request(maxWidth, maxHeight)
 
     @property
     def pilotID(self):
