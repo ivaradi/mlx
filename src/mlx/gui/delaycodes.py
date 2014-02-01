@@ -232,9 +232,11 @@ class CheckButton(gtk.CheckButton):
 
 class DelayCodeTable(DelayCodeTableBase):
     """The delay code table."""
-    def __init__(self):
+    def __init__(self, info):
         """Construct the delay code table."""
         super(DelayCodeTable, self).__init__()
+
+        self._info = info
 
         self._delayCodeData = None
 
@@ -270,6 +272,16 @@ class DelayCodeTable(DelayCodeTableBase):
                     codes.append(codeExtractor(checkButton.delayCodeRow))
 
         return codes
+
+    @property
+    def hasDelayCode(self):
+        """Determine if there is at least one delay code selected."""
+        if self._delayCodeData is not None:
+            for checkButton in self._checkButtons:
+                if checkButton.get_active():
+                    return True
+
+        return False
 
     def allocate_column_sizes(self, allocation):
         """Allocate the column sizes."""
@@ -331,6 +343,7 @@ class DelayCodeTable(DelayCodeTableBase):
                 self._table.set_row_spacing(i, 8)
             elif type==DELAYCODE:
                 checkButton = CheckButton(elements)
+                checkButton.connect("toggled", self._delayCodesChanged)
                 self._checkButtons.append(checkButton)
                 alignment = Alignment(xalign = 0.5, yalign = 0.5, xscale = 1.0)
                 alignment.add(checkButton)
@@ -364,5 +377,9 @@ class DelayCodeTable(DelayCodeTableBase):
         self._eventBox.remove(self._table)
         self._table = None
         self.show_all()
+
+    def _delayCodesChanged(self, button):
+        """Called when one of the delay codes have changed."""
+        self._info.delayCodesChanged()
 
 #------------------------------------------------------------------------------

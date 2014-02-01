@@ -81,7 +81,7 @@ class FlightInfo(gtk.VBox):
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
-        self._delayCodeTable = table = DelayCodeTable()
+        self._delayCodeTable = table = DelayCodeTable(self)
         self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(table)
         scrolledWindow.set_size_request(-1, 185)
@@ -123,6 +123,11 @@ class FlightInfo(gtk.VBox):
         """Get the list of delay codes checked by the user."""
         return self._delayCodeTable.delayCodes
 
+    @property
+    def hasDelayCode(self):
+        """Determine if there is at least one delay code selected."""
+        return self._delayCodeTable.hasDelayCode
+
     def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
@@ -144,6 +149,10 @@ class FlightInfo(gtk.VBox):
         self._flightDefects.get_buffer().set_text("")
         self._delayCodeTable.reset()
 
+    def delayCodesChanged(self):
+        """Callewd when the delay codes have changed."""
+        self._gui.delayCodesChanged()
+
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""
-        self._gui.updateRTO(inLoop = True)
+        self._gui.commentsChanged()

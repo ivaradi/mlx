@@ -937,11 +937,17 @@ msgstr ""
 msgid "finish_rating"
 msgstr "Flight rating:"
 
+msgid "finish_dep_time"
+msgstr "Departure time:"
+
 msgid "finish_flight_time"
 msgstr "Flight time:"
 
 msgid "finish_block_time"
 msgstr "Block time:"
+
+msgid "finish_arr_time"
+msgstr "Arrival time:"
 
 msgid "finish_distance"
 msgstr "Distance flown:"

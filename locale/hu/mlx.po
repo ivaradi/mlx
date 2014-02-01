@@ -938,11 +938,17 @@ msgstr ""
 msgid "finish_rating"
 msgstr "Pontszám:"
 
+msgid "finish_dep_time"
+msgstr "Indulási idő:"
+
 msgid "finish_flight_time"
 msgstr "Repült idő:"
 
 msgid "finish_block_time"
 msgstr "Blokk idő:"
+
+msgid "finish_arr_time"
+msgstr "Érkezési idő:"
 
 msgid "finish_distance"
 msgstr "Repült táv:"

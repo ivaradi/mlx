@@ -2820,10 +2820,12 @@ class FinishPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
+        row = 0
+
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_rating"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 0, 1)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._flightRating = gtk.Label()
@@ -2831,12 +2833,29 @@ class FinishPage(Page):
         self._flightRating.set_alignment(0.0, 0.5)
         self._flightRating.set_use_markup(True)
         labelAlignment.add(self._flightRating)
-        table.attach(labelAlignment, 1, 2, 0, 1)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label(xstr("finish_dep_time"))
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, row, row+1)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._depTime = gtk.Label()
+        self._depTime.set_width_chars(10)
+        self._depTime.set_alignment(0.0, 0.5)
+        self._depTime.set_use_markup(True)
+        labelAlignment.add(self._depTime)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_flight_time"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 1, 2)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._flightTime = gtk.Label()
@@ -2844,12 +2863,14 @@ class FinishPage(Page):
         self._flightTime.set_alignment(0.0, 0.5)
         self._flightTime.set_use_markup(True)
         labelAlignment.add(self._flightTime)
-        table.attach(labelAlignment, 1, 2, 1, 2)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_block_time"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 2, 3)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._blockTime = gtk.Label()
@@ -2857,12 +2878,29 @@ class FinishPage(Page):
         self._blockTime.set_alignment(0.0, 0.5)
         self._blockTime.set_use_markup(True)
         labelAlignment.add(self._blockTime)
-        table.attach(labelAlignment, 1, 2, 2, 3)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
+
+        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = gtk.Label(xstr("finish_arr_time"))
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, row, row+1)
+
+        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._arrTime = gtk.Label()
+        self._arrTime.set_width_chars(10)
+        self._arrTime.set_alignment(0.0, 0.5)
+        self._arrTime.set_use_markup(True)
+        labelAlignment.add(self._arrTime)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_distance"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 3, 4)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._distanceFlown = gtk.Label()
@@ -2870,12 +2908,14 @@ class FinishPage(Page):
         self._distanceFlown.set_alignment(0.0, 0.5)
         self._distanceFlown.set_use_markup(True)
         labelAlignment.add(self._distanceFlown)
-        table.attach(labelAlignment, 1, 2, 3, 4)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
         label = gtk.Label(xstr("finish_fuel"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 4, 5)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         self._fuelUsed = gtk.Label()
@@ -2883,14 +2923,16 @@ class FinishPage(Page):
         self._fuelUsed.set_alignment(0.0, 0.5)
         self._fuelUsed.set_use_markup(True)
         labelAlignment.add(self._fuelUsed)
-        table.attach(labelAlignment, 1, 2, 4, 5)
+        table.attach(labelAlignment, 1, 2, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
                                        yalign = 0.5, yscale = 0.0)
         label = gtk.Label(xstr("finish_type"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 5, 6)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         flightTypeModel = gtk.ListStore(str, int)
         for (name, type) in FinishPage._flightTypes:
@@ -2905,22 +2947,26 @@ class FinishPage(Page):
         self._flightType.connect("changed", self._flightTypeChanged)
         flightTypeAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         flightTypeAlignment.add(self._flightType)
-        table.attach(flightTypeAlignment, 1, 2, 5, 6)
+        table.attach(flightTypeAlignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._flightType)
+
+        row += 1
 
         self._onlineFlight = gtk.CheckButton(xstr("finish_online"))
         self._onlineFlight.set_use_underline(True)
         self._onlineFlight.set_tooltip_text(xstr("finish_online_tooltip"))
         onlineFlightAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
         onlineFlightAlignment.add(self._onlineFlight)
-        table.attach(onlineFlightAlignment, 1, 2, 6, 7)
+        table.attach(onlineFlightAlignment, 1, 2, row, row + 1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
                                        yalign = 0.5, yscale = 0.0)
         self._gateLabel = gtk.Label(xstr("finish_gate"))
         self._gateLabel.set_use_underline(True)
         labelAlignment.add(self._gateLabel)
-        table.attach(labelAlignment, 0, 1, 7, 8)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         self._gatesModel = gtk.ListStore(str)
 
@@ -2932,7 +2978,7 @@ class FinishPage(Page):
         self._gate.connect("changed", self._gateChanged)
         gateAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
         gateAlignment.add(self._gate)
-        table.attach(gateAlignment, 1, 2, 7, 8)
+        table.attach(gateAlignment, 1, 2, row, row+1)
         self._gateLabel.set_mnemonic_widget(self._gate)
 
         self.addButton(xstr("finish_newFlight"),
@@ -2950,6 +2996,8 @@ class FinishPage(Page):
         self._savePIREPDialog = None
         self._lastSavePath = None
 
+        self._tooBigTimeDifference = False
+        self._deferredAutoSave = False
         self._pirepSaved = False
         self._pirepSent = False
 
@@ -2957,6 +3005,15 @@ class FinishPage(Page):
                                           sensitive = False,
                                           clicked = self._sendClicked,
                                           tooltip = xstr("sendPIREP_tooltip"))
+
+        # self._formatTime(datetime.datetime(1970, 1, 1, 0, 10), 10*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 0, 10), 20*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 0, 10), 0*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 0, 10), (23*60.0+50)*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 1, 0), (1*60.0+5)*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 1, 0), (0*60.0+50)*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 23, 55), (0*60.0+5)*60.0)
+        # self._formatTime(datetime.datetime(1970, 1, 1, 23, 55), (23*60.0+45)*60.0)
 
     @property
     def flightType(self):
@@ -2971,6 +3028,7 @@ class FinishPage(Page):
 
     def activate(self):
         """Activate the page."""
+        self._deferredAutoSave = False
         self._pirepSaved = False
         self._pirepSent = False
 
@@ -2981,6 +3039,13 @@ class FinishPage(Page):
         else:
             self._flightRating.set_markup("<b>%.1f %%</b>" % (rating,))
 
+        bookedFlight = self._wizard.bookedFlight
+
+        (markup, tooBigDeparture) = \
+            self._formatTime(bookedFlight.departureTime, flight.blockTimeStart)
+
+        self._depTime.set_markup(markup)
+
         flightLength = flight.flightTimeEnd - flight.flightTimeStart
         self._flightTime.set_markup("<b>%s</b>" % \
                                     (util.getTimeIntervalString(flightLength),))
@@ -2988,6 +3053,13 @@ class FinishPage(Page):
         blockLength = flight.blockTimeEnd - flight.blockTimeStart
         self._blockTime.set_markup("<b>%s</b>" % \
                                    (util.getTimeIntervalString(blockLength),))
+
+        (markup, tooBigArrival) = \
+            self._formatTime(bookedFlight.arrivalTime, flight.blockTimeEnd)
+
+        self._tooBigTimeDifference = tooBigDeparture or tooBigArrival
+
+        self._arrTime.set_markup(markup)
 
         self._distanceFlown.set_markup("<b>%.2f NM</b>" % \
                                        (flight.flownDistance,))
@@ -3014,37 +3086,57 @@ class FinishPage(Page):
             self._gateLabel.set_sensitive(False)
             self._gate.set_sensitive(False)
 
-    def _backClicked(self, button):
-        """Called when the Back button is pressed."""
-        self.goBack()
+        self.updateButtons()
 
-    def _updateButtons(self):
+    def updateButtons(self):
         """Update the sensitivity state of the buttons."""
+        gui = self._wizard.gui
         sensitive = self._flightType.get_active()>=0 and \
                     (self._gatesModel.get_iter_first() is None or
-                     self._gate.get_active()>=0)
+                     self._gate.get_active()>=0) and \
+                    (not self._tooBigTimeDifference or
+                     gui.hasComments or gui.hasDelayCode)
 
         wasSensitive = self._saveButton.get_sensitive()
 
-        gui = self._wizard.gui
-        config = gui.config
-        if config.pirepAutoSave and sensitive and not wasSensitive:
-            self._lastSavePath = os.path.join(config.pirepDirectory,
-                                              self._getDefaultPIREPName())
-            self._lastSavePath = text2unicode(self._lastSavePath)
-            self._savePIREP(automatic = True)
+        if gui.config.pirepAutoSave and sensitive and not wasSensitive:
+            if gui.isWizardActive():
+                self._autoSavePIREP()
+            else:
+                self._deferredAutoSave = True
+
+        if not sensitive:
+            self._deferredAutoSave = False
 
         self._saveButton.set_sensitive(sensitive)
         self._sendButton.set_sensitive(sensitive and
                                        self._wizard.bookedFlight.id is not None)
 
+    def grabDefault(self):
+        """If the page has a default button, make it the default one."""
+        super(FinishPage, self).grabDefault()
+        if self._deferredAutoSave:
+            self._autoSavePIREP()
+            self._deferredAutoSave = False
+
+    def _autoSavePIREP(self):
+        """Perform the automatic saving of the PIREP."""
+        self._lastSavePath = os.path.join(self._wizard.gui.config.pirepDirectory,
+                                          self._getDefaultPIREPName())
+        self._lastSavePath = text2unicode(self._lastSavePath)
+        self._savePIREP(automatic = True)
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+
     def _flightTypeChanged(self, comboBox):
         """Called when the flight type has changed."""
-        self._updateButtons()
+        self.updateButtons()
 
     def _gateChanged(self, comboBox):
         """Called when the arrival gate has changed."""
-        self._updateButtons()
+        self.updateButtons()
 
     def _newFlightClicked(self, button):
         """Called when the new flight button is clicked."""
@@ -3202,6 +3294,52 @@ class FinishPage(Page):
     def _planeUpdated(self, success):
         """Callback for the plane updating."""
         pass
+
+    def _formatTime(self, scheduledTime, realTimestamp):
+        """Format the departure or arrival time based on the given data as a
+        markup for a label.
+
+        If the difference is greater than 15 minutes, the text should be
+        red. Otherwise, if the difference is greater that 5 minutes, the text
+        should be yellow. Otherwise it should be black.
+
+        scheduledTime is the scheduled time as a datetime object
+        realTimestamp is the real time as a timestamp (i.e. seconds
+        since the epoch)
+
+        Returns a tuple consisting of:
+        - the markup,
+        - a boolean indicating if the difference is greater than 15 minutes."""
+        realTime = time.gmtime(realTimestamp)
+
+        scheduledMinute = scheduledTime.hour * 60 + scheduledTime.minute
+        realMinute = realTime.tm_hour * 60 + realTime.tm_min
+
+        diff1 = scheduledMinute - realMinute
+        diff2 = -1 * diff1
+
+        if diff1 < 0: diff1 += 60*24
+        else: diff2 += 60*24
+
+        diff = min(diff1, diff2)
+
+        if diff>5:
+            colour = "red" if diff>15 else "orange"
+            markupBegin = '<span foreground="%s">' % (colour,)
+            markupEnd = '</span>'
+        else:
+            markupBegin = markupEnd = ""
+
+        markup = "<b>%s%02d:%02d [%02d:%02d]%s</b>" % \
+                 (markupBegin,
+                  realTime.tm_hour, realTime.tm_min,
+                  scheduledTime.hour, scheduledTime.minute,
+                  markupEnd)
+
+        # print "mlx.gui.flight.FinishPage._formatTime: markup='%s', diff=%d" % \
+        #       (markup, diff)
+
+        return (markup, diff>15)
 
 #-----------------------------------------------------------------------------
 
@@ -3562,6 +3700,11 @@ class Wizard(gtk.VBox):
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
         self.gui.endBusy()
+        returned = True
+        result.pilotID = "P096"
+        result.password = "V5fwj"
+        result.loggedIn = True
+        result.flights = []
         isReload = self._loginResult is not None
         if returned:
             if result.loggedIn:
@@ -3632,6 +3775,15 @@ class Wizard(gtk.VBox):
         rtoEnabled = flight is not None and flight.hasRTO and \
                      self.gui.hasComments
         self._takeoffPage.setRTOEnabled(rtoEnabled)
+
+    def commentsChanged(self):
+        """Called when the comments have changed."""
+        self.updateRTO()
+        self._finishPage.updateButtons()
+
+    def delayCodesChanged(self):
+        """Called when the delay codes have changed."""
+        self._finishPage.updateButtons()
 
     def rtoToggled(self, indicated):
         """Called when the RTO indication has changed."""

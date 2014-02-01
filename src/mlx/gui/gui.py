@@ -402,6 +402,11 @@ class GUI(fs.ConnectionListener):
         """Get the delay codes."""
         return self._flightInfo.delayCodes
 
+    @property
+    def hasDelayCode(self):
+        """Determine if there is at least one delay code selected."""
+        return self._flightInfo.hasDelayCode
+
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:
@@ -782,6 +787,14 @@ class GUI(fs.ConnectionListener):
         else:
             callback(self._fleet)
 
+    def commentsChanged(self):
+        """Indicate that the comments have changed."""
+        self._wizard.commentsChanged()
+
+    def delayCodesChanged(self):
+        """Called when the delay codes have changed."""
+        self._wizard.delayCodesChanged()
+
     def updateRTO(self, inLoop = False):
         """Indicate that the RTO state should be updated."""
         if inLoop:
@@ -1132,6 +1145,10 @@ class GUI(fs.ConnectionListener):
             gobject.idle_add(self._wizard.grabDefault)
         else:
             self._mainWindow.set_default(None)
+
+    def isWizardActive(self):
+        """Determine if the flight wizard is active."""
+        return self._notebook.get_current_page()==0
 
     def _editChecklist(self, menuItem):
         """Callback for editing the checklists."""
