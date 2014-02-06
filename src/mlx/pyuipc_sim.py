@@ -342,6 +342,23 @@ class Values(object):
             print "failed to read offset %04x: %s" % (offset, str(e))
             raise FSUIPCException(ERR_DATA)
 
+    def _getFlapsControl(self):
+        """Get the flaps control value"""
+        numNotchesM1 = len(self.flapsNotches) - 1
+        flapsIncrement = 16383.0 / numNotchesM1
+        index = 0
+        while index<numNotchesM1 and \
+              self.flapsControl>self.flapsNotches[index]:
+            index += 1
+
+        if index==numNotchesM1:
+            return 16383
+        else:
+            return int(index * flapsIncrement +
+                       (self.flapsControl-self.flapsNotches[index]) *
+                       flapsIncrement /
+                       (self.flapsNotches[index+1] - self.flapsNotches[index]))
+
     def _read(self, offset, type):
         """Read the value at the given offset."""
         if offset==0x023a:         # Second of time
@@ -472,20 +489,7 @@ class Values(object):
             return 0 if self.spoilers == 0 \
                 else int(self.spoilers * (16383 - 4800) + 4800)
         elif offset==0x0bdc:       # Flaps control
-            numNotchesM1 = len(self.flapsNotches) - 1
-            flapsIncrement = 16383.0 / numNotchesM1
-            index = 0
-            while index<numNotchesM1 and \
-                  self.flapsControl>self.flapsNotches[index]:
-                index += 1
-
-            if index==numNotchesM1:
-                return 16383
-            else:
-                return int(index * flapsIncrement +
-                           (self.flapsControl-self.flapsNotches[index]) *
-                           flapsIncrement /
-                           (self.flapsNotches[index+1] - self.flapsNotches[index]))
+            return self._getFlapsControl()
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
             return self.flaps * 16383.0 / self.flapsNotches[-1]
         elif offset==0x0be8:       # Gear control
@@ -591,6 +595,10 @@ class Values(object):
             return self.message
         elif offset==0x3364:       # Frozen
             return 1 if self.frozen else 0
+        elif offset==0x3414:       # Flaps axis
+            return self._getFlapsControl()
+        elif offset==0x3bfa:       # Flaps increment
+            return 16383 / (len(self.flapsNotches)-1)
         elif offset==0x3bfc:       # ZFW
             return int(self.zfw * 256.0 * const.KGSTOLB)
         elif offset==0x3c00:       # Path of the current AIR file

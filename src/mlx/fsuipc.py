@@ -1177,6 +1177,8 @@ class AircraftModel(object):
                       ("flapsControl", 0x0bdc, "d"),
                       ("flapsLeft", 0x0be0, "d"),
                       ("flapsRight", 0x0be4, "d"),
+                      ("flapsAxis", 0x3414, "H"),
+                      ("flapsIncrement", 0x3bfa, "H"),
                       ("lights", 0x0d0c, "H"),
                       ("pitot", 0x029c, "b"),
                       ("parking", 0x0bc8, "H"),
@@ -1269,6 +1271,7 @@ class AircraftModel(object):
         flapsNotches is a list of degrees of flaps that are available on the aircraft."""
         self._flapsNotches = flapsNotches
         self._xpdrReliable = False
+        self._flapsSet = -1
 
     @property
     def name(self):
@@ -1357,6 +1360,12 @@ class AircraftModel(object):
                 (flapsIndex+1)*flapsIncrement - flapsControl):
                 flapsIndex += 1
         state.flapsSet = self._flapsNotches[flapsIndex]
+        if state.flapsSet != self._flapsSet:
+            print "flapsControl: %d, flapsLeft: %d, flapsRight: %d, flapsAxis: %d, flapsIncrement: %d, flapsSet: %d, numNotchesM1: %d" % \
+                  (flapsControl, data[self._monidx_flapsLeft],
+                   data[self._monidx_flapsRight], data[self._monidx_flapsAxis],
+                   data[self._monidx_flapsIncrement], state.flapsSet, numNotchesM1)
+            self._flapsSet = state.flapsSet
 
         flapsLeft = data[self._monidx_flapsLeft]
         state.flaps = self._flapsNotches[-1]*flapsLeft/16383.0
