@@ -209,6 +209,13 @@ class Page(gtk.Alignment):
         This default implementation does nothing."""
         pass
 
+    def setHelp(self, help):
+        """Set the help string."""
+        self._help = help
+        if not self._completed:
+            self._helpLabel.set_markup(self._help)
+            self._helpLabel.set_sensitive(True)
+
     def complete(self):
         """Called when the page is completed.
 
@@ -2807,8 +2814,8 @@ class FinishPage(Page):
 
     def __init__(self, wizard):
         """Construct the finish page."""
-        super(FinishPage, self).__init__(wizard, xstr("finish_title"),
-                                         xstr("finish_help"))
+        help = xstr("finish_help") + xstr("finish_help_wrongtime")
+        super(FinishPage, self).__init__(wizard, xstr("finish_title"), help)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -3060,6 +3067,11 @@ class FinishPage(Page):
             self._formatTime(bookedFlight.arrivalTime, flight.blockTimeEnd)
 
         self._tooBigTimeDifference = tooBigDeparture or tooBigArrival
+
+        if self._tooBigTimeDifference:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
+        else:
+            self.setHelp(xstr("finish_help"))
 
         self._arrTime.set_markup(markup)
 
@@ -3688,6 +3700,7 @@ class Wizard(gtk.VBox):
             page.reset()
 
         self.setCurrentPage(firstPage)
+        #self.setCurrentPage(13)
 
     def login(self, callback, pilotID, password, entranceExam):
         """Called when the login button was clicked."""
