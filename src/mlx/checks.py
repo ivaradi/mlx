@@ -589,12 +589,16 @@ class SquawkLogger(GenericStateChangeLogger):
 
 #---------------------------------------------------------------------------------------
 
-class LightsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
+class LightsLogger(StateChangeLogger, SingleValueMixin, DelayedChangeMixin):
     """Base class for the loggers of the various lights."""
     def __init__(self, attrName, template):
         """Construct the logger."""
         StateChangeLogger.__init__(self)
         SingleValueMixin.__init__(self, attrName)
+        DelayedChangeMixin.__init__(self)
+        self._getLogTimestamp = \
+            lambda state, forced: \
+            DelayedChangeMixin._getLogTimestamp(self, state, forced)
 
         self._template = template
 
