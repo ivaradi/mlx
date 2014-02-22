@@ -4,6 +4,7 @@ from checks import SpeedChecker
 
 import const
 import util
+import time
 
 import threading
 
@@ -23,12 +24,45 @@ class Flight(object):
 
     It is also the hub for the other main objects participating in the handling of
     the flight."""
+
+    # The difference in minutes from the schedule which is considered a bit big
+    TIME_WARNING_DIFFERENCE = 5
+
+    # The difference in minutes from the schedule which is considered too big
+    TIME_ERROR_DIFFERENCE = 15
+
     @staticmethod
     def canLogCruiseAltitude(stage):
         """Determine if the cruise altitude can be logged in the given
         stage."""
         return stage in [const.STAGE_CRUISE, const.STAGE_DESCENT,
                          const.STAGE_LANDING]
+
+    @staticmethod
+    def isTimeDifferenceTooMuch(scheduledTime, realTimestamp):
+        """Determine if the given real time differs to much from the scheduled
+        time.
+
+        Returns a tuple of:
+        - a boolean indicating if the difference is enough to warrant at least
+          a warning
+        - a boolean indicating if the difference is too big, i. e. unacceptable
+          without explanation."""
+        realTime = time.gmtime(realTimestamp)
+
+        scheduledMinute = scheduledTime.hour * 60 + scheduledTime.minute
+        realMinute = realTime.tm_hour * 60 + realTime.tm_min
+
+        diff1 = scheduledMinute - realMinute
+        diff2 = -1 * diff1
+
+        if diff1 < 0: diff1 += 60*24
+        else: diff2 += 60*24
+
+        diff = min(diff1, diff2)
+
+        return (diff>Flight.TIME_WARNING_DIFFERENCE,
+                diff>Flight.TIME_ERROR_DIFFERENCE)
 
     def __init__(self, logger, gui):
         """Construct the flight."""
@@ -282,6 +316,30 @@ class Flight(object):
     def rtoState(self):
         """Get the RTO state."""
         return self._rtoState
+
+    @property
+    def blockTimeStartWrong(self):
+        """Determine if the block time start is wrong compared to the scheduled
+        departure time.
+
+        Returns a tuple of:
+        - a boolean indicating if the difference warrants a warning
+        - a boolean indicating if the difference warrants not only a warning,
+          but an error as well."""
+        return self.isTimeDifferenceTooMuch(self.bookedFlight.departureTime,
+                                            self.blockTimeStart)
+
+    @property
+    def blockTimeEndWrong(self):
+        """Determine if the block time end is wrong compared to the scheduled
+        arrival time.
+
+        Returns a tuple of:
+        - a boolean indicating if the difference warrants a warning
+        - a boolean indicating if the difference warrants not only a warning,
+          but an error as well."""
+        return self.isTimeDifferenceTooMuch(self.bookedFlight.arrivalTime,
+                                            self.blockTimeEnd)
 
     def handleState(self, oldState, currentState):
         """Handle a new state information."""

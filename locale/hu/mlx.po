@@ -939,6 +939,10 @@ msgstr ""
 "<span foreground=\"red\">\n\nAz érkezési és/vagy indulási idő jelentősen eltér a menetrendtől.\n"
 "Kérlek, írj megjegyzést vagy adj meg késési kódot a PIREP elküldése előtt.</span>"
 
+msgid "finish_help_goodtime"
+msgstr ""
+"<span>\n\n\n</span>"
+
 msgid "finish_rating"
 msgstr "Pontszám:"
 

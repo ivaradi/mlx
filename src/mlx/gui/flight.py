@@ -2814,7 +2814,7 @@ class FinishPage(Page):
 
     def __init__(self, wizard):
         """Construct the finish page."""
-        help = xstr("finish_help") + xstr("finish_help_wrongtime")
+        help = xstr("finish_help") + xstr("finish_help_goodtime")
         super(FinishPage, self).__init__(wizard, xstr("finish_title"), help)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
@@ -3048,13 +3048,6 @@ class FinishPage(Page):
         else:
             self._flightRating.set_markup("<b>%.1f %%</b>" % (rating,))
 
-        bookedFlight = self._wizard.bookedFlight
-
-        (markup, tooBigDeparture) = \
-            self._formatTime(bookedFlight.departureTime, flight.blockTimeStart)
-
-        self._depTime.set_markup(markup)
-
         flightLength = flight.flightTimeEnd - flight.flightTimeStart
         self._flightTime.set_markup("<b>%s</b>" % \
                                     (util.getTimeIntervalString(flightLength),))
@@ -3062,18 +3055,6 @@ class FinishPage(Page):
         blockLength = flight.blockTimeEnd - flight.blockTimeStart
         self._blockTime.set_markup("<b>%s</b>" % \
                                    (util.getTimeIntervalString(blockLength),))
-
-        (markup, tooBigArrival) = \
-            self._formatTime(bookedFlight.arrivalTime, flight.blockTimeEnd)
-
-        self._tooBigTimeDifference = tooBigDeparture or tooBigArrival
-
-        if self._tooBigTimeDifference:
-            self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
-        else:
-            self.setHelp(xstr("finish_help"))
-
-        self._arrTime.set_markup(markup)
 
         self._distanceFlown.set_markup("<b>%.2f NM</b>" % \
                                        (flight.flownDistance,))
@@ -3100,7 +3081,7 @@ class FinishPage(Page):
             self._gateLabel.set_sensitive(False)
             self._gate.set_sensitive(False)
 
-        self.updateButtons()
+        self._updateTimes()
 
     def updateButtons(self):
         """Update the sensitivity state of the buttons."""
@@ -3146,7 +3127,7 @@ class FinishPage(Page):
 
     def _flightTypeChanged(self, comboBox):
         """Called when the flight type has changed."""
-        self.updateButtons()
+        self._updateTimes()
 
     def _gateChanged(self, comboBox):
         """Called when the arrival gate has changed."""
@@ -3309,36 +3290,13 @@ class FinishPage(Page):
         """Callback for the plane updating."""
         pass
 
-    def _formatTime(self, scheduledTime, realTimestamp):
+    def _formatTime(self, scheduledTime, realTimestamp, (warning, error)):
         """Format the departure or arrival time based on the given data as a
-        markup for a label.
-
-        If the difference is greater than 15 minutes, the text should be
-        red. Otherwise, if the difference is greater that 5 minutes, the text
-        should be yellow. Otherwise it should be black.
-
-        scheduledTime is the scheduled time as a datetime object
-        realTimestamp is the real time as a timestamp (i.e. seconds
-        since the epoch)
-
-        Returns a tuple consisting of:
-        - the markup,
-        - a boolean indicating if the difference is greater than 15 minutes."""
+        markup for a label."""
         realTime = time.gmtime(realTimestamp)
 
-        scheduledMinute = scheduledTime.hour * 60 + scheduledTime.minute
-        realMinute = realTime.tm_hour * 60 + realTime.tm_min
-
-        diff1 = scheduledMinute - realMinute
-        diff2 = -1 * diff1
-
-        if diff1 < 0: diff1 += 60*24
-        else: diff2 += 60*24
-
-        diff = min(diff1, diff2)
-
-        if diff>5:
-            colour = "red" if diff>15 else "orange"
+        if warning:
+            colour = "red" if error else "orange"
             markupBegin = '<span foreground="%s">' % (colour,)
             markupEnd = '</span>'
         else:
@@ -3350,10 +3308,41 @@ class FinishPage(Page):
                   scheduledTime.hour, scheduledTime.minute,
                   markupEnd)
 
-        # print "mlx.gui.flight.FinishPage._formatTime: markup='%s', diff=%d" % \
-        #       (markup, diff)
+        return markup
 
-        return (markup, diff>15)
+    def _updateTimes(self):
+        """Format the flight times and the help text according to the flight
+        type.
+
+        The buttons are also updated.
+        """
+        flight = self._wizard.gui._flight
+        bookedFlight = flight.bookedFlight
+
+        (departureWarning, departureError) = flight.blockTimeStartWrong
+        (arrivalWarning, arrivalError) = flight.blockTimeEndWrong
+
+        if self.flightType==const.FLIGHTTYPE_VIP:
+            departureError = arrivalError = False
+
+        self._tooBigTimeDifference = departureError or arrivalError
+
+        if self._tooBigTimeDifference and self.flightType is not None:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
+        else:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_goodtime"))
+
+        self._depTime.set_markup(self._formatTime(bookedFlight.departureTime,
+                                                  flight.blockTimeStart,
+                                                  (departureWarning,
+                                                   departureError)))
+
+        self._arrTime.set_markup(self._formatTime(bookedFlight.arrivalTime,
+                                                  flight.blockTimeEnd,
+                                                  (arrivalWarning,
+                                                   arrivalError)))
+
+        self.updateButtons()
 
 #-----------------------------------------------------------------------------
 

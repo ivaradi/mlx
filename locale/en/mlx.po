@@ -938,6 +938,10 @@ msgstr ""
 "<span foreground=\"red\">\n\nYour departure and/or arrival time differ too much from the scheduled time(s).\n"
 "Please, provide a comment or a delay code to proceed.</span>"
 
+msgid "finish_help_goodtime"
+msgstr ""
+"<span>\n\n\n</span>"
+
 msgid "finish_rating"
 msgstr "Flight rating:"
 
