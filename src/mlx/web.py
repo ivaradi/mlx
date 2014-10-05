@@ -13,6 +13,7 @@ import codecs
 import traceback
 import xml.sax
 import xmlrpclib
+import HTMLParser
 
 #---------------------------------------------------------------------------------------
 
@@ -352,14 +353,17 @@ class Fleet(object):
 
 class NOTAM(object):
     """A NOTAM for an airport."""
-    def __init__(self, begin, notice, end = None, permanent = False,
+    def __init__(self, ident, basic,
+                 begin, notice, end = None, permanent = False,
                  repeatCycle = None):
         """Construct the NOTAM."""
+        self.ident = ident
+        self.basic = basic
         self.begin = begin
         self.notice = notice
         self.end = end
         self.permanent = permanent
-        self.repeatCycle = None
+        self.repeatCycle = repeatCycle
 
     def __repr__(self):
         """Get the representation of the NOTAM."""
@@ -372,6 +376,21 @@ class NOTAM(object):
             s += " (" + self.repeatCycle + ")"
         s += ": " + self.notice
         s += ">"
+        return s
+
+    def __str__(self):
+        """Get the string representation of the NOTAM."""
+        s = ""
+        s += str(self.ident) + " " + str(self.basic) + "\n"
+        s += str(self.begin)
+        if self.end is not None:
+            s += " - " + str(self.end)
+        elif self.permanent:
+            s += " - PERMANENT"
+        s += "\n"
+        if self.repeatCycle:
+            s += "Repeat cycle: " + self.repeatCycle + "\n"
+        s += self.notice + "\n"
         return s
 
 #------------------------------------------------------------------------------
@@ -387,6 +406,8 @@ class NOTAMHandler(xml.sax.handler.ContentHandler):
     def startElement(self, name, attrs):
         """Start an element."""
         if name!="notam" or \
+           "ident" not in attrs or not attrs["ident"] or \
+           "Q" not in attrs or not attrs["Q"] or \
            "A" not in attrs or not attrs["A"] or \
            "B" not in attrs or not attrs["B"] or \
            "E" not in attrs or not attrs["E"]:
@@ -405,13 +426,182 @@ class NOTAMHandler(xml.sax.handler.ContentHandler):
 
         repeatCycle = attrs["D"] if "D" in attrs else None
 
-        self._notams[icao].append(NOTAM(begin, attrs["E"], end = end,
+        self._notams[icao].append(NOTAM(attrs["ident"], attrs["Q"],
+                                        begin, attrs["E"], end = end,
                                         permanent = permanent,
                                         repeatCycle = repeatCycle))
 
     def get(self, icao):
         """Get the NOTAMs for the given ICAO code."""
         return self._notams[icao] if icao in self._notams else []
+
+#------------------------------------------------------------------------------
+
+class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
+    """XML handler for the NOTAM query results on the PilotsWeb website."""
+    def __init__(self):
+        """Construct the handler."""
+        HTMLParser.HTMLParser.__init__(self)
+
+        self._notams = []
+        self._currentNOTAM = ""
+        self._stage = 0
+
+    def handle_starttag(self, name, attrs):
+        """Start an element."""
+        if (self._stage==0 and name=="div" and ("id", "notamRight") in attrs) or \
+           (self._stage==1 and name=="span") or \
+           (self._stage==2 and name=="pre"):
+            self._stage += 1
+            if self._stage==1:
+                self._currentNOTAM = ""
+
+    def handle_data(self, content):
+        """Handle characters"""
+        if self._stage==3:
+            self._currentNOTAM += content
+
+    def handle_endtag(self, name):
+        """End an element."""
+        if (self._stage==3 and name=="pre") or \
+           (self._stage==2 and name=="span") or \
+           (self._stage==1 and name=="div"):
+            self._stage -= 1
+            if self._stage==0:
+                self._processCurrentNOTAM()
+
+    def getNOTAMs(self):
+        """Get the NOTAMs collected"""
+        return self._notams
+
+    def _processCurrentNOTAM(self):
+        """Parse the current NOTAM and append its contents to the list of
+        NOTAMS."""
+        notam = None
+        try:
+            notam = self._parseCurrentNOTAM2()
+        except Exception, e:
+            print "Error parsing current NOTAM: " + str(e)
+
+        if notam is None:
+            print "Could not parse NOTAM: " + self._currentNOTAM
+            if self._currentNOTAM:
+                self._notams.append(self._currentNOTAM + "\n")
+        else:
+            self._notams.append(notam)
+
+    def _parseCurrentNOTAM(self):
+        """Parse the current NOTAM, if possible, and return a NOTAM object."""
+        lines = self._currentNOTAM.splitlines()
+        lines = map(lambda line: line.strip(), lines)
+
+        if len(lines)<4:
+            return None
+
+        if not lines[1].startswith("Q)") or \
+           not lines[2].startswith("A)") or \
+           not (lines[3].startswith("E)") or
+                (lines[3].startswith("D)") and lines[4].startswith("E)"))):
+            return None
+
+        ident = lines[0].split()[0]
+        basic = lines[1][2:].strip()
+
+        words = lines[2].split()
+        if len(words)<4 or words[0]!="A)" or words[2]!="B)":
+            return None
+
+        begin = datetime.datetime.strptime(words[3], "%y%m%d%H%M")
+        end = None
+        permanent = False
+        if words[4]=="C)" and len(words)>=6:
+            if words[5] in ["PERM", "UFN"]:
+                permanent = True
+            else:
+                end = datetime.datetime.strptime(words[5], "%y%m%d%H%M")
+        else:
+            permanent = True
+
+        repeatCycle = None
+        noticeStartIndex = 3
+        if lines[3].startswith("D)"):
+            repeatCycle = lines[3][2:].strip()
+            noticeStartIndex = 4
+
+        notice = ""
+        for index in range(noticeStartIndex, len(lines)):
+            line = lines[index][2:] if index==noticeStartIndex else lines[index]
+            line = line.strip()
+
+            if line.lower().startswith("created:") or \
+               line.lower().startswith("source:"):
+               break
+
+            if notice: notice += " "
+            notice += line
+
+        return NOTAM(ident, basic, begin, notice, end = end,
+                     permanent = permanent, repeatCycle = repeatCycle)
+
+    def _parseCurrentNOTAM2(self):
+        """Parse the current NOTAM with a second, more flexible method."""
+        lines = self._currentNOTAM.splitlines()
+        lines = map(lambda line: line.strip(), lines)
+
+        if not lines:
+            return None
+
+        ident = lines[0].split()[0]
+
+        lines = lines[1:]
+        for i in range(0, 2):
+            l = lines[-1].lower()
+            if l.startswith("created:") or l.startswith("source:"):
+                lines = lines[:-1]
+
+        lines = map(lambda line: line.strip(), lines)
+        contents = " ".join(lines).split()
+
+        items = {}
+        for i in ["Q)", "A)", "B)", "C)", "D)", "E)"]:
+            items[i] = ""
+
+        currentItem = None
+        for word in contents:
+            if word in items:
+                currentItem = word
+            elif currentItem in items:
+                s = items[currentItem]
+                if s: s+= " "
+                s += word
+                items[currentItem] = s
+
+        if not items["Q)"] or not items["A)"] or not items["B)"] or \
+           not items["E)"]:
+            return None
+
+        basic = items["Q)"]
+        begin = datetime.datetime.strptime(items["B)"], "%y%m%d%H%M")
+
+        end = None
+        permanent = False
+        if items["C)"]:
+            endItem = items["C)"]
+            if endItem in ["PERM", "UFN"]:
+                permanent = True
+            else:
+                end = datetime.datetime.strptime(items["C)"], "%y%m%d%H%M")
+        else:
+            permanent = True
+
+        repeatCycle = None
+        if items["D)"]:
+            repeatCycle = items["D)"]
+
+        notice = items["E)"]
+
+        return NOTAM(ident, basic, begin, notice, end = end,
+                     permanent = permanent, repeatCycle = repeatCycle)
 
 #------------------------------------------------------------------------------
 
@@ -468,7 +658,7 @@ class Request(object):
             self._callback(returned, result)
         except Exception, e:
             print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + util.utf2unicode(str(e))
-            traceback.print_exc()
+            #traceback.print_exc()
 
 #------------------------------------------------------------------------------
 
@@ -609,23 +799,65 @@ class GetNOTAMs(Request):
 
     def run(self):
         """Perform the retrieval of the NOTAMs."""
-        xmlParser = xml.sax.make_parser()
-        notamHandler = NOTAMHandler([self._departureICAO, self._arrivalICAO])
-        xmlParser.setContentHandler(notamHandler)
+        departureNOTAMs = self.getPilotsWebNOTAMs(self._departureICAO)
+        arrivalNOTAMs = self.getPilotsWebNOTAMs(self._arrivalICAO)
 
-        url = "http://notams.euroutepro.com/notams.xml"
+        icaos = []
+        if not departureNOTAMs: icaos.append(self._departureICAO)
+        if not arrivalNOTAMs: icaos.append(self._arrivalICAO)
 
-        f = urllib2.urlopen(url, timeout = 10.0)
-        try:
-            xmlParser.parse(f)
-        finally:
-            f.close()
+        if icaos:
+            xmlParser = xml.sax.make_parser()
+            notamHandler = NOTAMHandler(icaos)
+            xmlParser.setContentHandler(notamHandler)
+
+            url = "http://notams.euroutepro.com/notams.xml"
+
+            f = urllib2.urlopen(url, timeout = 10.0)
+            try:
+                xmlParser.parse(f)
+            finally:
+                f.close()
+
+            for icao in icaos:
+                if icao==self._departureICAO:
+                    departureNOTAMs = notamHandler.get(icao)
+                else:
+                    arrivalNOTAMs = notamHandler.get(icao)
 
         result = Result()
-        result.departureNOTAMs = notamHandler.get(self._departureICAO)
-        result.arrivalNOTAMs = notamHandler.get(self._arrivalICAO)
+        result.departureNOTAMs = departureNOTAMs
+        result.arrivalNOTAMs = arrivalNOTAMs
 
         return result
+
+    def getPilotsWebNOTAMs(self, icao):
+        """Try to get the NOTAMs from FAA's PilotsWeb site for the given ICAO
+        code.
+
+        Returns a list of PilotsWEBNOTAM objects, or None in case of an error."""
+        try:
+            parser = PilotsWebNOTAMsParser()
+
+            url = "https://pilotweb.nas.faa.gov/PilotWeb/notamRetrievalByICAOAction.do?method=displayByICAOs&formatType=ICAO&retrieveLocId=%s&reportType=RAW&actionType=notamRetrievalByICAOs" % \
+              (icao.upper(),)
+
+            f = urllib2.urlopen(url, timeout = 10.0)
+            try:
+                data = f.read(16384)
+                while data:
+                    parser.feed(data)
+                    data = f.read(16384)
+            finally:
+                f.close()
+
+            return parser.getNOTAMs()
+
+        except Exception, e:
+            traceback.print_exc()
+            print "mlx.web.GetNOTAMs.getPilotsWebNOTAMs: failed to get NOTAMs for '%s': %s" % \
+                  (icao, str(e))
+            return None
 
 #------------------------------------------------------------------------------
 

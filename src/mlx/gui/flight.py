@@ -1988,15 +1988,7 @@ class BriefingPage(Page):
         else:
             s = ""
             for notam in notams:
-                s += str(notam.begin)
-                if notam.end is not None:
-                    s += " - " + str(notam.end)
-                elif notam.permanent:
-                    s += " - PERMANENT"
-                s += "\n"
-                if notam.repeatCycle:
-                    s += "Repeat cycle: " + notam.repeatCycle + "\n"
-                s += notam.notice + "\n"
+                s += str(notam)
                 s += "-------------------- * --------------------\n"
             buffer.set_text(s)
 
