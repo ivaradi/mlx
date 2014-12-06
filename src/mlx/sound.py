@@ -171,6 +171,10 @@ if os.name=="nt":
         _thread.requestSound(name, finishCallback = finishCallback,
                              extra = extra)
 
+    def finalizeSound():
+        """Finalize the sound handling."""
+        pass
+
 #------------------------------------------------------------------------------
 
 else: # os.name!="nt"
@@ -242,7 +246,7 @@ else: # os.name!="nt"
                 directory."""
                 super(SoundThread, self).__init__()
 
-                self.daemon = True
+                self.daemon = False
                 self.eventLoop = SoundThread.EventLoop(soundsDirectory)
 
             def run(self):
@@ -268,6 +272,10 @@ else: # os.name!="nt"
             _thread.startSound(name, finishCallback = finishCallback,
                                extra = extra)
 
+        def finalizeSound():
+            """Finalize the sound handling."""
+            pyglet.app.exit()
+
     except:
         print "The pyglet library is missing from your system. It is needed for sound playback on Linux"
         def initializeSound(soundsDirectory):
@@ -280,6 +288,10 @@ else: # os.name!="nt"
 
             FIXME: it does not do anything currently, but it should."""
             print "sound.startSound:", name
+
+        def finalizeSound():
+            """Finalize the sound handling."""
+            pass
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

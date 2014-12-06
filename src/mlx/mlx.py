@@ -1,7 +1,7 @@
 
 from config import Config
 from i18n import setLanguage
-from sound import initializeSound
+from sound import initializeSound, finalizeSound
 from util import secondaryInstallation
 from const import VERSION
 from watchdog import Watchdog
@@ -95,6 +95,8 @@ def main():
         gui.build(programDirectory)
 
         gui.run()
+
+        finalizeSound()
     finally:
         gui.flushStdIO()
         sys.stdout = sys.__stdout__
