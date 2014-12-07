@@ -179,105 +179,57 @@ if os.name=="nt":
 
 else: # os.name!="nt"
     import threading
+    import time
     try:
-        import pyglet
+        from common import gst, gobject, gst_element_factory_make
+        from common import GST_STATE_PLAYING, GST_MESSAGE_EOS
 
-        class SoundThread(threading.Thread):
-            """A thread executing the pyglet event loop that directs the
-            playback of the sound files."""
-            class Player(pyglet.media.ManagedSoundPlayer):
-                """Player which handles the end-of-stream condition
-                properly."""
-
-                def __init__(self, finishCallback, extra):
-                    """Construct the player with the given data."""
-                    super(SoundThread.Player, self).__init__()
-
-                    self._finishCallback = finishCallback
-                    self._extra = extra
-
-                def _on_eos(self):
-                    if self._finishCallback is not None:
-                        self._finishCallback(True, self._extra)
-                    return super(SoundThread.Player, self)._on_eos()
-
-            class EventLoop(pyglet.app.EventLoop):
-                """Own implementation of the event loop that collects the
-                requested sound files and plays them."""
-
-                def __init__(self, soundsDirectory):
-                    """Construct the event loop."""
-                    super(SoundThread.EventLoop, self).__init__()
-
-                    self._soundsDirectory = soundsDirectory
-
-                    self._lock = threading.Lock()
-                    self._requestedSounds = []
-
-                def startSound(self, name, finishCallback, extra):
-                    """Add the sound with the given name"""
-                    with self._lock:
-                        path = os.path.join(self._soundsDirectory, name)
-                        self._requestedSounds.append( (path,
-                                                       finishCallback, extra) )
-
-                def idle(self):
-                    """The idle callback."""
-                    with self._lock:
-                        requestedSounds = self._requestedSounds
-                        self._requestedSounds = []
-
-                    for (path, finishCallback, extra) in requestedSounds:
-                        try:
-                            media = pyglet.media.load(path)
-                            player = SoundThread.Player(finishCallback, extra)
-                            player.queue(media)
-                            player.play()
-                        except Exception, e:
-                            print "mlx.SoundThread.EventLoop.idle: " + str(e)
-                            if finishCallback is not None:
-                                finishCallback(False, extra)
-
-                    timeout = super(SoundThread.EventLoop, self).idle()
-                    return 0.1 if timeout is None else min(timeout, 0.1)
-
-            def __init__(self, soundsDirectory):
-                """Construct the sound playing thread with the given
-                directory."""
-                super(SoundThread, self).__init__()
-
-                self.daemon = False
-                self.eventLoop = SoundThread.EventLoop(soundsDirectory)
-
-            def run(self):
-                """Run the event loop."""
-                self.eventLoop.run()
-
-            def startSound(self, name, finishCallback = None, extra = None):
-                """Start the playback of the given sound."""
-                self.eventLoop.startSound(name, finishCallback, extra)
-
-        _thread = None
+        _soundsDirectory = None
+        _bins = set()
 
         def initializeSound(soundsDirectory):
             """Initialize the sound handling with the given directory containing
             the sound files."""
-            global _thread
-            _thread = SoundThread(soundsDirectory)
-            _thread.start()
-
+            gst.init()
+            global _soundsDirectory
+            _soundsDirectory = soundsDirectory
 
         def startSound(name, finishCallback = None, extra = None):
             """Start playing back the given sound."""
-            _thread.startSound(name, finishCallback = finishCallback,
-                               extra = extra)
+            try:
+                playBin = gst_element_factory_make("playbin")
+
+                bus = playBin.get_bus()
+                bus.enable_sync_message_emission()
+                bus.add_signal_watch()
+                bus.connect("message", _handlePlayBinMessage,
+                            playBin, finishCallback, extra)
+
+                path = os.path.join(_soundsDirectory, name)
+                playBin.set_property( "uri", "file://%s" % (path,))
+
+                playBin.set_state(GST_STATE_PLAYING)
+                _bins.add(playBin)
+            except Exception, e:
+                print "mlx.sound.startSound: " + str(e)
+                if finishCallback is not None:
+                    finishCallback(False, extra)
 
         def finalizeSound():
             """Finalize the sound handling."""
-            pyglet.app.exit()
+            pass
+
+        def _handlePlayBinMessage(bus, message, bin, finishCallback, extra):
+            """Handle the end of the playback of a sound file."""
+
+            # if message.type==GST_MESSAGE_EOS:
+            #     _bins.remove(bin)
+            #     if finishCallback is not None:
+            #         finishCallback(True, extra)
 
     except:
-        print "The pyglet library is missing from your system. It is needed for sound playback on Linux"
+        print "The Gst library is missing from your system. It is needed for sound playback on Linux"
+        traceback.print_exc()
         def initializeSound(soundsDirectory):
             """Initialize the sound handling with the given directory containing
             the sound files."""
