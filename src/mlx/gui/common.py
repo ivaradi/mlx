@@ -1,4 +1,6 @@
 
+from mlx.common import *
+
 import mlx.const as _const
 from mlx.i18n import xstr
 
@@ -25,14 +27,14 @@ import os
 
 appIndicator = False
 
-if os.name=="nt" or "FORCE_PYGTK" in os.environ:
+if not pygobject:
     print "Using PyGTK"
     pygobject = False
     import pygtk
     import gtk.gdk as gdk
     import gtk
-    import gobject
     import pango
+
     try:
         import appindicator
         appIndicator = True
@@ -104,16 +106,15 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
         """Convert the given text, returned by xstr to a string."""
         return str(text)
 
-else:
-    print "Using PyGObject"
-    pygobject = True
+else: # pygobject
     from gi.repository import Gdk as gdk
     from gi.repository import GdkPixbuf as gdkPixbuf
     from gi.repository import Gtk as gtk
-    from gi.repository import GObject as gobject
     from gi.repository import AppIndicator3 as appindicator
     from gi.repository import Pango as pango
+
     appIndicator = True
+
 
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR
     MESSAGETYPE_QUESTION = gtk.MessageType.QUESTION
