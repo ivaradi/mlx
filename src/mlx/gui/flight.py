@@ -286,7 +286,7 @@ class LoginPage(Page):
         table.attach(labelAlignment, 0, 1, 0, 1)
 
         self._pilotID = gtk.Entry()
-        self._pilotID.connect("changed", self._setControls)
+        self._pilotID.connect("changed", self._pilotIDChanged)
         self._pilotID.set_tooltip_text(xstr("login_pilotID_tooltip"))
         table.attach(self._pilotID, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._pilotID)
@@ -343,6 +343,14 @@ class LoginPage(Page):
         self._password.set_text(config.password)
         self._rememberButton.set_active(config.rememberPassword)
         self._setControls(None)
+
+    def _pilotIDChanged(self, entry):
+        """Called when the pilot ID has changed.
+
+        It sets the text to upper-case and calls _setControls to update other
+        stuff."""
+        entry.set_text(entry.get_text().upper())
+        self._setControls(entry)
 
     def _setControls(self, entry = None):
         """Set the sensitivity of the various controls.
