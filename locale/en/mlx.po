@@ -705,6 +705,13 @@ msgstr ""
 "You can edit the METAR if your simulator or network\n"
 "provides different weather."
 
+msgid "briefing_help_nometar"
+msgstr ""
+"Read carefully the NOTAMs below.\n"
+"\n"
+"<b>WARNING</b>: The METAR could not be downloaded.\n"
+"Please, provide one."
+
 msgid "briefing_chelp"
 msgstr ""
 "If your simulator or network provides a different\n"

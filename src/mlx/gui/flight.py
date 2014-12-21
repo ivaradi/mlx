@@ -2003,9 +2003,12 @@ class BriefingPage(Page):
         self._metarFrame.set_label(xstr("briefing_metar_template") % (icao,))
         buffer = self._metar.get_buffer()
         if metar is None:
-            buffer.set_text(xstr("briefing_metar_failed"))
+            #buffer.set_text(xstr("briefing_metar_failed"))
+            buffer.set_text("")
+            self.setHelp(xstr("briefing_help_nometar"))
         else:
             buffer.set_text(metar)
+        self._updateButton()
 
         label = self._metarFrame.get_label_widget()
         label.set_use_underline(True)
@@ -2032,9 +2035,7 @@ class BriefingPage(Page):
         """Called when the METAR has changed."""
         if not self._uppercasingMETAR:
             self.metarEdited = True
-            self._button.set_sensitive(buffer.get_text(buffer.get_start_iter(),
-                                                       buffer.get_end_iter(),
-                                                       True)!="")
+            self._updateButton()
 
     def _metarInserted(self, textBuffer, iter, text, length):
         """Called when new characters are inserted into the METAR.
@@ -2050,6 +2051,15 @@ class BriefingPage(Page):
             textBuffer.insert(iter, text.upper())
 
             self._uppercasingMETAR = False
+
+    def _updateButton(self):
+        """Update the sensitivity of the Next button based on the contents of
+        the METAR field."""
+        buffer = self._metar.get_buffer()
+        self._button.set_sensitive(buffer.get_text(buffer.get_start_iter(),
+                                                   buffer.get_end_iter(),
+                                                   True)!="")
+
 
 #-----------------------------------------------------------------------------
 

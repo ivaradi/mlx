@@ -704,6 +704,13 @@ msgstr ""
 "Ha a szimulátor vagy hálózat más időjárást ad,\n"
 "a METAR-t módosíthatod."
 
+msgid "briefing_help_nometar"
+msgstr ""
+"Olvasd el figyelmesen a lenti NOTAM-okat.\n"
+"\n"
+"<b>FIGYELEM</b>: A METAR-t nem sikerült letölteni.\n"
+"Kérlek, gépeld be azt."
+
 msgid "briefing_chelp"
 msgstr ""
 "Ha a szimulátor vagy hálózat más időjárást ad,\n"
