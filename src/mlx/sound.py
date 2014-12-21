@@ -181,7 +181,7 @@ else: # os.name!="nt"
     import threading
     import time
     try:
-        from common import gst, gobject, gst_element_factory_make
+        from common import gst_init, gobject, gst_element_factory_make
         from common import GST_STATE_PLAYING, GST_MESSAGE_EOS
 
         _soundsDirectory = None
@@ -190,7 +190,7 @@ else: # os.name!="nt"
         def initializeSound(soundsDirectory):
             """Initialize the sound handling with the given directory containing
             the sound files."""
-            gst.init()
+            gst_init()
             global _soundsDirectory
             _soundsDirectory = soundsDirectory
 

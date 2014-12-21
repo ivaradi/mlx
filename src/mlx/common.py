@@ -26,6 +26,9 @@ if os.name=="nt" or "FORCE_PYGTK" in os.environ:
         pygst.require('0.10')
         import gst
 
+        def gst_init():
+            pass
+
         def gst_element_factory_make(what):
             return gst.element_factory_make(what)
 
@@ -41,6 +44,9 @@ else:
 
     try:
         from gi.repository import Gst as gst
+
+        def gst_init():
+            gst.init()
 
         def gst_element_factory_make(what):
             return gst.ElementFactory.make(what)
