@@ -2107,7 +2107,7 @@ class TakeoffPage(Page):
         self._metar = gtk.Entry()
         self._metar.set_width_chars(40)
         self._metar.connect("changed", self._metarChanged)
-        self._metar.connect_after("insert-text", self._metarInserted)
+        self._metar.get_buffer().connect_after("inserted-text", self._metarInserted)
         table.attach(self._metar, 1, 24, row, row+1)
         label.set_mnemonic_widget(self._metar)
 
@@ -2521,7 +2521,7 @@ class TakeoffPage(Page):
             self._updateForwardButton()
             self._wizard.metarChanged(entry.get_text(), self)
 
-    def _metarInserted(self, entry, text, length, position):
+    def _metarInserted(self, buffer, position, text, length):
         """Called when new characters are inserted into the METAR.
 
         It uppercases all characters."""
@@ -2529,9 +2529,8 @@ class TakeoffPage(Page):
         if not self._updatingMETAR:
             self._updatingMETAR = True
 
-            position = entry.get_position()
-            entry.delete_text(position, position + length)
-            entry.insert_text(text.upper(), position)
+            buffer.delete_text(position, length)
+            buffer.insert_text(position, text.upper(), length)
 
             self._updatingMETAR = False
 
