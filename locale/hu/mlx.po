@@ -751,6 +751,9 @@ msgstr ""
 msgid "takeoff_chelp"
 msgstr "A naplózott futópálya, SID és a sebességek lent olvashatók."
 
+msgid "takeoff_metar"
+msgstr "_METAR:"
+
 msgid "takeoff_runway"
 msgstr "_Futópálya:"
 

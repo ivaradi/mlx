@@ -1937,7 +1937,7 @@ class BriefingPage(Page):
                                   gtk.PolicyType.AUTOMATIC if pygobject
                                   else gtk.POLICY_AUTOMATIC)
 
-        self._uppercasingMETAR = False
+        self._updatingMETAR = False
 
         self._metar = gtk.TextView()
         self._metar.set_accepts_tab(False)
@@ -1967,9 +1967,17 @@ class BriefingPage(Page):
                                buffer.get_end_iter(), True)
 
     def setMETAR(self, metar):
-        """Set the metar."""
+        """Set the METAR."""
         self._metar.get_buffer().set_text(metar)
         self.metarEdited = False
+
+    def changeMETAR(self, metar):
+        """Change the METAR as a result of an edit on one of the other
+        pages."""
+        self._updatingMETAR = True
+        self._metar.get_buffer().set_text(metar)
+        self._updatingMETAR = False
+        self.metarEdited = True
 
     def activate(self):
         """Activate the page."""
@@ -2002,12 +2010,13 @@ class BriefingPage(Page):
 
         self._metarFrame.set_label(xstr("briefing_metar_template") % (icao,))
         buffer = self._metar.get_buffer()
+        self._updatingMETAR = True
         if metar is None:
-            #buffer.set_text(xstr("briefing_metar_failed"))
             buffer.set_text("")
             self.setHelp(xstr("briefing_help_nometar"))
         else:
             buffer.set_text(metar)
+        self._updatingMETAR = False
         self._updateButton()
 
         label = self._metarFrame.get_label_widget()
@@ -2033,16 +2042,21 @@ class BriefingPage(Page):
 
     def _metarChanged(self, buffer):
         """Called when the METAR has changed."""
-        if not self._uppercasingMETAR:
+        print "BriefingPage.metarChanged", self._updatingMETAR
+        if not self._updatingMETAR:
             self.metarEdited = True
             self._updateButton()
+            metar = buffer.get_text(buffer.get_start_iter(),
+                                buffer.get_end_iter(), True)
+            self._wizard.metarChanged(metar, self)
 
     def _metarInserted(self, textBuffer, iter, text, length):
         """Called when new characters are inserted into the METAR.
 
         It uppercases all characters."""
-        if not self._uppercasingMETAR:
-            self._uppercasingMETAR = True
+        print "BriefingPage.metarInserted", self._updatingMETAR
+        if not self._updatingMETAR:
+            self._updatingMETAR = True
 
             iter1 = iter.copy()
             iter1.backward_chars(length)
@@ -2050,7 +2064,7 @@ class BriefingPage(Page):
 
             textBuffer.insert(iter, text.upper())
 
-            self._uppercasingMETAR = False
+            self._updatingMETAR = False
 
     def _updateButton(self):
         """Update the sensitivity of the Next button based on the contents of
@@ -2076,87 +2090,115 @@ class TakeoffPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(8, 4)
+        table = gtk.Table(9, 24)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
+        row = 0
+
+        label = gtk.Label(xstr("takeoff_metar"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, row, row+1)
+
+        self._metar = gtk.Entry()
+        self._metar.set_width_chars(40)
+        self._metar.connect("changed", self._metarChanged)
+        self._metar.connect_after("insert-text", self._metarInserted)
+        table.attach(self._metar, 1, 24, row, row+1)
+        label.set_mnemonic_widget(self._metar)
+
+        self._updatingMETAR = False
+
+        row += 1
+
         label = gtk.Label(xstr("takeoff_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 0, 1)
+        table.attach(label, 0, 1, row, row+1)
 
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("takeoff_runway_tooltip"))
         self._runway.connect("changed", self._upperChanged)
-        table.attach(self._runway, 1, 3, 0, 1)
+        table.attach(self._runway, 1, 3, row, row+1)
         label.set_mnemonic_widget(self._runway)
+
+        row += 1
 
         label = gtk.Label(xstr("takeoff_sid"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 1, 2)
+        table.attach(label, 0, 1, row, row+1)
 
         self._sid = gtk.Entry()
         self._sid.set_width_chars(10)
         self._sid.set_tooltip_text(xstr("takeoff_sid_tooltip"))
         self._sid.connect("changed", self._upperChanged)
-        table.attach(self._sid, 1, 3, 1, 2)
+        table.attach(self._sid, 1, 3, row, row+1)
         label.set_mnemonic_widget(self._sid)
+
+        row += 1
 
         label = gtk.Label(xstr("takeoff_v1"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 2, 3)
+        table.attach(label, 0, 1, row, row+1)
 
         self._v1 = IntegerEntry()
         self._v1.set_width_chars(4)
         self._v1.set_tooltip_markup(xstr("takeoff_v1_tooltip_knots"))
         self._v1.connect("integer-changed", self._valueChanged)
-        table.attach(self._v1, 2, 3, 2, 3)
+        table.attach(self._v1, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._v1)
 
         self._v1Unit = gtk.Label(xstr("label_knots"))
         self._v1Unit.set_alignment(0.0, 0.5)
-        table.attach(self._v1Unit, 3, 4, 2, 3)
+        table.attach(self._v1Unit, 3, 4, row, row+1)
+
+        row += 1
 
         label = gtk.Label(xstr("takeoff_vr"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 3, 4)
+        table.attach(label, 0, 1, row, row+1)
 
         self._vr = IntegerEntry()
         self._vr.set_width_chars(4)
         self._vr.set_tooltip_markup(xstr("takeoff_vr_tooltip_knots"))
         self._vr.connect("integer-changed", self._valueChanged)
-        table.attach(self._vr, 2, 3, 3, 4)
+        table.attach(self._vr, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._vr)
 
         self._vrUnit = gtk.Label(xstr("label_knots"))
         self._vrUnit.set_alignment(0.0, 0.5)
-        table.attach(self._vrUnit, 3, 4, 3, 4)
+        table.attach(self._vrUnit, 3, 4, row, row+1)
+
+        row += 1
 
         label = gtk.Label(xstr("takeoff_v2"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 4, 5)
+        table.attach(label, 0, 1, row, row+1)
 
         self._v2 = IntegerEntry()
         self._v2.set_width_chars(4)
         self._v2.set_tooltip_markup(xstr("takeoff_v2_tooltip_knots"))
         self._v2.connect("integer-changed", self._valueChanged)
-        table.attach(self._v2, 2, 3, 4, 5)
+        table.attach(self._v2, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._v2)
 
         self._v2Unit = gtk.Label(xstr("label_knots"))
         self._v2Unit.set_alignment(0.0, 0.5)
-        table.attach(self._v2Unit, 3, 4, 4, 5)
+        table.attach(self._v2Unit, 3, 4, row, row+1)
+
+        row += 1
 
         self._derateType = acft.DERATE_NONE
 
@@ -2164,31 +2206,37 @@ class TakeoffPage(Page):
         self._derateLabel.set_use_underline(True)
         self._derateLabel.set_markup(xstr("takeoff_derate_tupolev"))
         self._derateLabel.set_alignment(0.0, 0.5)
-        table.attach(self._derateLabel, 0, 1, 5, 6)
+        table.attach(self._derateLabel, 0, 1, row, row+1)
 
         self._derate = gtk.Alignment()
-        table.attach(self._derate, 2, 4, 5, 6)
+        table.attach(self._derate, 2, 4, row, row+1)
         self._derateWidget = None
         self._derateEntry = None
         self._derateUnit = None
         self._derateButtons = None
 
+        row += 1
+
         self._antiIceOn = gtk.CheckButton(xstr("takeoff_antiice"))
         self._antiIceOn.set_use_underline(True)
         self._antiIceOn.set_tooltip_text(xstr("takeoff_antiice_tooltip"))
-        table.attach(self._antiIceOn, 2, 4, 6, 7)
+        table.attach(self._antiIceOn, 2, 4, row, row+1)
+
+        row += 1
 
         self._rto = gtk.CheckButton(xstr("takeoff_rto"))
         self._rto.set_use_underline(True)
         self._rto.set_tooltip_text(xstr("takeoff_rto_tooltip"))
         self._rto.connect("toggled", self._rtoToggled)
-        table.attach(self._rto, 2, 4, 7, 8, ypadding = 8)
+        table.attach(self._rto, 2, 4, row, row+1, ypadding = 8)
 
         self.addCancelFlightButton()
 
         self.addPreviousButton(clicked = self._backClicked)
 
         self._button = self.addNextButton(clicked = self._forwardClicked)
+
+        self._active = False
 
     @property
     def runway(self):
@@ -2254,6 +2302,10 @@ class TakeoffPage(Page):
         """Activate the page."""
         print "TakeoffPage.activate"
 
+        self._updatingMETAR = True
+        self._metar.get_buffer().set_text(self._wizard.departureMETAR, -1)
+        self._updatingMETAR = False
+
         self._runway.set_text("")
         self._runway.set_sensitive(True)
         self._sid.set_text("")
@@ -2285,6 +2337,8 @@ class TakeoffPage(Page):
         self._button.set_sensitive(False)
         self._forwardAllowed = False
 
+        self._active = True
+
     def allowForward(self):
         """Allow going to the next page."""
         print "TakeoffPage.allowForward"
@@ -2301,12 +2355,22 @@ class TakeoffPage(Page):
         self._v2.reset()
         self._hasDerate = False
         self._antiIceOn.set_active(False)
+        self._active = False
 
     def setRTOEnabled(self, enabled):
         """Set the RTO checkbox enabled or disabled."""
         if not enabled:
             self._rto.set_active(False)
         self._rto.set_sensitive(enabled)
+
+    def changeMETAR(self, metar):
+        """Change the METAR as a result of an edit on one of the other
+        pages."""
+        if self._active:
+            print "TakeoffPage.changeMETAR"
+            self._updatingMETAR = True
+            self._metar.get_buffer().set_text(metar, -1)
+            self._updatingMETAR = False
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
@@ -2449,6 +2513,27 @@ class TakeoffPage(Page):
             self._derateWidget = None
             self._derateLabel.set_text("")
             self._derateLabel.set_sensitive(False)
+
+    def _metarChanged(self, entry):
+        """Called when the METAR has changed."""
+        print "TakeoffPage.metarChanged", self._updatingMETAR
+        if not self._updatingMETAR:
+            self._updateForwardButton()
+            self._wizard.metarChanged(entry.get_text(), self)
+
+    def _metarInserted(self, entry, text, length, position):
+        """Called when new characters are inserted into the METAR.
+
+        It uppercases all characters."""
+        print "TakeoffPage.metarInserted", self._updatingMETAR
+        if not self._updatingMETAR:
+            self._updatingMETAR = True
+
+            position = entry.get_position()
+            entry.delete_text(position, position + length)
+            entry.insert_text(text.upper(), position)
+
+            self._updatingMETAR = False
 
 #-----------------------------------------------------------------------------
 
@@ -3728,6 +3813,37 @@ class Wizard(gtk.VBox):
     def cruiseLevelChanged(self):
         """Called when the cruise level is changed."""
         return self.gui.cruiseLevelChanged()
+
+    def metarChanged(self, metar, originator):
+        """Called when a METER is changed on on of the pages.
+
+        originator is the page that originated the changed. It will be used to
+        determine which METAR (departure or arrival) has changed."""
+        metar = metar.upper()
+        if originator in [self._departureBriefingPage, self._takeoffPage]:
+            self._departureMETARChanged(metar, originator)
+        else:
+            self._arrivalMETARChanged(metar, originator)
+
+    def _departureMETARChanged(self, metar, originator):
+        """Called when the departure METAR has been edited on one of the
+        pages.
+
+        originator is the page that originated the change. It will not be
+        called to set the METAR, while others will be."""
+        for page in [self._departureBriefingPage, self._takeoffPage]:
+            if page is not originator:
+                page.changeMETAR(metar)
+
+    def _arrivalMETARChanged(self, metar, originator):
+        """Called when the arrival METAR has been edited on one of the
+        pages.
+
+        originator is the page that originated the change. It will not be
+        called to set the METAR, while others will be."""
+        for page in [self._arrivalBriefingPage]:
+            if page is not originator:
+                page.changeMETAR(metar)
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""

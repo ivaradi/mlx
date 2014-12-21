@@ -750,6 +750,9 @@ msgstr "Enter the runway and SID used, as well as the speeds."
 msgid "takeoff_chelp"
 msgstr "The runway, SID and takeoff speeds logged can be seen below."
 
+msgid "takeoff_metar"
+msgstr "_METAR:"
+
 msgid "takeoff_runway"
 msgstr "Run_way:"
 
