@@ -75,7 +75,7 @@ class StageChecker(StateChecker):
                  state.vs < 0.0 and state.gearsDown:
                 aircraft.setStage(state, const.STAGE_LANDING)
         elif stage==const.STAGE_CRUISE:
-            if (state.altitude+2000) < flight.cruiseAltitude:
+            if (state.altitude+2000) < flight.cruiseAltitudeForDescent:
                 aircraft.setStage(state, const.STAGE_DESCENT)
         elif stage==const.STAGE_DESCENT or stage==const.STAGE_GOAROUND:
             if state.gearsDown and state.radioAltitude<2000.0:

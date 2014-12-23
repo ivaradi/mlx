@@ -868,9 +868,8 @@ msgstr "Cruise"
 
 msgid "cruise_help"
 msgstr ""
-"If your cruise altitude changes, you can enter the new value below.\n"
-"To actually log the value, press the <b>Update</b> button,\n"
-"when you reach the specified level."
+"If your cruise altitude changes, enter the new value below,\n"
+"and then press the <b>Update</b> button."
 
 msgid "cruise_route_level_tooltip"
 msgstr ""

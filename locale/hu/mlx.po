@@ -869,9 +869,8 @@ msgstr "Utazó"
 
 msgid "cruise_help"
 msgstr ""
-"Ha az utazószint változik, az új értéket itt írhatod be.\n"
-"Az érték tényleges naplózásához nyomd meg a <b>Frissít</b> gombot,\n"
-"amikor eléred a megadott szintet."
+"Ha az utazószint változik, írd be az új értéket, majd\n"
+"nyomd meg a <b>Frissít</b> gombot."
 
 msgid "cruise_route_level_tooltip"
 msgstr ""

@@ -110,6 +110,8 @@ class Flight(object):
         self._soundScheduler = SoundScheduler(self)
         self._checklistScheduler = ChecklistScheduler(self)
 
+        self._maxAltitude = 0
+
     @property
     def config(self):
         """Get the configuration."""
@@ -179,6 +181,19 @@ class Flight(object):
     def cruiseAltitude(self):
         """Get the cruise altitude of the flight."""
         return self._gui.cruiseAltitude
+
+    @property
+    def maxAltitude(self):
+        """Get the maximal altitude ever reached during the flight."""
+        return self._maxAltitude
+
+    @property
+    def cruiseAltitudeForDescent(self):
+        """Get the cruise altitude to check for descending.
+
+        This is the minimum of current maximal altitude and the cruise
+        altitude."""
+        return min(self._maxAltitude, self.cruiseAltitude)
 
     @property
     def route(self):
@@ -352,6 +367,8 @@ class Flight(object):
         self._soundScheduler.schedule(currentState,
                                       self._pilotHotkeyPressed)
         self._pilotHotkeyPressed = False
+
+        self._maxAltitude = max(currentState.altitude, self._maxAltitude)
 
         if self._checklistHotkeyPressed:
             self._checklistScheduler.hotkeyPressed()
