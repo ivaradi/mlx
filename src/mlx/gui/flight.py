@@ -1977,6 +1977,8 @@ class BriefingPage(Page):
         self._updatingMETAR = True
         self._metar.get_buffer().set_text(metar)
         self._updatingMETAR = False
+
+        self._updateButton()
         self.metarEdited = True
 
     def activate(self):
@@ -2372,10 +2374,13 @@ class TakeoffPage(Page):
             self._metar.get_buffer().set_text(metar, -1)
             self._updatingMETAR = False
 
+            self._updateForwardButton()
+
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
 
         sensitive = self._forwardAllowed and \
+                    self._metar.get_text()!="" and \
                     self._runway.get_text()!="" and \
                     self._sid.get_text()!="" and \
                     self.v1 is not None and \
