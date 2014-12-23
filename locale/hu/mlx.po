@@ -754,6 +754,9 @@ msgstr "A naplózott futópálya, SID és a sebességek lent olvashatók."
 msgid "takeoff_metar"
 msgstr "_METAR:"
 
+msgid "takeoff_metar_tooltip"
+msgstr "Ha szükséges, itt szerkesztheted az induló repülőtér METAR-ját."
+
 msgid "takeoff_runway"
 msgstr "_Futópálya:"
 
@@ -886,6 +889,9 @@ msgstr ""
 
 msgid "landing_metar"
 msgstr "_METAR:"
+
+msgid "landing_metar_tooltip"
+msgstr "Ha szükséges, itt szerkesztheted az erkező repülőtér METAR-ját."
 
 msgid "landing_star"
 msgstr "_STAR:"

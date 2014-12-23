@@ -2108,6 +2108,7 @@ class TakeoffPage(Page):
 
         self._metar = gtk.Entry()
         self._metar.set_width_chars(40)
+        self._metar.set_tooltip_text(xstr("takeoff_metar_tooltip"))
         self._metar.connect("changed", self._metarChanged)
         self._metar.get_buffer().connect_after("inserted-text", self._metarInserted)
         table.attach(self._metar, 1, 24, row, row+1)
@@ -2684,6 +2685,7 @@ class LandingPage(Page):
 
         self._metar = gtk.Entry()
         self._metar.set_width_chars(40)
+        self._metar.set_tooltip_text(xstr("landing_metar_tooltip"))
         self._metar.connect("changed", self._metarChanged)
         self._metar.get_buffer().connect_after("inserted-text", self._metarInserted)
         table.attach(self._metar, 1, 24, row, row+1)

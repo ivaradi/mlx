@@ -753,6 +753,9 @@ msgstr "The runway, SID and takeoff speeds logged can be seen below."
 msgid "takeoff_metar"
 msgstr "_METAR:"
 
+msgid "takeoff_metar_tooltip"
+msgstr "You may edit the departure METAR here, if necessary."
+
 msgid "takeoff_runway"
 msgstr "Run_way:"
 
@@ -885,6 +888,9 @@ msgstr ""
 
 msgid "landing_metar"
 msgstr "_METAR:"
+
+msgid "landing_metar_tooltip"
+msgstr "You may edit the arrival METAR here, if necessary."
 
 msgid "landing_star"
 msgstr "_STAR:"
