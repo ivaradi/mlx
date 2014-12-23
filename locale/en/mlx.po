@@ -581,11 +581,25 @@ msgstr "Querying time..."
 msgid "fuel_title"
 msgstr "Fuel"
 
-msgid "fuel_help"
+msgid "fuel_help_pre"
 msgstr ""
 "Enter the amount of fuel in kilograms that need to be present "
-"in each tank below.\n"
-"\n"
+"in each tank below."
+
+msgid "fuel_help_min"
+msgstr ""
+" \n\n"
+"The minimal amount of landing fuel of your aircraft is <b>%u kgs</b>."
+
+msgid "fuel_help_min_rec"
+msgstr ""
+" \n\n"
+"The minimal amount of landing fuel of your aircraft is <b>%u kgs</b>,\n"
+"and it is recommended to land with %u kgs."
+
+msgid "fuel_help_post"
+msgstr ""
+" \n\n"
 "When you press <b>Next</b>, the necessary amount of fuel\n"
 "will be pumped into or out of the tanks."
 

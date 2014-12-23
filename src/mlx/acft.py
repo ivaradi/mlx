@@ -90,10 +90,12 @@ class Aircraft(object):
         """Create an aircraft instance for the type in the given flight."""
         return _classes[flight.aircraftType](flight)
 
-    def __init__(self, flight, minLandingFuel = None):
+    def __init__(self, flight, minLandingFuel = None,
+                 recommendedLandingFuel = None):
         """Construct the aircraft for the given type."""
         self._flight = flight
         self._minLandingFuel = minLandingFuel
+        self._recommendedLandingFuel = recommendedLandingFuel
 
         self._name = None
         self._modelName = None
@@ -210,6 +212,16 @@ class Aircraft(object):
     def flight(self):
         """Get the flight the aircraft belongs to."""
         return self._flight
+
+    @property
+    def minLandingFuel(self):
+        """Get the minimum acceptable amount of the landing fuel."""
+        return self._minLandingFuel
+
+    @property
+    def recommendedLandingFuel(self):
+        """Get the recommended amount of the landing fuel."""
+        return self._recommendedLandingFuel
 
     @property
     def logger(self):
@@ -638,8 +650,12 @@ class Boeing737(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right"""
-    def __init__(self, flight, minLandingFuel = 2500):
-        super(Boeing737, self).__init__(flight, minLandingFuel = minLandingFuel)
+    def __init__(self, flight, minLandingFuel = 2500,
+                 recommendedLandingFuel = 3500):
+        super(Boeing737, self).__init__(flight,
+                                        minLandingFuel = minLandingFuel,
+                                        recommendedLandingFuel =
+                                        recommendedLandingFuel)
 
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 260,
@@ -702,7 +718,8 @@ class B738Charter(B738):
 class Boeing737CL(Boeing737):
     """Base class for the various aircraft in the Boeing 737 Classic family."""
     def __init__(self, flight):
-        super(Boeing737CL, self).__init__(flight, minLandingFuel = 3500)
+        super(Boeing737CL, self).__init__(flight, minLandingFuel = 3500,
+                                          recommendedLandingFuel = None)
 
 #---------------------------------------------------------------------------------------
 

@@ -1602,7 +1602,8 @@ class FuelPage(Page):
     def __init__(self, wizard):
         """Construct the page."""
         super(FuelPage, self).__init__(wizard, xstr("fuel_title"),
-                                       xstr("fuel_help"),
+                                       xstr("fuel_help_pre") +
+                                       xstr("fuel_help_post"),
                                        completedHelp = xstr("fuel_chelp"))
 
         self._fuelTanks = []
@@ -1624,6 +1625,17 @@ class FuelPage(Page):
     def activate(self):
         """Activate the page."""
         self._setupTanks(self._wizard._fuelData)
+
+        aircraft = self._wizard.gui.flight.aircraft
+        minLandingFuel = aircraft.minLandingFuel
+        recommendedLandingFuel = aircraft.recommendedLandingFuel
+
+        middleHelp = "" if minLandingFuel is None else \
+            (xstr("fuel_help_min") % (minLandingFuel,)) \
+            if recommendedLandingFuel is None else \
+            (xstr("fuel_help_min_rec") % (minLandingFuel,
+                                          recommendedLandingFuel))
+        self.setHelp(xstr("fuel_help_pre") + middleHelp + xstr("fuel_help_post"))
 
     def finalize(self):
         """Finalize the page."""

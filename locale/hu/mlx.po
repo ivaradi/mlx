@@ -584,10 +584,24 @@ msgstr "Idő lekérdezése..."
 msgid "fuel_title"
 msgstr "Üzemanyag"
 
-msgid "fuel_help"
+msgid "fuel_help_pre"
 msgstr ""
-"Írd be az egyes tartályokba szükséges üzemanyag mennyiségét kilogrammban.\n"
-"\n"
+"Írd be az egyes tartályokba szükséges üzemanyag mennyiségét kilogrammban"
+
+msgid "fuel_help_min"
+msgstr ""
+" \n\n"
+"A repülőgép leszállási üzemanyagának minimális mennyisége: <b>%u kg</b>."
+
+msgid "fuel_help_min_rec"
+msgstr ""
+" \n\n"
+"A repülőgép leszállási üzemanyagának minimális mennyisége: <b>%u kg</b>,\n"
+"és ajánlott %u kg üzemanyaggal földet érni."
+
+msgid "fuel_help_post"
+msgstr ""
+" \n\n"
 "Ha megnyomod az <b>Előre</b> gombot, a megadott mennyiségű\n"
 "üzemanyag bekerül a tartályokba."
 
