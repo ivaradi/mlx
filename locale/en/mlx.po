@@ -883,6 +883,9 @@ msgstr ""
 "The STAR and/or transition, runway, approach\n"
 "type and V<sub>Ref</sub> logged can be seen below."
 
+msgid "landing_metar"
+msgstr "_METAR:"
+
 msgid "landing_star"
 msgstr "_STAR:"
 

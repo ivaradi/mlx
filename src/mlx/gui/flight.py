@@ -2668,91 +2668,119 @@ class LandingPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(6, 5)
+        table = gtk.Table(7, 24)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
+        row = 0
+
+        label = gtk.Label(xstr("landing_metar"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, row, row+1)
+
+        self._metar = gtk.Entry()
+        self._metar.set_width_chars(40)
+        self._metar.connect("changed", self._metarChanged)
+        self._metar.get_buffer().connect_after("inserted-text", self._metarInserted)
+        table.attach(self._metar, 1, 24, row, row+1)
+        label.set_mnemonic_widget(self._metar)
+
+        self._updatingMETAR = False
+
+        row += 1
+
         self._starButton = gtk.CheckButton()
         self._starButton.connect("clicked", self._starButtonClicked)
-        table.attach(self._starButton, 0, 1, 0, 1)
+        table.attach(self._starButton, 0, 1, row, row + 1)
 
         label = gtk.Label(xstr("landing_star"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 0, 1)
+        table.attach(label, 1, 2, row, row + 1)
 
         self._star = gtk.Entry()
         self._star.set_width_chars(10)
         self._star.set_tooltip_text(xstr("landing_star_tooltip"))
         self._star.connect("changed", self._upperChanged)
         self._star.set_sensitive(False)
-        table.attach(self._star, 2, 4, 0, 1)
+        table.attach(self._star, 2, 4, row, row + 1)
         label.set_mnemonic_widget(self._starButton)
+
+        row += 1
 
         self._transitionButton = gtk.CheckButton()
         self._transitionButton.connect("clicked", self._transitionButtonClicked)
-        table.attach(self._transitionButton, 0, 1, 1, 2)
+        table.attach(self._transitionButton, 0, 1, row, row + 1)
 
         label = gtk.Label(xstr("landing_transition"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 1, 2)
+        table.attach(label, 1, 2, row, row + 1)
 
         self._transition = gtk.Entry()
         self._transition.set_width_chars(10)
         self._transition.set_tooltip_text(xstr("landing_transition_tooltip"))
         self._transition.connect("changed", self._upperChanged)
         self._transition.set_sensitive(False)
-        table.attach(self._transition, 2, 4, 1, 2)
+        table.attach(self._transition, 2, 4, row, row + 1)
         label.set_mnemonic_widget(self._transitionButton)
+
+        row += 1
 
         label = gtk.Label(xstr("landing_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 2, 3)
+        table.attach(label, 1, 2, row, row + 1)
 
         self._runway = gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("landing_runway_tooltip"))
         self._runway.connect("changed", self._upperChanged)
-        table.attach(self._runway, 2, 4, 2, 3)
+        table.attach(self._runway, 2, 4, row, row + 1)
         label.set_mnemonic_widget(self._runway)
+
+        row += 1
 
         label = gtk.Label(xstr("landing_approach"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 3, 4)
+        table.attach(label, 1, 2, row, row + 1)
 
         self._approachType = gtk.Entry()
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
         self._approachType.connect("changed", self._upperChanged)
-        table.attach(self._approachType, 2, 4, 3, 4)
+        table.attach(self._approachType, 2, 4, row, row + 1)
         label.set_mnemonic_widget(self._approachType)
+
+        row += 1
 
         label = gtk.Label(xstr("landing_vref"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 1, 2, 4, 5)
+        table.attach(label, 1, 2, row, row + 1)
 
         self._vref = IntegerEntry()
         self._vref.set_width_chars(5)
         self._vref.set_tooltip_markup(xstr("landing_vref_tooltip_knots"))
         self._vref.connect("integer-changed", self._vrefChanged)
-        table.attach(self._vref, 3, 4, 4, 5)
+        table.attach(self._vref, 3, 4, row, row + 1)
         label.set_mnemonic_widget(self._vref)
 
         self._vrefUnit = gtk.Label(xstr("label_knots"))
-        table.attach(self._vrefUnit, 4, 5, 4, 5)
+        table.attach(self._vrefUnit, 4, 5, row, row + 1)
+
+        row += 1
 
         self._antiIceOn = gtk.CheckButton(xstr("landing_antiice"))
         self._antiIceOn.set_use_underline(True)
         self._antiIceOn.set_tooltip_text(xstr("landing_antiice_tooltip"))
-        table.attach(self._antiIceOn, 3, 5, 5, 6)
+        table.attach(self._antiIceOn, 3, 5, row, row + 1)
 
         self.addCancelFlightButton()
 
@@ -2763,6 +2791,8 @@ class LandingPage(Page):
         # These are needed for correct size calculations
         self._starButton.set_active(True)
         self._transitionButton.set_active(True)
+
+        self._active = False
 
     @property
     def star(self):
@@ -2806,9 +2836,14 @@ class LandingPage(Page):
         self._vref.reset()
         self._antiIceOn.set_active(False)
         self._flightEnded = False
+        self._active = False
 
     def activate(self):
         """Called when the page is activated."""
+        self._updatingMETAR = True
+        self._metar.get_buffer().set_text(self._wizard.arrivalMETAR, -1)
+        self._updatingMETAR = False
+
         self._starButton.set_sensitive(True)
         self._starButton.set_active(False)
         self._star.set_text("")
@@ -2835,11 +2870,24 @@ class LandingPage(Page):
 
         self._updateForwardButton()
 
+        self._active = True
+
     def flightEnded(self):
         """Called when the flight has ended."""
         super(LandingPage, self).flightEnded()
         self._flightEnded = True
         self._updateForwardButton()
+
+    def changeMETAR(self, metar):
+        """Change the METAR as a result of an edit on one of the other
+        pages."""
+        if self._active:
+            print "LandingPage.changeMETAR"
+            self._updatingMETAR = True
+            self._metar.get_buffer().set_text(metar, -1)
+            self._updatingMETAR = False
+
+            self._updateForwardButton()
 
     def _starButtonClicked(self, button):
         """Called when the STAR button is clicked."""
@@ -2860,6 +2908,7 @@ class LandingPage(Page):
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
         sensitive = self._flightEnded and \
+                    self._metar.get_text()!="" and \
                     (self._starButton.get_active() or \
                      self._transitionButton.get_active()) and \
                     (self._star.get_text()!="" or
@@ -2901,6 +2950,26 @@ class LandingPage(Page):
     def _fleetRetrieved(self, fleet):
         """Callback for the fleet retrieval."""
         self._wizard.nextPage()
+
+    def _metarChanged(self, entry):
+        """Called when the METAR has changed."""
+        print "LandingPage.metarChanged", self._updatingMETAR
+        if not self._updatingMETAR:
+            self._updateForwardButton()
+            self._wizard.metarChanged(entry.get_text(), self)
+
+    def _metarInserted(self, buffer, position, text, length):
+        """Called when new characters are inserted into the METAR.
+
+        It uppercases all characters."""
+        print "LandingPage.metarInserted", self._updatingMETAR
+        if not self._updatingMETAR:
+            self._updatingMETAR = True
+
+            buffer.delete_text(position, length)
+            buffer.insert_text(position, text.upper(), length)
+
+            self._updatingMETAR = False
 
 #-----------------------------------------------------------------------------
 
@@ -3845,7 +3914,7 @@ class Wizard(gtk.VBox):
 
         originator is the page that originated the change. It will not be
         called to set the METAR, while others will be."""
-        for page in [self._arrivalBriefingPage]:
+        for page in [self._arrivalBriefingPage, self._landingPage]:
             if page is not originator:
                 page.changeMETAR(metar)
 

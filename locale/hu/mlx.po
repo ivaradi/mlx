@@ -884,6 +884,9 @@ msgstr ""
 "A tervezett STAR és/vagy bevezetési eljárás neve, a használt\n"
 "futópálya, a megközelítés módja és a V<sub>Ref</sub> lent olvasható."
 
+msgid "landing_metar"
+msgstr "_METAR:"
+
 msgid "landing_star"
 msgstr "_STAR:"
 
@@ -903,7 +906,7 @@ msgid "landing_runway_tooltip"
 msgstr "A leszállásra használt futópálya."
 
 msgid "landing_approach"
-msgstr "_Megközelítés típusa:"
+msgstr "Megközelítés _típusa:"
 
 msgid "landing_approach_tooltip"
 msgstr "A megközelítgés típusa, pl. ILS vagy VISUAL."
