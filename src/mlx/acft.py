@@ -90,9 +90,10 @@ class Aircraft(object):
         """Create an aircraft instance for the type in the given flight."""
         return _classes[flight.aircraftType](flight)
 
-    def __init__(self, flight):
+    def __init__(self, flight, minLandingFuel = None):
         """Construct the aircraft for the given type."""
         self._flight = flight
+        self._minLandingFuel = minLandingFuel
 
         self._name = None
         self._modelName = None
@@ -358,6 +359,13 @@ class Aircraft(object):
                                           force = True)
                 self.logger.message(aircraftState.timestamp, "Flight time end")
                 self._flight.logFuel(aircraftState)
+                if self._minLandingFuel is not None and \
+                   aircraftState.totalFuel<self._minLandingFuel:
+                    self._flight.handleNoGo(self.__class__,
+                                            aircraftState.timestamp,
+                                            "The amount of the landing fuel is less than the minimum for this type: %ukgs" %
+                                            (self._minLandingFuel,),
+                                            "LANDING FUEL NO GO")
                 self.logger.message(aircraftState.timestamp,
                                     "Landing weight: %.0f kg, MLW: %.0f" % \
                                     (aircraftState.grossWeight, self.mlw))
@@ -630,8 +638,8 @@ class Boeing737(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right"""
-    def __init__(self, flight):
-        super(Boeing737, self).__init__(flight)
+    def __init__(self, flight, minLandingFuel = 2500):
+        super(Boeing737, self).__init__(flight, minLandingFuel = minLandingFuel)
 
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 260,
@@ -691,7 +699,14 @@ class B738Charter(B738):
 
 #---------------------------------------------------------------------------------------
 
-class B733(Boeing737):
+class Boeing737CL(Boeing737):
+    """Base class for the various aircraft in the Boeing 737 Classic family."""
+    def __init__(self, flight):
+        super(Boeing737CL, self).__init__(flight, minLandingFuel = 3500)
+
+#---------------------------------------------------------------------------------------
+
+class B733(Boeing737CL):
     """Boeing 737-300 aircraft."""
     def __init__(self, flight):
         super(B733, self).__init__(flight)
@@ -702,7 +717,7 @@ class B733(Boeing737):
 
 #---------------------------------------------------------------------------------------
 
-class B734(Boeing737):
+class B734(Boeing737CL):
     """Boeing 737-400 aircraft."""
     def __init__(self, flight):
         super(B734, self).__init__(flight)
@@ -713,7 +728,7 @@ class B734(Boeing737):
 
 #---------------------------------------------------------------------------------------
 
-class B735(Boeing737):
+class B735(Boeing737CL):
     """Boeing 737-500 aircraft."""
     def __init__(self, flight):
         super(B735, self).__init__(flight)
@@ -734,7 +749,7 @@ class DH8D(Aircraft):
     - reverser: left, right."""
 
     def __init__(self, flight):
-        super(DH8D, self).__init__(flight)
+        super(DH8D, self).__init__(flight, minLandingFuel = 2000)
         self.dow = 17185
         self.mtow = 29257
         self.mlw = 28009
@@ -756,8 +771,8 @@ class Boeing767(Aircraft):
     - n1: left, right
     - reverser: left, right"""
 
-    def __init__(self, flight):
-        super(Boeing767, self).__init__(flight)
+    def __init__(self, flight, minLandingFuel = 9000):
+        super(Boeing767, self).__init__(flight, minLandingFuel = minLandingFuel)
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 255,
                                  5 : 235,
@@ -804,7 +819,7 @@ class CRJ2(Aircraft):
     - n1: left, right
     - reverser: left, right."""
     def __init__(self, flight):
-        super(CRJ2, self).__init__(flight)
+        super(CRJ2, self).__init__(flight, minLandingFuel = 1000)
         self.dow = 14549
         self.mtow = 22995
         self.mlw = 21319
@@ -826,7 +841,7 @@ class F70(Aircraft):
     - n1: left, right
     - reverser: left, right."""
     def __init__(self, flight):
-        super(F70, self).__init__(flight)
+        super(F70, self).__init__(flight, minLandingFuel = 1900)
         self.dow = 24283
         self.mtow = 38100 # FIXME: differentiate by registration number,
                           # MTOW of HA-LMF: 41955
@@ -885,7 +900,7 @@ class T134(Aircraft):
     - n1: left, right
     - reverser: left, right."""
     def __init__(self, flight):
-        super(T134, self).__init__(flight)
+        super(T134, self).__init__(flight, minLandingFuel = 3000)
         self.dow = 29500
         self.mtow = 49000
         self.mlw = 43000
@@ -931,7 +946,7 @@ class T154(Aircraft):
     - n1: left, centre, right
     - reverser: left, right"""
     def __init__(self, flight):
-        super(T154, self).__init__(flight)
+        super(T154, self).__init__(flight, minLandingFuel = 5000)
         self.dow = 53259
         self.mtow = 98000
         self.mlw = 78000
