@@ -1323,6 +1323,19 @@ class PitotChecker(PatientFaultChecker):
 
 #---------------------------------------------------------------------------------------
 
+class ReverserLogger(StateChecker):
+    """Logger for the reverser."""
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Log the cruise speed if necessary."""
+        if oldState is not None and state.reverser != oldState.reverser:
+            reverser = max(state.reverser)
+            logger.message(state.timestamp,
+                           "Reverser " + ("unlocked" if reverser else "closed") +
+                           (" - %.0f %s" % (flight.speedFromKnots(state.ias),
+                                            flight.getEnglishSpeedUnit())))
+
+#---------------------------------------------------------------------------------------
+
 class ReverserChecker(SimpleFaultChecker):
     """Check if the reverser is not used below the speed prescribed for the
     aircraft."""
@@ -1331,12 +1344,12 @@ class ReverserChecker(SimpleFaultChecker):
         return flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING,
                                 const.STAGE_TAXIAFTERLAND] and \
             state.reverser and \
-            state.groundSpeed<aircraft.reverseMinSpeed and max(state.reverser)
+            state.ias<aircraft.reverseMinSpeed and max(state.reverser)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
         message = "Reverser used below %.0f %s" % \
-                  (flight.speedFromKnots(60), flight.getEnglishSpeedUnit())
+                  (flight.speedFromKnots(aircraft.reverseMinSpeed), flight.getEnglishSpeedUnit())
         flight.handleFault(ReverserChecker, state.timestamp,
                            FaultChecker._appendDuring(flight, message),
                            15)

@@ -113,7 +113,8 @@ class Aircraft(object):
 
         self.humanWeight = 82.0
 
-        self.reverseMinSpeed = 60
+        self.initialClimbSpeedAltitude = 1500
+        self.reverseMinSpeed = 50
 
         self.needNoStrobeSpeedCheck = False
 
@@ -193,6 +194,7 @@ class Aircraft(object):
 
         self._checkers.append(checks.PitotChecker())
 
+        self._checkers.append(checks.ReverserLogger())
         self._checkers.append(checks.ReverserChecker())
 
         if flight.aircraftType is not None and config.enableApproachCallouts:
