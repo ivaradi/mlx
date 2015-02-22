@@ -192,24 +192,30 @@ class CruiseSpeedLogger(StateChecker):
 #---------------------------------------------------------------------------------------
 
 class SpoilerLogger(StateChecker):
-    """Logger for the cruise speed."""
+    """Logger for the spoiler."""
     def __init__(self):
         """Construct the logger."""
+        self._spoilersDown = True
         self._logged = False
         self._spoilersExtension = None
 
     def check(self, flight, aircraft, logger, oldState, state):
         """Log the cruise speed if necessary."""
-        if flight.stage==const.STAGE_LANDING and not self._logged:
-            if state.onTheGround:
-                if state.spoilersExtension!=self._spoilersExtension:
-                    logger.message(state.timestamp, "Spoilers deployed")
+        spoilersDown = state.spoilersExtension==0
+
+        if flight.stage==const.STAGE_LANDING and state.onTheGround:
+            if not self._logged:
+                if not spoilersDown and self._spoilersDown:
+                    logger.message(state.timestamp, "Speedbrake deployed")
                     self._logged = True
                     config = flight.config
                     if config.enableSounds and config.speedbrakeAtTD:
                         startSound(const.SOUND_SPEEDBRAKE)
-            else:
-                self._spoilersExtension = state.spoilersExtension
+        elif spoilersDown!=self._spoilersDown:
+            logger.message(state.timestamp,
+                           "Speedbrake " + ("down" if spoilersDown else "up"))
+
+        self._spoilersDown = spoilersDown
 
 #---------------------------------------------------------------------------------------
 
