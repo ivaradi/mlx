@@ -243,7 +243,7 @@ table = (("info_delay_",
              ["ULD", "KONTÉNER"],
              ["Lack of and/or unserviceable ULD's or pallets",
               "Üzemképes konténerek és raklapok hiánya"]]),
-           (DELAYCODE, FOR_MODERN | FOR_OT,
+           (DELAYCODE, FOR_MODERN,
             [None, "39", "GT",
              ["TECHNICAL EQUIPMENT", "BERENDEZÉSEK"],
              ["Lack and/or breakdown; lack of operating staff;\n"
@@ -829,11 +829,46 @@ def generateFiles(baseDir):
         print >> dcdata
         print >> dcdata, "CAPTION = 1"
         print >> dcdata, "DELAYCODE = 2"
+        print >> dcdata
 
         tableMask = 1
         for i in range(0, len(tablePrefixes)):
+            print >> dcdata, "_%s_code2meaning = {" % (tablePrefixes[i],)
+
+            columnIndexes = []
+            for j in range(0, len(headings)):
+                if ( (headingFlags[j]&tableMask)==tableMask ):
+                    columnIndexes.append(j)
+
+            codeIndex = columnIndexes[0]
+            meaningIndex = columnIndexes[2]
+
+            rowIndex = 0
+            for (type, mask, columns) in rows:
+                if (mask&tableMask)!=tableMask:
+                    continue
+
+                if type==DELAYCODE:
+                    print >> dcdata, "    \"%s\": \"%s\"," % \
+                      (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", ""))
+
+            print >> dcdata, "}"
+            print >> dcdata
+
+            tableMask <<= 1
+
+        print >> dcdata, "def _extract(table, row):"
+        print >> dcdata, "    code = row[0].strip()"
+        print >> dcdata, "    meaning = table[code] if code in table else None"
+        print >> dcdata, "    return code + ((\" (\" + meaning + \")\") if meaning else \"\")"
+        print >> dcdata
+
+        tableMask = 1
+        for i in range(0, len(tablePrefixes)):
+
             print >> dcdata, "_%s_data = (" % (tablePrefixes[i],)
-            print >> dcdata, "    %s," % (extractor,)
+            print >> dcdata, "    lambda row: _extract(_%s_code2meaning, row)," % \
+              (tablePrefixes[i],)
             print >> dcdata, "    [",
 
             columnIndexes = []
