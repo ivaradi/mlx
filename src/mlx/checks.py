@@ -168,6 +168,26 @@ class TakeOffLogger(StateChecker):
 
 #---------------------------------------------------------------------------------------
 
+class InitialClimbSpeedLogger(StateChecker):
+    """Logger for the initial climb speed."""
+    def __init__(self):
+        """Construct the logger."""
+        self._logged = False
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Log the initial climb speed if the altitude is reached."""
+        if not self._logged and \
+           state.radioAltitude>=aircraft.initialClimbSpeedAltitude and \
+           flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB]:
+            logger.message(state.timestamp,
+                           "Initial climb speed: %.0f %s - %.0f ft AGL" % \
+                           (flight.speedFromKnots(state.ias),
+                            flight.getEnglishSpeedUnit(),
+                            state.radioAltitude))
+            self._logged = True
+
+#---------------------------------------------------------------------------------------
+
 class CruiseSpeedLogger(StateChecker):
     """Logger for the cruise speed."""
     def __init__(self):

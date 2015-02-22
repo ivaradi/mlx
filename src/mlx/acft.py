@@ -147,6 +147,7 @@ class Aircraft(object):
         self._checkers.append(checks.FlapsLogger())
 
         self._checkers.append(checks.GearsLogger())
+        self._checkers.append(checks.InitialClimbSpeedLogger())
         self._checkers.append(checks.CruiseSpeedLogger())
         self._checkers.append(checks.SpoilerLogger())
         self._checkers.append(checks.APLogger())
