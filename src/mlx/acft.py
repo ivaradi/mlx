@@ -373,11 +373,10 @@ class Aircraft(object):
                 self._flight.logFuel(aircraftState)
                 if self._minLandingFuel is not None and \
                    aircraftState.totalFuel<self._minLandingFuel:
-                    self._flight.handleNoGo(self.__class__,
-                                            aircraftState.timestamp,
-                                            "The amount of the landing fuel is less than the minimum for this type: %ukgs" %
-                                            (self._minLandingFuel,),
-                                            "LANDING FUEL NO GO")
+                    self._flight.handleFault(self.__class__,
+                                             aircraftState.timestamp,
+                                             "The amount of the landing fuel is less than the minimum for this type: %ukgs (possible NO GO!)" %
+                                             (self._minLandingFuel,), 0)
                 self.logger.message(aircraftState.timestamp,
                                     "Landing weight: %.0f kg, MLW: %.0f" % \
                                     (aircraftState.grossWeight, self.mlw))
