@@ -692,12 +692,10 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, DelayedChangeMixin):
                    self._lastChangeState is not None else state
         speed = logState.groundSpeed if logState.groundSpeed<80.0 \
                 else logState.ias
-        message = "Flaps %.0f - %.0f %s" % \
+        message = "Flaps %.0f - %.0f %s, %.0f ft AGL, %.0f ft AMSL" % \
                (logState.flapsSet, flight.speedFromKnots(speed),
-                flight.getEnglishSpeedUnit())
-
-        if flight.stage in [const.STAGE_DESCENT, const.STAGE_LANDING]:
-            message += ", %.0f ft AGL" % (logState.radioAltitude,)
+                flight.getEnglishSpeedUnit(), logState.radioAltitude,
+                logState.altitude)
 
         return message
 
