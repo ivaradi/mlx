@@ -68,6 +68,8 @@ class FlightInfo(gtk.VBox):
         self._comments.get_buffer().connect("changed", self._commentsChanged)
 
         self._faultExplainWidget = FaultExplainWidget()
+        self._faultExplainWidget.connect("explanations-changed",
+                                         self._faultExplanationsChanged)
         commentsBox.pack_start(self._faultExplainWidget, True, True, 8)
 
         self._commentsAlignment.add(commentsBox)
@@ -127,6 +129,11 @@ class FlightInfo(gtk.VBox):
         """Determine if there is at least one delay code selected."""
         return self._delayCodeTable.hasDelayCode
 
+    @property
+    def faultsFullyExplained(self):
+        """Determine if all the faults have been explained by the pilot."""
+        return self._faultExplainWidget.fullyExplained
+
     def addFault(self, id, faultText):
         """Add a fault to the list of faults."""
         self._faultExplainWidget.addFault(id, faultText)
@@ -167,3 +174,7 @@ class FlightInfo(gtk.VBox):
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""
         self._gui.commentsChanged()
+
+    def _faultExplanationsChanged(self, faultExplainWidget, fullyExplained):
+        """Called when the status of the fault explanations has changed."""
+        self._gui.faultExplanationsChanged()

@@ -407,6 +407,12 @@ class GUI(fs.ConnectionListener):
         """Determine if there is at least one delay code selected."""
         return self._flightInfo.hasDelayCode
 
+    @property
+    def faultsFullyExplained(self):
+        """Determine if all the faults have been fully explained by the
+        user."""
+        return self._flightInfo.faultsFullyExplained
+
     def run(self):
         """Run the GUI."""
         if self.config.autoUpdate:
@@ -808,6 +814,11 @@ class GUI(fs.ConnectionListener):
     def delayCodesChanged(self):
         """Called when the delay codes have changed."""
         self._wizard.delayCodesChanged()
+
+    def faultExplanationsChanged(self):
+        """Called when the status of the explanations of the faults have
+        changed."""
+        self._wizard.faultExplanationsChanged()
 
     def updateRTO(self, inLoop = False):
         """Indicate that the RTO state should be updated."""

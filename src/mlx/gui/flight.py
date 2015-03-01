@@ -3272,7 +3272,8 @@ class FinishPage(Page):
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0) and \
                     (not self._tooBigTimeDifference or
-                     gui.hasComments or gui.hasDelayCode)
+                     gui.hasComments or gui.hasDelayCode) and \
+                    gui.faultsFullyExplained
 
         wasSensitive = self._saveButton.get_sensitive()
 
@@ -4018,6 +4019,10 @@ class Wizard(gtk.VBox):
 
     def delayCodesChanged(self):
         """Called when the delay codes have changed."""
+        self._finishPage.updateButtons()
+
+    def faultExplanationsChanged(self):
+        """Called when the faults and their explanations have changed."""
         self._finishPage.updateButtons()
 
     def rtoToggled(self, indicated):
