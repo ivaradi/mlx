@@ -7,7 +7,7 @@ from mlx.gui.common import *
 
 #-------------------------------------------------------------------------------
 
-## @package mlx.gui.faultexplan
+## @package mlx.gui.faultexplain
 #
 # The widget and associated logic to display faults and allow the pilot to
 # explain them. Each fault is displayed as the text it is accompanied by in the
