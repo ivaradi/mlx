@@ -594,16 +594,16 @@ class GUI(fs.ConnectionListener):
     def addFault(self, id, timestampString, text):
         """Add a fault to the list of faults."""
         faultText = formatFlightLogLine(timestampString, text).strip()
-        self._flightInfo.addFault(id, faultText)
+        gobject.idle_add(self._flightInfo.addFault, id, faultText)
 
     def updateFault(self, id, timestampString, text):
         """Update a fault in the list of faults."""
         faultText = formatFlightLogLine(timestampString, text).strip()
-        self._flightInfo.updateFault(id, faultText)
+        gobject.idle_add(self._flightInfo.updateFault, id, faultText)
 
     def clearFault(self, id):
         """Clear a fault in the list of faults."""
-        self._flightInfo.clearFault(id)
+        gobject.idle_add(self._flightInfo.clearFault, id)
 
     def _removeFlightLogLine(self, index):
         """Perform the real removal."""
