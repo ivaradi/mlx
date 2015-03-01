@@ -283,15 +283,26 @@ class Logger(object):
                                         text = text,
                                         faultScore = score)
             self._updateEntry(id, newEntry)
+            if latestEntry.isFault:
+                self._output.updateFault(id, newEntry.timestampString, text)
+            else:
+                self._output.addFault(id, newEntry.timestampString, text)
         elif updateID is not None:
             id = updateID
-            newEntry = self._entries[id].copy(timestamp = timestamp,
-                                              text = text, faultID = faultID,
-                                              faultScore = score)
+            oldEntry = self._entries[id]
+            newEntry = oldEntry.copy(timestamp = timestamp,
+                                     text = text, faultID = faultID,
+                                     faultScore = score)
             self._updateEntry(id, newEntry)
+            if oldEntry.isFault:
+                self._output.updateFault(id, newEntry.timestampString, text)
+            else:
+                self._output.addFault(id, newEntry.timestampString, text)
         else:
-            id = self._addEntry(Logger.Entry(timestamp, text, faultID = faultID,
-                                             faultScore = score))
+            entry = Logger.Entry(timestamp, text, faultID = faultID,
+                                 faultScore = score)
+            id = self._addEntry(entry)
+            self._output.addFault(id, entry.timestampString, text)
 
         if updateID is None:
             (messageType, duration) = (const.MESSAGETYPE_NOGO, 10) \
@@ -327,6 +338,7 @@ class Logger(object):
         and clear its fault state."""
         newEntry = self._entries[id].copy(text = text, clearFault = True)
         self._updateEntry(id, newEntry)
+        self._output.clearFault(id)
 
     def _addEntry(self, entry):
         """Add the given entry to the log.

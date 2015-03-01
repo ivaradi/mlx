@@ -56,7 +56,9 @@ if not pygobject:
     CONTROL_MASK = gdk.CONTROL_MASK
     DIALOG_MODAL = gtk.DIALOG_MODAL
     WRAP_WORD = gtk.WRAP_WORD
+
     JUSTIFY_CENTER = gtk.JUSTIFY_CENTER
+    JUSTIFY_LEFT = gtk.JUSTIFY_LEFT
 
     CONTROL_MASK = gdk.CONTROL_MASK
     SHIFT_MASK = gdk.SHIFT_MASK
@@ -77,6 +79,8 @@ if not pygobject:
     SHADOW_NONE = gtk.SHADOW_NONE
 
     POLICY_AUTOMATIC = gtk.POLICY_AUTOMATIC
+    POLICY_NEVER = gtk.POLICY_NEVER
+    POLICY_ALWAYS = gtk.POLICY_ALWAYS
 
     WEIGHT_NORMAL = pango.WEIGHT_NORMAL
     WEIGHT_BOLD = pango.WEIGHT_BOLD
@@ -130,6 +134,7 @@ else: # pygobject
     DIALOG_MODAL = gtk.DialogFlags.MODAL
     WRAP_WORD = gtk.WrapMode.WORD
     JUSTIFY_CENTER = gtk.Justification.CENTER
+    JUSTIFY_LEFT = gtk.Justification.LEFT
 
     CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
     SHIFT_MASK = gdk.ModifierType.SHIFT_MASK
@@ -150,6 +155,8 @@ else: # pygobject
     SHADOW_NONE = gtk.ShadowType.NONE
 
     POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
+    POLICY_NEVER = gtk.PolicyType.NEVER
+    POLICY_ALWAYS = gtk.PolicyType.ALWAYS
 
     WEIGHT_NORMAL = pango.Weight.NORMAL
     WEIGHT_BOLD = pango.Weight.BOLD

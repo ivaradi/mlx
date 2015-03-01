@@ -2,6 +2,7 @@
 from common import *
 
 from mlx.gui.delaycodes import DelayCodeTable
+from mlx.gui.faultexplain import FaultExplainWidget
 
 from mlx.i18n import xstr
 import mlx.const as const
@@ -13,9 +14,9 @@ import mlx.const as const
 # The flight info tab.
 #
 # This module implements to \ref FlightInfo class, which is the widget for the
-# extra information related to the flight. It contains text areas for the
-# comments and the flight defects at the top next to each other, and the frame
-# for the delay codes at the bottom in the centre.
+# extra information related to the flight. It contains a text area for the
+# comments, the fault list widget, and the frame for the delay codes at the
+# bottom in the centre.
 
 #------------------------------------------------------------------------------
 
@@ -60,14 +61,14 @@ class FlightInfo(gtk.VBox):
         self._commentsAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                                 xscale = 1.0, yscale = 1.0)
         commentsBox = gtk.HBox()
+        commentsBox.set_homogeneous(True)
 
         (frame, self._comments) = FlightInfo._createCommentArea(xstr("info_comments"))
         commentsBox.pack_start(frame, True, True, 8)
         self._comments.get_buffer().connect("changed", self._commentsChanged)
 
-        (frame, self._flightDefects) = \
-             FlightInfo._createCommentArea(xstr("info_defects"))
-        commentsBox.pack_start(frame, True, True, 8)
+        self._faultExplainWidget = FaultExplainWidget()
+        commentsBox.pack_start(self._faultExplainWidget, True, True, 8)
 
         self._commentsAlignment.add(commentsBox)
         self.pack_start(self._commentsAlignment, True, True, 8)
@@ -112,11 +113,9 @@ class FlightInfo(gtk.VBox):
         return self._comments.get_buffer().get_char_count()>0
 
     @property
-    def flightDefects(self):
-        """Get the flight defects."""
-        buffer = self._flightDefects.get_buffer()
-        return text2unicode(buffer.get_text(buffer.get_start_iter(),
-                                            buffer.get_end_iter(), True))
+    def faultsAndExplanations(self):
+        """Get the faults and explanations as HTML."""
+        return self._faultExplainWidget.html
 
     @property
     def delayCodes(self):
@@ -128,10 +127,22 @@ class FlightInfo(gtk.VBox):
         """Determine if there is at least one delay code selected."""
         return self._delayCodeTable.hasDelayCode
 
+    def addFault(self, id, faultText):
+        """Add a fault to the list of faults."""
+        self._faultExplainWidget.addFault(id, faultText)
+
+    def updateFault(self, id, faultText):
+        """Update a fault to the list of faults."""
+        self._faultExplainWidget.updateFault(id, faultText)
+
+    def clearFault(self, id):
+        """Clear a fault to the list of faults."""
+        self._faultExplainWidget.clearFault(id)
+
     def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
-        self._flightDefects.set_sensitive(True)
+        self._faultExplainWidget.set_sensitive(True)
         self._delayCodeTable.setType(aircraftType)
         self._delayWindow.set_sensitive(True)
         self._delayCodeTable.setStyle()
@@ -139,14 +150,14 @@ class FlightInfo(gtk.VBox):
     def disable(self):
         """Enable the flight info tab."""
         self._comments.set_sensitive(False)
-        self._flightDefects.set_sensitive(False)
+        self._faultExplainWidget.set_sensitive(False)
         self._delayWindow.set_sensitive(False)
         self._delayCodeTable.setStyle()
 
     def reset(self):
         """Reset the flight info tab."""
         self._comments.get_buffer().set_text("")
-        self._flightDefects.get_buffer().set_text("")
+        self._faultExplainWidget.reset()
         self._delayCodeTable.reset()
 
     def delayCodesChanged(self):

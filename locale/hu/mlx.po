@@ -1074,8 +1074,8 @@ msgstr "A PIREP automatikus mentése..."
 msgid "info_comments"
 msgstr "_Megjegyzések"
 
-msgid "info_defects"
-msgstr "Hib_ajelenségek"
+msgid "info_faults"
+msgstr "_Hibák"
 
 msgid "info_delay"
 msgstr "Késés kódok"

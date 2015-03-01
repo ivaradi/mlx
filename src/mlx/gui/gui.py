@@ -395,7 +395,7 @@ class GUI(fs.ConnectionListener):
     @property
     def flightDefects(self):
         """Get the flight defects."""
-        return self._flightInfo.flightDefects
+        return self._flightInfo.faultsAndExplanations
 
     @property
     def delayCodes(self):
@@ -584,6 +584,20 @@ class GUI(fs.ConnectionListener):
     def removeFlightLogLine(self, index):
         """Remove the flight log line with the given index."""
         gobject.idle_add(self._removeFlightLogLine, index)
+
+    def addFault(self, id, timestampString, text):
+        """Add a fault to the list of faults."""
+        faultText = formatFlightLogLine(timestampString, text).strip()
+        self._flightInfo.addFault(id, faultText)
+
+    def updateFault(self, id, timestampString, text):
+        """Update a fault in the list of faults."""
+        faultText = formatFlightLogLine(timestampString, text).strip()
+        self._flightInfo.updateFault(id, faultText)
+
+    def clearFault(self, id):
+        """Clear a fault in the list of faults."""
+        self._flightInfo.clearFault(id)
 
     def _removeFlightLogLine(self, index):
         """Perform the real removal."""

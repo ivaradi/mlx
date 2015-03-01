@@ -1071,8 +1071,8 @@ msgstr "Saving PIREP automatically..."
 msgid "info_comments"
 msgstr "_Comments"
 
-msgid "info_defects"
-msgstr "Flight _defects"
+msgid "info_faults"
+msgstr "F_aults"
 
 msgid "info_delay"
 msgstr "Delay codes"
