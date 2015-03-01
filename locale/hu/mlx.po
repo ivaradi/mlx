@@ -966,6 +966,11 @@ msgstr ""
 "Ellenőrizd az adatokat, az előző oldalakon is, és ha\n"
 "megfelelnek, elmentheted vagy elküldheted a PIREP-et."
 
+msgid "finish_help_faults"
+msgstr ""
+"<span foreground=\"red\">\n\nA repülés során vétettél egy vagy több hibát. Kérlek, a Járat info oldalon\n"
+"írj ezekre magyarázatot a Járat info oldalon a PIREP elküldése előtt.</span>"
+
 msgid "finish_help_wrongtime"
 msgstr ""
 "<span foreground=\"red\">\n\nAz érkezési és/vagy indulási idő jelentősen eltér a menetrendtől.\n"

@@ -965,6 +965,11 @@ msgstr ""
 "Review the data, also on earlier pages, and if you are\n"
 "satisfied, you can save or send your PIREP."
 
+msgid "finish_help_faults"
+msgstr ""
+"<span foreground=\"red\">\n\nYou had one or more faults during your flight. Please, provide some\n"
+"explanation on the Flight info tab before sending the PIREP.</span>"
+
 msgid "finish_help_wrongtime"
 msgstr ""
 "<span foreground=\"red\">\n\nYour departure and/or arrival time differ too much from the scheduled time(s).\n"

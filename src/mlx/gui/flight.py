@@ -3268,12 +3268,16 @@ class FinishPage(Page):
     def updateButtons(self):
         """Update the sensitivity state of the buttons."""
         gui = self._wizard.gui
+        faultsExplained = gui.faultsFullyExplained
+        timesCorrect = self.flightType is None or \
+                       not self._tooBigTimeDifference or \
+                       gui.hasComments or gui.hasDelayCode
         sensitive = self._flightType.get_active()>=0 and \
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0) and \
-                    (not self._tooBigTimeDifference or
-                     gui.hasComments or gui.hasDelayCode) and \
-                    gui.faultsFullyExplained
+                     faultsExplained and timesCorrect
+
+        self._updateHelp(faultsExplained, timesCorrect)
 
         wasSensitive = self._saveButton.get_sensitive()
 
@@ -3510,11 +3514,6 @@ class FinishPage(Page):
 
         self._tooBigTimeDifference = departureError or arrivalError
 
-        if self._tooBigTimeDifference and self.flightType is not None:
-            self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
-        else:
-            self.setHelp(xstr("finish_help") + xstr("finish_help_goodtime"))
-
         self._depTime.set_markup(self._formatTime(bookedFlight.departureTime,
                                                   flight.blockTimeStart,
                                                   (departureWarning,
@@ -3526,6 +3525,16 @@ class FinishPage(Page):
                                                    arrivalError)))
 
         self.updateButtons()
+
+    def _updateHelp(self, faultsExplained, timesCorrect):
+        """Update the help text according to the actual situation."""
+        if not faultsExplained:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_faults"))
+        elif not timesCorrect:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
+        else:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_goodtime"))
+
 
 #-----------------------------------------------------------------------------
 
