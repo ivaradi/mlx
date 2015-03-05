@@ -356,6 +356,12 @@ class Flight(object):
         return self.isTimeDifferenceTooMuch(self.bookedFlight.arrivalTime,
                                             self.blockTimeEnd)
 
+    def disconnected(self):
+        """Called when the connection to the simulator has failed."""
+        if self.aircraft is not None and self.aircraft.state is not None:
+            self.logger.message(self.aircraft.state.timestamp,
+                                "The connection to the simulator has failed")
+
     def handleState(self, oldState, currentState):
         """Handle a new state information."""
         self._updateFlownDistance(currentState)

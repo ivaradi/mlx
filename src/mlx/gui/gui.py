@@ -480,6 +480,8 @@ class GUI(fs.ConnectionListener):
         """Called when we have disconnected from the simulator."""
         self._connected = False
         self._logger.untimedMessage("Disconnected from the simulator")
+        if self._flight is not None:
+            self._flight.disconnected()
 
         gobject.idle_add(self._disconnected)
 
