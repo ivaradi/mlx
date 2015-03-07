@@ -813,7 +813,7 @@ class Boeing767(Aircraft):
     - n1: left, right
     - reverser: left, right"""
 
-    def __init__(self, flight, minLandingFuel = 9000):
+    def __init__(self, flight, minLandingFuel = 7000):
         super(Boeing767, self).__init__(flight, minLandingFuel = minLandingFuel)
         self.gearSpeedLimit = 270
         self.flapSpeedLimits = { 1 : 255,
