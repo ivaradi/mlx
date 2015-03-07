@@ -164,6 +164,14 @@ class TakeOffLogger(StateChecker):
             logger.message(state.timestamp,
                            "CG/Trim: %.1f%%/%.2f" % \
                            (state.cog*100.0, state.elevatorTrim))
+
+
+            if abs(state.pitch)>aircraft.maxTakeOffPitch:
+                flight.handleNoGo("TOPitch", state.timestamp,
+                                  "Takeoff pitch higher than aircraft maximum (%.2f)" % \
+                                  (aircraft.maxTakeOffPitch,),
+                                  "TO TAILSTRIKE NO GO")
+
             self._onTheGround = False
 
 #---------------------------------------------------------------------------------------

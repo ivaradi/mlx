@@ -40,6 +40,7 @@ set n1_2=90
 
 set gs=100 ias=100
 set gs=120 ias=120
+set pitch=-8
 set onTheGround=no
 set altitude=600
 
@@ -56,6 +57,7 @@ set ias=400
 set altitude=22001
 
 set vs=-200
+set pitch=-2.0
 set altitude=15000
 set qnh=1007
 set nav1=116.3
@@ -78,6 +80,7 @@ set radioAltitude=9
 set altitude=517
 set latitude=47.49 longitude=21.62
 set lights=23
+set pitch=-5
 
 set onTheGround=yes
 set n1_1=-10

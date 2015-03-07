@@ -118,6 +118,9 @@ class Aircraft(object):
 
         self.needNoStrobeSpeedCheck = False
 
+        self.maxTakeOffPitch = 15.0
+        self.maxTouchDownPitch = 15.0
+
         self._checkers = []
 
         config = flight.config
@@ -454,6 +457,12 @@ class Aircraft(object):
                            "CG: %.1f%%" % \
                             (self._aircraftState.cog*100.0,))
 
+        if abs(pitch)>self.maxTouchDownPitch:
+            self._flight.handleNoGo("TDPitch", self._aircraftState.timestamp,
+                                    "Touchdown pitch higher than aircraft maximum (%.2f)" % \
+                                    (self.maxTouchDownPitch,),
+                                    "TD TAILSTRIKE NO GO")
+
     def cancelFlare(self):
         """Cancel flare, if it has started."""
         self.flight.simulator.cancelFlare()
@@ -684,6 +693,8 @@ class B736(Boeing737):
         self.mtow = 58328
         self.mlw = 54657
         self.mzfw = 51482
+        self.maxTakeOffPitch = 16.2
+        self.maxTouchDownPitch = 14.7
 
 #---------------------------------------------------------------------------------------
 
@@ -695,6 +706,8 @@ class B737(Boeing737):
         self.mtow = 61410
         self.mlw = 58059
         self.mzfw = 54657
+        self.maxTakeOffPitch = 14.7
+        self.maxTouchDownPitch = 13.2
 
 #---------------------------------------------------------------------------------------
 
@@ -706,6 +719,8 @@ class B738(Boeing737):
         self.mtow = 71709
         self.mlw = 65317
         self.mzfw = 61688
+        self.maxTakeOffPitch = 11
+        self.maxTouchDownPitch = 9.5
 
 #---------------------------------------------------------------------------------------
 
@@ -733,6 +748,8 @@ class B733(Boeing737CL):
         self.mtow = 62820
         self.mlw = 51700
         self.mzfw = 48410
+        self.maxTakeOffPitch = 13.4
+        self.maxTouchDownPitch = 12.0
 
 #---------------------------------------------------------------------------------------
 
@@ -744,6 +761,8 @@ class B734(Boeing737CL):
         self.mtow = 68050
         self.mlw = 56200
         self.mzfw = 53100
+        self.maxTakeOffPitch = 11.4
+        self.maxTouchDownPitch = 10
 
 #---------------------------------------------------------------------------------------
 
@@ -755,6 +774,8 @@ class B735(Boeing737CL):
         self.mtow = 60550
         self.mlw = 50000
         self.mzfw = 46700
+        self.maxTakeOffPitch = 14.7
+        self.maxTouchDownPitch = 13.2
 
 #---------------------------------------------------------------------------------------
 
@@ -778,6 +799,8 @@ class DH8D(Aircraft):
                                  10 : 181,
                                  15 : 172,
                                  35 : 158 }
+        self.maxTakeOffPitch = 8.0
+        self.maxTouchDownPitch = 7.0
 
 #---------------------------------------------------------------------------------------
 
@@ -815,6 +838,8 @@ class B762(Boeing767):
         self.mtow = 175540
         self.mlw = 126098
         self.mzfw = 114758
+        self.maxTakeOffPitch = 13.1
+        self.maxTouchDownPitch = 11.6
 
 #---------------------------------------------------------------------------------------
 
@@ -826,6 +851,8 @@ class B763(Boeing767):
         self.mtow = 181436
         self.mlw = 137892
         self.mzfw = 130635
+        self.maxTakeOffPitch = 9.6
+        self.maxTouchDownPitch = 8.1
 
 #---------------------------------------------------------------------------------------
 
@@ -848,6 +875,8 @@ class CRJ2(Aircraft):
                                  20 : 220,
                                  30 : 190,
                                  45 : 175 }
+        self.maxTakeOffPitch = 18.0
+        self.maxTouchDownPitch = 18.0
 
 #---------------------------------------------------------------------------------------
 
@@ -872,6 +901,8 @@ class F70(Aircraft):
                                  25 : 220,
                                  42 : 180 }
         self.reverseMinSpeed = 50
+        self.maxTakeOffPitch = 16.0
+        self.maxTouchDownPitch = 16.0
 
     @property
     def derateType(self):
@@ -932,6 +963,9 @@ class T134(Aircraft):
 
         self.needNoStrobeSpeedCheck = True
 
+        self.maxTakeOffPitch = 16.0
+        self.maxTouchDownPitch = 16.0
+
     @property
     def derateType(self):
         """Get the derate type for this type."""
@@ -977,6 +1011,9 @@ class T154(Aircraft):
         self.reverseMinSpeed = 50
 
         self.needNoStrobeSpeedCheck = True
+
+        self.maxTakeOffPitch = 16.0
+        self.maxTouchDownPitch = 16.0
 
     @property
     def speedInKnots(self):

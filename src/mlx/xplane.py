@@ -1400,7 +1400,7 @@ class AircraftModel(object):
 
         state.heading = data[self._monidx_heading]
 
-        state.pitch = data[self._monidx_pitch]
+        state.pitch = -1.0 * data[self._monidx_pitch]
         state.bank = data[self._monidx_bank]
 
         state.ias = data[self._monidx_ias]
