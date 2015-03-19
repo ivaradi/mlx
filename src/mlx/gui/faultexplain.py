@@ -224,7 +224,7 @@ class FaultExplainWidget(gtk.Frame):
         self._faults.show_all()
 
         self._faultWidgets = {}
-        self._updateStats(numFaults = 0, numExplanations = 0)
+        self._numFaults = self._numExplanations = 0
 
     def _updateStats(self, numFaults = None, numExplanations = None):
         """Update the statistics.
