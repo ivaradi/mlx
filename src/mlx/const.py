@@ -470,30 +470,6 @@ def fuelTank2logString(fuelTank):
 
 #-------------------------------------------------------------------------------
 
-## The available gates at LHBP
-lhbpGateNumbers = []
-
-for i in range(1, 7):
-    lhbpGateNumbers.append(str(i))
-
-for i in range(10, 19):
-    lhbpGateNumbers.append(str(i))
-
-for i in range(24, 28):
-    lhbpGateNumbers.append(str(i))
-
-for i in range(31, 39):
-    lhbpGateNumbers.append(str(i))
-
-for i in range(42, 47):
-    lhbpGateNumbers.append(str(i))
-
-for i in range(60, 84):
-    if i!=70 and i!=80:
-        lhbpGateNumbers.append(str(i))
-
-#-------------------------------------------------------------------------------
-
 languages = ["$system", "en_GB", "hu_HU"]
 
 #-------------------------------------------------------------------------------

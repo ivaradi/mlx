@@ -3,6 +3,7 @@ from mlx.gui.common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
+from mlx.gates import Gates, lhbpGates
 
 #-------------------------------------------------------------------------------
 
@@ -81,7 +82,8 @@ class FleetGateStatus(gtk.VBox):
         self._gatesFrame = gatesFrame = gtk.Frame(label = xstr("gates_gates_title"))
         statusBox.pack_start(gatesFrame, True, True, 4)        
 
-        self._gatesTable = table = gtk.Table(14, 4)
+        self._gatesTable = table = gtk.Table(lhbpGates.numRows,
+                                             lhbpGates.numColumns)
         table.set_tooltip_markup(xstr("gates_gates_tooltip"))
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
@@ -93,22 +95,22 @@ class FleetGateStatus(gtk.VBox):
         self._gateLabels = {}
         column = 0
         row = 0
-        for gateNumber in const.lhbpGateNumbers:
-            label = gtk.Label()
-            label.set_markup("<b>" + gateNumber + "</b>")
-            table.attach(label, column, column + 1, row, row + 1)
+        for (type, data) in lhbpGates.displayInfos:
+            if type==Gates.DISPLAY_GATE:
+                gate = data
 
-            self._gateLabels[gateNumber] = label
-            
-            if column==1 and row==12:
-                column = 2
-                row = 1
-            elif row==13:
-                column += 1
-                row = 0
-            else:
+                label = gtk.Label()
+                label.set_markup("<b>" + gate.number + "</b>")
+                table.attach(label, column, column + 1, row, row + 1)
+
+                self._gateLabels[gate.number] = label
                 row += 1
-                
+            elif type==Gates.DISPLAY_SPACE:
+                row += 1
+            elif type==Gates.DISPLAY_NEW_COLUMN:
+                row = 0
+                column += 1
+
         button = gtk.Button(xstr("gates_refresh"))
         button.set_use_underline(True)
         button.set_tooltip_text(xstr("gates_refresh_tooltip"))
@@ -167,7 +169,8 @@ class FleetGateStatus(gtk.VBox):
                                                 else gtk.SORT_ASCENDING)
 
             occupiedGateNumbers = fleet.getOccupiedGateNumbers()
-            for gateNumber in const.lhbpGateNumbers:
+            for gate in lhbpGates.gates:
+                gateNumber = gate.number
                 markup = gateNumber
                 if gateNumber in occupiedGateNumbers:
                     markup = '<span foreground="orange">' + markup + '</span>'

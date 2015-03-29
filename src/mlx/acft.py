@@ -1,5 +1,6 @@
 
 import const
+import gates
 import checks
 import fs
 from i18n import xstr
@@ -619,10 +620,10 @@ class Aircraft(object):
         if fleet is not None:
             gateList = ""
             occupiedGateNumbers = fleet.getOccupiedGateNumbers()
-            for gateNumber in const.lhbpGateNumbers:
-                if gateNumber not in occupiedGateNumbers:
+            for gate in gates.lhbpGates.gates:
+                if gate.isAvailable(gates.lhbpGates, occupiedGateNumbers):
                     if gateList: gateList += ", "
-                    gateList += gateNumber
+                    gateList += gate.number
             fs.sendMessage(const.MESSAGETYPE_GATE_SYSTEM,
                            "Free gates: " + gateList, 20)
 

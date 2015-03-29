@@ -6,6 +6,7 @@ import mlx.fs as fs
 import mlx.acft as acft
 from mlx.flight import Flight
 from mlx.checks import PayloadChecker
+from mlx.gates import lhbpGates
 import mlx.util as util
 from mlx.pirep import PIREP
 from mlx.i18n import xstr
@@ -817,9 +818,9 @@ class GateSelectionPage(Page):
         self._listStore.clear()
         self._gateList.set_sensitive(True)
         occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
-        for gateNumber in const.lhbpGateNumbers:
-            if gateNumber not in occupiedGateNumbers:
-                self._listStore.append([gateNumber])
+        for gate in lhbpGates:
+            if gate.isAvailable(lhbpGates, occupiedGateNumbers):
+                self._listStore.append([gate.number])
 
     def finalize(self):
         """Finalize the page."""
@@ -3252,10 +3253,10 @@ class FinishPage(Page):
            self._wizard.loggedIn and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
            not self._wizard.entranceExam:
-            occupiedGates = self._wizard._fleet.getOccupiedGateNumbers()
-            for gateNumber in const.lhbpGateNumbers:
-                if gateNumber not in occupiedGates:
-                    self._gatesModel.append([gateNumber])
+            occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
+            for gate in lhbpGates.gates:
+                if gate.isAvailable(lhbpGates, occupiedGateNumbers):
+                    self._gatesModel.append([gate.number])
             self._gateLabel.set_sensitive(True)
             self._gate.set_sensitive(True)
             self._gate.set_active(-1)
