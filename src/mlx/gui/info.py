@@ -67,7 +67,7 @@ class FlightInfo(gtk.VBox):
         commentsBox.pack_start(frame, True, True, 8)
         self._comments.get_buffer().connect("changed", self._commentsChanged)
 
-        self._faultExplainWidget = FaultExplainWidget()
+        self._faultExplainWidget = FaultExplainWidget(gui)
         self._faultExplainWidget.connect("explanations-changed",
                                          self._faultExplanationsChanged)
         commentsBox.pack_start(self._faultExplainWidget, True, True, 8)

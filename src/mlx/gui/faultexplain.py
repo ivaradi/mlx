@@ -131,8 +131,10 @@ class FaultExplainWidget(gtk.Frame):
         """Get the fault frame from the given alignment."""
         return alignment.get_children()[0]
 
-    def __init__(self):
+    def __init__(self, gui):
         gtk.Frame.__init__(self)
+
+        self._gui = gui
         self.set_label(xstr("info_faults"))
         label = self.get_label_widget()
         label.set_use_underline(True)
@@ -140,19 +142,35 @@ class FaultExplainWidget(gtk.Frame):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
-                              padding_left = 8, padding_right = 8)
+                              padding_left = 4, padding_right = 4)
+
+        self._outerBox = outerBox = gtk.EventBox()
+        outerBox.add(alignment)
+
+        self._innerBox = innerBox = gtk.EventBox()
+        alignment.add(self._innerBox)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 1.0, yscale = 1.0)
+        alignment.set_padding(padding_top = 0, padding_bottom = 0,
+                              padding_left = 0, padding_right = 0)
+
+        innerBox.add(alignment)
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scroller.set_shadow_type(SHADOW_NONE)
 
         self._faults = gtk.VBox()
         self._faults.set_homogeneous(False)
         scroller.add_with_viewport(self._faults)
 
+        alignment.add(scroller)
+
         self._faultWidgets = {}
 
-        alignment.add(scroller)
-        self.add(alignment)
+        self.add(outerBox)
+        self.show_all()
 
         self._numFaults = 0
         self._numExplanations = 0
@@ -225,6 +243,13 @@ class FaultExplainWidget(gtk.Frame):
 
         self._faultWidgets = {}
         self._numFaults = self._numExplanations = 0
+        self._setColor()
+
+    def set_sensitive(self, sensitive):
+        """Set the sensitiviy of the widget.
+
+        The outer event box's sensitivity is changed only."""
+        self._outerBox.set_sensitive(sensitive)
 
     def _updateStats(self, numFaults = None, numExplanations = None):
         """Update the statistics.
@@ -245,12 +270,35 @@ class FaultExplainWidget(gtk.Frame):
         self._numExplanations = numExplanations
 
         if before!=after:
+            self._setColor()
             self.emit("explanations-changed", after)
 
     def _explanationChanged(self, faultFrame, hasExplanation):
         """Called when the status of an explanation has changed."""
         self._updateStats(numExplanations = (self._numExplanations +
                                              (1 if hasExplanation else -1)))
+
+    def _setColor(self):
+        """Set the color to indicate if an unexplained fault is present or
+        not."""
+        allExplained = self._numExplanations >= self._numFaults
+        if pygobject:
+            styleContext = self.get_style_context()
+            if allExplained:
+                outerColour = innerColour = gdk.RGBA(red = 0.0, green=0.0,
+                                                     blue=0.0, alpha=0.0)
+            else:
+                outerColour = \
+                  styleContext.get_background_color(gtk.StateFlags.SELECTED)
+                innerColour = self._gui.backgroundColour
+
+            self._outerBox.override_background_color(gtk.StateFlags.NORMAL,
+                                                     outerColour)
+            self._innerBox.override_background_color(gtk.StateFlags.NORMAL,
+                                                     innerColour)
+        else:
+            style = self.rc_get_style()
+            self._outerBox.modify_bg(0, style.bg[0 if allExplained else 3])
 
 #-------------------------------------------------------------------------------
 

@@ -169,6 +169,7 @@ class GUI(fs.ConnectionListener):
         self._pirepViewer = PIREPViewer(self)
 
         window.show_all()
+
         self._wizard.grabDefault()
         self._weightHelp.reset()
         self._weightHelp.disable()
@@ -412,6 +413,13 @@ class GUI(fs.ConnectionListener):
         """Determine if all the faults have been fully explained by the
         user."""
         return self._flightInfo.faultsFullyExplained
+
+    if pygobject:
+        @property
+        def backgroundColour(self):
+            """Get the background colour of the main window."""
+            return self._mainWindow.get_style_context().\
+              get_background_color(gtk.StateFlags.NORMAL)
 
     def run(self):
         """Run the GUI."""
