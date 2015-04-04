@@ -3279,7 +3279,9 @@ class FinishPage(Page):
         timesCorrect = self.flightType is None or \
                        not self._tooBigTimeDifference or \
                        gui.hasComments or gui.hasDelayCode
-        sensitive = self._flightType.get_active()>=0 and \
+        sensitive = gui.flight is not None and \
+                    gui.flight.stage==const.STAGE_END and \
+                    self._flightType.get_active()>=0 and \
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0) and \
                      faultsExplained and timesCorrect
