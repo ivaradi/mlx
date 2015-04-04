@@ -2924,7 +2924,6 @@ class LandingPage(Page):
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
-        self._flightEnded = True
         sensitive = self._flightEnded and \
                     self._metar.get_text()!="" and \
                     (self.star is not None or
