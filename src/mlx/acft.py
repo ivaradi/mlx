@@ -117,8 +117,6 @@ class Aircraft(object):
         self.initialClimbSpeedAltitude = 1500
         self.reverseMinSpeed = 50
 
-        self.needNoStrobeSpeedCheck = False
-
         self.maxTakeOffPitch = 15.0
         self.maxTouchDownPitch = 15.0
 
@@ -188,7 +186,6 @@ class Aircraft(object):
         self._checkers.append(checks.MZFWChecker())
         self._checkers.append(checks.PayloadChecker())
 
-        self._checkers.append(checks.NoStrobeSpeedChecker())
         self._checkers.append(checks.SpeedChecker())
         self._checkers.append(checks.VSChecker())
 
@@ -962,8 +959,6 @@ class T134(Aircraft):
                                  30 : 300 }
         self.reverseMinSpeed = 50
 
-        self.needNoStrobeSpeedCheck = True
-
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
 
@@ -1011,8 +1006,6 @@ class T154(Aircraft):
                                  45 : 162 }
         self.reverseMinSpeed = 50
 
-        self.needNoStrobeSpeedCheck = True
-
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
 
@@ -1057,8 +1050,6 @@ class YK40(Aircraft):
         self.gearSpeedLimit = 165
         self.flapSpeedLimits = { 20 : 165,
                                  35 : 135 }
-
-        self.needNoStrobeSpeedCheck = True
 
     @property
     def speedInKnots(self):
