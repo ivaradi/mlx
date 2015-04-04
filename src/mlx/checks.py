@@ -1291,21 +1291,107 @@ class NavLightsChecker(PatientFaultChecker):
 
 #---------------------------------------------------------------------------------------
 
-class OverspeedChecker(PatientFaultChecker):
-    """Check if Vne has been exceeded."""
-    def __init__(self, timeout = 30.0):
-        """Construct the checker."""
-        super(OverspeedChecker, self).__init__(timeout = timeout)
+class WindSensitiveFaultChecker(FaultChecker):
+    """A fault checker which checks for a fault condition that might arise due
+    to suddenly changing winds.
 
+    If the condition is detected, its fact is logged, and the winds are also
+    logged repeatedly until and for a while after the condition has ceased. A
+    fault is logged only if the condition holds for a certain period of
+    time."""
+    # The time the winds were logged last. This is global to avoid duplicate
+    # logging if several wind-sensitive fault conditions gold
+    _windsLastLogged = None
+
+    # The wind logging interval
+    _windsLogInterval = 5.0
+
+    def __init__(self, faultTimeout = 30.0, afterLoggingTime = 20.0):
+        """Construct the fault checker."""
+        self._faultTimeout = faultTimeout
+        self._afterLoggingTime = afterLoggingTime
+
+        self._faultStarted = None
+        self._faultCeased = None
+
+    def check(self, flight, aircraft, logger, oldState, state):
+        """Check for the condition and do whatever is needed."""
+        timestamp = state.timestamp
+        logWinds = False
+
+        if self.isCondition(flight, aircraft, oldState, state):
+            logWinds = True
+            if self._faultStarted is None:
+                self._faultStarted = timestamp
+                self._faultCeased = None
+                self.logCondition(flight, aircraft, logger, oldState, state,
+                                  False)
+
+                WindSensitiveFaultChecker._windsLastLogged = None
+
+            elif timestamp >= (self._faultStarted + self._faultTimeout):
+                self.logCondition(flight, aircraft, logger, oldState, state,
+                                  True)
+                self._faultStarted = timestamp
+
+        else:
+            if self._faultStarted is not None and self._faultCeased is None:
+                self._faultCeased = timestamp
+                self._faultStarted = None
+
+            if self._faultCeased is not None:
+                if timestamp < (self._faultCeased + self._afterLoggingTime):
+                    logWinds = True
+                else:
+                    self._faultCeased = None
+
+        if logWinds and \
+           (WindSensitiveFaultChecker._windsLastLogged is None or
+            timestamp >= (WindSensitiveFaultChecker._windsLastLogged +
+                          self._windsLogInterval)):
+            logger.message(timestamp, "Winds: %.f knots from %.f" %
+                           (state.windSpeed, state.windDirection))
+            WindSensitiveFaultChecker._windsLastLogged = timestamp
+
+#---------------------------------------------------------------------------------------
+
+class OverspeedChecker(WindSensitiveFaultChecker):
+    """Check if Vne has been exceeded."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return state.overspeed
 
-    def logFault(self, flight, aircraft, logger, oldState, state):
-        """Log the fault."""
-        flight.handleFault(OverspeedChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight, "Overspeed"),
-                           20)
+    def logCondition(self, flight, aircraft, logger, oldState, state, isFault):
+        """Log the condition fault."""
+        if isFault:
+            flight.handleFault(OverspeedChecker, state.timestamp,
+                               FaultChecker._appendDuring(flight, "Overspeed"),
+                               20)
+        else:
+            logger.message(state.timestamp,
+                           FaultChecker._appendDuring(flight, "Overspeed"))
+
+#---------------------------------------------------------------------------------------
+
+class StallChecker(WindSensitiveFaultChecker):
+    """Check if stall occured."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
+                                const.STAGE_CRUISE, const.STAGE_DESCENT,
+                                const.STAGE_LANDING] and state.stalled
+
+    def logCondition(self, flight, aircraft, logger, oldState, state, isFault):
+        """Log the condition."""
+        if isFault:
+            score = 40 if flight.stage in [const.STAGE_TAKEOFF,
+                                           const.STAGE_LANDING] else 30
+            flight.handleFault(StallChecker, state.timestamp,
+                               FaultChecker._appendDuring(flight, "Stalled"),
+                               score)
+        else:
+            logger.message(state.timestamp,
+                            FaultChecker._appendDuring(flight, "Stalled"))
 
 #---------------------------------------------------------------------------------------
 
@@ -1474,24 +1560,6 @@ class NoStrobeSpeedChecker(StateChecker):
         elif self._takeoffState is not None:
             flight.setRTOState(self._highestSpeedState)
             self._takeoffState = None
-
-#---------------------------------------------------------------------------------------
-
-class StallChecker(PatientFaultChecker):
-    """Check if stall occured."""
-    def isCondition(self, flight, aircraft, oldState, state):
-        """Check if the fault condition holds."""
-        return flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
-                                const.STAGE_CRUISE, const.STAGE_DESCENT,
-                                const.STAGE_LANDING] and state.stalled
-
-    def logFault(self, flight, aircraft, logger, oldState, state):
-        """Log the fault."""
-        score = 40 if flight.stage in [const.STAGE_TAKEOFF,
-                                       const.STAGE_LANDING] else 30
-        flight.handleFault(StallChecker, state.timestamp,
-                           FaultChecker._appendDuring(flight, "Stalled"),
-                           score)
 
 #---------------------------------------------------------------------------------------
 
