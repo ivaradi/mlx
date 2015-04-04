@@ -49,6 +49,12 @@ import os
 
 #-----------------------------------------------------------------------------
 
+comboModel = gtk.ListStore(gobject.TYPE_STRING)
+comboModel.append(("N/A",))
+comboModel.append(("VECTORS",))
+
+#-----------------------------------------------------------------------------
+
 class Page(gtk.Alignment):
     """A page in the flight wizard."""
     def __init__(self, wizard, title, help, completedHelp = None):
@@ -2150,10 +2156,15 @@ class TakeoffPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row+1)
 
-        self._sid = gtk.Entry()
-        self._sid.set_width_chars(10)
+        if pygobject:
+            self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        else:
+            self._sid = gtk.ComboBoxEntry(comboModel)
+
+        self._sid.set_entry_text_column(0)
+        self._sid.get_child().set_width_chars(10)
         self._sid.set_tooltip_text(xstr("takeoff_sid_tooltip"))
-        self._sid.connect("changed", self._upperChanged)
+        self._sid.connect("changed", self._upperChangedComboBox)
         table.attach(self._sid, 1, 3, row, row+1)
         label.set_mnemonic_widget(self._sid)
 
@@ -2262,7 +2273,9 @@ class TakeoffPage(Page):
     @property
     def sid(self):
         """Get the SID."""
-        return self._sid.get_text()
+        text = self._sid.get_child().get_text()
+        return text if self._sid.get_active()!=0 and text and text!="N/A" \
+               else None
 
     @property
     def v1(self):
@@ -2324,7 +2337,7 @@ class TakeoffPage(Page):
 
         self._runway.set_text("")
         self._runway.set_sensitive(True)
-        self._sid.set_text("")
+        self._sid.set_active(0)
         self._sid.set_sensitive(True)
         self._v1.set_int(None)
         self._v1.set_sensitive(True)
@@ -2392,11 +2405,10 @@ class TakeoffPage(Page):
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button based on some conditions."""
-
         sensitive = self._forwardAllowed and \
                     self._metar.get_text()!="" and \
                     self._runway.get_text()!="" and \
-                    self._sid.get_text()!="" and \
+                    self.sid is not None and \
                     self.v1 is not None and \
                     self.vr is not None and \
                     self.v2 is not None and \
@@ -2421,6 +2433,13 @@ class TakeoffPage(Page):
         print "TakeoffPage._upperChanged"
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
+
+    def _upperChangedComboBox(self, comboBox):
+        """Called for combo box widgets that must be converted to uppercase."""
+        entry = comboBox.get_child()
+        if comboBox.get_active()==-1:
+            entry.set_text(entry.get_text().upper())
+        self._valueChanged(entry)
 
     def _derateChanged(self, entry):
         """Called when the value of the derate is changed."""
@@ -2708,41 +2727,43 @@ class LandingPage(Page):
 
         row += 1
 
-        self._starButton = gtk.CheckButton()
-        self._starButton.connect("clicked", self._starButtonClicked)
-        table.attach(self._starButton, 0, 1, row, row + 1)
-
         label = gtk.Label(xstr("landing_star"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._star = gtk.Entry()
-        self._star.set_width_chars(10)
+        if pygobject:
+            self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        else:
+            self._star = gtk.ComboBoxEntry(comboModel)
+
+        self._star.set_entry_text_column(0)
+        self._star.get_child().set_width_chars(10)
         self._star.set_tooltip_text(xstr("landing_star_tooltip"))
-        self._star.connect("changed", self._upperChanged)
+        self._star.connect("changed", self._upperChangedComboBox)
         self._star.set_sensitive(False)
         table.attach(self._star, 2, 4, row, row + 1)
-        label.set_mnemonic_widget(self._starButton)
+        label.set_mnemonic_widget(self._star)
 
         row += 1
-
-        self._transitionButton = gtk.CheckButton()
-        self._transitionButton.connect("clicked", self._transitionButtonClicked)
-        table.attach(self._transitionButton, 0, 1, row, row + 1)
 
         label = gtk.Label(xstr("landing_transition"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._transition = gtk.Entry()
-        self._transition.set_width_chars(10)
+        if pygobject:
+            self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        else:
+            self._transition = gtk.ComboBoxEntry(comboModel)
+
+        self._transition.set_entry_text_column(0)
+        self._transition.get_child().set_width_chars(10)
         self._transition.set_tooltip_text(xstr("landing_transition_tooltip"))
-        self._transition.connect("changed", self._upperChanged)
+        self._transition.connect("changed", self._upperChangedComboBox)
         self._transition.set_sensitive(False)
         table.attach(self._transition, 2, 4, row, row + 1)
-        label.set_mnemonic_widget(self._transitionButton)
+        label.set_mnemonic_widget(self._transition)
 
         row += 1
 
@@ -2803,22 +2824,21 @@ class LandingPage(Page):
 
         self._button = self.addNextButton(clicked = self._forwardClicked)
 
-        # These are needed for correct size calculations
-        self._starButton.set_active(True)
-        self._transitionButton.set_active(True)
-
         self._active = False
 
     @property
     def star(self):
         """Get the STAR or None if none entered."""
-        return self._star.get_text() if self._starButton.get_active() else None
+        text = self._star.get_child().get_text()
+        return text if self._star.get_active()!=0 and text and text!="N/A" \
+               else None
 
     @property
     def transition(self):
         """Get the transition or None if none entered."""
-        return self._transition.get_text() \
-               if self._transitionButton.get_active() else None
+        text = self._transition.get_child().get_text()
+        return text if self._transition.get_active()!=0 and text and text!="N/A" \
+               else None
 
     @property
     def approachType(self):
@@ -2859,13 +2879,11 @@ class LandingPage(Page):
         self._metar.get_buffer().set_text(self._wizard.arrivalMETAR, -1)
         self._updatingMETAR = False
 
-        self._starButton.set_sensitive(True)
-        self._starButton.set_active(False)
-        self._star.set_text("")
+        self._star.set_active(0)
+        self._star.set_sensitive(True)
 
-        self._transitionButton.set_sensitive(True)
-        self._transitionButton.set_active(False)
-        self._transition.set_text("")
+        self._transition.set_active(0)
+        self._transition.set_sensitive(True)
 
         self._runway.set_text("")
         self._runway.set_sensitive(True)
@@ -2904,32 +2922,13 @@ class LandingPage(Page):
 
             self._updateForwardButton()
 
-    def _starButtonClicked(self, button):
-        """Called when the STAR button is clicked."""
-        active = button.get_active()
-        self._star.set_sensitive(active)
-        if active:
-            self._star.grab_focus()
-        self._updateForwardButton()
-
-    def _transitionButtonClicked(self, button):
-        """Called when the Transition button is clicked."""
-        active = button.get_active()
-        self._transition.set_sensitive(active)
-        if active:
-            self._transition.grab_focus()
-        self._updateForwardButton()
-
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
+        self._flightEnded = True
         sensitive = self._flightEnded and \
                     self._metar.get_text()!="" and \
-                    (self._starButton.get_active() or \
-                     self._transitionButton.get_active()) and \
-                    (self._star.get_text()!="" or
-                     not self._starButton.get_active()) and \
-                    (self._transition.get_text()!="" or
-                     not self._transitionButton.get_active()) and \
+                    (self.star is not None or
+                     self.transition is not None) and \
                     self._runway.get_text()!="" and \
                     self._approachType.get_text()!="" and \
                     self.vref is not None
@@ -2938,6 +2937,13 @@ class LandingPage(Page):
     def _upperChanged(self, entry):
         """Called for entry widgets that must be converted to uppercase."""
         entry.set_text(entry.get_text().upper())
+        self._updateForwardButton()
+
+    def _upperChangedComboBox(self, comboBox):
+        """Called for combo box widgets that must be converted to uppercase."""
+        if comboBox.get_active()==-1:
+            entry = comboBox.get_child()
+            entry.set_text(entry.get_text().upper())
         self._updateForwardButton()
 
     def _vrefChanged(self, widget, value):
@@ -3882,7 +3888,7 @@ class Wizard(gtk.VBox):
             page.reset()
 
         self.setCurrentPage(firstPage)
-        #self.setCurrentPage(13)
+        #self.setCurrentPage(10)
 
     def login(self, callback, pilotID, password, entranceExam):
         """Called when the login button was clicked."""
