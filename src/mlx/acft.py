@@ -119,6 +119,7 @@ class Aircraft(object):
 
         self.maxTakeOffPitch = 15.0
         self.maxTouchDownPitch = 15.0
+        self.brakeCoolTime = 10.0
 
         self._checkers = []
 
@@ -332,6 +333,8 @@ class Aircraft(object):
         if newStage==const.STAGE_BOARDING:
             self._logNameAndModel(aircraftState.timestamp)
 
+        oldStage = self._flight.stage
+
         if self._flight.setStage(aircraftState.timestamp, newStage):
             if newStage==const.STAGE_PUSHANDTAXI:
                 self.logger.message(aircraftState.timestamp, "Block time start")
@@ -344,6 +347,14 @@ class Aircraft(object):
                                    "Don't forget to set the takeoff V-speeds!",
                                    5)
             elif newStage==const.STAGE_TAKEOFF:
+                if oldStage == const.STAGE_RTO and self._flight.hasRTO:
+                    rtoState = self._flight.rtoState
+                    if (aircraftState.timestamp - rtoState.timestamp) < \
+                       (self.brakeCoolTime * 60.0):
+                        self.logger.fault("brakeCoolTime",
+                                          aircraftState.timestamp,
+                                          "Did not cool the brakes for at least %.f minutes after the RTO" % (self.brakeCoolTime,),
+                                          15.0)
                 self.logger.message(aircraftState.timestamp,
                                     "Flight time start")
                 self.logger.message(aircraftState.timestamp,
