@@ -824,7 +824,7 @@ class GateSelectionPage(Page):
         self._listStore.clear()
         self._gateList.set_sensitive(True)
         occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
-        for gate in lhbpGates:
+        for gate in lhbpGates.gates:
             if gate.isAvailable(lhbpGates, occupiedGateNumbers):
                 self._listStore.append([gate.number])
 
