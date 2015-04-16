@@ -997,6 +997,20 @@ class TupolevAntiCollisionLightsChecker(AntiCollisionLightsChecker):
 
 #---------------------------------------------------------------------------------------
 
+class TupolevLandingLightsChecker(PatientFaultChecker):
+    """Check if the landing light is not switched on above an IAS of 340 km/h."""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        return state.landingLightsOn and state.ias>(340.0*const.KMPHTOKNOTS)
+
+    def logFault(self, flight, aircraft, logger, oldState, state):
+        """Log the fault."""
+        flight.handleFault(TupolevLandingLightsChecker, state.timestamp,
+                           "The landing lights were on above an IAS of 340 km/h",
+                           1)
+
+#---------------------------------------------------------------------------------------
+
 class BankChecker(SimpleFaultChecker):
     """Check for the bank is within limits."""
     def isCondition(self, flight, aircraft, oldState, state):
