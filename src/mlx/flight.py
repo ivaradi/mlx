@@ -323,6 +323,13 @@ class Flight(object):
                else True
 
     @property
+    def aglInFeet(self):
+        """Determine if the AGL altutides for the flight are to be expressed in
+        feet."""
+        return self.aircraft.aglInFeet if self.aircraft is not None \
+               else True
+
+    @property
     def hasRTO(self):
         """Determine if we have an RTO state."""
         return self._rtoState is not None
@@ -505,6 +512,11 @@ class Flight(object):
         speed unit."""
         return knots if self.speedInKnots else knots * const.KNOTSTOKMPH
 
+    def aglFromFeet(self, feet):
+        """Convert the given AGL altitude value expressed in feet into the
+        flight's AGL altitude unit."""
+        return feet if self.aglInFeet else feet * const.FEETTOMETRES
+
     def speedToKnots(self, speed):
         """Convert the given speed expressed in the flight's speed unit into
         knots."""
@@ -513,6 +525,10 @@ class Flight(object):
     def getEnglishSpeedUnit(self):
         """Get the English name of the speed unit used by the flight."""
         return "knots" if self.speedInKnots else "km/h"
+
+    def getEnglishAGLUnit(self):
+        """Get the English name of the AGL unit used by the flight."""
+        return "ft" if self.aglInFeet else "m"
 
     def getI18NSpeedUnit(self):
         """Get the speed unit suffix for i18n message identifiers."""

@@ -246,6 +246,13 @@ class Aircraft(object):
         return True
 
     @property
+    def aglInFeet(self):
+        """Indicate if AGL altitudes are to be logged in feet.
+
+        This default implementation returns True."""
+        return True
+
+    @property
     def timestamp(self):
         """Get the timestamp of the current state."""
         return None if self._aircraftState is None \
@@ -989,6 +996,11 @@ class T134(Aircraft):
         """Indicate if the speed is in knots."""
         return False
 
+    @property
+    def aglInFeet(self):
+        """Indicate if AGL altituedes are in feet."""
+        return False
+
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
         self._checkers.append(checks.AnticollisionLightsLogger())
@@ -1033,6 +1045,11 @@ class T154(Aircraft):
         return False
 
     @property
+    def aglInFeet(self):
+        """Indicate if AGL altituedes are in feet."""
+        return False
+
+    @property
     def derateType(self):
         """Get the derate type for this type."""
         return DERATE_TUPOLEV
@@ -1073,6 +1090,11 @@ class YK40(Aircraft):
     @property
     def speedInKnots(self):
         """Indicate if the speed is in knots."""
+        return False
+
+    @property
+    def aglInFeet(self):
+        """Indicate if AGL altituedes are in feet."""
         return False
 
     @property

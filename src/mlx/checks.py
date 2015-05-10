@@ -184,10 +184,11 @@ class InitialClimbSpeedLogger(StateChecker):
            state.radioAltitude>=aircraft.initialClimbSpeedAltitude and \
            flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB]:
             logger.message(state.timestamp,
-                           "Initial climb speed: %.0f %s - %.0f ft AGL" % \
+                           "Initial climb speed: %.0f %s - %.0f %s AGL" % \
                            (flight.speedFromKnots(state.ias),
                             flight.getEnglishSpeedUnit(),
-                            state.radioAltitude))
+                            flight.aglFromFeet(state.radioAltitude),
+                            flight.getEnglishAGLUnit()))
             self._logged = True
 
 #---------------------------------------------------------------------------------------
@@ -696,9 +697,11 @@ class FlapsLogger(StateChangeLogger, SingleValueMixin, DelayedChangeMixin):
                    self._lastChangeState is not None else state
         speed = logState.groundSpeed if logState.groundSpeed<80.0 \
                 else logState.ias
-        message = "Flaps %.0f - %.0f %s, %.0f ft AGL, %.0f ft AMSL" % \
+        message = "Flaps %.0f - %.0f %s, %.0f %s AGL, %.0f ft AMSL" % \
                (logState.flapsSet, flight.speedFromKnots(speed),
-                flight.getEnglishSpeedUnit(), logState.radioAltitude,
+                flight.getEnglishSpeedUnit(),
+                flight.aglFromFeet(logState.radioAltitude),
+                flight.getEnglishAGLUnit(),
                 logState.altitude)
 
         return message
@@ -714,11 +717,13 @@ class GearsLogger(StateChangeLogger, SingleValueMixin, SimpleChangeMixin):
 
     def _getMessage(self, flight, state, forced):
         """Get the message to log on a change."""
-        return "Gears SET to %s at %.0f %s, %.0f ft, %.0f ft AGL" % \
+        return "Gears SET to %s at %.0f %s, %.0f ft, %.0f %s AGL" % \
             ("DOWN" if state.gearControlDown else "UP",
              flight.speedFromKnots(state.ias),
              flight.getEnglishSpeedUnit(),
-             state.altitude, state.radioAltitude)
+             state.altitude,
+             flight.aglFromFeet(state.radioAltitude),
+             flight.getEnglishAGLUnit())
 
 #---------------------------------------------------------------------------------------
 
