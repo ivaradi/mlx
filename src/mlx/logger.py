@@ -185,6 +185,8 @@ class Logger(object):
 
     NO_GO_SCORE = 10000
 
+    NO_SCORE = 9999
+
     def __init__(self, output):
         """Construct the logger."""
         self._entries = {}
@@ -270,11 +272,15 @@ class Logger(object):
         Returns an ID of the fault, or -1 if it was not logged."""
         fault = self._faults[faultID] if faultID in self._faults else None
 
+        text = "%s (NO GO)" % (what) if score==Logger.NO_GO_SCORE \
+               else "%s" % (what,) if score==Logger.NO_SCORE \
+               else "%s (%.1f)" % (what, score)
+
+        if score==Logger.NO_SCORE:
+            score = 0
+
         if fault is not None and score<=fault.score:
             return fault.getLatestEntry().id if updatePrevious else -1
-
-        text = "%s (NO GO)" % (what) if score==Logger.NO_GO_SCORE \
-               else "%s (%.1f)" % (what, score)
 
         if updatePrevious and fault is not None:
             latestEntry = fault.getLatestEntry()

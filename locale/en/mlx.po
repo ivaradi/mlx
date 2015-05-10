@@ -967,7 +967,7 @@ msgstr ""
 
 msgid "finish_help_faults"
 msgstr ""
-"<span foreground=\"red\">\n\nYou had one or more faults during your flight. Please, provide some\n"
+"<span foreground=\"red\">\n\nWe observed some faults or unusual activities during your flight. Please, provide some\n"
 "explanation on the Flight info tab before sending the PIREP.</span>"
 
 msgid "finish_help_wrongtime"
@@ -1077,7 +1077,7 @@ msgid "info_comments"
 msgstr "_Comments"
 
 msgid "info_faults"
-msgstr "F_aults"
+msgstr "F_aults, observations"
 
 msgid "info_delay"
 msgstr "Delay codes"

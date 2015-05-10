@@ -373,6 +373,12 @@ class Aircraft(object):
                 self._logRadios(aircraftState)
                 if newStage==const.STAGE_LANDING:
                     self._logQNH(aircraftState)
+            elif newStage==const.STAGE_GOAROUND:
+                from logger import Logger
+                self._flight.handleFault("goaround",
+                                         aircraftState.timestamp,
+                                         "Go-around detected, please, explain!",
+                                         Logger.NO_SCORE)
             elif newStage==const.STAGE_TAXIAFTERLAND:
                 flight = self._flight
                 bookedFlight = flight.bookedFlight

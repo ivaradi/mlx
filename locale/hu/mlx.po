@@ -968,8 +968,8 @@ msgstr ""
 
 msgid "finish_help_faults"
 msgstr ""
-"<span foreground=\"red\">\n\nA repülés során vétettél egy vagy több hibát. Kérlek, a Járat info oldalon\n"
-"írj ezekre magyarázatot a Járat info oldalon a PIREP elküldése előtt.</span>"
+"<span foreground=\"red\">\n\nA repülés során hibát vagy szokatlan jelenséget figyeltünk meg. Kérlek, a Járat info oldalon\n"
+"írj ezekre magyarázatot a PIREP elküldése előtt.</span>"
 
 msgid "finish_help_wrongtime"
 msgstr ""
@@ -1080,7 +1080,7 @@ msgid "info_comments"
 msgstr "_Megjegyzések"
 
 msgid "info_faults"
-msgstr "_Hibák"
+msgstr "_Hibák, megfigyelések"
 
 msgid "info_delay"
 msgstr "Késés kódok"
