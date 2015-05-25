@@ -2418,6 +2418,15 @@ class TakeoffPage(Page):
                      self.derate is not None)
 
         print "TakeoffPage._updateForwardButton: forwardAllowed:", self._forwardAllowed, ", sensitive:", sensitive
+        if self._forwardAllowed:
+            print "  METAR: ", self._metar.get_text()
+            print "  runway: ", self._runway.get_text()
+            print "  SID:", self.sid
+            print "  V1:", self.v1
+            print "  VR:", self.vr
+            print "  V2:", self.v2
+            print "  derateType:", self._derateType
+            print "  derate:", self.derate
 
         self._button.set_sensitive(sensitive)
 
