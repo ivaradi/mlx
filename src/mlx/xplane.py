@@ -1903,3 +1903,92 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 #------------------------------------------------------------------------------
 
 AircraftModel.registerSpecial(FJSDH8DModel)
+
+#------------------------------------------------------------------------------
+
+# if __name__ == "__main__":
+#     class ConnectionListener:
+#         def connected(self, fsType, descriptor):
+#             """Called when a connection has been established to the flight
+#             simulator of the given type."""
+#             print "fs.ConnectionListener.connected, fsType:", fsType, ", descriptor:", descriptor
+
+#         def connectionFailed(self):
+#             """Called when the connection could not be established."""
+#             print "fs.ConnectionListener.connectionFailed"
+
+#         def disconnected(self):
+#             """Called when a connection to the flight simulator has been broken."""
+#             print "fs.ConnectionListener.disconnected"
+
+#     class Config:
+#         def __init__(self):
+#             self.onlineACARS = False
+#             self.realIASSmoothingLength = 2
+#             self.realVSSmoothingLength = 2
+#             self.enableSounds = False
+#             self.usingFS2Crew = False
+
+#         def isMessageTypeFS(self, type):
+#             return True
+
+
+
+#     class GUI:
+#         def __init__(self):
+#             self.config = Config()
+#             self.entranceExam = False
+#             self.zfw = 30000.0
+
+#         def resetFlightStatus(self):
+#             pass
+
+#         def setRating(self, value):
+#             pass
+
+#         def insertFlightLogLine(self, index, ts, text, isFault):
+#             pass
+
+#         def setStage(self, stage):
+#             pass
+
+
+#     from i18n import setLanguage
+
+#     setLanguage("/home/vi/munka/repules/mlx", "en")
+
+#     from logger import Logger
+#     from flight import Flight
+#     from acft import DH8D
+
+#     gui = GUI()
+
+#     logger = Logger(gui)
+
+#     flight = Flight(logger, gui)
+#     acft = DH8D(flight)
+
+#     Watchdog()
+
+#     connectionListener = ConnectionListener()
+#     simulator = Simulator(connectionListener, connectAttempts = 3)
+
+#     simulator.connect(acft)
+
+#     time.sleep(2)
+
+#     simulator.startMonitoring()
+
+#     simulator.sendMessage("[MLX] Flight stage: Taxi", duration = 3)
+
+#     time.sleep(4)
+
+#     simulator.sendMessage("[MLX] Free gates: 1, 2, 3, 4, 5, 6, 25, 26, 27, 32, 33, 34, 35, 36, 37, 38, 39, 42, 43, 45, 107, 108, 109, R113, R114, R115, R116, R117, R210, R211, R212, R212A, R220, R221, R222, R223, R224, R225, R226, R227, R270, R271, R272, R274, R275, R276, R277, R278, R278A, R279", duration = 20)
+#     #simulator.sendMessage("[MLX] Free gates: 1, 2, 3, 4, 5, 6, 25, 26, 27, 32, 33, 34, 35, 36, 37, 38, 39, 42, 43, 45, 107, 108, 109, R113, R114, R115, R116", duration = 20)
+#     #simulator.sendMessage("[MLX] Free gates: 1, 2, 3, 4, 5, 6, 25, 26, 27, 32, 33, 34, 35, 36, 37, 38, 39, 42, 43, 45, 107, 108, 109, R113, R114, R115", duration = 20)
+
+#     time.sleep(30)
+
+#     simulator.sendMessage("[MLX] Hello", duration = 3)
+
+#     time.sleep(10)
