@@ -1741,6 +1741,19 @@ class FJSDH8DModel(DH8DModel):
         """Get the name for this aircraft model."""
         return "X-Plane/FlyJSim Bombardier Dash 8-Q400"
 
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super(FJSDH8DModel, self).addMonitoringData(data, fsType)
+
+        self._speedBrakeIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/speedbrake1_deg",
+                                        (TYPE_FLOAT_ARRAY, 2))
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/speedbrake2_deg",
+                                        (TYPE_FLOAT_ARRAY, 2))
+
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
@@ -1755,6 +1768,9 @@ class FJSDH8DModel(DH8DModel):
         # It seems that N1 does not always go down to 0 properly
         # (maybe due to winds?)
         state.n1 = [0 if n1<2.0 else n1 for n1 in state.n1]
+
+        state.spoilersExtension = \
+            sum(data[self._speedBrakeIndex] + data[self._speedBrakeIndex+1])/4
 
         return state
 
