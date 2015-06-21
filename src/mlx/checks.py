@@ -1545,7 +1545,7 @@ class SpeedChecker(StateChecker):
                 if not state.onTheGround:
                     aircraft.setStage(self._takeoffState, const.STAGE_TAKEOFF)
                     self._takeoffState = None
-                elif state.timestamp > (self._takeoffState.timestamp + 40):
+                elif state.timestamp > (self._takeoffState.timestamp + 60):
                     flight.setRTOState(self._highestSpeedState)
         elif self._takeoffState is not None:
             flight.setRTOState(self._highestSpeedState)
