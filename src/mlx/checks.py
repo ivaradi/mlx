@@ -1525,7 +1525,11 @@ class SpeedChecker(StateChecker):
         """Check the state as described above."""
         if flight.stage==const.STAGE_PUSHANDTAXI or \
            flight.stage==const.STAGE_RTO:
-            self._checkPushAndTaxi(flight, aircraft, state)
+            if state.groundSpeed>50 and aircraft.hasStrobeLight and \
+               state.strobeLightsOn is False:
+                self.logSpeedFault(flight, state)
+            else:
+                self._checkPushAndTaxi(flight, aircraft, state)
         elif flight.stage==const.STAGE_TAXIAFTERLAND:
             if state.groundSpeed>50:
                 self.logSpeedFault(flight, state)

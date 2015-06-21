@@ -117,6 +117,8 @@ class Aircraft(object):
         self.initialClimbSpeedAltitude = 1500
         self.reverseMinSpeed = 50
 
+        self.hasStrobeLight = True
+
         self.maxTakeOffPitch = 15.0
         self.maxTouchDownPitch = 15.0
         self.brakeCoolTime = 10.0
@@ -983,6 +985,8 @@ class T134(Aircraft):
                                  30 : 300 }
         self.reverseMinSpeed = 50
 
+        self.hasStrobeLight = False
+
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
 
@@ -1036,6 +1040,8 @@ class T154(Aircraft):
                                  45 : 162 }
         self.reverseMinSpeed = 50
 
+        self.hasStrobeLight = False
+
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
 
@@ -1086,6 +1092,8 @@ class YK40(Aircraft):
         self.gearSpeedLimit = 165
         self.flapSpeedLimits = { 20 : 165,
                                  35 : 135 }
+
+        self.hasStrobeLight = False
 
     @property
     def speedInKnots(self):
