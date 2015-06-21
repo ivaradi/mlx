@@ -1752,6 +1752,10 @@ class FJSDH8DModel(DH8DModel):
           state.antiCollisionLightsOn or state.strobeLightsOn
         state.cog = (state.cog / 0.0254 + 21.504) / 94.512
 
+        # It seems that N1 does not always go down to 0 properly
+        # (maybe due to winds?)
+        state.n1 = [0 if n1<2.0 else n1 for n1 in state.n1]
+
         return state
 
 #------------------------------------------------------------------------------
