@@ -559,7 +559,7 @@ def updateProcess():
     (modifiedAndNew, removed) = manifest.compare(updateManifest)
     localRemoved = getToremoveFiles(directory)
 
-    updateFiles(directory, config.updateURL,
+    updateFiles(directory, Config.DEFAULT_UPDATE_URL,
                 ClientListener(clientSocket),
                 updateManifest, modifiedAndNew, removed, localRemoved)
 
