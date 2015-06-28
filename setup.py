@@ -27,7 +27,8 @@ if os.name=="nt":
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
-        data_files.append(("Microsoft.VC90.CRT",  glob(os.path.join(msvcrDir, "*.*"))))
+        data_files.append(("Microsoft.VC90.CRT", glob(os.path.join(msvcrDir, "*.*"))))
+        os.environ["PATH"] = os.environ["PATH"] + ";" + glob(os.path.join(msvcrDir))[0]
 
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
@@ -45,6 +46,16 @@ if os.name=="nt":
         path = os.path.join("share", "icons", "hicolor")
         data_files.append((os.path.join("library", path),
                            glob(os.path.join(gtkRuntimeDir, path, "*"))))
+
+    cefDir = os.environ.get("CEFDIR")
+    if cefDir:
+        for fileName in ["icudt.dll", "subprocess.exe"]:
+            data_files.append(("", [os.path.join(cefDir, fileName)]))
+
+        data_files.append(("locales",
+                           glob(os.path.join(cefDir, "locales", "*"))))
+
+    print data_files
 
     with open("mlx-common.nsh", "wt") as f:
             print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
@@ -83,3 +94,5 @@ if os.name=="nt":
     with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
         print >> f, "StartMenuFolder=MAVA Logger X"
         print >> f, "LinkName=MAVA Logger X"
+    os.rename(os.path.join(scriptdir, "dist", "library", "libcef.dll"),
+              os.path.join(scriptdir, "dist", "libcef.dll"))
