@@ -17,7 +17,8 @@ import os
 
 #-------------------------------------------------------------------------------
 
-if os.name=="nt" or "FORCE_PYGTK" in os.environ:
+# Due to CEF, PyGTK is the default
+if "FORCE_PYGOBJECT" not in os.environ:
     print "Using PyGTK"
     pygobject = False
     import gobject
