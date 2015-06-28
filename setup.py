@@ -90,9 +90,9 @@ setup(name = "mlx",
       )
 
 if os.name=="nt":
+    os.rename(os.path.join(scriptdir, "dist", "library", "libcef.dll"),
+              os.path.join(scriptdir, "dist", "libcef.dll"))
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
     with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
         print >> f, "StartMenuFolder=MAVA Logger X"
         print >> f, "LinkName=MAVA Logger X"
-    os.rename(os.path.join(scriptdir, "dist", "library", "libcef.dll"),
-              os.path.join(scriptdir, "dist", "libcef.dll"))
