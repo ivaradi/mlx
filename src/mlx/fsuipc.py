@@ -380,6 +380,8 @@ class Handler(threading.Thread):
                 if not autoReconnection:
                     fsType = const.SIM_MSFSX \
                              if pyuipc.fs_version == pyuipc.SIM_FSX \
+                             else const.SIM_P3D \
+                             if pyuipc.fs_version == pyuipc.SIM_P3D \
                              else const.SIM_MSFS9
 
                     Handler._callSafe(lambda:

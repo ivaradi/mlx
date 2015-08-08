@@ -45,6 +45,9 @@ SIM_XPLANE9 = 3
 ## Flight simulator type: X-Plane 10
 SIM_XPLANE10 = 4
 
+## Flight simulator type: Prepar3D
+SIM_P3D = 5
+
 #-------------------------------------------------------------------------------
 
 ## Aircraft type: Boeing 737-600
