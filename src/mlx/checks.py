@@ -961,7 +961,7 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
         """Check if the fault condition holds."""
         return (not flight.config.usingFS2Crew or not state.parking or
                 flight.stage!=const.STAGE_TAXIAFTERLAND) and \
-                not state.antiCollisionLightsOn and \
+                state.antiCollisionLightsOn is False and \
                 self.isEngineCondition(state)
 
     def logFault(self, flight, aircraft, logger, oldState, state):
