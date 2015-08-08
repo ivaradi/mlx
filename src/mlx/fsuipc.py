@@ -1680,8 +1680,9 @@ class PMDGBoeing737NGModel(B737Model):
 
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
-        if fsType==const.SIM_MSFSX:
-            print "FSX detected, adding PMDG 737 NGX-specific offsets"
+        if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D:
+            print "%s detected, adding PMDG 737 NGX-specific offsets" % \
+                  ("FSX" if fsType==const.SIM_MSFSX else "P3D",)
             self._addOffsetWithIndexMember(data, 0x6500, "b",
                                            "_pmdgidx_lts_positionsw")
             self._addOffsetWithIndexMember(data, 0x6545, "b", "_pmdgidx_cmda")
