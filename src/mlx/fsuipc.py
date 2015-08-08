@@ -1810,6 +1810,37 @@ class DreamwingsDH8DModel(DH8DModel):
 
 #------------------------------------------------------------------------------
 
+class MajesticDH8DModel(DH8DModel):
+    """Model handler for the Majestic Dash 8-Q400."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type==const.AIRCRAFT_DH8D and \
+            (name.find("MJC8Q400")!=-1 or \
+             airPath.lower().find("mjc8q400") or \
+             airPath.lower().find("mjc8q4.air"))
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Majestic Bombardier Dash 8-Q400"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then clear the anti-collision and landing
+        lights."""
+        state = super(MajesticDH8DModel, self).getAircraftState(aircraft,
+                                                                timestamp,
+                                                                data)
+        state.antiCollisionLightsOn = None
+        state.strobeLightsOn = None
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class CRJ2Model(GenericAircraftModel):
     """Generic model for the Bombardier CRJ-200 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
@@ -2144,6 +2175,7 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 
 AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 AircraftModel.registerSpecial(DreamwingsDH8DModel)
+AircraftModel.registerSpecial(MajesticDH8DModel)
 AircraftModel.registerSpecial(DAF70Model)
 AircraftModel.registerSpecial(PTT154Model)
 
