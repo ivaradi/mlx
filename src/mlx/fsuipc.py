@@ -2069,7 +2069,7 @@ class PTT154Model(T154Model):
         This removes the reverser value for the middle engine."""
         state = super(PTT154Model, self).getAircraftState(aircraft, timestamp, data)
 
-        if self._fsType==const.SIM_MSFSX:
+        if self._fsType==const.SIM_MSFSX or self._fsType==const.SIM_P3D:
             state.xpdrC = None
 
         return state
