@@ -1842,6 +1842,9 @@ class MajesticDH8DModel(DH8DModel):
         # a G-load of 1.0)
         state.gLoad += 1.0
 
+        # None of the gear values seem to work correctly
+        state.gearsDown = state.gearControlDown
+
         return state
 
 #------------------------------------------------------------------------------
