@@ -1836,6 +1836,7 @@ class MajesticDH8DModel(DH8DModel):
                                                                 data)
         state.antiCollisionLightsOn = None
         state.strobeLightsOn = None
+        state.pitotHeatOn = None
 
         return state
 
