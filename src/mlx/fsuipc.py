@@ -1838,6 +1838,10 @@ class MajesticDH8DModel(DH8DModel):
         state.strobeLightsOn = None
         state.pitotHeatOn = None
 
+        # G-load seems to be offset by -1.0 (i.e a value of 0 seem to mean
+        # a G-load of 1.0)
+        state.gLoad += 1.0
+
         return state
 
 #------------------------------------------------------------------------------
