@@ -524,6 +524,8 @@ def update(directory, updateURL, listener, fromGUI = False):
     if result is None:
         return
 
+    print "update: result:", result
+
     (manifest, updateManifest, modifiedAndNew, removed) = result        
     localRemoved = getToremoveFiles(directory)
 
