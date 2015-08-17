@@ -464,11 +464,11 @@ def sudoUpdate(directory, updateURL, listener, manifest):
 
         if os.name=="nt":
             win32api.ShellExecute(0, "open", os.path.join(directory, "mlxupdate"),
-                                  str(port) + " " +  manifestFile, "", 1)
+                                  str(port) + " " +  manifestFile + " " + updateURL, "", 1)
         else:
             process = subprocess.Popen([os.path.join(directory, "mlxupdate"),
-                                        str(port), manifestFile],
-                                       shell = os.name=="nt")
+                                        str(port), manifestFile, updateURL],
+                                        shell = os.name=="nt")
 
         (mlxUpdateSocket, _) = serverSocket.accept()
         serverSocket.close()
@@ -545,9 +545,6 @@ def updateProcess():
     clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
     clientSocket.connect(("127.0.0.1", int(sys.argv[1])))
 
-    config = Config()
-    config.load()
-
     directory = os.path.dirname(sys.argv[0])
 
     manifest = readLocalManifest(directory)
@@ -559,7 +556,7 @@ def updateProcess():
     (modifiedAndNew, removed) = manifest.compare(updateManifest)
     localRemoved = getToremoveFiles(directory)
 
-    updateFiles(directory, config.updateURL,
+    updateFiles(directory, sys.argv[3],
                 ClientListener(clientSocket),
                 updateManifest, modifiedAndNew, removed, localRemoved)
 
