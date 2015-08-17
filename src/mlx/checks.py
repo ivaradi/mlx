@@ -1443,7 +1443,7 @@ class PitotChecker(PatientFaultChecker):
 
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return state.groundSpeed>80 and not state.pitotHeatOn
+        return state.groundSpeed>80 and state.pitotHeatOn is False
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
