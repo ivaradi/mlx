@@ -1747,6 +1747,7 @@ class RoutePage(Page):
         self._cruiseLevel.set_range(min = 0, max = 500)
         self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
         self._cruiseLevel.set_numeric(True)
+        self._cruiseLevel.connect("changed", self._cruiseLevelChanged)
         self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
         label.set_mnemonic_widget(self._cruiseLevel)
 
@@ -1821,10 +1822,11 @@ class RoutePage(Page):
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
-        self._button.set_sensitive(self._cruiseLevel.get_value_as_int()>=50 and \
-                                   self._getRoute()!="")
+        cruiseLevelText = self._cruiseLevel.get_text()
+        cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
+        self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="")
 
-    def _cruiseLevelChanged(self, spinButton):
+    def _cruiseLevelChanged(self, *arg):
         """Called when the cruise level has changed."""
         self._updateForwardButton()
 
