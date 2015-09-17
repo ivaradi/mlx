@@ -230,6 +230,22 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 2, 3, 8, 9)
         table.attach(self._cog, 3, 4, 8, 9)
 
+        (label, self._ils) = self._createLabeledEntry("ILS:", 7)
+        table.attach(label, 4, 5, 8, 9)
+        table.attach(self._ils, 5, 6, 8, 9)
+
+        (label, self._crs1) = self._createLabeledEntry("CRS1:", 7)
+        table.attach(label, 6, 7, 8, 9)
+        table.attach(self._crs1, 7, 8, 8, 9)
+
+        (label, self._crs2) = self._createLabeledEntry("CRS2:", 7)
+        table.attach(label, 8, 9, 8, 9)
+        table.attach(self._crs2, 9, 10, 8, 9)
+
+        (label, self._crsi) = self._createLabeledEntry("CRSI:", 7)
+        table.attach(label, 10, 11, 8, 9)
+        table.attach(self._crsi, 11, 12, 8, 9)
+
         alignment.add(table)
 
         self.add(alignment)
@@ -316,6 +332,10 @@ class MonitorWindow(gtk.Window):
             self._adf2.set_text("-")
             self._qnh.set_text("-")
             self._cog.set_text("-")
+            self._ils.set_text("-")
+            self._crs1.set_text("-")
+            self._crs2.set_text("-")
+            self._crsi.set_text("-")
         else:
             self._timestamp.set_text(time.strftime("%H:%M:%S",
                                                    time.gmtime(aircraftState.timestamp)))
@@ -409,5 +429,11 @@ class MonitorWindow(gtk.Window):
             self._adf1.set_text("-" if aircraftState.adf1 is None else aircraftState.adf1)
             self._adf2.set_text("-" if aircraftState.adf2 is None else aircraftState.adf2)
             self._cog.set_text("%.2f%%" % (aircraftState.cog*100.0,))
+
+            self._ils.set_text("-" if aircraftState.ils is None else aircraftState.ils)
+
+            self._crs1.set_text("-" if aircraftState.nav1_obs is None else str(aircraftState.nav1_obs))
+            self._crs2.set_text("-" if aircraftState.nav2_obs is None else str(aircraftState.nav2_obs))
+            self._crsi.set_text("-" if aircraftState.ils_obs is None else str(aircraftState.ils_obs))
 
 #------------------------------------------------------------------------------
