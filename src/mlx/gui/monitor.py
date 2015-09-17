@@ -386,7 +386,7 @@ class MonitorWindow(gtk.Window):
                     self._landingLightsOn.set_text("LANDING")
             self._landingLightsOn.set_sensitive(aircraftState.landingLightsOn is True)
 
-            self._pitotHeatOn.set_sensitive(aircraftState.pitotHeatOn)
+            self._pitotHeatOn.set_sensitive(aircraftState.pitotHeatOn is True)
             self._parking.set_sensitive(aircraftState.parking)
             self._gearControlDown.set_sensitive(aircraftState.gearControlDown)
             self._gearsDown.set_sensitive(aircraftState.gearsDown)
