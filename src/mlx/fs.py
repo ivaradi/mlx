@@ -226,7 +226,8 @@ class AircraftState(object):
     - landingLightsOn: a boolean indicating if the landing lights are on. If
     the detection of the state of the landing lights is unreliable, and should
     not be considered, this is set to None.
-    - pitotHeatOn: a boolean indicating if the pitot heat is on
+    - pitotHeatOn: a boolean indicating if the pitot heat is on. Maybe None, if
+      the pitot heat setting cannot be read
     - parking: a boolean indicating if the parking brake is set
     - gearControlDown: a boolean indicating if the gear control is set to down
     - gearsDown: a boolean indicating if the gears are down

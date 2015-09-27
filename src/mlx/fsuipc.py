@@ -380,6 +380,8 @@ class Handler(threading.Thread):
                 if not autoReconnection:
                     fsType = const.SIM_MSFSX \
                              if pyuipc.fs_version == pyuipc.SIM_FSX \
+                             else const.SIM_P3D \
+                             if pyuipc.fs_version == pyuipc.SIM_P3D \
                              else const.SIM_MSFS9
 
                     Handler._callSafe(lambda:
@@ -1173,7 +1175,7 @@ class AircraftModel(object):
                       ("vs", 0x02c8, "d"),
                       ("radioAltitude", 0x31e4, "d"),
                       ("altitude", 0x0570, "l"),
-                      ("gLoad", 0x11ba, "H"),
+                      ("gLoad", 0x11ba, "h"),
                       ("flapsControl", 0x0bdc, "d"),
                       ("flapsLeft", 0x0be0, "d"),
                       ("flapsRight", 0x0be4, "d"),
@@ -1678,8 +1680,9 @@ class PMDGBoeing737NGModel(B737Model):
 
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
-        if fsType==const.SIM_MSFSX:
-            print "FSX detected, adding PMDG 737 NGX-specific offsets"
+        if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D:
+            print "%s detected, adding PMDG 737 NGX-specific offsets" % \
+                  ("FSX" if fsType==const.SIM_MSFSX else "P3D",)
             self._addOffsetWithIndexMember(data, 0x6500, "b",
                                            "_pmdgidx_lts_positionsw")
             self._addOffsetWithIndexMember(data, 0x6545, "b", "_pmdgidx_cmda")
@@ -1802,6 +1805,45 @@ class DreamwingsDH8DModel(DH8DModel):
                                                                   data)
         if data[self._dwdh8d_navgps]==1:
             state.apHeading = None
+
+        return state
+
+#------------------------------------------------------------------------------
+
+class MajesticDH8DModel(DH8DModel):
+    """Model handler for the Majestic Dash 8-Q400."""
+    @staticmethod
+    def doesHandle(aircraft, (name, airPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type==const.AIRCRAFT_DH8D and \
+            (name.find("MJC8Q400")!=-1 or \
+             airPath.lower().find("mjc8q400") or \
+             airPath.lower().find("mjc8q4.air"))
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Majestic Bombardier Dash 8-Q400"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then clear the anti-collision and landing
+        lights."""
+        state = super(MajesticDH8DModel, self).getAircraftState(aircraft,
+                                                                timestamp,
+                                                                data)
+        state.antiCollisionLightsOn = None
+        state.strobeLightsOn = None
+        state.pitotHeatOn = None
+
+        # G-load seems to be offset by -1.0 (i.e a value of 0 seem to mean
+        # a G-load of 1.0)
+        state.gLoad += 1.0
+
+        # None of the gear values seem to work correctly
+        state.gearsDown = state.gearControlDown
 
         return state
 
@@ -2066,7 +2108,7 @@ class PTT154Model(T154Model):
         This removes the reverser value for the middle engine."""
         state = super(PTT154Model, self).getAircraftState(aircraft, timestamp, data)
 
-        if self._fsType==const.SIM_MSFSX:
+        if self._fsType==const.SIM_MSFSX or self._fsType==const.SIM_P3D:
             state.xpdrC = None
 
         return state
@@ -2141,6 +2183,7 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 
 AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 AircraftModel.registerSpecial(DreamwingsDH8DModel)
+AircraftModel.registerSpecial(MajesticDH8DModel)
 AircraftModel.registerSpecial(DAF70Model)
 AircraftModel.registerSpecial(PTT154Model)
 

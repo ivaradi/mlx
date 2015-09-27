@@ -87,7 +87,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         statusBox.pack_start(gtk.VSeparator(), False, False, 8)
 
         self._ratingLabel = gtk.Label()
-        self._ratingLabel.set_width_chars(12)
+        self._ratingLabel.set_width_chars(20)
         self._ratingLabel.set_tooltip_text(xstr("statusbar_rating_tooltip"))
         self._ratingLabel.set_alignment(0.0, 0.5)
         

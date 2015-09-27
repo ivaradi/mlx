@@ -1,0 +1,101 @@
+set qnh=1004
+set altimeter=1013
+set n1_1=0
+set n1_2=0
+set onTheGround=yes
+set gs=0
+set xpdrC=1
+set lights=1
+set noseGear=100
+set gearControl=100
+set flapsControl=0
+set zfw=20000 hour=7 min=50
+set latitude=47.44 longitude=19.26
+set nav1=115.9
+set adf1=382
+set parking=yes
+
+set parking=no
+set lights=3
+set n1_1=25
+set n1_2=25
+set pitot=yes
+set eng1Deice=yes
+set eng2Deice=yes
+set gs=10 ias=10
+set flapsControl=37.5
+set nav2=112.3
+set adf1=540
+set xpdrC=0
+set altimeter=1004
+
+set lights=23
+set gs=60 ias=60
+set gs=80 ias=80
+set n1_1=70
+set n1_2=70
+set gs=90 ias=90
+set n1_1=90
+set n1_2=90
+
+set gs=100 ias=100
+set gs=120 ias=120
+set pitch=-8
+set onTheGround=no
+set altitude=600
+
+set gearControl=0
+set noseGear=0
+set altitude=2000
+set nav1=111.5
+set flapsControl=0
+
+set altimeter=1013.25
+set altitude=10000
+set lights=19
+set ias=400
+set altitude=22001
+
+set vs=-200
+set pitch=-2.0
+set altitude=15000
+set qnh=1007
+set nav1=116.3
+set altitude=10000
+set altimeter=1007
+set adf2=540
+set ias=160 gs=170
+set flapsControl=87.5
+set ias=130 gs=130
+
+set altitude=3500
+set ias=125 gs=125
+set radioAltitude=3200
+set radioAltitude=1100
+set gearControl=100
+set noseGear=100
+set radioAltitude=50
+set radioAltitude=29
+set radioAltitude=9
+set altitude=517
+set latitude=47.49 longitude=21.62
+set lights=23
+set pitch=-5
+
+set onTheGround=yes
+set n1_1=-10
+set n1_2=-10
+set lights=19
+set n1_1=20
+set n1_2=20
+set ias=45 gs=45
+set ias=35 gs=35
+set ias=20 gs=20
+set xpdrC=1
+
+set parking=yes
+set n1_1=0
+set n1_2=0
+set lights=17
+set ias=0 gs=0
+set lights=1
