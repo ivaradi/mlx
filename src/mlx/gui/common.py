@@ -31,6 +31,7 @@ if not pygobject:
     print "Using PyGTK"
     pygobject = False
     import pygtk
+    pygtk.require("2.0")
     import gtk.gdk as gdk
     import gtk
     import pango

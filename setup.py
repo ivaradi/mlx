@@ -19,11 +19,18 @@ for language in ["en", "hu"]:
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
 data_files.append(("", ["logo.png",
-                        "conn_grey.png", "conn_red.png", "conn_green.png"]))
+                        "conn_grey.png", "conn_red.png", "conn_green.png",
+                        "mlx_cef_caller.sh", "mlx_cef_caller_secondary.sh",
+                        "mlx_cef_caller.bat", "mlx_cef_caller_secondary.bat"]))
+
 if os.name=="nt":
     import py2exe
 
     data_files.append(("", ["logo.ico"]))
+
+    chromedriver = os.environ.get("CHROMEDRIVER")
+    if chromedriver:
+        data_files.append(("", [chromedriver]))
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
@@ -60,6 +67,14 @@ if os.name=="nt":
     with open("mlx-common.nsh", "wt") as f:
             print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
             f.close()
+else:
+    for (dirpath, dirnames, filenames) in os.walk("patches"):
+        if filenames:
+            filenames = [os.path.join(dirpath, filename)
+                         for filename in filenames]
+            data_files.append((dirpath, filenames))
+
+
 
 long_description="""MAVA Logger X
 

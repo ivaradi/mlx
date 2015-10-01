@@ -442,8 +442,7 @@ class GUI(fs.ConnectionListener):
                                     self._mainWindow)
             self._updater.start()
 
-        cef.initialize()
-        self._acars.start()
+        cef.initialize(self._programDirectory, self._cefInitialized)
 
         singleton.raiseCallback = self.raiseCallback
         gtk.main()
@@ -1486,6 +1485,10 @@ class GUI(fs.ConnectionListener):
         self._sendBugReportCallback = callback
         self.webHandler.sendBugReport(self._bugReportSentCallback,
                                       summary, description, email)
+
+    def _cefInitialized(self):
+        """Called when CEF has been initialized."""
+        self._acars.start()
 
     def _bugReportSentCallback(self, returned, result):
         """Callback function for the bug report sending result."""
