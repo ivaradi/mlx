@@ -1,5 +1,6 @@
 
 from mlx.gui.common import *
+import mlx.gui.cef as cef
 
 import mlx.const as const
 import mlx.fs as fs
@@ -16,6 +17,7 @@ import mlx.web as web
 import datetime
 import time
 import os
+import tempfile
 
 #-----------------------------------------------------------------------------
 
@@ -1424,6 +1426,415 @@ class TimePage(Page):
 
 #-----------------------------------------------------------------------------
 
+class RoutePage(Page):
+    """The page containing the route and the flight level."""
+    def __init__(self, wizard):
+        """Construct the page."""
+        super(RoutePage, self).__init__(wizard, xstr("route_title"),
+                                        xstr("route_help"),
+                                        completedHelp = xstr("route_chelp"))
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        mainBox = gtk.VBox()
+        alignment.add(mainBox)
+        self.setMainWidget(alignment)
+
+        levelBox = gtk.HBox()
+
+        label = gtk.Label(xstr("route_level"))
+        label.set_use_underline(True)
+        levelBox.pack_start(label, True, True, 0)
+
+        self._cruiseLevel = gtk.SpinButton()
+        self._cruiseLevel.set_increments(step = 10, page = 100)
+        self._cruiseLevel.set_range(min = 0, max = 500)
+        self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
+        self._cruiseLevel.set_numeric(True)
+        self._cruiseLevel.connect("changed", self._cruiseLevelChanged)
+        self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
+        label.set_mnemonic_widget(self._cruiseLevel)
+
+        levelBox.pack_start(self._cruiseLevel, False, False, 8)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(levelBox)
+
+        mainBox.pack_start(alignment, False, False, 0)
+
+
+        routeBox = gtk.VBox()
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("route_route"))
+        label.set_use_underline(True)
+        alignment.add(label)
+        routeBox.pack_start(alignment, True, True, 0)
+
+        routeWindow = gtk.ScrolledWindow()
+        routeWindow.set_size_request(400, 80)
+        routeWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
+                                    else gtk.SHADOW_IN)
+        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC,
+                               gtk.PolicyType.AUTOMATIC if pygobject
+                               else gtk.POLICY_AUTOMATIC)
+
+        self._uppercasingRoute = False
+
+        self._route = gtk.TextView()
+        self._route.set_tooltip_text(xstr("route_route_tooltip"))
+        self._route.set_wrap_mode(WRAP_WORD)
+        self._route.get_buffer().connect("changed", self._routeChanged)
+        self._route.get_buffer().connect_after("insert-text", self._routeInserted)
+        routeWindow.add(self._route)
+
+        label.set_mnemonic_widget(self._route)
+        routeBox.pack_start(routeWindow, True, True, 0)
+
+        mainBox.pack_start(routeBox, True, True, 8)
+
+        alternateBox = gtk.HBox()
+
+        label = gtk.Label(xstr("route_altn"))
+        label.set_use_underline(True)
+        alternateBox.pack_start(label, True, True, 0)
+
+        self._alternate = gtk.Entry()
+        self._alternate.set_width_chars(6)
+        self._alternate.connect("changed", self._alternateChanged)
+        self._alternate.set_tooltip_text(xstr("route_altn_tooltip"))
+        label.set_mnemonic_widget(self._alternate)
+
+        alternateBox.pack_start(self._alternate, False, False, 8)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(alternateBox)
+
+        mainBox.pack_start(alignment, False, False, 0)
+
+        self.addCancelFlightButton()
+
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
+
+    @property
+    def filedCruiseLevel(self):
+        """Get the filed cruise level."""
+        return self._cruiseLevel.get_value_as_int()
+
+    @property
+    def route(self):
+        """Get the route."""
+        return self._getRoute()
+
+    @property
+    def alternate(self):
+        """Get the ICAO code of the alternate airport."""
+        return self._alternate.get_text()
+
+    def activate(self):
+        """Setup the route from the booked flight."""
+        self._cruiseLevel.set_value(0)
+        self._cruiseLevel.set_text("")
+        self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
+        self._updateForwardButton()
+
+    def _getRoute(self):
+        """Get the text of the route."""
+        buffer = self._route.get_buffer()
+        return buffer.get_text(buffer.get_start_iter(),
+                               buffer.get_end_iter(), True)
+
+    def _updateForwardButton(self):
+        """Update the sensitivity of the forward button."""
+        cruiseLevelText = self._cruiseLevel.get_text()
+        cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
+        alternate = self._alternate.get_text()
+        self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="" and
+                                   len(alternate)==4)
+
+    def _cruiseLevelChanged(self, *arg):
+        """Called when the cruise level has changed."""
+        self._updateForwardButton()
+
+    def _routeChanged(self, textBuffer):
+        """Called when the route has changed."""
+        if not self._uppercasingRoute:
+            self._updateForwardButton()
+
+    def _routeInserted(self, textBuffer, iter, text, length):
+        """Called when new characters are inserted into the route.
+
+        It uppercases all characters."""
+        if not self._uppercasingRoute:
+            self._uppercasingRoute = True
+
+            iter1 = iter.copy()
+            iter1.backward_chars(length)
+            textBuffer.delete(iter, iter1)
+
+            textBuffer.insert(iter, text.upper())
+
+            self._uppercasingRoute = False
+
+    def _alternateChanged(self, entry):
+        """Called when the alternate airport has changed."""
+        entry.set_text(entry.get_text().upper())
+        self._updateForwardButton()
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+
+    def _forwardClicked(self, button):
+        """Called when the Forward button is clicked."""
+        if self._wizard.gui.config.useSimBrief:
+            self._wizard.nextPage()
+        else:
+            self._wizard.jumpPage(3)
+
+#-----------------------------------------------------------------------------
+
+class SimBriefSetupPage(Page):
+    """Page for setting up some parameters for SimBrief."""
+    monthNum2Name = [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC"
+        ]
+
+    @staticmethod
+    def getHTMLFilePath():
+        """Get the path of the HTML file to contain the generated flight
+        plan."""
+        if os.name=="nt":
+            return os.path.join(tempfile.gettempdir(),
+                                "mlx_simbrief" +
+                                (".secondary" if secondaryInstallation else "") +
+                                ".html")
+        else:
+            import pwd
+            return os.path.join(tempfile.gettempdir(),
+                                "mlx_simbrief." + pwd.getpwuid(os.getuid())[0] + "" +
+                                (".secondary" if secondaryInstallation else "") +
+                                ".html")
+
+    def __init__(self, wizard):
+        """Construct the setup page."""
+
+        super(SimBriefSetupPage, self).__init__(wizard,
+                                                "SimBrief setup",
+                                                "Complete the following data to "
+                                                "start generating your "
+                                                "SimBrief briefing.",
+                                                "Your SimBrief briefing was "
+                                                "generated with the following "
+                                                "data.")
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(7, 3)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        label = gtk.Label("_Username:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._userName = gtk.Entry()
+        self._userName.set_width_chars(16)
+        self._userName.connect("changed",
+                               lambda button: self._updateForwardButton())
+        self._userName.set_tooltip_text("Your SimBrief username")
+        table.attach(self._userName, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._userName)
+
+        label = gtk.Label("_Password:")
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._password = gtk.Entry()
+        self._password.set_visibility(False)
+        self._password.connect("changed",
+                               lambda button: self._updateForwardButton())
+        self._password.set_tooltip_text("Your SimBrief password")
+        table.attach(self._password, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._password)
+
+        self.addCancelFlightButton()
+
+        self._backButton = self.addPreviousButton(clicked = self._backClicked)
+        self._button = self.addNextButton(clicked = self._forwardClicked)
+
+    def activate(self):
+        """Activate the SimBrief setup page"""
+        self._updateForwardButton()
+
+    def _updateForwardButton(self):
+        """Update the sensitivity of the forward button."""
+        self._button.set_sensitive(len(self._userName.get_text())>0 and
+                                   len(self._password.get_text())>0)
+
+    def _backClicked(self, button):
+        """Called when the Back button is pressed."""
+        self.goBack()
+
+    def _forwardClicked(self, button):
+        if self._completed:
+            self._wizard.nextPage()
+        else:
+            plan = self._getPlan()
+            print "plan:", plan
+
+            userName = self._userName.get_text()
+            password = self._password.get_text()
+
+            self._wizard.gui.beginBusy("Calling SimBrief...")
+
+            cef.callSimBrief(plan,
+                             lambda count: (userName, password),
+                             self._simBriefProgressCallback,
+                             SimBriefSetupPage.getHTMLFilePath())
+
+            startSound(const.SOUND_NOTAM)
+
+    def _simBriefProgressCallback(self, message, done):
+        """Called by the SimBrief handling thread."""
+        gobject.idle_add(self._simBriefProgress, message, done)
+
+    def _simBriefProgress(self, message, done):
+        """The real SimBrief progress handler."""
+        if done:
+            self._wizard.gui.endBusy()
+            self._wizard.nextPage()
+        else:
+            self._wizard.gui.updateBusyState(message)
+
+    def _getPlan(self):
+        """Get the flight plan data for SimBrief."""
+        plan = {
+            "airline": "MAH",
+            "selcal": "XXXX",
+            "fuelfactor": "P000",
+            "contpct": "0.05",
+            "resvrule": "45",
+            "taxiout": "10",
+            "taxiin": "10",
+            "civalue": "AUTO"
+            }
+
+        wizard = self._wizard
+        gui = wizard.gui
+
+        loginResult = wizard.loginResult
+        plan["cpt"] = loginResult.pilotName
+        plan["pid"] = loginResult.pilotID
+
+        bookedFlight = wizard.bookedFlight
+        plan["fltnum"] = wizard.bookedFlight.callsign[2:]
+        plan["type"] = const.icaoCodes[bookedFlight.aircraftType]
+        plan["orig"] = bookedFlight.departureICAO
+        plan["dest"] = bookedFlight.arrivalICAO
+        plan["reg"] = bookedFlight.tailNumber
+        plan["fin"] = bookedFlight.tailNumber[3:]
+        plan["pax"] = str(bookedFlight.numPassengers)
+
+        departureTime = bookedFlight.departureTime
+        plan["date"] = "%d%s%d" % (departureTime.day,
+                                   SimBriefSetupPage.monthNum2Name[departureTime.month-1],
+                                   departureTime.year%100)
+        plan["deph"] = str(departureTime.hour)
+        plan["depm"] = str(departureTime.minute)
+
+        arrivalTime = bookedFlight.arrivalTime
+        plan["steh"] = str(arrivalTime.hour)
+        plan["stem"] = str(arrivalTime.minute)
+
+        plan["manualzfw"] = str(wizard.zfw)
+        plan["cargo"] = str(wizard.bagWeight + wizard.cargoWeight + wizard.mailWeight)
+
+        plan["route"] = wizard.route
+        plan["fl"] = str(wizard.filedCruiseAltitude)
+        plan["altn"] = wizard.alternate
+
+        plan["addedfuel"] = "2.5" # FIXME: query
+        plan["origrwy"] = "" # FIXME: query
+        plan["destrwy"] = "" # FIXME: query
+        plan["climb"] = "250/300/78" # FIXME: query
+        plan["descent"] = "80/280/250" # FIXME: query
+        plan["cruise"] = "LRC" # FIXME: query
+
+        return plan
+
+#-----------------------------------------------------------------------------
+
+class SimBriefingPage(Page):
+    """Page to display the SimBrief HTML briefing."""
+    def __init__(self, wizard):
+        """Construct the setup page."""
+
+        super(SimBriefingPage, self).__init__(wizard,
+                                              "SimBrief flight plan", "")
+
+        self._alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                       xscale = 1.0, yscale = 1.0)
+
+        self.setMainWidget(self._alignment)
+
+        self.addCancelFlightButton()
+
+        self.addPreviousButton(clicked = self._backClicked)
+
+        self._button = self.addNextButton(clicked = self._forwardClicked)
+        self._button.set_label(xstr("briefing_button"))
+        self._button.set_has_tooltip(False)
+        self._button.set_use_stock(False)
+
+    def activate(self):
+        """Activate the SimBrief flight plan page"""
+        container = cef.getContainer()
+        self._alignment.add(container)
+
+        self._browser = \
+          cef.startInContainer(container,
+                               "file://" + SimBriefSetupPage.getHTMLFilePath())
+
+    def _backClicked(self, button):
+        """Called when the Back button has been pressed."""
+        self.goBack()
+
+    def _forwardClicked(self, button):
+        """Called when the Forward button has been pressed."""
+        if not self._completed:
+            self._button.set_label(xstr("button_next"))
+            self._button.set_tooltip_text(xstr("button_next_tooltip"))
+            self._wizard.usingSimBrief = True
+            self.complete()
+
+        self._wizard.nextPage()
+
+#-----------------------------------------------------------------------------
+
 class FuelTank(gtk.VBox):
     """Widget for the fuel tank."""
     def __init__(self, fuelTank, name, capacity, currentWeight):
@@ -1659,6 +2070,8 @@ class FuelPage(Page):
             self._pumpIndex = 0
             self._wizard.gui.beginBusy(xstr("fuel_pump_busy"))
             self._pump()
+        elif self._wizard.usingSimBrief:
+            self._wizard.jumpPage(3)
         else:
             self._wizard.nextPage()
 
@@ -1704,7 +2117,16 @@ class FuelPage(Page):
 
         if fuelTank is None:
             self._wizard.gui.endBusy()
-            self._wizard.nextPage()
+            if self._wizard.usingSimBrief:
+                self._wizard.gui.startMonitoring()
+                self._wizard.jumpPage(3)
+            else:
+                bookedFlight = self._wizard._bookedFlight
+                self._wizard.gui.beginBusy(xstr("route_down_notams"))
+                self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
+                                                      bookedFlight.departureICAO,
+                                                      bookedFlight.arrivalICAO)
+                startSound(const.SOUND_NOTAM)
         else:
             currentLevel = fuelTank.currentWeight / fuelTank.capacity
             expectedLevel = fuelTank.expectedWeight / fuelTank.capacity
@@ -1718,153 +2140,6 @@ class FuelPage(Page):
             self._wizard.gui.simulator.setFuelLevel([(fuelTank.fuelTank,
                                                       currentLevel)])
             gobject.timeout_add(50, self._pump)
-
-#-----------------------------------------------------------------------------
-
-class RoutePage(Page):
-    """The page containing the route and the flight level."""
-    def __init__(self, wizard):
-        """Construct the page."""
-        super(RoutePage, self).__init__(wizard, xstr("route_title"),
-                                        xstr("route_help"),
-                                        completedHelp = xstr("route_chelp"))
-
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0.0, yscale = 0.0)
-
-        mainBox = gtk.VBox()
-        alignment.add(mainBox)
-        self.setMainWidget(alignment)
-
-        levelBox = gtk.HBox()
-
-        label = gtk.Label(xstr("route_level"))
-        label.set_use_underline(True)
-        levelBox.pack_start(label, True, True, 0)
-
-        self._cruiseLevel = gtk.SpinButton()
-        self._cruiseLevel.set_increments(step = 10, page = 100)
-        self._cruiseLevel.set_range(min = 0, max = 500)
-        self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
-        self._cruiseLevel.set_numeric(True)
-        self._cruiseLevel.connect("changed", self._cruiseLevelChanged)
-        self._cruiseLevel.connect("value-changed", self._cruiseLevelChanged)
-        label.set_mnemonic_widget(self._cruiseLevel)
-
-        levelBox.pack_start(self._cruiseLevel, False, False, 8)
-
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
-                                  xscale = 0.0, yscale = 0.0)
-        alignment.add(levelBox)
-
-        mainBox.pack_start(alignment, False, False, 0)
-
-
-        routeBox = gtk.VBox()
-
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
-                                  xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("route_route"))
-        label.set_use_underline(True)
-        alignment.add(label)
-        routeBox.pack_start(alignment, True, True, 0)
-
-        routeWindow = gtk.ScrolledWindow()
-        routeWindow.set_size_request(400, 80)
-        routeWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                    else gtk.SHADOW_IN)
-        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC,
-                               gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC)
-
-        self._uppercasingRoute = False
-
-        self._route = gtk.TextView()
-        self._route.set_tooltip_text(xstr("route_route_tooltip"))
-        self._route.set_wrap_mode(WRAP_WORD)
-        self._route.get_buffer().connect("changed", self._routeChanged)
-        self._route.get_buffer().connect_after("insert-text", self._routeInserted)
-        routeWindow.add(self._route)
-
-        label.set_mnemonic_widget(self._route)
-        routeBox.pack_start(routeWindow, True, True, 0)
-
-        mainBox.pack_start(routeBox, True, True, 8)
-
-        self.addCancelFlightButton()
-
-        self._backButton = self.addPreviousButton(clicked = self._backClicked)
-        self._button = self.addNextButton(clicked = self._forwardClicked)
-
-    @property
-    def filedCruiseLevel(self):
-        """Get the filed cruise level."""
-        return self._cruiseLevel.get_value_as_int()
-
-    @property
-    def route(self):
-        """Get the route."""
-        return self._getRoute()
-
-    def activate(self):
-        """Setup the route from the booked flight."""
-        self._cruiseLevel.set_value(0)
-        self._cruiseLevel.set_text("")
-        self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
-        self._updateForwardButton()
-
-    def _getRoute(self):
-        """Get the text of the route."""
-        buffer = self._route.get_buffer()
-        return buffer.get_text(buffer.get_start_iter(),
-                               buffer.get_end_iter(), True)
-
-    def _updateForwardButton(self):
-        """Update the sensitivity of the forward button."""
-        cruiseLevelText = self._cruiseLevel.get_text()
-        cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
-        self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="")
-
-    def _cruiseLevelChanged(self, *arg):
-        """Called when the cruise level has changed."""
-        self._updateForwardButton()
-
-    def _routeChanged(self, textBuffer):
-        """Called when the route has changed."""
-        if not self._uppercasingRoute:
-            self._updateForwardButton()
-
-    def _routeInserted(self, textBuffer, iter, text, length):
-        """Called when new characters are inserted into the route.
-
-        It uppercases all characters."""
-        if not self._uppercasingRoute:
-            self._uppercasingRoute = True
-
-            iter1 = iter.copy()
-            iter1.backward_chars(length)
-            textBuffer.delete(iter, iter1)
-
-            textBuffer.insert(iter, text.upper())
-
-            self._uppercasingRoute = False
-
-    def _backClicked(self, button):
-        """Called when the Back button is pressed."""
-        self.goBack()
-
-    def _forwardClicked(self, button):
-        """Called when the Forward button is clicked."""
-        if self._completed:
-            self._wizard.nextPage()
-        else:
-            bookedFlight = self._wizard._bookedFlight
-            self._wizard.gui.beginBusy(xstr("route_down_notams"))
-            self._wizard.gui.webHandler.getNOTAMs(self._notamsCallback,
-                                                  bookedFlight.departureICAO,
-                                                  bookedFlight.arrivalICAO)
-            startSound(const.SOUND_NOTAM)
 
     def _notamsCallback(self, returned, result):
         """Callback for the NOTAMs."""
@@ -3577,9 +3852,13 @@ class Wizard(gtk.VBox):
         self._pages.append(self._payloadPage)
         self._payloadIndex = len(self._pages)
         self._pages.append(TimePage(self))
-        self._pages.append(FuelPage(self))
         self._routePage = RoutePage(self)
         self._pages.append(self._routePage)
+        self._simBriefSetupPage = SimBriefSetupPage(self)
+        self._pages.append(self._simBriefSetupPage)
+        self._simBriefingPage = SimBriefingPage(self)
+        self._pages.append(self._simBriefingPage)
+        self._pages.append(FuelPage(self))
         self._departureBriefingPage = BriefingPage(self, True)
         self._pages.append(self._departureBriefingPage)
         self._arrivalBriefingPage = BriefingPage(self, False)
@@ -3740,6 +4019,11 @@ class Wizard(gtk.VBox):
         return self._routePage.route
 
     @property
+    def alternate(self):
+        """Get the ICAO code of the alternate airport."""
+        return self._routePage.alternate
+
+    @property
     def departureMETAR(self):
         """Get the METAR of the departure airport."""
         return self._departureBriefingPage.metar
@@ -3839,6 +4123,16 @@ class Wizard(gtk.VBox):
         """Get whether the flight was online or not."""
         return self._finishPage.online
 
+    @property
+    def usingSimBrief(self):
+        """Indicate if we are using a SimBrief briefing or not."""
+        return self._usingSimBrief
+
+    @usingSimBrief.setter
+    def usingSimBrief(self, x):
+        """Set whether we are using a SimBrief briefing or not."""
+        self._usingSimBrief = x
+
     def nextPage(self, finalize = True):
         """Go to the next page."""
         self.jumpPage(1, finalize)
@@ -3894,6 +4188,7 @@ class Wizard(gtk.VBox):
         self._departureMETAR = None
         self._arrivalNOTAMs = None
         self._arrivalMETAR = None
+        self._usingSimBrief = False
 
         firstPage = 0 if self._loginResult is None else 1
         for page in self._pages[firstPage:]:

@@ -697,6 +697,12 @@ msgstr "_Route"
 msgid "route_route_tooltip"
 msgstr "The planned flight route in the standard format."
 
+msgid "route_altn"
+msgstr "_Alternate:"
+
+msgid "route_altn_tooltip"
+msgstr "The ICAO code of the alternate airport."
+
 msgid "route_down_notams"
 msgstr "Downloading NOTAMs..."
 

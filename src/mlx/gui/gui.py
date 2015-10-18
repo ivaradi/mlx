@@ -1493,6 +1493,7 @@ class GUI(fs.ConnectionListener):
     def _cefInitialized(self):
         """Called when CEF has been initialized."""
         self._acars.start()
+        cef.initializeSimBrief()
 
     def _bugReportSentCallback(self, returned, result):
         """Callback function for the bug report sending result."""

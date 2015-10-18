@@ -696,6 +696,12 @@ msgstr "Út_vonal"
 msgid "route_route_tooltip"
 msgstr "Az útvonal a szokásos formátumban."
 
+msgid "route_altn"
+msgstr "_Kitérő:"
+
+msgid "route_altn_tooltip"
+msgstr "A kitérő repülőtér ICAO kódja."
+
 msgid "route_down_notams"
 msgstr "NOTAM-ok letöltése..."
 
