@@ -812,6 +812,10 @@ class GUI(fs.ConnectionListener):
         self._mainWindow.get_window().set_cursor(self._busyCursor)
         self._statusbar.updateBusyState(message)
 
+    def updateBusyState(self, message):
+        """Update the busy state."""
+        self._statusbar.updateBusyState(message)
+
     def endBusy(self):
         """End a period of background processing."""
         self._mainWindow.get_window().set_cursor(None)
