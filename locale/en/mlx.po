@@ -1437,6 +1437,15 @@ msgstr ""
 msgid "prefs_smoothing_seconds"
 msgstr "sec."
 
+msgid "prefs_useSimBrief"
+msgstr "Use Sim_Brief"
+
+msgid "prefs_useSimBrief_tooltip"
+msgstr ""
+"If enabled, the SimBrief dispatching system will be "
+"used to create your briefing.\n"
+"You will need a SimBrief user name and password."
+
 msgid "prefs_pirepDirectory"
 msgstr "_PIREP directory:"
 

@@ -232,6 +232,8 @@ class Config(object):
         self._iasSmoothingLength = -2
         self._vsSmoothingLength = -2
 
+        self._useSimBrief = False
+
         self._pirepDirectory = None
         self._pirepAutoSave = False
 
@@ -441,6 +443,18 @@ class Config(object):
         smoothed VS calculation."""
         if vsSmoothingLength!=self._vsSmoothingLength:
             self._vsSmoothingLength = vsSmoothingLength
+            self._modified = True
+
+    @property
+    def useSimBrief(self):
+        """Check if SimBrief should be used."""
+        return self._useSimBrief
+
+    @useSimBrief.setter
+    def useSimBrief(self, useSimBrief):
+        """Check if SimBrief should be used."""
+        if self._useSimBrief != useSimBrief:
+            self._useSimBrief = useSimBrief
             self._modified = True
 
     @property
@@ -677,6 +691,10 @@ class Config(object):
         self._vsSmoothingLength = int(self._get(config, "general",
                                                 "vsSmoothingLength",
                                                 -2))
+
+        self._useSimBrief = self._getBoolean(config, "general",
+                                             "useSimBrief", False)
+
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
@@ -756,6 +774,9 @@ class Config(object):
                    str(self._iasSmoothingLength))
         config.set("general", "vsSmoothingLength",
                    str(self._vsSmoothingLength))
+
+        config.set("general", "useSimBrief",
+                   "yes" if self._useSimBrief else "no")
 
         if self._pirepDirectory is not None:
             config.set("general", "pirepDirectory", self._pirepDirectory)
@@ -905,6 +926,8 @@ class Config(object):
 
         print "  iasSmoothingLength:", self._iasSmoothingLength
         print "  vsSmoothingLength:", self._vsSmoothingLength
+
+        print "  useSimBrief:", self._useSimBrief
 
         print "  pirepDirectory:", self._pirepDirectory
         print "  pirepAutoSave:", self._pirepAutoSave

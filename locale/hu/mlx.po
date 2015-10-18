@@ -1478,6 +1478,15 @@ msgstr ""
 msgid "prefs_smoothing_seconds"
 msgstr "másodpercig."
 
+msgid "prefs_useSimBrief"
+msgstr "Sim_Brief használata"
+
+msgid "prefs_useSimBrief_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, az eligazítás elkészítéséhez a "
+"SimBrief rendszert használja a program.\n"
+"Szükséged lesz SimBrief felhasználónévre és jelszóra."
+
 msgid "prefs_pirepDirectory"
 msgstr "_PIREP-ek könyvtára:"
 
