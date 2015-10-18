@@ -1,5 +1,7 @@
 from common import *
 
+from mava_simbrief import MavaSimbriefIntegrator
+
 from mlx.util import secondaryInstallation
 
 from cefpython3 import cefpython
@@ -86,7 +88,14 @@ class SeleniumHandler(threading.Thread):
         self._commandsCondition = threading.Condition()
         self._commands = []
 
+        self._driver = None
+
         self._toQuit = False
+
+    @property
+    def programDirectory(self):
+        """Get the program directory."""
+        return self._programDirectory
 
     def run(self):
         """Create the Selenium driver and the perform any operations
@@ -101,7 +110,7 @@ class SeleniumHandler(threading.Thread):
 
         options = Options()
         options.binary_location = scriptPath
-        driver = webdriver.Chrome(chrome_options = options)
+        driver = self._driver = webdriver.Chrome(chrome_options = options)
         # try:
         # except:
         #     traceback.print_exc()
@@ -119,6 +128,14 @@ class SeleniumHandler(threading.Thread):
 
         driver.quit()
 
+    def callSimBrief(self, plan, getCredentials, updateProgress,
+                     htmlFilePath):
+        """Call SimBrief with the given plan."""
+        self._enqueue(lambda:
+                      self._callSimBrief(plan, self._driver,
+                                         getCredentials, updateProgress,
+                                         htmlFilePath))
+
     def quit(self):
         """Instruct the thread to quit and then join it."""
         self._enqueue(self._quit)
@@ -131,6 +148,21 @@ class SeleniumHandler(threading.Thread):
         with self._commandsCondition:
             self._commands.append(command)
             self._commandsCondition.notify()
+
+    def _callSimBrief(self, plan, driver,
+                      getCredentials, updateProgress, htmlFilePath):
+        """Perform the SimBrief call."""
+        integrator = MavaSimbriefIntegrator(plan = plan, driver = driver)
+        link = integrator.get_xml_link(getCredentials, updateProgress,
+                                       local_xml_debug = False,
+                                       local_html_debug = False)
+
+        updateProgress("Retrieving briefing...", False)
+
+        flight_info = integrator.get_results(link,
+                                             html_file_path = htmlFilePath)
+
+        updateProgress("Done", True)
 
     def _quit(self):
         """Set the _toQuit member variable to indicate that the thread should
@@ -227,6 +259,81 @@ def startInContainer(container, url, browserSettings = {}):
     return cefpython.CreateBrowserSync(windowInfo,
                                        browserSettings = browserSettings,
                                        navigateUrl = url)
+
+#------------------------------------------------------------------------------
+
+class OffscreenRenderHandler(object):
+    def GetRootScreenRect(self, browser, rect):
+        #print "GetRootScreenRect"
+        rect += [0, 0, 800, 600]
+        return True
+
+    def GetViewRect(self, browser, rect):
+        #print "GetViewRect"
+        rect += [0, 0, 800, 600]
+        return True
+
+    def GetScreenPoint(self, browser, viewX, viewY, screenCoordinates):
+        #print "GetScreenPoint", viewX, viewY
+        rect += [viewX, viewY]
+        return True
+
+    def GetScreenInfo(self, browser, screenInfo):
+        #print "GetScreenInfo"
+        pass
+
+    def OnPopupShow(self, browser, show):
+        #print "OnPopupShow", show
+        pass
+
+    def OnPopupSize(self, browser, rect):
+        #print "OnPopupSize", rect
+        pass
+
+    def OnPaint(self, browser, paintElementType, dirtyRects, buffer, width, height):
+        #print "OnPaint", paintElementType, dirtyRects, buffer, width, height
+        pass
+
+    def OnCursorChange(self, browser, cursor):
+        #print "OnCursorChange", cursor
+        pass
+
+    def OnScrollOffsetChanged(self, browser):
+        #print "OnScrollOffsetChange"
+        pass
+
+    def OnBeforePopup(self, browser, frame, targetURL, targetFrameName,
+                      popupFeatures, windowInfo, client, browserSettings,
+                      noJavascriptAccess):
+        wInfo = cefpython.WindowInfo()
+        wInfo.SetAsOffscreen(int(0))
+
+        windowInfo.append(wInfo)
+
+        return False
+
+#------------------------------------------------------------------------------
+
+def initializeSimBrief():
+    """Initialize the (hidden) browser window for SimBrief."""
+    windowInfo = cefpython.WindowInfo()
+    windowInfo.SetAsOffscreen(int(0))
+
+    url = "file://" + os.path.join(_seleniumHandler.programDirectory,
+                                   "simbrief.html")
+    simBriefBrowser = cefpython.CreateBrowserSync(windowInfo,
+                                                  browserSettings = {},
+                                                  navigateUrl = url)
+    simBriefBrowser.SetClientHandler(OffscreenRenderHandler())
+
+    simBriefBrowser.SetFocus(True)
+
+#------------------------------------------------------------------------------
+
+def callSimBrief(plan, getCredentials, updateProgress, htmlFilePath):
+    """Call SimBrief with the given plan."""
+    _seleniumHandler.callSimBrief(plan, getCredentials,
+                                  updateProgress, htmlFilePath)
 
 #------------------------------------------------------------------------------
 
