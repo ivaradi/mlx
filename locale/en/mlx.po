@@ -709,6 +709,16 @@ msgstr "Downloading NOTAMs..."
 msgid "route_down_metars"
 msgstr "Downloading METARs..."
 
+msgid "simbrief_remember_password"
+msgstr "_Remember password"
+
+msgid "simbrief_remember_tooltip"
+msgstr ""
+"If checked, your SimBrief password will be stored, so that you "
+"should not have to enter it every time. Note, however, that "
+"the password is stored as text, and anybody who can access "
+"your files will be able to read it."
+
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
 

@@ -708,6 +708,15 @@ msgstr "NOTAM-ok letöltése..."
 msgid "route_down_metars"
 msgstr "METAR-ok letöltése..."
 
+msgid "simbrief_remember_password"
+msgstr "_Emlékezz a jelszóra"
+
+msgid "simbrief_remember_tooltip"
+msgstr ""
+"Ha ezt kiválasztod, a SimBrief jelszavadat eltárolja a program, így nem kell "
+"mindig újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként "
+"tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
+
 msgid "briefing_title"
 msgstr "Eligazítás (%d/2): %s"
 

@@ -1681,6 +1681,11 @@ class SimBriefSetupPage(Page):
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
+        self._rememberButton = gtk.CheckButton(xstr("simbrief_remember_password"))
+        self._rememberButton.set_use_underline(True)
+        self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
+        table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
+
         self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -1688,7 +1693,14 @@ class SimBriefSetupPage(Page):
 
     def activate(self):
         """Activate the SimBrief setup page"""
+        config = self._wizard.gui.config
+
+        self._userName.set_text(config.simBriefUserName)
+        self._password.set_text(config.simBriefPassword)
+        self._rememberButton.set_active(config.rememberSimBriefPassword)
+
         self._updateForwardButton()
+
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
@@ -1703,6 +1715,17 @@ class SimBriefSetupPage(Page):
         if self._completed:
             self._wizard.nextPage()
         else:
+            config = self._wizard.gui.config
+
+            config.simBriefUserName = self._userName.get_text()
+
+            rememberPassword = self._rememberButton.get_active()
+            config.simBriefPassword = \
+              self._password.get_text() if rememberPassword else ""
+            config.rememberSimBriefPassword = rememberPassword
+
+            config.save()
+
             plan = self._getPlan()
             print "plan:", plan
 
