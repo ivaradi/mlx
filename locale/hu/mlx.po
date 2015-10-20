@@ -708,6 +708,27 @@ msgstr "NOTAM-ok letöltése..."
 msgid "route_down_metars"
 msgstr "METAR-ok letöltése..."
 
+msgid "simbrief_setup_title"
+msgstr "SimBrief beállítások"
+
+msgid "simbrief_setup_help"
+msgstr "Töltsd ki a lenti adatokat a SimBrief eligazítás előállítása céljából."
+
+msgid "simbrief_setup_chelp"
+msgstr "A SimBrief eligazítás az alábbi adatok alapján keszült."
+
+msgid "simbrief_username"
+msgstr "_Felhasználónév:"
+
+msgid "simbrief_username_tooltip"
+msgstr "Írd be a SimBrief felhasználónevedet"
+
+msgid "simbrief_password"
+msgstr "_Jelszó:"
+
+msgid "simbrief_password_tooltip"
+msgstr "Írdbe a SimBrief jelszavadat"
+
 msgid "simbrief_remember_password"
 msgstr "_Emlékezz a jelszóra"
 

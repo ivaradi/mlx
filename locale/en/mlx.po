@@ -709,6 +709,27 @@ msgstr "Downloading NOTAMs..."
 msgid "route_down_metars"
 msgstr "Downloading METARs..."
 
+msgid "simbrief_setup_title"
+msgstr "SimBrief setup"
+
+msgid "simbrief_setup_help"
+msgstr "Complete the following data to start generating your SimBrief briefing."
+
+msgid "simbrief_setup_chelp"
+msgstr "Your SimBrief briefing was generated with the following data."
+
+msgid "simbrief_username"
+msgstr "_Username:"
+
+msgid "simbrief_username_tooltip"
+msgstr "Enter your Simbrief username"
+
+msgid "simbrief_password"
+msgstr "_Password:"
+
+msgid "simbrief_password_tooltip"
+msgstr "Enter your Simbrief password"
+
 msgid "simbrief_remember_password"
 msgstr "_Remember password"
 

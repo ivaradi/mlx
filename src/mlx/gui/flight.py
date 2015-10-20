@@ -1637,13 +1637,9 @@ class SimBriefSetupPage(Page):
         """Construct the setup page."""
 
         super(SimBriefSetupPage, self).__init__(wizard,
-                                                "SimBrief setup",
-                                                "Complete the following data to "
-                                                "start generating your "
-                                                "SimBrief briefing.",
-                                                "Your SimBrief briefing was "
-                                                "generated with the following "
-                                                "data.")
+                                                xstr("simbrief_setup_title"),
+                                                xstr("simbrief_setup_help"),
+                                                xstr("simbrief_setup_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -1655,7 +1651,7 @@ class SimBriefSetupPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label("_Username:")
+        label = gtk.Label(xstr("simbrief_username"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
@@ -1664,11 +1660,11 @@ class SimBriefSetupPage(Page):
         self._userName.set_width_chars(16)
         self._userName.connect("changed",
                                lambda button: self._updateForwardButton())
-        self._userName.set_tooltip_text("Your SimBrief username")
+        self._userName.set_tooltip_text(xstr("simbrief_username_tooltip"))
         table.attach(self._userName, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._userName)
 
-        label = gtk.Label("_Password:")
+        label = gtk.Label(xstr("simbrief_password"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
@@ -1677,7 +1673,7 @@ class SimBriefSetupPage(Page):
         self._password.set_visibility(False)
         self._password.connect("changed",
                                lambda button: self._updateForwardButton())
-        self._password.set_tooltip_text("Your SimBrief password")
+        self._password.set_tooltip_text(xstr("simbrief_password_tooltip"))
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
