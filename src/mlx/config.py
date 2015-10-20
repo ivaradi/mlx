@@ -692,8 +692,8 @@ class Config(object):
                                                 "vsSmoothingLength",
                                                 -2))
 
-        self._useSimBrief = self._getBoolean(config, "general",
-                                             "useSimBrief", False)
+        self._useSimBrief = self._getBoolean(config, "simbrief",
+                                             "use", False)
 
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
@@ -775,7 +775,8 @@ class Config(object):
         config.set("general", "vsSmoothingLength",
                    str(self._vsSmoothingLength))
 
-        config.set("general", "useSimBrief",
+        config.add_section("simbrief")
+        config.set("simbrief", "use",
                    "yes" if self._useSimBrief else "no")
 
         if self._pirepDirectory is not None:
