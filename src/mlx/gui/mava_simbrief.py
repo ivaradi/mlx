@@ -21,6 +21,48 @@ class MavaSimbriefIntegrator():
     """Implements the integration with the excellent Simbrief pilot briefing
     system for MALEV Virtual."""
 
+    # Progress stage: searching the suitable browser window
+    PROGRESS_SEARCHING_BROWSER = 1
+
+    # Progress stage: retrieving the form from the server
+    PROGRESS_LOADING_FORM = 2
+
+    # Progress stage: filling the form
+    PROGRESS_FILLING_FORM = 3
+
+    # Progress stage: waiting for the login
+    PROGRESS_WAITING_LOGIN = 4
+
+    # Progress stage: logging in
+    PROGRESS_LOGGING_IN = 5
+
+    # Progress stage: waiting for result
+    PROGRESS_WAITING_RESULT = 6
+
+    # The maximal reserved progress stage
+    PROGRESS_MAX = 16
+
+    # Result code: none (i.e. the SimBrief query is in progress).
+    RESULT_NONE = 0
+
+    # Result code: success
+    RESULT_OK = 1
+
+    # Result code: other error
+    RESULT_ERROR_OTHER = 2
+
+    # Result code: form could not be loaded
+    RESULT_ERROR_NO_FORM = 11
+
+    # Result code: no popup (i.e. login) window found
+    RESULT_ERROR_NO_POPUP = 12
+
+    # Result code: login failed
+    RESULT_ERROR_LOGIN_FAILED = 13
+
+    # The maximal reserved result code
+    RESULT_MAX = 32
+
     def __init__(self,
                  plan,
                  driver=None,
@@ -113,15 +155,19 @@ class MavaSimbriefIntegrator():
                         + "xml.xml")
             is_briefing_available = True
         else:
-            update_progress("Looking for a browser...", False)
+            update_progress(MavaSimbriefIntegrator.PROGRESS_SEARCHING_BROWSER,
+                            MavaSimbriefIntegrator.RESULT_NONE, None)
             # There must be window whose title is 'SimBrief' so that we
             # could find our one among several
             if self._find_window_by_title("SimBrief") is None:
                 print "No SimBrief window was found!"
+                update_progress(MavaSimbriefIntegrator.PROGRESS_SEARCHING_BROWSER,
+                                MavaSimbriefIntegrator.RESULT_ERROR_OTHER, None)
                 return None
 
             # normal operation with a real xml file
-            update_progress("Retrieving form...", False)
+            update_progress(MavaSimbriefIntegrator.PROGRESS_LOADING_FORM,
+                            MavaSimbriefIntegrator.RESULT_NONE, None)
             if local_html_debug:
                 self.driver.get(
                     "file://" + os.getcwd() + os.sep + "simbrief_form.html")
@@ -132,6 +178,8 @@ class MavaSimbriefIntegrator():
             main_handle = self._find_window_by_title("Malev Virtual Simbrief Integration System")
             if main_handle is None:
                 print "No SimBrief Integration window was found!"
+                update_progress(MavaSimbriefIntegrator.PROGRESS_LOADING_FORM,
+                                MavaSimbriefIntegrator.RESULT_ERROR_NO_FORM, None)
                 return None
 
             # Make a copy of the window handles before submitting the form,
@@ -139,7 +187,8 @@ class MavaSimbriefIntegrator():
             handles = self.driver.window_handles[:]
 
             # Entering form data
-            update_progress("Filling form...", False)
+            update_progress(MavaSimbriefIntegrator.PROGRESS_FILLING_FORM,
+                            MavaSimbriefIntegrator.RESULT_NONE, None)
             self.driver.switch_to_window(main_handle)
             self.fill_form(self.plan,
                            self.simbrief_query_settings)
@@ -148,10 +197,12 @@ class MavaSimbriefIntegrator():
             button = self.driver.find_element_by_name("submitform")
             button.send_keys(Keys.RETURN)
 
-            update_progress("Waiting for login...", False)
+            update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN,
+                            MavaSimbriefIntegrator.RESULT_NONE, None)
             popup_handle = self._find_popup(handles)
             if popup_handle is None:
-                print "No popup window was found!"
+                update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN,
+                                MavaSimbriefIntegrator.RESULT_ERROR_NO_POPUP, None)
                 return None
 
             login_count = 0
@@ -163,8 +214,14 @@ class MavaSimbriefIntegrator():
                     userElement = self.driver.find_element_by_name("user")
 
                     if userElement is not None:
-                        update_progress("Logging in...", False)
+                        update_progress(MavaSimbriefIntegrator.PROGRESS_LOGGING_IN,
+                                        MavaSimbriefIntegrator.RESULT_NONE, None)
                         (userName, password) = get_credentials(login_count)
+                        if userName is None or password is None:
+                            update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN,
+                                            MavaSimbriefIntegrator.RESULT_ERROR_LOGIN_FAILED, None)
+                            return None
+
                         userElement.send_keys(userName)
                         self.driver.find_element_by_name("pass").send_keys(password)
                         self.driver.find_element_by_name("staylogged").click()
@@ -177,7 +234,8 @@ class MavaSimbriefIntegrator():
                 except NoSuchWindowException:
                     pass
 
-                update_progress("Waiting for the result...", False)
+                update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_RESULT,
+                                MavaSimbriefIntegrator.RESULT_NONE, None)
                 self.driver.switch_to.window(main_handle)
                 try:
                     if self.driver.find_element_by_name("hidden_is_briefing_available") is not None:

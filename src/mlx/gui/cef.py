@@ -76,6 +76,25 @@ class ArgsFileWaiter(threading.Thread):
 
 #------------------------------------------------------------------------------
 
+SIMBRIEF_PROGRESS_SEARCHING_BROWSER = MavaSimbriefIntegrator.PROGRESS_SEARCHING_BROWSER
+SIMBRIEF_PROGRESS_LOADING_FORM = MavaSimbriefIntegrator.PROGRESS_LOADING_FORM
+SIMBRIEF_PROGRESS_FILLING_FORM = MavaSimbriefIntegrator.PROGRESS_FILLING_FORM
+SIMBRIEF_PROGRESS_WAITING_LOGIN = MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN
+SIMBRIEF_PROGRESS_LOGGING_IN = MavaSimbriefIntegrator.PROGRESS_LOGGING_IN
+SIMBRIEF_PROGRESS_WAITING_RESULT = MavaSimbriefIntegrator.PROGRESS_WAITING_RESULT
+
+SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING = MavaSimbriefIntegrator.PROGRESS_MAX + 1
+SIMBRIEF_PROGRESS_DONE = 1000
+
+SIMBRIEF_RESULT_NONE = MavaSimbriefIntegrator.RESULT_NONE
+SIMBRIEF_RESULT_OK = MavaSimbriefIntegrator.RESULT_OK
+SIMBRIEF_RESULT_ERROR_OTHER = MavaSimbriefIntegrator.RESULT_ERROR_OTHER
+SIMBRIEF_RESULT_ERROR_NO_FORM = MavaSimbriefIntegrator.RESULT_ERROR_NO_FORM
+SIMBRIEF_RESULT_ERROR_NO_POPUP = MavaSimbriefIntegrator.RESULT_ERROR_NO_POPUP
+SIMBRIEF_RESULT_ERROR_LOGIN_FAILED = MavaSimbriefIntegrator.RESULT_ERROR_LOGIN_FAILED
+
+#------------------------------------------------------------------------------
+
 class SeleniumHandler(threading.Thread):
     """Thread to handle Selenium operations."""
     def __init__(self, programDirectory):
@@ -157,12 +176,21 @@ class SeleniumHandler(threading.Thread):
                                        local_xml_debug = False,
                                        local_html_debug = False)
 
-        updateProgress("Retrieving briefing...", False)
+        if link is not None:
+            updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
+                           SIMBRIEF_RESULT_NONE, None)
 
-        flight_info = integrator.get_results(link,
-                                             html_file_path = htmlFilePath)
+            try:
+                flight_info = integrator.get_results(link,
+                                                     html_file_path =
+                                                     htmlFilePath)
 
-        updateProgress("Done", True)
+                updateProgress(SIMBRIEF_PROGRESS_DONE,
+                               SIMBRIEF_RESULT_OK, flight_info)
+            except Exception, e:
+                print "Failed retrieving the briefing:", e
+                updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
+                               SIMBRIEF_RESULT_ERROR_OTHER, None)
 
     def _quit(self):
         """Set the _toQuit member variable to indicate that the thread should

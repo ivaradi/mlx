@@ -738,6 +738,48 @@ msgstr ""
 "mindig újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként "
 "tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
 
+msgid "simbrief_progress_searching_browser"
+msgstr "Böngésző keresése..."
+
+msgid "simbrief_progress_loading_form"
+msgstr "Űrlap letöltése..."
+
+msgid "simbrief_progress_filling_form"
+msgstr "Űrlap kitöltése..."
+
+msgid "simbrief_progress_waiting_login"
+msgstr "Várakozás a bejelentkező ablakra..."
+
+msgid "simbrief_progress_logging_in"
+msgstr "Bejelentkezés..."
+
+msgid "simbrief_progress_waiting_result"
+msgstr "Várakozás az eredményre..."
+
+msgid "simbrief_progress_retrieving_briefing"
+msgstr "Az eligazítás letöltése..."
+
+msgid "simbrief_progress_unknown"
+msgstr "?????"
+
+msgid "simbrief_result_error_other"
+msgstr "Valamilyen hiba történt, lásd a hibanaplót."
+
+msgid "simbrief_result_error_no_form"
+msgstr "Nem sikerült letölteni az űrlapot."
+
+msgid "simbrief_result_error_no_popup"
+msgstr "Nem jelent meg a bejelentkező ablak."
+
+msgid "simbrief_result_login_failed"
+msgstr "A bejelentkezés nem sikerült."
+
+msgid "simbrief_result_unknown"
+msgstr "Ismeretlen hiba történt."
+
+msgid "simbrief_cancelled"
+msgstr "Áttérünk a régi eligazításra."
+
 msgid "briefing_title"
 msgstr "Eligazítás (%d/2): %s"
 

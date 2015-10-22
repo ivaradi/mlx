@@ -1542,6 +1542,7 @@ class RoutePage(Page):
         self._cruiseLevel.set_value(0)
         self._cruiseLevel.set_text("")
         self._route.get_buffer().set_text(self._wizard._bookedFlight.route)
+        self._alternate.set_text("")
         self._updateForwardButton()
 
     def _getRoute(self):
@@ -1593,7 +1594,8 @@ class RoutePage(Page):
 
     def _forwardClicked(self, button):
         """Called when the Forward button is clicked."""
-        if self._wizard.gui.config.useSimBrief:
+        if self._wizard.gui.config.useSimBrief and \
+           self._wizard.usingSimBrief is not False:
             self._wizard.nextPage()
         else:
             self._wizard.jumpPage(3)
@@ -1616,6 +1618,23 @@ class SimBriefSetupPage(Page):
         "NOV",
         "DEC"
         ]
+
+    progress2Message = {
+        cef.SIMBRIEF_PROGRESS_SEARCHING_BROWSER: "simbrief_progress_searching_browser",
+        cef.SIMBRIEF_PROGRESS_LOADING_FORM: "simbrief_progress_loading_form",
+        cef.SIMBRIEF_PROGRESS_FILLING_FORM: "simbrief_progress_filling_form",
+        cef.SIMBRIEF_PROGRESS_WAITING_LOGIN: "simbrief_progress_waiting_login",
+        cef.SIMBRIEF_PROGRESS_LOGGING_IN: "simbrief_progress_logging_in",
+        cef.SIMBRIEF_PROGRESS_WAITING_RESULT: "simbrief_progress_waiting_result",
+        cef.SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING: "simbrief_progress_retrieving_briefing"
+        }
+
+    result2Message = {
+        cef.SIMBRIEF_RESULT_ERROR_OTHER: "simbrief_result_error_other",
+        cef.SIMBRIEF_RESULT_ERROR_NO_FORM: "simbrief_result_error_no_form",
+        cef.SIMBRIEF_RESULT_ERROR_NO_POPUP: "simbrief_result_error_no_popup",
+        cef.SIMBRIEF_RESULT_ERROR_LOGIN_FAILED: "simbrief_result_error_login_failed"
+        }
 
     @staticmethod
     def getHTMLFilePath():
@@ -1737,17 +1756,40 @@ class SimBriefSetupPage(Page):
 
             startSound(const.SOUND_NOTAM)
 
-    def _simBriefProgressCallback(self, message, done):
+    def _simBriefProgressCallback(self, progress, result, flightInfo):
         """Called by the SimBrief handling thread."""
-        gobject.idle_add(self._simBriefProgress, message, done)
+        gobject.idle_add(self._simBriefProgress, progress, result, flightInfo)
 
-    def _simBriefProgress(self, message, done):
+    def _simBriefProgress(self, progress, result, flightInfo):
         """The real SimBrief progress handler."""
-        if done:
-            self._wizard.gui.endBusy()
-            self._wizard.nextPage()
+        print "_simBriefProgress", progress, result, flightInfo
+        if result==cef.SIMBRIEF_RESULT_NONE:
+            message = SimBriefSetupPage.progress2Message.get(progress,
+                                                             "simbrief_progress_unknown")
+            self._wizard.gui.updateBusyState(xstr(message))
         else:
-            self._wizard.gui.updateBusyState(message)
+            self._wizard.gui.endBusy()
+
+            if result==cef.SIMBRIEF_RESULT_OK:
+                self._wizard.nextPage()
+            else:
+                message = SimBriefSetupPage.result2Message.get(result,
+                                                               "simbrief_result_unknown")
+                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                           type = MESSAGETYPE_ERROR,
+                                           message_format =
+                                           xstr(message) + "\n"+
+                                           xstr("simbrief_cancelled"))
+
+                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                secondary = xstr("flightsel_save_failed_sec")
+                dialog.format_secondary_markup(secondary)
+                dialog.run()
+                dialog.hide()
+
+                self._wizard.usingSimBrief = False
+                self._wizard.jumpPage(2, fromPageShift = 1)
 
     def _getPlan(self):
         """Get the flight plan data for SimBrief."""
@@ -3950,8 +3992,13 @@ class Wizard(gtk.VBox):
         """Get the login result."""
         return self._loginResult
 
-    def setCurrentPage(self, index, finalize = False):
-        """Set the current page to the one with the given index."""
+    def setCurrentPage(self, index, finalize = False, fromPageShift = None):
+        """Set the current page to the one with the given index.
+
+        @param fromPageShift if given, the relative index of one of the
+        previous pages that should be used as the from-page of the next
+        page. E.g. if fromPageShift is 1, the previous page will be the
+        from-page."""
         assert index < len(self._pages)
 
         fromPage = self._currentPage
@@ -3960,6 +4007,8 @@ class Wizard(gtk.VBox):
             if finalize and not page._completed:
                 page.complete()
             self.remove(page)
+            if fromPageShift is not None:
+                fromPage -= fromPageShift
 
         self._currentPage = index
         page = self._pages[index]
@@ -4156,9 +4205,10 @@ class Wizard(gtk.VBox):
         """Go to the next page."""
         self.jumpPage(1, finalize)
 
-    def jumpPage(self, count, finalize = True):
+    def jumpPage(self, count, finalize = True, fromPageShift = None):
         """Go to the page which is 'count' pages after the current one."""
-        self.setCurrentPage(self._currentPage + count, finalize = finalize)
+        self.setCurrentPage(self._currentPage + count,
+                            finalize = finalize, fromPageShift = fromPageShift)
 
     def grabDefault(self):
         """Make the default button of the current page the default."""
@@ -4207,7 +4257,7 @@ class Wizard(gtk.VBox):
         self._departureMETAR = None
         self._arrivalNOTAMs = None
         self._arrivalMETAR = None
-        self._usingSimBrief = False
+        self._usingSimBrief = None
 
         firstPage = 0 if self._loginResult is None else 1
         for page in self._pages[firstPage:]:

@@ -740,6 +740,48 @@ msgstr ""
 "the password is stored as text, and anybody who can access "
 "your files will be able to read it."
 
+msgid "simbrief_progress_searching_browser"
+msgstr "Searching browser..."
+
+msgid "simbrief_progress_loading_form"
+msgstr "Loading form..."
+
+msgid "simbrief_progress_filling_form"
+msgstr "Filling form..."
+
+msgid "simbrief_progress_waiting_login"
+msgstr "Waiting login..."
+
+msgid "simbrief_progress_logging_in"
+msgstr "Logging in..."
+
+msgid "simbrief_progress_waiting_result"
+msgstr "Waiting for the result..."
+
+msgid "simbrief_progress_retrieving_briefing"
+msgstr "Retrieving briefing..."
+
+msgid "simbrief_progress_unknown"
+msgstr "?????"
+
+msgid "simbrief_result_error_other"
+msgstr "Some error occured, see debug logs."
+
+msgid "simbrief_result_error_no_form"
+msgstr "No form could be loaded."
+
+msgid "simbrief_result_error_no_popup"
+msgstr "No login window appeared."
+
+msgid "simbrief_result_login_failed"
+msgstr "Login failed."
+
+msgid "simbrief_result_unknown"
+msgstr "Unknown error occured."
+
+msgid "simbrief_cancelled"
+msgstr "Reverting to the old-style briefing."
+
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
 
