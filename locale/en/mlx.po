@@ -780,6 +780,9 @@ msgstr "_Descent profile:"
 msgid "simbrief_descent_profile_tooltip"
 msgstr "Select the descent profile."
 
+msgid "simbrief_calling"
+msgstr "Calling SimBrief..."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Searching browser..."
 

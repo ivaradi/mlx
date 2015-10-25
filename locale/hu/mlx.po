@@ -778,6 +778,9 @@ msgstr "_Süllyedési profil:"
 msgid "simbrief_descent_profile_tootip"
 msgstr "Válaszd ki a süllyedési profilt"
 
+msgid "simbrief_calling"
+msgstr "A SimBrief indítása..."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Böngésző keresése..."
 

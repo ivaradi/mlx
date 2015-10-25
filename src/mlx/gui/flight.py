@@ -1971,7 +1971,7 @@ class SimBriefSetupPage(Page):
             self._cruiseProfile.set_sensitive(False)
             self._descentProfile.set_sensitive(False)
 
-            self._wizard.gui.beginBusy("Calling SimBrief...")
+            self._wizard.gui.beginBusy(xstr("simbrief_calling"))
 
             cef.startFastTimeout()
             cef.callSimBrief(plan,
