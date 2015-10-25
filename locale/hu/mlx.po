@@ -780,6 +780,15 @@ msgstr "Ismeretlen hiba történt."
 msgid "simbrief_cancelled"
 msgstr "Áttérünk a régi eligazításra."
 
+msgid "simbrief_credentials_title"
+msgstr "SimBrief bejelentkezés"
+
+msgid "simbrief_login_failed"
+msgstr ""
+"A megadott adatokkal nem tudtam\n"
+"bejelentkezni a SimBriefbe. Adj meg\n"
+"új adatokat, vagy hagyjuk a SimBriefet"
+
 msgid "briefing_title"
 msgstr "Eligazítás (%d/2): %s"
 

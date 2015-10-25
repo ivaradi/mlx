@@ -18,6 +18,7 @@ import datetime
 import time
 import os
 import tempfile
+import threading
 
 #-----------------------------------------------------------------------------
 
@@ -1602,6 +1603,108 @@ class RoutePage(Page):
 
 #-----------------------------------------------------------------------------
 
+class SimBriefCredentialsDialog(gtk.Dialog):
+    """A dialog window to ask for SimBrief credentials."""
+    def __init__(self, gui, userName, password, rememberPassword):
+        """Construct the dialog."""
+        super(SimBriefCredentialsDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
+                                                        xstr("simbrief_credentials_title"),
+                                                        gui.mainWindow,
+                                                        DIALOG_MODAL)
+        self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
+        self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+
+        contentArea = self.get_content_area()
+
+        contentAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                         xscale = 0.0, yscale = 0.0)
+        contentAlignment.set_padding(padding_top = 4, padding_bottom = 16,
+                                     padding_left = 8, padding_right = 8)
+
+        contentArea.pack_start(contentAlignment, False, False, 0)
+
+        contentVBox = gtk.VBox()
+        contentAlignment.add(contentVBox)
+
+        label = gtk.Label(xstr("simbrief_login_failed"))
+        label.set_alignment(0.0, 0.0)
+
+        contentVBox.pack_start(label, False, False, 0)
+
+        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        tableAlignment.set_padding(padding_top = 24, padding_bottom = 0,
+                                   padding_left = 0, padding_right = 0)
+
+        table = gtk.Table(3, 2)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+
+        tableAlignment.add(table)
+        contentVBox.pack_start(tableAlignment, True, True, 0)
+
+        label = gtk.Label(xstr("simbrief_username"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._userName = gtk.Entry()
+        self._userName.set_width_chars(16)
+        #self._userName.connect("changed",
+        #                       lambda button: self._updateForwardButton())
+        self._userName.set_tooltip_text(xstr("simbrief_username_tooltip"))
+        self._userName.set_text(userName)
+        table.attach(self._userName, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._userName)
+
+        label = gtk.Label(xstr("simbrief_password"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._password = gtk.Entry()
+        self._password.set_visibility(False)
+        #self._password.connect("changed",
+        #                       lambda button: self._updateForwardButton())
+        self._password.set_tooltip_text(xstr("simbrief_password_tooltip"))
+        self._password.set_text(password)
+        table.attach(self._password, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._password)
+
+        self._rememberButton = gtk.CheckButton(xstr("simbrief_remember_password"))
+        self._rememberButton.set_use_underline(True)
+        self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
+        self._rememberButton.set_active(rememberPassword)
+        table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
+
+    @property
+    def userName(self):
+        """Get the user name entered."""
+        return self._userName.get_text()
+
+    @property
+    def password(self):
+        """Get the password entered."""
+        return self._password.get_text()
+
+    @property
+    def rememberPassword(self):
+        """Get whether the password is to be remembered."""
+        return self._rememberButton.get_active()
+
+    def run(self):
+        """Run the dialog."""
+        self.show_all()
+
+        response = super(SimBriefCredentialsDialog, self).run()
+
+        self.hide()
+
+        return response
+
+#-----------------------------------------------------------------------------
+
 class SimBriefSetupPage(Page):
     """Page for setting up some parameters for SimBrief."""
     monthNum2Name = [
@@ -1701,6 +1804,11 @@ class SimBriefSetupPage(Page):
         self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
+        self._credentialsCondition = threading.Condition()
+        self._credentialsAvailable = False
+        self._credentialsUserName = None
+        self._credentialsPassword = None
+
         self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -1715,7 +1823,6 @@ class SimBriefSetupPage(Page):
         self._rememberButton.set_active(config.rememberSimBriefPassword)
 
         self._updateForwardButton()
-
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
@@ -1744,17 +1851,67 @@ class SimBriefSetupPage(Page):
             plan = self._getPlan()
             print "plan:", plan
 
-            userName = self._userName.get_text()
-            password = self._password.get_text()
-
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
             cef.callSimBrief(plan,
-                             lambda count: (userName, password),
+                             self._getCredentialsCallback,
                              self._simBriefProgressCallback,
                              SimBriefSetupPage.getHTMLFilePath())
 
             startSound(const.SOUND_NOTAM)
+
+    def _getCredentialsCallback(self, count):
+        """Called when the SimBrief home page requests the credentials."""
+        with self._credentialsCondition:
+            self._credentialsAvailable = False
+
+            gobject.idle_add(self._getCredentials, count)
+
+            while not self._credentialsAvailable:
+                self._credentialsCondition.wait()
+
+            return (self._credentialsUserName, self._credentialsPassword)
+
+    def _getCredentials(self, count):
+        """Get the credentials.
+
+        If count is 0, the user name and password entered into the setup page
+        are returned. Otherwise a dialog box is displayed informing the user of
+        invalid credentials and requesting another set of them."""
+        with self._credentialsCondition:
+            if count==0:
+                self._credentialsUserName = self._userName.get_text()
+                self._credentialsPassword = self._password.get_text()
+            else:
+                gui = self._wizard.gui
+                config = gui.config
+
+                dialog = SimBriefCredentialsDialog(gui,
+                                                   config.simBriefUserName,
+                                                   config.simBriefPassword,
+                                                   config.rememberSimBriefPassword)
+                response = dialog.run()
+
+                if response==RESPONSETYPE_OK:
+                    self._credentialsUserName = dialog.userName
+                    self._userName.set_text(self._credentialsUserName)
+                    self._credentialsPassword = dialog.password
+                    self._password.set_text(self._credentialsPassword)
+                    rememberPassword = dialog.rememberPassword
+
+                    config.simBriefUserName = self._credentialsUserName
+
+                    config.simBriefPassword = \
+                        self._credentialsPassword if rememberPassword else ""
+                    config.rememberSimBriefPassword = rememberPassword
+
+                    config.save()
+                else:
+                    self._credentialsUserName = None
+                    self._credentialsPassword = None
+
+            self._credentialsAvailable = True
+            self._credentialsCondition.notify()
 
     def _simBriefProgressCallback(self, progress, result, flightInfo):
         """Called by the SimBrief handling thread."""

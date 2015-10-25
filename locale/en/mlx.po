@@ -782,6 +782,15 @@ msgstr "Unknown error occured."
 msgid "simbrief_cancelled"
 msgstr "Reverting to the old-style briefing."
 
+msgid "simbrief_credentials_title"
+msgstr "SimBrief login"
+
+msgid "simbrief_login_failed"
+msgstr ""
+"Failed to log in to SimBrief using the\n"
+"supplied credentials. Please, enter\n"
+"new ones, or cancel SimBrief."
+
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
 
