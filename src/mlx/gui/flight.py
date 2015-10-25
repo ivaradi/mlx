@@ -1822,6 +1822,30 @@ class SimBriefSetupPage(Page):
 
         table.attach(gtk.Label("kg"), 2, 3, 3, 4)
 
+        label = gtk.Label(xstr("simbrief_takeoff_runway"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 4, 5)
+
+        self._takeoffRunway = gtk.Entry()
+        self._takeoffRunway.set_width_chars(10)
+        self._takeoffRunway.set_tooltip_text(xstr("simbrief_takeoff_runway_tooltip"))
+        self._takeoffRunway.connect("changed", self._upperChanged)
+        table.attach(self._takeoffRunway, 1, 2, 4, 5)
+        label.set_mnemonic_widget(self._takeoffRunway)
+
+        label = gtk.Label(xstr("simbrief_landing_runway"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 5, 6)
+
+        self._landingRunway = gtk.Entry()
+        self._landingRunway.set_width_chars(10)
+        self._landingRunway.set_tooltip_text(xstr("simbrief_takeoff_runway_tooltip"))
+        self._landingRunway.connect("changed", self._upperChanged)
+        table.attach(self._landingRunway, 1, 2, 5, 6)
+        label.set_mnemonic_widget(self._landingRunway)
+
         self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -1842,6 +1866,12 @@ class SimBriefSetupPage(Page):
 
         self._extraFuel.set_int(0)
         self._extraFuel.set_sensitive(True)
+
+        self._takeoffRunway.set_text("")
+        self._takeoffRunway.set_sensitive(True)
+
+        self._landingRunway.set_text("")
+        self._landingRunway.set_sensitive(True)
 
         self._updateForwardButton()
 
@@ -1876,6 +1906,8 @@ class SimBriefSetupPage(Page):
             self._password.set_sensitive(False)
             self._rememberButton.set_sensitive(False)
             self._extraFuel.set_sensitive(False)
+            self._takeoffRunway.set_sensitive(False)
+            self._landingRunway.set_sensitive(False)
 
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
@@ -2022,13 +2054,18 @@ class SimBriefSetupPage(Page):
         plan["altn"] = wizard.alternate
 
         plan["addedfuel"] = str(self._extraFuel.get_int() / 1000.0)
-        plan["origrwy"] = "" # FIXME: query
-        plan["destrwy"] = "" # FIXME: query
+        plan["origrwy"] = self._takeoffRunway.get_text()
+        plan["destrwy"] = self._landingRunway.get_text()
         plan["climb"] = "250/300/78" # FIXME: query
         plan["cruise"] = "LRC" # FIXME: query
         plan["descent"] = "80/280/250" # FIXME: query
 
         return plan
+
+    def _upperChanged(self, entry, arg = None):
+        """Called when the value of some entry widget has changed and the value
+        should be converted to uppercase."""
+        entry.set_text(entry.get_text().upper())
 
 #-----------------------------------------------------------------------------
 

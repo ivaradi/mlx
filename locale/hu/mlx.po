@@ -744,6 +744,22 @@ msgstr "_Extra üzemanyag:"
 msgid "simbrief_extra_fuel_tooltip"
 msgstr "Írd be az extra üzemanyag mennyiségéet kilogrammban."
 
+msgid "simbrief_takeoff_runway"
+msgstr "_Felszálló futópálya:"
+
+msgid "simbrief_takeoff_runway_tooltip"
+msgstr
+"Írd be a tervezett felszálló futópálya számát.\n"
+"Ha nem akarod megadni, hagyd üresen a mezőt."
+
+msgid "simbrief_landing_runway"
+msgstr "_Leszálló futópálya:"
+
+msgid "simbrief_landing_runway_tooltip"
+msgstr
+"Írd be a tervezett leszálló futópálya számát.\n"
+"Ha nem akarod megadni, hagyd üresen a mezőt."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Böngésző keresése..."
 

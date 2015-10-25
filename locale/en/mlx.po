@@ -746,6 +746,22 @@ msgstr "_Extra fuel:"
 msgid "simbrief_extra_fuel_tooltip"
 msgstr "Enter the amount of extra fuel in kilograms."
 
+msgid "simbrief_takeoff_runway"
+msgstr "_Takeoff runway:"
+
+msgid "simbrief_takeoff_runway_tooltip"
+msgstr ""
+"Enter the number of the planned takeoff runway.\n"
+"If you don't want to specify it, leave it empty"
+
+msgid "simbrief_landing_runway"
+msgstr "_Landing runway:"
+
+msgid "simbrief_landing_runway_tooltip"
+msgstr ""
+"Enter the number of the planned landing runway.\n"
+"If you don't want to specify it, leave it empty"
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Searching browser..."
 
