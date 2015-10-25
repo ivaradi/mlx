@@ -193,9 +193,15 @@ class SeleniumHandler(threading.Thread):
         self._simBriefBrowser.LoadUrl(self.simBriefInitURL)
 
         integrator = MavaSimbriefIntegrator(plan = plan, driver = driver)
-        link = integrator.get_xml_link(getCredentials, updateProgress,
-                                       local_xml_debug = False,
-                                       local_html_debug = False)
+        link = None
+        try:
+            link = integrator.get_xml_link(getCredentials, updateProgress,
+                                           local_xml_debug = False,
+                                           local_html_debug = False)
+        except Exception, e:
+            print "Failed to initiate the generation of the briefing:", e
+            updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
+                           SIMBRIEF_RESULT_ERROR_OTHER, None)
 
         if link is not None:
             updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
