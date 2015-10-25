@@ -28,6 +28,10 @@ import traceback
 # Indicate if we should quit
 _toQuit = False
 
+# Indicate the users of the fast timeout handler. If it reaches zero, the
+# timeout will be stopped
+_fastTimeoutUsers = 0
+
 # The Selenium thread
 _seleniumHandler = None
 
@@ -394,6 +398,37 @@ def finalize():
 def _handleTimeout():
     """Handle the timeout by running the CEF message loop."""
     if _toQuit:
+        return False
+    else:
+        cefpython.MessageLoopWork()
+        return True
+
+#------------------------------------------------------------------------------
+
+def startFastTimeout():
+    """Start the fast timeout handler."""
+    global _fastTimeoutUsers
+
+    if _fastTimeoutUsers==0:
+        _fastTimeoutUsers = 1
+        gobject.timeout_add(1, _handleFastTimeout)
+    else:
+        _fastTimeoutUsers += 1
+
+#------------------------------------------------------------------------------
+
+def stopFastTimeout():
+    """Stop the fast timeout handler."""
+    global _fastTimeoutUsers
+
+    assert _fastTimeoutUsers>0
+    _fastTimeoutUsers -= 1
+
+#------------------------------------------------------------------------------
+
+def _handleFastTimeout():
+    """Handle a (fast) timeout by running the CEF message loop."""
+    if _toQuit or _fastTimeoutUsers==0:
         return False
     else:
         cefpython.MessageLoopWork()

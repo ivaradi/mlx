@@ -1973,6 +1973,7 @@ class SimBriefSetupPage(Page):
 
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
+            cef.startFastTimeout()
             cef.callSimBrief(plan,
                              self._getCredentialsCallback,
                              self._simBriefProgressCallback,
@@ -2045,6 +2046,7 @@ class SimBriefSetupPage(Page):
                                                              "simbrief_progress_unknown")
             self._wizard.gui.updateBusyState(xstr(message))
         else:
+            cef.stopFastTimeout()
             self._wizard.gui.endBusy()
 
             if result==cef.SIMBRIEF_RESULT_OK:
