@@ -249,8 +249,6 @@ class MavaSimbriefIntegrator():
                 except NoSuchElementException:
                     pass
 
-            self.driver.quit()
-
         if is_briefing_available:
             return xml_link
         else:
