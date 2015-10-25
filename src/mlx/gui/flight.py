@@ -1809,6 +1809,19 @@ class SimBriefSetupPage(Page):
         self._credentialsUserName = None
         self._credentialsPassword = None
 
+        label = gtk.Label(xstr("simbrief_extra_fuel"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 3, 4)
+
+        self._extraFuel = IntegerEntry(defaultValue = 0)
+        self._extraFuel.set_width_chars(6)
+        self._extraFuel.set_tooltip_text(xstr("simbrief_extra_fuel_tooltip"))
+        table.attach(self._extraFuel, 1, 2, 3, 4)
+        label.set_mnemonic_widget(self._extraFuel)
+
+        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
+
         self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -1826,6 +1839,9 @@ class SimBriefSetupPage(Page):
 
         self._rememberButton.set_active(config.rememberSimBriefPassword)
         self._rememberButton.set_sensitive(True)
+
+        self._extraFuel.set_int(0)
+        self._extraFuel.set_sensitive(True)
 
         self._updateForwardButton()
 
@@ -1859,6 +1875,7 @@ class SimBriefSetupPage(Page):
             self._userName.set_sensitive(False)
             self._password.set_sensitive(False)
             self._rememberButton.set_sensitive(False)
+            self._extraFuel.set_sensitive(False)
 
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
@@ -2004,7 +2021,7 @@ class SimBriefSetupPage(Page):
         plan["fl"] = str(wizard.filedCruiseAltitude)
         plan["altn"] = wizard.alternate
 
-        plan["addedfuel"] = "2.5" # FIXME: query
+        plan["addedfuel"] = str(self._extraFuel.get_int() / 1000.0)
         plan["origrwy"] = "" # FIXME: query
         plan["destrwy"] = "" # FIXME: query
         plan["climb"] = "250/300/78" # FIXME: query

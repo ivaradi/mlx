@@ -738,6 +738,12 @@ msgstr ""
 "mindig újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként "
 "tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
 
+msgid "simbrief_extra_fuel"
+msgstr "_Extra üzemanyag:"
+
+msgid "simbrief_extra_fuel_tooltip"
+msgstr "Írd be az extra üzemanyag mennyiségéet kilogrammban."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Böngésző keresése..."
 

@@ -740,6 +740,12 @@ msgstr ""
 "the password is stored as text, and anybody who can access "
 "your files will be able to read it."
 
+msgid "simbrief_extra_fuel"
+msgstr "_Extra fuel:"
+
+msgid "simbrief_extra_fuel_tooltip"
+msgstr "Enter the amount of extra fuel in kilograms."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Searching browser..."
 
