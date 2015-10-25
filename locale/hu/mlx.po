@@ -742,7 +742,7 @@ msgid "simbrief_extra_fuel"
 msgstr "E_xtra üzemanyag:"
 
 msgid "simbrief_extra_fuel_tooltip"
-msgstr "Írd be az extra üzemanyag mennyiségéet kilogrammban."
+msgstr "Írd be az extra üzemanyag mennyiségét kilogrammban."
 
 msgid "simbrief_takeoff_runway"
 msgstr "_Felszálló futópálya:"
