@@ -697,7 +697,7 @@ msgid "route_route_tooltip"
 msgstr "Az útvonal a szokásos formátumban."
 
 msgid "route_altn"
-msgstr "_Kitérő:"
+msgstr "Ki_térő:"
 
 msgid "route_altn_tooltip"
 msgstr "A kitérő repülőtér ICAO kódja."
@@ -718,19 +718,19 @@ msgid "simbrief_setup_chelp"
 msgstr "A SimBrief eligazítás az alábbi adatok alapján keszült."
 
 msgid "simbrief_username"
-msgstr "_Felhasználónév:"
+msgstr "Fel_használónév:"
 
 msgid "simbrief_username_tooltip"
 msgstr "Írd be a SimBrief felhasználónevedet"
 
 msgid "simbrief_password"
-msgstr "_Jelszó:"
+msgstr "Jels_zó:"
 
 msgid "simbrief_password_tooltip"
 msgstr "Írdbe a SimBrief jelszavadat"
 
 msgid "simbrief_remember_password"
-msgstr "_Emlékezz a jelszóra"
+msgstr "E_mlékezz a jelszóra"
 
 msgid "simbrief_remember_tooltip"
 msgstr ""
@@ -739,7 +739,7 @@ msgstr ""
 "tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
 
 msgid "simbrief_extra_fuel"
-msgstr "_Extra üzemanyag:"
+msgstr "E_xtra üzemanyag:"
 
 msgid "simbrief_extra_fuel_tooltip"
 msgstr "Írd be az extra üzemanyag mennyiségéet kilogrammban."
@@ -761,7 +761,7 @@ msgstr
 "Ha nem akarod megadni, hagyd üresen a mezőt."
 
 msgid "simbrief_climb_profile"
-msgstr "_Emelkedési profil:"
+msgstr "Emelke_dési profil:"
 
 msgid "simbrief_climb_profile_tootip"
 msgstr "Válaszd ki az emelkedési profilt"
@@ -773,7 +773,7 @@ msgid "simbrief_cruise_profile_tootip"
 msgstr "Válaszd ki az utazó profilt"
 
 msgid "simbrief_descent_profile"
-msgstr "_Süllyedési profil:"
+msgstr "Süll_yedési profil:"
 
 msgid "simbrief_descent_profile_tootip"
 msgstr "Válaszd ki a süllyedési profilt"
