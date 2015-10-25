@@ -109,12 +109,19 @@ class SeleniumHandler(threading.Thread):
 
         self._driver = None
 
+        self._simBriefBrowser = None
+
         self._toQuit = False
 
     @property
     def programDirectory(self):
         """Get the program directory."""
         return self._programDirectory
+
+    @property
+    def simBriefInitURL(self):
+        """Get the initial URL for the SimBrief browser."""
+        return "file://" + os.path.join(self.programDirectory, "simbrief.html")
 
     def run(self):
         """Create the Selenium driver and the perform any operations
@@ -146,6 +153,18 @@ class SeleniumHandler(threading.Thread):
             command()
 
         driver.quit()
+
+    def initializeSimBrief(self):
+        """Create and initialize the browser used for Simbrief."""
+        windowInfo = cefpython.WindowInfo()
+        windowInfo.SetAsOffscreen(int(0))
+
+        url = self.simBriefInitURL
+        self._simBriefBrowser = \
+          cefpython.CreateBrowserSync(windowInfo, browserSettings = {},
+                                      navigateUrl = self.simBriefInitURL)
+        self._simBriefBrowser.SetClientHandler(OffscreenRenderHandler())
+        self._simBriefBrowser.SetFocus(True)
 
     def callSimBrief(self, plan, getCredentials, updateProgress,
                      htmlFilePath):
@@ -344,17 +363,7 @@ class OffscreenRenderHandler(object):
 
 def initializeSimBrief():
     """Initialize the (hidden) browser window for SimBrief."""
-    windowInfo = cefpython.WindowInfo()
-    windowInfo.SetAsOffscreen(int(0))
-
-    url = "file://" + os.path.join(_seleniumHandler.programDirectory,
-                                   "simbrief.html")
-    simBriefBrowser = cefpython.CreateBrowserSync(windowInfo,
-                                                  browserSettings = {},
-                                                  navigateUrl = url)
-    simBriefBrowser.SetClientHandler(OffscreenRenderHandler())
-
-    simBriefBrowser.SetFocus(True)
+    _seleniumHandler.initializeSimBrief()
 
 #------------------------------------------------------------------------------
 
