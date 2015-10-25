@@ -1960,6 +1960,14 @@ class SimBriefSetupPage(Page):
             plan = self._getPlan()
             print "plan:", plan
 
+            takeoffRunway = self._takeoffRunway.get_text()
+            if takeoffRunway:
+                self._wizard.takeoffRunway = takeoffRunway
+
+            landingRunway = self._landingRunway.get_text()
+            if landingRunway:
+                self._wizard.landingRunway = landingRunway
+
             self._userName.set_sensitive(False)
             self._password.set_sensitive(False)
             self._rememberButton.set_sensitive(False)
@@ -3002,7 +3010,10 @@ class TakeoffPage(Page):
         self._metar.get_buffer().set_text(self._wizard.departureMETAR, -1)
         self._updatingMETAR = False
 
-        self._runway.set_text("")
+        if self._wizard.takeoffRunway is None:
+            self._runway.set_text("")
+        else:
+            self._runway.set_text(self._wizard.takeoffRunway)
         self._runway.set_sensitive(True)
         self._sid.set_active(0)
         self._sid.set_sensitive(True)
@@ -3561,7 +3572,10 @@ class LandingPage(Page):
         self._transition.set_active(0)
         self._transition.set_sensitive(True)
 
-        self._runway.set_text("")
+        if self._wizard.landingRunway is None:
+            self._runway.set_text("")
+        else:
+            self._runway.set_text(self._wizard.landingRunway)
         self._runway.set_sensitive(True)
 
         self._approachType.set_text("")
@@ -4587,6 +4601,8 @@ class Wizard(gtk.VBox):
         self._arrivalNOTAMs = None
         self._arrivalMETAR = None
         self._usingSimBrief = None
+        self.takeoffRunway = None
+        self.landingRunway = None
 
         firstPage = 0 if self._loginResult is None else 1
         for page in self._pages[firstPage:]:
