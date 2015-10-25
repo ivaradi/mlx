@@ -2008,8 +2008,8 @@ class SimBriefSetupPage(Page):
         plan["origrwy"] = "" # FIXME: query
         plan["destrwy"] = "" # FIXME: query
         plan["climb"] = "250/300/78" # FIXME: query
-        plan["descent"] = "80/280/250" # FIXME: query
         plan["cruise"] = "LRC" # FIXME: query
+        plan["descent"] = "80/280/250" # FIXME: query
 
         return plan
 
