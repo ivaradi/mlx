@@ -209,7 +209,7 @@ class SeleniumHandler(threading.Thread):
                 updateProgress(SIMBRIEF_PROGRESS_DONE,
                                SIMBRIEF_RESULT_OK, flight_info)
             except Exception, e:
-                print "Failed retrieving the briefing:", e
+                print "Failed to retrieve the briefing:", e
                 updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
                                SIMBRIEF_RESULT_ERROR_OTHER, None)
 
