@@ -760,6 +760,24 @@ msgstr
 "Írd be a tervezett leszálló futópálya számát.\n"
 "Ha nem akarod megadni, hagyd üresen a mezőt."
 
+msgid "simbrief_climb_profile"
+msgstr "_Emelkedési profil:"
+
+msgid "simbrief_climb_profile_tootip"
+msgstr "Válaszd ki az emelkedési profilt"
+
+msgid "simbrief_cruise_profile"
+msgstr "_Utazó profil:"
+
+msgid "simbrief_cruise_profile_tootip"
+msgstr "Válaszd ki az utazó profilt"
+
+msgid "simbrief_descent_profile"
+msgstr "_Süllyedési profil:"
+
+msgid "simbrief_descent_profile_tootip"
+msgstr "Válaszd ki a süllyedési profilt"
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Böngésző keresése..."
 

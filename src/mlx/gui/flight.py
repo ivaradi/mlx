@@ -1768,7 +1768,7 @@ class SimBriefSetupPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 3)
+        table = gtk.Table(9, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -1848,6 +1848,45 @@ class SimBriefSetupPage(Page):
         table.attach(self._landingRunway, 1, 2, 5, 6)
         label.set_mnemonic_widget(self._landingRunway)
 
+        label = gtk.Label(xstr("simbrief_climb_profile"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 6, 7)
+
+        self._climbProfile = gtk.ComboBox()
+        renderer = gtk.CellRendererText()
+        self._climbProfile.pack_start(renderer, True)
+        self._climbProfile.add_attribute(renderer, "text", 0)
+        self._climbProfile.set_tooltip_text(xstr("simbrief_climb_profile_tooltip"))
+        table.attach(self._climbProfile, 1, 2, 6, 7)
+        label.set_mnemonic_widget(self._climbProfile)
+
+        label = gtk.Label(xstr("simbrief_cruise_profile"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 7, 8)
+
+        self._cruiseProfile = gtk.ComboBox()
+        renderer = gtk.CellRendererText()
+        self._cruiseProfile.pack_start(renderer, True)
+        self._cruiseProfile.add_attribute(renderer, "text", 0)
+        self._cruiseProfile.set_tooltip_text(xstr("simbrief_cruise_profile_tooltip"))
+        table.attach(self._cruiseProfile, 1, 2, 7, 8)
+        label.set_mnemonic_widget(self._cruiseProfile)
+
+        label = gtk.Label(xstr("simbrief_descent_profile"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 8, 9)
+
+        self._descentProfile = gtk.ComboBox()
+        renderer = gtk.CellRendererText()
+        self._descentProfile.pack_start(renderer, True)
+        self._descentProfile.add_attribute(renderer, "text", 0)
+        self._descentProfile.set_tooltip_text(xstr("simbrief_descent_profile_tooltip"))
+        table.attach(self._descentProfile, 1, 2, 8, 9)
+        label.set_mnemonic_widget(self._descentProfile)
+
         self.addCancelFlightButton()
 
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -1874,6 +1913,23 @@ class SimBriefSetupPage(Page):
 
         self._landingRunway.set_text("")
         self._landingRunway.set_sensitive(True)
+
+        simBriefData = self._wizard.gui.flight.aircraft.simBriefData
+        for (control, profiles) in [(self._climbProfile,
+                                     simBriefData.climbProfiles),
+                                    (self._cruiseProfile,
+                                     simBriefData.cruiseProfiles),
+                                    (self._descentProfile,
+                                     simBriefData.descentProfiles)]:
+            model = gtk.ListStore(str)
+            for profile in profiles:
+                model.append([profile])
+            control.set_model(model)
+            control.set_sensitive(True)
+
+        self._climbProfile.set_active(0)
+        self._cruiseProfile.set_active(0)
+        self._descentProfile.set_active(0)
 
         self._updateForwardButton()
 
@@ -1910,6 +1966,10 @@ class SimBriefSetupPage(Page):
             self._extraFuel.set_sensitive(False)
             self._takeoffRunway.set_sensitive(False)
             self._landingRunway.set_sensitive(False)
+
+            self._climbProfile.set_sensitive(False)
+            self._cruiseProfile.set_sensitive(False)
+            self._descentProfile.set_sensitive(False)
 
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
@@ -2058,9 +2118,14 @@ class SimBriefSetupPage(Page):
         plan["addedfuel"] = str(self._extraFuel.get_int() / 1000.0)
         plan["origrwy"] = self._takeoffRunway.get_text()
         plan["destrwy"] = self._landingRunway.get_text()
-        plan["climb"] = "250/300/78" # FIXME: query
-        plan["cruise"] = "LRC" # FIXME: query
-        plan["descent"] = "80/280/250" # FIXME: query
+
+        for (key, control) in [("climb", self._climbProfile),
+                               ("cruise", self._cruiseProfile),
+                               ("descent", self._descentProfile)]:
+            model = control.get_model()
+            active = control.get_active_iter()
+            value = model.get_value(active, 0)
+            plan[key] = value
 
         return plan
 

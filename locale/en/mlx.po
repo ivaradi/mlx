@@ -762,6 +762,24 @@ msgstr ""
 "Enter the number of the planned landing runway.\n"
 "If you don't want to specify it, leave it empty"
 
+msgid "simbrief_climb_profile"
+msgstr "_Climb profile:"
+
+msgid "simbrief_climb_profile_tooltip"
+msgstr "Select the climb profile."
+
+msgid "simbrief_cruise_profile"
+msgstr "C_ruise profile:"
+
+msgid "simbrief_cruise_profile_tooltip"
+msgstr "Select the cruise profile."
+
+msgid "simbrief_descent_profile"
+msgstr "_Descent profile:"
+
+msgid "simbrief_descent_profile_tooltip"
+msgstr "Select the descent profile."
+
 msgid "simbrief_progress_searching_browser"
 msgstr "Searching browser..."
 
