@@ -190,6 +190,8 @@ class SeleniumHandler(threading.Thread):
     def _callSimBrief(self, plan, driver,
                       getCredentials, updateProgress, htmlFilePath):
         """Perform the SimBrief call."""
+        self._simBriefBrowser.LoadUrl(self.simBriefInitURL)
+
         integrator = MavaSimbriefIntegrator(plan = plan, driver = driver)
         link = integrator.get_xml_link(getCredentials, updateProgress,
                                        local_xml_debug = False,
