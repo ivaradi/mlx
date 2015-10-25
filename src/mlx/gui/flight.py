@@ -2058,6 +2058,9 @@ class SimBriefSetupPage(Page):
             self._wizard.gui.endBusy()
 
             if result==cef.SIMBRIEF_RESULT_OK:
+                self._wizard.departureMETARChanged(flightInfo["orig_metar"],
+                                                   self)
+                self._wizard.arrivalMETARChanged(flightInfo["dest_metar"], self)
                 self._wizard.nextPage()
             else:
                 message = SimBriefSetupPage.result2Message.get(result,
@@ -4646,11 +4649,11 @@ class Wizard(gtk.VBox):
         determine which METAR (departure or arrival) has changed."""
         metar = metar.upper()
         if originator in [self._departureBriefingPage, self._takeoffPage]:
-            self._departureMETARChanged(metar, originator)
+            self.departureMETARChanged(metar, originator)
         else:
-            self._arrivalMETARChanged(metar, originator)
+            self.arrivalMETARChanged(metar, originator)
 
-    def _departureMETARChanged(self, metar, originator):
+    def departureMETARChanged(self, metar, originator):
         """Called when the departure METAR has been edited on one of the
         pages.
 
@@ -4660,7 +4663,7 @@ class Wizard(gtk.VBox):
             if page is not originator:
                 page.changeMETAR(metar)
 
-    def _arrivalMETARChanged(self, metar, originator):
+    def arrivalMETARChanged(self, metar, originator):
         """Called when the arrival METAR has been edited on one of the
         pages.
 
