@@ -2138,6 +2138,16 @@ class SimBriefSetupPage(Page):
 
 class SimBriefingPage(Page):
     """Page to display the SimBrief HTML briefing."""
+    class BrowserLifeSpanHandler(object):
+        """The life-span handler of a browser."""
+        def __init__(self, simBriefingPage):
+            """Construct the life-span handler for the given page."""
+            self._simBriefingPage = simBriefingPage
+
+        def OnBeforeClose(self, browser):
+            """Called before closing the browser."""
+            self._simBriefingPage._invalidateBrowser()
+
     def __init__(self, wizard):
         """Construct the setup page."""
 
@@ -2166,10 +2176,16 @@ class SimBriefingPage(Page):
     def activate(self):
         """Activate the SimBrief flight plan page"""
         if self._browser is None:
-            url = "file://" + SimBriefSetupPage.getHTMLFilePath()
-            self._browser = cef.startInContainer(self._container, url)
+            self._startBrowser()
         else:
             self._browser.Reload()
+
+    def grabDefault(self):
+        """If the page has a default button, make it the default one."""
+        super(SimBriefingPage, self).grabDefault()
+
+        if self._browser is None:
+            self._startBrowser()
 
     def _backClicked(self, button):
         """Called when the Back button has been pressed."""
@@ -2184,6 +2200,26 @@ class SimBriefingPage(Page):
             self.complete()
 
         self._wizard.nextPage()
+
+    def _startBrowser(self):
+        """Start the browser.
+
+        If a container is needed, create one."""
+        if self._container is None:
+            self._container = cef.getContainer()
+            self._alignment.add(self._container)
+
+        url = "file://" + SimBriefSetupPage.getHTMLFilePath()
+        self._browser = cef.startInContainer(self._container, url)
+
+        lifeSpanHandler = SimBriefingPage.BrowserLifeSpanHandler(self)
+        self._browser.SetClientHandler(lifeSpanHandler)
+
+    def _invalidateBrowser(self):
+        """Invalidate the browser (and associated stuff)."""
+        self._alignment.remove(self._container)
+        self._container = None
+        self._browser = None
 
 #-----------------------------------------------------------------------------
 
