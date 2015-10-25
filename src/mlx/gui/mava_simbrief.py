@@ -252,6 +252,8 @@ class MavaSimbriefIntegrator():
         if is_briefing_available:
             return xml_link
         else:
+            update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_RESULT,
+                            MavaSimbriefIntegrator.RESULT_ERROR_OTHER, None)
             return None
 
     def get_results(self,
