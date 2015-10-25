@@ -380,8 +380,8 @@ def finalize():
     """Finalize the Chrome Embedded Framework."""
     global _toQuit, _seleniumHandler
     toQuit = True
-    _seleniumHandler.quit()
     cefpython.Shutdown()
+    _seleniumHandler.quit()
 
 #------------------------------------------------------------------------------
 
