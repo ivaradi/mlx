@@ -1595,6 +1595,8 @@ class RoutePage(Page):
 
     def _forwardClicked(self, button):
         """Called when the Forward button is clicked."""
+        if self._wizard.gui.flight.aircraft.simBriefData is None:
+            self._wizard.usingSimBrief = False
         if self._wizard.gui.config.useSimBrief and \
            self._wizard.usingSimBrief is not False:
             self._wizard.nextPage()
