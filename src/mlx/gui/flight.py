@@ -1997,8 +1997,8 @@ class SimBriefSetupPage(Page):
         plan["steh"] = str(arrivalTime.hour)
         plan["stem"] = str(arrivalTime.minute)
 
-        plan["manualzfw"] = str(wizard.zfw)
-        plan["cargo"] = str(wizard.bagWeight + wizard.cargoWeight + wizard.mailWeight)
+        plan["manualzfw"] = str(wizard.zfw / 1000.0)
+        plan["cargo"] = str((wizard.bagWeight + wizard.cargoWeight + wizard.mailWeight)/1000.0)
 
         plan["route"] = wizard.route
         plan["fl"] = str(wizard.filedCruiseAltitude)
