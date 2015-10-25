@@ -1819,8 +1819,13 @@ class SimBriefSetupPage(Page):
         config = self._wizard.gui.config
 
         self._userName.set_text(config.simBriefUserName)
+        self._userName.set_sensitive(True)
+
         self._password.set_text(config.simBriefPassword)
+        self._password.set_sensitive(True)
+
         self._rememberButton.set_active(config.rememberSimBriefPassword)
+        self._rememberButton.set_sensitive(True)
 
         self._updateForwardButton()
 
@@ -1850,6 +1855,10 @@ class SimBriefSetupPage(Page):
 
             plan = self._getPlan()
             print "plan:", plan
+
+            self._userName.set_sensitive(False)
+            self._password.set_sensitive(False)
+            self._rememberButton.set_sensitive(False)
 
             self._wizard.gui.beginBusy("Calling SimBrief...")
 
