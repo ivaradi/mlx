@@ -771,7 +771,7 @@ msgstr "Nem sikerült letölteni az űrlapot."
 msgid "simbrief_result_error_no_popup"
 msgstr "Nem jelent meg a bejelentkező ablak."
 
-msgid "simbrief_result_login_failed"
+msgid "simbrief_result_error_login_failed"
 msgstr "A bejelentkezés nem sikerült."
 
 msgid "simbrief_result_unknown"

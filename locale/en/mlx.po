@@ -773,7 +773,7 @@ msgstr "No form could be loaded."
 msgid "simbrief_result_error_no_popup"
 msgstr "No login window appeared."
 
-msgid "simbrief_result_login_failed"
+msgid "simbrief_result_error_login_failed"
 msgstr "Login failed."
 
 msgid "simbrief_result_unknown"
