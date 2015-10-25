@@ -217,6 +217,7 @@ class MavaSimbriefIntegrator():
                         update_progress(MavaSimbriefIntegrator.PROGRESS_LOGGING_IN,
                                         MavaSimbriefIntegrator.RESULT_NONE, None)
                         (userName, password) = get_credentials(login_count)
+                        end_time = time.time() + 120.0
                         if userName is None or password is None:
                             update_progress(MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN,
                                             MavaSimbriefIntegrator.RESULT_ERROR_LOGIN_FAILED, None)
