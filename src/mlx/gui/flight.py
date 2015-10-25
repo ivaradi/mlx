@@ -1860,7 +1860,12 @@ class SimBriefingPage(Page):
         self._alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 1.0, yscale = 1.0)
 
+        self._container = cef.getContainer()
+        self._alignment.add(self._container)
+
         self.setMainWidget(self._alignment)
+
+        self._browser = None
 
         self.addCancelFlightButton()
 
@@ -1873,12 +1878,11 @@ class SimBriefingPage(Page):
 
     def activate(self):
         """Activate the SimBrief flight plan page"""
-        container = cef.getContainer()
-        self._alignment.add(container)
-
-        self._browser = \
-          cef.startInContainer(container,
-                               "file://" + SimBriefSetupPage.getHTMLFilePath())
+        if self._browser is None:
+            url = "file://" + SimBriefSetupPage.getHTMLFilePath()
+            self._browser = cef.startInContainer(self._container, url)
+        else:
+            self._browser.Reload()
 
     def _backClicked(self, button):
         """Called when the Back button has been pressed."""
