@@ -1601,6 +1601,7 @@ class RoutePage(Page):
            self._wizard.usingSimBrief is not False:
             self._wizard.nextPage()
         else:
+            self._wizard.usingSimBrief = False
             self._wizard.jumpPage(3)
 
 #-----------------------------------------------------------------------------
