@@ -18,7 +18,7 @@ for language in ["en", "hu"]:
     data_files.append((os.path.join("locale", language, "LC_MESSAGES"),
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
-data_files.append(("", ["logo.png",
+data_files.append(("", ["logo.png", "simbrief.html",
                         "conn_grey.png", "conn_red.png", "conn_green.png",
                         "mlx_cef_caller.sh", "mlx_cef_caller_secondary.sh",
                         "mlx_cef_caller.bat", "mlx_cef_caller_secondary.bat"]))
@@ -96,7 +96,7 @@ setup(name = "mlx",
                    "icon_resources" : [(1, "logo.ico")]},
                  { "script" : "mlxupdate.py",
                    "uac_info" : "requireAdministrator"}],
-      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo",
+      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo, lxml._elementpath",
                                "skip_archive": True} },
       zipfile = "library/.",
       data_files = data_files,
