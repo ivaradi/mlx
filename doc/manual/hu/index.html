@@ -52,28 +52,31 @@
     felengedjük a parkoló fékeket vagy a guruló sebesség meghaladja az
     5 csomót, a program ebbe a fázisba lép.</li>
     <li><b>felszállás</b>: Ha kigurulás közben vagy megszakított
-    felszállás után felkapcsoljuk a villogót. Ha a repülőgép
-    villogójának állapota nem érzékelhető, a transzponder C módba
-    állítására is ebbe a fázisba kerül a program. Ha a repülőgép
-    egyáltalán nem rendelkezik villogóval, a program 50 csomós
-    sebesség túllépésekor elkezd figyelni, és ha 40 másodpercen belül
-    elemelkedünk, azt is felszállásnak veszi.</li>
+    felszállás után túllépjük az 50 csomós földhöz viszonyítot sebességet,
+    majd 60 másodpercen belül elemelkedünk, az elemelkedést követően lép a
+    program felszállási fázisba. A felszálló konfigurációt azonban az
+    50 csomó túllépésének időszakában menti el, majd a fázisba való
+    belépés pillanatában ellenőrzi, illetve írja a naplóba. Ha az 50 csomó
+    túllépését követően 60 másodpercen belül nem emelkedünk el, a program
+    hibát naplóz. Ha azonban ezután a
+    <a href="#takeOffPage"><i>Felszállás</i></a> oldalon bejelöljük a
+    <i>Megszakított felszállás</i> jelölőnégyzetet, a hiba eltűnik és
+    <b>megszakított felszállás</b> fázisba lép a program.</li>
     <li><b>emelkedés</b>: Ha felszállás közben behúzzuk a futóműveket
     vagy elérjük a reptérhez viszonyított 3000 láb magasságot.</li>
-    <li><b>megszakított felszállás</b>: Ha felszállás közben még a
-    földön vagyunk, és kikapcsoljuk mind a leszálló fényeket, mind a
-    villogót, vagy a sebesség 50 csomó alá csökken.</li>
-    <li><b>utazó</b>: Ha emelkedés közben az utazómagasságot 2000
-    lábnyira megközelítjük.</li>
+    <li><b>utazó</b>: Ha felszállás utáni, vagy megszakított megözelítés vagy
+    leszállást követő emelkedés közben az utazómagasságot 2000 lábnyira
+    megközelítjük.</li>
     <li><b>süllyedés</b>: Ha az utazó fázis közben a repülési magasság
     több mint 2000 lábbal az utazó magasság alá csökken.</li>
     <li><b>leszállás</b>: Ha süllyedés vagy átstartolás közben a
     futóműveket kiengedjük és a reptérhez viszonyítva 2000 láb alá
-    csökken a magasság.</li>
+    csökken a magasság. Valamit akkor is, ha emelkedés közben süllyedni
+    kezdünk és az előbbi feltételek is fennálnak.</li>
     <li><b>átstartolás</b>: Ha leszállás közben visszahúzzuk a futóműveket.</li>
     <li><b>begurulás</b>: Ha leszállás után a repülőgép a földön gurul
-    és a sebessége 50 csomó alá csökken.</li>
-    <li><b>vége</b>: Ha parkolás közben a gázturbinák N<sub>1</sub>
+    és a földhöz viszonyított sebessége 25 csomó alá csökken.</li>
+    <li><b>vége</b>: Ha a parkolófékeket behúzzük és a gázturbinák N<sub>1</sub>
     paramétere 0,5 alá, vagy a dugattyús motorok fordulatszáma
     0-ra csökken. Ez a járat teljesítésének utolsó fázisa.</li>
   </ol>
@@ -231,7 +234,8 @@
   hibásan, és ebben az esetben sajnos nincs más lehetőség, mint a
   járat újrakezdése. Ebben az esetben feltétlenül értesítsük a
   szerzőt, és az értesítésbe másoljuk be a <a href="#debugLog">debug
-  napló</a> tartalmát.
+  napló</a> tartalmát. Erre használhatjuk
+  a <a href="#bugReportWindow"><i>Hibajelentés</i></a> funkciót is.
   </p>
 
   <p>
