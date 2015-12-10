@@ -834,6 +834,9 @@ msgstr ""
 "supplied credentials. Please, enter\n"
 "new ones, or cancel SimBrief."
 
+msgid "simbrief_result_title"
+msgstr "SimBrief flight plan"
+
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
 
