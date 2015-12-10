@@ -3404,14 +3404,14 @@ class LandingPage(Page):
         label = gtk.Label(xstr("landing_metar"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, row, row+1)
+        table.attach(label, 1, 2, row, row+1)
 
         self._metar = gtk.Entry()
         self._metar.set_width_chars(40)
         self._metar.set_tooltip_text(xstr("landing_metar_tooltip"))
         self._metar.connect("changed", self._metarChanged)
         self._metar.get_buffer().connect_after("inserted-text", self._metarInserted)
-        table.attach(self._metar, 1, 24, row, row+1)
+        table.attach(self._metar, 2, 24, row, row+1)
         label.set_mnemonic_widget(self._metar)
 
         self._updatingMETAR = False
