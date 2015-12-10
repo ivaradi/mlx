@@ -2166,7 +2166,7 @@ class SimBriefingPage(Page):
         """Construct the setup page."""
 
         super(SimBriefingPage, self).__init__(wizard,
-                                              "SimBrief flight plan", "")
+                                              xstr("simbrief_result_title"), "")
 
         self._alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 1.0, yscale = 1.0)
