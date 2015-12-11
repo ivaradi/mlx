@@ -14,6 +14,8 @@ from mlx.gui.checklist import ChecklistEditor
 from mlx.gui.callouts import ApproachCalloutsEditor
 from mlx.gui.pirep import PIREPViewer
 from mlx.gui.bugreport import BugReportDialog
+from mlx.gui.acars import ACARS
+import cef
 
 import mlx.const as const
 import mlx.fs as fs
@@ -101,8 +103,11 @@ class GUI(fs.ConnectionListener):
         window.set_resizable(False)
         window.connect("delete-event", self.deleteMainWindow)
         window.connect("window-state-event", self._handleMainWindowState)
+        if os.name=="nt":
+            window.connect("leave-notify-event", self._handleLeaveNotify)
         accelGroup = gtk.AccelGroup()
         window.add_accel_group(accelGroup)
+        window.realize()
 
         mainVBox = gtk.VBox()
         window.add(mainVBox)
@@ -150,6 +155,11 @@ class GUI(fs.ConnectionListener):
         label.set_tooltip_text(xstr("tab_gates_tooltip"))
         self._notebook.append_page(self._fleetGateStatus, label)
 
+        self._acars = ACARS(self)
+        label = gtk.Label("ACARS")
+        label.set_use_underline(True)
+        self._notebook.append_page(self._acars, label)
+
         (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
         self._debugLogWidget.show_all()
 
@@ -169,6 +179,8 @@ class GUI(fs.ConnectionListener):
         self._pirepViewer = PIREPViewer(self)
 
         window.show_all()
+        if os.name=="nt":
+            window.get_window().focus()
 
         self._wizard.grabDefault()
         self._weightHelp.reset()
@@ -426,13 +438,17 @@ class GUI(fs.ConnectionListener):
         if self.config.autoUpdate:
             self._updater = Updater(self,
                                     self._programDirectory,
-                                    self.config.updateURL,
+                                    self.config.DEFAULT_UPDATE_URL,
                                     self._mainWindow)
             self._updater.start()
+
+        cef.initialize(self._programDirectory, self._cefInitialized)
 
         singleton.raiseCallback = self.raiseCallback
         gtk.main()
         singleton.raiseCallback = None
+
+        cef.finalize()
 
         self._disconnect()
 
@@ -687,6 +703,13 @@ class GUI(fs.ConnectionListener):
              (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
             self._mainWindow.present()
 
+    def _handleLeaveNotify(self, widget, event):
+        """Handle the leave-notify event.
+
+        Here we reset the focus to the main window as CEF might have acquired
+        it earlier."""
+        self._mainWindow.get_window().focus()
+
     def raiseCallback(self):
         """Callback for the singleton handling code."""
         gobject.idle_add(self.raiseMainWindow)
@@ -787,6 +810,10 @@ class GUI(fs.ConnectionListener):
         self._wizard.set_sensitive(False)
         self._weightHelp.set_sensitive(False)
         self._mainWindow.get_window().set_cursor(self._busyCursor)
+        self._statusbar.updateBusyState(message)
+
+    def updateBusyState(self, message):
+        """Update the busy state."""
         self._statusbar.updateBusyState(message)
 
     def endBusy(self):
@@ -1462,6 +1489,11 @@ class GUI(fs.ConnectionListener):
         self._sendBugReportCallback = callback
         self.webHandler.sendBugReport(self._bugReportSentCallback,
                                       summary, description, email)
+
+    def _cefInitialized(self):
+        """Called when CEF has been initialized."""
+        self._acars.start()
+        cef.initializeSimBrief()
 
     def _bugReportSentCallback(self, returned, result):
         """Callback function for the bug report sending result."""

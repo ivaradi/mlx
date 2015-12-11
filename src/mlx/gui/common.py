@@ -31,6 +31,7 @@ if not pygobject:
     print "Using PyGTK"
     pygobject = False
     import pygtk
+    pygtk.require("2.0")
     import gtk.gdk as gdk
     import gtk
     import pango
@@ -287,7 +288,7 @@ gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
 
 PROGRAM_NAME = "MAVA Logger X"
 
-WINDOW_TITLE_BASE = PROGRAM_NAME + " " + _const.VERSION
+WINDOW_TITLE_BASE = PROGRAM_NAME
 if secondaryInstallation:
     WINDOW_TITLE_BASE += " (" + xstr("secondary") + ")"
 

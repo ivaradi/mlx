@@ -57,9 +57,11 @@
     most 60 second, your flight enters the takeoff stage. The takeoff
     configuration, however is saved at the time of exceeding 50 knots GS, but
     will be checked and logged when leaving the ground. If you do not lift-off
-    within 60 seconds of exceeding 50 knots GS, a fault will be logged. If,
-    however, you check the <i>Rejected takeoff</i> checkbox on
-    the <a href="#takeOffPage"><i>Takeoff</i></a> page, the fault will
+    within 60 seconds of exceeding 50 knots GS, a speed fault will be
+    logged. The same occurs, if your GS decreases to or below 50 knots after
+    having exceeded it earllier. If, however, you check the
+    <i>Rejected takeoff</i> checkbox on the
+    <a href="#takeOffPage"><i>Takeoff</i></a> page, the fault will
     disappear and your flight will enter the <b>RTO</b> (rejected takeoff)
     stage.</li>
     <li><b>climb</b>: When you retract the gears or you reach 3000
@@ -73,7 +75,7 @@
     less than 2000 feet AGL during descent or go-around. Also when you start
     to descend during a climb and the previous conditions also hold.</li>
     <li><b>go-around</b>: If you retract the gears during landing.</li>
-    <li><b>taxi after landing</b>: When the aircraft is in the
+    <li><b>taxi after landing</b>: When the aircraft is on the
     ground and its ground speed is below 25 knots after landing.</li>
     <li><b>end</b>: If the N<sub>1</sub> of the turbines becomes
     less than 0.5, or the RPM of the piston engines becomes 0 during
@@ -99,7 +101,8 @@
   displays the status of the flights in progress. The data appears on
   the front page of the <a href="http://virtualairlines.hu">MAVA
   website</a> and also on a
-  <a href="http://virtualairlines.hu/acars2/show.html">map</a>.
+  <a href="http://virtualairlines.hu/acars2/show.html">map</a>. This map is
+  also <a href="#acarsTab">displayed</a> by the program.
   </p>
 
   <p><a name="onlineGateSystem"/>
@@ -398,7 +401,12 @@
   <p>
   This page displays some important information about your flight,
   such as the type and tail number of the aircraft to use, the
-  departure airport and possibly the gate.
+  departure airport and possibly the gate. You can also select whether you
+  would like to connect to a variant of  Microsoft Flight Simulator or
+  X-Plane. The choice is remembered by the program and the selected one will be
+  the default next time. (<i>Support for X-Plane is currently experimental. The
+  logger is used by the author on Linux with good results. Volunteers are
+  wanted to test X-Plane support on Windows.</i>)
   </p>
 
   <p>
@@ -460,6 +468,67 @@
   the <b>Next</b> button.
   </p>
 
+  <h4><a name="routePage">The <i>Route</i> Page</a></h4>
+
+  <img src="route.png" alt="The Route page"/>
+
+  <p>
+  This page displays the flight plan route taken from the booked flight. This
+  can be edited if necessary (e.g. when you will enter some airspace that will
+  require you to change the flight level during flight.) You should also
+  specify the cruise level and the ICAO code of the alternate airport.
+  </p>
+
+  <p>
+  When satisfied with the information on the page, press
+  the <b>Next</b> button to advance. Note, that these data can be
+  edited later as well if you come back to this page.
+  </p>
+
+  <h4><a name="simbriefSetupPage">The <i>SimBrief setup</i> page</a></h4>
+
+  <img src="simbriefSetup.png" alt="The SimBrief setup page"/>
+
+  <p>
+  If using the <a href="http://simbrief.com">SimBrief</a> flight planning
+  service has been enabled in the <a href="#prefsGeneral">Preferences</a>
+  window, this page is displayed following the
+  <a href="#routePage"><i>Route</i></a> page.
+  </p>
+
+  <p>
+  Enter your SimBrief user name and password. The former one is always saved
+  and offered as the default entry, but the latter one only when the checkbox
+  below is checked. Some further data should also be entered.
+  </p>
+
+  <p>
+  Press the <b>Next</b> button to start generating the flight plan. The program
+  then contacts the SimBrief website, sends the data and downloads the
+  result. This can take a relatively long time, during which the lower right
+  corner of the Logger window displays some progress information. If there is
+  some error, a popup window is displayed. If the login attempt is
+  unsuccessful, the user name and/or the password can be entered again, but you
+  can decide to abort using SimBrief.
+  </p>
+
+  <p>
+  If the result is successfully produced, it can be studied on page
+  <a href="#simbriefResultPage"><i>SimBrief flight plan</i></a>. In case of a
+  failure, the flight setup continues with
+  the  <a href="#fuelPage"><i>Fuel</i></a> page.
+  </p>
+
+  <h4><a name="simbriefResultPage">The <i>SimBrief flight plan</i> page</a></h4>
+
+  <img src="simbriefResult.png" alt="The SimBrief flight plan page"/>
+
+  <p>
+  This page displays the SimBrief flight plan created. When carefully read and
+  understood, press the button at the bottom to the right to continue. Of
+  course, you can come back to this page later.
+  </p>
+
   <h4><a name="fuelPage">The <i>Fuel</i> Page</a></h4>
 
   <img src="fuel.png" alt="The Fuel page"/>
@@ -493,24 +562,11 @@
   few seconds.
   </p>
 
-  <h4><a name="routePage">The <i>Route</i> Page</a></h4>
-
-  <img src="route.png" alt="The Route page"/>
-
   <p>
-  This page displays the cruise level and the flight plan route. The
-  cruise level starts out at FL240, but the route comes from the
-  booked flight. Set the cruise level to the one you have calculated
-  with, and modify the flight plan if needed. For example, if you will
-  enter some airspace that will require you to change the flight
-  level, you should add that here.
-  </p>
-
-  <p>
-  When satisfied with the information on the page, press
-  the <b>Next</b> button to advance. Note, that these data can be
-  edited later as well if you come back to this page.
-  </p>
+  When fuel pumping has completed, and the SimBrief service is used, and the
+  generation of the flight plan has been successful, the program jumps to the
+  <a href="#takeoffPage"><i>Takeoff</i></a> page. Otherwise the
+  <a href="#briefingPage"><i>Briefing</i></a> pages come next.
 
   <h4><a name="briefingPage">The <i>Briefing</i> Pages</a></h4>
 
@@ -518,7 +574,8 @@
 
   <p>
   These pages display the NOTAMs and the METAR for the departure and
-  the arrival airports. You can edit the METAR if your network
+  the arrival airports unless we have used SimBrief for flight planning.
+  You can edit the METAR if your network
   provides a different weather, or you do not fly with real
   weather. The METAR of the arrival airport will be updated when
   entering the landing stage, unless you have edited it before. The
@@ -539,10 +596,14 @@
   <img src="takeoff.png" alt="The Takeoff page"/>
 
   <p>
-  On this page you have to enter the name of the departure runway, the
+  This page displays the current METAR of the departure airport. It can be
+  modified if necessary, e.g. when the weather in the simulator is different
+  from it. Below you have to enter the name of the departure runway, the
   name of the Standard Instrument Departure procedure you follow after
-  takeoff and the takeoff V-speeds. While you can edit these data
-  anytime, it is recommended to do so before takeoff.
+  takeoff and the takeoff V-speeds. In case of the SID you can select
+  the <i>VECTORS</i> "procedure" if, for some reason, no SID is flown.
+  While you can edit these data anytime, it is recommended to do so before
+  takeoff.
   <p>
 
   <p>
@@ -575,11 +636,11 @@
   <img src="cruise.png" alt="The Cruise page"/>
 
   <p>
-  This page displays your cruise altitude as set on the
-  <a href="#routePage">Route page</a>. If you need to modify your
+  This page displays your cruise altitude as set in the
+  <a href="#routePage"><i>Route</i> page</a>. If you need to modify your
   cruise level due to airspace requirements, step climb or any other
   justified reason, you can set the new level here and then press
-  the <b>Update</b> button when you have reached the specified level.
+  the <b>Update</b> button.
   </p>
 
   <p>
@@ -592,13 +653,14 @@
   <img src="landing.png" alt="The Landing page"/>
 
   <p>
-  On this page you have to enter the name of the STAR and/or
-  transition you planned to follow (even if you get a different one,
-  or simply vectors from ATC, in which case add a
-  <a href="#flightInfoTab">comment</a> about it),
+  The upper part of this page displays the METAR of the landing airport, which
+  can be edited, if necessary. Below you have to enter the name of the STAR
+  and/or transition you planned to follow or have followed,
   the approach type (e.g. <q>ILS</q>, <q>VOR</q>, <q>VISUAL</q>,
   etc.), the name of the landing runway, and the landing reference speed,
-  V<sub>ref</sub>. You can enter this data during the flight, or after
+  V<sub>ref</sub>. In case of the procedures you can select <i>VECTORS</i>
+  from the  drop-down list if you have received vectors from ATC.
+  You can enter this data during the flight, or after
   you have landed, at your discretion. Note, that if you fly one of
   the Tupolev or Yak aircraft, the speed will have to be entered in km/h.
   </p>
@@ -619,8 +681,11 @@
 
   <p>
   This is the final page of the flight wizard. It contains a summary
-  of your flight: the rating, the flight and block times, the distance
-  flown and the amount of fuel burnt.
+  of your flight: the rating, the deptarture, arrival, flight and block times,
+  the distance flown and the amount of fuel burnt. If the departure or the
+  arrival time is too off of the schedule, they are displayed in orange or red
+  depending on the difference. In case of a red colour, comment on the
+  difference in the <a href="#flightInfoTab"><i>Flight info</i> tab</a>.
   </p>
 
   <p>
@@ -650,7 +715,7 @@
 
   <p>
   You can also start a new flight using the <b>New flight</b>
-  button. If you have not saved or sent the PIREP, you will be asked
+  button. If you have not saved or sent the PIREP yet, you will be asked
   to confirm your intention. When starting a new flight you are taken
   to the <a href="#flightSelectionPage">flight selection page</a>, if
   you have logged in to the MAVA server, or to
@@ -675,10 +740,12 @@
   </p>
 
   <p>
-  The <i>Flight defects</i> text area should contain information about
-  any problems you encountered with the plane during the flight. For
-  example an engine stopped and why (if known), that flaps could not
-  be extended or retracted, etc.
+  The <i>Faults, observations</i> area contains the faults logged with a small
+  field below each of them. The PIREP cannot be sent until an explanation has
+  been provided in these fields for each fault. The thick frame around the area
+  appears as long as there is at least one unexplained fault. A warning is also
+  presented in the upper part of the <a href="#finishPage"<i>Finish</i></a>
+  page, if something is missing from here.
   </p>
 
   <p>
@@ -773,6 +840,23 @@
   parking positions. A number is black if no aircraft is positioned at
   the corresponding gate or stand, and it is orange, if the location
   is occupied.
+  </p>
+
+  <h3><a name="acarsTab">The ACARS tab</a></h3>
+
+  <img src="acarsTab.png" alt="The ACARS tab"/>
+
+  <p>
+  This tab displays the MAVA ACARS system, which is a map with aircraft symbols
+  representing the flights in progress with icons denoting the departure and
+  landing airports. Clicking on an airplane displays information on the
+  corresponding flight.
+  </p>
+
+  <p>
+  The map is actually displayed by a web browser integrated into the
+  program. Therefore you can, for example, zoom in or out the map using the
+  mouse wheel and perform other operations known in case of browsers.
   </p>
 
   <h3><a name="debugLog">The Debug log</a></h3>
@@ -936,7 +1020,7 @@
   These are some general settings for various parts of the
   program. The <i>GUI</i> frame contains options regarding the
   behaviour of the graphical user interface. The <i>Language</i> combo
-  box can be used to selected what language the program should
+  box can be used to select what language the program should
   use. Currently English and Hungarian are supported. The value
   of <i>system default</i> means that the operating system's default
   language is used if it is one of the supported ones or English
@@ -961,7 +1045,7 @@
   <p>
   The <i>Simulator</i> frame contains settings for how the program
   interacts with the simulator. Most options are self-explanatory, but
-  the ones related to smoothing requires some discussion. Flight
+  the ones related to smoothing require some discussion. Flight
   Simulator is known to produce wind speed changes that are not
   entirely realistic and can result in the simulated aircraft
   experiencing some very high indicated airspeeds, which in turn can
@@ -975,6 +1059,12 @@
   of seconds may need experimenting with, but note that every change
   for which you press the <b>OK</b> button is taken into account
   immediately.
+  </p>
+
+  <p>
+  If the <b>Use SimBrief</b> checkbox is checked, the program will try to
+  <a href="#simbriefSetupPage">create</a> a flight plan using the SimBrief
+  service during the flight preparation.
   </p>
 
   <p>

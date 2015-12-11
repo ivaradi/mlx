@@ -697,11 +697,145 @@ msgstr "_Route"
 msgid "route_route_tooltip"
 msgstr "The planned flight route in the standard format."
 
+msgid "route_altn"
+msgstr "_Alternate:"
+
+msgid "route_altn_tooltip"
+msgstr "The ICAO code of the alternate airport."
+
 msgid "route_down_notams"
 msgstr "Downloading NOTAMs..."
 
 msgid "route_down_metars"
 msgstr "Downloading METARs..."
+
+msgid "simbrief_setup_title"
+msgstr "SimBrief setup"
+
+msgid "simbrief_setup_help"
+msgstr "Complete the following data to start generating your SimBrief briefing."
+
+msgid "simbrief_setup_chelp"
+msgstr "Your SimBrief briefing was generated with the following data."
+
+msgid "simbrief_username"
+msgstr "_Username:"
+
+msgid "simbrief_username_tooltip"
+msgstr "Enter your Simbrief username"
+
+msgid "simbrief_password"
+msgstr "_Password:"
+
+msgid "simbrief_password_tooltip"
+msgstr "Enter your Simbrief password"
+
+msgid "simbrief_remember_password"
+msgstr "_Remember password"
+
+msgid "simbrief_remember_tooltip"
+msgstr ""
+"If checked, your SimBrief password will be stored, so that you "
+"should not have to enter it every time. Note, however, that "
+"the password is stored as text, and anybody who can access "
+"your files will be able to read it."
+
+msgid "simbrief_extra_fuel"
+msgstr "_Extra fuel:"
+
+msgid "simbrief_extra_fuel_tooltip"
+msgstr "Enter the amount of extra fuel in kilograms."
+
+msgid "simbrief_takeoff_runway"
+msgstr "_Takeoff runway:"
+
+msgid "simbrief_takeoff_runway_tooltip"
+msgstr ""
+"Enter the number of the planned takeoff runway.\n"
+"If you don't want to specify it, leave it empty"
+
+msgid "simbrief_landing_runway"
+msgstr "_Landing runway:"
+
+msgid "simbrief_landing_runway_tooltip"
+msgstr ""
+"Enter the number of the planned landing runway.\n"
+"If you don't want to specify it, leave it empty"
+
+msgid "simbrief_climb_profile"
+msgstr "_Climb profile:"
+
+msgid "simbrief_climb_profile_tooltip"
+msgstr "Select the climb profile."
+
+msgid "simbrief_cruise_profile"
+msgstr "C_ruise profile:"
+
+msgid "simbrief_cruise_profile_tooltip"
+msgstr "Select the cruise profile."
+
+msgid "simbrief_descent_profile"
+msgstr "_Descent profile:"
+
+msgid "simbrief_descent_profile_tooltip"
+msgstr "Select the descent profile."
+
+msgid "simbrief_calling"
+msgstr "Calling SimBrief..."
+
+msgid "simbrief_progress_searching_browser"
+msgstr "Searching browser..."
+
+msgid "simbrief_progress_loading_form"
+msgstr "Loading form..."
+
+msgid "simbrief_progress_filling_form"
+msgstr "Filling form..."
+
+msgid "simbrief_progress_waiting_login"
+msgstr "Waiting login..."
+
+msgid "simbrief_progress_logging_in"
+msgstr "Logging in..."
+
+msgid "simbrief_progress_waiting_result"
+msgstr "Waiting for the result..."
+
+msgid "simbrief_progress_retrieving_briefing"
+msgstr "Retrieving briefing..."
+
+msgid "simbrief_progress_unknown"
+msgstr "?????"
+
+msgid "simbrief_result_error_other"
+msgstr "Some error occured, see debug logs."
+
+msgid "simbrief_result_error_no_form"
+msgstr "No form could be loaded."
+
+msgid "simbrief_result_error_no_popup"
+msgstr "No login window appeared."
+
+msgid "simbrief_result_error_login_failed"
+msgstr "Login failed."
+
+msgid "simbrief_result_unknown"
+msgstr "Unknown error occured."
+
+msgid "simbrief_cancelled"
+msgstr "Reverting to the old-style briefing."
+
+msgid "simbrief_credentials_title"
+msgstr "SimBrief login"
+
+msgid "simbrief_login_failed"
+msgstr ""
+"Failed to log in to SimBrief using the\n"
+"supplied credentials. Please, enter\n"
+"new ones, or cancel SimBrief."
+
+msgid "simbrief_result_title"
+msgstr "SimBrief flight plan"
 
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
@@ -1436,6 +1570,15 @@ msgstr ""
 
 msgid "prefs_smoothing_seconds"
 msgstr "sec."
+
+msgid "prefs_useSimBrief"
+msgstr "Use Sim_Brief"
+
+msgid "prefs_useSimBrief_tooltip"
+msgstr ""
+"If enabled, the SimBrief dispatching system will be "
+"used to create your briefing.\n"
+"You will need a SimBrief user name and password."
 
 msgid "prefs_pirepDirectory"
 msgstr "_PIREP directory:"

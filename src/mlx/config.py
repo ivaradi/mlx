@@ -210,7 +210,7 @@ class ApproachCallouts(object):
 
 class Config(object):
     """Our configuration."""
-    DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
+    DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update/cef"
 
     _messageTypesSection = "messageTypes"
 
@@ -231,6 +231,11 @@ class Config(object):
         self._usingFS2Crew = False
         self._iasSmoothingLength = -2
         self._vsSmoothingLength = -2
+
+        self._useSimBrief = False
+        self._simBriefUserName = ""
+        self._simBriefPassword = ""
+        self._rememberSimBriefPassword = False
 
         self._pirepDirectory = None
         self._pirepAutoSave = False
@@ -441,6 +446,54 @@ class Config(object):
         smoothed VS calculation."""
         if vsSmoothingLength!=self._vsSmoothingLength:
             self._vsSmoothingLength = vsSmoothingLength
+            self._modified = True
+
+    @property
+    def useSimBrief(self):
+        """Check if SimBrief should be used."""
+        return self._useSimBrief
+
+    @useSimBrief.setter
+    def useSimBrief(self, useSimBrief):
+        """Check if SimBrief should be used."""
+        if self._useSimBrief != useSimBrief:
+            self._useSimBrief = useSimBrief
+            self._modified = True
+
+    @property
+    def simBriefUserName(self):
+        """Get the SimBrief user name last used"""
+        return self._simBriefUserName
+
+    @simBriefUserName.setter
+    def simBriefUserName(self, simBriefUserName):
+        """Set the SimBrief user name to be used next."""
+        if self._simBriefUserName != simBriefUserName:
+            self._simBriefUserName = simBriefUserName
+            self._modified = True
+
+    @property
+    def simBriefPassword(self):
+        """Get the SimBrief password last used"""
+        return self._simBriefPassword
+
+    @simBriefPassword.setter
+    def simBriefPassword(self, simBriefPassword):
+        """Set the SimBrief password to be used next."""
+        if self._simBriefPassword != simBriefPassword:
+            self._simBriefPassword = simBriefPassword
+            self._modified = True
+
+    @property
+    def rememberSimBriefPassword(self):
+        """Get if we should remember the SimBrief password."""
+        return self._rememberSimBriefPassword
+
+    @rememberSimBriefPassword.setter
+    def rememberSimBriefPassword(self, rememberSimBriefPassword):
+        """Set if we should remember the SimBrief password."""
+        if rememberSimBriefPassword!=self._rememberSimBriefPassword:
+            self._rememberSimBriefPassword = rememberSimBriefPassword
             self._modified = True
 
     @property
@@ -677,6 +730,17 @@ class Config(object):
         self._vsSmoothingLength = int(self._get(config, "general",
                                                 "vsSmoothingLength",
                                                 -2))
+
+        self._useSimBrief = self._getBoolean(config, "simbrief",
+                                             "use", False)
+        self._simBriefUserName = self._get(config, "simbrief",
+                                           "username", "")
+        self._simBriefPassword = self._get(config, "simbrief",
+                                           "password", "")
+        self._rememberSimBriefPassword = self._getBoolean(config, "simbrief",
+                                                          "rememberPassword",
+                                                          False)
+
         self._pirepDirectory = self._get(config, "general",
                                          "pirepDirectory", None)
 
@@ -756,6 +820,14 @@ class Config(object):
                    str(self._iasSmoothingLength))
         config.set("general", "vsSmoothingLength",
                    str(self._vsSmoothingLength))
+
+        config.add_section("simbrief")
+        config.set("simbrief", "use",
+                   "yes" if self._useSimBrief else "no")
+        config.set("simbrief", "username", self._simBriefUserName)
+        config.set("simbrief", "password", self._simBriefPassword)
+        config.set("simbrief", "rememberPassword",
+                   "yes" if self._rememberSimBriefPassword else "no")
 
         if self._pirepDirectory is not None:
             config.set("general", "pirepDirectory", self._pirepDirectory)
@@ -905,6 +977,10 @@ class Config(object):
 
         print "  iasSmoothingLength:", self._iasSmoothingLength
         print "  vsSmoothingLength:", self._vsSmoothingLength
+
+        print "  useSimBrief:", self._useSimBrief
+        print "  simBriefUserName:", self._simBriefUserName
+        print "  rememberSimBriefPassword:", self._rememberSimBriefPassword
 
         print "  pirepDirectory:", self._pirepDirectory
         print "  pirepAutoSave:", self._pirepAutoSave

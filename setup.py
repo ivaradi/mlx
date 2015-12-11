@@ -18,16 +18,24 @@ for language in ["en", "hu"]:
     data_files.append((os.path.join("locale", language, "LC_MESSAGES"),
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
-data_files.append(("", ["logo.png",
-                        "conn_grey.png", "conn_red.png", "conn_green.png"]))
+data_files.append(("", ["logo.png", "simbrief.html",
+                        "conn_grey.png", "conn_red.png", "conn_green.png",
+                        "mlx_cef_caller.sh", "mlx_cef_caller_secondary.sh",
+                        "mlx_cef_caller.bat", "mlx_cef_caller_secondary.bat"]))
+
 if os.name=="nt":
     import py2exe
 
     data_files.append(("", ["logo.ico"]))
 
+    chromedriver = os.environ.get("CHROMEDRIVER")
+    if chromedriver:
+        data_files.append(("", [chromedriver]))
+
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
-        data_files.append(("Microsoft.VC90.CRT",  glob(os.path.join(msvcrDir, "*.*"))))
+        data_files.append(("Microsoft.VC90.CRT", glob(os.path.join(msvcrDir, "*.*"))))
+        os.environ["PATH"] = os.environ["PATH"] + ";" + glob(os.path.join(msvcrDir))[0]
 
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
@@ -46,9 +54,27 @@ if os.name=="nt":
         data_files.append((os.path.join("library", path),
                            glob(os.path.join(gtkRuntimeDir, path, "*"))))
 
+    cefDir = os.environ.get("CEFDIR")
+    if cefDir:
+        for fileName in ["icudt.dll", "subprocess.exe"]:
+            data_files.append(("", [os.path.join(cefDir, fileName)]))
+
+        data_files.append(("locales",
+                           glob(os.path.join(cefDir, "locales", "*"))))
+
+    print data_files
+
     with open("mlx-common.nsh", "wt") as f:
             print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
             f.close()
+else:
+    for (dirpath, dirnames, filenames) in os.walk("patches"):
+        if filenames:
+            filenames = [os.path.join(dirpath, filename)
+                         for filename in filenames]
+            data_files.append((dirpath, filenames))
+
+
 
 long_description="""MAVA Logger X
 
@@ -70,7 +96,7 @@ setup(name = "mlx",
                    "icon_resources" : [(1, "logo.ico")]},
                  { "script" : "mlxupdate.py",
                    "uac_info" : "requireAdministrator"}],
-      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo",
+      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo, lxml._elementpath",
                                "skip_archive": True} },
       zipfile = "library/.",
       data_files = data_files,
@@ -79,6 +105,8 @@ setup(name = "mlx",
       )
 
 if os.name=="nt":
+    os.rename(os.path.join(scriptdir, "dist", "library", "libcef.dll"),
+              os.path.join(scriptdir, "dist", "libcef.dll"))
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
     with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
         print >> f, "StartMenuFolder=MAVA Logger X"

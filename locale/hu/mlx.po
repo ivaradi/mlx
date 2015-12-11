@@ -696,11 +696,144 @@ msgstr "Út_vonal"
 msgid "route_route_tooltip"
 msgstr "Az útvonal a szokásos formátumban."
 
+msgid "route_altn"
+msgstr "Ki_térő:"
+
+msgid "route_altn_tooltip"
+msgstr "A kitérő repülőtér ICAO kódja."
+
 msgid "route_down_notams"
 msgstr "NOTAM-ok letöltése..."
 
 msgid "route_down_metars"
 msgstr "METAR-ok letöltése..."
+
+msgid "simbrief_setup_title"
+msgstr "SimBrief beállítások"
+
+msgid "simbrief_setup_help"
+msgstr "Töltsd ki a lenti adatokat a SimBrief eligazítás előállítása céljából."
+
+msgid "simbrief_setup_chelp"
+msgstr "A SimBrief eligazítás az alábbi adatok alapján keszült."
+
+msgid "simbrief_username"
+msgstr "Fel_használónév:"
+
+msgid "simbrief_username_tooltip"
+msgstr "Írd be a SimBrief felhasználónevedet"
+
+msgid "simbrief_password"
+msgstr "Jels_zó:"
+
+msgid "simbrief_password_tooltip"
+msgstr "Írdbe a SimBrief jelszavadat"
+
+msgid "simbrief_remember_password"
+msgstr "E_mlékezz a jelszóra"
+
+msgid "simbrief_remember_tooltip"
+msgstr ""
+"Ha ezt kiválasztod, a SimBrief jelszavadat eltárolja a program, így nem kell "
+"mindig újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként "
+"tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
+
+msgid "simbrief_extra_fuel"
+msgstr "E_xtra üzemanyag:"
+
+msgid "simbrief_extra_fuel_tooltip"
+msgstr "Írd be az extra üzemanyag mennyiségét kilogrammban."
+
+msgid "simbrief_takeoff_runway"
+msgstr "_Felszálló futópálya:"
+
+msgid "simbrief_takeoff_runway_tooltip"
+msgstr
+"Írd be a tervezett felszálló futópálya számát.\n"
+"Ha nem akarod megadni, hagyd üresen a mezőt."
+
+msgid "simbrief_landing_runway"
+msgstr "_Leszálló futópálya:"
+
+msgid "simbrief_landing_runway_tooltip"
+msgstr
+"Írd be a tervezett leszálló futópálya számát.\n"
+"Ha nem akarod megadni, hagyd üresen a mezőt."
+
+msgid "simbrief_climb_profile"
+msgstr "Emelke_dési profil:"
+
+msgid "simbrief_climb_profile_tootip"
+msgstr "Válaszd ki az emelkedési profilt"
+
+msgid "simbrief_cruise_profile"
+msgstr "_Utazó profil:"
+
+msgid "simbrief_cruise_profile_tootip"
+msgstr "Válaszd ki az utazó profilt"
+
+msgid "simbrief_descent_profile"
+msgstr "Süll_yedési profil:"
+
+msgid "simbrief_descent_profile_tootip"
+msgstr "Válaszd ki a süllyedési profilt"
+
+msgid "simbrief_calling"
+msgstr "A SimBrief indítása..."
+
+msgid "simbrief_progress_searching_browser"
+msgstr "Böngésző keresése..."
+
+msgid "simbrief_progress_loading_form"
+msgstr "Űrlap letöltése..."
+
+msgid "simbrief_progress_filling_form"
+msgstr "Űrlap kitöltése..."
+
+msgid "simbrief_progress_waiting_login"
+msgstr "Várakozás a bejelentkező ablakra..."
+
+msgid "simbrief_progress_logging_in"
+msgstr "Bejelentkezés..."
+
+msgid "simbrief_progress_waiting_result"
+msgstr "Várakozás az eredményre..."
+
+msgid "simbrief_progress_retrieving_briefing"
+msgstr "Az eligazítás letöltése..."
+
+msgid "simbrief_progress_unknown"
+msgstr "?????"
+
+msgid "simbrief_result_error_other"
+msgstr "Valamilyen hiba történt, lásd a hibanaplót."
+
+msgid "simbrief_result_error_no_form"
+msgstr "Nem sikerült letölteni az űrlapot."
+
+msgid "simbrief_result_error_no_popup"
+msgstr "Nem jelent meg a bejelentkező ablak."
+
+msgid "simbrief_result_error_login_failed"
+msgstr "A bejelentkezés nem sikerült."
+
+msgid "simbrief_result_unknown"
+msgstr "Ismeretlen hiba történt."
+
+msgid "simbrief_cancelled"
+msgstr "Áttérünk a régi eligazításra."
+
+msgid "simbrief_credentials_title"
+msgstr "SimBrief bejelentkezés"
+
+msgid "simbrief_login_failed"
+msgstr ""
+"A megadott adatokkal nem tudtam\n"
+"bejelentkezni a SimBriefbe. Adj meg\n"
+"új adatokat, vagy hagyjuk a SimBriefet"
+
+msgid "simbrief_result_title"
+msgstr "SimBrief repülési terv"
 
 msgid "briefing_title"
 msgstr "Eligazítás (%d/2): %s"
@@ -1477,6 +1610,15 @@ msgstr ""
 
 msgid "prefs_smoothing_seconds"
 msgstr "másodpercig."
+
+msgid "prefs_useSimBrief"
+msgstr "Sim_Brief használata"
+
+msgid "prefs_useSimBrief_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, az eligazítás elkészítéséhez a "
+"SimBrief rendszert használja a program.\n"
+"Szükséged lesz SimBrief felhasználónévre és jelszóra."
 
 msgid "prefs_pirepDirectory"
 msgstr "_PIREP-ek könyvtára:"

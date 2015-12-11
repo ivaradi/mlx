@@ -243,6 +243,8 @@ class Preferences(gtk.Dialog):
         self._setSmoothing(self._vsSmoothingEnabled, self._vsSmoothingLength,
                            config.vsSmoothingLength)
 
+        self._useSimBrief.set_active(config.useSimBrief)
+
         pirepDirectory = config.pirepDirectory
         self._pirepDirectory.set_text("" if pirepDirectory is None
                                       else pirepDirectory)
@@ -290,6 +292,7 @@ class Preferences(gtk.Dialog):
                                                        self._iasSmoothingLength)
         config.vsSmoothingLength = self._getSmoothing(self._vsSmoothingEnabled,
                                                        self._vsSmoothingLength)
+        config.useSimBrief = self._useSimBrief.get_active()
         config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
         config.pirepAutoSave = self._pirepAutoSave.get_active()
 
@@ -405,6 +408,11 @@ class Preferences(gtk.Dialog):
            self._createSmoothingBox(xstr("prefs_vsSmoothingEnabled"),
                                     xstr("prefs_vsSmoothingEnabledTooltip"))
         simulatorBox.pack_start(vsSmoothingBox, False, False, 4)
+
+        self._useSimBrief = gtk.CheckButton(xstr("prefs_useSimBrief"))
+        self._useSimBrief.set_use_underline(True)
+        self._useSimBrief.set_tooltip_text(xstr("prefs_useSimBrief_tooltip"))
+        mainBox.pack_start(self._useSimBrief, False, False, 0)
 
         pirepBox = gtk.HBox()
         mainBox.pack_start(pirepBox, False, False, 8)

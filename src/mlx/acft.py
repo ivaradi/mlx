@@ -84,6 +84,16 @@ class SmoothedValue(object):
 
 #---------------------------------------------------------------------------------------
 
+class SimBriefData(object):
+    """Data to be used when creating SimBrief briefings."""
+    def __init__(self, climbProfiles, cruiseProfiles, descentProfiles):
+        """Construct the SimBrief data with the given profiles."""
+        self.climbProfiles = climbProfiles
+        self.cruiseProfiles = cruiseProfiles
+        self.descentProfiles = descentProfiles
+
+#---------------------------------------------------------------------------------------
+
 class Aircraft(object):
     """Base class for aircraft."""
     @staticmethod
@@ -122,6 +132,8 @@ class Aircraft(object):
         self.maxTakeOffPitch = 15.0
         self.maxTouchDownPitch = 15.0
         self.brakeCoolTime = 10.0
+
+        self.simBriefData = None
 
         self._checkers = []
 
@@ -719,6 +731,9 @@ class B736(Boeing737):
         self.mzfw = 51482
         self.maxTakeOffPitch = 16.2
         self.maxTouchDownPitch = 14.7
+        self.simBriefData = SimBriefData(["250/280/78"],
+                                         ["CI", "M75", "M78", "M79", "M80", "LRC"],
+                                         ["78/280/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -732,6 +747,9 @@ class B737(Boeing737):
         self.mzfw = 54657
         self.maxTakeOffPitch = 14.7
         self.maxTouchDownPitch = 13.2
+        self.simBriefData = SimBriefData(["250/280/78"],
+                                         ["CI", "M75", "M78", "M79", "M80", "LRC"],
+                                         ["78/280/250", "78/250/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -745,6 +763,9 @@ class B738(Boeing737):
         self.mzfw = 61688
         self.maxTakeOffPitch = 11
         self.maxTouchDownPitch = 9.5
+        self.simBriefData = SimBriefData(["250/280/78"],
+                                         ["CI", "M76", "M78", "M79", "M80", "LRC"],
+                                         ["78/280/250", "78/250/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -753,6 +774,9 @@ class B738Charter(B738):
     def __init__(self, flight):
         super(B738Charter, self).__init__(flight)
         self.mtow = 77791
+        self.simBriefData = SimBriefData(["AUTO"],
+                                         ["280/M74"],
+                                         ["AUTO"])
 
 #---------------------------------------------------------------------------------------
 
@@ -825,6 +849,10 @@ class DH8D(Aircraft):
                                  35 : 158 }
         self.maxTakeOffPitch = 8.0
         self.maxTouchDownPitch = 7.0
+        self.simBriefData = SimBriefData(["I-900", "II-900", "III-900",
+                                          "I-850", "II-850", "III-850"],
+                                         ["MCR", "ISC", "LRC", "HSC"],
+                                         ["I-850", "II-850", "III-850"])
 
 #---------------------------------------------------------------------------------------
 
@@ -877,6 +905,9 @@ class B763(Boeing767):
         self.mzfw = 130635
         self.maxTakeOffPitch = 9.6
         self.maxTouchDownPitch = 8.1
+        self.simBriefData = SimBriefData(["250/290/78"],
+                                         ["CI", "M76", "M78", "M80", "M82", "M84", "LRC"],
+                                         ["78/290/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -901,6 +932,9 @@ class CRJ2(Aircraft):
                                  45 : 175 }
         self.maxTakeOffPitch = 18.0
         self.maxTouchDownPitch = 18.0
+        self.simBriefData = SimBriefData(["250/70", "290/74"],
+                                         ["CI", "LRC", "M70", "M72", "M74", "M77", "M80"],
+                                         ["74/290/250", "77/320/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -1044,6 +1078,9 @@ class T154(Aircraft):
 
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
+        self.simBriefData = SimBriefData(["AUTO"],
+                                         ["300/M80"],
+                                         ["AUTO"])
 
     @property
     def speedInKnots(self):
