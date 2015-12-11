@@ -438,7 +438,7 @@ class GUI(fs.ConnectionListener):
         if self.config.autoUpdate:
             self._updater = Updater(self,
                                     self._programDirectory,
-                                    self.config.DEFAULT_UPDATE_URL,
+                                    self.config.updateURL,
                                     self._mainWindow)
             self._updater.start()
 

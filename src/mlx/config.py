@@ -210,7 +210,7 @@ class ApproachCallouts(object):
 
 class Config(object):
     """Our configuration."""
-    DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update/cef"
+    DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
 
     _messageTypesSection = "messageTypes"
 
