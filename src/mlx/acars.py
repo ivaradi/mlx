@@ -24,7 +24,7 @@ class ACARS(object):
 
         self.state = state
         self.bookedFlight = gui.bookedFlight
-        
+
         self.blockTime = 0 if flight.blockTimeStart is None \
                          else aircraft.state.timestamp - flight.blockTimeStart
         self.stage = flight.stage
@@ -47,5 +47,6 @@ class ACARS(object):
                    else "Approaching"
         else:
             return "Landed"
-        
+
+
 #------------------------------------------------------------------------------
