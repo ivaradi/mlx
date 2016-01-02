@@ -1,6 +1,7 @@
 
 import const
 import util
+import rpc
 import rpccommon
 
 from common import MAVA_BASE_URL
@@ -610,6 +611,17 @@ class Request(object):
 
 #------------------------------------------------------------------------------
 
+class RPCRequest(Request):
+    """Common base class for RPC requests.
+
+    It stores the RPC client received from the handler."""
+    def __init__(self, client, callback):
+        """Construct the request."""
+        super(RPCRequest, self).__init__(callback)
+        self._client = client
+
+#------------------------------------------------------------------------------
+
 class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
@@ -683,6 +695,36 @@ class Login(Request):
 
 #------------------------------------------------------------------------------
 
+class LoginRPC(RPCRequest):
+    """An RPC-based login request."""
+    def __init__(self, client, callback, pilotID, password, entranceExam):
+        """Construct the login request with the given pilot ID and
+        password."""
+        super(LoginRPC, self).__init__(client, callback)
+
+        self._pilotID = pilotID
+        self._password = password
+        self._entranceExam = entranceExam
+
+    def run(self):
+        """Perform the login request."""
+        result = Result()
+        # FIXME: handle the entrance exam case
+        result.entranceExam = self._entranceExam
+
+        self._client.setCredentials(self._pilotID, self._password)
+        pilotName = self._client.login()
+        result.loggedIn = pilotName is not None
+        if result.loggedIn:
+            result.pilotID = self._pilotID
+            result.pilotName = pilotName
+            result.password = self._password
+            result.flights = self._client.getFlights()
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class GetFleet(Request):
     """Request to get the fleet from the website."""
 
@@ -698,6 +740,22 @@ class GetFleet(Request):
         result = Result()
         result.fleet = Fleet(f)
         f.close()
+
+        return result
+
+#------------------------------------------------------------------------------
+
+class GetFleetRPC(RPCRequest):
+    """Request to get the fleet from the website using RPC."""
+    def __init__(self, client, callback):
+        """Construct the request with the given client and callback function."""
+        super(GetFleetRPC, self).__init__(client, callback)
+
+    def run(self):
+        """Perform the login request."""
+        result = Result()
+
+        result.fleet = self._client.getFleet()
 
         return result
 
@@ -729,6 +787,28 @@ class UpdatePlane(Request):
 
         result = Result()
         result.success = line == "OK"
+
+        return result
+
+#------------------------------------------------------------------------------
+
+class UpdatePlaneRPC(RPCRequest):
+    """RPC request to update the status and the position of a plane in the
+    fleet."""
+    def __init__(self, client, callback, tailNumber, status, gateNumber = None):
+        """Construct the request."""
+        super(UpdatePlaneRPC, self).__init__(client, callback)
+        self._tailNumber = tailNumber
+        self._status = status
+        self._gateNumber = gateNumber
+
+    def run(self):
+        """Perform the plane update."""
+        self._client.updatePlane(self._tailNumber, self._status, self._gateNumber)
+
+        # Otherwise an exception is thrown
+        result = Result()
+        result.success = True
 
         return result
 
@@ -919,6 +999,28 @@ class SendPIREP(Request):
         return result
 #------------------------------------------------------------------------------
 
+class SendPIREPRPC(RPCRequest):
+    """A request to send a PIREP to the MAVA website via the RPC interface."""
+
+    def __init__(self, client, callback, pirep):
+        """Construct the sending of the PIREP."""
+        super(SendPIREPRPC, self).__init__(client, callback)
+        self._pirep = pirep
+
+    def run(self):
+        """Perform the sending of the PIREP."""
+        pirep = self._pirep
+        resultCode = self._client.addPIREP(pirep.bookedFlight.id, pirep)
+
+        result = Result()
+        result.success = resultCode==rpc.Client.RESULT_OK
+        result.alreadyFlown = resultCode==rpc.Client.RESULT_FLIGHT_ALREADY_REPORTED
+        result.notAvailable = resultCode==rpc.Client.RESULT_FLIGHT_NOT_EXISTS
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class SendACARS(Request):
     """A request to send an ACARS to the MAVA website."""
     _latin2Encoder = codecs.getencoder("iso-8859-2")
@@ -966,6 +1068,22 @@ class SendACARS(Request):
 
 #------------------------------------------------------------------------------
 
+class SendACARSRPC(RPCRequest):
+    """A request to send an ACARS to the MAVA website via JSON-RPC."""
+    def __init__(self, client, callback, acars):
+        """Construct the request for the given PIREP."""
+        super(SendACARSRPC, self).__init__(client, callback)
+        self._acars = acars
+
+    def run(self):
+        """Perform the sending of the ACARS."""
+        print "Sending the online ACARS via JSON-RPC"
+
+        self._client.updateOnlineACARS(self._acars)
+        return Result()
+
+#------------------------------------------------------------------------------
+
 class SendBugReport(Request):
     """A request to send a bug report to the project homepage."""
     _latin2Encoder = codecs.getencoder("iso-8859-2")
@@ -1002,7 +1120,7 @@ class Handler(threading.Thread):
 
     It can process one request at a time. The results are passed to a callback
     function."""
-    def __init__(self):
+    def __init__(self, config, getCredentialsFn):
         """Construct the handler."""
         super(Handler, self).__init__()
 
@@ -1010,18 +1128,35 @@ class Handler(threading.Thread):
         self._requestCondition = threading.Condition()
 
         self.daemon = True
+        self._config = config
+        self._rpcClient = rpc.Client(getCredentialsFn)
+        if config.rememberPassword:
+            self._rpcClient.setCredentials(config.pilotID, config.password)
 
     def login(self, callback, pilotID, password, entranceExam = False):
         """Enqueue a login request."""
-        self._addRequest(Login(callback, pilotID, password, entranceExam))
+        request = \
+          LoginRPC(self._rpcClient, callback, pilotID, password, entranceExam) \
+          if self._config.useRPC and not entranceExam \
+          else Login(callback, pilotID, password, entranceExam)
+
+        self._addRequest(request)
 
     def getFleet(self, callback):
         """Enqueue a fleet retrieval request."""
-        self._addRequest(GetFleet(callback))
+        request = \
+          GetFleetRPC(self._rpcClient, callback,) if self._config.useRPC \
+          else GetFleet(callback)
+        self._addRequest(request)
 
     def updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the status of the given plane."""
-        self._addRequest(UpdatePlane(callback, tailNumber, status, gateNumber))
+        request = \
+          UpdatePlaneRPC(self._rpcClient, callback,
+                         tailNumber, status, gateNumber) \
+          if self._config.useRPC \
+          else UpdatePlane(callback, tailNumber, status, gateNumber)
+        self._addRequest(request)
 
     def getNOTAMs(self, callback, departureICAO, arrivalICAO):
         """Get the NOTAMs for the given two airports."""
@@ -1033,11 +1168,17 @@ class Handler(threading.Thread):
 
     def sendPIREP(self, callback, pirep):
         """Send the given PIREP."""
-        self._addRequest(SendPIREP(callback, pirep))
+        request = \
+          SendPIREPRPC(self._rpcClient, callback, pirep) if self._config.useRPC \
+          else SendPIREP(callback, pirep)
+        self._addRequest(request)
 
     def sendACARS(self, callback, acars):
         """Send the given ACARS"""
-        self._addRequest(SendACARS(callback, acars))
+        request = \
+          SendACARSRPC(self._rpcClient, callback, acars) if self._config.useRPC \
+          else SendACARS(callback, acars)
+        self._addRequest(request)
 
     def sendBugReport(self, callback, summary, description, email):
         """Send a bug report with the given data."""

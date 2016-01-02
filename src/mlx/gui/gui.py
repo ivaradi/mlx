@@ -94,7 +94,7 @@ class GUI(fs.ConnectionListener):
         self._credentialsUserName = None
         self._credentialsPassword = None
 
-        self.webHandler = web.Handler()
+        self.webHandler = web.Handler(config, self._getCredentialsCallback)
         self.webHandler.start()
 
         self.toRestart = False
