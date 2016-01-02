@@ -4681,7 +4681,6 @@ class Wizard(gtk.VBox):
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
         self.gui.endBusy()
-        returned = True
         isReload = self._loginResult is not None
         if returned:
             if result.loggedIn:
