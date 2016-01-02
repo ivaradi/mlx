@@ -1,6 +1,7 @@
 
 import const
 import util
+import rpccommon
 
 from common import MAVA_BASE_URL
 
@@ -256,7 +257,7 @@ class BookedFlight(object):
 
 #------------------------------------------------------------------------------
 
-class Plane(object):
+class Plane(rpccommon.Plane):
     """Information about an airplane in the fleet."""
     def __init__(self, s):
         """Build a plane info based on the given string.
@@ -264,16 +265,15 @@ class Plane(object):
         The string consists of three, space-separated fields.
         The first field is the tail number, the second field is the gate
         number, the third field is the plane's status as a character."""
+        super(Plane, self).__init__()
+
         try:
             words = s.split(" ")
             tailNumber = words[0]
             self.tailNumber = tailNumber
 
             status = words[2] if len(words)>2 else None
-            self.status = const.PLANE_HOME if status=="H" else \
-                          const.PLANE_AWAY if status=="A" else \
-                          const.PLANE_PARKING if status=="P" else \
-                          const.PLANE_UNKNOWN
+            self._setStatus(status)
 
             gateNumber = words[1] if len(words)>1 else ""
             self.gateNumber = gateNumber if gateNumber else None
@@ -282,74 +282,20 @@ class Plane(object):
             print >> sys.stderr, "Plane string is invalid: '" + s + "'"
             self.tailNumber = None
 
-    def __repr__(self):
-        """Get the representation of the plane object."""
-        s = "<Plane: %s %s" % (self.tailNumber,
-                               "home" if self.status==const.PLANE_HOME else \
-                               "away" if self.status==const.PLANE_AWAY else \
-                               "parking" if self.status==const.PLANE_PARKING \
-                               else "unknown")
-        if self.gateNumber is not None:
-            s += " (gate " + self.gateNumber + ")"
-        s += ">"
-        return s
-
-
 #------------------------------------------------------------------------------
 
-class Fleet(object):
+class Fleet(rpccommon.Fleet):
     """Information about the whole fleet."""
     def __init__(self, f):
         """Construct the fleet information by reading the given file object."""
-        self._planes = {}
+        super(Fleet, self).__init__()
+
         while True:
             line = readline(f)
             if not line or line == "#END": break
 
             plane = Plane(line)
-            if plane.tailNumber is not None:
-                self._planes[plane.tailNumber] = plane
-
-    def isGateConflicting(self, plane):
-        """Check if the gate of the given plane conflicts with another plane's
-        position."""
-        for p in self._planes.itervalues():
-            if p.tailNumber!=plane.tailNumber and \
-               p.status==const.PLANE_HOME and \
-               p.gateNumber==plane.gateNumber:
-                return True
-
-        return False
-
-    def getOccupiedGateNumbers(self):
-        """Get a set containing the numbers of the gates occupied by planes."""
-        gateNumbers = set()
-        for p in self._planes.itervalues():
-            if p.status==const.PLANE_HOME and p.gateNumber:
-                gateNumbers.add(p.gateNumber)
-        return gateNumbers
-
-    def updatePlane(self, tailNumber, status, gateNumber = None):
-        """Update the status of the given plane."""
-        if tailNumber in self._planes:
-            plane = self._planes[tailNumber]
-            plane.status = status
-            plane.gateNumber = gateNumber
-
-    def __iter__(self):
-        """Get an iterator over the planes."""
-        for plane in self._planes.itervalues():
-            yield plane
-
-    def __getitem__(self, tailNumber):
-        """Get the plane with the given tail number.
-
-        If the plane is not in the fleet, None is returned."""
-        return self._planes[tailNumber] if tailNumber in self._planes else None
-
-    def __repr__(self):
-        """Get the representation of the fleet object."""
-        return self._planes.__repr__()
+            self._addPlane(plane)
 
 #------------------------------------------------------------------------------
 
@@ -770,9 +716,7 @@ class UpdatePlane(Request):
         """Perform the plane update."""
         url = MAVA_BASE_URL + "/onlinegates_set.php"
 
-        status = "H" if self._status==const.PLANE_HOME else \
-                 "A" if self._status==const.PLANE_AWAY else \
-                 "P" if self._status==const.PLANE_PARKING else ""
+        status = Plane.status2str(self._status)
 
         gateNumber = self._gateNumber if self._gateNumber else ""
 
