@@ -843,11 +843,6 @@ class GetMETARs(Request):
 
 class SendPIREP(Request):
     """A request to send a PIREP to the MAVA website."""
-    _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
-                     const.FLIGHTTYPE_OLDTIMER : "OT",
-                     const.FLIGHTTYPE_VIP : "VIP",
-                     const.FLIGHTTYPE_CHARTER : "CHARTER" }
-
     _latin2Encoder = codecs.getencoder("iso-8859-2")
 
     def __init__(self, callback, pirep):
@@ -876,7 +871,7 @@ class SendPIREP(Request):
         data["bag"] = str(pirep.bagWeight)
         data["mail"] = str(pirep.mailWeight)
 
-        data["flttype"] = SendPIREP._flightTypes[pirep.flightType]
+        data["flttype"] = pirep.flightTypeText
         data["onoff"] = "1" if pirep.online else "0"
         data["bt_dep"] = util.getTimestampString(pirep.blockTimeStart)
         data["bt_arr"] = util.getTimestampString(pirep.blockTimeEnd)

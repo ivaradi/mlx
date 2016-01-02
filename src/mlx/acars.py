@@ -48,5 +48,26 @@ class ACARS(object):
         else:
             return "Landed"
 
+    def _serialize(self):
+        """Serialize the ACARS object for JSON-RPC."""
+        bookedFlight = self.bookedFlight
+        state = self.state
+
+        attrs = {}
+        attrs["longitude"] = state.longitude
+        attrs["latitude"] = state.latitude
+        attrs["pilotName"] = self.pilotName
+        attrs["numPassengers"] = bookedFlight.numPassengers
+        attrs["blockTime"] = self.getBlockTimeText()
+        attrs["callsign"] = bookedFlight.callsign
+        attrs["aircraftTypeName"] = bookedFlight.aircraftTypeName
+        attrs["departureICAO"] = bookedFlight.departureICAO
+        attrs["arrivalICAO"] = bookedFlight.arrivalICAO
+        attrs["altitude"] = state.altitude
+        attrs["groundSpeed"] = state.groundSpeed
+        attrs["event"] = self.getEventText()
+        attrs["tailNumber"] = bookedFlight.tailNumber
+
+        return ([], attrs)
 
 #------------------------------------------------------------------------------

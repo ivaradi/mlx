@@ -3,6 +3,8 @@ from util import utf2unicode
 
 import const
 import cPickle as pickle
+import datetime
+import time
 
 #------------------------------------------------------------------------------
 
@@ -18,11 +20,21 @@ import cPickle as pickle
 
 class PIREP(object):
     """A pilot's report of a flight."""
+    _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
+                     const.FLIGHTTYPE_OLDTIMER : "OT",
+                     const.FLIGHTTYPE_VIP : "VIP",
+                     const.FLIGHTTYPE_CHARTER : "CHARTER" }
+
     @staticmethod
     def _formatLine(timeStr, line):
         """Format the given time string and line as needed for the ACARS and
         some other things."""
         return "[" + timeStr + "]-[" + line + "]"
+
+    @staticmethod
+    def formatTimestampForRPC(t):
+        """Format the given timestamp for RPC."""
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     @staticmethod
     def load(path):
@@ -90,6 +102,31 @@ class PIREP(object):
         self.logLines = logger.lines
         self.faultLineIndexes = logger.faultLineIndexes
 
+    @property
+    def flightTypeText(self):
+        """Get the text representation of the flight type."""
+        return PIREP._flightTypes[self.flightType]
+
+    @property
+    def blockTimeStartText(self):
+        """Get the beginning of the block time in string format."""
+        return PIREP.formatTimestampForRPC(self.blockTimeStart)
+
+    @property
+    def flightTimeStartText(self):
+        """Get the beginning of the flight time in string format."""
+        return PIREP.formatTimestampForRPC(self.flightTimeStart)
+
+    @property
+    def flightTimeEndText(self):
+        """Get the end of the flight time in string format."""
+        return PIREP.formatTimestampForRPC(self.flightTimeEnd)
+
+    @property
+    def blockTimeEndText(self):
+        """Get the end of the block time in string format."""
+        return PIREP.formatTimestampForRPC(self.blockTimeEnd)
+
     def getACARSText(self):
         """Get the ACARS text.
 
@@ -151,3 +188,40 @@ class PIREP(object):
             error = utf2unicode(str(e))
             print u"Failed saving PIREP to %s: %s" % (path, error)
             return error
+
+    def _serialize(self):
+        """Serialize the PIREP for JSON-RPC."""
+        attrs = {}
+        attrs["log"] = self.getACARSText()
+        attrs["numPassengers"] = self.numPassengers
+        attrs["numCrew"] = self.numCrew
+        attrs["cargoWeight"] = self.cargoWeight
+        attrs["bagWeight"] = self.bagWeight
+        attrs["mailWeight"] = self.mailWeight
+        attrs["flightType"] = self.flightTypeText
+        attrs["online"] = 1 if self.online else 0
+        attrs["blockTimeStart"] = self.blockTimeStartText
+        attrs["blockTimeEnd"] = self.blockTimeEndText
+        attrs["flightTimeStart"] = self.flightTimeStartText
+        attrs["flightTimeEnd"] = self.flightTimeEndText
+        attrs["timeComment"] = self.getTimeComment()
+        attrs["fuelUsed"] = self.fuelUsed
+        attrs["departureRunway"] = self.departureRunway
+        attrs["arrivalRunway"] = self.arrivalRunway
+        attrs["departureMETAR"] = self.departureMETAR
+        attrs["arrivalMETAR"] = self.arrivalMETAR
+        attrs["filedCruiseLevel"] = self.filedCruiseAltitude / 100.0
+        attrs["cruiseLevel"] = self.cruiseAltitude / 100.0
+        attrs["sid"] = self.sid
+        attrs["route"] = self.route
+        attrs["star"] = self.star
+        attrs["approachType"] = self.approachType
+        attrs["comments"] = self.comments
+        attrs["flightDefects"] = self.flightDefects
+        attrs["ratingText"] = self.getRatingText()
+        attrs["rating"] = max(0.0, self.rating)
+        attrs["flownDistance"] = self.flownDistance
+        # FIXME: it should be stored in the PIREP when it is sent later
+        attrs["flightDate"] = datetime.date.today().strftime("%Y-%m-%d")
+
+        return ([], attrs)
