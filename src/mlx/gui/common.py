@@ -281,6 +281,121 @@ class IntegerEntry(gtk.Entry):
 
 #------------------------------------------------------------------------------
 
+class CredentialsDialog(gtk.Dialog):
+    """A dialog window to ask for a user name and a password."""
+    def __init__(self, gui, userName, password,
+                 titleLabel, cancelButtonLabel, okButtonLabel,
+                 userNameLabel, userNameTooltip,
+                 passwordLabel, passwordTooltip,
+                 infoText = None,
+                 rememberPassword = None,
+                 rememberLabel = None, rememberTooltip = None):
+        """Construct the dialog."""
+        super(CredentialsDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
+                                                titleLabel,
+                                                gui.mainWindow,
+                                                DIALOG_MODAL)
+        self.add_button(cancelButtonLabel, RESPONSETYPE_CANCEL)
+        self.add_button(okButtonLabel, RESPONSETYPE_OK)
+
+        contentArea = self.get_content_area()
+
+        contentAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                         xscale = 0.0, yscale = 0.0)
+        contentAlignment.set_padding(padding_top = 4, padding_bottom = 16,
+                                     padding_left = 8, padding_right = 8)
+
+        contentArea.pack_start(contentAlignment, False, False, 0)
+
+        contentVBox = gtk.VBox()
+        contentAlignment.add(contentVBox)
+
+        if infoText is not None:
+            label = gtk.Label(infoText)
+            label.set_alignment(0.0, 0.0)
+
+            contentVBox.pack_start(label, False, False, 0)
+
+        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        tableAlignment.set_padding(padding_top = 24, padding_bottom = 0,
+                                   padding_left = 0, padding_right = 0)
+
+        table = gtk.Table(3, 2)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+
+        tableAlignment.add(table)
+        contentVBox.pack_start(tableAlignment, True, True, 0)
+
+        label = gtk.Label(userNameLabel)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._userName = gtk.Entry()
+        self._userName.set_width_chars(16)
+        # FIXME: enabled the OK button only when there is something in thr
+        # user name and password fields
+        #self._userName.connect("changed",
+        #                       lambda button: self._updateForwardButton())
+        self._userName.set_tooltip_text(userNameTooltip)
+        self._userName.set_text(userName)
+        table.attach(self._userName, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._userName)
+
+        label = gtk.Label(passwordLabel)
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._password = gtk.Entry()
+        self._password.set_visibility(False)
+        #self._password.connect("changed",
+        #                       lambda button: self._updateForwardButton())
+        self._password.set_tooltip_text(passwordTooltip)
+        self._password.set_text(password)
+        table.attach(self._password, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._password)
+
+        if rememberPassword is not None:
+            self._rememberButton = gtk.CheckButton(rememberLabel)
+            self._rememberButton.set_use_underline(True)
+            self._rememberButton.set_tooltip_text(rememberTooltip)
+            self._rememberButton.set_active(rememberPassword)
+            table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
+        else:
+            self._rememberButton = None
+
+    @property
+    def userName(self):
+        """Get the user name entered."""
+        return self._userName.get_text()
+
+    @property
+    def password(self):
+        """Get the password entered."""
+        return self._password.get_text()
+
+    @property
+    def rememberPassword(self):
+        """Get whether the password is to be remembered."""
+        return None if self._rememberButton is None \
+               else self._rememberButton.get_active()
+
+    def run(self):
+        """Run the dialog."""
+        self.show_all()
+
+        response = super(CredentialsDialog, self).run()
+
+        self.hide()
+
+        return response
+
+#------------------------------------------------------------------------------
+
 gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
                    None, (object,))
 
