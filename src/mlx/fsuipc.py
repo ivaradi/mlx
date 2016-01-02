@@ -1386,6 +1386,9 @@ class AircraftModel(object):
         state.gearControlDown = data[self._monidx_gearControl]==16383
         state.gearsDown = data[self._monidx_noseGear]==16383
 
+        if state.gearControlDown!=state.gearsDown:
+            print "gearControl:", data[self._monidx_gearControl], ", noseGear:", data[self._monidx_noseGear]
+
         state.spoilersArmed = data[self._monidx_spoilersArmed]!=0
 
         spoilers = data[self._monidx_spoilers]
