@@ -15,6 +15,10 @@ import os
 # used, which is the default on Windows or when the \c FORCE_PYGTK environment
 # variable is set.
 
+#---------------------------------------------------------------------------------------
+
+MAVA_BASE_URL = os.environ.get("MAVA_BASE_URL", "http://virtualairlines.hu")
+
 #-------------------------------------------------------------------------------
 
 # Due to CEF, PyGTK is the default

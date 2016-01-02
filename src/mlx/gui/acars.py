@@ -20,7 +20,7 @@ import cef
 class ACARS(gtk.VBox):
     """The flight info tab."""
     # The URL of the ACARS map
-    URL = "http://virtualairlines.hu/acars2/show.html"
+    URL = MAVA_BASE_URL + "/acars2/show.html"
 
     def __init__(self, gui):
         """Construct the flight info tab."""

@@ -2,6 +2,8 @@
 import const
 import util
 
+from common import MAVA_BASE_URL
+
 import threading
 import sys
 import urllib
@@ -686,10 +688,10 @@ class Login(Request):
         password = md5.hexdigest()
 
         if self._entranceExam:
-            url = "http://www.virtualairlines.hu/ellenorzo/getflightplan.php?pid=%s" % \
+            url = MAVA_BASE_URL + "/ellenorzo/getflightplan.php?pid=%s" % \
                   (pilotID,)
         else:
-            url = "http://www.virtualairlines.hu/leker2.php?pid=%s&psw=%s" % \
+            url = MAVA_BASE_URL + "/leker2.php?pid=%s&psw=%s" % \
                   (pilotID, password)
 
         result = Result()
@@ -744,7 +746,7 @@ class GetFleet(Request):
 
     def run(self):
         """Perform the login request."""
-        url = "http://www.virtualairlines.hu/onlinegates_get.php"
+        url = MAVA_BASE_URL + "/onlinegates_get.php"
 
         f = urllib2.urlopen(url, timeout = 10.0)
         result = Result()
@@ -766,7 +768,7 @@ class UpdatePlane(Request):
 
     def run(self):
         """Perform the plane update."""
-        url = "http://www.virtualairlines.hu/onlinegates_set.php"
+        url = MAVA_BASE_URL + "/onlinegates_set.php"
 
         status = "H" if self._status==const.PLANE_HOME else \
                  "A" if self._status==const.PLANE_AWAY else \
@@ -911,8 +913,7 @@ class SendPIREP(Request):
 
     def run(self):
         """Perform the sending of the PIREP."""
-        url = "http://www.virtualairlines.hu/malevacars.php"
-        #url = "http://localhost:15000"
+        url = MAVA_BASE_URL + "/malevacars.php"
 
         pirep = self._pirep
 
@@ -992,7 +993,7 @@ class SendACARS(Request):
         """Perform the sending of the ACARS."""
         print "Sending the online ACARS"
 
-        url = "http://www.virtualairlines.hu/acars2/acarsonline.php"
+        url = MAVA_BASE_URL  + "/acars2/acarsonline.php"
 
         acars = self._acars
         bookedFlight = acars.bookedFlight
