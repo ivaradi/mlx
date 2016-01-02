@@ -232,6 +232,14 @@ msgstr "_Próbáld újra"
 msgid "button_reconnect"
 msgstr "Újra_kapcsolódás"
 
+msgid "login_title"
+msgstr "Bejelentkezés"
+
+msgid "login_info"
+msgstr ""
+"Írd be a MAVA pilóta azonosítódat és a\n"
+"bejelentkezéshez használt jelszavadat."
+
 msgid "login"
 msgstr "Bejelentkezés"
 

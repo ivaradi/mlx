@@ -89,6 +89,11 @@ class GUI(fs.ConnectionListener):
         self._sendPIREPCallback = None
         self._sendBugReportCallback = None
 
+        self._credentialsCondition = threading.Condition()
+        self._credentialsAvailable = False
+        self._credentialsUserName = None
+        self._credentialsPassword = None
+
         self.webHandler = web.Handler()
         self.webHandler.start()
 
@@ -1634,3 +1639,57 @@ class GUI(fs.ConnectionListener):
     def _setLandingAntiIceOn(self, value):
         """Set the anti-ice on indicator."""
         self._wizard.landingAntiIceOn = value
+
+    def _getCredentialsCallback(self):
+        """Called when the web handler asks for the credentials."""
+        # FIXME: this is almost the same as
+        # SimBriefSetupPage._getCredentialsCallback
+        with self._credentialsCondition:
+            self._credentialsAvailable = False
+
+            gobject.idle_add(self._getCredentials)
+
+            while not self._credentialsAvailable:
+                self._credentialsCondition.wait()
+
+            return (self._credentialsUserName, self._credentialsPassword)
+
+    def _getCredentials(self):
+        """Get the credentials."""
+        # FIXME: this is almost the same as
+        # SimBriefSetupPage._getCredentials
+        with self._credentialsCondition:
+            config = self.config
+
+            dialog = CredentialsDialog(self, config.pilotID, config.password,
+                                       xstr("login_title"),
+                                       xstr("button_cancel"),
+                                       xstr("button_ok"),
+                                       xstr("label_pilotID"),
+                                       xstr("login_pilotID_tooltip"),
+                                       xstr("label_password"),
+                                       xstr("login_password_tooltip"),
+                                       xstr("login_info"),
+                                       config.rememberPassword,
+                                       xstr("remember_password"),
+                                       xstr("login_remember_tooltip"))
+            response = dialog.run()
+
+            if response==RESPONSETYPE_OK:
+                self._credentialsUserName = dialog.userName
+                self._credentialsPassword = dialog.password
+                rememberPassword = dialog.rememberPassword
+
+                config.pilotID = self._credentialsUserName
+
+                config.password = \
+                  self._credentialsPassword if rememberPassword else ""
+                config.rememberPassword = rememberPassword
+
+                config.save()
+            else:
+                self._credentialsUserName = None
+                self._credentialsPassword = None
+
+            self._credentialsAvailable = True
+            self._credentialsCondition.notify()

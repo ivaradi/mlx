@@ -232,6 +232,14 @@ msgstr "_Try again"
 msgid "button_reconnect"
 msgstr "_Reconnect"
 
+msgid "login_title"
+msgstr "Login"
+
+msgid "login_info"
+msgstr ""
+"Enter your MAVA pilot's ID and password to\n"
+"log in to the MAVA website."
+
 msgid "login"
 msgstr "Login"
 
