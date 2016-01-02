@@ -1747,6 +1747,16 @@ msgstr ""
 "Az URL, ahol a frissítéseket keresi a program. Csak akkor változtasd meg, "
 "ha biztos vagy a dolgodban!"
 
+msgid "prefs_use_rpc"
+msgstr "_RPC hívások"
+
+msgid "prefs_use_rpc_tooltip"
+msgstr ""
+"Ha ez be van jelölve, a program RPC hívásokkal kommunikál a MAVA "
+"szerverrel. Ez a normális, azonban ha valamilyen szerverművelet "
+"nem sikerül, megpróbálhatjuk itt megszüntetni a kijelölést. "
+"Azonban bizonyos új funkciókat továbbra is RPC-n fog hívni a program."
+
 msgid "prefs_msgs_fs"
 msgstr ""
 "Szimulátorban\n"

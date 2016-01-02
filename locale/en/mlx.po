@@ -1736,6 +1736,16 @@ msgstr ""
 "The URL from which to download the updates. Change this only if you "
 "know what you are doing!"
 
+msgid "prefs_use_rpc"
+msgstr "Use _RPC calls"
+
+msgid "prefs_use_rpc_tooltip"
+msgstr ""
+"If checked the program will use RPC calls towards the MAVA server. "
+"This should be the normal operation, but if some server operation "
+"fails, you may want to try to uncheck here. Note, that some new "
+"functionality will still be called over RPC."
+
 msgid "prefs_msgs_fs"
 msgstr "Displayed in FS"
 

@@ -276,6 +276,8 @@ class Preferences(gtk.Dialog):
 
         self._updateURL.set_text(config.updateURL)
 
+        self._useRPC.set_active(config.useRPC)
+
         self._settingFromConfig = False
 
     def _toConfig(self, config):
@@ -319,6 +321,7 @@ class Preferences(gtk.Dialog):
 
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
+        config.useRPC = self._useRPC.get_active()
 
     def _buildGeneral(self):
         """Build the page for the general settings."""
@@ -812,6 +815,12 @@ class Preferences(gtk.Dialog):
         self._updateURL.set_tooltip_text(xstr("prefs_update_url_tooltip"))
         self._updateURL.connect("changed", self._updateURLChanged)
         updateURLBox.pack_start(self._updateURL, True, True, 4)
+
+        self._useRPC = gtk.CheckButton(xstr("prefs_use_rpc"))
+        mainBox.pack_start(self._useRPC, False, False, 16)
+
+        self._useRPC.set_use_underline(True)
+        self._useRPC.set_tooltip_text(xstr("prefs_use_rpc_tooltip"))
 
         return mainAlignment
 
