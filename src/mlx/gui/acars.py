@@ -12,7 +12,7 @@ import cef
 #
 # The ACARS tab.
 #
-# This module implements to \ref ACRS class, which displays the MAVA ACARS in a
+# This module implements to \ref ACARS class, which displays the MAVA ACARS in a
 # browser window using CEF
 
 #------------------------------------------------------------------------------
