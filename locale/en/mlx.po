@@ -2122,6 +2122,17 @@ msgstr ""
 msgid "sendBugReport_error_sec"
 msgstr "There was some communication error, try again later."
 
+msgid "register_ask"
+msgstr "Would you like to register with MAVA?"
+
+msgid "register_ask_sec"
+msgstr ""
+"It seems, you have not run the program\n"
+"on this computer, or at least not logged in yet.\n"
+"\n"
+"If you would like to register, click the\n"
+"<b>Register</b> button below and fill the form."
+
 msgid "register_title"
 msgstr "Registration"
 

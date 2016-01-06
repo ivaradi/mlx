@@ -123,6 +123,7 @@ class Updater(threading.Thread):
         update(self._programDirectory, self._updateURL, self, fromGUI = True)
         if not self._waitAfterFinish:
             gobject.idle_add(self._progressWindow.hide)
+            self._gui.updateDone()
 
     def downloadingManifest(self):
         """Called when the downloading of the manifest has started."""
@@ -285,5 +286,7 @@ class Updater(threading.Thread):
         self._progressWindow.hide()
         if self._restart:
             self._gui.restart()
+        else:
+            self._gui.updateDone()
 
 #-------------------------------------------------------------------------------

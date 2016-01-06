@@ -2136,6 +2136,17 @@ msgstr ""
 msgid "sendBugReport_error_sec"
 msgstr "Valamilyen kommunikációs probléma adódott, próbáld újra később."
 
+msgid "register_ask"
+msgstr "Szeretnél regisztrálni?"
+
+msgid "register_ask_sec"
+msgstr ""
+"Úgy tűnik, nem futtattad még a programot ezen a\n"
+"számítógépen, vagy legalábbis nem jelentkeztél még be.\n"
+"\n"
+"Ha szeretnél regisztrálni, kattints a <b>Regisztráció</b>\n"
+"gombra, majd töltsd ki a megjelenő űrlapot."
+
 msgid "register_title"
 msgstr "Regisztráció"
 

@@ -446,6 +446,8 @@ class GUI(fs.ConnectionListener):
                                     self.config.updateURL,
                                     self._mainWindow)
             self._updater.start()
+        else:
+            self.updateDone()
 
         cef.initialize(self._programDirectory, self._cefInitialized)
 
@@ -456,6 +458,10 @@ class GUI(fs.ConnectionListener):
         cef.finalize()
 
         self._disconnect()
+
+    def updateDone(self):
+        """Called when the update is done (and there is no need to restart)."""
+        gobject.idle_add(self._updateDone)
 
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
@@ -1693,3 +1699,25 @@ class GUI(fs.ConnectionListener):
 
             self._credentialsAvailable = True
             self._credentialsCondition.notify()
+
+    def _updateDone(self):
+        """Called when the update is done.
+
+        It checks if we already know the PID, and if not, asks the user whether
+        to register."""
+        if not self.config.pilotID and not self.config.password:
+            dialog = gtk.MessageDialog(parent = self._mainWindow,
+                                       type = MESSAGETYPE_QUESTION,
+                                       message_format = xstr("register_ask"))
+
+            dialog.set_title(WINDOW_TITLE_BASE)
+            dialog.format_secondary_markup(xstr("register_ask_sec"))
+
+            dialog.add_button(xstr("button_cancel"), 0)
+            dialog.add_button(xstr("button_register"), 1)
+            dialog.set_default_response(1)
+
+            result = dialog.run()
+            dialog.hide()
+            if result == 1:
+                self._wizard.jumpPage("register")
