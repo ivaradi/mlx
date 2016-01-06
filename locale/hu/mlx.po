@@ -93,6 +93,9 @@ msgstr "Keresés..."
 msgid "button_send"
 msgstr "_Küldés..."
 
+msgid "button_register"
+msgstr "_Regisztráció"
+
 msgid "button_cancelFlight"
 msgstr "Járat megszakítása"
 
@@ -277,6 +280,12 @@ msgstr "_Ellenőrző repülés"
 
 msgid "login_entranceExam_tooltip"
 msgstr "Ha ezt bejelölöd, ellenörző repülésre jelentkezhetsz be."
+
+msgid "button_login_register"
+msgstr "_Regisztráció..."
+
+msgid "button_login_register_tooltip"
+msgstr "Kattints ide a Malév Virtualhoz való regisztrálás céljából."
 
 msgid "button_offline"
 msgstr "_Offline repülés"
@@ -2126,3 +2135,88 @@ msgstr ""
 
 msgid "sendBugReport_error_sec"
 msgstr "Valamilyen kommunikációs probléma adódott, próbáld újra később."
+
+msgid "register_title"
+msgstr "Regisztráció"
+
+msgid "register_help"
+msgstr ""
+"Töltsd ki a lenti űrlapot.\n"
+"A <i>dőlt</i> betűs adatokat nem kötelező megadnod.\n"
+"Vagy VATSIM vagy IVAO azonosítót meg kell adni."
+
+msgid "register_name"
+msgstr "Né_v:"
+
+msgid "register_name_tooltip"
+msgstr "Írd be a valódi nevedet"
+
+msgid "register_year_of_birth"
+msgstr "S_zületés éve:"
+
+msgid "register_year_of_birth_tooltip"
+msgstr "Írd be az évnek a számát, amelyben születtél.."
+
+msgid "register_email"
+msgstr "E-m_ail:"
+
+msgid "register_email_tooltip"
+msgstr "Írd be az e-mail címedet."
+
+msgid "register_email_public"
+msgstr "P_ublikus"
+
+msgid "register_email_public_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, az e-mail címed megjelenhet a fórumunkban és "
+"egyéb belső weboldalakon is, így azt a MAVA többi tagja "
+"láthatja."
+
+msgid "register_vatsim_id"
+msgstr "VATSIM _CID:"
+
+msgid "register_vatsim_id_tooltip"
+msgstr ""
+"Ha rendelkezel VATSIM regisztrációval, írd be ide az azonosítódat. "
+"A regisztrációhoz vagy VATSIM vagy IVAO azonosító szükséges."
+
+msgid "register_ivao_id"
+msgstr "IVA_O VID:"
+
+msgid "register_ivao_id_tooltip"
+msgstr ""
+"Ha rendelkezel IVAO regisztrációval, írd be ide az azonosítódat. "
+"A regisztrációhoz vagy VATSIM vagy IVAO azonosító szükséges."
+
+msgid "register_phone_num"
+msgstr "<i>Tele_fonszám</i>:"
+
+msgid "register_phone_num_tooltip"
+msgstr "Ha telefonon is kereshetünk, írd be a számodat."
+
+msgid "register_nationality"
+msgstr "<i>Nemzetisé_g</i>:"
+
+msgid "register_nationality_tooltip"
+msgstr "Írd be a nemzetiségedet, ha meg kívánod azt velünk osztani."
+
+msgid "register_password"
+msgstr "Je_lszó:"
+
+msgid "register_password_tooltip"
+msgstr "Írd be a jelszót, amivel be szeretnél majd jelentkezni."
+
+msgid "register_password2"
+msgstr "Jelszó új_ra:"
+
+msgid "register_password2_tooltip"
+msgstr "Írd be ugyanazt a jelszót megint."
+
+msgid "register_password_ok"
+msgstr "<span foreground=\"green\">Rendben</span>"
+
+msgid "register_password_too_short"
+msgstr "<span foreground=\"orange\">Túl rövid</span>"
+
+msgid "register_password_mismatch"
+msgstr "<span foreground=\"red\">A két jelszó különbözik</span>"

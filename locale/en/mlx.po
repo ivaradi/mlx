@@ -93,6 +93,9 @@ msgstr "Browse..."
 msgid "button_send"
 msgstr "_Send..."
 
+msgid "button_register"
+msgstr "_Register"
+
 msgid "button_cancelFlight"
 msgstr "Cancel flight"
 
@@ -268,7 +271,7 @@ msgstr "_Remember password"
 
 msgid "login_remember_tooltip"
 msgstr ""
-"If checked, your password will be stored, so that you "
+"If checked, your password will be stored by the program, so that you "
 "should not have to enter it every time. Note, however, that "
 "the password is stored as text, and anybody who can access "
 "your files will be able to read it."
@@ -278,6 +281,12 @@ msgstr "_Entrance exam"
 
 msgid "login_entranceExam_tooltip"
 msgstr "Check this to log in to take your entrance exam."
+
+msgid "button_login_register"
+msgstr "R_egister..."
+
+msgid "button_login_register_tooltip"
+msgstr "Click here if you would like to register with Malév Virtual"
 
 msgid "button_offline"
 msgstr "Fl_y offline"
@@ -2112,3 +2121,88 @@ msgstr ""
 
 msgid "sendBugReport_error_sec"
 msgstr "There was some communication error, try again later."
+
+msgid "register_title"
+msgstr "Registration"
+
+msgid "register_help"
+msgstr ""
+"Enter the data below.\n"
+"Optional data items are in <i>italics</i>.\n"
+"One of VATSIM ID or IVAO ID is mandatory."
+
+msgid "register_name"
+msgstr "_Name:"
+
+msgid "register_name_tooltip"
+msgstr "Enter your real name."
+
+msgid "register_year_of_birth"
+msgstr "_Year of birth:"
+
+msgid "register_year_of_birth_tooltip"
+msgstr "Enter the year in which you were born."
+
+msgid "register_email"
+msgstr "_E-mail:"
+
+msgid "register_email_tooltip"
+msgstr "Enter your e-mail address."
+
+msgid "register_email_public"
+msgstr "P_ublic"
+
+msgid "register_email_public_tooltip"
+msgstr ""
+"If checked, your e-mail address will be displayed in our forums and "
+"possibly other internal website areas, and thus it will be made "
+"available to other members of MAVA."
+
+msgid "register_vatsim_id"
+msgstr "_VATSIM CID:"
+
+msgid "register_vatsim_id_tooltip"
+msgstr ""
+"Enter your VATSIM CID, if you are registered with VATSIM. "
+"Note that either a VATSIM CID or an IVAO VID is required for the registration."
+
+msgid "register_ivao_id"
+msgstr "IV_AO VID:"
+
+msgid "register_ivao_id_tooltip"
+msgstr ""
+"Enter your IVAO VID, if you are registered with IVAO. "
+"Note that either a VATSIM CID or an IVAO VID is required for the registration."
+
+msgid "register_phone_num"
+msgstr "<i>Phone num_ber</i>:"
+
+msgid "register_phone_num_tooltip"
+msgstr "Enter your phone number, if we can reach you by phone."
+
+msgid "register_nationality"
+msgstr "<i>Na_tionality</i>:"
+
+msgid "register_nationality_tooltip"
+msgstr "Enter your nationality, if you would like to share that info with us."
+
+msgid "register_password"
+msgstr "Pa_ssword:"
+
+msgid "register_password_tooltip"
+msgstr "Enter the password you would like to use for logging in."
+
+msgid "register_password2"
+msgstr "Pass_word again:"
+
+msgid "register_password2_tooltip"
+msgstr "Enter the same password again."
+
+msgid "register_password_ok"
+msgstr "<span foreground=\"green\">OK</span>"
+
+msgid "register_password_too_short"
+msgstr "<span foreground=\"orange\">Too short</span>"
+
+msgid "register_password_mismatch"
+msgstr "<span foreground=\"red\">Passwords differ</span>"

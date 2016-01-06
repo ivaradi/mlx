@@ -19,6 +19,7 @@ import time
 import os
 import tempfile
 import threading
+import re
 
 #-----------------------------------------------------------------------------
 
@@ -326,6 +327,10 @@ class LoginPage(Page):
         self._entranceExam.connect("toggled", self._setControls)
         table.attach(self._entranceExam, 1, 2, 3, 4, ypadding = 12)
 
+        self.addButton(xstr("button_login_register"),
+                       clicked = self._registerClicked,
+                       tooltip = xstr("button_login_register_tooltip"))
+
         self.addButton(xstr("button_offline"),
                        clicked = self._offlineClicked,
                        tooltip = xstr("button_offline_tooltip"))
@@ -384,6 +389,10 @@ class LoginPage(Page):
         self._entranceExam.set_sensitive(pilotID!="")
         self._loginButton.set_sensitive(pilotID!="" and
                                         (password!="" or entranceExam))
+
+    def _registerClicked(self, button):
+        """Called when the Register button was clicked."""
+        self._wizard.jumpPage(3)
 
     def _offlineClicked(self, button):
         """Called when the offline button was clicked."""
@@ -657,32 +666,32 @@ class FlightSelectionPage(Page):
                                          flight.tailNumber,
                                          const.PLANE_AWAY)
         else:
-            self._nextDistance = 2
-            self._wizard.jumpPage(2)
+            self._nextDistance = 4
+            self._wizard.jumpPage(4)
 
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
-            self._nextDistance = 2
-            self._wizard.jumpPage(2)
+            self._nextDistance = 4
+            self._wizard.jumpPage(4)
         else:
             plane = fleet[self._wizard._bookedFlight.tailNumber]
             if plane is None:
-                self._nextDistance = 2
-                self._wizard.jumpPage(2)
+                self._nextDistance = 4
+                self._wizard.jumpPage(4)
             elif plane.gateNumber is not None and \
                  not fleet.isGateConflicting(plane):
                 self._wizard._departureGate = plane.gateNumber
-                self._nextDistance = 2
-                self._wizard.jumpPage(2)
+                self._nextDistance = 4
+                self._wizard.jumpPage(4)
             else:
                 self._nextDistance = 1
                 self._wizard.nextPage()
 
     def _planeUpdated(self, success):
         """Callback for the plane updating."""
-        self._nextDistance = 2
-        self._wizard.jumpPage(2)
+        self._nextDistance = 4
+        self._wizard.jumpPage(4)
 
     def _getSaveDialog(self):
         """Get the dialog to load a flight file."""
@@ -848,7 +857,7 @@ class GateSelectionPage(Page):
         if not self._completed:
             self._gateSelected()
         else:
-            self._wizard.nextPage()
+            self._wizard.jumpPage(3)
 
     def _rowActivated(self, flightList, path, column):
         """Called when a row is activated."""
@@ -870,7 +879,7 @@ class GateSelectionPage(Page):
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
         if success is None or success:
-            self._wizard.nextPage()
+            self._wizard.jumpPage(3)
         else:
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
@@ -886,9 +895,282 @@ class GateSelectionPage(Page):
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
-            self._wizard.nextPage()
+            self._wizard.jumpPage(3)
         else:
             self.activate()
+
+#-----------------------------------------------------------------------------
+
+class RegisterPage(Page):
+    """A page to enter the registration data."""
+
+    # The minimal year of birth
+    _minYearOfBirth = 1900
+
+    # The maximal year of birth
+    _maxYearOfBirth = datetime.date.today().year
+
+    # The regular expression to check the e-mail address with
+    _emailAddressRE = re.compile("[^@]+@[^@]+\.[^@]+")
+
+    def __init__(self, wizard):
+        """Construct the registration page."""
+        super(RegisterPage, self).__init__(wizard, xstr("register_title"),
+                                           xstr("register_help"))
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+
+        table = gtk.Table(11, 3)
+        table.set_row_spacings(4)
+        table.set_col_spacings(32)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_name"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 0, 1)
+
+        self._name = gtk.Entry()
+        self._name.connect("changed", self._updateButtons)
+        self._name.set_tooltip_text(xstr("register_name_tooltip"))
+        self._name.set_width_chars(30)
+        table.attach(self._name, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._name)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_year_of_birth"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 1, 2)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 0.0, yscale = 0.0)
+
+        self._yearOfBirth = gtk.SpinButton()
+        self._yearOfBirth.set_increments(step = 1, page = 10)
+        self._yearOfBirth.set_range(min = RegisterPage._minYearOfBirth,
+                                    max = RegisterPage._maxYearOfBirth)
+        self._yearOfBirth.set_numeric(True)
+        self._yearOfBirth.set_tooltip_text(xstr("register_year_of_birth_tooltip"))
+        self._yearOfBirth.set_width_chars(5)
+        self._yearOfBirth.connect("changed", self._updateButtons)
+        self._yearOfBirth.connect("value-changed", self._updateButtons)
+        alignment.add(self._yearOfBirth)
+        table.attach(alignment, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._yearOfBirth)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_email"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 2, 3)
+
+        self._emailAddress = gtk.Entry()
+        self._emailAddress.connect("changed", self._updateButtons)
+        self._emailAddress.set_tooltip_text(xstr("register_email_tooltip"))
+        table.attach(self._emailAddress, 1, 2, 2, 3)
+        label.set_mnemonic_widget(self._emailAddress)
+
+        self._emailAddressPublic = gtk.CheckButton(xstr("register_email_public"))
+        self._emailAddressPublic.set_use_underline(True)
+        self._emailAddressPublic.set_tooltip_text(xstr("register_email_public_tooltip"))
+        table.attach(self._emailAddressPublic, 2, 3, 2, 3)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_vatsim_id"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 3, 4)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 0.0, yscale = 0.0)
+        self._vatsimID = IntegerEntry()
+        self._vatsimID.connect("changed", self._updateButtons)
+        self._vatsimID.set_tooltip_text(xstr("register_vatsim_id_tooltip"))
+        self._vatsimID.set_width_chars(7)
+        alignment.add(self._vatsimID)
+        table.attach(alignment, 1, 2, 3, 4)
+        label.set_mnemonic_widget(self._vatsimID)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_ivao_id"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 4, 5)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                  xscale = 0.0, yscale = 0.0)
+        self._ivaoID = IntegerEntry()
+        self._ivaoID.connect("changed", self._updateButtons)
+        self._ivaoID.set_tooltip_text(xstr("register_ivao_id_tooltip"))
+        self._ivaoID.set_width_chars(7)
+        alignment.add(self._ivaoID)
+        table.attach(alignment, 1, 2, 4, 5)
+        label.set_mnemonic_widget(self._ivaoID)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_phone_num"))
+        label.set_use_underline(True)
+        label.set_use_markup(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 5, 6)
+
+        self._phoneNumber = gtk.Entry()
+        self._phoneNumber.set_tooltip_text(xstr("register_phone_num_tooltip"))
+        table.attach(self._phoneNumber, 1, 2, 5, 6)
+        label.set_mnemonic_widget(self._phoneNumber)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_nationality"))
+        label.set_use_underline(True)
+        label.set_use_markup(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 6, 7)
+
+
+        self._nationality = gtk.Entry()
+        self._nationality.set_tooltip_text(xstr("register_nationality_tooltip"))
+        table.attach(self._nationality, 1, 2, 6, 7)
+        label.set_mnemonic_widget(self._nationality)
+
+        placeholder = gtk.Label()
+        placeholder.set_text(xstr("register_password_mismatch"))
+        placeholder.set_use_markup(True)
+        placeholder.set_child_visible(False)
+        placeholder.hide()
+        table.attach(placeholder, 2, 3, 6, 7)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_password"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 8, 9)
+
+        self._password = gtk.Entry()
+        self._password.set_visibility(False)
+        self._password.connect("changed", self._updateButtons)
+        self._password.set_tooltip_text(xstr("register_password_tooltip"))
+        table.attach(self._password, 1, 2, 8, 9)
+        label.set_mnemonic_widget(self._password)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        self._passwordStatus = gtk.Label()
+        alignment.add(self._passwordStatus)
+        table.attach(alignment, 2, 3, 8, 9)
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_password2"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, 9, 10)
+
+        self._password2 = gtk.Entry()
+        self._password2.set_visibility(False)
+        self._password2.connect("changed", self._updateButtons)
+        self._password2.set_tooltip_text(xstr("register_password2_tooltip"))
+        table.attach(self._password2, 1, 2, 9, 10)
+        label.set_mnemonic_widget(self._password2)
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        self._password2Status = gtk.Label()
+        alignment.add(self._password2Status)
+        table.attach(alignment, 2, 3, 9, 10)
+
+        self._rememberButton = gtk.CheckButton(xstr("remember_password"))
+        self._rememberButton.set_use_underline(True)
+        self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
+        table.attach(self._rememberButton, 1, 2, 10, 11)
+
+        cancelButton = \
+          self.addButton(xstr("button_cancel"))
+        cancelButton.connect("clicked", self._cancelClicked)
+
+        self._registerButton = \
+          self.addButton(xstr("button_register"), default = True,
+                              tooltip = xstr("button_register_tooltip"))
+        self._registerButton.connect("clicked", self._registerClicked)
+
+        self._updateButtons()
+
+    def activate(self):
+        """Setup the route from the booked flight."""
+        self._yearOfBirth.set_value(0)
+        self._yearOfBirth.set_text("")
+        self._updateButtons()
+
+    def _updateButtons(self, widget = None):
+        """Update the sensitive state of the buttons"""
+        name = self._name.get_text()
+        nameLength = len(name)
+        nameSpacePosition = name.find(" ")
+
+        yearOfBirthText = self._yearOfBirth.get_text()
+        yearOfBirth = int(yearOfBirthText) if yearOfBirthText else 0
+
+        emailAddressText = self._emailAddress.get_text()
+        emailAddressMatch = RegisterPage._emailAddressRE.match(emailAddressText)
+
+        vatsimID = self._vatsimID.get_int()
+        ivaoID = self._ivaoID.get_int()
+
+        password = self._password.get_text()
+        password2 = self._password2.get_text()
+        if not password:
+            self._passwordStatus.set_text("")
+        elif len(password)<5:
+            self._passwordStatus.set_text(xstr("register_password_too_short"))
+        else:
+            self._passwordStatus.set_text(xstr("register_password_ok"))
+        self._passwordStatus.set_use_markup(True)
+
+        if len(password)<5 or not password2:
+            self._password2Status.set_text("")
+        elif password!=password2:
+            self._password2Status.set_text(xstr("register_password_mismatch"))
+        else:
+            self._password2Status.set_text(xstr("register_password_ok"))
+        self._password2Status.set_use_markup(True)
+
+        sensitive = \
+            nameLength >= 5 and nameSpacePosition != -1 and \
+            nameSpacePosition<(nameLength-2) and \
+            yearOfBirth>=RegisterPage._minYearOfBirth and \
+            yearOfBirth<=RegisterPage._maxYearOfBirth and \
+            emailAddressMatch is not None and \
+            (vatsimID>=800000 or ivaoID>=100000) and \
+            len(password)>=5 and password==password2
+
+        self._registerButton.set_sensitive(sensitive)
+
+    def _cancelClicked(self, button):
+        """Called when the Cancel button is clicked."""
+        self.goBack()
+
+    def _registerClicked(self, button):
+        """Called when the Register button is clicked."""
+
+#-----------------------------------------------------------------------------
+
+class StudentPage(Page):
+    """A page displayed to students after logging in."""
+    def __init__(self, wizard):
+        """Construct the student page."""
+        super(StudentPage, self).__init__(wizard, xstr("student_title"),
+                                          xstr("student_help"))
 
 #-----------------------------------------------------------------------------
 
@@ -4255,6 +4537,8 @@ class Wizard(gtk.VBox):
         self._pages.append(self._loginPage)
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
+        self._pages.append(RegisterPage(self))
+        self._pages.append(StudentPage(self))
         self._pages.append(ConnectPage(self))
         self._payloadPage = PayloadPage(self)
         self._pages.append(self._payloadPage)
