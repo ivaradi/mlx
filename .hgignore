@@ -8,3 +8,5 @@ locale/.+/LC_MESSAGES
 locale/.+/mlx_delay.po
 src/mlx/gui/dcdata.py
 xplra.py
+chromedriver.exe
+debug.log
