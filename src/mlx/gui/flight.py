@@ -61,7 +61,7 @@ comboModel.append(("VECTORS",))
 
 class Page(gtk.Alignment):
     """A page in the flight wizard."""
-    def __init__(self, wizard, title, help, completedHelp = None):
+    def __init__(self, wizard, id, title, help, completedHelp = None):
         """Construct the page."""
         super(Page, self).__init__(xalign = 0.0, yalign = 0.0,
                                    xscale = 1.0, yscale = 1.0)
@@ -139,11 +139,28 @@ class Page(gtk.Alignment):
         self._vbox.pack_start(buttonAlignment, False, False, 0)
 
         self._wizard = wizard
+        self._id = id
+        self._nextPageID = None
 
         self._cancelFlightButton = None
 
         self._completed = False
         self._fromPage = None
+
+    @property
+    def id(self):
+        """Get the identifier of the page."""
+        return self._id
+
+    @property
+    def nextPageID(self):
+        """Get the identifier of the next page, if set."""
+        return self._nextPageID
+
+    @nextPageID.setter
+    def nextPageID(self, nextPageID):
+        """Set the identifier of the next page."""
+        self._nextPageID = nextPageID
 
     def setMainWidget(self, widget):
         """Set the given widget as the main one."""
@@ -277,8 +294,8 @@ class LoginPage(Page):
     """The login page."""
     def __init__(self, wizard):
         """Construct the login page."""
-        super(LoginPage, self).__init__(wizard, xstr("login"),
-                                        xstr("loginHelp"))
+        super(LoginPage, self).__init__(wizard, "login",
+                                        xstr("login"), xstr("loginHelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -392,7 +409,7 @@ class LoginPage(Page):
 
     def _registerClicked(self, button):
         """Called when the Register button was clicked."""
-        self._wizard.jumpPage(3)
+        self._wizard.jumpPage("register")
 
     def _offlineClicked(self, button):
         """Called when the offline button was clicked."""
@@ -431,7 +448,8 @@ class FlightSelectionPage(Page):
         """Construct the flight selection page."""
         help = xstr("flightsel_help")
         completedHelp = xstr("flightsel_chelp")
-        super(FlightSelectionPage, self).__init__(wizard, xstr("flightsel_title"),
+        super(FlightSelectionPage, self).__init__(wizard, "flightsel",
+                                                  xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
 
@@ -611,7 +629,7 @@ class FlightSelectionPage(Page):
     def _forwardClicked(self, button):
         """Called when the forward button was clicked."""
         if self._completed:
-            self._wizard.jumpPage(self._nextDistance, finalize = False)
+            self._wizard.jumpPage(self._nextID, finalize = False)
         else:
             self._flightSelected()
 
@@ -666,32 +684,32 @@ class FlightSelectionPage(Page):
                                          flight.tailNumber,
                                          const.PLANE_AWAY)
         else:
-            self._nextDistance = 4
-            self._wizard.jumpPage(4)
+            self._nextID = "connect"
+            self._wizard.jumpPage("connect")
 
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
-            self._nextDistance = 4
-            self._wizard.jumpPage(4)
+            self._nextID = "connect"
+            self._wizard.jumpPage("connect")
         else:
             plane = fleet[self._wizard._bookedFlight.tailNumber]
             if plane is None:
-                self._nextDistance = 4
-                self._wizard.jumpPage(4)
+                self._nextID = "connect"
+                self._wizard.jumpPage("connect")
             elif plane.gateNumber is not None and \
                  not fleet.isGateConflicting(plane):
                 self._wizard._departureGate = plane.gateNumber
-                self._nextDistance = 4
-                self._wizard.jumpPage(4)
+                self._nextID = "connect"
+                self._wizard.jumpPage("connect")
             else:
-                self._nextDistance = 1
-                self._wizard.nextPage()
+                self._nextID = "gatesel"
+                self._wizard.jumpPage("gatesel")
 
     def _planeUpdated(self, success):
         """Callback for the plane updating."""
-        self._nextDistance = 4
-        self._wizard.jumpPage(4)
+        self._nextID = "connect"
+        self._wizard.jumpPage("connect")
 
     def _getSaveDialog(self):
         """Get the dialog to load a flight file."""
@@ -794,7 +812,8 @@ class GateSelectionPage(Page):
     This page should be displayed only if we have fleet information!."""
     def __init__(self, wizard):
         """Construct the gate selection page."""
-        super(GateSelectionPage, self).__init__(wizard, xstr("gatesel_title"),
+        super(GateSelectionPage, self).__init__(wizard, "gatesel",
+                                                xstr("gatesel_title"),
                                                 xstr("gatesel_help"))
 
         self._listStore = gtk.ListStore(str)
@@ -857,7 +876,7 @@ class GateSelectionPage(Page):
         if not self._completed:
             self._gateSelected()
         else:
-            self._wizard.jumpPage(3)
+            self._wizard.jumpPage("connect")
 
     def _rowActivated(self, flightList, path, column):
         """Called when a row is activated."""
@@ -879,7 +898,7 @@ class GateSelectionPage(Page):
     def _planeUpdated(self, success):
         """Callback for the plane updating call."""
         if success is None or success:
-            self._wizard.jumpPage(3)
+            self._wizard.jumpPage("connect")
         else:
             dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
@@ -895,7 +914,7 @@ class GateSelectionPage(Page):
     def _fleetRetrieved(self, fleet):
         """Called when the fleet has been retrieved."""
         if fleet is None:
-            self._wizard.jumpPage(3)
+            self._wizard.jumpPage("connect")
         else:
             self.activate()
 
@@ -915,7 +934,8 @@ class RegisterPage(Page):
 
     def __init__(self, wizard):
         """Construct the registration page."""
-        super(RegisterPage, self).__init__(wizard, xstr("register_title"),
+        super(RegisterPage, self).__init__(wizard, "register",
+                                           xstr("register_title"),
                                            xstr("register_help"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
@@ -1169,7 +1189,8 @@ class StudentPage(Page):
     """A page displayed to students after logging in."""
     def __init__(self, wizard):
         """Construct the student page."""
-        super(StudentPage, self).__init__(wizard, xstr("student_title"),
+        super(StudentPage, self).__init__(wizard, "student",
+                                          xstr("student_title"),
                                           xstr("student_help"))
 
 #-----------------------------------------------------------------------------
@@ -1182,7 +1203,8 @@ class ConnectPage(Page):
                "at the given airport, at the gate below, if present.\n\n" \
                "Then press the Connect button to connect to the simulator."
         completedHelp = "The basic data of your flight can be read below."
-        super(ConnectPage, self).__init__(wizard, xstr("connect_title"),
+        super(ConnectPage, self).__init__(wizard, "connect",
+                                          xstr("connect_title"),
                                           xstr("connect_help"),
                                           completedHelp = xstr("connect_chelp"))
 
@@ -1365,7 +1387,8 @@ class PayloadPage(Page):
     """Page to allow setting up the payload."""
     def __init__(self, wizard):
         """Construct the page."""
-        super(PayloadPage, self).__init__(wizard, xstr("payload_title"),
+        super(PayloadPage, self).__init__(wizard, "payload",
+                                          xstr("payload_title"),
                                           xstr("payload_help"),
                                           completedHelp = xstr("payload_chelp"))
 
@@ -1592,7 +1615,8 @@ class TimePage(Page):
     """Page displaying the departure and arrival times and allows querying the
     current time from the flight simulator."""
     def __init__(self, wizard):
-        super(TimePage, self).__init__(wizard, xstr("time_title"),
+        super(TimePage, self).__init__(wizard, "time",
+                                       xstr("time_title"),
                                        xstr("time_help"),
                                        completedHelp = xstr("time_chelp"))
 
@@ -1713,7 +1737,8 @@ class RoutePage(Page):
     """The page containing the route and the flight level."""
     def __init__(self, wizard):
         """Construct the page."""
-        super(RoutePage, self).__init__(wizard, xstr("route_title"),
+        super(RoutePage, self).__init__(wizard, "route",
+                                        xstr("route_title"),
                                         xstr("route_help"),
                                         completedHelp = xstr("route_chelp"))
 
@@ -1881,10 +1906,10 @@ class RoutePage(Page):
             self._wizard.usingSimBrief = False
         if self._wizard.gui.config.useSimBrief and \
            self._wizard.usingSimBrief is not False:
-            self._wizard.nextPage()
+            self._wizard.jumpPage("simbrief_setup")
         else:
             self._wizard.usingSimBrief = False
-            self._wizard.jumpPage(3)
+            self._wizard.jumpPage("fuel")
 
 #-----------------------------------------------------------------------------
 
@@ -2043,7 +2068,7 @@ class SimBriefSetupPage(Page):
     def __init__(self, wizard):
         """Construct the setup page."""
 
-        super(SimBriefSetupPage, self).__init__(wizard,
+        super(SimBriefSetupPage, self).__init__(wizard, "simbrief_setup",
                                                 xstr("simbrief_setup_title"),
                                                 xstr("simbrief_setup_help"),
                                                 xstr("simbrief_setup_chelp"))
@@ -2362,7 +2387,7 @@ class SimBriefSetupPage(Page):
                 dialog.hide()
 
                 self._wizard.usingSimBrief = False
-                self._wizard.jumpPage(2, fromPageShift = 1)
+                self._wizard.jumpPage("fuel", fromPageShift = 1)
 
     def _getPlan(self):
         """Get the flight plan data for SimBrief."""
@@ -2447,7 +2472,7 @@ class SimBriefingPage(Page):
     def __init__(self, wizard):
         """Construct the setup page."""
 
-        super(SimBriefingPage, self).__init__(wizard,
+        super(SimBriefingPage, self).__init__(wizard, "simbrief_result",
                                               xstr("simbrief_result_title"), "")
 
         self._alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
@@ -2703,7 +2728,8 @@ class FuelPage(Page):
 
     def __init__(self, wizard):
         """Construct the page."""
-        super(FuelPage, self).__init__(wizard, xstr("fuel_title"),
+        super(FuelPage, self).__init__(wizard, "fuel",
+                                       xstr("fuel_title"),
                                        xstr("fuel_help_pre") +
                                        xstr("fuel_help_post"),
                                        completedHelp = xstr("fuel_chelp"))
@@ -2755,9 +2781,9 @@ class FuelPage(Page):
             self._wizard.gui.beginBusy(xstr("fuel_pump_busy"))
             self._pump()
         elif self._wizard.usingSimBrief:
-            self._wizard.jumpPage(3)
+            self._wizard.jumpPage("takeoff")
         else:
-            self._wizard.nextPage()
+            self._wizard.jumpPage("briefing1")
 
     def _setupTanks(self, tankData):
         """Setup the tanks for the given data."""
@@ -2803,7 +2829,7 @@ class FuelPage(Page):
             self._wizard.gui.endBusy()
             if self._wizard.usingSimBrief:
                 self._wizard.gui.startMonitoring()
-                self._wizard.jumpPage(3)
+                self._wizard.jumpPage("takeoff")
             else:
                 bookedFlight = self._wizard._bookedFlight
                 self._wizard.gui.beginBusy(xstr("route_down_notams"))
@@ -2872,11 +2898,15 @@ class BriefingPage(Page):
         """Construct the briefing page."""
         self._departure = departure
 
-        title = xstr("briefing_title") % (1 if departure else 2,
+        number = 1 if departure else 2
+
+        title = xstr("briefing_title") % (number,
                                           xstr("briefing_departure")
                                           if departure
                                           else xstr("briefing_arrival"))
-        super(BriefingPage, self).__init__(wizard, title, xstr("briefing_help"),
+        super(BriefingPage, self).__init__(wizard,
+                                           "briefing%d" % (number,),
+                                           title, xstr("briefing_help"),
                                            completedHelp = xstr("briefing_chelp"))
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
@@ -3063,7 +3093,8 @@ class TakeoffPage(Page):
     """Page for entering the takeoff data."""
     def __init__(self, wizard):
         """Construct the takeoff page."""
-        super(TakeoffPage, self).__init__(wizard, xstr("takeoff_title"),
+        super(TakeoffPage, self).__init__(wizard, "takeoff",
+                                          xstr("takeoff_title"),
                                           xstr("takeoff_help"),
                                           completedHelp = xstr("takeoff_chelp"))
 
@@ -3551,7 +3582,8 @@ class CruisePage(Page):
     """The page containing the flight level that might change during flight."""
     def __init__(self, wizard):
         """Construct the page."""
-        super(CruisePage, self).__init__(wizard, xstr("cruise_title"),
+        super(CruisePage, self).__init__(wizard, "cruise",
+                                         xstr("cruise_title"),
                                          xstr("cruise_help"))
 
         self._loggable = False
@@ -3665,7 +3697,8 @@ class LandingPage(Page):
     """Page for entering landing data."""
     def __init__(self, wizard):
         """Construct the landing page."""
-        super(LandingPage, self).__init__(wizard, xstr("landing_title"),
+        super(LandingPage, self).__init__(wizard, "landing",
+                                          xstr("landing_title"),
                                           xstr("landing_help"),
                                           completedHelp = xstr("landing_chelp"))
 
@@ -3979,7 +4012,8 @@ class FinishPage(Page):
     def __init__(self, wizard):
         """Construct the finish page."""
         help = xstr("finish_help") + xstr("finish_help_goodtime")
-        super(FinishPage, self).__init__(wizard, xstr("finish_title"), help)
+        super(FinishPage, self).__init__(wizard, "finish",
+                                         xstr("finish_title"), help)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
@@ -4834,11 +4868,16 @@ class Wizard(gtk.VBox):
 
     def nextPage(self, finalize = True):
         """Go to the next page."""
-        self.jumpPage(1, finalize)
+        nextPageID = self._pages[self._currentPage].nextPageID
+        self.jumpPage(1 if nextPageID is None else nextPageID, finalize)
 
-    def jumpPage(self, count, finalize = True, fromPageShift = None):
+    def jumpPage(self, countOrID, finalize = True, fromPageShift = None):
         """Go to the page which is 'count' pages after the current one."""
-        self.setCurrentPage(self._currentPage + count,
+        if isinstance(countOrID, str):
+            targetIndex = self._getIndexOf(countOrID)
+        else:
+            targetIndex = self._currentPage + countOrID
+        self.setCurrentPage(targetIndex,
                             finalize = finalize, fromPageShift = fromPageShift)
 
     def grabDefault(self):
@@ -5069,5 +5108,15 @@ class Wizard(gtk.VBox):
             metar = result.metars[icao]
             if metar!="":
                 self._arrivalBriefingPage.setMETAR(metar)
+
+    def _getIndexOf(self, pageID):
+        """Get the index for the given page ID.
+
+        It is an assertion failure if the ID is not found."""
+        for index in range(0, len(self._pages)):
+            page = self._pages[index]
+            if page.id==pageID:
+                return index
+        assert False
 
 #-----------------------------------------------------------------------------
