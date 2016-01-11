@@ -1,6 +1,7 @@
 
 import const
 import util
+from rpc import Registration
 import rpc
 import rpccommon
 
@@ -622,6 +623,37 @@ class RPCRequest(Request):
 
 #------------------------------------------------------------------------------
 
+class Register(RPCRequest):
+    """A registration request."""
+    def __init__(self, client, callback, registrationData):
+        """Construct the request."""
+        super(Register, self).__init__(client, callback)
+        self._registrationData = registrationData
+
+    def run(self):
+        """Perform the registration."""
+
+        registrationData = self._registrationData
+
+        (resultCode, pilotID) = self._client.register(registrationData)
+        result = Result()
+        result.registered = resultCode==rpc.Client.RESULT_OK
+        if result.registered:
+            result.pilotID = pilotID
+
+            self._client.setCredentials(pilotID, registrationData.password)
+            loginResult = self._client.login()
+            result.loggedIn = loginResult is not None
+
+        result.invalidData = \
+          resultCode==rpc.Client.RESULT_INVALID_DATA
+        result.emailAlreadyRegistered = \
+          resultCode==rpc.Client.RESULT_EMAIL_ALREADY_REGISTERED
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
@@ -1132,6 +1164,10 @@ class Handler(threading.Thread):
         self._rpcClient = rpc.Client(getCredentialsFn)
         if config.rememberPassword:
             self._rpcClient.setCredentials(config.pilotID, config.password)
+
+    def register(self, callback, registrationData):
+        """Enqueue a registration request."""
+        self._addRequest(Register(self._rpcClient, callback, registrationData))
 
     def login(self, callback, pilotID, password, entranceExam = False):
         """Enqueue a login request."""

@@ -124,6 +124,24 @@ class Fleet(rpccommon.Fleet):
 
 #---------------------------------------------------------------------------------------
 
+class Registration(object):
+    """Data for registration."""
+    def __init__(self, name, yearOfBirth, emailAddress, emailAddressPublic,
+                 vatsimID, ivaoID, phoneNumber, nationality, password):
+        """Construct the registration data."""
+        self.name = name
+        self.yearOfBirth = yearOfBirth
+        self.emailAddress = emailAddress
+        self.emailAddressPublic = 1 if emailAddressPublic is True else \
+          0 if emailAddressPublic is False else emailAddressPublic
+        self.vatsimID = "" if vatsimID is None else vatsimID
+        self.ivaoID = "" if ivaoID is None else ivaoID
+        self.phoneNumber = phoneNumber
+        self.nationality = nationality
+        self.password = password
+
+#---------------------------------------------------------------------------------------
+
 class RPCException(Exception):
     """An exception thrown by RPC operations."""
     def __init__(self, result, message = None):
@@ -154,11 +172,17 @@ class Client(object):
     # Result code: some database error
     RESULT_DATABASE_ERROR = 3
 
+    # Result code: invalid data
+    RESULT_INVALID_DATA = 4
+
     # Result code: the flight does not exist
     RESULT_FLIGHT_NOT_EXISTS = 101
 
     # Result code: the flight has already been reported.
     RESULT_FLIGHT_ALREADY_REPORTED = 102
+
+    # Result code: a user with the given e-mail address already exists
+    RESULT_EMAIL_ALREADY_REGISTERED = 103
 
     def __init__(self, getCredentialsFn):
         """Construct the client."""
@@ -188,12 +212,23 @@ class Client(object):
 
         self._sessionID = None
 
+    def register(self, registrationData):
+        """Register with the given data.
+
+        Returns a tuple of:
+        - the error code,
+        - the PID if there is no error."""
+        reply = Reply(self._server.register(registrationData))
+
+        return (reply.result,
+                reply.value["pid"] if reply.result==Client.RESULT_OK else None)
+
     def login(self):
         """Login using the given previously set credentials.
 
         The session ID is stored in the object and used for later calls.
 
-        Returns a boolean indicating if login has succeeded."""
+        Returns the name of the pilot on success, or None on error."""
         self._sessionID = None
 
         reply = Reply(self._server.login(self._userName, self._passwordHash))

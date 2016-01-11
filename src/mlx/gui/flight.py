@@ -1126,6 +1126,57 @@ class RegisterPage(Page):
 
         self._updateButtons()
 
+    @property
+    def name(self):
+        """Get the name entered."""
+        return self._name.get_text()
+
+    @property
+    def yearOfBirth(self):
+        """Get the year of birth."""
+        yearOfBirthText = self._yearOfBirth.get_text()
+        return int(yearOfBirthText) if yearOfBirthText else 0
+
+    @property
+    def emailAddress(self):
+        """Get the e-mail address."""
+        return self._emailAddress.get_text()
+
+    @property
+    def emailAddressPublic(self):
+        """Get the whether the e-mail address is public."""
+        return self._emailAddressPublic.get_active()
+
+    @property
+    def vatsimID(self):
+        """Get the VATSIM ID."""
+        return self._vatsimID.get_int()
+
+    @property
+    def ivaoID(self):
+        """Get the IVAO ID."""
+        return self._ivaoID.get_int()
+
+    @property
+    def phoneNumber(self):
+        """Get the phone number."""
+        return self._phoneNumber.get_text()
+
+    @property
+    def nationality(self):
+        """Get the nationality."""
+        return self._nationality.get_text()
+
+    @property
+    def password(self):
+        """Get the password."""
+        return self._password.get_text()
+
+    @property
+    def rememberPassword(self):
+        """Get whether the password should be remembered."""
+        return self._rememberButton.get_active()
+
     def activate(self):
         """Setup the route from the booked flight."""
         self._yearOfBirth.set_value(0)
@@ -1134,20 +1185,19 @@ class RegisterPage(Page):
 
     def _updateButtons(self, widget = None):
         """Update the sensitive state of the buttons"""
-        name = self._name.get_text()
+        name = self.name
         nameLength = len(name)
         nameSpacePosition = name.find(" ")
 
-        yearOfBirthText = self._yearOfBirth.get_text()
-        yearOfBirth = int(yearOfBirthText) if yearOfBirthText else 0
+        yearOfBirth = self.yearOfBirth
 
-        emailAddressText = self._emailAddress.get_text()
-        emailAddressMatch = RegisterPage._emailAddressRE.match(emailAddressText)
+        emailAddress = self.emailAddress
+        emailAddressMatch = RegisterPage._emailAddressRE.match(emailAddress)
 
-        vatsimID = self._vatsimID.get_int()
-        ivaoID = self._ivaoID.get_int()
+        vatsimID = self.vatsimID
+        ivaoID = self.ivaoID
 
-        password = self._password.get_text()
+        password = self.password
         password2 = self._password2.get_text()
         if not password:
             self._passwordStatus.set_text("")
@@ -1182,6 +1232,94 @@ class RegisterPage(Page):
 
     def _registerClicked(self, button):
         """Called when the Register button is clicked."""
+        registrationData = web.Registration(self.name, self.yearOfBirth,
+                                            self.emailAddress,
+                                            self.emailAddressPublic,
+                                            self.vatsimID, self.ivaoID,
+                                            self.phoneNumber, self.nationality,
+                                            self.password)
+        print "Registering with data:"
+        print "  name:", self.name, registrationData.name
+        print "  yearOfBirth:", self.yearOfBirth, registrationData.yearOfBirth
+        print "  emailAddress:", self.emailAddress, registrationData.emailAddress
+        print "  emailAddressPublic:", self.emailAddressPublic, registrationData.emailAddressPublic
+        print "  vatsimID:", self.vatsimID, registrationData.vatsimID
+        print "  ivaoID:", self.ivaoID, registrationData.ivaoID
+        print "  phoneNumber:", self.phoneNumber, registrationData.phoneNumber
+        print "  nationality:", self.nationality, registrationData.nationality
+
+        gui = self._wizard.gui
+        gui.beginBusy(xstr("register_busy"))
+        gui.webHandler.register(self._registerResultCallback, registrationData)
+
+    def _registerResultCallback(self, returned, result):
+        """Called when the registration result is available."""
+        gobject.idle_add(self._handleRegisterResult, returned, result)
+
+    def _handleRegisterResult(self, returned, result):
+        """Handle the registration result."""
+        gui = self._wizard.gui
+
+        gui.endBusy()
+
+        print "Registration result:"
+        print "  returned:", returned
+        if returned:
+            print "  registered:", result.registered
+            if result.registered:
+                print "  pilotID", result.pilotID
+                print "  loggedIn", result.loggedIn
+            print "  emailAlreadyRegistered:", result.emailAlreadyRegistered
+            print "  invalidData:", result.invalidData
+
+        registrationOK = returned and result.registered
+
+        message = xstr("register_ok") if registrationOK \
+                  else xstr("register_failed")
+        secondaryMessage = None
+        if registrationOK:
+            if result.loggedIn:
+                secondaryMessage = xstr("register_info") % (result.pilotID,)
+            else:
+                secondaryMessage = xstr("register_nologin") % (result.pilotID,)
+            messageType = MESSAGETYPE_INFO
+
+            config = gui.config
+            config.pilotID = result.pilotID
+            config.rememberPassword = self.rememberPassword
+            if config.rememberPassword:
+                config.password = self.password
+            else:
+                config.password = ""
+
+            config.save()
+        elif returned and result.emailAlreadyRegistered:
+            secondaryMessage = xstr("register_email_already")
+            messageType = MESSAGETYPE_ERROR
+        elif returned and result.invalidData:
+            secondaryMessage = xstr("register_invalid_data")
+            messageType = MESSAGETYPE_ERROR
+        else:
+            secondaryMessage = xstr("register_error")
+            messageType = MESSAGETYPE_ERROR
+
+        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                   type = messageType,
+                                   message_format = message)
+        dialog.set_title(WINDOW_TITLE_BASE + " - " +
+                         xstr("register_result_title"))
+        dialog.format_secondary_markup(secondaryMessage)
+
+        dialog.add_button(xstr("button_ok"), 0)
+
+        dialog.run()
+        dialog.hide()
+
+        if registrationOK:
+            if result.loggedIn:
+                self._wizard.nextPage()
+            else:
+                self._wizard.jumpPage("login")
 
 #-----------------------------------------------------------------------------
 
