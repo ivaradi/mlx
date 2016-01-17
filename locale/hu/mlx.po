@@ -2224,13 +2224,13 @@ msgid "register_password2_tooltip"
 msgstr "Írd be ugyanazt a jelszót megint."
 
 msgid "register_password_ok"
-msgstr "<span foreground=\"green\">Rendben</span>"
+msgstr "<span foreground=\"darkgreen\"><b>Rendben</b></span>"
 
 msgid "register_password_too_short"
-msgstr "<span foreground=\"orange\">Túl rövid</span>"
+msgstr "<span foreground=\"orange\"><b>Túl rövid</b></span>"
 
 msgid "register_password_mismatch"
-msgstr "<span foreground=\"red\">A két jelszó különbözik</span>"
+msgstr "<span foreground=\"red\"><b>A két jelszó különbözik</b></span>"
 
 msgid "register_busy"
 msgstr "Regisztráció..."

@@ -2210,13 +2210,13 @@ msgid "register_password2_tooltip"
 msgstr "Enter the same password again."
 
 msgid "register_password_ok"
-msgstr "<span foreground=\"green\">OK</span>"
+msgstr "<span foreground=\"darkgreen\"><b>OK</b></span>"
 
 msgid "register_password_too_short"
-msgstr "<span foreground=\"orange\">Too short</span>"
+msgstr "<span foreground=\"orange\"><b>Too short</b></span>"
 
 msgid "register_password_mismatch"
-msgstr "<span foreground=\"red\">Passwords differ</span>"
+msgstr "<span foreground=\"red\"><b>Passwords differ</b></span>"
 
 msgid "register_busy"
 msgstr "Registering..."
