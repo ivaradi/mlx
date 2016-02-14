@@ -735,6 +735,29 @@ class LoginRPC(RPCRequest):
             result.rank = loginResult[1]
             result.password = self._password
             result.flights = self._client.getFlights()
+            if result.rank=="STU":
+                reply = self._client.getEntryExamStatus()
+                result.entryExamPassed = reply[0]
+                result.checkFlightStatus = reply[1]
+
+        return result
+
+#------------------------------------------------------------------------------
+
+class GetEntryExamStatus(RPCRequest):
+    """A request to get the entry exam status."""
+    def __init__(self, client, callback):
+        """Construct the request."""
+        super(GetEntryExamStatus, self).__init__(client, callback)
+
+    def run(self):
+        """Perform the query."""
+        result = Result()
+
+        reply = self._client.getEntryExamStatus()
+
+        result.entryExamPassed = reply[0]
+        result.checkFlightStatus = reply[1]
 
         return result
 
@@ -1159,6 +1182,10 @@ class Handler(threading.Thread):
           if self._config.useRPC else Login(callback, pilotID, password)
 
         self._addRequest(request)
+
+    def getEntryExamStatus(self, callback):
+        """Get the entry exam status."""
+        self._addRequest(GetEntryExamStatus(self._rpcClient, callback))
 
     def getFleet(self, callback):
         """Enqueue a fleet retrieval request."""

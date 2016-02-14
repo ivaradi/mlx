@@ -256,6 +256,12 @@ class Client(object):
 
         return flights
 
+    def getEntryExamStatus(self):
+        """Get the status of the exams needed for joining MAVA."""
+        value = self._performCall(lambda sessionID:
+                                  self._server.getEntryExamStatus(sessionID))
+        return (value["entryExamPassed"], value["checkFlightStatus"])
+
     def getFleet(self):
         """Query and return the fleet."""
         value = self._performCall(lambda sessionID:
