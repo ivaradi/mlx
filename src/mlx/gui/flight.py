@@ -10,7 +10,7 @@ from mlx.checks import PayloadChecker
 from mlx.gates import lhbpGates
 import mlx.util as util
 from mlx.pirep import PIREP
-from mlx.i18n import xstr
+from mlx.i18n import xstr, getLanguage
 from mlx.sound import startSound
 import mlx.web as web
 
@@ -941,32 +941,52 @@ class RegisterPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(11, 3)
+        table = gtk.Table(12, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
         alignment.add(table)
         self.setMainWidget(alignment)
 
+        row = 0
+
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_name"))
+        label = gtk.Label(xstr("register_name1"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 0, 1)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._name = gtk.Entry()
-        self._name.connect("changed", self._updateButtons)
-        self._name.set_tooltip_text(xstr("register_name_tooltip"))
-        self._name.set_width_chars(30)
-        table.attach(self._name, 1, 2, 0, 1)
-        label.set_mnemonic_widget(self._name)
+        self._name1 = gtk.Entry()
+        self._name1.connect("changed", self._updateButtons)
+        self._name1.set_tooltip_text(xstr("register_name1_tooltip"))
+        self._name1.set_width_chars(15)
+        table.attach(self._name1, 1, 2, row, row+1)
+        label.set_mnemonic_widget(self._name1)
+
+        row += 1
+
+        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        label = gtk.Label(xstr("register_name2"))
+        label.set_use_underline(True)
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, row, row+1)
+
+        self._name2 = gtk.Entry()
+        self._name2.connect("changed", self._updateButtons)
+        self._name2.set_tooltip_text(xstr("register_name2_tooltip"))
+        self._name2.set_width_chars(15)
+        table.attach(self._name2, 1, 2, row, row+1)
+        label.set_mnemonic_widget(self._name2)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_year_of_birth"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 1, 2)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
@@ -981,33 +1001,37 @@ class RegisterPage(Page):
         self._yearOfBirth.connect("changed", self._updateButtons)
         self._yearOfBirth.connect("value-changed", self._updateButtons)
         alignment.add(self._yearOfBirth)
-        table.attach(alignment, 1, 2, 1, 2)
+        table.attach(alignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._yearOfBirth)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_email"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 2, 3)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         self._emailAddress = gtk.Entry()
         self._emailAddress.connect("changed", self._updateButtons)
         self._emailAddress.set_tooltip_text(xstr("register_email_tooltip"))
-        table.attach(self._emailAddress, 1, 2, 2, 3)
+        table.attach(self._emailAddress, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._emailAddress)
 
         self._emailAddressPublic = gtk.CheckButton(xstr("register_email_public"))
         self._emailAddressPublic.set_use_underline(True)
         self._emailAddressPublic.set_tooltip_text(xstr("register_email_public_tooltip"))
-        table.attach(self._emailAddressPublic, 2, 3, 2, 3)
+        table.attach(self._emailAddressPublic, 2, 3, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_vatsim_id"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 3, 4)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
@@ -1016,15 +1040,17 @@ class RegisterPage(Page):
         self._vatsimID.set_tooltip_text(xstr("register_vatsim_id_tooltip"))
         self._vatsimID.set_width_chars(7)
         alignment.add(self._vatsimID)
-        table.attach(alignment, 1, 2, 3, 4)
+        table.attach(alignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._vatsimID)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_ivao_id"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 4, 5)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
@@ -1033,8 +1059,10 @@ class RegisterPage(Page):
         self._ivaoID.set_tooltip_text(xstr("register_ivao_id_tooltip"))
         self._ivaoID.set_width_chars(7)
         alignment.add(self._ivaoID)
-        table.attach(alignment, 1, 2, 4, 5)
+        table.attach(alignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._ivaoID)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1042,12 +1070,14 @@ class RegisterPage(Page):
         label.set_use_underline(True)
         label.set_use_markup(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 5, 6)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         self._phoneNumber = gtk.Entry()
         self._phoneNumber.set_tooltip_text(xstr("register_phone_num_tooltip"))
-        table.attach(self._phoneNumber, 1, 2, 5, 6)
+        table.attach(self._phoneNumber, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._phoneNumber)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
@@ -1055,12 +1085,12 @@ class RegisterPage(Page):
         label.set_use_underline(True)
         label.set_use_markup(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 6, 7)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
 
         self._nationality = gtk.Entry()
         self._nationality.set_tooltip_text(xstr("register_nationality_tooltip"))
-        table.attach(self._nationality, 1, 2, 6, 7)
+        table.attach(self._nationality, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._nationality)
 
         placeholder = gtk.Label()
@@ -1068,52 +1098,58 @@ class RegisterPage(Page):
         placeholder.set_use_markup(True)
         placeholder.set_child_visible(False)
         placeholder.hide()
-        table.attach(placeholder, 2, 3, 6, 7)
+        table.attach(placeholder, 2, 3, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_password"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 8, 9)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         self._password = gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed", self._updateButtons)
         self._password.set_tooltip_text(xstr("register_password_tooltip"))
-        table.attach(self._password, 1, 2, 8, 9)
+        table.attach(self._password, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._password)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         self._passwordStatus = gtk.Label()
         alignment.add(self._passwordStatus)
-        table.attach(alignment, 2, 3, 8, 9)
+        table.attach(alignment, 2, 3, row, row+1)
+
+        row += 1
 
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_password2"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, 9, 10)
+        table.attach(labelAlignment, 0, 1, row, row+1)
 
         self._password2 = gtk.Entry()
         self._password2.set_visibility(False)
         self._password2.connect("changed", self._updateButtons)
         self._password2.set_tooltip_text(xstr("register_password2_tooltip"))
-        table.attach(self._password2, 1, 2, 9, 10)
+        table.attach(self._password2, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._password2)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         self._password2Status = gtk.Label()
         alignment.add(self._password2Status)
-        table.attach(alignment, 2, 3, 9, 10)
+        table.attach(alignment, 2, 3, row, row+1)
+
+        row += 1
 
         self._rememberButton = gtk.CheckButton(xstr("remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
-        table.attach(self._rememberButton, 1, 2, 10, 11)
+        table.attach(self._rememberButton, 1, 2, row, row+1)
 
         cancelButton = \
           self.addButton(xstr("button_cancel"))
@@ -1127,9 +1163,14 @@ class RegisterPage(Page):
         self._updateButtons()
 
     @property
-    def name(self):
-        """Get the name entered."""
-        return self._name.get_text()
+    def name1(self):
+        """Get the first name component entered."""
+        return self._name1.get_text()
+
+    @property
+    def name2(self):
+        """Get the second name component entered."""
+        return self._name2.get_text()
 
     @property
     def yearOfBirth(self):
@@ -1185,10 +1226,6 @@ class RegisterPage(Page):
 
     def _updateButtons(self, widget = None):
         """Update the sensitive state of the buttons"""
-        name = self.name
-        nameLength = len(name)
-        nameSpacePosition = name.find(" ")
-
         yearOfBirth = self.yearOfBirth
 
         emailAddress = self.emailAddress
@@ -1216,8 +1253,7 @@ class RegisterPage(Page):
         self._password2Status.set_use_markup(True)
 
         sensitive = \
-            nameLength >= 5 and nameSpacePosition != -1 and \
-            nameSpacePosition<(nameLength-2) and \
+            len(self.name1)>0 and len(self.name2)>0 and \
             yearOfBirth>=RegisterPage._minYearOfBirth and \
             yearOfBirth<=RegisterPage._maxYearOfBirth and \
             emailAddressMatch is not None and \
@@ -1232,14 +1268,33 @@ class RegisterPage(Page):
 
     def _registerClicked(self, button):
         """Called when the Register button is clicked."""
-        registrationData = web.Registration(self.name, self.yearOfBirth,
+        nameOrder = xstr("register_nameorder")
+
+        if nameOrder=="eastern":
+            surName = self.name1
+            firstName = self.name2
+        else:
+            surName = self.name2
+            firstName = self.name1
+
+        nationality = self.nationality.lower()
+
+        if getLanguage().lower()=="hu" or nationality.find("hung")!=-1 or \
+           nationality.find("magyar")!=-1:
+            requestedNameOrder = "eastern"
+        else:
+            requestedNameOrder = "western"
+
+        registrationData = web.Registration(surName, firstName,
+                                            requestedNameOrder,
+                                            self.yearOfBirth,
                                             self.emailAddress,
                                             self.emailAddressPublic,
                                             self.vatsimID, self.ivaoID,
                                             self.phoneNumber, self.nationality,
                                             self.password)
         print "Registering with data:"
-        print "  name:", self.name, registrationData.name
+        print "  name:", self.name1, self.name2, registrationData.firstName, registrationData.surName, requestedNameOrder
         print "  yearOfBirth:", self.yearOfBirth, registrationData.yearOfBirth
         print "  emailAddress:", self.emailAddress, registrationData.emailAddress
         print "  emailAddressPublic:", self.emailAddressPublic, registrationData.emailAddressPublic

@@ -126,10 +126,13 @@ class Fleet(rpccommon.Fleet):
 
 class Registration(object):
     """Data for registration."""
-    def __init__(self, name, yearOfBirth, emailAddress, emailAddressPublic,
+    def __init__(self, surName, firstName, nameOrder,
+                 yearOfBirth, emailAddress, emailAddressPublic,
                  vatsimID, ivaoID, phoneNumber, nationality, password):
         """Construct the registration data."""
-        self.name = name
+        self.surName = surName
+        self.firstName = firstName
+        self.nameOrder = nameOrder
         self.yearOfBirth = yearOfBirth
         self.emailAddress = emailAddress
         self.emailAddressPublic = 1 if emailAddressPublic is True else \

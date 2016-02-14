@@ -2156,11 +2156,20 @@ msgstr ""
 "A <i>dőlt</i> betűs adatokat nem kötelező megadnod.\n"
 "Vagy VATSIM vagy IVAO azonosítót meg kell adni."
 
-msgid "register_name"
-msgstr "Né_v:"
+msgid "register_name1"
+msgstr "_Vezetéknév:"
 
-msgid "register_name_tooltip"
-msgstr "Írd be a valódi nevedet"
+msgid "register_name1_tooltip"
+msgstr "Írd be a valódi vezetéknevedet"
+
+msgid "register_name2"
+msgstr "Keresz_tnév:"
+
+msgid "register_name2_tooltip"
+msgstr "Írd be a valódi keresztnevedet"
+
+msgid "register_nameorder"
+msgstr "eastern"
 
 msgid "register_year_of_birth"
 msgstr "S_zületés éve:"

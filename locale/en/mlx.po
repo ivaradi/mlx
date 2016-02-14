@@ -2142,11 +2142,20 @@ msgstr ""
 "Optional data items are in <i>italics</i>.\n"
 "One of VATSIM ID or IVAO ID is mandatory."
 
-msgid "register_name"
-msgstr "_Name:"
+msgid "register_name1"
+msgstr "First _name:"
 
-msgid "register_name_tooltip"
-msgstr "Enter your real name."
+msgid "register_name1_tooltip"
+msgstr "Enter your real first name."
+
+msgid "register_name2"
+msgstr "Sur_name:"
+
+msgid "register_name2_tooltip"
+msgstr "Enter your real surname."
+
+msgid "register_nameorder"
+msgstr "western"
 
 msgid "register_year_of_birth"
 msgstr "_Year of birth:"
