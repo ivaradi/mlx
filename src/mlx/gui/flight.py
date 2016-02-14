@@ -1366,11 +1366,59 @@ class RegisterPage(Page):
 
 class StudentPage(Page):
     """A page displayed to students after logging in."""
+    _entryExamStatusQueryInterval = 60*1000
+
     def __init__(self, wizard):
         """Construct the student page."""
         super(StudentPage, self).__init__(wizard, "student",
                                           xstr("student_title"),
                                           xstr("student_help"))
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.5, yscale = 0.0)
+
+        table = gtk.Table(1, 1)
+        table.set_row_spacings(4)
+        table.set_col_spacings(32)
+        alignment.add(table)
+        self.setMainWidget(alignment)
+
+        row = 0
+
+        buttonAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+        button = self._entryExamButton = gtk.Button(xstr("student_entry_exam"))
+        button.set_use_underline(True)
+        button.connect("clicked", self._entryExamClicked)
+        button.set_tooltip_text(xstr("student_entry_exam_tooltip"))
+
+        buttonAlignment.add(button)
+        table.attach(buttonAlignment, 0, 1, 0, 1)
+
+    def activate(self):
+        """Activate the student page."""
+        loginResult = self._wizard.loginResult
+        self._entryExamButton.set_sensitive(not loginResult.entryExamPassed)
+        self._getEntryExamStatus()
+
+    def _entryExamClicked(self, button):
+        """Called when the entry exam button is clicked."""
+
+    def _getEntryExamStatus(self):
+        """Initiate the query of the entry exam status after the interval."""
+        gobject.timeout_add(StudentPage._entryExamStatusQueryInterval,
+                            lambda: self._wizard.gui.webHandler. \
+                            getEntryExamStatus(self._entryExamStatusCallback))
+
+    def _entryExamStatusCallback(self, returned, result):
+        """Called when the entry exam status is available."""
+        gobject.idle_add(self._handleEntryExamStatus, returned, result)
+
+    def _handleEntryExamStatus(self, returned, result):
+        """Called when the entry exam status is availabe."""
+        print "_handleEntryExamStatus", returned, result
+        if returned:
+            self._entryExamButton.set_sensitive(not result.entryExamPassed)
+            self._getEntryExamStatus()
 
 #-----------------------------------------------------------------------------
 

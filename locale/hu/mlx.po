@@ -2297,3 +2297,21 @@ msgstr ""
 
 msgid "register_result_title"
 msgstr "Regisztráció"
+
+msgid "student_title"
+msgstr "Tanuló"
+
+msgid "student_help"
+msgstr ""
+"Itt intézheted a felvételi elméleti vizsgát\n"
+"és az ellenőrző repülést."
+
+msgid "student_entry_exam"
+msgstr "_Elméleti vizsga"
+
+msgid "student_entry_exam_tooltip"
+msgstr ""
+"Erre a gombra kattintva a MAVA oktatási weboldalára kerülsz "
+"böngésződben és kitöltheted az elméleti vizsga tesztjét. "
+"Ha a gomb inaktív, a vizsgát korábban már sikeresen teljesítetted. "
+"A gomb állapota csak néhány perccel a vizsga teljesítése után frissül."

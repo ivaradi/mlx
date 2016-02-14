@@ -2281,3 +2281,21 @@ msgstr ""
 
 msgid "register_result_title"
 msgstr "Registration"
+
+msgid "student_title"
+msgstr "Student"
+
+msgid "student_help"
+msgstr ""
+"You can initiate the entrace exam\n"
+"and the check flight here."
+
+msgid "student_entry_exam"
+msgstr "Take the _entry exam"
+
+msgid "student_entry_exam_tooltip"
+msgstr ""
+"Click this button to go to MAVA's training website and take "
+"the theoretical entry exam. If this button is greyed out, "
+"it means that you have already passed the exam earlier. Note, that "
+"its status is updated only a few minutes after passing the exam."
