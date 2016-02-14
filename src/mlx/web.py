@@ -658,14 +658,13 @@ class Login(Request):
     """A login request."""
     iso88592decoder = codecs.getdecoder("iso-8859-2")
 
-    def __init__(self, callback, pilotID, password, entranceExam):
+    def __init__(self, callback, pilotID, password):
         """Construct the login request with the given pilot ID and
         password."""
         super(Login, self).__init__(callback)
 
         self._pilotID = pilotID
         self._password = password
-        self._entranceExam = entranceExam
 
     def run(self):
         """Perform the login request."""
@@ -677,45 +676,31 @@ class Login(Request):
         md5.update(self._password)
         password = md5.hexdigest()
 
-        if self._entranceExam:
-            url = MAVA_BASE_URL + "/ellenorzo/getflightplan.php?pid=%s" % \
-                  (pilotID,)
-        else:
-            url = MAVA_BASE_URL + "/leker2.php?pid=%s&psw=%s" % \
-                  (pilotID, password)
+        url = MAVA_BASE_URL + "/leker2.php?pid=%s&psw=%s" %  (pilotID, password)
 
         result = Result()
-        result.entranceExam = self._entranceExam
 
         f = urllib2.urlopen(url, timeout = 10.0)
 
         status = readline(f)
-        if self._entranceExam:
-            result.loggedIn = status != "#NOEXAM"
-        else:
-            result.loggedIn = status == ".OK."
+        result.loggedIn = status == ".OK."
 
         if result.loggedIn:
             result.pilotID = self._pilotID
             result.password = self._password
+            result.rank = "FO"
             result.flights = []
-            # FIXME: this may not be the correct behaviour
-            # for an entrance exam, but the website returns
-            # an error
-            if self._entranceExam:
-                result.pilotName = result.pilotID
-                result.exams = ""
-            else:
-                result.pilotName = self.iso88592decoder(readline(f))[0]
-                result.exams = readline(f)
 
-                while True:
-                    line = readline(f)
-                    if not line or line == "#ENDPIREP": break
+            result.pilotName = self.iso88592decoder(readline(f))[0]
+            result.exams = readline(f)
 
-                    flight = BookedFlight(line)
-                    flight.readFromWeb(f)
-                    result.flights.append(flight)
+            while True:
+                line = readline(f)
+                if not line or line == "#ENDPIREP": break
+
+                flight = BookedFlight(line)
+                flight.readFromWeb(f)
+                result.flights.append(flight)
 
             result.flights.sort(cmp = lambda flight1, flight2:
                                 cmp(flight1.departureTime,
@@ -729,27 +714,25 @@ class Login(Request):
 
 class LoginRPC(RPCRequest):
     """An RPC-based login request."""
-    def __init__(self, client, callback, pilotID, password, entranceExam):
+    def __init__(self, client, callback, pilotID, password):
         """Construct the login request with the given pilot ID and
         password."""
         super(LoginRPC, self).__init__(client, callback)
 
         self._pilotID = pilotID
         self._password = password
-        self._entranceExam = entranceExam
 
     def run(self):
         """Perform the login request."""
         result = Result()
-        # FIXME: handle the entrance exam case
-        result.entranceExam = self._entranceExam
 
         self._client.setCredentials(self._pilotID, self._password)
-        pilotName = self._client.login()
-        result.loggedIn = pilotName is not None
+        loginResult = self._client.login()
+        result.loggedIn = loginResult is not None
         if result.loggedIn:
             result.pilotID = self._pilotID
-            result.pilotName = pilotName
+            result.pilotName = loginResult[0]
+            result.rank = loginResult[1]
             result.password = self._password
             result.flights = self._client.getFlights()
 
@@ -1169,12 +1152,11 @@ class Handler(threading.Thread):
         """Enqueue a registration request."""
         self._addRequest(Register(self._rpcClient, callback, registrationData))
 
-    def login(self, callback, pilotID, password, entranceExam = False):
+    def login(self, callback, pilotID, password):
         """Enqueue a login request."""
         request = \
-          LoginRPC(self._rpcClient, callback, pilotID, password, entranceExam) \
-          if self._config.useRPC and not entranceExam \
-          else Login(callback, pilotID, password, entranceExam)
+          LoginRPC(self._rpcClient, callback, pilotID, password) \
+          if self._config.useRPC else Login(callback, pilotID, password)
 
         self._addRequest(request)
 

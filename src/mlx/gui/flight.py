@@ -300,7 +300,7 @@ class LoginPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(4, 2)
+        table = gtk.Table(3, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
         alignment.add(table)
@@ -338,12 +338,6 @@ class LoginPage(Page):
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
-        self._entranceExam = gtk.CheckButton(xstr("login_entranceExam"))
-        self._entranceExam.set_use_underline(True)
-        self._entranceExam.set_tooltip_text(xstr("login_entranceExam_tooltip"))
-        self._entranceExam.connect("toggled", self._setControls)
-        table.attach(self._entranceExam, 1, 2, 3, 4, ypadding = 12)
-
         self.addButton(xstr("button_login_register"),
                        clicked = self._registerClicked,
                        tooltip = xstr("button_login_register_tooltip"))
@@ -356,12 +350,6 @@ class LoginPage(Page):
         self._loginButton.connect("clicked", self._loginClicked)
         self._loginButton.set_tooltip_text(xstr("login_button_tooltip"))
 
-
-    @property
-    def entranceExam(self):
-        """Get whether an entrance exam is being performed."""
-        return self._entranceExam.get_active() and \
-               self._pilotID.get_text()!=""
 
     @property
     def pilotID(self):
@@ -400,12 +388,8 @@ class LoginPage(Page):
         empty."""
         pilotID = self._pilotID.get_text()
         password = self._password.get_text()
-        entranceExam = self._entranceExam.get_active()
-        self._password.set_sensitive(not entranceExam)
-        self._rememberButton.set_sensitive(password!="" and not entranceExam)
-        self._entranceExam.set_sensitive(pilotID!="")
-        self._loginButton.set_sensitive(pilotID!="" and
-                                        (password!="" or entranceExam))
+        self._rememberButton.set_sensitive(password!="")
+        self._loginButton.set_sensitive(pilotID!="" and password!="")
 
     def _registerClicked(self, button):
         """Called when the Register button was clicked."""
@@ -421,8 +405,7 @@ class LoginPage(Page):
         print "mlx.flight.LoginPage: logging in"
         self._wizard.login(self._handleLoginResult,
                            self._pilotID.get_text(),
-                           self._password.get_text(),
-                           self.entranceExam)
+                           self._password.get_text())
 
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
@@ -438,7 +421,10 @@ class LoginPage(Page):
             config.rememberPassword = rememberPassword
 
             config.save()
-            self._wizard.nextPage()
+            if result.rank=="STU":
+                self._wizard.jumpPage("student")
+            else:
+                self._wizard.nextPage()
 
 #-----------------------------------------------------------------------------
 
@@ -4838,7 +4824,7 @@ class Wizard(gtk.VBox):
     @property
     def entranceExam(self):
         """Get whether an entrance exam is about to be taken."""
-        return self._loginPage.entranceExam
+        return self._loginResult is not None and self._loginResult.rank=="STU"
 
     @property
     def loggedIn(self):
@@ -5131,7 +5117,7 @@ class Wizard(gtk.VBox):
         self.setCurrentPage(firstPage)
         #self.setCurrentPage(10)
 
-    def login(self, callback, pilotID, password, entranceExam):
+    def login(self, callback, pilotID, password):
         """Called when the login button was clicked."""
         self._loginCallback = callback
         if pilotID is None:
@@ -5139,7 +5125,6 @@ class Wizard(gtk.VBox):
             assert loginResult is not None and loginResult.loggedIn
             pilotID = loginResult.pilotID
             password = loginResult.password
-            entranceExam = loginResult.entranceExam
             busyMessage = xstr("reload_busy")
         else:
             self._loginResult = None
@@ -5148,8 +5133,7 @@ class Wizard(gtk.VBox):
         self.gui.beginBusy(busyMessage)
 
         self.gui.webHandler.login(self._loginResultCallback,
-                                  pilotID, password,
-                                  entranceExam = entranceExam)
+                                  pilotID, password)
 
     def reloadFlights(self, callback):
         """Reload the flights from the MAVA server."""

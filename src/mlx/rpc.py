@@ -238,7 +238,7 @@ class Client(object):
         if reply.result == Client.RESULT_OK:
             self._loginCount += 1
             self._sessionID = reply.value["sessionID"]
-            return reply.value["name"]
+            return (reply.value["name"], reply.value["rank"])
         else:
             return None
 
