@@ -2295,7 +2295,7 @@ msgstr "Take the _entry exam"
 
 msgid "student_entry_exam_tooltip"
 msgstr ""
-"Click this button to go to MAVA's training website and take "
+"Click this button to go to MAVA's training website in your browser and take "
 "the theoretical entry exam. If this button is greyed out, "
 "it means that you have already passed the exam earlier. Note, that "
 "its status is updated only a few minutes after passing the exam."
