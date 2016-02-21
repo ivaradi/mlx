@@ -211,7 +211,8 @@ class AircraftState(object):
     - totalFuel: the total amount of fuel in kg
     - n1[]: the N1 values of the turbine engines (array of floats
     of as many items as the number of engines, present only for aircraft with
-    turbines, for other aircraft it is None)
+    turbines, for other aircraft it is None). If the aircraft has turbines, but
+    the N1 values cannot be read reliably, the array contains Nones.
     - rpm[]: the RPM values of the piston engines (array of floats
     of as many items as the number of engines, present only for aircraft with
     pistons, for other aircraft it is None)

@@ -377,7 +377,10 @@ class MonitorWindow(gtk.Window):
                 n1Str = ""
                 for n1 in aircraftState.n1:
                     if n1Str: n1Str += ", "
-                    n1Str += "%.0f" % (n1,)
+                    if n1 is None:
+                        n1Str += "?"
+                    else:
+                        n1Str += "%.0f" % (n1,)
             elif aircraftState.rpm is not None:
                 n1Str = ""
                 for rpm in aircraftState.rpm:

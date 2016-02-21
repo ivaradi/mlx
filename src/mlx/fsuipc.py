@@ -1845,6 +1845,9 @@ class MajesticDH8DModel(DH8DModel):
         # None of the gear values seem to work correctly
         state.gearsDown = state.gearControlDown
 
+        # Th N1 values cannot be read either
+        state.n1 = [None, None]
+
         return state
 
 #------------------------------------------------------------------------------
