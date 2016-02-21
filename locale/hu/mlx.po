@@ -2306,6 +2306,15 @@ msgstr ""
 "Itt intézheted a felvételi elméleti vizsgát\n"
 "és az ellenőrző repülést."
 
+msgid "student_entry_exam_status"
+msgstr "Elméleti vizsga:"
+
+msgid "student_entry_exam_passed"
+msgstr "<span color=\"darkgreen\"><b>Sikeres</b></span>"
+
+msgid "student_entry_exam_not_passed"
+msgstr "<span color=\"orange\"><b>Még nem tetted le</b></span>"
+
 msgid "student_entry_exam"
 msgstr "_Elméleti vizsga"
 
@@ -2313,5 +2322,7 @@ msgid "student_entry_exam_tooltip"
 msgstr ""
 "Erre a gombra kattintva a MAVA oktatási weboldalára kerülsz "
 "böngésződben és kitöltheted az elméleti vizsga tesztjét. "
+"A weboldalon szükség lehet bejelentkezned: ebben az esetben "
+"használd a MAVA pilóta azonosítódat (PXXX) és jelszavadat. "
 "Ha a gomb inaktív, a vizsgát korábban már sikeresen teljesítetted. "
 "A gomb állapota csak néhány perccel a vizsga teljesítése után frissül."

@@ -20,6 +20,7 @@ import os
 import tempfile
 import threading
 import re
+import webbrowser
 
 #-----------------------------------------------------------------------------
 
@@ -1377,13 +1378,30 @@ class StudentPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.5, yscale = 0.0)
 
-        table = gtk.Table(1, 1)
+        table = gtk.Table(2, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
+        table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
         row = 0
+
+        labelAlignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+                                       xscale=0.0, yscale = 0.0)
+        label = gtk.Label(xstr("student_entry_exam_status"))
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = 0)
+
+        alignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+                                  xscale=1.0, yscale = 0.0)
+        self._entryExamStatus = gtk.Label()
+        self._entryExamStatus.set_use_markup(True)
+        self._entryExamStatus.set_alignment(0.0, 0.5)
+        alignment.add(self._entryExamStatus)
+        table.attach(alignment, 1, 2, row, row + 1)
+
+        row += 1
 
         buttonAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
         button = self._entryExamButton = gtk.Button(xstr("student_entry_exam"))
@@ -1392,16 +1410,21 @@ class StudentPage(Page):
         button.set_tooltip_text(xstr("student_entry_exam_tooltip"))
 
         buttonAlignment.add(button)
-        table.attach(buttonAlignment, 0, 1, 0, 1)
+        table.attach(buttonAlignment, 0, 2, row, row + 1,
+                     ypadding = 4)
 
     def activate(self):
         """Activate the student page."""
         loginResult = self._wizard.loginResult
-        self._entryExamButton.set_sensitive(not loginResult.entryExamPassed)
+        self._entryExamLink = loginResult.entryExamLink
+
+        self._updateEntryExamStatus(loginResult.entryExamPassed)
+
         self._getEntryExamStatus()
 
     def _entryExamClicked(self, button):
         """Called when the entry exam button is clicked."""
+        webbrowser.open(self._entryExamLink)
 
     def _getEntryExamStatus(self):
         """Initiate the query of the entry exam status after the interval."""
@@ -1417,8 +1440,17 @@ class StudentPage(Page):
         """Called when the entry exam status is availabe."""
         print "_handleEntryExamStatus", returned, result
         if returned:
-            self._entryExamButton.set_sensitive(not result.entryExamPassed)
+            self._entryExamLink = result.entryExamLink
+            self._updateEntryExamStatus(result.entryExamPassed)
             self._getEntryExamStatus()
+
+    def _updateEntryExamStatus(self, passed):
+        """Update the entry exam status display and button."""
+        self._entryExamStatus.set_text(xstr("student_entry_exam_passed")
+                                       if passed else
+                                       xstr("student_entry_exam_not_passed"))
+        self._entryExamStatus.set_use_markup(True)
+        self._entryExamButton.set_sensitive(not passed)
 
 #-----------------------------------------------------------------------------
 

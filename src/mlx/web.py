@@ -738,7 +738,8 @@ class LoginRPC(RPCRequest):
             if result.rank=="STU":
                 reply = self._client.getEntryExamStatus()
                 result.entryExamPassed = reply[0]
-                result.checkFlightStatus = reply[1]
+                result.entryExamLink = reply[1]
+                result.checkFlightStatus = reply[2]
 
         return result
 
@@ -757,7 +758,8 @@ class GetEntryExamStatus(RPCRequest):
         reply = self._client.getEntryExamStatus()
 
         result.entryExamPassed = reply[0]
-        result.checkFlightStatus = reply[1]
+        result.entryExamLink = reply[1]
+        result.checkFlightStatus = reply[2]
 
         return result
 

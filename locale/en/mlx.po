@@ -2290,12 +2290,23 @@ msgstr ""
 "You can initiate the entrace exam\n"
 "and the check flight here."
 
+msgid "student_entry_exam_status"
+msgstr "Entry exam:"
+
+msgid "student_entry_exam_passed"
+msgstr "<span color=\"darkgreen\"><b>Passed</b></span>"
+
+msgid "student_entry_exam_not_passed"
+msgstr "<span color=\"orange\"><b>Not yet passed</b></span>"
+
 msgid "student_entry_exam"
 msgstr "Take the _entry exam"
 
 msgid "student_entry_exam_tooltip"
 msgstr ""
 "Click this button to go to MAVA's training website in your browser and take "
-"the theoretical entry exam. If this button is greyed out, "
-"it means that you have already passed the exam earlier. Note, that "
-"its status is updated only a few minutes after passing the exam."
+"the theoretical entry exam. The website might ask you for login: you can "
+"use your MAVA pilot ID (PXXX) and password. "
+"If this button is greyed out, it means that you have already passed "
+"the exam earlier. Note, that its status is updated only a few minutes "
+"after passing the exam."
