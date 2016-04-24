@@ -374,7 +374,8 @@ class DelayCodeTable(DelayCodeTableBase):
         columns = self._treeView.get_columns()
         for column in columns:
             self._treeView.remove_column(column)
-        self._eventBox.remove(self._table)
+        if self._table is not None:
+            self._eventBox.remove(self._table)
         self._table = None
         self.show_all()
 
