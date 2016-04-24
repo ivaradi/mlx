@@ -168,7 +168,8 @@ class Page(gtk.Alignment):
         self._mainAlignment.add(widget)
 
     def addButton(self, label, default = False, sensitive = True,
-                  tooltip = None, clicked = None, padding = 4):
+                  tooltip = None, clicked = None, padding = 4,
+                  clickedArg = None):
         """Add a button with the given label.
 
         Return the button object created."""
@@ -182,7 +183,10 @@ class Page(gtk.Alignment):
         if tooltip is not None:
             button.set_tooltip_text(tooltip)
         if clicked is not None:
-            button.connect("clicked", clicked)
+            if clickedArg is None:
+                button.connect("clicked", clicked)
+            else:
+                button.connect("clicked", clicked, clickedArg)
         return button
 
     def addCancelFlightButton(self):
@@ -1375,12 +1379,15 @@ class StudentPage(Page):
                                           xstr("student_title"),
                                           xstr("student_help"))
 
+
+        self._getEntryExamStatusCancelled = False
+
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.5, yscale = 0.0)
 
-        table = gtk.Table(2, 2)
+        table = gtk.Table(6, 4)
         table.set_row_spacings(4)
-        table.set_col_spacings(32)
+        table.set_col_spacings(0)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
@@ -1390,8 +1397,10 @@ class StudentPage(Page):
         labelAlignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
                                        xscale=0.0, yscale = 0.0)
         label = gtk.Label(xstr("student_entry_exam_status"))
+        label.set_alignment(0.0, 0.5)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = 0)
+        labelAlignment.resize_children()
+        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
 
         alignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
                                   xscale=1.0, yscale = 0.0)
@@ -1399,7 +1408,8 @@ class StudentPage(Page):
         self._entryExamStatus.set_use_markup(True)
         self._entryExamStatus.set_alignment(0.0, 0.5)
         alignment.add(self._entryExamStatus)
-        table.attach(alignment, 1, 2, row, row + 1)
+        alignment.resize_children()
+        table.attach(alignment, 1, 4, row, row + 1)
 
         row += 1
 
@@ -1410,17 +1420,86 @@ class StudentPage(Page):
         button.set_tooltip_text(xstr("student_entry_exam_tooltip"))
 
         buttonAlignment.add(button)
-        table.attach(buttonAlignment, 0, 2, row, row + 1,
+        table.attach(buttonAlignment, 0, 4, row, row + 1, xoptions = FILL,
                      ypadding = 4)
+
+        row += 3
+
+        labelAlignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+                                       xscale=0.0, yscale = 0.0)
+        label = gtk.Label(xstr("student_check_flight_status"))
+        labelAlignment.add(label)
+        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
+
+        alignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+                                  xscale=1.0, yscale = 0.0)
+        self._checkFlightStatus = gtk.Label()
+        self._checkFlightStatus.set_use_markup(True)
+        self._checkFlightStatus.set_alignment(0.0, 0.5)
+        alignment.add(self._checkFlightStatus)
+        table.attach(alignment, 1, 4, row, row + 1)
+
+        row += 1
+
+        alignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+
+        hbox = gtk.HBox()
+        hbox.set_homogeneous(False)
+        hbox.set_spacing(0)
+
+        aircraftTypesModel = gtk.ListStore(str, int)
+        for aircraftType in web.BookedFlight.checkFlightTypes:
+            aircraftTypesModel.append([aircraftNames[aircraftType],
+                                       aircraftType])
+
+        aircraftTypeAlignment = gtk.Alignment(xalign = 0.0, xscale = 1.0)
+
+        self._aircraftType = gtk.ComboBox(model = aircraftTypesModel)
+        renderer = gtk.CellRendererText()
+        self._aircraftType.pack_start(renderer, True)
+        self._aircraftType.add_attribute(renderer, "text", 0)
+        self._aircraftType.set_tooltip_text(xstr("student_check_flight_type_tooltip"))
+        self._aircraftType.set_active(0)
+
+        aircraftTypeAlignment.add(self._aircraftType)
+
+        hbox.pack_start(aircraftTypeAlignment, False, False, 0)
+
+        buttonAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+        button = self._checkFlightButton = gtk.Button(xstr("student_check_flight"))
+        button.set_use_underline(True)
+        button.connect("clicked", self._checkFlightClicked)
+        button.set_tooltip_text(xstr("student_check_flight_tooltip"))
+
+        hbox.pack_start(button, True, True, 0)
+
+        alignment.add(hbox)
+        table.attach(alignment, 0, 4, row, row + 1, xoptions = FILL)
+
+    @property
+    def aircraftType(self):
+        """Get the type of the aircraft used to perform the check flight."""
+        index = self._aircraftType.get_active()
+        return self._aircraftType.get_model()[index][1]
 
     def activate(self):
         """Activate the student page."""
+        print "StudentPage.activate"
+        self._getEntryExamStatusCancelled = False
+
         loginResult = self._wizard.loginResult
         self._entryExamLink = loginResult.entryExamLink
 
         self._updateEntryExamStatus(loginResult.entryExamPassed)
-
         self._getEntryExamStatus()
+
+        # FIXME: call with real value
+        self._updateCheckFlightStatus(self._wizard.loginResult.checkFlightStatus)
+
+    def finalize(self):
+        """Finalize the page."""
+        print "StudentPage.finalize"
+        self._getEntryExamStatusCancelled = True
 
     def _entryExamClicked(self, button):
         """Called when the entry exam button is clicked."""
@@ -1428,9 +1507,10 @@ class StudentPage(Page):
 
     def _getEntryExamStatus(self):
         """Initiate the query of the entry exam status after the interval."""
-        gobject.timeout_add(StudentPage._entryExamStatusQueryInterval,
-                            lambda: self._wizard.gui.webHandler. \
-                            getEntryExamStatus(self._entryExamStatusCallback))
+        if not self._getEntryExamStatusCancelled:
+            gobject.timeout_add(StudentPage._entryExamStatusQueryInterval,
+                                lambda: self._wizard.gui.webHandler. \
+                                getEntryExamStatus(self._entryExamStatusCallback))
 
     def _entryExamStatusCallback(self, returned, result):
         """Called when the entry exam status is available."""
@@ -1439,10 +1519,13 @@ class StudentPage(Page):
     def _handleEntryExamStatus(self, returned, result):
         """Called when the entry exam status is availabe."""
         print "_handleEntryExamStatus", returned, result
-        if returned:
+        if returned and not self._getEntryExamStatusCancelled:
             self._entryExamLink = result.entryExamLink
             self._updateEntryExamStatus(result.entryExamPassed)
-            self._getEntryExamStatus()
+            if result.madeFO:
+                self._madeFO()
+            else:
+                self._getEntryExamStatus()
 
     def _updateEntryExamStatus(self, passed):
         """Update the entry exam status display and button."""
@@ -1451,6 +1534,44 @@ class StudentPage(Page):
                                        xstr("student_entry_exam_not_passed"))
         self._entryExamStatus.set_use_markup(True)
         self._entryExamButton.set_sensitive(not passed)
+
+    def _checkFlightClicked(self, button):
+        """Called when the check flight button is clicked."""
+        aircraftType = self.aircraftType
+        self._wizard._bookedFlight = \
+            web.BookedFlight.forCheckFlight(aircraftType)
+        self._wizard.gui.enableFlightInfo(aircraftType)
+        self._wizard.jumpPage("connect")
+
+    def _updateCheckFlightStatus(self, passed):
+        """Update the status of the check flight."""
+        self._aircraftType.set_sensitive(not passed)
+        self._checkFlightStatus.set_text(xstr("student_check_flight_passed")
+                                         if passed else
+                                         xstr("student_check_flight_not_passed"))
+        self._checkFlightStatus.set_use_markup(True)
+        self._checkFlightButton.set_sensitive(not passed)
+
+    def _madeFO(self):
+        """Handle the event when the pilot has become a first officer."""
+        wizard = self._wizard
+        loginResult = wizard.loginResult
+        loginResult.rank = "FO"
+
+        gui = wizard.gui
+
+        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                   type = MESSAGETYPE_INFO,
+                                   message_format = xstr("student_fo"))
+
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.set_title(WINDOW_TITLE_BASE)
+        secondary = xstr("student_fo_secondary")
+        dialog.format_secondary_markup(secondary)
+        dialog.run()
+        dialog.hide()
+
+        gui.reset()
 
 #-----------------------------------------------------------------------------
 
@@ -1574,7 +1695,8 @@ class ConnectPage(Page):
 
         self.addCancelFlightButton()
 
-        self.addPreviousButton(clicked = self._backClicked)
+        self._previousButton = \
+          self.addPreviousButton(clicked = self._backClicked)
 
         self._button = self.addButton(xstr("button_connect"), default = True,
                                       tooltip = xstr("button_connect_tooltip"))
@@ -1608,6 +1730,8 @@ class ConnectPage(Page):
             config = self._wizard.gui.config
             self._selectMSFS.set_active(config.defaultMSFS)
             self._selectXPlane.set_active(not config.defaultMSFS)
+
+        self._previousButton.set_sensitive(not self._wizard.entranceExam)
 
     def finalize(self):
         """Finalize the page."""
@@ -2124,7 +2248,7 @@ class RoutePage(Page):
         cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
         alternate = self._alternate.get_text()
         self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="" and
-                                   len(alternate)==4)
+                                   (len(alternate)==4 or self._wizard.entranceExam))
 
     def _cruiseLevelChanged(self, *arg):
         """Called when the cruise level has changed."""
@@ -4223,17 +4347,20 @@ class LandingPage(Page):
 
     def _forwardClicked(self, button):
         """Called when the forward button is clicked."""
-        aircraft = self._wizard.gui.flight.aircraft
+        wizard = self._wizard
+
+        aircraft = wizard.gui.flight.aircraft
         aircraft.updateVRef()
         aircraft.updateLandingAntiIce()
-        if self._wizard.gui.config.onlineGateSystem and \
-           self._wizard.loggedIn and not self._completed and \
-           self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
-           not self._wizard.entranceExam:
-            self._wizard.getFleet(callback = self._fleetRetrieved,
-                                  force = True)
+        if wizard.gui.config.onlineGateSystem and \
+           wizard.loggedIn and not self._completed and \
+           wizard.bookedFlight.arrivalICAO=="LHBP" and \
+           not wizard.entranceExam:
+            wizard.getFleet(callback = self._fleetRetrieved, force = True)
+        elif wizard.entranceExam:
+            self._handleEntranceExamDone()
         else:
-            self._wizard.nextPage()
+            wizard.nextPage()
 
     def _fleetRetrieved(self, fleet):
         """Callback for the fleet retrieval."""
@@ -4259,6 +4386,148 @@ class LandingPage(Page):
 
             self._updatingMETAR = False
 
+    def _handleEntranceExamDone(self):
+        """Handle the end of the entrance exam.
+
+        If the there was a NO-GO fault, notify the user that exam is a failure
+        and take them back to the student page. Otherwise congratulate, update
+        the database to reflect that the exam has been taken and go back to the
+        student page."""
+        self._wizard.jumpPage("chkfinish")
+
+#-----------------------------------------------------------------------------
+
+class PIREPSaveHelper(object):
+    """A helper to use for saving PIREPs."""
+    def __init__(self, wizard):
+        """Construct the helper."""
+        super(PIREPSaveHelper, self).__init__()
+
+        self._wizard = wizard
+
+        self._lastSavePath = None
+        self._savePIREPDialog = None
+
+    def addButton(self, page):
+        """Add a button to save the PIREP to the given page."""
+        return page.addButton(xstr("finish_save"), sensitive = False,
+                              clicked = self._saveClicked,
+                              tooltip = xstr("finish_save_tooltip"),
+                              clickedArg = page)
+
+    def autoSavePIREP(self):
+        """Perform the automatic saving of the PIREP."""
+        self._lastSavePath = os.path.join(self._wizard.gui.config.pirepDirectory,
+                                          self._getDefaultPIREPName())
+        self._lastSavePath = text2unicode(self._lastSavePath)
+        self._savePIREP(automatic = True)
+
+    def _getDefaultPIREPName(self):
+        """Get the default name of the PIREP."""
+        gui = self._wizard.gui
+
+        bookedFlight = gui.bookedFlight
+        tm = time.gmtime()
+
+        pilotID = self._wizard.pilotID
+        if pilotID: pilotID += " "
+        return "%s%s %02d%02d %s-%s.pirep" % \
+               (pilotID, str(bookedFlight.departureTime.date()),
+                tm.tm_hour, tm.tm_min,
+                bookedFlight.departureICAO, bookedFlight.arrivalICAO)
+
+    def _saveClicked(self, button, page):
+        """Called when the Save PIREP button is clicked."""
+        gui = self._wizard.gui
+
+        fileName = self._getDefaultPIREPName()
+
+        dialog = self._getSaveDialog()
+
+        if self._lastSavePath is None:
+            pirepDirectory = gui.config.pirepDirectory
+            if pirepDirectory is not None:
+                dialog.set_current_folder(pirepDirectory)
+        else:
+            dialog.set_current_folder(os.path.dirname(self._lastSavePath))
+
+        dialog.set_current_name(fileName)
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_OK:
+            self._lastSavePath = text2unicode(dialog.get_filename())
+            self._savePIREP(page)
+
+    def _savePIREP(self, page, automatic = False):
+        """Perform the saving of the PIREP."""
+
+        gui = self._wizard.gui
+
+        if automatic:
+            gui.beginBusy(xstr("finish_autosave_busy"))
+
+        pirep = PIREP(gui.flight)
+        error = pirep.save(self._lastSavePath)
+
+        if automatic:
+            gui.endBusy()
+
+        if error:
+            type = MESSAGETYPE_ERROR
+            message = xstr("finish_save_failed")
+            secondary = xstr("finish_save_failed_sec") % (text2unicode(error),)
+        else:
+            type = MESSAGETYPE_INFO
+            message = xstr("finish_save_done")
+            if automatic:
+                secondary = xstr("finish_save_done_sec") % (self._lastSavePath,)
+            else:
+                secondary = None
+            page.setPIREPSaved()
+
+        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                   type = type, message_format = message)
+        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.set_title(WINDOW_TITLE_BASE)
+        if secondary is not None:
+            dialog.format_secondary_markup(secondary)
+
+        dialog.run()
+        dialog.hide()
+
+        return pirepSaved
+
+    def _getSaveDialog(self):
+        """Get the PIREP saving dialog.
+
+        If it does not exist yet, create it."""
+        if self._savePIREPDialog is None:
+            gui = self._wizard.gui
+            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+                                           xstr("finish_save_title"),
+                                           action = FILE_CHOOSER_ACTION_SAVE,
+                                           buttons = (gtk.STOCK_CANCEL,
+                                                      RESPONSETYPE_CANCEL,
+                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                           parent = gui.mainWindow)
+            dialog.set_modal(True)
+            dialog.set_do_overwrite_confirmation(True)
+
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("file_filter_pireps"))
+            filter.add_pattern("*.pirep")
+            dialog.add_filter(filter)
+
+            filter = gtk.FileFilter()
+            filter.set_name(xstr("file_filter_all"))
+            filter.add_pattern("*.*")
+            dialog.add_filter(filter)
+
+            self._savePIREPDialog = dialog
+
+        return self._savePIREPDialog
+
 #-----------------------------------------------------------------------------
 
 class FinishPage(Page):
@@ -4268,7 +4537,7 @@ class FinishPage(Page):
                      ("flighttype_vip", const.FLIGHTTYPE_VIP),
                      ("flighttype_charter", const.FLIGHTTYPE_CHARTER) ]
 
-    def __init__(self, wizard):
+    def __init__(self, wizard, saveHelper):
         """Construct the finish page."""
         help = xstr("finish_help") + xstr("finish_help_goodtime")
         super(FinishPage, self).__init__(wizard, "finish",
@@ -4455,12 +4724,8 @@ class FinishPage(Page):
 
         self.addPreviousButton(clicked = self._backClicked)
 
-        self._saveButton = self.addButton(xstr("finish_save"),
-                                          sensitive = False,
-                                          clicked = self._saveClicked,
-                                          tooltip = xstr("finish_save_tooltip"))
-        self._savePIREPDialog = None
-        self._lastSavePath = None
+        self._saveHelper = saveHelper
+        self._saveButton = saveHelper.addButton(self)
 
         self._tooBigTimeDifference = False
         self._deferredAutoSave = False
@@ -4560,7 +4825,7 @@ class FinishPage(Page):
 
         if gui.config.pirepAutoSave and sensitive and not wasSensitive:
             if gui.isWizardActive():
-                self._autoSavePIREP()
+                self._saveHelper.autoSavePIREP()
             else:
                 self._deferredAutoSave = True
 
@@ -4575,15 +4840,12 @@ class FinishPage(Page):
         """If the page has a default button, make it the default one."""
         super(FinishPage, self).grabDefault()
         if self._deferredAutoSave:
-            self._autoSavePIREP()
+            self._saveHelper.autoSavePIREP()
             self._deferredAutoSave = False
 
-    def _autoSavePIREP(self):
-        """Perform the automatic saving of the PIREP."""
-        self._lastSavePath = os.path.join(self._wizard.gui.config.pirepDirectory,
-                                          self._getDefaultPIREPName())
-        self._lastSavePath = text2unicode(self._lastSavePath)
-        self._savePIREP(automatic = True)
+    def setPIREPSaved(self):
+        """Mark the PIREP as saved."""
+        self._pirepSaved = True
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -4615,112 +4877,6 @@ class FinishPage(Page):
                 return
 
         gui.reset()
-
-    def _getDefaultPIREPName(self):
-        """Get the default name of the PIREP."""
-        gui = self._wizard.gui
-
-        bookedFlight = gui.bookedFlight
-        tm = time.gmtime()
-
-        pilotID = self._wizard.pilotID
-        if pilotID: pilotID += " "
-        return "%s%s %02d%02d %s-%s.pirep" % \
-               (pilotID, str(bookedFlight.departureTime.date()),
-                tm.tm_hour, tm.tm_min,
-                bookedFlight.departureICAO, bookedFlight.arrivalICAO)
-
-
-    def _saveClicked(self, button):
-        """Called when the Save PIREP button is clicked."""
-        gui = self._wizard.gui
-
-        fileName = self._getDefaultPIREPName()
-
-        dialog = self._getSaveDialog()
-
-        if self._lastSavePath is None:
-            pirepDirectory = gui.config.pirepDirectory
-            if pirepDirectory is not None:
-                dialog.set_current_folder(pirepDirectory)
-        else:
-            dialog.set_current_folder(os.path.dirname(self._lastSavePath))
-
-        dialog.set_current_name(fileName)
-        result = dialog.run()
-        dialog.hide()
-
-        if result==RESPONSETYPE_OK:
-            self._lastSavePath = text2unicode(dialog.get_filename())
-            self._savePIREP()
-
-    def _savePIREP(self, automatic = False):
-        """Perform the saving of the PIREP."""
-
-        gui = self._wizard.gui
-
-        if automatic:
-            gui.beginBusy(xstr("finish_autosave_busy"))
-
-        pirep = PIREP(gui.flight)
-        error = pirep.save(self._lastSavePath)
-
-        if automatic:
-            gui.endBusy()
-
-        if error:
-            type = MESSAGETYPE_ERROR
-            message = xstr("finish_save_failed")
-            secondary = xstr("finish_save_failed_sec") % (text2unicode(error),)
-        else:
-            type = MESSAGETYPE_INFO
-            message = xstr("finish_save_done")
-            if automatic:
-                secondary = xstr("finish_save_done_sec") % (self._lastSavePath,)
-            else:
-                secondary = None
-            self._pirepSaved = True
-
-        dialog = gtk.MessageDialog(parent = gui.mainWindow,
-                                   type = type, message_format = message)
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
-        dialog.set_title(WINDOW_TITLE_BASE)
-        if secondary is not None:
-            dialog.format_secondary_markup(secondary)
-
-        dialog.run()
-        dialog.hide()
-
-    def _getSaveDialog(self):
-        """Get the PIREP saving dialog.
-
-        If it does not exist yet, create it."""
-        if self._savePIREPDialog is None:
-            gui = self._wizard.gui
-            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
-                                           xstr("finish_save_title"),
-                                           action = FILE_CHOOSER_ACTION_SAVE,
-                                           buttons = (gtk.STOCK_CANCEL,
-                                                      RESPONSETYPE_CANCEL,
-                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
-                                           parent = gui.mainWindow)
-            dialog.set_modal(True)
-            dialog.set_do_overwrite_confirmation(True)
-
-            filter = gtk.FileFilter()
-            filter.set_name(xstr("file_filter_pireps"))
-            filter.add_pattern("*.pirep")
-            dialog.add_filter(filter)
-
-            filter = gtk.FileFilter()
-            filter.set_name(xstr("file_filter_all"))
-            filter.add_pattern("*.*")
-            dialog.add_filter(filter)
-
-            self._savePIREPDialog = dialog
-
-        return self._savePIREPDialog
-
 
     def _sendClicked(self, button):
         """Called when the Send button is clicked."""
@@ -4815,6 +4971,123 @@ class FinishPage(Page):
 
 #-----------------------------------------------------------------------------
 
+class CheckFlightFinishPage(Page):
+    """Finish page for a check flight."""
+    def __init__(self, wizard, saveHelper):
+        """Construct the check flight finish page."""
+        super(CheckFlightFinishPage, self).__init__(wizard,
+                                                    "chkfinish",
+                                                    xstr("chkfinish_title"),
+                                                    "")
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 1.0, yscale = 1.0)
+        self._label = gtk.Label()
+        alignment.add(self._label)
+
+        self.setMainWidget(alignment)
+
+        self._saveHelper = saveHelper
+        self._saveButton = saveHelper.addButton(self)
+
+        self._button = self.addNextButton(sensitive = False,
+                                          clicked =  self._forwardClicked)
+
+    def activate(self):
+        """Activate the page."""
+        wizard = self._wizard
+        loginResult = wizard.loginResult
+        gui = wizard.gui
+        rating = gui.flight.logger.getRating()
+
+        if rating>=0:
+            loginResult.checkFlightStatus = True
+
+        firstOfficer = \
+          loginResult.entryExamPassed and loginResult.checkFlightStatus
+
+        if firstOfficer:
+            loginResult.rank = "FO"
+
+        if rating<0:
+            mainMessage = xstr("chkfinish_failed")
+        else:
+            mainMessage = xstr("chkfinish_passed_begin")
+            if firstOfficer:
+                mainMessage += xstr("chkfinish_passed_fo")
+            mainMessage += xstr("chkfinish_passed_end")
+
+        if firstOfficer:
+            nextMessage = xstr("chkfinish_next")
+        else:
+            nextMessage = xstr("chkfinish_next_student_begin")
+            if not loginResult.entryExamPassed and \
+               not loginResult.checkFlightStatus:
+                nextMessage += xstr("chkfinish_next_student_nothing")
+            elif loginResult.entryExamPassed and \
+                 not loginResult.checkFlightStatus:
+                nextMessage += xstr("chkfinish_next_student_no_flight")
+            elif not loginResult.entryExamPassed and \
+                 loginResult.checkFlightStatus:
+                nextMessage += xstr("chkfinish_next_student_no_exam")
+
+        self._label.set_text(mainMessage +
+                             xstr("chkfinish_savepirep") +
+                             nextMessage)
+        self._label.set_use_markup(True)
+        self._label.set_alignment(0.5, 0.0)
+
+        self._saveButton.set_sensitive(True)
+        self._button.set_sensitive(True)
+
+    def _forwardClicked(self, button):
+        """Jump to the student page if there are some tasks to do,
+        or to the flight selection page, if the pilot is allowed to perform
+        MAVA flights."""
+        wizard = self._wizard
+        gui = wizard.gui
+
+        loginResult = wizard.loginResult
+        if loginResult.checkFlightStatus:
+            gui.beginBusy(xstr("chkfinish_updateweb_busy"))
+            gui.webHandler.setCheckFlightPassed(self._checkFlightPassedSetCallback,
+                                                wizard.checkFlightAircraftType)
+        else:
+            self._resetGUI()
+
+    def _checkFlightPassedSetCallback(self, returned, result):
+        """Called when the check flight status has been set."""
+        gobject.idle_add(self._checkFlightPassedSet, returned, result)
+
+    def _checkFlightPassedSet(self, returned, result):
+        """Handle the result of an attempt to set the check flight status."""
+        gui = self._wizard.gui
+
+        gui.endBusy()
+
+        if returned:
+            self._resetGUI()
+        else:
+            dialog = gtk.MessageDialog(parent = gui.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       message_format =
+                                       xstr("chkfinish_passedset_failed"))
+            dialog.set_title(WINDOW_TITLE_BASE + " - " +
+                             xstr("chkfinish_passedset_failed_title"))
+            dialog.format_secondary_markup(xstr("chkfinish_passedset_failed_secondary"))
+
+            dialog.add_button(xstr("button_ok"), 0)
+
+            dialog.run()
+            dialog.hide()
+
+    def _resetGUI(self):
+        """Reset the GUI."""
+        gui = self._wizard.gui
+        gui.reset()
+
+#-----------------------------------------------------------------------------
+
 class Wizard(gtk.VBox):
     """The flight wizard."""
     def __init__(self, gui):
@@ -4831,7 +5104,8 @@ class Wizard(gtk.VBox):
         self._pages.append(FlightSelectionPage(self))
         self._pages.append(GateSelectionPage(self))
         self._pages.append(RegisterPage(self))
-        self._pages.append(StudentPage(self))
+        self._studentPage = StudentPage(self)
+        self._pages.append(self._studentPage)
         self._pages.append(ConnectPage(self))
         self._payloadPage = PayloadPage(self)
         self._pages.append(self._payloadPage)
@@ -4855,8 +5129,12 @@ class Wizard(gtk.VBox):
         self._pages.append(self._cruisePage)
         self._landingPage = LandingPage(self)
         self._pages.append(self._landingPage)
-        self._finishPage = FinishPage(self)
+
+        pirepSaveHelper = PIREPSaveHelper(self)
+
+        self._finishPage = FinishPage(self, pirepSaveHelper)
         self._pages.append(self._finishPage)
+        self._pages.append(CheckFlightFinishPage(self, pirepSaveHelper))
 
         self._requestedWidth = None
         self._requestedHeight = None
@@ -4915,6 +5193,11 @@ class Wizard(gtk.VBox):
     def loginResult(self):
         """Get the login result."""
         return self._loginResult
+
+    @property
+    def checkFlightAircraftType(self):
+        """Get the type of the aircraft used to perform the check flight."""
+        return self._studentPage.aircraftType
 
     def setCurrentPage(self, index, finalize = False, fromPageShift = None):
         """Set the current page to the one with the given index.
@@ -5217,7 +5500,18 @@ class Wizard(gtk.VBox):
 
     def reloadFlights(self, callback):
         """Reload the flights from the MAVA server."""
-        self.login(callback, None, None, None)
+        self.login(callback, None, None)
+
+    def cancelFlight(self, reloadCallback):
+        """Cancel the flight.
+
+        If it is an entry exam flight, we go back to the student page.
+        Otherwise we reload the flights."""
+        if self.entranceExam:
+            self.reset(None)
+            self.jumpPage("student")
+        else:
+            self.reloadFlights(reloadCallback)
 
     def cruiseLevelChanged(self):
         """Called when the cruise level is changed."""

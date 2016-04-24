@@ -261,7 +261,7 @@ class Client(object):
         value = self._performCall(lambda sessionID:
                                   self._server.getEntryExamStatus(sessionID))
         return (value["entryExamPassed"], value["entryExamLink"],
-                value["checkFlightStatus"])
+                value["checkFlightStatus"], value["madeFO"])
 
     def getFleet(self):
         """Query and return the fleet."""
@@ -291,6 +291,11 @@ class Client(object):
         """Update the online ACARS from the given data."""
         self._performCall(lambda sessionID:
                           self._server.updateOnlineACARS(sessionID, acars))
+
+    def setCheckFlightPassed(self, type):
+        """Mark the check flight of the user passed with the given type."""
+        self._performCall(lambda sessionID:
+                          self._server.setCheckFlightPassed(sessionID, type))
 
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.

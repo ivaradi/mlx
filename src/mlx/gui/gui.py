@@ -580,7 +580,7 @@ class GUI(fs.ConnectionListener):
         self._logView.get_buffer().set_text("")
 
         if self.loggedIn:
-            self._wizard.reloadFlights(self._handleReloadResult)
+            self._wizard.cancelFlight(self._handleReloadResult)
         else:
             self._wizard.reset(None)
 

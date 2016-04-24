@@ -90,11 +90,46 @@ class BookedFlight(object):
                       const.AIRCRAFT_YK40  : "YK4",
                       const.AIRCRAFT_B462  : "146" }
 
+    checkFlightTypes = [ const.AIRCRAFT_B736, const.AIRCRAFT_B737,
+                         const.AIRCRAFT_B738, const.AIRCRAFT_DH8D ]
+
     @staticmethod
     def getDateTime(date, time):
         """Get a datetime object from the given textual date and time."""
         return datetime.datetime.strptime(date + " " + time,
                                           "%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
+    def forCheckFlight(aircraftType):
+        """Create a booked flight for a check flight with the given aircraft
+        type."""
+        flight = BookedFlight()
+
+        flight.departureICAO = "LHBP"
+        flight.arrivalICAO = "LHBP"
+
+        flight.aircraftType = aircraftType
+        flight.aircraftTypeName = BookedFlight.TYPE2TYPECODE[aircraftType]
+
+        # FIXME: perhaps find one for the type
+        flight.tailNumber = "HA-CHK"
+        flight.callsign = "HA-CHK"
+
+        flight.numPassengers = 0
+        flight.numCrew = 2
+        flight.bagWeight = 0
+        flight.cargoWeight = 0
+        flight.mailWeight = 0
+        flight.route = "DCT"
+
+        t = datetime.datetime.now() + datetime.timedelta(minutes = 20)
+        flight.departureTime = datetime.datetime(t.year, t.month, t.day,
+                                                 t.hour, t.minute)
+        t = flight.departureTime + datetime.timedelta(minutes = 30)
+        flight.arrivalTime = datetime.datetime(t.year, t.month, t.day,
+                                               t.hour, t.minute)
+
+        return flight
 
     def __init__(self, id = None):
         """Construct a booked flight with the given ID."""
@@ -740,6 +775,8 @@ class LoginRPC(RPCRequest):
                 result.entryExamPassed = reply[0]
                 result.entryExamLink = reply[1]
                 result.checkFlightStatus = reply[2]
+                if reply[3]:
+                    result.rank = "FO"
 
         return result
 
@@ -760,6 +797,7 @@ class GetEntryExamStatus(RPCRequest):
         result.entryExamPassed = reply[0]
         result.entryExamLink = reply[1]
         result.checkFlightStatus = reply[2]
+        result.madeFO = reply[3]
 
         return result
 
@@ -1155,6 +1193,21 @@ class SendBugReport(Request):
 
 #------------------------------------------------------------------------------
 
+class SetCheckFlightPassed(RPCRequest):
+    """A request to mark the user as one having passed the check flight."""
+    def __init__(self, client, callback, aircraftType):
+        """Construct the request for the given type."""
+        super(SetCheckFlightPassed, self).__init__(client, callback)
+        self._aircraftType = aircraftType
+
+    def run(self):
+        """Perform the update."""
+        aircraftType = BookedFlight.TYPE2TYPECODE[self._aircraftType]
+        self._client.setCheckFlightPassed(aircraftType)
+        return Result()
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1230,6 +1283,11 @@ class Handler(threading.Thread):
     def sendBugReport(self, callback, summary, description, email):
         """Send a bug report with the given data."""
         self._addRequest(SendBugReport(callback, summary, description, email))
+
+    def setCheckFlightPassed(self, callback, aircraftType):
+        """Mark the check flight as passed."""
+        self._addRequest(SetCheckFlightPassed(self._rpcClient,
+                                              callback, aircraftType))
 
     def run(self):
         """Process the requests."""

@@ -1,4 +1,4 @@
-# English-language texts for the MAVA Logger X
+
 #
 # István Váradi <ivaradi@gmail.com>, 2012
 msgid ""
@@ -2310,3 +2310,104 @@ msgstr ""
 "If this button is greyed out, it means that you have already passed "
 "the exam earlier. Note, that its status is updated only a few minutes "
 "after passing the exam."
+
+msgid "student_check_flight_status"
+msgstr "Check flight:"
+
+msgid "student_check_flight_passed"
+msgstr "<span color=\"darkgreen\"><b>Passed</b></span>"
+
+msgid "student_check_flight_not_passed"
+msgstr "<span color=\"orange\"><b>Not yet passed</b></span>"
+
+msgid "student_check_flight"
+msgstr "Perform the _check flight"
+
+msgid "student_check_flight_tooltip"
+msgstr ""
+"Click this button to perform the check flight, after you have selected "
+"the airfract type to fly with. You will then have to perform a flight "
+"departing from and arriving at LHBP (Budapest Ferihegy Airport) with a "
+"proper SID and arrival transition."
+
+msgid "student_fo"
+msgstr "Congratulations!"
+
+msgid "student_fo_secondary"
+msgstr ""
+"You have received the rank of <b>First Officer</b> (FO).\n\n"
+"By clicking OK below, you will be taken to the flight selection page, "
+"from which you can perform your first real MAVA flight!"
+
+msgid "chkfinish_title"
+msgstr "Check flight finished"
+
+msgid "chkfinish_passed_begin"
+msgstr ""
+"<b><span size=\"xx-large\">Congratulations!</span></b>\n"
+"\n"
+"You have successfully completed your check flight."
+
+msgid "chkfinish_passed_fo"
+msgstr ""
+" \n\n"
+"You have received the rank of <b>First Officer</b> (FO)."
+
+msgid "chkfinish_passed_end"
+msgstr ""
+" \n\n"
+"You may wish to review the log if you have made any mistakes."
+
+msgid "chkfinish_failed"
+msgstr ""
+"Unfortunately, you have <b>failed</b> your check flight.\n"
+"\n"
+"You can review the log to check what mistakes you have committed."
+
+msgid "chkfinish_savepirep"
+msgstr ""
+" \n\n"
+"If you have further questions, you can save your PIREP\n"
+"and send the file to your mentor for a review and\n"
+"to receive helpful advice."
+
+msgid "chkfinish_next_student_begin"
+msgstr ""
+" \n\n"
+"The <i>Next</i> button takes you back to the <i>Student</i> page,"
+
+msgid "chkfinish_next_student_nothing"
+msgstr ""
+" \n"
+"where you can initiate another test flight or take your entry exam."
+
+msgid "chkfinish_next_student_no_exam"
+msgstr ""
+" \n"
+"where you can take your entry exam."
+
+msgid "chkfinish_next_student_no_flight"
+msgstr ""
+" \n"
+"where you can initiate another test flight."
+
+msgid "chkfinish_next"
+msgstr ""
+" \n\n"
+"The <i>Next</i> button takes you to the flight selection page,\n"
+"from which you can perform your first real MAVA flight!"
+
+msgid "chkfinish_updateweb_busy"
+msgstr "Updating check flight status..."
+
+msgid "chkfinish_passedset_failed"
+msgstr "Failed to update the check flight status"
+
+msgid "chkfinish_passedset_failed_title"
+msgstr "Update failure"
+
+msgid "chkfinish_passedset_failed_secondary"
+msgstr ""
+"You can retry later, or save your PIREP and send it "
+"to your mentor at MAVA, who can arrange for your flight "
+"to be accepted."
