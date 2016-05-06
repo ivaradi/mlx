@@ -677,8 +677,8 @@ class Register(RPCRequest):
             result.pilotID = pilotID
 
             self._client.setCredentials(pilotID, registrationData.password)
-            loginResult = self._client.login()
-            result.loggedIn = loginResult is not None
+            LoginRPC.setupLoginResult(result, self._client, pilotID,
+                                      registrationData.password)
 
         result.invalidData = \
           resultCode==rpc.Client.RESULT_INVALID_DATA
@@ -749,6 +749,26 @@ class Login(Request):
 
 class LoginRPC(RPCRequest):
     """An RPC-based login request."""
+    @staticmethod
+    def setupLoginResult(result, client, pilotID, password):
+        """Setup the login result with the given client, pilot ID and
+        password."""
+        loginResult = client.login()
+        result.loggedIn = loginResult is not None
+        if result.loggedIn:
+            result.pilotID = pilotID
+            result.pilotName = loginResult[0]
+            result.rank = loginResult[1]
+            result.password = password
+            result.flights = client.getFlights()
+            if result.rank=="STU":
+                reply = client.getEntryExamStatus()
+                result.entryExamPassed = reply[0]
+                result.entryExamLink = reply[1]
+                result.checkFlightStatus = reply[2]
+                if reply[3]:
+                    result.rank = "FO"
+
     def __init__(self, client, callback, pilotID, password):
         """Construct the login request with the given pilot ID and
         password."""
@@ -762,21 +782,8 @@ class LoginRPC(RPCRequest):
         result = Result()
 
         self._client.setCredentials(self._pilotID, self._password)
-        loginResult = self._client.login()
-        result.loggedIn = loginResult is not None
-        if result.loggedIn:
-            result.pilotID = self._pilotID
-            result.pilotName = loginResult[0]
-            result.rank = loginResult[1]
-            result.password = self._password
-            result.flights = self._client.getFlights()
-            if result.rank=="STU":
-                reply = self._client.getEntryExamStatus()
-                result.entryExamPassed = reply[0]
-                result.entryExamLink = reply[1]
-                result.checkFlightStatus = reply[2]
-                if reply[3]:
-                    result.rank = "FO"
+        LoginRPC.setupLoginResult(result, self._client,
+                                  self._pilotID, self._password)
 
         return result
 

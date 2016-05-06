@@ -1363,6 +1363,7 @@ class RegisterPage(Page):
 
         if registrationOK:
             if result.loggedIn:
+                self._wizard._loginResult = result
                 self._wizard.nextPage()
             else:
                 self._wizard.jumpPage("login")
