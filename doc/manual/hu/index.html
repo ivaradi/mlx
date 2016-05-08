@@ -197,6 +197,20 @@
   főablaka jelenik meg ahelyett, hogy új példány indulna el.
   </p>
 
+  <p>
+  Ha a számítógépen először fut a program, az alábbi dialógus ablak jelenik meg:
+  </p>
+  <div align="center">
+    <img src="registrationDialog.png" alt="A regisztrációra rákérdező dialógus"/>
+  </div>
+
+  <p>
+  Ha még nincs regisztrációnk a MAVA-nál, kattintsunk a <b>Regisztráció</b>
+  gombra. A regisztráció folyamatának leírása <a href="#registration">itt</a>
+  olvasható el. Ha már van pilóta azonosítónk és jelszavunk, kattintsunk a
+  <b>Mégse</b> gombra, és az alábbiakban leírtaknak megfelelően haladjunk tovább.
+  </p>
+
   <h2><a name="mainWindow">A főablak</a></h2>
 
   <p>
@@ -1272,6 +1286,86 @@
   ablaknak a segítségével dönthető el, hogy a probléma a szimulátorból
   kiolvasott adatok átalakításával, vagy a már átalakított értékek
   feldolgozásával van-e.
+  </p>
+
+  <h2><a name="registration">Regisztráció</a></h2>
+
+  <img src="registration.png" alt="A Regisztráció oldal"/>
+
+  <p>
+  Ha a regisztrálás mellett döntöttünk, a <i>Regisztráció</i> oldal jelenik
+  meg. Írjuk be a kért adatokat. A dőlt betűvel jelölt adatokat (a
+  telefonszámot és a nemzetiséget) nem kötelező megadni. A VATSIM és az IVAO
+  azonosítók közül az egyiket viszont kötelező megadni, így valamelyik
+  hálózatban regisztráljunk előbb. A jelszónak legalább 5 karakter hosszúnak
+  kell lennie. Javasolt olyat választani, amelyben kis- és nagybetűk, számok
+  és akár speciális karakterek is egyaránt megtalálhatók.
+  </p>
+
+  <p>
+  Ha minden szükséges adatot beírtunk, kattintsünk a <b>Regisztráció</b>
+  gombra. Az adatok bekerülnek a MAVA adatbázisába, és ha minden jól megy, egy
+  dialógus ablakban megkapjuk a <i>pilóta azonosító</i>nkat. Ennek alkja
+  <i>Pnnn</i>, ahol <i>nnn</i> egy háromjegyű szám (pl. <i>P210</i>).
+  Ezt a jelszóval együtt célszerű lejegyezni. Ezekkel az adatokkal tudunk
+  bejelentkezni a MAVA weboldalára, fórumába és az oktatóközpontba.
+  </p>
+
+  <p>
+  Ha a megjelenő dialógus ablakban az <b>OK</b>-ra kattintunk, a <i>Jelölt</i>
+  lap jelenik meg:
+  </p>
+
+  <img src="student.png" alt="A Jelölt lap"/>
+
+  <p>
+  Itt megtekinthetjük az elméleti vizsga és az ellenőrző repülés állapotát,
+  valamint elindíthatjuk ezen tevékenységeket.
+  </p>
+
+  <p>
+  Az elméleti vizsgált az Interneten,
+  a <a href="http://mavasystems.hu/moodle">MAVA Oktatási Központban</a>
+  tehetjük le. Az <b>Elméleti vizsga</b> gomb megnyomásával a böngészőnkben
+  megjelenik a Központ weboldala, ahol a pilóta azonosítóval és a
+  jelszavunkkal történő bejelentkezés után letehetjük a vizsgát. Ha az sikerül,
+  a <i>Jelölt</i> lapon a vizsga állapota frissül. Erre azonban csak néhány
+  perc elteltével kerül sor, mire a háttérben futó rendszerekben frissül az
+  állapot és erről a logger is értesül.
+  </p>
+
+  <p>
+  Az ellenőrző repülés egy egyszerű repülés, amely során a ferihegyi
+  repülőtérről (LHBP) felszállünk, lerepüljük a szabványos indulási eljárást
+  (SID-et), majd egy megközelítési transition kezdőpontjára repülünk,
+  lerepüljük a transitiont és végül leszállunk. (Ha az előző mondatban szereplő
+  egyes fogalmak jelentése nem világos, úgy nézzünk ezeknek utána, mert a
+  normál járatok teljesítéséhez is tudnunk kell, mit jelentenek ezek.)
+  Válasszuk ki a használni kívánt repülőgép típusát (jelenleg a Boeing 737NG
+  család valamelyik típusát vagy a Bombardier Dash-8 Q400-ast), majd
+  kattintsünk az <b>Ellenőrző repülés</b> gombra. Ekkor a normál járatok
+  teljesítésével szinte teljesen megegyező
+  folyamaton <a href="#tabFlight">végigvezet</a> minket a program a
+  <a href="#connectPage"><i>Kapcsolódás</i></a> oldaltól kezdve.
+  </p>
+
+  <p>
+  Az ellenőrző repülés akkor sikeres, ha nem vétettünk olyan súlyos hibát,
+  amelyre már a program is azt mondja, hogy NO-GO. Ellenkező esetben újra kell
+  próbálkoznunk. Ha a járattal kapcsolatban tanácsot szeretnénk kérni, a
+  PIREP-et mindkét esetben elmenthetjük fájlba, és azt elküldhetjünk a MAVA
+  mentorunknak.
+  </p>
+
+  <p>
+  Ha a későbbiekben elindítjuk a programot és bejelentkezünk, az mindig
+  ellenőrzi a rangunkat. Ha az még STU (student - jelölt), akkor mindig
+  a <i>Jelölt</i> oldalra kerülünk a belépés után. Ha minde az elméleti
+  vizsgát, mind az ellenőrző repülést sikeresen teljesítetjük, a rangunk FO
+  (First Officer - elsőtiszt) lesz. Ekkor már foglalhatunk járatokat a MAVA
+  weboldaláln és a logger segítségével le is repülhetjük azokat. Ebben az
+  esetben a <a href="#flightSelectionPage">Járatválasztás</a> oldal jelenik meg
+  a sikeres belépés után.
   </p>
 
 </html>
