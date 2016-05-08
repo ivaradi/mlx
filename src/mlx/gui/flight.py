@@ -1535,6 +1535,7 @@ class StudentPage(Page):
                                        xstr("student_entry_exam_not_passed"))
         self._entryExamStatus.set_use_markup(True)
         self._entryExamButton.set_sensitive(not passed)
+        self._wizard._loginResult.entryExamPassed = passed
 
     def _checkFlightClicked(self, button):
         """Called when the check flight button is clicked."""
