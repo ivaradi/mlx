@@ -1896,7 +1896,8 @@ class DAF70Model(F70Model):
         name."""
         return aircraft.type == const.AIRCRAFT_F70 and \
                (airPath.endswith("fokker70_2k4_v4.1.air") or
-                airPath.endswith("fokker70_2k4_v4.3.air"))
+                airPath.endswith("fokker70_2k4_v4.3.air") or
+                airPath.lower().endswith("fokker70_fsx_v4.3.air"))
 
     @property
     def name(self):
