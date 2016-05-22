@@ -4417,12 +4417,12 @@ class PIREPSaveHelper(object):
                               tooltip = xstr("finish_save_tooltip"),
                               clickedArg = page)
 
-    def autoSavePIREP(self):
+    def autoSavePIREP(self, page):
         """Perform the automatic saving of the PIREP."""
         self._lastSavePath = os.path.join(self._wizard.gui.config.pirepDirectory,
                                           self._getDefaultPIREPName())
         self._lastSavePath = text2unicode(self._lastSavePath)
-        self._savePIREP(automatic = True)
+        self._savePIREP(page, automatic = True)
 
     def _getDefaultPIREPName(self):
         """Get the default name of the PIREP."""
@@ -4497,8 +4497,6 @@ class PIREPSaveHelper(object):
 
         dialog.run()
         dialog.hide()
-
-        return pirepSaved
 
     def _getSaveDialog(self):
         """Get the PIREP saving dialog.
@@ -4827,7 +4825,7 @@ class FinishPage(Page):
 
         if gui.config.pirepAutoSave and sensitive and not wasSensitive:
             if gui.isWizardActive():
-                self._saveHelper.autoSavePIREP()
+                self._saveHelper.autoSavePIREP(self)
             else:
                 self._deferredAutoSave = True
 
@@ -4842,7 +4840,7 @@ class FinishPage(Page):
         """If the page has a default button, make it the default one."""
         super(FinishPage, self).grabDefault()
         if self._deferredAutoSave:
-            self._saveHelper.autoSavePIREP()
+            self._saveHelper.autoSavePIREP(self)
             self._deferredAutoSave = False
 
     def setPIREPSaved(self):
