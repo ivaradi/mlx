@@ -296,6 +296,30 @@ def removeFile(toremoveDir, directory, path):
 
 #------------------------------------------------------------------------------
 
+def removeFiles(directory, listener, removed, count):
+    """Remove the given files."""
+    toremoveDir = None
+    
+    listener.startRemoving()
+
+    removed.sort(reverse = True)
+    for path in removed:
+        removePath = createLocalPath(directory, path)
+        removeFile(toremoveDir, directory, removePath)
+
+        removeDirectory = os.path.dirname(removePath)
+        try:
+            os.removedirs(removeDirectory)
+        except:
+            pass
+
+        count += 1
+        listener.removed(path, count)
+
+    return count
+
+#------------------------------------------------------------------------------
+
 def updateFiles(directory, updateURL, listener,
                 manifest, modifiedAndNew, removed, localRemoved):
     """Update the files according to the given information."""
@@ -313,6 +337,11 @@ def updateFiles(directory, updateURL, listener,
     try:        
         updateURL += "/" + os.name
 
+        removeCount = 0
+        if localRemoved:
+            removeCount = removeFiles(directory, listener,
+                                      localRemoved, removeCount)
+        
         for (path, size, sum) in modifiedAndNew:
             targetFile = createLocalPath(directory, path)
             targetFile += "."
@@ -345,23 +374,8 @@ def updateFiles(directory, updateURL, listener,
             os.rename(downloadedFile, targetFile)
             count += 1
             listener.renamed(path, count)
-        
-        listener.startRemoving()
-        count = 0
-        removed += localRemoved
-        removed.sort(reverse = True)
-        for path in removed:            
-            removePath = createLocalPath(directory, path)
-            removeFile(toremoveDir, directory, removePath)
 
-            removeDirectory = os.path.dirname(removePath)
-            try:
-                os.removedirs(removeDirectory)
-            except:
-                pass
-
-            count += 1
-            listener.removed(path, count)
+        removeFiles(directory, listener, removed, removeCount)
 
         listener.writingManifest()
 
