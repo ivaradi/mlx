@@ -103,6 +103,11 @@ class PIREP(object):
         self.faultLineIndexes = logger.faultLineIndexes
 
     @property
+    def flightDateText(self):
+        """Get the text version of the booked flight's departure time."""
+        return self.bookedFlight.departureTime.strftime("%Y-%m-%d")
+
+    @property
     def flightTypeText(self):
         """Get the text representation of the flight type."""
         return PIREP._flightTypes[self.flightType]
@@ -193,6 +198,10 @@ class PIREP(object):
         """Serialize the PIREP for JSON-RPC."""
         attrs = {}
         attrs["log"] = self.getACARSText()
+        attrs["flightDate"] = self.flightDateText
+        attrs["callsign"] = self.bookedFlight.callsign
+        attrs["departureICAO"] = self.bookedFlight.departureICAO
+        attrs["arrivalICAO"] = self.bookedFlight.arrivalICAO
         attrs["numPassengers"] = self.numPassengers
         attrs["numCrew"] = self.numCrew
         attrs["cargoWeight"] = self.cargoWeight
@@ -222,6 +231,6 @@ class PIREP(object):
         attrs["rating"] = max(0.0, self.rating)
         attrs["flownDistance"] = self.flownDistance
         # FIXME: it should be stored in the PIREP when it is sent later
-        attrs["flightDate"] = datetime.date.today().strftime("%Y-%m-%d")
+        attrs["performDate"] = datetime.date.today().strftime("%Y-%m-%d")
 
         return ([], attrs)
