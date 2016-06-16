@@ -1669,6 +1669,12 @@ class PMDGBoeing737NGModel(B737Model):
              name.find("800")!=-1 or airPath.find("800")!=-1 or \
              name.find("900")!=-1 or airPath.find("900")!=-1)
 
+    def __init__(self):
+        """Construct the model."""
+        super(PMDGBoeing737NGModel, self).__init__()
+        self._lastGearControl = None
+        self._lastNoseGear = None
+
     @property
     def name(self):
         """Get the name for this aircraft model."""
@@ -1732,6 +1738,14 @@ class PMDGBoeing737NGModel(B737Model):
 
         state.apHeading = data[self._pmdgidx_aphdg]
         state.apAltitude = data[self._pmdgidx_apalt]
+
+        gearControl = data[self._monidx_gearControl]
+        noseGear = data[self._monidx_noseGear]
+
+        if gearControl!=self._lastGearControl or noseGear!=self._lastNoseGear:
+            print "gearControl:", gearControl, " noseGear:", noseGear
+            self._lastGearControl = gearControl
+            self._lastNoseGear = noseGear
 
         return state
 
