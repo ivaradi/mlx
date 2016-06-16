@@ -169,7 +169,14 @@ secondaryInstallation="secondary" in sys.argv
 #------------------------------------------------------------------------------
 
 _utf8decoder = codecs.getdecoder("utf-8")
+_latin2decoder = codecs.getdecoder("iso8859-2")
 
 def utf2unicode(text):
     """Convert the given text from UTF-8 encoding to unicode."""
-    return unicode(_utf8decoder(text)[0])
+    try:
+        return unicode(_utf8decoder(text)[0])
+    except:
+        try:
+            return unicode(_latin2decoder(text)[0])
+        except:
+            return unicode(list(text))
