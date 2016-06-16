@@ -9,6 +9,7 @@ import tempfile
 import socket
 import subprocess
 import hashlib
+import traceback
 
 if os.name=="nt":
     import win32api
@@ -290,7 +291,12 @@ def removeFile(toremoveDir, directory, path):
             sum = hashlib.md5()
             sum.update(path)
             toremoveDir = getToremoveDir(toremoveDir, directory)
-            os.rename(path, os.path.join(toremoveDir, sum.hexdigest()))
+            targetPath = os.path.join(toremoveDir, sum.hexdigest())
+            try:
+                os.remove(targetPath)
+            except:
+                pass
+            os.rename(path, targetPath)
         except Exception, e:
             print "Cannot remove file " + path + ": " + utf2unicode(str(e))
 
@@ -385,8 +391,12 @@ def updateFiles(directory, updateURL, listener,
         
         listener.done()
     except Exception, e:
+        exc = traceback.format_exc()
+        print >> sys.stderr, utf2unicode(exc)
+        
         error = utf2unicode(str(e))
         print >> sys.stderr, "Error:", error
+
         listener.failed(error)
 
 #------------------------------------------------------------------------------
@@ -534,45 +544,58 @@ def sudoUpdate(directory, updateURL, listener, manifest):
 
 def update(directory, updateURL, listener, fromGUI = False):
     """Perform the update."""
-    result = prepareUpdate(directory, updateURL, listener)
-    if result is None:
-        return
+    try:
+        result = prepareUpdate(directory, updateURL, listener)
+        if result is None:
+            return
 
-    (manifest, updateManifest, modifiedAndNew, removed) = result        
-    localRemoved = getToremoveFiles(directory)
+        (manifest, updateManifest, modifiedAndNew, removed) = result        
+        localRemoved = getToremoveFiles(directory)
 
-    if not modifiedAndNew and not removed and not localRemoved:
-        listener.done()
-        return
+        if not modifiedAndNew and not removed and not localRemoved:
+            listener.done()
+            return
 
-    if fromGUI and not isDirectoryWritable(directory):
-        if listener.needSudo():
-            sudoUpdate(directory, updateURL, listener, updateManifest)
-    else:
-        updateFiles(directory, updateURL, listener, updateManifest,
-                    modifiedAndNew, removed, localRemoved)
+        if fromGUI and not isDirectoryWritable(directory):
+            if listener.needSudo():
+                sudoUpdate(directory, updateURL, listener, updateManifest)
+        else:
+            updateFiles(directory, updateURL, listener, updateManifest,
+                        modifiedAndNew, removed, localRemoved)
+    except Exception, e:
+        exc = traceback.format_exc()
+        print >> sys.stderr, utf2unicode(exc)
+        
+        error = utf2unicode(str(e))
+        print >> sys.stderr, "Update error:", error
+        
+        listener.failed(error)
 
 #------------------------------------------------------------------------------
 
 def updateProcess():
     """This is called in the child process, when we need a child process."""
-    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
-    clientSocket.connect(("127.0.0.1", int(sys.argv[1])))
+    try:
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
+        clientSocket.connect(("127.0.0.1", int(sys.argv[1])))
 
-    directory = os.path.dirname(sys.argv[0])
+        directory = os.path.dirname(sys.argv[0])
 
-    manifest = readLocalManifest(directory)
-    
-    updateManifest = Manifest()
-    with open(sys.argv[2], "rt") as f:
-        updateManifest.readFrom(f)
+        manifest = readLocalManifest(directory)
 
-    (modifiedAndNew, removed) = manifest.compare(updateManifest)
-    localRemoved = getToremoveFiles(directory)
+        updateManifest = Manifest()
+        with open(sys.argv[2], "rt") as f:
+            updateManifest.readFrom(f)
 
-    updateFiles(directory, sys.argv[3],
-                ClientListener(clientSocket),
-                updateManifest, modifiedAndNew, removed, localRemoved)
+        (modifiedAndNew, removed) = manifest.compare(updateManifest)
+        localRemoved = getToremoveFiles(directory)
+
+        updateFiles(directory, sys.argv[3],
+                    ClientListener(clientSocket),
+                    updateManifest, modifiedAndNew, removed, localRemoved)
+    except:
+        exc = traceback.format_exc()
+        print >> sys.stderr, utf2unicode(exc)
 
 #------------------------------------------------------------------------------
 
