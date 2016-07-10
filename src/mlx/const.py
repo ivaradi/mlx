@@ -62,6 +62,9 @@ AIRCRAFT_B738 = 3
 ## Aircraft type: Boeing 737-800 (charter configuration)
 AIRCRAFT_B738C = 16
 
+## Aircraft type: Boeing 737-200
+AIRCRAFT_B732 = 18
+
 ## Aircraft type: Boeing 737-300
 AIRCRAFT_B733 = 4
 
@@ -111,7 +114,7 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
                  AIRCRAFT_DH8D,
                  AIRCRAFT_F70, AIRCRAFT_CRJ2,
                  AIRCRAFT_B762, AIRCRAFT_B763,
-                 AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
+                 AIRCRAFT_B732, AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
                  AIRCRAFT_T154, AIRCRAFT_T134,
                  AIRCRAFT_YK40, AIRCRAFT_DC3,
                  AIRCRAFT_B462]
@@ -124,6 +127,7 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_B737  : "B737",
               AIRCRAFT_B738  : "B738",
               AIRCRAFT_B738C : "B738C",
+              AIRCRAFT_B732  : "B732",
               AIRCRAFT_B733  : "B733",
               AIRCRAFT_B734  : "B734",
               AIRCRAFT_B735  : "B735",

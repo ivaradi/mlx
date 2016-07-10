@@ -27,6 +27,9 @@ msgstr "Boeing 737-800"
 msgid "aircraft_b738c"
 msgstr "Boeing 737-800 (charter)"
 
+msgid "aircraft_b732"
+msgstr "Boeing 737-200"
+
 msgid "aircraft_b733"
 msgstr "Boeing 737-300"
 

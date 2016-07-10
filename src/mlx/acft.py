@@ -788,6 +788,19 @@ class Boeing737CL(Boeing737):
 
 #---------------------------------------------------------------------------------------
 
+class B732(Boeing737CL):
+    """Boeing 737-200 aircraft."""
+    def __init__(self, flight):
+        super(B732, self).__init__(flight)
+        self.dow = 32700
+        self.mtow = 62820
+        self.mlw = 51700
+        self.mzfw = 48410
+        self.maxTakeOffPitch = 13.4
+        self.maxTouchDownPitch = 12.0
+
+#---------------------------------------------------------------------------------------
+
 class B733(Boeing737CL):
     """Boeing 737-300 aircraft."""
     def __init__(self, flight):
@@ -1200,6 +1213,7 @@ _classes = { const.AIRCRAFT_B736  : B736,
              const.AIRCRAFT_B737  : B737,
              const.AIRCRAFT_B738  : B738,
              const.AIRCRAFT_B738C : B738Charter,
+             const.AIRCRAFT_B732  : B732,
              const.AIRCRAFT_B733  : B733,
              const.AIRCRAFT_B734  : B734,
              const.AIRCRAFT_B735  : B735,
