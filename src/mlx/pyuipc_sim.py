@@ -620,6 +620,8 @@ class Values(object):
         """Write the value at the given offset."""
         try:
             return self._write(offset, value, type)
+        except TypeError, e:
+            raise e
         except Exception, e:
             print "failed to write offset %04x: %s" % (offset, str(e))
             raise FSUIPCException(ERR_DATA)
@@ -861,6 +863,8 @@ class Values(object):
         elif offset==0x337d:       # Structural de-ice
             self.structDeIce = value!=0
         elif offset==0x3380:       # Message
+            if not isinstance(value, str):
+                raise TypeError("String expected!")
             self.message = value
         elif offset==0x3bfc:       # ZFW
             self.zfw = value * const.LBSTOKG / 256.0
