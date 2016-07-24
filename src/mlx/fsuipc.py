@@ -117,7 +117,7 @@ class Handler(threading.Thread):
     CONNECT_INTERVAL = 0.25
 
     @staticmethod
-    def _performRead(data, callback, extra, validator):
+    def _performRead(data, callback, extra, validator, unimportant = False):
         """Perform a read request.
 
         If there is a validator, that will be called with the return values,
@@ -129,24 +129,39 @@ class Handler(threading.Thread):
         some lower-level communication problem."""
         attemptsLeft = Handler.NUM_READATTEMPTS
         while attemptsLeft>0:
-            values = pyuipc.read(data)
-            if validator is None or \
-               Handler._callSafe(lambda: validator(values, extra)):
+            exception = None
+            try:
+                values = pyuipc.read(data)
+            except TypeError, e:
+                exception = e
+
+            failed = True
+            if (exception is None or unimportant) and \
+               (validator is None or \
+                Handler._callSafe(lambda: validator(values, extra))):
                 Handler._callSafe(lambda: callback(values, extra))
-                return True
-            else:
+                failed = False
+
+            if exception is not None:
+                raise exception
+
+            if failed:
                 attemptsLeft -= 1
+            else:
+                return True
         return False
 
     class Request(object):
         """A simple, one-shot request."""
-        def __init__(self, forWrite, data, callback, extra, validator = None):
+        def __init__(self, forWrite, data, callback, extra,
+                     validator = None, unimportant = False):
             """Construct the request."""
             self._forWrite = forWrite
             self._data = data
             self._callback = callback
             self._extra = extra
             self._validator = validator
+            self.unimportant = unimportant
 
         def process(self, time):
             """Process the request.
@@ -155,12 +170,24 @@ class Handler(threading.Thread):
             has failed for a reading request. An exception may also be thrown
             if there is some lower-level communication problem."""
             if self._forWrite:
-                pyuipc.write(self._data)
-                Handler._callSafe(lambda: self._callback(True, self._extra))
+                exception = None
+                try:
+                    pyuipc.write(self._data)
+                except TypeError, e:
+                    exception = e
+
+                if exception is None or self.unimportant:
+                    Handler._callSafe(lambda: self._callback(True,
+                                                             self._extra))
+
+                if exception is not None:
+                    raise exception
+
                 return True
             else:
                 return Handler._performRead(self._data, self._callback,
-                                            self._extra, self._validator)
+                                            self._extra, self._validator,
+                                            self.unimportant)
 
         def fail(self):
             """Handle the failure of this request."""
@@ -266,7 +293,7 @@ class Handler(threading.Thread):
                                                   validator))
             self._requestCondition.notify()
 
-    def requestWrite(self, data, callback, extra = None):
+    def requestWrite(self, data, callback, extra = None, unimportant = False):
         """Request the writing of some data.
 
         data is a list of tuples of the following items:
@@ -280,7 +307,8 @@ class Handler(threading.Thread):
         It will be called in the handler's thread!
         """
         with self._requestCondition:
-            request = Handler.Request(True, data, callback, extra)
+            request = Handler.Request(True, data, callback, extra,
+                                      unimportant = unimportant)
             #print "fsuipc.Handler.requestWrite", request
             self._requests.append(request)
             self._requestCondition.notify()
@@ -450,6 +478,12 @@ class Handler(threading.Thread):
                 if not request.process(time):
                     print "fsuipc.Handler._processRequest: FSUIPC returned invalid data too many times, reconnecting"
                     needReconnect = True
+            except TypeError as e:
+                print "fsuipc.Handler._processRequest: type error: " + \
+                      util.utf2unicode(str(e)) + \
+                      ("." if request.unimportant else
+                       (", reconnecting (attempts=%d)." % (attempts,)))
+                needReconnect = not request.unimportant
             except Exception as e:
                 print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
                       util.utf2unicode(str(e)) + \
