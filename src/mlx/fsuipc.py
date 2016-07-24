@@ -727,6 +727,11 @@ class Simulator(object):
             elif duration == 1: duration = -2
             else: duration = -duration
 
+        try:
+            message = str(message)
+        except Exception, e:
+            print "fsuipc.Simulator.sendMessage: failed to convert the message to a string:", e
+
         data = [(0x3380, -1 - len(message), message),
                 (0x32fa, 'h', duration)]
 
@@ -734,7 +739,8 @@ class Simulator(object):
         #    print "fsuipc.Simulator.sendMessage(disconnect)", message
 
         self._handler.requestWrite(data, self._handleMessageSent,
-                                   extra = _disconnect)
+                                   extra = _disconnect,
+                                   unimportant = True)
 
     def getFuel(self, callback):
         """Get the fuel information for the current model.
