@@ -929,6 +929,12 @@ class B763(Boeing767):
                                          ["CI", "M76", "M78", "M80", "M82", "M84", "LRC"],
                                          ["78/290/250"])
 
+    def setBookedFlight(self, bookedFlight):
+        """Update the aircraft based on the booked flight data (e.g. tail number)."""
+        if bookedFlight.tailNumber=="HA-LHD":
+            self.mtow = 159210
+            self.mlw = 126098
+
 #---------------------------------------------------------------------------------------
 
 class CRJ2(Aircraft):
@@ -1116,6 +1122,13 @@ class T154(Aircraft):
     def derateType(self):
         """Get the derate type for this type."""
         return DERATE_TUPOLEV
+
+    def setBookedFlight(self, bookedFlight):
+        """Update the aircraft based on the booked flight data (e.g. tail number)."""
+        if bookedFlight.tailNumber in ["HA-LCM", "HA-LCN", "HA-LCO", "HA-LCP",
+                                       "HA-LCR", "HA-LCU", "HA-LCV"]:
+            self.mtow = 100000
+            self.mlw = 80000
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
