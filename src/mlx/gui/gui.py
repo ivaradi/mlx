@@ -981,14 +981,14 @@ class GUI(fs.ConnectionListener):
             self._writeLog(text, self._debugLogView)
             self._stdioStartingLine = False
 
-    def connectSimulator(self, aircraftType, simulatorType):
+    def connectSimulator(self, bookedFlight, simulatorType):
         """Connect to the simulator for the first time."""
         self._logger.reset()
 
         self._flight = flight.Flight(self._logger, self)
         self._flight.flareTimeFromFS = self.config.flareTimeFromFS
-        self._flight.aircraftType = aircraftType
-        self._flight.aircraft = acft.Aircraft.create(self._flight)
+        self._flight.aircraftType = bookedFlight.aircraftType
+        self._flight.aircraft = acft.Aircraft.create(self._flight, bookedFlight)
         self._flight.aircraft._checkers.append(self)
 
         if self._simulator is None:

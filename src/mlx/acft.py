@@ -97,9 +97,11 @@ class SimBriefData(object):
 class Aircraft(object):
     """Base class for aircraft."""
     @staticmethod
-    def create(flight):
+    def create(flight, bookedFlight):
         """Create an aircraft instance for the type in the given flight."""
-        return _classes[flight.aircraftType](flight)
+        acft = _classes[flight.aircraftType](flight)
+        acft.setBookedFlight(bookedFlight)
+        return acft
 
     def __init__(self, flight, minLandingFuel = None,
                  recommendedLandingFuel = None):
@@ -278,6 +280,11 @@ class Aircraft(object):
 
         This default implementation returns DERATE_NONE."""
         return DERATE_NONE
+
+    def setBookedFlight(self, bookedFlight):
+        """Update the aircraft based on the booked flight data (e.g. tail number).
+
+        This default implementation does nothing."""
 
     def getDerateLine(self, value):
         """Get the log line for the given derate value.

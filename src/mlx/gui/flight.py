@@ -5645,8 +5645,7 @@ class Wizard(gtk.VBox):
 
     def _connectSimulator(self, simulatorType):
         """Connect to the simulator."""
-        self.gui.connectSimulator(self._bookedFlight.aircraftType,
-                                  simulatorType)
+        self.gui.connectSimulator(self._bookedFlight, simulatorType)
 
     def _arrivalMETARCallback(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
