@@ -758,7 +758,7 @@ class B738(Boeing737):
     def __init__(self, flight):
         super(B738, self).__init__(flight)
         self.dow = 42690
-        self.mtow = 71709
+        self.mtow = 71791
         self.mlw = 65317
         self.mzfw = 61688
         self.maxTakeOffPitch = 11
@@ -805,10 +805,10 @@ class B733(Boeing737CL):
     """Boeing 737-300 aircraft."""
     def __init__(self, flight):
         super(B733, self).__init__(flight)
-        self.dow = 32700
-        self.mtow = 62820
-        self.mlw = 51700
-        self.mzfw = 48410
+        self.dow = 32900
+        self.mtow = 56472
+        self.mlw = 51710
+        self.mzfw = 47625
         self.maxTakeOffPitch = 13.4
         self.maxTouchDownPitch = 12.0
 
@@ -818,10 +818,10 @@ class B734(Boeing737CL):
     """Boeing 737-400 aircraft."""
     def __init__(self, flight):
         super(B734, self).__init__(flight)
-        self.dow = 33200
-        self.mtow = 68050
-        self.mlw = 56200
-        self.mzfw = 53100
+        self.dow = 35100
+        self.mtow = 62822
+        self.mlw = 54885
+        self.mzfw = 51256
         self.maxTakeOffPitch = 11.4
         self.maxTouchDownPitch = 10
 
@@ -831,10 +831,10 @@ class B735(Boeing737CL):
     """Boeing 737-500 aircraft."""
     def __init__(self, flight):
         super(B735, self).__init__(flight)
-        self.dow = 31300
-        self.mtow = 60550
-        self.mlw = 50000
-        self.mzfw = 46700
+        self.dow = 31900
+        self.mtow = 62823
+        self.mlw = 49895
+        self.mzfw = 46720
         self.maxTakeOffPitch = 14.7
         self.maxTouchDownPitch = 13.2
 
@@ -851,10 +851,10 @@ class DH8D(Aircraft):
 
     def __init__(self, flight):
         super(DH8D, self).__init__(flight, minLandingFuel = 2000)
-        self.dow = 17185
-        self.mtow = 29257
-        self.mlw = 28009
-        self.mzfw = 25855
+        self.dow = 18508
+        self.mtow = 29574
+        self.mlw = 28123
+        self.mzfw = 26308
         self.gearSpeedLimit = 215
         self.flapSpeedLimits = { 5 : 200,
                                  10 : 181,
@@ -900,7 +900,7 @@ class B762(Boeing767):
     def __init__(self, flight):
         super(B762, self).__init__(flight)
         self.dow = 84507
-        self.mtow = 175540
+        self.mtow = 159210
         self.mlw = 126098
         self.mzfw = 114758
         self.maxTakeOffPitch = 13.1
@@ -915,7 +915,7 @@ class B763(Boeing767):
         self.dow = 91311
         self.mtow = 181436
         self.mlw = 137892
-        self.mzfw = 130635
+        self.mzfw = 114758
         self.maxTakeOffPitch = 9.6
         self.maxTouchDownPitch = 8.1
         self.simBriefData = SimBriefData(["250/290/78"],
