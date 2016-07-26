@@ -792,12 +792,12 @@ class B732(Boeing737CL):
     """Boeing 737-200 aircraft."""
     def __init__(self, flight):
         super(B732, self).__init__(flight)
-        self.dow = 32700
-        self.mtow = 62820
-        self.mlw = 51700
-        self.mzfw = 48410
-        self.maxTakeOffPitch = 13.4
-        self.maxTouchDownPitch = 12.0
+        self.dow = 27646
+        self.mtow = 52390
+        self.mlw = 46720
+        self.mzfw = 43091
+        self.maxTakeOffPitch = 15.5
+        self.maxTouchDownPitch = 15.5
 
 #---------------------------------------------------------------------------------------
 
