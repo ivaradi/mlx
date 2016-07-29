@@ -1,7 +1,7 @@
 
 from config import Config
 from i18n import setLanguage
-from sound import initializeSound, finalizeSound
+from sound import preInitializeSound, initializeSound, finalizeSound
 from util import secondaryInstallation
 from const import VERSION
 from watchdog import Watchdog
@@ -76,6 +76,8 @@ def main():
         restart(["usedeflang"] + secondaryArgs)
 
     setLanguage(programDirectory, config.getLanguage())
+
+    preInitializeSound()
 
     from .gui.gui import GUI
     gui = GUI(programDirectory, config)

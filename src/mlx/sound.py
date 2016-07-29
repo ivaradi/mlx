@@ -156,6 +156,11 @@ if os.name=="nt":
 
     _thread = None
 
+    def preInitializeSound():
+        """Perform any-pre initialization.
+
+        This does nothing on Windows."""
+
     def initializeSound(soundsDirectory):
         """Initialize the sound handling with the given directory containing
         the sound files."""
@@ -178,81 +183,219 @@ if os.name=="nt":
 #------------------------------------------------------------------------------
 
 else: # os.name!="nt"
-    import threading
-    import time
-    try:
-        from common import gst_init, gobject, gst_element_factory_make
-        from common import GST_STATE_PLAYING, GST_MESSAGE_EOS
+    from multiprocessing import Process, Queue
+    from threading import Thread, Lock
 
-        _soundsDirectory = None
+    COMMAND_STARTSOUND = 1
+    COMMAND_QUIT = 2
+
+    REPLY_FINISHED = 101
+    REPLY_FAILED = 102
+    REPLY_QUIT = 103
+
+    _initialized = False
+    _process = None
+    _thread = None
+    _inQueue = None
+    _outQueue = None
+    _nextReference = 1
+    _ref2Data = {}
+    _lock = Lock()
+
+    def _processFn(inQueue, outQueue):
+        """The function running in the helper process created.
+
+        It tries to load the Gst module. If successful, True is sent back,
+        otherwise False followed by the exception caught and the function
+        quits.
+
+        In case of successful initialization, the directory of the sound files
+        is read, the command reader thread is created and the gobject main loop
+        is executed."""
+        try:
+            import gi.repository
+            gi.require_version("Gst", "1.0")
+            from gi.repository import Gst
+            from gi.repository import GObject as gobject
+
+            Gst.init(None)
+        except Exception, e:
+            outQueue.put(False)
+            outQueue.put(e)
+            return
+
+        outQueue.put(True)
+
+        soundsDirectory = inQueue.get()
+
         _bins = set()
 
-        def initializeSound(soundsDirectory):
-            """Initialize the sound handling with the given directory containing
-            the sound files."""
-            gst_init()
-            global _soundsDirectory
-            _soundsDirectory = soundsDirectory
+        mainLoop = None
 
-        def startSound(name, finishCallback = None, extra = None):
-            """Start playing back the given sound."""
-            try:
-                playBin = gst_element_factory_make("playbin")
+        def _handlePlayBinMessage(bus, message, bin, reference):
+            """Handle messages related to a playback."""
+            if bin in _bins:
+                if message.type==Gst.MessageType.EOS:
+                    _bins.remove(bin)
+                    if reference is not None:
+                        outQueue.put((REPLY_FINISHED, (reference,)))
+                elif message.type==Gst.MessageType.ERROR:
+                    _bins.remove(bin)
+                    if reference is not None:
+                        outQueue.put((REPLY_FAILED, (reference,)))
 
-                bus = playBin.get_bus()
-                bus.enable_sync_message_emission()
-                bus.add_signal_watch()
-                bus.connect("message", _handlePlayBinMessage,
-                            playBin, finishCallback, extra)
+        def _handleCommand(command, args):
+            """Handle commands sent to the server."""
+            if command==COMMAND_STARTSOUND:
+                (name, reference) = args
+                try:
+                    playBin = Gst.ElementFactory.make("playbin", "player")
 
-                path = os.path.join(_soundsDirectory, name)
-                playBin.set_property( "uri", "file://%s" % (path,))
+                    bus = playBin.get_bus()
+                    bus.add_signal_watch()
+                    bus.connect("message", _handlePlayBinMessage,
+                                playBin, reference)
 
-                playBin.set_state(GST_STATE_PLAYING)
-                _bins.add(playBin)
-            except Exception, e:
-                print "mlx.sound.startSound: " + str(e)
-                if finishCallback is not None:
-                    finishCallback(False, extra)
+                    path = os.path.join(soundsDirectory, name)
+                    playBin.set_property( "uri", "file://%s" % (path,))
 
-        def finalizeSound():
-            """Finalize the sound handling."""
-            pass
+                    playBin.set_state(Gst.State.PLAYING)
+                    _bins.add(playBin)
+                except Exception as e:
+                    if reference is not None:
+                        outQueue.put((REPLY_FAILED, (reference,)))
+            elif command==COMMAND_QUIT:
+                outQueue.put((REPLY_QUIT, None))
+                mainLoop.quit()
 
-        def _handlePlayBinMessage(bus, message, bin, finishCallback, extra):
-            """Handle the end of the playback of a sound file."""
+        def _processCommands():
+            """Process incoming commands.
 
-            # if message.type==GST_MESSAGE_EOS:
-            #     _bins.remove(bin)
-            #     if finishCallback is not None:
-            #         finishCallback(True, extra)
+            It is to be executed in a separate thread and it reads the incoming
+            queue for commands. The commands with their arguments are added to the
+            idle queue of gobject so that _handleCommand will be called by them.
 
-    except:
-        print "The Gst library is missing from your system. It is needed for sound playback on Linux"
-        traceback.print_exc()
-        def initializeSound(soundsDirectory):
-            """Initialize the sound handling with the given directory containing
-            the sound files."""
-            pass
+            If COMMAND_QUIT is received, the thread exits."""
 
-        def startSound(name, finishCallback = None, extra = None):
-            """Start playing back the given sound.
+            while True:
+                (command, args) = inQueue.get()
 
-            FIXME: it does not do anything currently, but it should."""
-            print "sound.startSound:", name
+                gobject.idle_add(_handleCommand, command, args)
+                if command==COMMAND_QUIT:
+                    break
 
-        def finalizeSound():
-            """Finalize the sound handling."""
-            pass
+        commandThread = Thread(target = _processCommands)
+        commandThread.daemon = True
+        commandThread.start()
+
+
+        mainLoop = gobject.MainLoop()
+        mainLoop.run()
+
+        commandThread.join()
+
+    def _handleInQueue():
+        """Handle the incoming queue in the main program.
+
+        It reads the replies sent by the helper process. In case of
+        REPLY_FINISHED and REPLY_FAILED the appropriate callback is called. In
+        case of REPLY_QUIT, the thread quits as well."""
+        while True:
+            (reply, args) = _inQueue.get()
+            if reply==REPLY_FINISHED or reply==REPLY_FAILED:
+                (reference,) = args
+                callback = None
+                extra = None
+                with _lock:
+                    (callback, extra) = _ref2Data.get(reference, (None, None))
+                    if callback is not None:
+                        del _ref2Data[reference]
+                if callback is not None:
+                    callback(reply==REPLY_FINISHED, extra)
+            elif reply==REPLY_QUIT:
+                break
+
+    def preInitializeSound():
+        """Start the sound handling process and create the thread handling the
+        incoming queue."""
+        global _thread
+        global _process
+        global _inQueue
+        global _outQueue
+
+        _inQueue = Queue()
+        _outQueue = Queue()
+
+        _process = Process(target = _processFn, args = (_outQueue, _inQueue))
+        _process.start()
+
+        _thread = Thread(target = _handleInQueue)
+        _thread.daemon = True
+
+    def initializeSound(soundsDirectory):
+        """Initialize the sound handling. It reads a boolean from the incoming
+        queue indicating if the libraries could be loaded by the process.
+
+        If the boolean is True, the thread handling the incoming replies is
+        started and the directory containing the sounds file is written to the
+        output queue.
+
+        Otherwise the exception is read from the queue, and printed with an
+        error message."""
+        global _initialized
+        _initialized = _inQueue.get()
+
+        if _initialized:
+            _thread.start()
+            _outQueue.put(soundsDirectory)
+        else:
+            exception = _inQueue.get()
+            print "The Gst library is missing from your system. It is needed for sound playback on Linux:"
+            print exception
+
+    def startSound(name, finishCallback = None, extra = None):
+        """Start playing back the given sound.
+
+        If a callback is given, a new reference is acquired and the callback is
+        registered with it. Then a COMMAND_STARTSOUND command is written to the
+        output queue"""
+        if _initialized:
+            reference = None
+            if finishCallback is not None:
+                with _lock:
+                    global _nextReference
+                    reference = _nextReference
+                    _nextReference += 1
+                    _ref2Data[reference] = (finishCallback, extra)
+
+            _outQueue.put((COMMAND_STARTSOUND, (name, reference)))
+
+    def finalizeSound():
+        """Finalize the sound handling.
+
+        COMMAND_QUIT is sent to the helper process, and then it is joined."""
+        if _initialized:
+            _outQueue.put((COMMAND_QUIT, None))
+            _process.join()
+            _thread.join()
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    import time
+
     def callback(result, extra):
         print "callback", result, extra
 
-    initializeSound("e:\\home\\vi\\tmp")
+    preInitializeSound()
+
+    soundsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                              "..", "..", "sounds"))
+    print "soundsPath:", soundsPath
+    initializeSound(soundsPath)
+    startSound("notam.mp3", finishCallback = callback, extra= "notam.mp3")
+    time.sleep(5)
     startSound("malev.mp3", finishCallback = callback, extra="malev.mp3")
     time.sleep(5)
     startSound("ding.wav", finishCallback = callback, extra="ding1.wav")
@@ -260,6 +403,10 @@ if __name__ == "__main__":
     startSound("ding.wav", finishCallback = callback, extra="ding2.wav")
     time.sleep(5)
     startSound("ding.wav", finishCallback = callback, extra="ding3.wav")
+    time.sleep(5)
+    startSound("dong.wav", finishCallback = callback, extra="dong3.wav")
     time.sleep(50)
+
+    finalizeSound()
 
 #------------------------------------------------------------------------------

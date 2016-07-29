@@ -26,39 +26,8 @@ if "FORCE_PYGOBJECT" not in os.environ:
     print "Using PyGTK"
     pygobject = False
     import gobject
-    try:
-        import pygst
-        pygst.require('0.10')
-        import gst
-
-        def gst_init():
-            pass
-
-        def gst_element_factory_make(what):
-            return gst.element_factory_make(what)
-
-        GST_STATE_PLAYING=gst.STATE_PLAYING
-        GST_MESSAGE_EOS=gst.MESSAGE_EOS
-    except:
-        pass
 else:
     print "Using PyGObject"
     pygobject = True
 
     from gi.repository import GObject as gobject
-
-    try:
-        from gi.repository import Gst as gst
-
-        def gst_init():
-            gst.init()
-
-        def gst_element_factory_make(what):
-            return gst.ElementFactory.make(what)
-
-        GST_STATE_PLAYING=gst.State.PLAYING
-        GST_MESSAGE_EOS=gst.MessageType.EOS
-    except:
-        import traceback
-        traceback.print_exc()
-        pass
