@@ -19,18 +19,12 @@ for language in ["en", "hu"]:
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
 data_files.append(("", ["logo.png", "simbrief.html",
-                        "conn_grey.png", "conn_red.png", "conn_green.png",
-                        "mlx_cef_caller.sh", "mlx_cef_caller_secondary.sh",
-                        "mlx_cef_caller.bat", "mlx_cef_caller_secondary.bat"]))
+                        "conn_grey.png", "conn_red.png", "conn_green.png"]))
 
 if os.name=="nt":
     import py2exe
 
     data_files.append(("", ["logo.ico"]))
-
-    chromedriver = os.environ.get("CHROMEDRIVER")
-    if chromedriver:
-        data_files.append(("", [chromedriver]))
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
