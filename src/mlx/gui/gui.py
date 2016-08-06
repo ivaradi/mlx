@@ -449,7 +449,7 @@ class GUI(fs.ConnectionListener):
         else:
             self.updateDone()
 
-        cef.initialize(self._programDirectory, self._cefInitialized)
+        cef.initialize(self._cefInitialized)
 
         singleton.raiseCallback = self.raiseCallback
         gtk.main()

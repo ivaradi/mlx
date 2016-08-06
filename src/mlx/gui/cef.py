@@ -1,21 +1,22 @@
 from common import *
 
-from mava_simbrief import MavaSimbriefIntegrator
-
 from mlx.util import secondaryInstallation
 
 from cefpython3 import cefpython
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 import platform
 import json
 import time
 import os
 import re
+import thread
 import threading
 import tempfile
 import traceback
+import urllib2
+from lxml import etree
+from StringIO import StringIO
+import lxml.html
 
 #------------------------------------------------------------------------------
 
@@ -28,225 +29,237 @@ import traceback
 # Indicate if we should quit
 _toQuit = False
 
-# Indicate the users of the fast timeout handler. If it reaches zero, the
-# timeout will be stopped
-_fastTimeoutUsers = 0
-
-# The Selenium thread
-_seleniumHandler = None
+# The SimBrief handler
+_simBriefHandler = None
 
 #------------------------------------------------------------------------------
 
-def getArgsFilePath():
-    """Get the path of the argument file."""
-    if os.name=="nt":
-        return os.path.join(tempfile.gettempdir(),
-                            "mlxcef.args" +
-                            (".secondary" if secondaryInstallation else ""))
-    else:
-        import pwd
-        return os.path.join(tempfile.gettempdir(),
-                            "mlxcef." + pwd.getpwuid(os.getuid())[0] + ".args" +
-                            (".secondary" if secondaryInstallation else ""))
+SIMBRIEF_PROGRESS_SEARCHING_BROWSER = 1
+SIMBRIEF_PROGRESS_LOADING_FORM = 2
+SIMBRIEF_PROGRESS_FILLING_FORM = 3
+SIMBRIEF_PROGRESS_WAITING_LOGIN = 4
+SIMBRIEF_PROGRESS_LOGGING_IN = 5
+SIMBRIEF_PROGRESS_WAITING_RESULT = 6
 
-#------------------------------------------------------------------------------
-
-class ArgsFileWaiter(threading.Thread):
-    """A thread to wait for the appearance of the arguments file."""
-    def __init__(self, initializedCallback):
-        """Construct the thread."""
-        threading.Thread.__init__(self)
-        self.daemon = True
-
-        self._initializedCallback = initializedCallback
-
-    def run(self):
-        """Repeatedly check for the existence of the arguments file.
-
-        If it is found, read it, extract the arguments and insert a job into
-        the GUI loop to perform the actual initialization of CEF."""
-        argsFilePath = getArgsFilePath()
-        print "Waiting for the arguments file '%s' to appear" % (argsFilePath,)
-
-        while not os.path.exists(argsFilePath):
-            time.sleep(0.1)
-
-        print "Got arguments, reading them."""
-
-        with open(argsFilePath, "rt") as f:
-            args = f.read().split()
-
-        gobject.idle_add(_initializeCEF, args, self._initializedCallback)
-
-#------------------------------------------------------------------------------
-
-SIMBRIEF_PROGRESS_SEARCHING_BROWSER = MavaSimbriefIntegrator.PROGRESS_SEARCHING_BROWSER
-SIMBRIEF_PROGRESS_LOADING_FORM = MavaSimbriefIntegrator.PROGRESS_LOADING_FORM
-SIMBRIEF_PROGRESS_FILLING_FORM = MavaSimbriefIntegrator.PROGRESS_FILLING_FORM
-SIMBRIEF_PROGRESS_WAITING_LOGIN = MavaSimbriefIntegrator.PROGRESS_WAITING_LOGIN
-SIMBRIEF_PROGRESS_LOGGING_IN = MavaSimbriefIntegrator.PROGRESS_LOGGING_IN
-SIMBRIEF_PROGRESS_WAITING_RESULT = MavaSimbriefIntegrator.PROGRESS_WAITING_RESULT
-
-SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING = MavaSimbriefIntegrator.PROGRESS_MAX + 1
+SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING = 7
 SIMBRIEF_PROGRESS_DONE = 1000
 
-SIMBRIEF_RESULT_NONE = MavaSimbriefIntegrator.RESULT_NONE
-SIMBRIEF_RESULT_OK = MavaSimbriefIntegrator.RESULT_OK
-SIMBRIEF_RESULT_ERROR_OTHER = MavaSimbriefIntegrator.RESULT_ERROR_OTHER
-SIMBRIEF_RESULT_ERROR_NO_FORM = MavaSimbriefIntegrator.RESULT_ERROR_NO_FORM
-SIMBRIEF_RESULT_ERROR_NO_POPUP = MavaSimbriefIntegrator.RESULT_ERROR_NO_POPUP
-SIMBRIEF_RESULT_ERROR_LOGIN_FAILED = MavaSimbriefIntegrator.RESULT_ERROR_LOGIN_FAILED
+SIMBRIEF_RESULT_NONE = 0
+SIMBRIEF_RESULT_OK = 1
+SIMBRIEF_RESULT_ERROR_OTHER = 2
+SIMBRIEF_RESULT_ERROR_NO_FORM = 11
+SIMBRIEF_RESULT_ERROR_NO_POPUP = 12
+SIMBRIEF_RESULT_ERROR_LOGIN_FAILED = 13
 
 #------------------------------------------------------------------------------
 
-class SeleniumHandler(threading.Thread):
-    """Thread to handle Selenium operations."""
-    def __init__(self, programDirectory):
-        """Construct the thread."""
-        threading.Thread.__init__(self)
-        self.daemon = False
+class SimBriefHandler(object):
+    """An object to store the state of a SimBrief query."""
+    _formURL = "http://flare.privatedns.org/mava_simbrief/simbrief_form.html"
 
-        self._programDirectory = programDirectory
+    _querySettings = {
+        'navlog': True,
+        'etops': True,
+        'stepclimbs': True,
+        'tlr': True,
+        'notams': True,
+        'firnot': True,
+        'maps': 'Simple',
+        };
 
-        self._commandsCondition = threading.Condition()
-        self._commands = []
 
-        self._driver = None
+    def __init__(self):
+        """Construct the handler."""
+        self._browser = None
+        self._plan = None
+        self._getCredentials = None
+        self._getCredentialsCount = 0
+        self._updateProgressFn = None
+        self._htmlFilePath = None
+        self._lastProgress = SIMBRIEF_PROGRESS_SEARCHING_BROWSER
+        self._timeoutID = None
 
-        self._simBriefBrowser = None
-
-        self._toQuit = False
-
-    @property
-    def programDirectory(self):
-        """Get the program directory."""
-        return self._programDirectory
-
-    @property
-    def simBriefInitURL(self):
-        """Get the initial URL for the SimBrief browser."""
-        return "file://" + os.path.join(self.programDirectory, "simbrief.html")
-
-    def run(self):
-        """Create the Selenium driver and the perform any operations
-        requested."""
-        scriptName = "mlx_cef_caller"
-        if secondaryInstallation:
-            scriptName += "_secondary"
-        scriptName += ".bat" if os.name=="nt" else ".sh"
-
-        scriptPath = os.path.join(self._programDirectory, scriptName)
-        print "Creating the Selenium driver to call script", scriptPath
-
-        options = Options()
-        options.binary_location = scriptPath
-        driver = self._driver = webdriver.Chrome(chrome_options = options)
-        # try:
-        # except:
-        #     traceback.print_exc()
-
-        print "Created Selenium driver."
-        while not self._toQuit:
-            with self._commandsCondition:
-                while not self._commands:
-                    self._commandsCondition.wait()
-
-                command = self._commands[0]
-                del self._commands[0]
-
-            command()
-
-        driver.quit()
-
-    def initializeSimBrief(self):
+    def initialize(self):
         """Create and initialize the browser used for Simbrief."""
         windowInfo = cefpython.WindowInfo()
         windowInfo.SetAsOffscreen(int(0))
 
-        url = self.simBriefInitURL
-        self._simBriefBrowser = \
+        self._browser = \
           cefpython.CreateBrowserSync(windowInfo, browserSettings = {},
-                                      navigateUrl = self.simBriefInitURL)
-        self._simBriefBrowser.SetClientHandler(OffscreenRenderHandler())
-        self._simBriefBrowser.SetFocus(True)
+                                      navigateUrl = SimBriefHandler._formURL)
+        self._browser.SetClientHandler(OffscreenRenderHandler())
+        self._browser.SetFocus(True)
+        self._browser.SetClientCallback("OnLoadEnd", self._onLoadEnd)
 
-    def callSimBrief(self, plan, getCredentials, updateProgress,
-                     htmlFilePath):
+        bindings = cefpython.JavascriptBindings(bindToFrames=True,
+                                                bindToPopups=True)
+        bindings.SetFunction("briefingData", self._briefingDataAvailable)
+        bindings.SetFunction("formFilled", self._formFilled)
+        self._browser.SetJavascriptBindings(bindings)
+
+    def call(self, plan, getCredentials, updateProgress, htmlFilePath):
         """Call SimBrief with the given plan."""
-        self._enqueue(lambda:
-                      self._callSimBrief(plan, self._driver,
-                                         getCredentials, updateProgress,
-                                         htmlFilePath))
+        self._timeoutID = gobject.timeout_add(120*1000, self._timedOut)
 
-    def quit(self):
-        """Instruct the thread to quit and then join it."""
-        self._enqueue(self._quit)
-        self.join()
+        self._plan = plan
+        self._getCredentials = getCredentials
+        self._getCredentialsCount = 0
+        self._updateProgressFn = updateProgress
+        self._htmlFilePath = htmlFilePath
 
-    def _enqueue(self, command):
-        """Enqueue the given command.
+        self._browser.LoadUrl(SimBriefHandler._formURL)
+        self._updateProgress(SIMBRIEF_PROGRESS_LOADING_FORM,
+                             SIMBRIEF_RESULT_NONE, None)
 
-        command should be a function to be executed in the thread."""
-        with self._commandsCondition:
-            self._commands.append(command)
-            self._commandsCondition.notify()
+    def _onLoadEnd(self, browser, frame, httpCode):
+        """Called when a page has been loaded in the SimBrief browser."""
+        url = frame.GetUrl()
+        print "gui.cef.SimBriefHandler._onLoadEnd", httpCode, url
+        if httpCode>=300:
+            self._updateProgress(self._lastProgress,
+                                 SIMBRIEF_RESULT_ERROR_OTHER, None)
+        elif url.startswith("http://flare.privatedns.org/mava_simbrief/simbrief_form.html"):
+            if self._plan is None:
+                return
 
-    def _callSimBrief(self, plan, driver,
-                      getCredentials, updateProgress, htmlFilePath):
-        """Perform the SimBrief call."""
-        self._simBriefBrowser.LoadUrl(self.simBriefInitURL)
+            self._updateProgress(SIMBRIEF_PROGRESS_FILLING_FORM,
+                                 SIMBRIEF_RESULT_NONE, None)
 
-        integrator = MavaSimbriefIntegrator(plan = plan, driver = driver)
-        link = None
-        try:
-            link = integrator.get_xml_link(getCredentials, updateProgress,
-                                           local_xml_debug = False,
-                                           local_html_debug = False)
-        except Exception, e:
-            print "Failed to initiate the generation of the briefing:", e
-            updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
-                           SIMBRIEF_RESULT_ERROR_OTHER, None)
+            js = "form=document.getElementById(\"sbapiform\");"
+            for (name, value) in self._plan.iteritems():
+                js += "form." + name + ".value=\"" + value + "\";"
+            for (name, value) in SimBriefHandler._querySettings.iteritems():
+                if isinstance(value, bool):
+                    js += "form." + name + ".checked=" + \
+                      ("true" if value else "false") + ";"
+                elif isinstance(value, str):
+                    js += "form." + name + ".value=\"" + value + "\";"
 
-        if link is not None:
-            updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
-                           SIMBRIEF_RESULT_NONE, None)
+            js += "form.submitform.click();"
+            js += "window.formFilled();"
 
-            try:
-                flight_info = integrator.get_results(link,
-                                                     html_file_path =
-                                                     htmlFilePath)
+            frame.ExecuteJavascript(js)
+        elif url.startswith("http://www.simbrief.com/system/login.api.php"):
+            (user, password) = self._getCredentials(self._getCredentialsCount)
+            if user is None or password is None:
+                self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
+                                     SIMBRIEF_RESULT_ERROR_LOGIN_FAILED, None)
+                return
 
-                updateProgress(SIMBRIEF_PROGRESS_DONE,
-                               SIMBRIEF_RESULT_OK, flight_info)
-            except Exception, e:
-                print "Failed to retrieve the briefing:", e
-                updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
-                               SIMBRIEF_RESULT_ERROR_OTHER, None)
+            self._getCredentialsCount += 1
+            js = "form=document.forms[0];"
+            js += "form.user.value=\"" + user + "\";"
+            js += "form.pass.value=\"" + password + "\";"
+            js += "form.submit();"
+            frame.ExecuteJavascript(js)
+        elif url.startswith("http://www.simbrief.com/ofp/ofp.loader.api.php"):
+            self._updateProgress(SIMBRIEF_PROGRESS_WAITING_RESULT,
+                                 SIMBRIEF_RESULT_NONE, None)
+        elif url.startswith("http://flare.privatedns.org/mava_simbrief/simbrief_briefing.php"):
+            js = "form=document.getElementById(\"hiddenform\");"
+            js += "window.briefingData(form.hidden_is_briefing_available.value, form.hidden_link.value);";
+            frame.ExecuteJavascript(js)
 
-    def _quit(self):
-        """Set the _toQuit member variable to indicate that the thread should
-        quit."""
-        self._toQuit = True
+    def _formFilled(self):
+        """Called when the form has been filled and submitted."""
+        self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
+                             SIMBRIEF_RESULT_NONE, None)
+
+    def _briefingDataAvailable(self, available, link):
+        """Called when the briefing data is available."""
+        if available:
+            link ="http://www.simbrief.com/ofp/flightplans/xml/" + link + ".xml"
+
+            self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
+                                 SIMBRIEF_RESULT_NONE, None)
+
+            thread = threading.Thread(target = self._getResults, args = (link,))
+            thread.daemon = True
+            thread.start()
+        else:
+            self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
+                                 SIMBRIEF_RESULT_ERROR_OTHER, None)
+
+    def _resultsAvailable(self, flightInfo):
+        """Called from the result retrieval thread when the result is
+        available.
+
+        It checks for the plan being not None, as we may time out."""
+        if self._plan is not None:
+            self._updateProgress(SIMBRIEF_PROGRESS_DONE,
+                                 SIMBRIEF_RESULT_OK, flightInfo)
+
+    def _updateProgress(self, progress, results, flightInfo):
+        """Update the progress."""
+        self._lastProgress = progress
+        if results!=SIMBRIEF_RESULT_NONE:
+            gobject.source_remove(self._timeoutID)
+            self._plan = None
+
+        self._updateProgressFn(progress, results, flightInfo)
+
+    def _timedOut(self):
+        """Called when the timeout occurs."""
+        if self._lastProgress==SIMBRIEF_PROGRESS_LOADING_FORM:
+            result = SIMBRIEF_RESULT_ERROR_NO_FORM
+        elif self._lastProgress==SIMBRIEF_PROGRESS_WAITING_LOGIN:
+            result = SIMBRIEF_RESULT_ERROR_NO_POPUP
+        else:
+            result = SIMBRIEF_RESULT_ERROR_OTHER
+
+        self._updateProgress(self._lastProgress, result, None)
+
+        return False
+
+    def _getResults(self, link):
+        """Get the result from the given link."""
+        availableInfo = {}
+        ## Holds analysis data to be used
+        flightInfo = {}
+
+        # Obtaining the xml
+        response = urllib2.urlopen(link)
+        xmlContent = response.read()
+        # Processing xml
+        content = etree.iterparse(StringIO(xmlContent))
+
+        for (action, element) in content:
+            # Processing tags that occur multiple times
+            if element.tag == "weather":
+                weatherElementList = list(element)
+                for weatherElement in weatherElementList:
+                    flightInfo[weatherElement.tag] = weatherElement.text
+            else:
+                availableInfo[element.tag] = element.text
+
+        # Processing plan_html
+        ## Obtaining chart links
+        imageLinks = []
+        for imageLinkElement in lxml.html.find_class(availableInfo["plan_html"],
+                                                     "ofpmaplink"):
+            for imageLink in imageLinkElement.iterlinks():
+                if imageLink[1] == 'src':
+                    imageLinks.append(imageLink[2])
+        flightInfo["image_links"] = imageLinks
+        print(sorted(availableInfo.keys()))
+        htmlFilePath = "simbrief_plan.html" if self._htmlFilePath is None \
+          else self._htmlFilePath
+        with open(htmlFilePath, 'w') as f:
+            f.write(availableInfo["plan_html"])
+
+        gobject.idle_add(self._resultsAvailable, flightInfo)
 
 #------------------------------------------------------------------------------
 
-def initialize(programDirectory, initializedCallback):
+def initialize(initializedCallback):
     """Initialize the Chrome Embedded Framework."""
-    global _toQuit, _seleniumHandler
+    global _toQuit, _simBriefHandler
     _toQuit = False
 
     gobject.threads_init()
 
-    argsFilePath = getArgsFilePath()
-    try:
-        os.unlink(argsFilePath)
-    except:
-        pass
-
-    _seleniumHandler = SeleniumHandler(programDirectory)
-    _seleniumHandler.start()
-
-    ArgsFileWaiter(initializedCallback).start()
+    _simBriefHandler = SimBriefHandler()
+    _initializeCEF([], initializedCallback)
 
 #------------------------------------------------------------------------------
 
@@ -306,14 +319,20 @@ def getContainer():
 def startInContainer(container, url, browserSettings = {}):
     """Start a browser instance in the given container with the given URL."""
     if os.name=="nt":
-        windowID = container.get_window().handle
+        window = container.get_window()
+        if window is None:
+            print "mlx.gui.cef.startInContainer: no window found!"
+            windowID = None
+        else:
+            windowID = window.handle
     else:
         m = re.search("GtkVBox at 0x(\w+)", str(container))
         hexID = m.group(1)
         windowID = int(hexID, 16)
 
     windowInfo = cefpython.WindowInfo()
-    windowInfo.SetAsChild(windowID)
+    if windowID is not None:
+        windowInfo.SetAsChild(windowID)
 
     return cefpython.CreateBrowserSync(windowInfo,
                                        browserSettings = browserSettings,
@@ -375,23 +394,23 @@ class OffscreenRenderHandler(object):
 
 def initializeSimBrief():
     """Initialize the (hidden) browser window for SimBrief."""
-    _seleniumHandler.initializeSimBrief()
+    _simBriefHandler.initialize()
 
 #------------------------------------------------------------------------------
 
 def callSimBrief(plan, getCredentials, updateProgress, htmlFilePath):
-    """Call SimBrief with the given plan."""
-    _seleniumHandler.callSimBrief(plan, getCredentials,
-                                  updateProgress, htmlFilePath)
+    """Call SimBrief with the given plan.
+
+    The callbacks will be called in the main GUI thread."""
+    _simBriefHandler.call(plan, getCredentials, updateProgress, htmlFilePath)
 
 #------------------------------------------------------------------------------
 
 def finalize():
     """Finalize the Chrome Embedded Framework."""
-    global _toQuit, _seleniumHandler
-    toQuit = True
+    global _toQuit
+    _toQuit = True
     cefpython.Shutdown()
-    _seleniumHandler.quit()
 
 #------------------------------------------------------------------------------
 
@@ -405,37 +424,8 @@ def _handleTimeout():
 
 #------------------------------------------------------------------------------
 
-def startFastTimeout():
-    """Start the fast timeout handler."""
-    global _fastTimeoutUsers
-
-    if _fastTimeoutUsers==0:
-        _fastTimeoutUsers = 1
-        gobject.timeout_add(1, _handleFastTimeout)
-    else:
-        _fastTimeoutUsers += 1
-
-#------------------------------------------------------------------------------
-
-def stopFastTimeout():
-    """Stop the fast timeout handler."""
-    global _fastTimeoutUsers
-
-    assert _fastTimeoutUsers>0
-    _fastTimeoutUsers -= 1
-
-#------------------------------------------------------------------------------
-
-def _handleFastTimeout():
-    """Handle a (fast) timeout by running the CEF message loop."""
-    if _toQuit or _fastTimeoutUsers==0:
-        return False
-    else:
-        cefpython.MessageLoopWork()
-        return True
-
-#------------------------------------------------------------------------------
-
 def _handleSizeAllocate(widget, sizeAlloc):
     """Handle the size-allocate event."""
-    cefpython.WindowUtils.OnSize(widget.get_window().handle, 0, 0, 0)
+    window = widget.get_window()
+    if widget is not None:
+        cefpython.WindowUtils.OnSize(window.handle, 0, 0, 0)

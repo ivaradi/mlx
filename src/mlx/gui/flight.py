@@ -2499,11 +2499,6 @@ class SimBriefSetupPage(Page):
         self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
-        self._credentialsCondition = threading.Condition()
-        self._credentialsAvailable = False
-        self._credentialsUserName = None
-        self._credentialsPassword = None
-
         label = gtk.Label(xstr("simbrief_extra_fuel"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -2674,25 +2669,12 @@ class SimBriefSetupPage(Page):
 
             self._wizard.gui.beginBusy(xstr("simbrief_calling"))
 
-            cef.startFastTimeout()
             cef.callSimBrief(plan,
-                             self._getCredentialsCallback,
-                             self._simBriefProgressCallback,
+                             self._getCredentials,
+                             self._simBriefProgress,
                              SimBriefSetupPage.getHTMLFilePath())
 
             startSound(const.SOUND_NOTAM)
-
-    def _getCredentialsCallback(self, count):
-        """Called when the SimBrief home page requests the credentials."""
-        with self._credentialsCondition:
-            self._credentialsAvailable = False
-
-            gobject.idle_add(self._getCredentials, count)
-
-            while not self._credentialsAvailable:
-                self._credentialsCondition.wait()
-
-            return (self._credentialsUserName, self._credentialsPassword)
 
     def _getCredentials(self, count):
         """Get the credentials.
@@ -2700,44 +2682,37 @@ class SimBriefSetupPage(Page):
         If count is 0, the user name and password entered into the setup page
         are returned. Otherwise a dialog box is displayed informing the user of
         invalid credentials and requesting another set of them."""
-        with self._credentialsCondition:
-            if count==0:
-                self._credentialsUserName = self._userName.get_text()
-                self._credentialsPassword = self._password.get_text()
+        print "_getCredentials", count
+        if count==0:
+            return (self._userName.get_text(), self._password.get_text())
+        else:
+            gui = self._wizard.gui
+            config = gui.config
+
+            dialog = SimBriefCredentialsDialog(gui,
+                                               config.simBriefUserName,
+                                               config.simBriefPassword,
+                                               config.rememberSimBriefPassword)
+            response = dialog.run()
+
+            if response==RESPONSETYPE_OK:
+                userName = dialog.userName
+                self._userName.set_text(userName)
+                password = dialog.password
+                self._password.set_text(password)
+                rememberPassword = dialog.rememberPassword
+
+                config.simBriefUserName = userName
+
+                config.simBriefPassword = \
+                    password if rememberPassword else ""
+                config.rememberSimBriefPassword = rememberPassword
+
+                config.save()
+
+                return (userName, password)
             else:
-                gui = self._wizard.gui
-                config = gui.config
-
-                dialog = SimBriefCredentialsDialog(gui,
-                                                   config.simBriefUserName,
-                                                   config.simBriefPassword,
-                                                   config.rememberSimBriefPassword)
-                response = dialog.run()
-
-                if response==RESPONSETYPE_OK:
-                    self._credentialsUserName = dialog.userName
-                    self._userName.set_text(self._credentialsUserName)
-                    self._credentialsPassword = dialog.password
-                    self._password.set_text(self._credentialsPassword)
-                    rememberPassword = dialog.rememberPassword
-
-                    config.simBriefUserName = self._credentialsUserName
-
-                    config.simBriefPassword = \
-                        self._credentialsPassword if rememberPassword else ""
-                    config.rememberSimBriefPassword = rememberPassword
-
-                    config.save()
-                else:
-                    self._credentialsUserName = None
-                    self._credentialsPassword = None
-
-            self._credentialsAvailable = True
-            self._credentialsCondition.notify()
-
-    def _simBriefProgressCallback(self, progress, result, flightInfo):
-        """Called by the SimBrief handling thread."""
-        gobject.idle_add(self._simBriefProgress, progress, result, flightInfo)
+                return (None, None)
 
     def _simBriefProgress(self, progress, result, flightInfo):
         """The real SimBrief progress handler."""
@@ -2747,7 +2722,6 @@ class SimBriefSetupPage(Page):
                                                              "simbrief_progress_unknown")
             self._wizard.gui.updateBusyState(xstr(message))
         else:
-            cef.stopFastTimeout()
             self._wizard.gui.endBusy()
 
             if result==cef.SIMBRIEF_RESULT_OK:
