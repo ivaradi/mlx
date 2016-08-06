@@ -567,8 +567,14 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
            not items["E)"]:
             return None
 
+        def parseTime(item):
+            try:
+                return datetime.datetime.strptime(item, "%y%m%d%H%M")
+            except ValueError:
+                return datetime.datetime.strptime(item, "%Y%m%d%H%M")
+
         basic = items["Q)"]
-        begin = datetime.datetime.strptime(items["B)"], "%y%m%d%H%M")
+        begin = parseTime(items["B)"])
 
         end = None
         permanent = False
@@ -577,7 +583,7 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
             if endItem in ["PERM", "UFN"]:
                 permanent = True
             else:
-                end = datetime.datetime.strptime(items["C)"], "%y%m%d%H%M")
+                end = parseTime(items["C)"])
         else:
             permanent = True
 
