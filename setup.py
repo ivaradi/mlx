@@ -18,7 +18,7 @@ for language in ["en", "hu"]:
     data_files.append((os.path.join("locale", language, "LC_MESSAGES"),
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
-data_files.append(("", ["logo.png", "simbrief.html",
+data_files.append(("", ["logo.png",
                         "conn_grey.png", "conn_red.png", "conn_green.png"]))
 
 if os.name=="nt":
