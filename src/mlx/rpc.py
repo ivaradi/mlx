@@ -72,12 +72,38 @@ class BookedFlight(RPCObject):
         else:
             raise Exception("Invalid aircraft type code: '" + typeCode + "'")
 
+    @staticmethod
+    def _decodeStatus(status):
+        """Decode the status from the status string."""
+        if status=="booked":
+            return BookedFlight.STATUS_BOOKED
+        elif status=="reported":
+            return BookedFlight.STATUS_REPORTED
+        elif status=="accepted":
+            return BookedFlight.STATUS_ACCEPTED
+        elif status=="rejected":
+            return BookedFlight.STATUS_REJECTED
+        else:
+            raise Exception("Invalid flight status code: '" + status + "'")
+
     # FIXME: copied from web.BookedFlight
     @staticmethod
     def getDateTime(date, time):
         """Get a datetime object from the given textual date and time."""
         return datetime.datetime.strptime(date + " " + time,
                                           "%Y-%m-%d %H:%M:%S")
+
+    # FIXME: copied from web.BookedFlight
+    STATUS_BOOKED = 1
+
+    # FIXME: copied from web.BookedFlight
+    STATUS_REPORTED = 2
+
+    # FIXME: copied from web.BookedFlight
+    STATUS_ACCEPTED = 3
+
+    # FIXME: copied from web.BookedFlight
+    STATUS_REJECTED = 4
 
     # The instructions for the construction
     _instructions = {
@@ -86,7 +112,8 @@ class BookedFlight(RPCObject):
         "bagWeight" : int,
         "cargoWeight" : int,
         "mailWeight" : int,
-        "aircraftType" : lambda value: BookedFlight._decodeAircraftType(value)
+        "aircraftType" : lambda value: BookedFlight._decodeAircraftType(value),
+        "status" : lambda value: BookedFlight._decodeStatus(value)
         }
 
     def __init__(self, value):
@@ -245,17 +272,26 @@ class Client(object):
 
     def getFlights(self):
         """Get the flights available for performing."""
-        flights = []
+        bookedFlights = []
+        reportedFlights = []
+        rejectedFlights = []
 
         value = self._performCall(lambda sessionID:
                                   self._server.getFlights(sessionID))
         for flightData in value:
-            flights.append(BookedFlight(flightData))
+            flight = BookedFlight(flightData)
+            if flight.status == BookedFlight.STATUS_BOOKED:
+                bookedFlights.append(flight)
+            elif flight.status == BookedFlight.STATUS_REPORTED:
+                reportedFlights.append(flight)
+            elif flight.status == BookedFlight.STATUS_REJECTED:
+                rejectedFlights.append(flight)
 
-        flights.sort(cmp = lambda flight1, flight2:
-                     cmp(flight1.departureTime, flight2.departureTime))
+        for flights in [bookedFlights, reportedFlights, rejectedFlights]:
+            flights.sort(cmp = lambda flight1, flight2:
+                         cmp(flight1.departureTime, flight2.departureTime))
 
-        return flights
+        return (bookedFlights, reportedFlights, rejectedFlights)
 
     def getEntryExamStatus(self):
         """Get the status of the exams needed for joining MAVA."""

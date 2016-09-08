@@ -95,6 +95,14 @@ class BookedFlight(object):
     checkFlightTypes = [ const.AIRCRAFT_B736, const.AIRCRAFT_B737,
                          const.AIRCRAFT_B738, const.AIRCRAFT_DH8D ]
 
+    STATUS_BOOKED = 1
+
+    STATUS_REPORTED = 2
+
+    STATUS_ACCEPTED = 3
+
+    STATUS_REJECTED = 4
+
     @staticmethod
     def getDateTime(date, time):
         """Get a datetime object from the given textual date and time."""
@@ -136,6 +144,13 @@ class BookedFlight(object):
     def __init__(self, id = None):
         """Construct a booked flight with the given ID."""
         self.id = id
+
+    @property
+    def status(self):
+        """Get the status of the flight.
+
+        For web-based flights this is always STATUS_BOOKED."""
+        return BookedFlight.STATUS_BOOKED
 
     def readFromWeb(self, f):
         """Read the data of the flight from the web via the given file
@@ -768,7 +783,10 @@ class LoginRPC(RPCRequest):
             result.pilotName = loginResult[0]
             result.rank = loginResult[1]
             result.password = password
-            result.flights = client.getFlights()
+            flights = client.getFlights()
+            result.flights = flights[0]
+            result.reportedFlights = flights[1]
+            result.rejectedFlights = flights[2]
             if result.rank=="STU":
                 reply = client.getEntryExamStatus()
                 result.entryExamPassed = reply[0]
