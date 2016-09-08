@@ -510,6 +510,7 @@ class FlightSelectionPage(Page):
 
     def activate(self):
         """Fill the flight list."""
+        self._setupHelp()
         self._flightList.set_sensitive(True)
         self._loadButton.set_sensitive(True)
         self._refreshButton.set_sensitive(self._wizard.loggedIn)
@@ -520,6 +521,27 @@ class FlightSelectionPage(Page):
         self._flightList.set_sensitive(False)
         self._loadButton.set_sensitive(False)
         self._refreshButton.set_sensitive(False)
+
+    def _setupHelp(self):
+        """Setup the help string"""
+        help = ""
+
+        if self._wizard.loggedIn:
+            numReported = len(self._wizard.loginResult.reportedFlights)
+            numRejected = len(self._wizard.loginResult.rejectedFlights)
+            if numReported==0 and numRejected==0:
+                help = xstr("flightsel_prehelp_nopending")
+            elif numReported>0 and numRejected==0:
+                help = xstr("flightsel_prehelp_rep_0rej") % (numReported,)
+            elif numReported==0 and numRejected>0:
+                help = xstr("flightsel_prehelp_0rep_rej") % (numRejected,)
+            else:
+                help = xstr("flightsel_prehelp_rep_rej") % \
+                       (numReported, numRejected)
+
+        help += xstr("flightsel_help")
+
+        self.setHelp(help)
 
     def _buildFlights(self):
         """Rebuild the flights from the login result."""
@@ -580,8 +602,10 @@ class FlightSelectionPage(Page):
 
     def _refreshCallback(self, returned, result):
         """Callback for the refresh."""
-        if returned and result.loggedIn:
-            self._buildFlights()
+        if returned:
+            self._setupHelp()
+            if result.loggedIn:
+                self._buildFlights()
 
     def _selectionChanged(self, selection):
         """Called when the selection is changed."""

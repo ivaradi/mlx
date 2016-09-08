@@ -369,6 +369,21 @@ msgstr ""
 msgid "flightsel_title"
 msgstr "Flight selection"
 
+msgid "flightsel_prehelp_nopending"
+msgstr ""
+
+msgid "flightsel_prehelp_0rep_rej"
+msgstr ""
+"<span color=\"red\">You have %d rejected flight(s).</span>\n\n "
+
+msgid "flightsel_prehelp_rep_0rej"
+msgstr ""
+"You have %d reported flight(s).\n\n "
+
+msgid "flightsel_prehelp_rep_rej"
+msgstr ""
+"<span color=\"red\">You have %d rejected and %d reported flight(s).</span>\n\n "
+
 msgid "flightsel_help"
 msgstr "Select the flight you want to perform."
 

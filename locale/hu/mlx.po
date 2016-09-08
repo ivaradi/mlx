@@ -369,6 +369,21 @@ msgstr ""
 msgid "flightsel_title"
 msgstr "Járatválasztás"
 
+msgid "flightsel_prehelp_nopending"
+msgstr ""
+
+msgid "flightsel_prehelp_0rep_rej"
+msgstr ""
+"<span color=\"red\">%d visszautasított járatod van.</span>\n\n "
+
+msgid "flightsel_prehelp_rep_0rej"
+msgstr ""
+"%d jelentett járatod van.\n\n "
+
+msgid "flightsel_prehelp_rep_rej"
+msgstr ""
+"<span color=\"red\">%d visszautasított és %d jelentett járatod van.</span>\n\n "
+
 msgid "flightsel_help"
 msgstr "Válaszd ki a járatot, amelyet le szeretnél repülni."
 
