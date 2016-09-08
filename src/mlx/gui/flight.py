@@ -1,6 +1,7 @@
 
 from mlx.gui.common import *
 import mlx.gui.cef as cef
+from mlx.gui.flightlist import ColumnDescriptor, FlightList
 
 import mlx.const as const
 import mlx.fs as fs
@@ -435,6 +436,13 @@ class LoginPage(Page):
 
 class FlightSelectionPage(Page):
     """The page to select the flight."""
+    columnDescriptors = [
+        ColumnDescriptor("callsign", xstr("flightsel_no")),
+        ColumnDescriptor("departureTime", xstr("flightsel_deptime")),
+        ColumnDescriptor("departureICAO", xstr("flightsel_from")),
+        ColumnDescriptor("arrivalICAO", xstr("flightsel_to"))
+    ]
+
     def __init__(self, wizard):
         """Construct the flight selection page."""
         help = xstr("flightsel_help")
@@ -443,48 +451,14 @@ class FlightSelectionPage(Page):
                                                   xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
-
-        self._listStore = gtk.ListStore(str, str, str, str)
-        self._flightList = gtk.TreeView(self._listStore)
-        column = gtk.TreeViewColumn(xstr("flightsel_no"), gtk.CellRendererText(),
-                                    text = 1)
-        column.set_expand(True)
-        self._flightList.append_column(column)
-        column = gtk.TreeViewColumn(xstr("flightsel_deptime"), gtk.CellRendererText(),
-                                    text = 0)
-        column.set_expand(True)
-        self._flightList.append_column(column)
-        column = gtk.TreeViewColumn(xstr("flightsel_from"), gtk.CellRendererText(),
-                                    text = 2)
-        column.set_expand(True)
-        self._flightList.append_column(column)
-        column = gtk.TreeViewColumn(xstr("flightsel_to"), gtk.CellRendererText(),
-                                    text = 3)
-        column.set_expand(True)
-        self._flightList.append_column(column)
+        self._flightList = FlightList(FlightSelectionPage.columnDescriptors,
+                                      popupMenuProducer =
+                                      self._createListPopupMenu,
+                                      widthRequest = 400)
         self._flightList.connect("row-activated", self._rowActivated)
-        self._flightList.connect("button-press-event", self._listButtonPressed)
+        self._flightList.connect("selection-changed", self._selectionChanged)
 
-        self._flightListPopupMenu = None
-
-        flightSelection = self._flightList.get_selection()
-        flightSelection.connect("changed", self._selectionChanged)
-
-        scrolledWindow = gtk.ScrolledWindow()
-        scrolledWindow.add(self._flightList)
-        scrolledWindow.set_size_request(400, -1)
-        # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                       else gtk.SHADOW_IN)
-
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
-        alignment.add(scrolledWindow)
-
-        self.setMainWidget(alignment)
+        self.setMainWidget(self._flightList)
 
         self._saveButton = self.addButton(xstr("flightsel_save"),
                                           sensitive = False,
@@ -546,7 +520,7 @@ class FlightSelectionPage(Page):
     def _buildFlights(self):
         """Rebuild the flights from the login result."""
         self._flights = []
-        self._listStore.clear()
+        self._flightList.clear()
         if self._wizard.loggedIn:
             for flight in self._wizard.loginResult.flights:
                 self._addFlight(flight)
@@ -554,10 +528,7 @@ class FlightSelectionPage(Page):
     def _addFlight(self, flight):
         """Add the given file to the list of flights."""
         self._flights.append(flight)
-        self._listStore.append([str(flight.departureTime),
-                                flight.callsign,
-                                flight.departureICAO,
-                                flight.arrivalICAO])
+        self._flightList.addFlight(flight)
 
     def _saveClicked(self, button):
         """Called when the Save flight button is clicked."""
@@ -607,9 +578,9 @@ class FlightSelectionPage(Page):
             if result.loggedIn:
                 self._buildFlights()
 
-    def _selectionChanged(self, selection):
+    def _selectionChanged(self, flightList, index):
         """Called when the selection is changed."""
-        selected = selection.count_selected_rows()==1
+        selected = index is not None
         self._saveButton.set_sensitive(selected)
         self._button.set_sensitive(selected)
 
@@ -648,7 +619,7 @@ class FlightSelectionPage(Page):
         else:
             self._flightSelected()
 
-    def _rowActivated(self, flightList, path, column):
+    def _rowActivated(self, flightList, index):
         """Called when a row is activated."""
         if not self._completed:
             self._flightSelected()
@@ -663,29 +634,8 @@ class FlightSelectionPage(Page):
 
     def _getSelectedFlight(self):
         """Get the currently selected flight."""
-        selection = self._flightList.get_selection()
-        (listStore, iter) = selection.get_selected()
-        path = listStore.get_path(iter)
-        [index] = path.get_indices() if pygobject else path
-
+        index = self._flightList.selectedIndex
         return self._flights[index]
-
-    def _listButtonPressed(self, widget, event):
-        """Called when a mouse button is pressed on the flight list."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
-            return
-
-        (path, _, _, _) = self._flightList.get_path_at_pos(int(event.x),
-                                                           int(event.y))
-        selection = self._flightList.get_selection()
-        selection.unselect_all()
-        selection.select_path(path)
-
-        menu = self._getListPopupMenu()
-        if pygobject:
-            menu.popup(None, None, None, None, event.button, event.time)
-        else:
-            menu.popup(None, None, None, event.button, event.time)
 
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""
@@ -785,30 +735,27 @@ class FlightSelectionPage(Page):
 
         return dialog
 
-    def _getListPopupMenu(self):
+    def _createListPopupMenu(self):
         """Get the flight list popup menu."""
-        if self._flightListPopupMenu is None:
-            menu = gtk.Menu()
+        menu = gtk.Menu()
 
-            menuItem = gtk.MenuItem()
-            menuItem.set_label(xstr("flightsel_popup_select"))
-            menuItem.set_use_underline(True)
-            menuItem.connect("activate", self._popupSelect)
-            menuItem.show()
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("flightsel_popup_select"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupSelect)
+        menuItem.show()
 
-            menu.append(menuItem)
+        menu.append(menuItem)
 
-            menuItem = gtk.MenuItem()
-            menuItem.set_label(xstr("flightsel_popup_save"))
-            menuItem.set_use_underline(True)
-            menuItem.connect("activate", self._popupSave)
-            menuItem.show()
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("flightsel_popup_save"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupSave)
+        menuItem.show()
 
-            menu.append(menuItem)
+        menu.append(menuItem)
 
-            self._flightListPopupMenu = menu
-
-        return self._flightListPopupMenu
+        return menu
 
     def _popupSelect(self, menuItem):
         """Called when the Select menu item is activated in the popup menu."""
