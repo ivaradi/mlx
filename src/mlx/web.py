@@ -1241,6 +1241,20 @@ class SetCheckFlightPassed(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class ReflyFlights(RPCRequest):
+    """A request to mark certain flights for reflying."""
+    def __init__(self, client, callback, flightIDs):
+        """Construct the request."""
+        super(ReflyFlights, self).__init__(client, callback)
+        self._flightIDs = flightIDs
+
+    def run(self):
+        """Perform the update."""
+        self._client.reflyFlights(self._flightIDs)
+        return Result()
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1321,6 +1335,10 @@ class Handler(threading.Thread):
         """Mark the check flight as passed."""
         self._addRequest(SetCheckFlightPassed(self._rpcClient,
                                               callback, aircraftType))
+
+    def reflyFlights(self, callback, flightIDs):
+        """Mark the flights with the given IDs for reflying."""
+        self._addRequest(ReflyFlights(self._rpcClient, callback, flightIDs))
 
     def run(self):
         """Process the requests."""

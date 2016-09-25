@@ -250,6 +250,7 @@ class PendingFlightsFrame(gtk.Frame):
 
         self._reflyButton = gtk.Button(xstr("pendflt_refly_" + which))
         self._reflyButton.set_sensitive(False)
+        self._reflyButton.connect("clicked", self._reflyClicked)
         buttonBox.pack_start(self._reflyButton, False, False, 2)
 
         self._deleteButton = gtk.Button(xstr("pendflt_delete_" + which))
@@ -282,6 +283,39 @@ class PendingFlightsFrame(gtk.Frame):
         self._editButton.set_sensitive(sensitive)
         self._reflyButton.set_sensitive(sensitive)
         self._deleteButton.set_sensitive(sensitive)
+
+    def _reflyClicked(self, button):
+        """Called when the Refly button is clicked."""
+        gui = self._wizard.gui
+        gui.beginBusy(xstr("pendflt_refly_busy"))
+        self.set_sensitive(False)
+
+        flight = self._flights[self._flightList.selectedIndex]
+        gui.webHandler.reflyFlights(self._reflyResultCallback, [flight.id])
+
+    def _reflyResultCallback(self, returned, result):
+        """Called when the refly result is available."""
+        gobject.idle_add(self._handleReflyResult, returned, result)
+
+    def _handleReflyResult(self, returned, result):
+        """Handle the refly result."""
+
+        self.set_sensitive(True)
+        gui = self._wizard.gui
+        gui.endBusy()
+
+        print "PendingFlightsFrame._handleReflyResult", returned, result
+
+        if returned:
+            index = self._flightList.selectedIndex
+
+            flight = self._flights[index]
+
+            self._flightList.removeFlight(index)
+            del self._flights[index]
+
+            self._wizard.reflyFlight(flight)
+
 
 #-----------------------------------------------------------------------------
 

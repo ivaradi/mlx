@@ -540,6 +540,12 @@ class FlightSelectionPage(Page):
         self._flights.append(flight)
         self._flightList.addFlight(flight)
 
+    def _reflyFlight(self, flight):
+        """Refly the given flight."""
+        self._addFlight(flight)
+        self._setupHelp()
+        self._updatePendingButton()
+
     def _pendingClicked(self, button):
         """Called when the Pending flights button is clicked."""
         self._pendingFlightsWindow.show_all()
@@ -5079,7 +5085,8 @@ class Wizard(gtk.VBox):
 
         self._loginPage = LoginPage(self)
         self._pages.append(self._loginPage)
-        self._pages.append(FlightSelectionPage(self))
+        self._flightSelectionPage = FlightSelectionPage(self)
+        self._pages.append(self._flightSelectionPage)
         self._pages.append(GateSelectionPage(self))
         self._pages.append(RegisterPage(self))
         self._studentPage = StudentPage(self)
@@ -5480,6 +5487,11 @@ class Wizard(gtk.VBox):
         """Reload the flights from the MAVA server."""
         self.login(callback, None, None)
 
+    def reflyFlight(self, bookedFlight):
+        """Add the given booked flight to the flight selection page."""
+        self._removePendingFlight(bookedFlight)
+        self._flightSelectionPage._reflyFlight(bookedFlight)
+
     def cancelFlight(self, reloadCallback):
         """Cancel the flight.
 
@@ -5525,6 +5537,15 @@ class Wizard(gtk.VBox):
         for page in [self._arrivalBriefingPage, self._landingPage]:
             if page is not originator:
                 page.changeMETAR(metar)
+
+    def _removePendingFlight(self, flight):
+        """Remove the given pending flight from the login result."""
+        for flights in [self._loginResult.reportedFlights,
+                        self._loginResult.rejectedFlights]:
+            for f in flights:
+                if f.id==flight.id:
+                    flights.remove(f)
+                    return
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""

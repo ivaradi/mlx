@@ -339,6 +339,11 @@ class Client(object):
         self._performCall(lambda sessionID:
                           self._server.setCheckFlightPassed(sessionID, type))
 
+    def reflyFlights(self, flightIDs):
+        """Mark the flights with the given IDs for reflying."""
+        self._performCall(lambda sessionID:
+                          self._server.reflyFlights(sessionID, flightIDs))
+
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.
 
