@@ -153,7 +153,8 @@ class FlightList(gtk.Alignment):
 
     def _buttonPressEvent(self, widget, event):
         """Called when a mouse button is pressed or released."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+        if event.type!=EVENT_BUTTON_PRESS or event.button!=3 or \
+           self._popupMenuProducer is None:
             return
 
         (path, _, _, _) = self._view.get_path_at_pos(int(event.x),
