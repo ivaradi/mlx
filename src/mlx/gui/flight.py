@@ -436,13 +436,6 @@ class LoginPage(Page):
 
 class FlightSelectionPage(Page):
     """The page to select the flight."""
-    columnDescriptors = [
-        ColumnDescriptor("callsign", xstr("flightsel_no")),
-        ColumnDescriptor("departureTime", xstr("flightsel_deptime")),
-        ColumnDescriptor("departureICAO", xstr("flightsel_from")),
-        ColumnDescriptor("arrivalICAO", xstr("flightsel_to"))
-    ]
-
     def __init__(self, wizard):
         """Construct the flight selection page."""
         help = xstr("flightsel_help")
@@ -451,8 +444,7 @@ class FlightSelectionPage(Page):
                                                   xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
-        self._flightList = FlightList(FlightSelectionPage.columnDescriptors,
-                                      popupMenuProducer =
+        self._flightList = FlightList(popupMenuProducer =
                                       self._createListPopupMenu,
                                       widthRequest = 400)
         self._flightList.connect("row-activated", self._rowActivated)

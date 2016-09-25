@@ -58,8 +58,18 @@ class FlightList(gtk.Alignment):
 
     This is a complete widget with a scroll window. It is alignment centered
     horizontally and expandable vertically."""
-    def __init__(self, columnDescriptors, popupMenuProducer = None,
-                 widthRequest = None):
+
+    defaultColumnDescriptors = [
+        ColumnDescriptor("callsign", xstr("flightsel_no")),
+        ColumnDescriptor("departureTime", xstr("flightsel_deptime"),
+                         sortable = True),
+        ColumnDescriptor("departureICAO", xstr("flightsel_from"),
+                         sortable = True),
+        ColumnDescriptor("arrivalICAO", xstr("flightsel_to"), sortable = True)
+    ]
+
+    def __init__(self, columnDescriptors = defaultColumnDescriptors,
+                 popupMenuProducer = None, widthRequest = None):
         """Construct the flight list with the given column descriptors."""
 
         self._columnDescriptors = columnDescriptors
