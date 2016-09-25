@@ -117,6 +117,11 @@ class FlightList(gtk.Alignment):
             index = model.get_value(iter, 0)
             return index
 
+    @property
+    def hasFlights(self):
+        """Determine if there are any flights in the list."""
+        return self._model.get_iter_root() is not None
+
     def clear(self):
         """Clear the model."""
         self._model.clear()
