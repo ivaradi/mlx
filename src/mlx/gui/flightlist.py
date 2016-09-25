@@ -4,6 +4,8 @@
 
 from mlx.gui.common import *
 
+import mlx.const as const
+
 #-----------------------------------------------------------------------------
 
 class ColumnDescriptor(object):
@@ -49,7 +51,7 @@ class ColumnDescriptor(object):
         """Get the value from the given flight."""
         value = getattr(flight, self._attribute)
         return self._type(value) if self._convertFn is None \
-            else self._convertFn(value)
+            else self._convertFn(value, flight)
 
 #-----------------------------------------------------------------------------
 
@@ -192,5 +194,168 @@ gobject.signal_new("row-activated", FlightList, gobject.SIGNAL_RUN_FIRST,
 
 gobject.signal_new("selection-changed", FlightList, gobject.SIGNAL_RUN_FIRST,
                    None, (object,))
+
+#-----------------------------------------------------------------------------
+
+class PendingFlightsFrame(gtk.Frame):
+    """A frame for a list of pending (reported or rejected) flights.
+
+    It contains the list and the buttons available."""
+    def getAircraft(tailNumber, bookedFlight):
+        """Get the aircraft from the given booked flight.
+
+        This is the tail number followed by the ICAO code of the aircraft's
+        type."""
+        return tailNumber + \
+            " (" + const.icaoCodes[bookedFlight.aircraftType] + ")"
+
+    columnDescriptors = [
+        ColumnDescriptor("callsign", xstr("flightsel_no")),
+        ColumnDescriptor("departureTime", xstr("flightsel_deptime"),
+                         sortable = True),
+        ColumnDescriptor("departureICAO", xstr("flightsel_from"),
+                         sortable = True),
+        ColumnDescriptor("arrivalICAO", xstr("flightsel_to"),
+                         sortable = True),
+        ColumnDescriptor("tailNumber", xstr("pendflt_acft"),
+                         convertFn = getAircraft)
+    ]
+
+    def __init__(self, which, wizard):
+        """Construct the frame with the given title."""
+        super(PendingFlightsFrame, self).__init__(xstr("pendflt_title_" + which))
+
+        self._which = which
+        self._wizard = wizard
+
+        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment.set_padding(padding_top = 2, padding_bottom = 8,
+                              padding_left = 4, padding_right = 4)
+
+        hbox = gtk.HBox()
+
+        self._flights = []
+        self._flightList = FlightList(columnDescriptors =
+                                      PendingFlightsFrame.columnDescriptors,
+                                      widthRequest = 500)
+        self._flightList.connect("selection-changed", self._selectionChanged)
+
+        hbox.pack_start(self._flightList, True, True, 4)
+
+        buttonBox = gtk.VBox()
+
+        self._editButton = gtk.Button(xstr("pendflt_edit_" + which))
+        self._editButton.set_sensitive(False)
+        buttonBox.pack_start(self._editButton, False, False, 2)
+
+        self._reflyButton = gtk.Button(xstr("pendflt_refly_" + which))
+        self._reflyButton.set_sensitive(False)
+        buttonBox.pack_start(self._reflyButton, False, False, 2)
+
+        self._deleteButton = gtk.Button(xstr("pendflt_delete_" + which))
+        self._deleteButton.set_sensitive(False)
+        buttonBox.pack_start(self._deleteButton, False, False, 2)
+
+        hbox.pack_start(buttonBox, False, False, 4)
+
+        alignment.add(hbox)
+        self.add(alignment)
+
+    @property
+    def hasFlights(self):
+        """Determine if there are any flights in the list."""
+        return self._flightList.hasFlights
+
+    def clear(self):
+        """Clear the lists."""
+        self._flights = []
+        self._flightList.clear()
+
+    def addFlight(self, flight):
+        """Add a flight to the list."""
+        self._flights.append(flight)
+        self._flightList.addFlight(flight)
+
+    def _selectionChanged(self, flightList, selectedIndex):
+        """Called when the selection in the list has changed."""
+        sensitive = selectedIndex is not None
+        self._editButton.set_sensitive(sensitive)
+        self._reflyButton.set_sensitive(sensitive)
+        self._deleteButton.set_sensitive(sensitive)
+
+#-----------------------------------------------------------------------------
+
+class PendingFlightsWindow(gtk.Window):
+    """The window to display the lists of the pending (reported or rejected)
+    flights."""
+    def __init__(self, wizard):
+        """Construct the window"""
+        super(PendingFlightsWindow, self).__init__()
+
+        gui = wizard.gui
+
+        self.set_title(WINDOW_TITLE_BASE + " - " + xstr("pendflt_title"))
+        self.set_size_request(-1, 450)
+        self.set_transient_for(gui.mainWindow)
+        self.set_modal(True)
+
+        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                      xscale = 1.0, yscale = 1.0)
+        mainAlignment.set_padding(padding_top = 0, padding_bottom = 12,
+                                  padding_left = 8, padding_right = 8)
+
+        vbox = gtk.VBox()
+
+        self._reportedFrame = PendingFlightsFrame("reported", wizard)
+        vbox.pack_start(self._reportedFrame, True, True, 2)
+
+        self._rejectedFrame = PendingFlightsFrame("rejected", wizard)
+        vbox.pack_start(self._rejectedFrame, True, True, 2)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        self._closeButton = gtk.Button(xstr("button_ok"))
+        self._closeButton.connect("clicked", self._closeClicked)
+        alignment.add(self._closeButton)
+        vbox.pack_start(alignment, False, False, 2)
+
+        mainAlignment.add(vbox)
+
+        self.add(mainAlignment)
+
+        self.connect("key-press-event", self._keyPressed)
+
+    @property
+    def hasFlights(self):
+        """Determine if the window has any flights."""
+        return self._reportedFrame.hasFlights or self._rejectedFrame.hasFlights
+
+    def clear(self):
+        """Clear the lists."""
+        self._reportedFrame.clear()
+        self._rejectedFrame.clear()
+
+    def addReportedFlight(self, flight):
+        """Add a reported flight."""
+        self._reportedFrame.addFlight(flight)
+
+    def addRejectedFlight(self, flight):
+        """Add a rejected flight."""
+        self._rejectedFrame.addFlight(flight)
+
+    def _closeClicked(self, button):
+        """Called when the Close button is clicked.
+
+        A 'delete-event' is emitted to close the window."""
+        self.emit("delete-event", None)
+
+    def _keyPressed(self, window, event):
+        """Called when a key is pressed in the window.
+
+        If the Escape key is pressed, 'delete-event' is emitted to close the
+        window."""
+        if gdk.keyval_name(event.keyval) == "Escape":
+            self.emit("delete-event", None)
+            return True
 
 #-----------------------------------------------------------------------------

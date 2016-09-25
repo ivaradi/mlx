@@ -1,7 +1,7 @@
 
 from mlx.gui.common import *
 import mlx.gui.cef as cef
-from mlx.gui.flightlist import ColumnDescriptor, FlightList
+from mlx.gui.flightlist import ColumnDescriptor, FlightList, PendingFlightsWindow
 
 import mlx.const as const
 import mlx.fs as fs
@@ -452,6 +452,11 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(self._flightList)
 
+        self._pendingButton = self.addButton(xstr("flightsel_pending"),
+                                             sensitive = False,
+                                             clicked = self._pendingClicked,
+                                             tooltip = xstr("flightsel_pending_tooltip"))
+
         self._saveButton = self.addButton(xstr("flightsel_save"),
                                           sensitive = False,
                                           clicked = self._saveClicked,
@@ -473,6 +478,11 @@ class FlightSelectionPage(Page):
                                           clicked =  self._forwardClicked)
 
         self._flights = []
+
+        self._pendingFlightsWindow = PendingFlightsWindow(self._wizard)
+        self._pendingFlightsWindowShown = False
+        self._pendingFlightsWindow.connect("delete-event",
+                                           self._deletePendingFlightsWindow)
 
     def activate(self):
         """Fill the flight list."""
@@ -513,14 +523,35 @@ class FlightSelectionPage(Page):
         """Rebuild the flights from the login result."""
         self._flights = []
         self._flightList.clear()
+        self._pendingFlightsWindow.clear()
+        loginResult = self._wizard.loginResult
         if self._wizard.loggedIn:
-            for flight in self._wizard.loginResult.flights:
+            for flight in loginResult.flights:
                 self._addFlight(flight)
+            for flight in loginResult.reportedFlights:
+                self._pendingFlightsWindow.addReportedFlight(flight)
+            for flight in loginResult.rejectedFlights:
+                self._pendingFlightsWindow.addRejectedFlight(flight)
+
+        self._updatePendingButton()
 
     def _addFlight(self, flight):
         """Add the given file to the list of flights."""
         self._flights.append(flight)
         self._flightList.addFlight(flight)
+
+    def _pendingClicked(self, button):
+        """Called when the Pending flights button is clicked."""
+        self._pendingFlightsWindow.show_all()
+        self._pendingFlightsWindowShown = True
+        self._updateNextButton()
+
+    def _deletePendingFlightsWindow(self, window, event):
+        """Called when the pending flights window is closed."""
+        self._pendingFlightsWindow.hide()
+        self._pendingFlightsWindowShown = False
+        self._updateNextButton()
+        return True
 
     def _saveClicked(self, button):
         """Called when the Save flight button is clicked."""
@@ -574,7 +605,17 @@ class FlightSelectionPage(Page):
         """Called when the selection is changed."""
         selected = index is not None
         self._saveButton.set_sensitive(selected)
-        self._button.set_sensitive(selected)
+        self._updateNextButton()
+
+    def _updatePendingButton(self):
+        """Update the senstivity of the Pending button."""
+        self._pendingButton.set_sensitive(self._pendingFlightsWindow.hasFlights)
+
+    def _updateNextButton(self):
+        """Update the sensitivity of the Next button."""
+        sensitive = self._flightList.selectedIndex is not None and \
+          not self._pendingFlightsWindowShown
+        self._button.set_sensitive(sensitive)
 
     def _loadButtonClicked(self, loadButton):
         """Called when the load a flight button is clicked."""

@@ -370,7 +370,7 @@ msgid "flightsel_title"
 msgstr "Járatválasztás"
 
 msgid "flightsel_prehelp_nopending"
-msgstr ""
+msgstr " "
 
 msgid "flightsel_prehelp_0rep_rej"
 msgstr ""
@@ -401,6 +401,13 @@ msgstr "Honnan"
 
 msgid "flightsel_to"
 msgstr "Hová"
+
+msgid "flightsel_pending"
+msgstr "Fü_ggő járatok..."
+
+msgid "flightsel_pending_tooltip"
+msgstr "Ide kattinva megnézheted azokat a járataidat, amelyeket "
+"már jelentettél, de még nem fogadták el vagy utasították vissza."
 
 msgid "flightsel_save"
 msgstr "Járat _mentése"
@@ -2446,3 +2453,36 @@ msgstr ""
 "Megpróbálhatod később, vagy elmentheted a PIREP-et, és "
 "elküldheted a mentorodnak, aki tesz róla, hogy elfogadják az "
 "ellenőrző repülésedet."
+
+msgid "pendflt_title"
+msgstr "Függő járatok"
+
+msgid "pendflt_title_reported"
+msgstr "Még nem elfogadott"
+
+msgid "pendflt_edit_reported"
+msgstr "_Szerkesztés..."
+
+msgid "pendflt_refly_reported"
+msgstr "_Újra"
+
+msgid "pendflt_delete_reported"
+msgstr "_Törlés"
+
+msgid "pendflt_title_rejected"
+msgstr "Elutasított"
+
+msgid "pendflt_edit_rejected"
+msgstr "S_zerkesztés..."
+
+msgid "pendflt_refly_rejected"
+msgstr "Ú_jra"
+
+msgid "pendflt_delete_rejected"
+msgstr "Tö_rlés"
+
+msgid "pendflt_acft"
+msgstr "Repülőgép"
+
+msgid "pendflt_refly_busy"
+msgstr "A járatok megjelölése újrarepülésre"

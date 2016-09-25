@@ -370,7 +370,7 @@ msgid "flightsel_title"
 msgstr "Flight selection"
 
 msgid "flightsel_prehelp_nopending"
-msgstr ""
+msgstr " "
 
 msgid "flightsel_prehelp_0rep_rej"
 msgstr ""
@@ -401,6 +401,13 @@ msgstr "From"
 
 msgid "flightsel_to"
 msgstr "To"
+
+msgid "flightsel_pending"
+msgstr "_Pending flights..."
+
+msgid "flightsel_pending_tooltip"
+msgstr "Click here to review the list of the flights you have "
+"reported, but are either not reviewed yet or have been rejected."
 
 msgid "flightsel_save"
 msgstr "_Save flight"
@@ -2429,3 +2436,36 @@ msgstr ""
 "You can retry later, or save your PIREP and send it "
 "to your mentor at MAVA, who can arrange for your flight "
 "to be accepted."
+
+msgid "pendflt_title"
+msgstr "Pending Flights"
+
+msgid "pendflt_title_reported"
+msgstr "Not yet reviewed"
+
+msgid "pendflt_edit_reported"
+msgstr "_View/Edit..."
+
+msgid "pendflt_refly_reported"
+msgstr "_Refly"
+
+msgid "pendflt_delete_reported"
+msgstr "_Delete"
+
+msgid "pendflt_title_rejected"
+msgstr "Rejected"
+
+msgid "pendflt_edit_rejected"
+msgstr "V_iew/Edit..."
+
+msgid "pendflt_refly_rejected"
+msgstr "R_efly"
+
+msgid "pendflt_delete_rejected"
+msgstr "De_lete"
+
+msgid "pendflt_acft"
+msgstr "Aircraft"
+
+msgid "pendflt_refly_busy"
+msgstr "Marking flights(s) for reflying"
