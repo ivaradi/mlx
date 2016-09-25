@@ -12,7 +12,8 @@ class ColumnDescriptor(object):
     """A descriptor for a column in the list."""
     def __init__(self, attribute, heading, type = str,
                  convertFn = None, renderer = gtk.CellRendererText(),
-                 extraColumnAttributes = None, sortable = False):
+                 extraColumnAttributes = None, sortable = False,
+                 defaultSortable = False):
         """Construct the descriptor."""
         self._attribute = attribute
         self._heading = heading
@@ -21,6 +22,12 @@ class ColumnDescriptor(object):
         self._renderer = renderer
         self._extraColumnAttributes = extraColumnAttributes
         self._sortable = sortable
+        self._defaultSortable = defaultSortable
+
+    @property
+    def defaultSortable(self):
+        """Determine if this column is the default sortable one."""
+        return self._defaultSortable
 
     def appendType(self, types):
         """Append the type of this column to the given list of types."""
@@ -64,7 +71,7 @@ class FlightList(gtk.Alignment):
     defaultColumnDescriptors = [
         ColumnDescriptor("callsign", xstr("flightsel_no")),
         ColumnDescriptor("departureTime", xstr("flightsel_deptime"),
-                         sortable = True),
+                         sortable = True, defaultSortable = True),
         ColumnDescriptor("departureICAO", xstr("flightsel_from"),
                          sortable = True),
         ColumnDescriptor("arrivalICAO", xstr("flightsel_to"), sortable = True)
@@ -79,11 +86,16 @@ class FlightList(gtk.Alignment):
         self._popupMenu = None
 
         types = [int]
+        defaultSortableIndex = None
         for columnDescriptor in self._columnDescriptors:
+            if columnDescriptor.defaultSortable:
+                defaultSortableIndex = len(types)
             columnDescriptor.appendType(types)
 
         self._model = gtk.ListStore(*types)
-        self._model.set_sort_column_id(2, SORT_ASCENDING)
+        if defaultSortableIndex is not None:
+            self._model.set_sort_column_id(defaultSortableIndex,
+                                           SORT_ASCENDING)
         self._view = gtk.TreeView(self._model)
 
         flightIndexColumn = gtk.TreeViewColumn()
@@ -212,7 +224,7 @@ class PendingFlightsFrame(gtk.Frame):
     columnDescriptors = [
         ColumnDescriptor("callsign", xstr("flightsel_no")),
         ColumnDescriptor("departureTime", xstr("flightsel_deptime"),
-                         sortable = True),
+                         sortable = True, defaultSortable = True),
         ColumnDescriptor("departureICAO", xstr("flightsel_from"),
                          sortable = True),
         ColumnDescriptor("arrivalICAO", xstr("flightsel_to"),
