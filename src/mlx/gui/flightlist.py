@@ -10,7 +10,7 @@ class ColumnDescriptor(object):
     """A descriptor for a column in the list."""
     def __init__(self, attribute, heading, type = str,
                  convertFn = None, renderer = gtk.CellRendererText(),
-                 extraColumnAttributes = None):
+                 extraColumnAttributes = None, sortable = False):
         """Construct the descriptor."""
         self._attribute = attribute
         self._heading = heading
@@ -18,6 +18,7 @@ class ColumnDescriptor(object):
         self._convertFn = convertFn
         self._renderer = renderer
         self._extraColumnAttributes = extraColumnAttributes
+        self._sortable = sortable
 
     def appendType(self, types):
         """Append the type of this column to the given list of types."""
@@ -38,6 +39,9 @@ class ColumnDescriptor(object):
         column = gtk.TreeViewColumn(self._heading, self._renderer,
                                     text = index)
         column.set_expand(True)
+        if self._sortable:
+            column.set_sort_column_id(index)
+            column.set_sort_indicator(True)
 
         return column
 
@@ -62,14 +66,19 @@ class FlightList(gtk.Alignment):
         self._popupMenuProducer = popupMenuProducer
         self._popupMenu = None
 
-        types = []
+        types = [int]
         for columnDescriptor in self._columnDescriptors:
             columnDescriptor.appendType(types)
 
         self._model = gtk.ListStore(*types)
+        self._model.set_sort_column_id(2, SORT_ASCENDING)
         self._view = gtk.TreeView(self._model)
 
-        index = 0
+        flightIndexColumn = gtk.TreeViewColumn()
+        flightIndexColumn.set_visible(False)
+        self._view.append_column(flightIndexColumn)
+
+        index = 1
         for columnDescriptor in self._columnDescriptors:
             column = columnDescriptor.getViewColumn(index)
             self._view.append_column(column)
@@ -105,8 +114,7 @@ class FlightList(gtk.Alignment):
         if iter is None:
             return None
         else:
-            path = model.get_path(iter)
-            [index] = path.get_indices() if pygobject else path
+            index = model.get_value(iter, 0)
             return index
 
     def clear(self):
@@ -115,7 +123,7 @@ class FlightList(gtk.Alignment):
 
     def addFlight(self, flight):
         """Add the given booked flight."""
-        values = []
+        values = [self._model.iter_n_children(None)]
         for columnDescriptor in self._columnDescriptors:
             values.append(columnDescriptor.getValueFrom(flight))
         self._model.append(values)
