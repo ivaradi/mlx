@@ -1255,6 +1255,20 @@ class ReflyFlights(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class DeleteFlights(RPCRequest):
+    """A request to delete certain flights."""
+    def __init__(self, client, callback, flightIDs):
+        """Construct the request."""
+        super(DeleteFlights, self).__init__(client, callback)
+        self._flightIDs = flightIDs
+
+    def run(self):
+        """Perform the update."""
+        self._client.deleteFlights(self._flightIDs)
+        return Result()
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1339,6 +1353,10 @@ class Handler(threading.Thread):
     def reflyFlights(self, callback, flightIDs):
         """Mark the flights with the given IDs for reflying."""
         self._addRequest(ReflyFlights(self._rpcClient, callback, flightIDs))
+
+    def deleteFlights(self, callback, flightIDs):
+        """Delete the flights with the given IDs."""
+        self._addRequest(DeleteFlights(self._rpcClient, callback, flightIDs))
 
     def run(self):
         """Process the requests."""

@@ -543,6 +543,10 @@ class FlightSelectionPage(Page):
     def _reflyFlight(self, flight):
         """Refly the given flight."""
         self._addFlight(flight)
+        self._updatePending()
+
+    def _updatePending(self):
+        """Update the stuff depending on the set of pending flights."""
         self._setupHelp()
         self._updatePendingButton()
 
@@ -5491,6 +5495,11 @@ class Wizard(gtk.VBox):
         """Add the given booked flight to the flight selection page."""
         self._removePendingFlight(bookedFlight)
         self._flightSelectionPage._reflyFlight(bookedFlight)
+
+    def deleteFlight(self, bookedFlight):
+        """Remove the given flight from the pending flight list."""
+        self._removePendingFlight(bookedFlight)
+        self._flightSelectionPage._updatePending()
 
     def cancelFlight(self, reloadCallback):
         """Cancel the flight.

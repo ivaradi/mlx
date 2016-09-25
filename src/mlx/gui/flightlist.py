@@ -242,12 +242,13 @@ class PendingFlightsFrame(gtk.Frame):
                          convertFn = getAircraft)
     ]
 
-    def __init__(self, which, wizard):
+    def __init__(self, which, wizard, window):
         """Construct the frame with the given title."""
         super(PendingFlightsFrame, self).__init__(xstr("pendflt_title_" + which))
 
         self._which = which
         self._wizard = wizard
+        self._window = window
 
         alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 8,
@@ -276,6 +277,7 @@ class PendingFlightsFrame(gtk.Frame):
 
         self._deleteButton = gtk.Button(xstr("pendflt_delete_" + which))
         self._deleteButton.set_sensitive(False)
+        self._deleteButton.connect("clicked", self._deleteClicked)
         buttonBox.pack_start(self._deleteButton, False, False, 2)
 
         hbox.pack_start(buttonBox, False, False, 4)
@@ -339,6 +341,52 @@ class PendingFlightsFrame(gtk.Frame):
             for flight in flights:
                 self._wizard.reflyFlight(flight)
 
+    def _deleteClicked(self, button):
+        """Called when the Delete button is clicked."""
+        dialog = gtk.MessageDialog(parent = self._window,
+                                   type = MESSAGETYPE_QUESTION,
+                                   message_format = xstr("flight_delete_question"))
+
+        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+
+        dialog.set_title(WINDOW_TITLE_BASE)
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_YES:
+            gui = self._wizard.gui
+            gui.beginBusy(xstr("pendflt_refly_busy"))
+            self.set_sensitive(False)
+
+            flightIDs = [self._flights[i].id
+                        for i in self._flightList.selectedIndexes]
+            gui.webHandler.deleteFlights(self._deleteResultCallback, flightIDs)
+
+    def _deleteResultCallback(self, returned, result):
+        """Called when the deletion result is available."""
+        gobject.idle_add(self._handleDeleteResult, returned, result)
+
+    def _handleDeleteResult(self, returned, result):
+        """Handle the delete result."""
+
+        self.set_sensitive(True)
+        gui = self._wizard.gui
+        gui.endBusy()
+
+        print "PendingFlightsFrame._handleDeleteResult", returned, result
+
+        if returned:
+            indexes = self._flightList.selectedIndexes
+
+            flights = [self._flights[index] for index in indexes]
+
+            self._flightList.removeFlights(indexes)
+            for index in indexes[::-1]:
+                del self._flights[index]
+
+            for flight in flights:
+                self._wizard.deleteFlight(flight)
 
 #-----------------------------------------------------------------------------
 
@@ -363,10 +411,10 @@ class PendingFlightsWindow(gtk.Window):
 
         vbox = gtk.VBox()
 
-        self._reportedFrame = PendingFlightsFrame("reported", wizard)
+        self._reportedFrame = PendingFlightsFrame("reported", wizard, self)
         vbox.pack_start(self._reportedFrame, True, True, 2)
 
-        self._rejectedFrame = PendingFlightsFrame("rejected", wizard)
+        self._rejectedFrame = PendingFlightsFrame("rejected", wizard, self)
         vbox.pack_start(self._rejectedFrame, True, True, 2)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,

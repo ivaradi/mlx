@@ -344,6 +344,11 @@ class Client(object):
         self._performCall(lambda sessionID:
                           self._server.reflyFlights(sessionID, flightIDs))
 
+    def deleteFlights(self, flightIDs):
+        """Delete the flights with the given IDs."""
+        self._performCall(lambda sessionID:
+                          self._server.deleteFlights(sessionID, flightIDs))
+
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.
 
