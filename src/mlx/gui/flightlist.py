@@ -133,6 +133,20 @@ class FlightList(gtk.Alignment):
             values.append(columnDescriptor.getValueFrom(flight))
         self._model.append(values)
 
+    def removeFlight(self, index):
+        """Remove the flight with the given index."""
+        model = self._model
+        idx = 0
+        iter = model.get_iter_first()
+        while iter is not None:
+            nextIter = model.iter_next(iter)
+            if model.get_value(iter, 0)==index:
+                model.remove(iter)
+            else:
+                model.set_value(iter, 0, idx)
+                idx += 1
+            iter = nextIter
+
     def _rowActivated(self, flightList, path, column):
         """Called when a row is selected."""
         self.emit("row-activated", self.selectedIndex)
