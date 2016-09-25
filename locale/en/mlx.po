@@ -2470,5 +2470,8 @@ msgstr "Aircraft"
 msgid "pendflt_refly_busy"
 msgstr "Marking flights(s) for reflying"
 
+msgid "pendflt_refly_question"
+msgstr "Are you sure to refly the selected flight(s)?"
+
 msgid "flight_delete_question"
 msgstr "Are you sure to delete the selected flight(s)?"

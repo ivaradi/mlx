@@ -2487,5 +2487,8 @@ msgstr "Repülőgép"
 msgid "pendflt_refly_busy"
 msgstr "A járatok megjelölése újrarepülésre"
 
+msgid "pendflt_refly_question"
+msgstr "Biztosan újra szeretnéd repülni a kiválasztott járato(ka)t?"
+
 msgid "flight_delete_question"
 msgstr "Biztosan törölni szerednéd a kiválasztott járato(ka)t?"

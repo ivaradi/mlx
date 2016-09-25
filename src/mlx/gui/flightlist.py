@@ -308,13 +308,25 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
-        gui = self._wizard.gui
-        gui.beginBusy(xstr("pendflt_refly_busy"))
-        self.set_sensitive(False)
+        dialog = gtk.MessageDialog(parent = self._window,
+                                   type = MESSAGETYPE_QUESTION,
+                                   message_format = xstr("pendflt_refly_question"))
 
-        flightIDs = [self._flights[i].id
-                     for i in self._flightList.selectedIndexes]
-        gui.webHandler.reflyFlights(self._reflyResultCallback, flightIDs)
+        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+
+        dialog.set_title(WINDOW_TITLE_BASE)
+        result = dialog.run()
+        dialog.hide()
+
+        if result==RESPONSETYPE_YES:
+            gui = self._wizard.gui
+            gui.beginBusy(xstr("pendflt_refly_busy"))
+            self.set_sensitive(False)
+
+            flightIDs = [self._flights[i].id
+                        for i in self._flightList.selectedIndexes]
+            gui.webHandler.reflyFlights(self._reflyResultCallback, flightIDs)
 
     def _reflyResultCallback(self, returned, result):
         """Called when the refly result is available."""
