@@ -475,3 +475,22 @@ def insertTextBuffer(buffer, iter, text, isFault = False):
         buffer.remove_all_tags(iter0, iter1)
 
 #------------------------------------------------------------------------------
+
+def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
+    """Ask a Yes/No question.
+
+    Return a boolean indicating the answer."""
+    dialog = gtk.MessageDialog(parent = parent,
+                               type = MESSAGETYPE_QUESTION,
+                               message_format = question)
+
+    dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
+    dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+
+    dialog.set_title(title)
+    result = dialog.run()
+    dialog.hide()
+
+    return result==RESPONSETYPE_YES
+
+#------------------------------------------------------------------------------
