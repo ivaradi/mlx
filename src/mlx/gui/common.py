@@ -101,6 +101,8 @@ if not pygobject:
 
     UPDATE_IF_VALID = gtk.UPDATE_IF_VALID
 
+    SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -176,6 +178,8 @@ else: # pygobject
     EXPAND = gtk.AttachOptions.EXPAND
 
     UPDATE_IF_VALID = gtk.SpinButtonUpdatePolicy.IF_VALID
+
+    SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
 
     pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 

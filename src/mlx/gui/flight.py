@@ -607,10 +607,9 @@ class FlightSelectionPage(Page):
             if result.loggedIn:
                 self._buildFlights()
 
-    def _selectionChanged(self, flightList, index):
+    def _selectionChanged(self, flightList, indexes):
         """Called when the selection is changed."""
-        selected = index is not None
-        self._saveButton.set_sensitive(selected)
+        self._saveButton.set_sensitive(len(indexes)==1)
         self._updateNextButton()
 
     def _updatePendingButton(self):
@@ -619,7 +618,7 @@ class FlightSelectionPage(Page):
 
     def _updateNextButton(self):
         """Update the sensitivity of the Next button."""
-        sensitive = self._flightList.selectedIndex is not None and \
+        sensitive = len(self._flightList.selectedIndexes)==1 and \
           not self._pendingFlightsWindowShown
         self._button.set_sensitive(sensitive)
 
@@ -673,8 +672,9 @@ class FlightSelectionPage(Page):
 
     def _getSelectedFlight(self):
         """Get the currently selected flight."""
-        index = self._flightList.selectedIndex
-        return self._flights[index]
+        indexes = self._flightList.selectedIndexes
+        assert(len(indexes)==1)
+        return self._flights[indexes[0]]
 
     def _updateDepartureGate(self):
         """Update the departure gate for the booked flight."""

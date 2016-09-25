@@ -78,7 +78,8 @@ class FlightList(gtk.Alignment):
     ]
 
     def __init__(self, columnDescriptors = defaultColumnDescriptors,
-                 popupMenuProducer = None, widthRequest = None):
+                 popupMenuProducer = None, widthRequest = None,
+                 multiSelection = False):
         """Construct the flight list with the given column descriptors."""
 
         self._columnDescriptors = columnDescriptors
@@ -113,6 +114,8 @@ class FlightList(gtk.Alignment):
 
         selection = self._view.get_selection()
         selection.connect("changed", self._selectionChanged)
+        if multiSelection:
+            selection.set_mode(SELECTION_MULTIPLE)
 
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._view)
@@ -131,15 +134,16 @@ class FlightList(gtk.Alignment):
         self.add(scrolledWindow)
 
     @property
-    def selectedIndex(self):
-        """Get the index of the selected entry, if any."""
+    def selectedIndexes(self):
+        """Get the indexes of the selected entries, if any.
+
+        The indexes are sorted."""
         selection = self._view.get_selection()
-        (model, iter) = selection.get_selected()
-        if iter is None:
-            return None
-        else:
-            index = model.get_value(iter, 0)
-            return index
+        (model, rows) = selection.get_selected_rows()
+
+        indexes = [self._getIndexForPath(path) for path in rows]
+        indexes.sort()
+        return indexes
 
     @property
     def hasFlights(self):
@@ -157,23 +161,28 @@ class FlightList(gtk.Alignment):
             values.append(columnDescriptor.getValueFrom(flight))
         self._model.append(values)
 
-    def removeFlight(self, index):
-        """Remove the flight with the given index."""
+    def removeFlights(self, indexes):
+        """Remove the flights with the given indexes."""
         model = self._model
         idx = 0
         iter = model.get_iter_first()
         while iter is not None:
             nextIter = model.iter_next(iter)
-            if model.get_value(iter, 0)==index:
+            if model.get_value(iter, 0) in indexes:
                 model.remove(iter)
             else:
                 model.set_value(iter, 0, idx)
                 idx += 1
             iter = nextIter
 
+    def _getIndexForPath(self, path):
+        """Get the index for the given path."""
+        iter = self._model.get_iter(path)
+        return self._model.get_value(iter, 0)
+
     def _rowActivated(self, flightList, path, column):
         """Called when a row is selected."""
-        self.emit("row-activated", self.selectedIndex)
+        self.emit("row-activated", self._getIndexForPath(path))
 
     def _buttonPressEvent(self, widget, event):
         """Called when a mouse button is pressed or released."""
@@ -197,7 +206,7 @@ class FlightList(gtk.Alignment):
 
     def _selectionChanged(self, selection):
         """Called when the selection has changed."""
-        self.emit("selection-changed", self.selectedIndex)
+        self.emit("selection-changed", self.selectedIndexes)
 
 #-------------------------------------------------------------------------------
 
@@ -249,7 +258,7 @@ class PendingFlightsFrame(gtk.Frame):
         self._flights = []
         self._flightList = FlightList(columnDescriptors =
                                       PendingFlightsFrame.columnDescriptors,
-                                      widthRequest = 500)
+                                      widthRequest = 500, multiSelection = True)
         self._flightList.connect("selection-changed", self._selectionChanged)
 
         hbox.pack_start(self._flightList, True, True, 4)
@@ -289,12 +298,11 @@ class PendingFlightsFrame(gtk.Frame):
         self._flights.append(flight)
         self._flightList.addFlight(flight)
 
-    def _selectionChanged(self, flightList, selectedIndex):
+    def _selectionChanged(self, flightList, selectedIndexes):
         """Called when the selection in the list has changed."""
-        sensitive = selectedIndex is not None
-        self._editButton.set_sensitive(sensitive)
-        self._reflyButton.set_sensitive(sensitive)
-        self._deleteButton.set_sensitive(sensitive)
+        self._editButton.set_sensitive(len(selectedIndexes)==1)
+        self._reflyButton.set_sensitive(len(selectedIndexes)>0)
+        self._deleteButton.set_sensitive(len(selectedIndexes)>0)
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
@@ -302,8 +310,9 @@ class PendingFlightsFrame(gtk.Frame):
         gui.beginBusy(xstr("pendflt_refly_busy"))
         self.set_sensitive(False)
 
-        flight = self._flights[self._flightList.selectedIndex]
-        gui.webHandler.reflyFlights(self._reflyResultCallback, [flight.id])
+        flightIDs = [self._flights[i].id
+                     for i in self._flightList.selectedIndexes]
+        gui.webHandler.reflyFlights(self._reflyResultCallback, flightIDs)
 
     def _reflyResultCallback(self, returned, result):
         """Called when the refly result is available."""
@@ -319,14 +328,16 @@ class PendingFlightsFrame(gtk.Frame):
         print "PendingFlightsFrame._handleReflyResult", returned, result
 
         if returned:
-            index = self._flightList.selectedIndex
+            indexes = self._flightList.selectedIndexes
 
-            flight = self._flights[index]
+            flights = [self._flights[index] for index in indexes]
 
-            self._flightList.removeFlight(index)
-            del self._flights[index]
+            self._flightList.removeFlights(indexes)
+            for index in indexes[::-1]:
+                del self._flights[index]
 
-            self._wizard.reflyFlight(flight)
+            for flight in flights:
+                self._wizard.reflyFlight(flight)
 
 
 #-----------------------------------------------------------------------------
