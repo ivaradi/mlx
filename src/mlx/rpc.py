@@ -119,6 +119,7 @@ class BookedFlight(RPCObject):
     def __init__(self, value):
         """Construct the booked flight object from the given RPC result
         value."""
+        self.status = BookedFlight.STATUS_BOOKED
         super(BookedFlight, self).__init__(value, BookedFlight._instructions)
         self.departureTime = \
           BookedFlight.getDateTime(self.date, self.departureTime)
@@ -191,6 +192,9 @@ class RPCException(Exception):
 
 class Client(object):
     """The RPC client interface."""
+    # The client protocol version
+    VERSION = 2
+
     # Result code: OK
     RESULT_OK = 0
 
@@ -262,7 +266,8 @@ class Client(object):
         Returns the name of the pilot on success, or None on error."""
         self._sessionID = None
 
-        reply = Reply(self._server.login(self._userName, self._passwordHash))
+        reply = Reply(self._server.login(self._userName, self._passwordHash,
+                                         Client.VERSION))
         if reply.result == Client.RESULT_OK:
             self._loginCount += 1
             self._sessionID = reply.value["sessionID"]
