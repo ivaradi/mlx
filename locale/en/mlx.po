@@ -2475,3 +2475,9 @@ msgstr "Are you sure to refly the selected flight(s)?"
 
 msgid "flight_delete_question"
 msgstr "Are you sure to delete the selected flight(s)?"
+
+msgid "error_communication"
+msgstr "Communication error"
+
+msgid "error_communication_secondary"
+msgstr "Communication failed with the MAVA website. Try again later or file a bug report, if the problem persists."

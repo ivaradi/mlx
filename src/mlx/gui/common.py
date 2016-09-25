@@ -494,3 +494,27 @@ def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
     return result==RESPONSETYPE_YES
 
 #------------------------------------------------------------------------------
+
+def errroDialog(message, parent = None, secondary = None,
+                title = WINDOW_TITLE_BASE):
+    """Display an error dialog box with the given message."""
+    dialog = gtk.MessageDialog(parent = parent,
+                               type = MESSAGETYPE_ERROR,
+                               message_format = message)
+    dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+    dialog.set_title(title)
+    if secondary is not None:
+        dialog.format_secondary_markup(secondary)
+
+    dialog.run()
+    dialog.hide()
+
+#------------------------------------------------------------------------------
+
+def communicationErrorDialog(parent = None, title = WINDOW_TITLE_BASE):
+    """Display a communication error dialog."""
+    errroDialog(xstr("error_communication"), parent = parent,
+                secondary = xstr("error_communication_secondary"),
+                title = title)
+
+#------------------------------------------------------------------------------

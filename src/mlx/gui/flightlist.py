@@ -341,6 +341,9 @@ class PendingFlightsFrame(gtk.Frame):
 
             for flight in flights:
                 self._wizard.reflyFlight(flight)
+            self._window.checkFlights()
+        else:
+            communicationErrorDialog()
 
     def _deleteClicked(self, button):
         """Called when the Delete button is clicked."""
@@ -377,6 +380,9 @@ class PendingFlightsFrame(gtk.Frame):
 
             for flight in flights:
                 self._wizard.deleteFlight(flight)
+            self._window.checkFlights()
+        else:
+            communicationErrorDialog()
 
 #-----------------------------------------------------------------------------
 
@@ -437,6 +443,12 @@ class PendingFlightsWindow(gtk.Window):
     def addRejectedFlight(self, flight):
         """Add a rejected flight."""
         self._rejectedFrame.addFlight(flight)
+
+    def checkFlights(self):
+        """Check if there are any flights in any of the lists, and close the
+        window if not."""
+        if not self.hasFlights:
+            self.emit("delete-event", None)
 
     def _closeClicked(self, button):
         """Called when the Close button is clicked.

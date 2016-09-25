@@ -2492,3 +2492,9 @@ msgstr "Biztosan újra szeretnéd repülni a kiválasztott járato(ka)t?"
 
 msgid "flight_delete_question"
 msgstr "Biztosan törölni szerednéd a kiválasztott járato(ka)t?"
+
+msgid "error_communication"
+msgstr "Kommunikációs hiba"
+
+msgid "error_communication_secondary"
+msgstr "Nem sikerült kommunikálni a MAVA weboldalával. Próbáld meg később, vagy jelents hibát, ha a probléma nem szűnik meg."
