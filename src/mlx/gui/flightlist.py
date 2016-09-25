@@ -308,18 +308,7 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
-        dialog = gtk.MessageDialog(parent = self._window,
-                                   type = MESSAGETYPE_QUESTION,
-                                   message_format = xstr("pendflt_refly_question"))
-
-        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
-
-        dialog.set_title(WINDOW_TITLE_BASE)
-        result = dialog.run()
-        dialog.hide()
-
-        if result==RESPONSETYPE_YES:
+        if askYesNo(xstr("pendflt_refly_question"), parent = self._window):
             gui = self._wizard.gui
             gui.beginBusy(xstr("pendflt_refly_busy"))
             self.set_sensitive(False)
@@ -355,18 +344,7 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _deleteClicked(self, button):
         """Called when the Delete button is clicked."""
-        dialog = gtk.MessageDialog(parent = self._window,
-                                   type = MESSAGETYPE_QUESTION,
-                                   message_format = xstr("flight_delete_question"))
-
-        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
-
-        dialog.set_title(WINDOW_TITLE_BASE)
-        result = dialog.run()
-        dialog.hide()
-
-        if result==RESPONSETYPE_YES:
+        if askYesNo(xstr("flight_delete_question"), parent = self._window):
             gui = self._wizard.gui
             gui.beginBusy(xstr("pendflt_refly_busy"))
             self.set_sensitive(False)
