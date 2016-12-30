@@ -1299,10 +1299,7 @@ class GUI(fs.ConnectionListener):
                     if result==RESPONSETYPE_OK:
                         self.sendPIREP(pirep)
                     elif result==1:
-                        self._pirepViewer.setPIREP(pirep)
-                        self._pirepViewer.show_all()
-                        self._pirepViewer.run()
-                        self._pirepViewer.hide()
+                        self.viewPIREP(pirep)
                     else:
                         break
 
