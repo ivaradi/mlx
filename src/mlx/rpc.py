@@ -339,6 +339,12 @@ class Client(object):
         self._performCall(lambda sessionID:
                           self._server.setCheckFlightPassed(sessionID, type))
 
+    def getPIREP(self, flightID):
+        """Get the PIREP data for the flight with the given ID."""
+        value = self._performCall(lambda sessionID:
+                                  self._server.getPIREP(sessionID, flightID))
+        return value
+
     def reflyFlights(self, flightIDs):
         """Mark the flights with the given IDs for reflying."""
         self._performCall(lambda sessionID:

@@ -6,6 +6,7 @@ import rpc
 import rpccommon
 
 from common import MAVA_BASE_URL
+from pirep import PIREP
 
 import threading
 import sys
@@ -256,6 +257,35 @@ class BookedFlight(object):
         if "aircraftTypeName" not in d:
             self.aircraftTypeName = \
                 BookedFlight.TYPE2TYPECODE[self.aircraftType]
+
+    def setupFromPIREPData(self, pirepData):
+        """Setup the booked flight from the given PIREP data."""
+        bookedFlightData = pirepData["bookedFlight"]
+
+        self.callsign = bookedFlightData["callsign"]
+
+        date = bookedFlightData["date"]
+
+        departureTime = bookedFlightData["departureTime"]
+        self.departureTime = BookedFlight.getDateTime(date, departureTime)
+
+        arrivalTime = bookedFlightData["arrivalTime"]
+        self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
+        if self.arrivalTime<self.departureTime:
+            self.arrivalTime += datetime.timedelta(days = 1)
+
+        self.departureICAO = bookedFlightData["departureICAO"]
+        self.arrivalICAO = bookedFlightData["arrivalICAO"]
+
+        self.aircraftType = \
+          self._decodeAircraftType(bookedFlightData["aircraftType"])
+        self.tailNumber = bookedFlightData["tailNumber"]
+        self.numPassengers = int(bookedFlightData["numPassengers"])
+        self.numCrew = int(bookedFlightData["numCrew"])
+        self.bagWeight = int(bookedFlightData["bagWeight"])
+        self.cargoWeight = int(bookedFlightData["cargoWeight"])
+        self.mailWeight = int(bookedFlightData["mailWeight"])
+        self.route = bookedFlightData["route"]
 
     def writeIntoFile(self, f):
         """Write the flight into a file."""
@@ -1241,6 +1271,30 @@ class SetCheckFlightPassed(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class GetPIREP(RPCRequest):
+    """A request to retrieve the PIREP of a certain flight."""
+    def __init__(self, client, callback, flightID):
+        """Construct the request."""
+        super(GetPIREP, self).__init__(client, callback)
+        self._flightID = flightID
+
+    def run(self):
+        """Perform the update."""
+        result = Result()
+
+        pirepData = self._client.getPIREP(self._flightID)
+        print "pirepData:", pirepData
+
+        bookedFlight = BookedFlight()
+        bookedFlight.setupFromPIREPData(pirepData)
+
+        result.pirep = PIREP(None)
+        result.pirep.setupFromPIREPData(pirepData, bookedFlight)
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class ReflyFlights(RPCRequest):
     """A request to mark certain flights for reflying."""
     def __init__(self, client, callback, flightIDs):
@@ -1349,6 +1403,10 @@ class Handler(threading.Thread):
         """Mark the check flight as passed."""
         self._addRequest(SetCheckFlightPassed(self._rpcClient,
                                               callback, aircraftType))
+
+    def getPIREP(self, callback, flightID):
+        """Query the PIREP for the given flight."""
+        self._addRequest(GetPIREP(self._rpcClient, callback, flightID))
 
     def reflyFlights(self, callback, flightIDs):
         """Mark the flights with the given IDs for reflying."""

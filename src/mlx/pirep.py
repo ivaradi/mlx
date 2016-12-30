@@ -1,8 +1,10 @@
 
 from util import utf2unicode
+from flight import Flight
 
 import const
 import cPickle as pickle
+import calendar
 import datetime
 import time
 
@@ -37,6 +39,57 @@ class PIREP(object):
         return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     @staticmethod
+    def parseTimestampFromRPC(s):
+        """Format the given timestamp for RPC."""
+        dt = datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+        return calendar.timegm(dt.utctimetuple())
+
+    @staticmethod
+    def decodeFlightTypeText(s):
+        """Decode the given flight type text."""
+        for (flighType, text) in PIREP._flightTypes.iteritems():
+            if s==text:
+                return flighType
+        return const.FLIGHTYPE_SCHEDULED
+
+    @staticmethod
+    def parseLogFromRPC(log):
+        """Parse the given log coming from the RPC."""
+        index = 0
+        entries = []
+
+        inTimeStr = False
+        inEntry = False
+
+        timestr = ""
+        entry = ""
+
+        while index<len(log):
+            c = log[index]
+            index += 1
+
+            if c==']':
+                if inEntry:
+                    entries.append((timestr, entry))
+                    timestr = ""
+                    entry = ""
+
+                inTimeStr = False
+                inEntry = False
+            elif not inTimeStr and not inEntry:
+                if c=='[':
+                    if timestr:
+                        inEntry = True
+                    else:
+                        inTimeStr = True
+            elif inTimeStr:
+                timestr += c
+            elif inEntry:
+                entry += c
+
+        return entries
+
+    @staticmethod
     def load(path):
         """Load a PIREP from the given path.
 
@@ -60,6 +113,9 @@ class PIREP(object):
 
     def __init__(self, flight):
         """Initialize the PIREP from the given flight."""
+        if flight is None:
+            return
+
         self.bookedFlight = flight.bookedFlight
 
         self.numCrew = flight.numCrew
@@ -101,6 +157,91 @@ class PIREP(object):
         self.rating = logger.getRating()
         self.logLines = logger.lines
         self.faultLineIndexes = logger.faultLineIndexes
+
+    def setupFromPIREPData(self, pirepData, bookedFlight):
+
+        self.bookedFlight = bookedFlight
+
+        self.numCrew = int(pirepData["numCrew"])
+        self.numPassengers = int(pirepData["numPassengers"])
+        self.bagWeight = int(pirepData["bagWeight"])
+        self.cargoWeight = int(pirepData["cargoWeight"])
+        self.mailWeight = int(pirepData["mailWeight"])
+
+        self.filedCruiseAltitude = int(pirepData["filedCruiseLevel"][2:])*100
+        cruiseLevel = pirepData["cruiseLevel"]
+        if cruiseLevel:
+            self.cruiseAltitude = int(cruiseLevel[2:])*100
+        else:
+            self.cruiseAltitude = self.filedCruiseAltitude
+        self.route = pirepData["route"]
+
+        self.departureMETAR = pirepData["departureMETAR"]
+        self.arrivalMETAR = pirepData["arrivalMETAR"]
+
+        self.departureRunway = pirepData["departureRunway"]
+        self.sid = pirepData["sid"]
+
+        star = pirepData["star"].split(",")
+        self.star = star[0]
+        self.star.strip()
+
+        if len(star)>1:
+            self.transition = star[1]
+            self.transition.strip()
+        else:
+            self.transition = ""
+        self.approachType = pirepData["approachType"]
+        self.arrivalRunway = pirepData["arrivalRunway"]
+
+        self.flightType = PIREP.decodeFlightTypeText(pirepData["flightType"])
+        self.online = int(pirepData["online"])!=0
+
+        self.comments = pirepData["comments"]
+        self.flightDefects = pirepData["flightDefects"]
+        self.delayCodes = pirepData["timeComment"]
+        if self.delayCodes=="UTC":
+            self.delayCodes = ""
+
+        flightDate = pirepData["flightDate"] + " "
+
+        self.blockTimeStart = \
+          PIREP.parseTimestampFromRPC(flightDate + pirepData["blockTimeStart"])
+        self.flightTimeStart = \
+          PIREP.parseTimestampFromRPC(flightDate + pirepData["flightTimeStart"])
+        self.flightTimeEnd = \
+          PIREP.parseTimestampFromRPC(flightDate + pirepData["flightTimeEnd"])
+        self.blockTimeEnd = \
+          PIREP.parseTimestampFromRPC(flightDate + pirepData["blockTimeEnd"])
+        self.flownDistance = float(pirepData["flownDistance"])
+        self.fuelUsed = float(pirepData["fuelUsed"])
+
+        # logger = flight.logger
+        self.rating = float(pirepData["rating"])
+
+        log = pirepData["log"]
+
+        self.logLines = PIREP.parseLogFromRPC(log)[1:]
+        if self.logLines and \
+           (self.logLines[0][0]=="LOGGER NG LOG" or
+            self.logLines[0][0]=="MAVA LOGGER X"):
+            self.logLines = self.logLines[1:]
+        numLogLines = len(self.logLines)
+
+        lastFaultLineIndex = 0
+        self.faultLineIndexes = []
+        for ratingText in pirepData["ratingText"].splitlines()[:-1]:
+            faultLines = PIREP.parseLogFromRPC(ratingText)
+            for (timeStr, entry) in faultLines:
+                for i in range(lastFaultLineIndex, numLogLines-1):
+                    if timeStr>=self.logLines[i][0] and \
+                       timeStr<self.logLines[i+1][0]:
+                        self.logLines = self.logLines[:i+1] + \
+                          [(timeStr, entry)] + self.logLines[i+1:]
+                        self.faultLineIndexes.append(i+1)
+                        lastFaultLineIndex = i+1
+                        numLogLines += 1
+                        break
 
     @property
     def flightDateText(self):
