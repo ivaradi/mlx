@@ -28,7 +28,7 @@ class PIREPViewer(gtk.Dialog):
 
         The frame will contain an alignment to properly distance the
         insides. The alignment will contain a VBox to contain the real
-        contents. 
+        contents.
 
         The function returns a tuple with the following items:
         - the frame,
@@ -42,7 +42,7 @@ class PIREPViewer(gtk.Dialog):
                               padding_left = 4, padding_right = 4)
         box = gtk.VBox()
         alignment.add(box)
-        
+
         return (frame, box)
 
     @staticmethod
@@ -65,7 +65,7 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def getTextWindow(heightRequest = 40):
         """Get a scrollable text window.
-        
+
         Returns a tuple of the following items:
         - the window,
         - the text view."""
@@ -86,15 +86,15 @@ class PIREPViewer(gtk.Dialog):
     def tableAttach(table, column, row, labelText, width = None,
                     dataLabelXAlignment = 0.0):
         """Attach a labeled data to the given column and row of the
-        table. 
-        
+        table.
+
         If width is given, that will be the width of the data
         label.
 
         Returns the data label attached."""
         dataBox = gtk.HBox()
         table.attach(dataBox, column, column+1, row, row+1)
-        
+
         dataLabel = PIREPViewer.addLabeledData(dataBox, labelText,
                                                width = width)
         dataLabel.set_alignment(dataLabelXAlignment, 0.5)
@@ -104,11 +104,11 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def addLabeledData(hBox, labelText, width = None, dataPadding = 8):
         """Add a label and a data label to the given HBox.
-        
+
         Returnsd the data label."""
         label = PIREPViewer.getLabel(labelText)
         hBox.pack_start(label, False, False, 0)
-                
+
         dataLabel = PIREPViewer.getDataLabel(width = width)
         hBox.pack_start(dataLabel, False, False, dataPadding)
 
@@ -121,7 +121,7 @@ class PIREPViewer(gtk.Dialog):
                                xscale = 1.0, yscale = 1.0)
         filler.set_size_request(-1, height)
         vBox.pack_start(filler, False, False, 0)
-        
+
     @staticmethod
     def timestamp2text(label, timestamp):
         """Convert the given timestamp into a text containing the hour
@@ -135,28 +135,28 @@ class PIREPViewer(gtk.Dialog):
                                           " - " +
                                           xstr("pirepView_title"),
                                           parent = gui.mainWindow)
-                                          
+
         self.set_resizable(False)
 
         self._gui = gui
-        
+
         contentArea = self.get_content_area()
 
         self._notebook = gtk.Notebook()
         contentArea.pack_start(self._notebook, False, False, 4)
-        
+
         dataTab = self._buildDataTab()
         label = gtk.Label(xstr("pirepView_tab_data"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_data_tooltip"))
         self._notebook.append_page(dataTab, label)
-        
+
         commentsTab = self._buildCommentsTab()
         label = gtk.Label(xstr("pirepView_tab_comments"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_comments_tooltip"))
         self._notebook.append_page(commentsTab, label)
-        
+
         logTab = self._buildLogTab()
         label = gtk.Label(xstr("pirepView_tab_log"))
         label.set_use_underline(True)
@@ -165,7 +165,7 @@ class PIREPViewer(gtk.Dialog):
 
         self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         self._okButton.set_can_default(True)
-        
+
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
         bookedFlight = pirep.bookedFlight
@@ -174,7 +174,7 @@ class PIREPViewer(gtk.Dialog):
         self._tailNumber.set_text(bookedFlight.tailNumber)
         aircraftType = xstr("aircraft_" + icaoCodes[bookedFlight.aircraftType].lower())
         self._aircraftType.set_text(aircraftType)
-        
+
         self._departureICAO.set_text(bookedFlight.departureICAO)
         self._departureTime.set_text("%02d:%02d" % \
                                      (bookedFlight.departureTime.hour,
@@ -190,7 +190,7 @@ class PIREPViewer(gtk.Dialog):
         self._bagWeight.set_text(str(bookedFlight.bagWeight))
         self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
-        
+
         self._route.get_buffer().set_text(bookedFlight.route)
 
         self._filedCruiseLevel.set_text("FL" + str(pirep.filedCruiseAltitude/100))
@@ -217,7 +217,7 @@ class PIREPViewer(gtk.Dialog):
         PIREPViewer.timestamp2text(self._blockTimeEnd, pirep.blockTimeEnd)
         PIREPViewer.timestamp2text(self._flightTimeStart, pirep.flightTimeStart)
         PIREPViewer.timestamp2text(self._flightTimeEnd, pirep.flightTimeEnd)
-        
+
         self._flownDistance.set_text("%.1f" % (pirep.flownDistance,))
         self._fuelUsed.set_text("%.0f" % (pirep.fuelUsed,))
 
@@ -232,7 +232,7 @@ class PIREPViewer(gtk.Dialog):
         self._flownBagWeight.set_text("%.0f" % (pirep.bagWeight,))
         self._flownCargoWeight.set_text("%.0f" % (pirep.cargoWeight,))
         self._flownMailWeight.set_text("%.0f" % (pirep.mailWeight,))
-        self._flightType.set_text(xstr("flighttype_" + 
+        self._flightType.set_text(xstr("flighttype_" +
                                        flightType2string(pirep.flightType)))
         self._online.set_text(xstr("pirepView_" +
                                    ("yes" if pirep.online else "no")))
@@ -241,8 +241,8 @@ class PIREPViewer(gtk.Dialog):
         for code in pirep.delayCodes:
             if delayCodes: delayCodes += ", "
             delayCodes += code
-        
-        self._delayCodes.get_buffer().set_text(delayCodes)        
+
+        self._delayCodes.get_buffer().set_text(delayCodes)
 
         self._comments.get_buffer().set_text(pirep.comments)
         self._flightDefects.get_buffer().set_text(pirep.flightDefects)
@@ -269,10 +269,10 @@ class PIREPViewer(gtk.Dialog):
 
         box1 = gtk.VBox()
         table.attach(box1, 0, 1, 0, 1)
-        
+
         box2 = gtk.VBox()
         table.attach(box2, 1, 2, 0, 1)
-        
+
         flightFrame = self._buildFlightFrame()
         box1.pack_start(flightFrame, False, False, 4)
 
@@ -295,12 +295,12 @@ class PIREPViewer(gtk.Dialog):
 
     def _buildFlightFrame(self):
         """Build the frame for the flight data."""
-        
+
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_flight"))
-        
+
         dataBox = gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
-        
+
         self._callsign = \
             PIREPViewer.addLabeledData(dataBox,
                                        xstr("pirepView_callsign"),
@@ -326,7 +326,7 @@ class PIREPViewer(gtk.Dialog):
         table = gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
-        table.set_col_spacings(8)        
+        table.set_col_spacings(8)
 
         self._departureICAO = \
             PIREPViewer.tableAttach(table, 0, 0,
@@ -351,7 +351,7 @@ class PIREPViewer(gtk.Dialog):
         table = gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
-        table.set_col_spacings(8)        
+        table.set_col_spacings(8)
 
         self._numPassengers = \
             PIREPViewer.tableAttach(table, 0, 0,
@@ -364,25 +364,25 @@ class PIREPViewer(gtk.Dialog):
                                     width = 3)
 
         self._bagWeight = \
-            PIREPViewer.tableAttach(table, 0, 1, 
+            PIREPViewer.tableAttach(table, 0, 1,
                                     xstr("pirepView_bagWeight"),
                                     width = 5)
 
         self._cargoWeight = \
-            PIREPViewer.tableAttach(table, 1, 1, 
+            PIREPViewer.tableAttach(table, 1, 1,
                                     xstr("pirepView_cargoWeight"),
                                     width = 5)
 
         self._mailWeight = \
-            PIREPViewer.tableAttach(table, 2, 1, 
+            PIREPViewer.tableAttach(table, 2, 1,
                                     xstr("pirepView_mailWeight"),
                                     width = 5)
-            
+
         PIREPViewer.addVFiller(mainBox)
 
         mainBox.pack_start(PIREPViewer.getLabel(xstr("pirepView_route")),
                            False, False, 0)
-        
+
         (routeWindow, self._route) = PIREPViewer.getTextWindow()
         mainBox.pack_start(routeWindow, False, False, 0)
 
@@ -391,14 +391,14 @@ class PIREPViewer(gtk.Dialog):
     def _buildRouteFrame(self):
         """Build the frame for the user-specified route and flight
         level."""
-        
+
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_route"))
 
         levelBox = gtk.HBox()
         mainBox.pack_start(levelBox, False, False, 0)
-        
+
         self._filedCruiseLevel = \
-            PIREPViewer.addLabeledData(levelBox, 
+            PIREPViewer.addLabeledData(levelBox,
                                        xstr("pirepView_filedCruiseLevel"),
                                        width = 6)
 
@@ -415,7 +415,7 @@ class PIREPViewer(gtk.Dialog):
         return frame
 
     def _buildDepartureFrame(self):
-        """Build the frame for the departure data."""        
+        """Build the frame for the departure data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_departure"))
 
         mainBox.pack_start(PIREPViewer.getLabel("METAR:"),
@@ -428,7 +428,7 @@ class PIREPViewer(gtk.Dialog):
 
         dataBox = gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
-        
+
         self._departureRunway = \
             PIREPViewer.addLabeledData(dataBox,
                                        xstr("pirepView_runway"),
@@ -440,9 +440,9 @@ class PIREPViewer(gtk.Dialog):
                                        width = 12)
 
         return frame
-                           
+
     def _buildArrivalFrame(self):
-        """Build the frame for the arrival data."""        
+        """Build the frame for the arrival data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_arrival"))
 
         mainBox.pack_start(PIREPViewer.getLabel("METAR:"),
@@ -456,7 +456,7 @@ class PIREPViewer(gtk.Dialog):
         table = gtk.Table(2, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
-        table.set_col_spacings(8)        
+        table.set_col_spacings(8)
 
         self._star = \
             PIREPViewer.tableAttach(table, 0, 0,
@@ -467,21 +467,21 @@ class PIREPViewer(gtk.Dialog):
             PIREPViewer.tableAttach(table, 1, 0,
                                     xstr("pirepView_transition"),
                                     width = 12)
-                           
+
         self._approachType = \
             PIREPViewer.tableAttach(table, 0, 1,
                                     xstr("pirepView_approachType"),
                                     width = 7)
-                           
+
         self._arrivalRunway = \
-            PIREPViewer.tableAttach(table, 1, 1, 
+            PIREPViewer.tableAttach(table, 1, 1,
                                     xstr("pirepView_runway"),
                                     width = 5)
-                           
+
         return frame
 
     def _buildStatisticsFrame(self):
-        """Build the frame for the statistics data."""        
+        """Build the frame for the statistics data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_statistics"))
 
         table = gtk.Table(4, 2)
@@ -489,12 +489,12 @@ class PIREPViewer(gtk.Dialog):
         table.set_row_spacings(4)
         table.set_col_spacings(8)
         table.set_homogeneous(False)
-        
+
         self._blockTimeStart = \
             PIREPViewer.tableAttach(table, 0, 0,
                                     xstr("pirepView_blockTimeStart"),
                                     width = 6)
-        
+
         self._blockTimeEnd = \
             PIREPViewer.tableAttach(table, 1, 0,
                                     xstr("pirepView_blockTimeEnd"),
@@ -504,9 +504,9 @@ class PIREPViewer(gtk.Dialog):
             PIREPViewer.tableAttach(table, 0, 1,
                                     xstr("pirepView_flightTimeStart"),
                                     width = 6)
-        
+
         self._flightTimeEnd = \
-            PIREPViewer.tableAttach(table, 1, 1, 
+            PIREPViewer.tableAttach(table, 1, 1,
                                     xstr("pirepView_flightTimeEnd"),
                                     width = 6)
 
@@ -514,12 +514,12 @@ class PIREPViewer(gtk.Dialog):
             PIREPViewer.tableAttach(table, 0, 2,
                                     xstr("pirepView_flownDistance"),
                                     width = 8)
-        
+
         self._fuelUsed = \
             PIREPViewer.tableAttach(table, 1, 2,
                                     xstr("pirepView_fuelUsed"),
                                     width = 6)
-        
+
         self._rating = \
             PIREPViewer.tableAttach(table, 0, 3,
                                     xstr("pirepView_rating"),
@@ -527,14 +527,14 @@ class PIREPViewer(gtk.Dialog):
         return frame
 
     def _buildMiscellaneousFrame(self):
-        """Build the frame for the miscellaneous data."""        
+        """Build the frame for the miscellaneous data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_miscellaneous"))
 
         table = gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
-        table.set_col_spacings(8)        
-        
+        table.set_col_spacings(8)
+
         self._flownNumPassengers = \
             PIREPViewer.tableAttach(table, 0, 0,
                                     xstr("pirepView_numPassengers"),
@@ -564,7 +564,7 @@ class PIREPViewer(gtk.Dialog):
             PIREPViewer.tableAttach(table, 0, 2,
                                     xstr("pirepView_flightType"),
                                     width = 15)
-            
+
         self._online = \
             PIREPViewer.tableAttach(table, 1, 2,
                                     xstr("pirepView_online"),
@@ -574,11 +574,11 @@ class PIREPViewer(gtk.Dialog):
 
         mainBox.pack_start(PIREPViewer.getLabel(xstr("pirepView_delayCodes")),
                            False, False, 0)
-    
+
         (textWindow, self._delayCodes) = PIREPViewer.getTextWindow()
         mainBox.pack_start(textWindow, False, False, 0)
 
-        return frame        
+        return frame
 
     def _buildCommentsTab(self):
         """Build the tab with the comments and flight defects."""
@@ -600,7 +600,7 @@ class PIREPViewer(gtk.Dialog):
         (flightDefectsWindow, self._flightDefects) = \
             PIREPViewer.getTextWindow(heightRequest = -1)
         flightDefectsBox.pack_start(flightDefectsWindow, True, True, 0)
-        
+
         return table
 
     def _buildLogTab(self):
@@ -610,7 +610,7 @@ class PIREPViewer(gtk.Dialog):
         (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
         addFaultTag(self._log.get_buffer())
         mainBox.pack_start(logWindow, True, True, 0)
-        
+
         return mainBox
-        
+
 #------------------------------------------------------------------------------
