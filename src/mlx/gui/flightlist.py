@@ -242,13 +242,14 @@ class PendingFlightsFrame(gtk.Frame):
                          convertFn = getAircraft)
     ]
 
-    def __init__(self, which, wizard, window):
+    def __init__(self, which, wizard, window, pirepEditable = False):
         """Construct the frame with the given title."""
         super(PendingFlightsFrame, self).__init__(xstr("pendflt_title_" + which))
 
         self._which = which
         self._wizard = wizard
         self._window = window
+        self._pirepEditable = pirepEditable
 
         alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 8,
@@ -266,8 +267,11 @@ class PendingFlightsFrame(gtk.Frame):
 
         buttonBox = gtk.VBox()
 
-        self._editButton = gtk.Button(xstr("pendflt_edit_" + which))
+        self._editButton = gtk.Button(xstr("pendflt_" +
+                                           ("edit" if pirepEditable else
+                                            "view") + "_" + which))
         self._editButton.set_sensitive(False)
+        self._editButton.connect("clicked", self._editClicked)
         buttonBox.pack_start(self._editButton, False, False, 2)
 
         self._reflyButton = gtk.Button(xstr("pendflt_refly_" + which))
@@ -305,6 +309,35 @@ class PendingFlightsFrame(gtk.Frame):
         self._editButton.set_sensitive(len(selectedIndexes)==1)
         self._reflyButton.set_sensitive(len(selectedIndexes)>0)
         self._deleteButton.set_sensitive(len(selectedIndexes)>0)
+
+    def _editClicked(self, button):
+        """Called when the Edit button is clicked."""
+        gui = self._wizard.gui
+        gui.beginBusy(xstr("pendflt_pirep_busy"))
+        self.set_sensitive(False)
+
+        indexes = self._flightList.selectedIndexes
+        assert(len(indexes)==1)
+
+        flightID = self._flights[indexes[0]].id
+        gui.webHandler.getPIREP(self._pirepResultCallback, flightID)
+
+    def _pirepResultCallback(self, returned, result):
+        """Called when the PIREP query result is available."""
+        gobject.idle_add(self._handlePIREPResult, returned, result)
+
+    def _handlePIREPResult(self, returned, result):
+        """Handle the refly result."""
+
+        self.set_sensitive(True)
+        gui = self._wizard.gui
+        gui.endBusy()
+
+        if returned:
+            if self._pirepEditable:
+                gui.editPIREP(result.pirep)
+            else:
+                gui.viewPIREP(result.pirep)
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
@@ -407,7 +440,8 @@ class PendingFlightsWindow(gtk.Window):
 
         vbox = gtk.VBox()
 
-        self._reportedFrame = PendingFlightsFrame("reported", wizard, self)
+        self._reportedFrame = PendingFlightsFrame("reported", wizard, self,
+                                                  True)
         vbox.pack_start(self._reportedFrame, True, True, 2)
 
         self._rejectedFrame = PendingFlightsFrame("rejected", wizard, self)

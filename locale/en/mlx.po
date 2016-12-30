@@ -382,7 +382,7 @@ msgstr ""
 
 msgid "flightsel_prehelp_rep_rej"
 msgstr ""
-"<span color=\"red\">You have %d rejected and %d reported flight(s).</span>\n\n "
+"<span color=\"red\">You have %d reported and %d rejected flight(s).</span>\n\n "
 
 msgid "flightsel_help"
 msgstr "Select the flight you want to perform."
@@ -2444,7 +2444,7 @@ msgid "pendflt_title_reported"
 msgstr "Not yet reviewed"
 
 msgid "pendflt_edit_reported"
-msgstr "_View/Edit..."
+msgstr "_Edit..."
 
 msgid "pendflt_refly_reported"
 msgstr "_Refly"
@@ -2455,11 +2455,11 @@ msgstr "_Delete"
 msgid "pendflt_title_rejected"
 msgstr "Rejected"
 
-msgid "pendflt_edit_rejected"
-msgstr "V_iew/Edit..."
+msgid "pendflt_view_rejected"
+msgstr "_View..."
 
 msgid "pendflt_refly_rejected"
-msgstr "R_efly"
+msgstr "Re_fly"
 
 msgid "pendflt_delete_rejected"
 msgstr "De_lete"

@@ -382,7 +382,7 @@ msgstr ""
 
 msgid "flightsel_prehelp_rep_rej"
 msgstr ""
-"<span color=\"red\">%d visszautasított és %d jelentett járatod van.</span>\n\n "
+"<span color=\"red\">%d jelentett és %d visszautasított járatod van.</span>\n\n "
 
 msgid "flightsel_help"
 msgstr "Válaszd ki a járatot, amelyet le szeretnél repülni."
@@ -2472,8 +2472,8 @@ msgstr "_Törlés"
 msgid "pendflt_title_rejected"
 msgstr "Elutasított"
 
-msgid "pendflt_edit_rejected"
-msgstr "S_zerkesztés..."
+msgid "pendflt_view_rejected"
+msgstr "_Megtekintés..."
 
 msgid "pendflt_refly_rejected"
 msgstr "Ú_jra"

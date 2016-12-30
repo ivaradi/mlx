@@ -1252,6 +1252,17 @@ class GUI(fs.ConnectionListener):
             else:
                 simulator.disableTimeSync()
 
+    def viewPIREP(self, pirep):
+        """Display the PIREP viewer window with the given PIREP."""
+        self._pirepViewer.setPIREP(pirep)
+        self._pirepViewer.show_all()
+        self._pirepViewer.run()
+        self._pirepViewer.hide()
+
+    def editPIREP(self, pirep):
+        """Display the PIREP editor window and allow editing the PIREP."""
+        self.viewPIREP(pirep)
+
     def _loadPIREP(self, menuItem):
         """Load a PIREP for sending."""
         dialog = self._getLoadPirepDialog()
