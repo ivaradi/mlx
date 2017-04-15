@@ -2061,6 +2061,9 @@ msgstr "_Napló"
 msgid "pirepView_tab_log_tooltip"
 msgstr "A repülési napló."
 
+msgid "pirepEdit_title"
+msgstr "PIREP szerkesztése"
+
 msgid "about_website"
 msgstr "A projekt honlapja"
 

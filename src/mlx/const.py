@@ -246,6 +246,10 @@ def flightType2string(flightType):
     return _flightTypeStrings[flightType] \
            if flightType in _flightTypeStrings else None
 
+def flightType2index(flightType):
+    """Get the index of the given flight type according to the list above"""
+    return flightTypes.index(flightType)
+
 #-------------------------------------------------------------------------------
 
 ## Message type: logger error
