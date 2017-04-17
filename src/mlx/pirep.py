@@ -201,7 +201,9 @@ class PIREP(object):
         self.flightDefects = pirepData["flightDefects"]
         self.delayCodes = pirepData["timeComment"]
         if self.delayCodes=="UTC":
-            self.delayCodes = ""
+            self.delayCodes = []
+        else:
+            self.delayCodes = self.delayCodes.split(", ")
 
         flightDate = pirepData["flightDate"] + " "
 
