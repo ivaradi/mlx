@@ -146,6 +146,10 @@ class FlightInfo(gtk.VBox):
         """Clear a fault to the list of faults."""
         self._faultExplainWidget.clearFault(id)
 
+    def setExplanation(self, id, explanation):
+        """Set the explanation of the given fault."""
+        self._faultExplainWidget.setExplanation(id, explanation)
+
     def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)

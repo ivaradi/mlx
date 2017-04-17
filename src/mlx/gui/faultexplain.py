@@ -93,6 +93,11 @@ class FaultFrame(gtk.Frame):
         return buffer.get_text(buffer.get_start_iter(),
                                buffer.get_end_iter(), True)
 
+    @explanation.setter
+    def explanation(self, explanation):
+        """Set the explanation."""
+        self._explanation.get_buffer().set_text(explanation)
+
     @property
     def hasExplanation(self):
         """Determine if there is a valid explanation."""
@@ -234,6 +239,10 @@ class FaultExplainWidget(gtk.Frame):
         self._updateStats(numFaults = self._numFaults - 1,
                           numExplanations = self._numExplanations -
                           (1 if hasExplanation else 0))
+
+    def setExplanation(self, id, explanation):
+        """Set the explanation for the fault with the given ID"""
+        self._faultWidgets[id][1].explanation = explanation
 
     def reset(self):
         """Reset the widget by removing all faults."""
