@@ -372,7 +372,7 @@ class PIREP(object):
         attrs["flightDefects"] = self.flightDefects
         attrs["ratingText"] = self.getRatingText()
         attrs["rating"] = max(0.0, self.rating)
-        attrs["flownDistance"] = self.flownDistance
+        attrs["flownDistance"] = "%.2f" % (self.flownDistance,)
         # FIXME: it should be stored in the PIREP when it is sent later
         attrs["performDate"] = datetime.date.today().strftime("%Y-%m-%d")
 
