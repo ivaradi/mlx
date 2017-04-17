@@ -7,6 +7,7 @@ from mlx.i18n import xstr
 from mlx.util import secondaryInstallation
 
 import os
+import time
 
 #-----------------------------------------------------------------------------
 
@@ -282,6 +283,95 @@ class IntegerEntry(gtk.Entry):
         self.set_text("" if self._currentInteger is None
                       else str(self._currentInteger))
         self._selfSetting = False
+
+#------------------------------------------------------------------------------
+
+class TimeEntry(gtk.Entry):
+    """Widget to display and edit a time value in HH:MM format."""
+    def __init__(self):
+        """Construct the entry"""
+        super(TimeEntry, self).__init__(max = 5)
+
+        self.connect("insert-text", self._insertText)
+        self.connect("delete-text", self._deleteText)
+        self.connect("focus-out-event", self._focusOutEvent)
+
+    @property
+    def hour(self):
+        """Get the hour from the current text"""
+        text = self.get_text()
+        if not text or text==":":
+            return 0
+
+        words = text.split(":")
+        if len(words)==1:
+            return 0
+        elif len(words)>=2:
+            return 0 if len(words[0])==0 else int(words[0])
+        else:
+            return 0
+
+    @property
+    def minute(self):
+        """Get the hour from the current text"""
+        text = self.get_text()
+        if not text or text==":":
+            return 0
+
+        words = text.split(":")
+        if len(words)==1:
+            return 0 if len(words[0])==0 else int(words[0])
+        elif len(words)>=2:
+            return 0 if len(words[1])==0 else int(words[1])
+        else:
+            return 0
+
+    def setTimestamp(self, timestamp):
+        """Set the hour and minute from the given timestamp in UTC."""
+        tm = time.gmtime(timestamp)
+        self.set_text("%02d:%02d" % (tm.tm_hour, tm.tm_min))
+
+    def _focusOutEvent(self, widget, event):
+        """Reformat the text to match pattern HH:MM"""
+        text = "%02d:%02d" % (self.hour, self.minute)
+        if text!=self.get_text():
+            self.set_text(text)
+
+    def _insertText(self, entry, text, length, position):
+        """Called when some text is inserted into the entry."""
+        text=text[:length]
+        currentText = self.get_text()
+        position = self.get_position()
+        newText = currentText[:position] + text + currentText[position:]
+        self._checkText(newText, "insert-text")
+
+    def _deleteText(self, entry, start, end):
+        """Called when some text is erased from the entry."""
+        currentText = self.get_text()
+        newText = currentText[:start] + currentText[end:]
+        self._checkText(newText, "delete-text")
+
+    def _checkText(self, newText, signal):
+        """Check the given text.
+
+        If it is not suitable, stop the emission of the signal to prevent the
+        change from appearing."""
+        if not newText or newText==":":
+            return
+
+        words = newText.split(":")
+        if (len(words)==1 and
+            len(words[0])<=2 and (len(words[0])==0 or
+                                  (words[0].isdigit() and int(words[0])<60))) or \
+           (len(words)==2 and
+            len(words[0])<=2 and (len(words[0])==0 or
+                                  (words[0].isdigit() and int(words[0])<24)) and
+            len(words[1])<=2 and (len(words[1])==0 or
+                                  (words[1].isdigit() and int(words[1])<60))):
+            pass
+        else:
+            gtk.gdk.display_get_default().beep()
+            self.stop_emission(signal)
 
 #------------------------------------------------------------------------------
 
