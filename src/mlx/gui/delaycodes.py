@@ -379,16 +379,6 @@ class DelayCodeTable(DelayCodeTableBase):
         self._table = None
         self.show_all()
 
-    def activateCode(self, code):
-        """Check the checkbox for the given code."""
-        index = 0
-        for (type, data) in self._delayCodeData[2]:
-            if type==DELAYCODE:
-                if code==data[0].strip():
-                    self._checkButtons[index].set_active(True)
-                    break
-                index += 1
-
     def _delayCodesChanged(self, button):
         """Called when one of the delay codes have changed."""
         self._info.delayCodesChanged()

@@ -12,7 +12,7 @@ from mlx.gui.gates import FleetGateStatus
 from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
 from mlx.gui.callouts import ApproachCalloutsEditor
-from mlx.gui.pirep import PIREPViewer, PIREPEditor
+from mlx.gui.pirep import PIREPViewer
 from mlx.gui.bugreport import BugReportDialog
 from mlx.gui.acars import ACARS
 import cef
@@ -182,8 +182,6 @@ class GUI(fs.ConnectionListener):
         self._selfToggling = False
 
         self._pirepViewer = PIREPViewer(self)
-
-        self._pirepEditor = PIREPEditor(self)
 
         window.show_all()
         if os.name=="nt":
@@ -1263,10 +1261,7 @@ class GUI(fs.ConnectionListener):
 
     def editPIREP(self, pirep):
         """Display the PIREP editor window and allow editing the PIREP."""
-        self._pirepEditor.setPIREP(pirep)
-        self._pirepEditor.show_all()
-        self._pirepEditor.run()
-        self._pirepEditor.hide()
+        self.viewPIREP(pirep)
 
     def _loadPIREP(self, menuItem):
         """Load a PIREP for sending."""

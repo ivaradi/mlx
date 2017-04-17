@@ -53,11 +53,10 @@ class FlightInfo(gtk.VBox):
 
         return (frame, comments)
 
-    def __init__(self, gui, mainInstance = True):
+    def __init__(self, gui):
         """Construct the flight info tab."""
         super(FlightInfo, self).__init__()
         self._gui = gui
-        self._mainInstance = mainInstance
 
         self._commentsAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                                 xscale = 1.0, yscale = 1.0)
@@ -110,11 +109,6 @@ class FlightInfo(gtk.VBox):
         return text2unicode(buffer.get_text(buffer.get_start_iter(),
                                             buffer.get_end_iter(), True))
 
-    @comments.setter
-    def comments(self, comments):
-        """Set the comments."""
-        self._comments.get_buffer().set_text(comments)
-
     @property
     def hasComments(self):
         """Get whether there is any text in comments field."""
@@ -152,10 +146,6 @@ class FlightInfo(gtk.VBox):
         """Clear a fault to the list of faults."""
         self._faultExplainWidget.clearFault(id)
 
-    def setExplanation(self, id, explanation):
-        """Set the explanation of the given fault."""
-        self._faultExplainWidget.setExplanation(id, explanation)
-
     def enable(self, aircraftType):
         """Enable the flight info tab."""
         self._comments.set_sensitive(True)
@@ -177,21 +167,14 @@ class FlightInfo(gtk.VBox):
         self._faultExplainWidget.reset()
         self._delayCodeTable.reset()
 
-    def activateDelayCode(self, code):
-        """Active the checkbox corresponding to the given code."""
-        self._delayCodeTable.activateCode(code)
-
     def delayCodesChanged(self):
         """Callewd when the delay codes have changed."""
-        if self._mainInstance:
-            self._gui.delayCodesChanged()
+        self._gui.delayCodesChanged()
 
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""
-        if self._mainInstance:
-            self._gui.commentsChanged()
+        self._gui.commentsChanged()
 
     def _faultExplanationsChanged(self, faultExplainWidget, fullyExplained):
         """Called when the status of the fault explanations has changed."""
-        if self._mainInstance:
-            self._gui.faultExplanationsChanged()
+        self._gui.faultExplanationsChanged()

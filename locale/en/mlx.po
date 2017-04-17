@@ -2046,12 +2046,6 @@ msgstr "_Log"
 msgid "pirepView_tab_log_tooltip"
 msgstr "The flight log."
 
-msgid "pirepEdit_title"
-msgstr "PIREP editor"
-
-msgid "pirepEdit_FL"
-msgstr "  FL"
-
 msgid "about_website"
 msgstr "Project Homepage"
 

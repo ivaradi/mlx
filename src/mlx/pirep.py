@@ -201,9 +201,7 @@ class PIREP(object):
         self.flightDefects = pirepData["flightDefects"]
         self.delayCodes = pirepData["timeComment"]
         if self.delayCodes=="UTC":
-            self.delayCodes = []
-        else:
-            self.delayCodes = self.delayCodes.split(", ")
+            self.delayCodes = ""
 
         flightDate = pirepData["flightDate"] + " "
 
@@ -372,7 +370,7 @@ class PIREP(object):
         attrs["flightDefects"] = self.flightDefects
         attrs["ratingText"] = self.getRatingText()
         attrs["rating"] = max(0.0, self.rating)
-        attrs["flownDistance"] = "%.2f" % (self.flownDistance,)
+        attrs["flownDistance"] = self.flownDistance
         # FIXME: it should be stored in the PIREP when it is sent later
         attrs["performDate"] = datetime.date.today().strftime("%Y-%m-%d")
 
