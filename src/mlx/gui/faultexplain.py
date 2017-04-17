@@ -130,7 +130,7 @@ gobject.signal_new("explanation-changed", FaultFrame, gobject.SIGNAL_RUN_FIRST,
 #-------------------------------------------------------------------------------
 
 class FaultExplainWidget(gtk.Frame):
-    """The widget for the failts and their explanations."""
+    """The widget for the faults and their explanations."""
     @staticmethod
     def getFaultFrame(alignment):
         """Get the fault frame from the given alignment."""
