@@ -53,10 +53,11 @@ class FlightInfo(gtk.VBox):
 
         return (frame, comments)
 
-    def __init__(self, gui):
+    def __init__(self, gui, mainInstance = True):
         """Construct the flight info tab."""
         super(FlightInfo, self).__init__()
         self._gui = gui
+        self._mainInstance = mainInstance
 
         self._commentsAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                                 xscale = 1.0, yscale = 1.0)
@@ -182,12 +183,15 @@ class FlightInfo(gtk.VBox):
 
     def delayCodesChanged(self):
         """Callewd when the delay codes have changed."""
-        self._gui.delayCodesChanged()
+        if self._mainInstance:
+            self._gui.delayCodesChanged()
 
     def _commentsChanged(self, textbuffer):
         """Called when the comments have changed."""
-        self._gui.commentsChanged()
+        if self._mainInstance:
+            self._gui.commentsChanged()
 
     def _faultExplanationsChanged(self, faultExplainWidget, fullyExplained):
         """Called when the status of the fault explanations has changed."""
-        self._gui.faultExplanationsChanged()
+        if self._mainInstance:
+            self._gui.faultExplanationsChanged()
