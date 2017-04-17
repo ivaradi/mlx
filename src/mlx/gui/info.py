@@ -109,6 +109,11 @@ class FlightInfo(gtk.VBox):
         return text2unicode(buffer.get_text(buffer.get_start_iter(),
                                             buffer.get_end_iter(), True))
 
+    @comments.setter
+    def comments(self, comments):
+        """Set the comments."""
+        self._comments.get_buffer().set_text(comments)
+
     @property
     def hasComments(self):
         """Get whether there is any text in comments field."""
