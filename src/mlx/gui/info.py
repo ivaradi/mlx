@@ -167,6 +167,10 @@ class FlightInfo(gtk.VBox):
         self._faultExplainWidget.reset()
         self._delayCodeTable.reset()
 
+    def activateDelayCode(self, code):
+        """Active the checkbox corresponding to the given code."""
+        self._delayCodeTable.activateCode(code)
+
     def delayCodesChanged(self):
         """Callewd when the delay codes have changed."""
         self._gui.delayCodesChanged()
