@@ -4520,11 +4520,6 @@ class PIREPSaveHelper(object):
 
 class FinishPage(Page):
     """Flight finish page."""
-    _flightTypes = [ ("flighttype_scheduled", const.FLIGHTTYPE_SCHEDULED),
-                     ("flighttype_ot", const.FLIGHTTYPE_OLDTIMER),
-                     ("flighttype_vip", const.FLIGHTTYPE_VIP),
-                     ("flighttype_charter", const.FLIGHTTYPE_CHARTER) ]
-
     def __init__(self, wizard, saveHelper):
         """Construct the finish page."""
         help = xstr("finish_help") + xstr("finish_help_goodtime")
@@ -4657,14 +4652,7 @@ class FinishPage(Page):
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        flightTypeModel = gtk.ListStore(str, int)
-        for (name, type) in FinishPage._flightTypes:
-            flightTypeModel.append([xstr(name), type])
-
-        self._flightType = gtk.ComboBox(model = flightTypeModel)
-        renderer = gtk.CellRendererText()
-        self._flightType.pack_start(renderer, True)
-        self._flightType.add_attribute(renderer, "text", 0)
+        self._flightType = createFlightTypeComboBox()
         self._flightType.set_tooltip_text(xstr("finish_type_tooltip"))
         self._flightType.set_active(0)
         self._flightType.connect("changed", self._flightTypeChanged)

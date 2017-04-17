@@ -518,3 +518,18 @@ def communicationErrorDialog(parent = None, title = WINDOW_TITLE_BASE):
                 title = title)
 
 #------------------------------------------------------------------------------
+
+def createFlightTypeComboBox():
+        flightTypeModel = gtk.ListStore(str, int)
+        for type in _const.flightTypes:
+            name = "flighttype_" + _const.flightType2string(type)
+            flightTypeModel.append([xstr(name), type])
+
+        flightType = gtk.ComboBox(model = flightTypeModel)
+        renderer = gtk.CellRendererText()
+        flightType.pack_start(renderer, True)
+        flightType.add_attribute(renderer, "text", 0)
+
+        return flightType
+
+#------------------------------------------------------------------------------
