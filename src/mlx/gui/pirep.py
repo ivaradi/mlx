@@ -5,6 +5,7 @@ from info import FlightInfo
 from flight import comboModel
 
 from mlx.pirep import PIREP
+from mlx.flight import Flight
 from mlx.const import *
 
 import time
@@ -691,6 +692,8 @@ class PIREPEditor(gtk.Dialog):
 
         self._gui = gui
 
+        self._pirep = None
+
         contentArea = self.get_content_area()
 
         self._notebook = gtk.Notebook()
@@ -714,11 +717,15 @@ class PIREPEditor(gtk.Dialog):
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
 
+        self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
+
         self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         self._okButton.set_can_default(True)
 
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
+        self._pirep = pirep
+
         bookedFlight = pirep.bookedFlight
 
         self._callsign.set_text(bookedFlight.callsign)
@@ -834,6 +841,20 @@ class PIREPEditor(gtk.Dialog):
         self._notebook.set_current_page(0)
         self._okButton.grab_default()
 
+        self._updateButtons()
+
+    def delayCodesChanged(self):
+        """Called when the delay codes have changed."""
+        self._updateButtons()
+
+    def commentsChanged(self):
+        """Called when the comments have changed."""
+        self._updateButtons()
+
+    def faultExplanationsChanged(self):
+        """Called when the fault explanations have changed."""
+        self._updateButtons()
+
     def _buildDataTab(self):
         """Build the data tab of the viewer."""
         table = gtk.Table(1, 2)
@@ -931,7 +952,6 @@ class PIREPEditor(gtk.Dialog):
             PIREPViewer.tableAttach(table, 0, 0,
                                     xstr("pirepView_numPassengers"),
                                     width = 4)
-
         self._numCrew = \
             PIREPViewer.tableAttach(table, 1, 0,
                                     xstr("pirepView_numCrew"),
@@ -980,6 +1000,7 @@ class PIREPEditor(gtk.Dialog):
         self._filedCruiseLevel.set_range(min = 0, max = 500)
         #self._filedCruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
         self._filedCruiseLevel.set_numeric(True)
+        self._filedCruiseLevel.connect("value-changed", self._updateButtons)
 
         levelBox.pack_start(self._filedCruiseLevel, False, False, 0)
 
@@ -994,6 +1015,7 @@ class PIREPEditor(gtk.Dialog):
         self._modifiedCruiseLevel.set_range(min = 0, max = 500)
         #self._modifiedCruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
         self._modifiedCruiseLevel.set_numeric(True)
+        self._modifiedCruiseLevel.connect("value-changed", self._updateButtons)
 
         levelBox.pack_start(self._modifiedCruiseLevel, False, False, 0)
 
@@ -1002,6 +1024,7 @@ class PIREPEditor(gtk.Dialog):
         (routeWindow, self._userRoute) = \
           PIREPViewer.getTextWindow(editable = True)
         mainBox.pack_start(routeWindow, False, False, 0)
+        self._userRoute.get_buffer().connect("changed", self._updateButtons)
 
         return frame
 
@@ -1014,6 +1037,7 @@ class PIREPEditor(gtk.Dialog):
         (metarWindow, self._departureMETAR) = \
             PIREPViewer.getTextWindow(heightRequest = -1,
                                       editable = True)
+        self._departureMETAR.get_buffer().connect("changed", self._updateButtons)
         mainBox.pack_start(metarWindow, True, True, 0)
 
         PIREPViewer.addVFiller(mainBox)
@@ -1061,6 +1085,7 @@ class PIREPEditor(gtk.Dialog):
         (metarWindow, self._arrivalMETAR) = \
             PIREPViewer.getTextWindow(heightRequest = -1,
                                       editable = True)
+        self._arrivalMETAR.get_buffer().connect("changed", self._updateButtons)
         mainBox.pack_start(metarWindow, True, True, 0)
 
         PIREPViewer.addVFiller(mainBox)
@@ -1136,18 +1161,22 @@ class PIREPEditor(gtk.Dialog):
         self._blockTimeStart = \
             PIREPEditor.tableAttachTimeEntry(table, 0, 0,
                                              xstr("pirepView_blockTimeStart"))
+        self._blockTimeStart.connect("changed", self._updateButtons)
 
         self._blockTimeEnd = \
             PIREPEditor.tableAttachTimeEntry(table, 2, 0,
                                              xstr("pirepView_blockTimeEnd"))
+        self._blockTimeEnd.connect("changed", self._updateButtons)
 
         self._flightTimeStart = \
             PIREPEditor.tableAttachTimeEntry(table, 0, 1,
                                              xstr("pirepView_flightTimeStart"))
+        self._flightTimeStart.connect("changed", self._updateButtons)
 
         self._flightTimeEnd = \
             PIREPEditor.tableAttachTimeEntry(table, 2, 1,
                                              xstr("pirepView_flightTimeEnd"))
+        self._flightTimeEnd.connect("changed", self._updateButtons)
 
         self._flownDistance = PIREPViewer.getDataLabel(width = 3)
         PIREPEditor.tableAttachWidget(table, 0, 2,
@@ -1158,7 +1187,7 @@ class PIREPEditor(gtk.Dialog):
             PIREPEditor.tableAttachSpinButton(table, 2, 2,
                                               xstr("pirepView_fuelUsed"),
                                               1000000)
-
+        self._fuelUsed.connect("value-changed", self._updateButtons)
 
         self._rating = PIREPViewer.getDataLabel(width = 3)
         PIREPEditor.tableAttachWidget(table, 0, 3,
@@ -1180,11 +1209,13 @@ class PIREPEditor(gtk.Dialog):
             PIREPEditor.tableAttachSpinButton(table, 0, 0,
                                               xstr("pirepView_numPassengers"),
                                               300)
+        self._flownNumPassengers.connect("value-changed", self._updateButtons)
 
         self._flownNumCrew = \
             PIREPEditor.tableAttachSpinButton(table, 2, 0,
                                               xstr("pirepView_numCrew"),
                                               10)
+        self._flownNumCrew.connect("value-changed", self._updateButtons)
 
         self._flownBagWeight = \
             PIREPEditor.tableAttachSpinButton(table, 0, 1,
@@ -1221,7 +1252,7 @@ class PIREPEditor(gtk.Dialog):
 
     def _buildCommentsTab(self):
         """Build the tab with the comments and flight defects."""
-        return FlightInfo(self._gui, mainInstance = False)
+        return FlightInfo(self._gui, callbackObject = self)
 
     def _buildLogTab(self):
         """Build the log tab."""
@@ -1237,6 +1268,7 @@ class PIREPEditor(gtk.Dialog):
         """Called when the value of some entry widget has changed and the value
         should be converted to uppercase."""
         entry.set_text(entry.get_text().upper())
+        self._updateButtons()
         #self._valueChanged(entry, arg)
 
     def _upperChangedComboBox(self, comboBox):
@@ -1244,6 +1276,66 @@ class PIREPEditor(gtk.Dialog):
         entry = comboBox.get_child()
         if comboBox.get_active()==-1:
             entry.set_text(entry.get_text().upper())
+        self._updateButtons()
         #self._valueChanged(entry)
+
+    def _updateButtons(self, *kwargs):
+        """Update the activity state of the buttons."""
+        pirep = self._pirep
+        bookedFlight = pirep.bookedFlight
+
+        departureMinutes = \
+            bookedFlight.departureTime.hour*60 + bookedFlight.departureTime.minute
+        departureDifference = abs(Flight.getMinutesDifference(self._blockTimeStart.minutes,
+                                                              departureMinutes))
+        flightStartDifference = \
+            Flight.getMinutesDifference(self._flightTimeStart.minutes,
+                                        self._blockTimeStart.minutes)
+        arrivalMinutes = \
+            bookedFlight.arrivalTime.hour*60 + bookedFlight.arrivalTime.minute
+        arrivalDifference = abs(Flight.getMinutesDifference(self._blockTimeEnd.minutes,
+                                                            arrivalMinutes))
+        flightEndDifference = \
+            Flight.getMinutesDifference(self._blockTimeEnd.minutes,
+                                        self._flightTimeEnd.minutes)
+
+        timesOK = self._flightInfo.hasComments or \
+                  self._flightInfo.hasDelayCode or \
+                  (departureDifference<=Flight.TIME_ERROR_DIFFERENCE and
+                   arrivalDifference<=Flight.TIME_ERROR_DIFFERENCE and
+                   flightStartDifference>=0 and flightStartDifference<30 and
+                   flightEndDifference>=0 and flightEndDifference<30)
+
+        text = self._sid.get_child().get_text()
+        sid = text if self._sid.get_active()!=0 and text and text!="N/A" \
+               else None
+
+        text = self._star.get_child().get_text()
+        star = text if self._star.get_active()!=0 and text and text!="N/A" \
+               else None
+
+        text = self._transition.get_child().get_text()
+        transition = text if self._transition.get_active()!=0 \
+                     and text and text!="N/A" else None
+
+
+        buffer = self._userRoute.get_buffer()
+        route =  buffer.get_text(buffer.get_start_iter(),
+                                 buffer.get_end_iter(), True)
+
+        self._okButton.set_sensitive(timesOK and
+                                     self._flightInfo.faultsFullyExplained and
+                                     self._flownNumPassengers.get_value_as_int()>0 and
+                                     self._flownNumCrew.get_value_as_int()>2 and
+                                     self._fuelUsed.get_value_as_int()>0 and
+                                     self._departureRunway.get_text_length()>0 and
+                                     self._arrivalRunway.get_text_length()>0 and
+                                     self._departureMETAR.get_buffer().get_char_count()>0 and
+                                     self._arrivalMETAR.get_buffer().get_char_count()>0 and
+                                     self._filedCruiseLevel.get_value_as_int()>=50 and
+                                     self._modifiedCruiseLevel.get_value_as_int()>=50 and
+                                     sid is not None and (star is not None or
+                                     transition is not None) and route!="" and
+                                     self._approachType.get_text()!="")
 
 #------------------------------------------------------------------------------

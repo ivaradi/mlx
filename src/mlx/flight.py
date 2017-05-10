@@ -39,6 +39,20 @@ class Flight(object):
                          const.STAGE_LANDING]
 
     @staticmethod
+    def getMinutesDifference(minutes1, minutes2):
+        """Get the difference in minutes between the given two time
+        instances."""
+        diff1 = minutes1 - minutes2
+        diff2 = -1 * diff1
+
+        if diff1 < 0: diff1 += 60*24
+        else: diff2 += 60*24
+
+        diff = min(diff1, diff2)
+
+        return -1*diff if diff2<diff1 else diff
+
+    @staticmethod
     def isTimeDifferenceTooMuch(scheduledTime, realTimestamp):
         """Determine if the given real time differs to much from the scheduled
         time.
@@ -53,13 +67,7 @@ class Flight(object):
         scheduledMinute = scheduledTime.hour * 60 + scheduledTime.minute
         realMinute = realTime.tm_hour * 60 + realTime.tm_min
 
-        diff1 = scheduledMinute - realMinute
-        diff2 = -1 * diff1
-
-        if diff1 < 0: diff1 += 60*24
-        else: diff2 += 60*24
-
-        diff = min(diff1, diff2)
+        diff = abs(Flight.getMinutesDifference(scheduledMinute, realMinute))
 
         return (diff>Flight.TIME_WARNING_DIFFERENCE,
                 diff>Flight.TIME_ERROR_DIFFERENCE)

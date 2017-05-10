@@ -326,6 +326,11 @@ class TimeEntry(gtk.Entry):
         else:
             return 0
 
+    @property
+    def minutes(self):
+        """Get the time in minutes, i.e. hour*60+minute."""
+        return self.hour * 60 + self.minute
+
     def setTimestamp(self, timestamp):
         """Set the hour and minute from the given timestamp in UTC."""
         tm = time.gmtime(timestamp)
