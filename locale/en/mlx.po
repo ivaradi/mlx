@@ -2052,6 +2052,51 @@ msgstr "PIREP editor"
 msgid "pirepEdit_FL"
 msgstr "  FL"
 
+msgid "pirepEdit_online"
+msgstr "Online"
+
+msgid "pirepEdit_online_tooltip"
+msgstr "If checked, it indicates that your flight was online, i.e. on VATSIM or IVAO"
+
+msgid "pirepEdit_route_level_tooltip"
+msgstr ""
+"The initial cruise flight level. Click on the arrows to increment "
+"or decrement by 10, or enter the number on the keyboard."
+
+msgid "pirepEdit_modified_route_level_tooltip"
+msgstr ""
+"The final cruise flight level in case of a step climb or descent during "
+"the flight. Click on the arrows to increment "
+"or decrement by 10, or enter the number on the keyboard."
+
+msgid "pirepEdit_block_time_start_tooltip"
+msgstr ""
+"You can edit the beginning of the block time here. The format expected is HH:MM."""
+
+msgid "pirepEdit_block_time_end_tooltip"
+msgstr ""
+"You can edit the end of the block time here. The format expected is HH:MM."""
+
+msgid "pirepEdit_flight_time_start_tooltip"
+msgstr ""
+"You can edit the beginning of the flight time here. The format expected is HH:MM."""
+
+msgid "pirepEdit_flight_time_end_tooltip"
+msgstr ""
+"You can edit the end of the flight time here. The format expected is HH:MM."""
+
+msgid "pirepEdit_fuel_used_tooltip"
+msgstr ""
+"The amount of fuel used during the flight can be modified here."
+
+msgid "pirepEdit_flight_type_tooltip"
+msgstr ""
+"The type of the flight can be selected here."
+
+msgid "pirepEdit_delayCodes_tooltip"
+msgstr ""
+"The delay codes set. You should edit them in the 'Comments & defects' tab at the bottom."
+
 msgid "about_website"
 msgstr "Project Homepage"
 

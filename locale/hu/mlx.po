@@ -2067,6 +2067,51 @@ msgstr "PIREP szerkesztése"
 msgid "pirepEdit_FL"
 msgstr "  FL"
 
+msgid "pirepEdit_online"
+msgstr "Online"
+
+msgid "pirepEdit_online_tooltip"
+msgstr "Ha ezt bejelölöd, azzal azt jelzed, hogy online, VATSIM-en vagy IVAO-n repültél."
+
+msgid "pirepEdit_route_level_tooltip"
+msgstr ""
+"A kezdeti repülési szint. A nyilakkal a szint 10-zel növelhető ill. "
+"csökkenthethő, vagy beírhatod a konkrét számot."
+
+msgid "pirepEdit_modified_route_level_tooltip"
+msgstr ""
+"A végső repülési szint lépcsős emelkedés vagy süllyedés esetén. "
+"A nyilakkal a szint 10-zel növelhető ill. csökkenthethő, "
+"vagy beírhatod a konkrét számot."
+
+msgid "pirepEdit_block_time_start_tooltip"
+msgstr ""
+"A fékoldás idejét módosíthatod itt. A formátum ÓÓ:PP."""
+
+msgid "pirepEdit_block_time_end_tooltip"
+msgstr ""
+"A leparkolás idejét módosíthatod itt. A formátum ÓÓ:PP."""
+
+msgid "pirepEdit_flight_time_start_tooltip"
+msgstr ""
+"A felszállás idejét módosíthatod itt. A formátum ÓÓ:PP."""
+
+msgid "pirepEdit_flight_time_end_tooltip"
+msgstr ""
+"A leszállás idejét módosíthatod itt. A formátum ÓÓ:PP."""
+
+msgid "pirepEdit_fuel_used_tooltip"
+msgstr ""
+"A repülés során elhasznált üzemanyag mennyisége módosítható itt."
+
+msgid "pirepEdit_flight_type_tooltip"
+msgstr ""
+"A repülés típusát választhatod itt ki."
+
+msgid "pirepEdit_delayCodes_tooltip"
+msgstr ""
+"A megadott késési kódok. Szerkeszteni a 'Megjegyzések és hibák' fül alsó részén tudod."
+
 msgid "about_website"
 msgstr "A projekt honlapja"
 
