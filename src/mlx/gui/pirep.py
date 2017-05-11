@@ -719,7 +719,7 @@ class PIREPEditor(gtk.Dialog):
 
         self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
 
-        self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        self._okButton = self.add_button(xstr("button_save"), RESPONSETYPE_OK)
         self._okButton.set_can_default(True)
 
     def setPIREP(self, pirep):

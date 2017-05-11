@@ -102,6 +102,9 @@ msgstr "_Register"
 msgid "button_cancelFlight"
 msgstr "Cancel flight"
 
+msgid "button_save"
+msgstr "_Save"
+
 msgid "menu_file"
 msgstr "File"
 
