@@ -721,6 +721,7 @@ class PIREPEditor(gtk.Dialog):
 
         self._okButton = self.add_button(xstr("button_save"), RESPONSETYPE_OK)
         self._okButton.set_can_default(True)
+        self._modified = False
 
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
@@ -841,7 +842,9 @@ class PIREPEditor(gtk.Dialog):
         self._notebook.set_current_page(0)
         self._okButton.grab_default()
 
+        self._modified = False
         self._updateButtons()
+        self._modified = True
 
     def delayCodesChanged(self):
         """Called when the delay codes have changed."""
@@ -1231,28 +1234,33 @@ class PIREPEditor(gtk.Dialog):
             PIREPEditor.tableAttachSpinButton(table, 0, 1,
                                               xstr("pirepView_bagWeight"),
                                               100000, width = 6)
+        self._flownBagWeight.connect("value-changed", self._updateButtons)
         self._flownBagWeight.set_tooltip_text(xstr("payload_bag_tooltip"))
 
         self._flownCargoWeight = \
             PIREPEditor.tableAttachSpinButton(table, 2, 1,
                                               xstr("pirepView_cargoWeight"),
                                               100000, width = 6)
+        self._flownCargoWeight.connect("value-changed", self._updateButtons)
         self._flownCargoWeight.set_tooltip_text(xstr("payload_cargo_tooltip"))
 
         self._flownMailWeight = \
             PIREPEditor.tableAttachSpinButton(table, 4, 1,
                                               xstr("pirepView_mailWeight"),
                                               100000, width = 6)
+        self._flownMailWeight.connect("value-changed", self._updateButtons)
         self._flownMailWeight.set_tooltip_text(xstr("payload_mail_tooltip"))
 
         self._flightType = createFlightTypeComboBox()
         PIREPEditor.tableAttachWidget(table, 0, 2,
                                       xstr("pirepView_flightType"),
                                       self._flightType)
+        self._flightType.connect("changed", self._updateButtons)
         self._flightType.set_tooltip_text(xstr("pirepEdit_flight_type_tooltip"))
 
         self._online = gtk.CheckButton(xstr("pirepEdit_online"))
         table.attach(self._online, 2, 3, 2, 3)
+        self._online.connect("toggled", self._updateButtons)
         self._online.set_tooltip_text(xstr("pirepEdit_online_tooltip"))
 
         PIREPViewer.addVFiller(mainBox)
@@ -1339,7 +1347,7 @@ class PIREPEditor(gtk.Dialog):
         route =  buffer.get_text(buffer.get_start_iter(),
                                  buffer.get_end_iter(), True)
 
-        self._okButton.set_sensitive(timesOK and
+        self._okButton.set_sensitive(self._modified and timesOK and
                                      self._flightInfo.faultsFullyExplained and
                                      self._flownNumPassengers.get_value_as_int()>0 and
                                      self._flownNumCrew.get_value_as_int()>2 and
