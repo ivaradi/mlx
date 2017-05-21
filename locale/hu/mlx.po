@@ -126,6 +126,12 @@ msgstr "Biztosan ki akarsz lépni?"
 msgid "menu_tools"
 msgstr "Eszközök"
 
+msgid "menu_tools_flights"
+msgstr "Elfogadott _járatok"
+
+msgid "menu_tools_flights_key"
+msgstr "j"
+
 msgid "menu_tools_chklst"
 msgstr "_Ellenőrzőlista szerkesztő"
 
@@ -2549,6 +2555,30 @@ msgstr "Biztosan újra szeretnéd repülni a kiválasztott járato(ka)t?"
 
 msgid "flight_delete_question"
 msgstr "Biztosan törölni szerednéd a kiválasztott járato(ka)t?"
+
+msgid "acceptedflt_title"
+msgstr "Elfogadott járatok"
+
+msgid "acceptedflt_refresh"
+msgstr "_Frissítés"
+
+msgid "acceptedflt_view"
+msgstr "_Megtekintés..."
+
+msgid "acceptedflt_failed"
+msgstr "Nem sikerült letölteni az elfogadott járatokat."
+
+msgid "acceptedflt_flight_duration"
+msgstr "Idő"
+
+msgid "acceptedflt_num_pax"
+msgstr "Utasok"
+
+msgid "acceptedflt_fuel"
+msgstr "Üza."
+
+msgid "acceptedflt_rating"
+msgstr "Pontszám"
 
 msgid "error_communication"
 msgstr "Kommunikációs hiba"

@@ -12,6 +12,7 @@ from mlx.gui.gates import FleetGateStatus
 from mlx.gui.prefs import Preferences
 from mlx.gui.checklist import ChecklistEditor
 from mlx.gui.callouts import ApproachCalloutsEditor
+from mlx.gui.flightlist import AcceptedFlightsWindow
 from mlx.gui.pirep import PIREPViewer, PIREPEditor
 from mlx.gui.bugreport import BugReportDialog
 from mlx.gui.acars import ACARS
@@ -118,6 +119,8 @@ class GUI(fs.ConnectionListener):
         window.add(mainVBox)
 
         self._preferences = Preferences(self)
+        self._flightsWindow = AcceptedFlightsWindow(self)
+        self._flightsWindow.connect("delete-event", self._hideFlightsWindow)
         self._checklistEditor = ChecklistEditor(self)
         self._approachCalloutsEditor = ApproachCalloutsEditor(self)
         self._bugReportDialog = BugReportDialog(self)
@@ -1059,6 +1062,17 @@ class GUI(fs.ConnectionListener):
         toolsMenuItem.set_submenu(toolsMenu)
         menuBar.append(toolsMenuItem)
 
+        self._flightsMenuItem = flightsMenuItem = \
+          gtk.ImageMenuItem(gtk.STOCK_SPELL_CHECK)
+        flightsMenuItem.set_use_stock(True)
+        flightsMenuItem.set_label(xstr("menu_tools_flights"))
+        flightsMenuItem.add_accelerator("activate", accelGroup,
+                                        ord(xstr("menu_tools_flights_key")),
+                                        CONTROL_MASK, ACCEL_VISIBLE)
+        flightsMenuItem.connect("activate", self.showFlights)
+        self._flightsMenuItem.set_sensitive(False)
+        toolsMenu.append(flightsMenuItem)
+
         checklistMenuItem = gtk.ImageMenuItem(gtk.STOCK_APPLY)
         checklistMenuItem.set_use_stock(True)
         checklistMenuItem.set_label(xstr("menu_tools_chklst"))
@@ -1221,9 +1235,47 @@ class GUI(fs.ConnectionListener):
         else:
             self._mainWindow.set_default(None)
 
+    def loginSuccessful(self):
+        """Called when the login is successful."""
+        self._flightsMenuItem.set_sensitive(True)
+
     def isWizardActive(self):
         """Determine if the flight wizard is active."""
         return self._notebook.get_current_page()==0
+
+    def showFlights(self, menuItem):
+        """Callback for showing the flight list."""
+        if self._flightsWindow.hasFlights:
+            self._flightsWindow.show_all()
+        else:
+            self.beginBusy(xstr("acceptedflt_query_busy"))
+            self.webHandler.getAcceptedFlights(self._acceptedFlightsCallback)
+
+    def _acceptedFlightsCallback(self, returned, result):
+        """Called when the accepted flights have been received."""
+        gobject.idle_add(self._handleAcceptedFlights, returned, result)
+
+    def _handleAcceptedFlights(self, returned, result):
+        """Handle the result of the query for accepted flights."""
+        self.endBusy()
+        if returned:
+            self._flightsWindow.clear()
+            for flight in result.flights:
+                self._flightsWindow.addFlight(flight)
+            self._flightsWindow.show_all()
+        else:
+            dialog = gtk.MessageDialog(parent = self.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       message_format = xstr("acceptedflt_failed"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            dialog.run()
+            dialog.hide()
+
+    def _hideFlightsWindow(self, window, event):
+        """Hide the window of the accepted flights."""
+        self._flightsWindow.hide()
+        return True
 
     def _editChecklist(self, menuItem):
         """Callback for editing the checklists."""

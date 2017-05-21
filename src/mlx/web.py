@@ -1325,6 +1325,22 @@ class DeleteFlights(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class GetAcceptedFlights(RPCRequest):
+    """Request to get the accepted flights."""
+    def __init__(self, client, callback):
+        """Construct the request with the given client and callback function."""
+        super(GetAcceptedFlights, self).__init__(client, callback)
+
+    def run(self):
+        """Perform the login request."""
+        result = Result()
+
+        result.flights = self._client.getAcceptedFlights()
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1417,6 +1433,10 @@ class Handler(threading.Thread):
     def deleteFlights(self, callback, flightIDs):
         """Delete the flights with the given IDs."""
         self._addRequest(DeleteFlights(self._rpcClient, callback, flightIDs))
+
+    def getAcceptedFlights(self, callback):
+        """Enqueue a request to get the accepted flights."""
+        self._addRequest(GetAcceptedFlights(self._rpcClient, callback))
 
     def run(self):
         """Process the requests."""

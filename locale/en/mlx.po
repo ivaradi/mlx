@@ -126,6 +126,12 @@ msgstr "Are you sure to quit the logger?"
 msgid "menu_tools"
 msgstr "Tools"
 
+msgid "menu_tools_flights"
+msgstr "Accepted _flights"
+
+msgid "menu_tools_flights_key"
+msgstr "f"
+
 msgid "menu_tools_chklst"
 msgstr "_Checklist Editor"
 
@@ -2532,6 +2538,30 @@ msgstr "Are you sure to refly the selected flight(s)?"
 
 msgid "flight_delete_question"
 msgstr "Are you sure to delete the selected flight(s)?"
+
+msgid "acceptedflt_title"
+msgstr "Accepted flights"
+
+msgid "acceptedflt_refresh"
+msgstr "_Refresh"
+
+msgid "acceptedflt_view"
+msgstr "_View..."
+
+msgid "acceptedflt_failed"
+msgstr "Failed to query the accepted flights."
+
+msgid "acceptedflt_flight_duration"
+msgstr "Dur."
+
+msgid "acceptedflt_num_pax"
+msgstr "PAX"
+
+msgid "acceptedflt_fuel"
+msgstr "Fuel"
+
+msgid "acceptedflt_rating"
+msgstr "Rating"
 
 msgid "error_communication"
 msgstr "Communication error"

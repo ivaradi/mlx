@@ -5555,6 +5555,7 @@ class Wizard(gtk.VBox):
         if returned:
             if result.loggedIn:
                 self._loginResult = result
+                self.gui.loginSuccessful()
             else:
                 if isReload:
                     message = xstr("reload_failed")

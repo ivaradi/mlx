@@ -11,18 +11,22 @@ import mlx.const as const
 class ColumnDescriptor(object):
     """A descriptor for a column in the list."""
     def __init__(self, attribute, heading, type = str,
-                 convertFn = None, renderer = gtk.CellRendererText(),
+                 convertFn = None, renderer = None,
                  extraColumnAttributes = None, sortable = False,
-                 defaultSortable = False):
+                 defaultSortable = False, defaultDescending = False,
+                 cellDataFn = None):
         """Construct the descriptor."""
         self._attribute = attribute
         self._heading = heading
         self._type = type
         self._convertFn = convertFn
-        self._renderer = renderer
+        self._renderer = \
+          gtk.CellRendererText() if renderer is None else renderer
         self._extraColumnAttributes = extraColumnAttributes
         self._sortable = sortable
         self._defaultSortable = defaultSortable
+        self._defaultDescending = defaultDescending
+        self._cellDataFn = cellDataFn
 
     @property
     def defaultSortable(self):
@@ -37,14 +41,6 @@ class ColumnDescriptor(object):
         """Get a new column object for a tree view.
 
         @param index is the 0-based index of the column."""
-        if self._extraColumnAttributes is None:
-            if isinstance(self._renderer, gtk.CellRendererText):
-                extraColumnAttributes = {"text" : index}
-            else:
-                extraColumnAttributes = {}
-        else:
-            extraColumnAttributes = self._extraColumnAttributes
-
         column = gtk.TreeViewColumn(self._heading, self._renderer,
                                     text = index)
         column.set_expand(True)
@@ -52,11 +48,24 @@ class ColumnDescriptor(object):
             column.set_sort_column_id(index)
             column.set_sort_indicator(True)
 
+        if self._extraColumnAttributes is not None:
+            for (key, value) in self._extraColumnAttributes.iteritems():
+                if key=="alignment":
+                    self._renderer.set_alignment(value, 0.5)
+                else:
+                    raise Exception("unhandled extra column attribute '" +
+                                    key + "'")
+        if self._cellDataFn is not None:
+            column.set_cell_data_func(self._renderer, self._cellDataFn)
+
         return column
 
     def getValueFrom(self, flight):
         """Get the value from the given flight."""
-        value = getattr(flight, self._attribute)
+        attributes = self._attribute.split(".")
+        value = getattr(flight, attributes[0])
+        for attr in attributes[1:]:
+            value = getattr(value, attr)
         return self._type(value) if self._convertFn is None \
             else self._convertFn(value, flight)
 
@@ -95,8 +104,10 @@ class FlightList(gtk.Alignment):
 
         self._model = gtk.ListStore(*types)
         if defaultSortableIndex is not None:
-            self._model.set_sort_column_id(defaultSortableIndex,
-                                           SORT_ASCENDING)
+            sortOrder = SORT_DESCENDING \
+              if self._columnDescriptors[defaultSortableIndex-1]._defaultDescending \
+              else SORT_ASCENDING
+            self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
         self._view = gtk.TreeView(self._model)
 
         flightIndexColumn = gtk.TreeViewColumn()
@@ -222,6 +233,7 @@ class PendingFlightsFrame(gtk.Frame):
     """A frame for a list of pending (reported or rejected) flights.
 
     It contains the list and the buttons available."""
+    @staticmethod
     def getAircraft(tailNumber, bookedFlight):
         """Get the aircraft from the given booked flight.
 
@@ -229,6 +241,9 @@ class PendingFlightsFrame(gtk.Frame):
         type."""
         return tailNumber + \
             " (" + const.icaoCodes[bookedFlight.aircraftType] + ")"
+
+    def _getAcft(tailNumber, bookedFlight):
+        return PendingFlightsFrame.getAircraft(tailNumber, bookedFlight)
 
     columnDescriptors = [
         ColumnDescriptor("callsign", xstr("flightsel_no")),
@@ -239,7 +254,7 @@ class PendingFlightsFrame(gtk.Frame):
         ColumnDescriptor("arrivalICAO", xstr("flightsel_to"),
                          sortable = True),
         ColumnDescriptor("tailNumber", xstr("pendflt_acft"),
-                         convertFn = getAircraft)
+                         convertFn = _getAcft)
     ]
 
     def __init__(self, which, wizard, window, pirepEditable = False):
@@ -483,6 +498,176 @@ class PendingFlightsWindow(gtk.Window):
         window if not."""
         if not self.hasFlights:
             self.emit("delete-event", None)
+
+    def _closeClicked(self, button):
+        """Called when the Close button is clicked.
+
+        A 'delete-event' is emitted to close the window."""
+        self.emit("delete-event", None)
+
+    def _keyPressed(self, window, event):
+        """Called when a key is pressed in the window.
+
+        If the Escape key is pressed, 'delete-event' is emitted to close the
+        window."""
+        if gdk.keyval_name(event.keyval) == "Escape":
+            self.emit("delete-event", None)
+            return True
+
+#-----------------------------------------------------------------------------
+
+class AcceptedFlightsWindow(gtk.Window):
+    """A window for a list of accepted flights."""
+    def getFlightDuration(flightTimeStart, flight):
+        """Get the flight duration for the given flight."""
+        minutes = int(round((flight.flightTimeEnd - flightTimeStart)/60.0))
+        return "%02d:%02d" % (minutes/60, minutes%60)
+
+    columnDescriptors = [
+        ColumnDescriptor("bookedFlight.callsign", xstr("flightsel_no")),
+        ColumnDescriptor("bookedFlight.departureTime", xstr("flightsel_deptime"),
+                         sortable = True, defaultSortable = True,
+                         defaultDescending = True),
+        ColumnDescriptor("bookedFlight.departureICAO", xstr("flightsel_from"),
+                         sortable = True),
+        ColumnDescriptor("bookedFlight.arrivalICAO", xstr("flightsel_to"),
+                         sortable = True),
+        ColumnDescriptor("bookedFlight.tailNumber", xstr("pendflt_acft"),
+                         convertFn = lambda value, flight:
+                         PendingFlightsFrame.getAircraft(value,
+                                                         flight.bookedFlight)),
+        ColumnDescriptor("flightTimeStart", xstr("acceptedflt_flight_duration"),
+                         convertFn = getFlightDuration, sortable = True,
+                         extraColumnAttributes =
+                             { "alignment": 0.5 } ),
+        ColumnDescriptor("numPassengers", xstr("acceptedflt_num_pax"),
+                         type = int, sortable = True,
+                         extraColumnAttributes =
+                             { "alignment": 1.0 } ),
+        ColumnDescriptor("fuelUsed", xstr("acceptedflt_fuel"),
+                         type = int, sortable = True,
+                         extraColumnAttributes =
+                             { "alignment": 1.0 } ),
+        ColumnDescriptor("rating", xstr("acceptedflt_rating"),
+                         type = float, sortable = True,
+                         extraColumnAttributes =
+                             { "alignment": 1.0 },
+                         cellDataFn = lambda col, cell, model, iter:
+                             cell.set_property("text",
+                                               "%.0f" %
+                                               (model.get(iter, 9)[0],)))
+    ]
+
+    def __init__(self, gui):
+        """Construct the window."""
+        super(AcceptedFlightsWindow, self).__init__()
+
+        self._gui = gui
+
+        self.set_title(WINDOW_TITLE_BASE + " - " + xstr("acceptedflt_title"))
+        self.set_size_request(-1, 700)
+        self.set_transient_for(gui.mainWindow)
+
+        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment.set_padding(padding_top = 2, padding_bottom = 8,
+                              padding_left = 4, padding_right = 4)
+
+        vbox = gtk.VBox()
+
+        hbox = gtk.HBox()
+        vbox.pack_start(hbox, True, True, 4)
+
+        self._flights = []
+        self._flightList = FlightList(columnDescriptors =
+                                      AcceptedFlightsWindow.columnDescriptors,
+                                      widthRequest = 750,
+                                      multiSelection = False)
+        self._flightList.connect("selection-changed", self._selectionChanged)
+
+        hbox.pack_start(self._flightList, True, True, 4)
+
+        buttonBox = gtk.VBox()
+
+        self._refreshButton = gtk.Button(xstr("acceptedflt_refresh"))
+        self._refreshButton.set_sensitive(True)
+        self._refreshButton.connect("clicked", self._refreshClicked)
+        buttonBox.pack_start(self._refreshButton, False, False, 2)
+
+        filler = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                               xscale = 1.0, yscale = 1.0)
+        filler.set_size_request(-1, 4)
+        buttonBox.pack_start(filler, False, False, 0)
+
+        self._viewButton = gtk.Button(xstr("acceptedflt_view"))
+        self._viewButton.set_sensitive(False)
+        self._viewButton.connect("clicked", self._viewClicked)
+        buttonBox.pack_start(self._viewButton, False, False, 2)
+
+        hbox.pack_start(buttonBox, False, False, 4)
+
+        buttonAlignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+                                        xalign = 0.5, yalign = 0.5)
+
+        self._closeButton =  gtk.Button(xstr("button_ok"))
+        self._closeButton.connect("clicked", self._closeClicked)
+
+        buttonAlignment.add(self._closeButton)
+        vbox.pack_start(buttonAlignment, False, False, 2)
+
+        alignment.add(vbox)
+
+        self.add(alignment)
+
+        self.connect("key-press-event", self._keyPressed)
+
+    @property
+    def hasFlights(self):
+        """Determine if there are any flights that we know of."""
+        return len(self._flights)>0
+
+    def clear(self):
+        """Clear the flight list."""
+        self._flights = []
+        self._flightList.clear()
+
+    def addFlight(self, flight):
+        """Add the given flight."""
+        self._flights.append(flight)
+        self._flightList.addFlight(flight)
+
+    def _selectionChanged(self, flightList, selectedIndexes):
+        """Called when the selection has changed."""
+        self._viewButton.set_sensitive(len(selectedIndexes)==1)
+
+    def _refreshClicked(self, button):
+        """Called when the refresh button has been clicked."""
+        self.clear()
+        self._gui.showFlights(None)
+
+    def _viewClicked(self, button):
+        """Called when the view button has been clicked."""
+        gui = self._gui
+        gui.beginBusy(xstr("pendflt_pirep_busy"))
+        self.set_sensitive(False)
+
+        indexes = self._flightList.selectedIndexes
+        assert(len(indexes)==1)
+
+        flightID = self._flights[indexes[0]].bookedFlight.id
+        gui.webHandler.getPIREP(self._pirepResultCallback, flightID)
+
+    def _pirepResultCallback(self, returned, result):
+        """Called when the PIREP query result is available."""
+        gobject.idle_add(self._handlePIREPResult, returned, result)
+
+    def _handlePIREPResult(self, returned, result):
+        """Handle the refly result."""
+        self.set_sensitive(True)
+        gui = self._gui
+        gui.endBusy()
+
+        if returned:
+            gui.viewPIREP(result.pirep)
 
     def _closeClicked(self, button):
         """Called when the Close button is clicked.

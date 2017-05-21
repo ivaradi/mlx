@@ -6,6 +6,8 @@ from common import MAVA_BASE_URL
 import jsonrpclib
 import hashlib
 import datetime
+import calendar
+import sys
 
 #---------------------------------------------------------------------------------------
 
@@ -31,7 +33,13 @@ class RPCObject(object):
                 if instruction is None:
                     continue
 
-                value = instruction(value)
+                try:
+                    value = instruction(value)
+                except:
+                    print >> sys.stderr, "Failed to convert value '%s' of attribute '%s':" % \
+                        (value, key)
+                    import traceback
+                    traceback.print_exc()
             setattr(self, key, value)
 
 #---------------------------------------------------------------------------------------
@@ -127,6 +135,37 @@ class BookedFlight(RPCObject):
           BookedFlight.getDateTime(self.date, self.arrivalTime)
         if self.arrivalTime<self.departureTime:
             self.arrivalTime += datetime.timedelta(days = 1)
+
+#---------------------------------------------------------------------------------------
+
+class AcceptedFlight(RPCObject):
+    """A flight that has been already accepted."""
+    # The instructions for the construction
+    @staticmethod
+    def parseTimestamp(s):
+        """Parse the given RPC timestamp."""
+        dt = datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+        return calendar.timegm(dt.utctimetuple())
+
+    _instructions = {
+        "bookedFlight" : lambda value: BookedFlight(value),
+        "numPassengers" : int,
+        "fuelUsed" : int,
+        "rating" : lambda value: float(value) if value else 0.0
+        }
+
+    def __init__(self, value):
+        """Construct the booked flight object from the given RPC result
+        value."""
+        super(AcceptedFlight, self).__init__(value, AcceptedFlight._instructions)
+        self.flightTimeStart = \
+          AcceptedFlight.parseTimestamp(self.flightDate + " " +
+                                        self.flightTimeStart)
+        self.flightTimeEnd = \
+          AcceptedFlight.parseTimestamp(self.flightDate + " " +
+                                        self.flightTimeEnd)
+        if self.flightTimeEnd<self.flightTimeStart:
+            self.flightTimeEnd += 24*60*60
 
 #---------------------------------------------------------------------------------------
 
@@ -297,6 +336,15 @@ class Client(object):
                          cmp(flight1.departureTime, flight2.departureTime))
 
         return (bookedFlights, reportedFlights, rejectedFlights)
+
+    def getAcceptedFlights(self):
+        """Get the flights that are already accepted."""
+        value = self._performCall(lambda sessionID:
+                                  self._server.getAcceptedFlights(sessionID))
+        flights = []
+        for flight in value:
+            flights.append(AcceptedFlight(flight))
+        return flights
 
     def getEntryExamStatus(self):
         """Get the status of the exams needed for joining MAVA."""

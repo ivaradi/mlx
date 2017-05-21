@@ -169,7 +169,10 @@ class PIREP(object):
         self.mailWeight = int(pirepData["mailWeight"])
 
         self.filedCruiseAltitude = int(pirepData["filedCruiseLevel"][2:])*100
-        cruiseLevel = pirepData["cruiseLevel"]
+        cruiseLevel = pirepData["cruiseLevel"].strip()
+        if cruiseLevel:
+            if cruiseLevel.startswith("FL"):
+                cruiseLevel = cruiseLevel[2:]
         if cruiseLevel:
             self.cruiseAltitude = int(cruiseLevel[2:])*100
         else:
