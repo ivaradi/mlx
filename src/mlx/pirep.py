@@ -67,7 +67,7 @@ class PIREP(object):
         for (flighType, text) in PIREP._flightTypes.iteritems():
             if s==text:
                 return flighType
-        return const.FLIGHTYPE_SCHEDULED
+        return const.FLIGHTTYPE_SCHEDULED
 
     @staticmethod
     def parseLogFromRPC(log):
@@ -187,7 +187,15 @@ class PIREP(object):
         self.cargoWeight = int(pirepData["cargoWeight"])
         self.mailWeight = int(pirepData["mailWeight"])
 
-        self.filedCruiseAltitude = int(pirepData["filedCruiseLevel"][2:])*100
+        filedCruiseLevel = pirepData["filedCruiseLevel"].strip()
+        if filedCruiseLevel:
+            if filedCruiseLevel.startswith("FL"):
+                filedCruiseLevel = filedCruiseLevel[2:]
+        if filedCruiseLevel:
+            self.filedCruiseAltitude = int(filedCruiseLevel)*100
+        else:
+            self.filedCruiseAltitude = 10000;
+
         cruiseLevel = pirepData["cruiseLevel"].strip()
         if cruiseLevel:
             if cruiseLevel.startswith("FL"):
