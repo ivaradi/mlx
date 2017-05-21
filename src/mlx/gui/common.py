@@ -8,6 +8,7 @@ from mlx.util import secondaryInstallation
 
 import os
 import time
+import calendar
 
 #-----------------------------------------------------------------------------
 
@@ -337,6 +338,21 @@ class TimeEntry(gtk.Entry):
         """Set the hour and minute from the given timestamp in UTC."""
         tm = time.gmtime(timestamp)
         self.set_text("%02d:%02d" % (tm.tm_hour, tm.tm_min))
+
+    def getTimestampFrom(self, timestamp):
+        """Get the timestamp by replacing the hour and minute from the given
+        timestamp with what is set in this widget."""
+        tm = time.gmtime(timestamp)
+        ts = calendar.timegm((tm.tm_year, tm.tm_mon, tm.tm_mday,
+                              self.hour, self.minute, 0,
+                              tm.tm_wday, tm.tm_yday, tm.tm_isdst))
+
+        if ts > (timestamp + (16*60*60)):
+            ts -= 24*60*60
+        elif (ts + 16*60*60) < timestamp:
+            ts += 24*60*60
+
+        return ts
 
     def _focusOutEvent(self, widget, event):
         """Reformat the text to match pattern HH:MM"""
