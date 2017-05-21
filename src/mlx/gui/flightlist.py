@@ -352,7 +352,7 @@ class PendingFlightsFrame(gtk.Frame):
             if self._pirepEditable:
                 gui.editPIREP(result.pirep)
             else:
-                gui.viewPIREP(result.pirep)
+                gui.viewMessagedPIREP(result.pirep)
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
