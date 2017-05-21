@@ -320,11 +320,12 @@ class Client(object):
                           self._server.updatePlane(sessionID, tailNumber,
                                                    status, gateNumber))
 
-    def addPIREP(self, flightID, pirep):
+    def addPIREP(self, flightID, pirep, update = False):
         """Add the PIREP for the given flight."""
         (result, _value) = \
           self._performCall(lambda sessionID:
-                            self._server.addPIREP(sessionID, flightID, pirep),
+                            self._server.addPIREP(sessionID, flightID, pirep,
+                                                  update),
                             acceptResults = [Client.RESULT_FLIGHT_ALREADY_REPORTED,
                                              Client.RESULT_FLIGHT_NOT_EXISTS])
         return result

@@ -2100,6 +2100,9 @@ msgid "pirepEdit_delayCodes_tooltip"
 msgstr ""
 "The delay codes set. You should edit them in the 'Comments & defects' tab at the bottom."
 
+msgid "pirepEdit_save_question"
+msgstr "Are you sure to save the PIREP modifications?"
+
 msgid "about_website"
 msgstr "Project Homepage"
 

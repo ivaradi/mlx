@@ -719,9 +719,11 @@ class PIREPEditor(gtk.Dialog):
 
         self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
 
-        self._okButton = self.add_button(xstr("button_save"), RESPONSETYPE_OK)
+        self._okButton = self.add_button(xstr("button_save"), RESPONSETYPE_NONE)
+        self._okButton.connect("clicked", self._okClicked)
         self._okButton.set_can_default(True)
         self._modified = False
+        self._toSave = False
 
     def setPIREP(self, pirep):
         """Setup the data in the dialog from the given PIREP."""
@@ -845,6 +847,7 @@ class PIREPEditor(gtk.Dialog):
         self._modified = False
         self._updateButtons()
         self._modified = True
+        self._toSave = False
 
     def delayCodesChanged(self):
         """Called when the delay codes have changed."""
@@ -1361,5 +1364,60 @@ class PIREPEditor(gtk.Dialog):
                                      sid is not None and (star is not None or
                                      transition is not None) and route!="" and
                                      self._approachType.get_text()!="")
+
+    def _okClicked(self, button):
+        """Called when the OK button has been clicked.
+
+        The PIREP is updated from the data in the window."""
+        if not askYesNo(xstr("pirepEdit_save_question"), parent = self):
+            self.response(RESPONSETYPE_CANCEL)
+
+        pirep = self._pirep
+
+        pirep.filedCruiseAltitude = \
+          self._filedCruiseLevel.get_value_as_int() * 100
+        pirep.cruiseAltitude = \
+          self._modifiedCruiseLevel.get_value_as_int() * 100
+
+        pirep.route = getTextViewText(self._userRoute)
+
+        pirep.departureMETAR = getTextViewText(self._departureMETAR)
+        pirep.departureRunway = self._departureRunway.get_text()
+        pirep.sid = self._sid.get_child().get_text()
+
+        pirep.arrivalMETAR = getTextViewText(self._arrivalMETAR)
+        pirep.star = None if self._star.get_active()==0 \
+          else self._star.get_child().get_text()
+        pirep.transition = None if self._transition.get_active()==0 \
+          else self._transition.get_child().get_text()
+        pirep.approachType = self._approachType.get_text()
+        pirep.arrivalRunway = self._arrivalRunway.get_text()
+
+        pirep.blockTimeStart = \
+          self._blockTimeStart.getTimestampFrom(pirep.blockTimeStart)
+        pirep.blockTimeEnd = \
+          self._blockTimeEnd.getTimestampFrom(pirep.blockTimeEnd)
+        pirep.flightTimeStart = \
+          self._flightTimeStart.getTimestampFrom(pirep.flightTimeStart)
+        pirep.flightTimeEnd = \
+          self._flightTimeEnd.getTimestampFrom(pirep.flightTimeEnd)
+
+        pirep.fuelUsed = self._fuelUsed.get_value()
+
+        pirep.numCrew = self._flownNumCrew.get_value()
+        pirep.numPassengers = self._flownNumPassengers.get_value()
+        pirep.bagWeight = self._flownBagWeight.get_value()
+        pirep.cargoWeight = self._flownCargoWeight.get_value()
+        pirep.mailWeight = self._flownMailWeight.get_value()
+
+        pirep.flightType = flightTypes[self._flightType.get_active()]
+        pirep.online = self._online.get_active()
+
+        pirep.delayCodes = self._flightInfo.delayCodes
+        pirep.comments = self._flightInfo.comments
+        pirep.flightDefects = self._flightInfo.faultsAndExplanations
+
+        self.response(RESPONSETYPE_OK)
+
 
 #------------------------------------------------------------------------------

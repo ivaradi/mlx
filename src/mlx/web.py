@@ -1143,15 +1143,17 @@ class SendPIREP(Request):
 class SendPIREPRPC(RPCRequest):
     """A request to send a PIREP to the MAVA website via the RPC interface."""
 
-    def __init__(self, client, callback, pirep):
+    def __init__(self, client, callback, pirep, update):
         """Construct the sending of the PIREP."""
         super(SendPIREPRPC, self).__init__(client, callback)
         self._pirep = pirep
+        self._update = update
 
     def run(self):
         """Perform the sending of the PIREP."""
         pirep = self._pirep
-        resultCode = self._client.addPIREP(pirep.bookedFlight.id, pirep)
+        resultCode = self._client.addPIREP(pirep.bookedFlight.id, pirep,
+                                           self._update)
 
         result = Result()
         result.success = resultCode==rpc.Client.RESULT_OK
@@ -1285,7 +1287,7 @@ class GetPIREP(RPCRequest):
         pirepData = self._client.getPIREP(self._flightID)
         print "pirepData:", pirepData
 
-        bookedFlight = BookedFlight()
+        bookedFlight = BookedFlight(self._flightID)
         bookedFlight.setupFromPIREPData(pirepData)
 
         result.pirep = PIREP(None)
@@ -1381,11 +1383,11 @@ class Handler(threading.Thread):
         """Get the METARs for the given airports."""
         self._addRequest(GetMETARs(callback, airports))
 
-    def sendPIREP(self, callback, pirep):
+    def sendPIREP(self, callback, pirep, update = False):
         """Send the given PIREP."""
         request = \
-          SendPIREPRPC(self._rpcClient, callback, pirep) if self._config.useRPC \
-          else SendPIREP(callback, pirep)
+          SendPIREPRPC(self._rpcClient, callback, pirep, update) \
+          if self._config.useRPC else SendPIREP(callback, pirep)
         self._addRequest(request)
 
     def sendACARS(self, callback, acars):

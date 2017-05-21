@@ -2115,6 +2115,9 @@ msgid "pirepEdit_delayCodes_tooltip"
 msgstr ""
 "A megadott késési kódok. Szerkeszteni a 'Megjegyzések és hibák' fül alsó részén tudod."
 
+msgid "pirepEdit_save_question"
+msgstr "Biztosan el szeretnéd menteni a PIREP módosításait?"
+
 msgid "about_website"
 msgstr "A projekt honlapja"
 

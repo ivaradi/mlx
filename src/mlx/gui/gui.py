@@ -1265,7 +1265,49 @@ class GUI(fs.ConnectionListener):
         """Display the PIREP editor window and allow editing the PIREP."""
         self._pirepEditor.setPIREP(pirep)
         self._pirepEditor.show_all()
-        self._pirepEditor.run()
+        if self._pirepEditor.run()==RESPONSETYPE_OK:
+            self.beginBusy(xstr("pirepEdit_save_busy"))
+            self.webHandler.sendPIREP(self._pirepUpdatedCallback, pirep,
+                                      update = True)
+        else:
+            self._pirepEditor.hide()
+
+    def _pirepUpdatedCallback(self, returned, result):
+        """Callback for the PIREP updating result."""
+        gobject.idle_add(self._handlePIREPUpdated, returned, result)
+
+    def _handlePIREPUpdated(self, returned, result):
+        """Callback for the PIREP updating result."""
+        self.endBusy()
+        secondaryMarkup = None
+        type = MESSAGETYPE_ERROR
+        if returned:
+            if result.success:
+                type = None
+            elif result.alreadyFlown:
+                messageFormat = xstr("sendPIREP_already")
+                secondaryMarkup = xstr("sendPIREP_already_sec")
+            elif result.notAvailable:
+                messageFormat = xstr("sendPIREP_notavail")
+            else:
+                messageFormat = xstr("sendPIREP_unknown")
+                secondaryMarkup = xstr("sendPIREP_unknown_sec")
+        else:
+            print "PIREP sending failed", result
+            messageFormat = xstr("sendPIREP_failed")
+            secondaryMarkup = xstr("sendPIREP_failed_sec")
+
+        if type is not None:
+            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                       type = type, message_format = messageFormat)
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            if secondaryMarkup is not None:
+                dialog.format_secondary_markup(secondaryMarkup)
+
+            dialog.run()
+            dialog.hide()
+
         self._pirepEditor.hide()
 
     def _loadPIREP(self, menuItem):
