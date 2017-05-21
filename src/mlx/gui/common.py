@@ -646,3 +646,10 @@ def createFlightTypeComboBox():
         return flightType
 
 #------------------------------------------------------------------------------
+
+def getTextViewText(textView):
+    """Get the text from the given text view."""
+    buffer = textView.get_buffer()
+    return buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), True)
+
+#------------------------------------------------------------------------------
