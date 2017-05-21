@@ -2070,6 +2070,15 @@ msgstr "_Napló"
 msgid "pirepView_tab_log_tooltip"
 msgstr "A repülési napló."
 
+msgid "pirepView_tab_messages"
+msgstr "Ü_zenet"
+
+msgid "pirepView_tab_messages_tooltip"
+msgstr "A javító üzenete."
+
+msgid "pirep_messages"
+msgstr "Üzenet"
+
 msgid "pirepEdit_title"
 msgstr "PIREP szerkesztése"
 

@@ -25,6 +25,135 @@ import re
 
 #------------------------------------------------------------------------------
 
+class MessageFrame(gtk.Frame):
+    """A frame containing the information about a PIREP message.
+
+    It consists of a text view with the heading information (author, time) and
+    another text view with the actual message."""
+    def __init__(self, message, senderPID, senderName):
+        """Construct the frame."""
+        gtk.Frame.__init__(self)
+
+        vbox = gtk.VBox()
+
+        self._heading = heading = gtk.TextView()
+        heading.set_editable(False)
+        heading.set_can_focus(False)
+        heading.set_wrap_mode(WRAP_WORD)
+
+        buffer = heading.get_buffer()
+        self._headingTag  = buffer.create_tag("heading", weight=WEIGHT_BOLD)
+        buffer.set_text("%s - %s" % (senderPID, senderName))
+        buffer.apply_tag(self._headingTag,
+                         buffer.get_start_iter(), buffer.get_end_iter())
+
+        headingAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                         xscale = 1.0, yscale = 0.0)
+        headingAlignment.set_padding(padding_top = 0, padding_bottom = 0,
+                                     padding_left = 2, padding_right = 2)
+        headingAlignment.add(heading)
+        vbox.pack_start(headingAlignment, True, True, 4)
+
+        self._messageView = messageView = gtk.TextView()
+        messageView.set_wrap_mode(WRAP_WORD)
+        messageView.set_accepts_tab(False)
+        messageView.set_size_request(-1, 60)
+
+        buffer = messageView.get_buffer()
+        buffer.set_text(message)
+
+        vbox.pack_start(messageView, True, True, 4)
+
+        self.add(vbox)
+        self.show_all()
+
+        if pygobject:
+            styleContext = self.get_style_context()
+            color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
+            heading.override_background_color(0, color)
+        else:
+            style = self.rc_get_style()
+            heading.modify_base(0, style.bg[0])
+
+
+#-------------------------------------------------------------------------------
+
+class MessagesWidget(gtk.Frame):
+    """The widget for the messages."""
+    @staticmethod
+    def getFaultFrame(alignment):
+        """Get the fault frame from the given alignment."""
+        return alignment.get_children()[0]
+
+    def __init__(self, gui):
+        gtk.Frame.__init__(self)
+
+        self._gui = gui
+        self.set_label(xstr("pirep_messages"))
+        label = self.get_label_widget()
+        label.set_use_underline(True)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 1.0, yscale = 1.0)
+        alignment.set_padding(padding_top = 4, padding_bottom = 4,
+                              padding_left = 4, padding_right = 4)
+
+        self._outerBox = outerBox = gtk.EventBox()
+        outerBox.add(alignment)
+
+        self._innerBox = innerBox = gtk.EventBox()
+        alignment.add(self._innerBox)
+
+        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                  xscale = 1.0, yscale = 1.0)
+        alignment.set_padding(padding_top = 0, padding_bottom = 0,
+                              padding_left = 0, padding_right = 0)
+
+        innerBox.add(alignment)
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scroller.set_shadow_type(SHADOW_NONE)
+
+        self._messages = gtk.VBox()
+        self._messages.set_homogeneous(False)
+        scroller.add_with_viewport(self._messages)
+
+        alignment.add(scroller)
+
+        self._messageWidgets = []
+
+        self.add(outerBox)
+        self.show_all()
+
+    def addMessage(self, message):
+        """Add a message from the given sender."""
+
+        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+                                      xscale = 1.0, yscale = 0.0)
+        alignment.set_padding(padding_top = 2, padding_bottom = 2,
+                              padding_left = 4, padding_right = 4)
+
+        messageFrame = MessageFrame(message.message,
+                                    message.senderPID,
+                                    message.senderName)
+
+        alignment.add(messageFrame)
+        self._messages.pack_start(alignment, False, False, 4)
+        self._messages.show_all()
+
+        self._messageWidgets.append((alignment, messageFrame))
+
+    def reset(self):
+        """Reset the widget by removing all messages."""
+        for (alignment, messageFrame) in self._messageWidgets:
+            self._messages.remove(alignment)
+        self._messages.show_all()
+
+        self._messageWidgets = []
+
+#------------------------------------------------------------------------------
+
 class PIREPViewer(gtk.Dialog):
     """The dialog for PIREP viewing."""
     @staticmethod
@@ -142,7 +271,7 @@ class PIREPViewer(gtk.Dialog):
         tm = time.gmtime(timestamp)
         label.set_text("%02d:%02d" % (tm.tm_hour, tm.tm_min))
 
-    def __init__(self, gui):
+    def __init__(self, gui, showMessages = False):
         """Construct the PIREP viewer."""
         super(PIREPViewer, self).__init__(title = WINDOW_TITLE_BASE +
                                           " - " +
@@ -175,6 +304,14 @@ class PIREPViewer(gtk.Dialog):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
+
+        self._showMessages = showMessages
+        if showMessages:
+            messagesTab = self._buildMessagesTab()
+            label = gtk.Label(xstr("pirepView_tab_messages"))
+            label.set_use_underline(True)
+            label.set_tooltip_text(xstr("pirepView_tab_messages_tooltip"))
+            self._notebook.append_page(messagesTab, label)
 
         self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         self._okButton.set_can_default(True)
@@ -269,6 +406,11 @@ class PIREPViewer(gtk.Dialog):
                              formatFlightLogLine(timeStr, line),
                              isFault = isFault)
             lineIndex += 1
+
+        if self._showMessages:
+            self._messages.reset()
+            for message in pirep.messages:
+                self._messages.addMessage(message)
 
         self._notebook.set_current_page(0)
         self._okButton.grab_default()
@@ -623,6 +765,15 @@ class PIREPViewer(gtk.Dialog):
         (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
         addFaultTag(self._log.get_buffer())
         mainBox.pack_start(logWindow, True, True, 0)
+
+        return mainBox
+
+    def _buildMessagesTab(self):
+        """Build the messages tab."""
+        mainBox = gtk.VBox()
+
+        self._messages = MessagesWidget(self._gui)
+        mainBox.pack_start(self._messages, True, True, 0)
 
         return mainBox
 

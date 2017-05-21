@@ -667,7 +667,7 @@ class AcceptedFlightsWindow(gtk.Window):
         gui.endBusy()
 
         if returned:
-            gui.viewPIREP(result.pirep)
+            gui.viewMessagedPIREP(result.pirep)
 
     def _closeClicked(self, button):
         """Called when the Close button is clicked.

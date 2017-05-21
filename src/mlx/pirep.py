@@ -22,6 +22,23 @@ import time
 
 class PIREP(object):
     """A pilot's report of a flight."""
+    class Message(object):
+        """A message belonging to the PIREP."""
+        @staticmethod
+        def fromMessageData(messageData):
+            """Construct a message from a JSON message data."""
+            message = messageData["message"]
+            senderPID = messageData["senderPID"]
+            senderName = messageData["senderName"]
+
+            return PIREP.Message(message, senderPID, senderName)
+
+        def __init__(self, message, senderPID, senderName):
+            """Construct the message object."""
+            self.message = message
+            self.senderPID = senderPID
+            self.senderName = senderName
+
     _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
                      const.FLIGHTTYPE_OLDTIMER : "OT",
                      const.FLIGHTTYPE_VIP : "VIP",
@@ -158,6 +175,8 @@ class PIREP(object):
         self.logLines = logger.lines
         self.faultLineIndexes = logger.faultLineIndexes
 
+        self.messages = []
+
     def setupFromPIREPData(self, pirepData, bookedFlight):
 
         self.bookedFlight = bookedFlight
@@ -247,6 +266,10 @@ class PIREP(object):
                         lastFaultLineIndex = i+1
                         numLogLines += 1
                         break
+
+        self.messages = []
+        for messageData in pirepData["messages"]:
+            self.messages.append(PIREP.Message.fromMessageData(messageData))
 
     @property
     def flightDateText(self):

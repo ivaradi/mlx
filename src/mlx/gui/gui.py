@@ -185,6 +185,7 @@ class GUI(fs.ConnectionListener):
         self._selfToggling = False
 
         self._pirepViewer = PIREPViewer(self)
+        self._messagedPIREPViewer = PIREPViewer(self, showMessages = True)
 
         self._pirepEditor = PIREPEditor(self)
 
@@ -1312,6 +1313,14 @@ class GUI(fs.ConnectionListener):
         self._pirepViewer.show_all()
         self._pirepViewer.run()
         self._pirepViewer.hide()
+
+    def viewMessagedPIREP(self, pirep):
+        """Display the PIREP viewer window with the given PIREP containing
+        messages as well."""
+        self._messagedPIREPViewer.setPIREP(pirep)
+        self._messagedPIREPViewer.show_all()
+        self._messagedPIREPViewer.run()
+        self._messagedPIREPViewer.hide()
 
     def editPIREP(self, pirep):
         """Display the PIREP editor window and allow editing the PIREP."""

@@ -2055,6 +2055,15 @@ msgstr "_Log"
 msgid "pirepView_tab_log_tooltip"
 msgstr "The flight log."
 
+msgid "pirepView_tab_messages"
+msgstr "_Message"
+
+msgid "pirepView_tab_messages_tooltip"
+msgstr "The message sent by the reviewer."
+
+msgid "pirep_messages"
+msgstr "Message"
+
 msgid "pirepEdit_title"
 msgstr "PIREP editor"
 
