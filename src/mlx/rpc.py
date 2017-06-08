@@ -49,6 +49,92 @@ class Reply(RPCObject):
 
 #---------------------------------------------------------------------------------------
 
+class ScheduledFlight(RPCObject):
+    """A scheduled flight in the time table."""
+    # The instructions for the construction
+    # Type: normal flight
+    TYPE_NORMAL = 0
+
+    # Type: VIP flight
+    TYPE_VIP = 1
+
+    _instructions = {
+        "id" : int,
+        "pairID": int,
+        "typeCode": lambda value: BookedFlight._decodeAircraftType(value),
+        "departureTime": lambda value: ScheduledFlight._decodeTime(value),
+        "arrivalTime": lambda value: ScheduledFlight._decodeTime(value),
+        "duration": lambda value: ScheduledFlight._decodeDuration(value),
+        "type": int,
+        "spec": int
+        }
+
+    @staticmethod
+    def _decodeTime(value):
+        """Decode the given value as a time value."""
+        return datetime.datetime.strptime(value, "%H:%M:%S").time()
+
+    @staticmethod
+    def _decodeDuration(value):
+        """Decode the given value as a duration.
+
+        A number of seconds will be returned."""
+        t = datetime.datetime.strptime(value, "%H:%M:%S")
+        return (t.hour*60 + t.minute) * 60 + t.second
+
+    def __init__(self, value):
+        """Construct the scheduled flight object from the given JSON value."""
+        super(ScheduledFlight, self).__init__(value,
+                                              ScheduledFlight._instructions)
+        self.aircraftType = self.typeCode
+        del self.typeCode
+
+    def __repr__(self):
+        return "ScheduledFlight<%d, %d, %s, %s (%s) - %s (%s) -> %d, %d>" % \
+          (self.id, self.pairID, BookedFlight.TYPE2TYPECODE[self.aircraftType],
+           self.departureICAO, str(self.departureTime),
+           self.arrivalICAO, str(self.arrivalTime),
+           self.duration, self.spec)
+
+#---------------------------------------------------------------------------------------
+
+class ScheduledFlightPair(object):
+    """A pair of scheduled flights.
+
+    Occasionally, one of the flights may be missing."""
+    @staticmethod
+    def scheduledFlights2Pairs(scheduledFlights):
+        """Convert the given list of scheduled flights into a list of flight
+        pairs."""
+        flights = {}
+        for flight in scheduledFlights:
+            flights[flight.id] = flight
+
+        flightPairs = []
+
+        while flights:
+            (id, flight) = flights.popitem()
+            pairID = flight.pairID
+            if pairID in flights:
+                pairFlight = flights[pairID]
+                if flight.departureICAO=="LHBP" or \
+                  (pairFlight.departureICAO!="LHBP" and id<pairID):
+                    flightPairs.append(ScheduledFlightPair(flight, pairFlight))
+                else:
+                    flightPairs.append(ScheduledFlightPair(pairFlight, flight))
+                del flights[pairID]
+            else:
+                flightPairs.append(ScheduledFlightPair(flight))
+
+        return flightPairs
+
+    def __init__(self, flight0, flight1 = None):
+        """Construct the pair with the given flights."""
+        self.flight0 = flight0
+        self.flight1 = flight1
+
+#---------------------------------------------------------------------------------------
+
 class BookedFlight(RPCObject):
     """A booked flight."""
     # FIXME: copied from web.BookedFlight
@@ -70,6 +156,26 @@ class BookedFlight(RPCObject):
                       "TU5"  : const.AIRCRAFT_T154,
                       "YK4"  : const.AIRCRAFT_YK40,
                       "146"  : const.AIRCRAFT_B462 }
+
+    # FIXME: copied from web.BookedFlight
+    TYPE2TYPECODE = { const.AIRCRAFT_B736  : "736",
+                      const.AIRCRAFT_B737  : "73G",
+                      const.AIRCRAFT_B738  : "738",
+                      const.AIRCRAFT_B738C : "73H",
+                      const.AIRCRAFT_B732  : "732",
+                      const.AIRCRAFT_B733  : "733",
+                      const.AIRCRAFT_B734  : "734",
+                      const.AIRCRAFT_B735  : "735",
+                      const.AIRCRAFT_DH8D  : "DH4",
+                      const.AIRCRAFT_B762  : "762",
+                      const.AIRCRAFT_B763  : "763",
+                      const.AIRCRAFT_CRJ2  : "CR2",
+                      const.AIRCRAFT_F70   : "F70",
+                      const.AIRCRAFT_DC3   : "LI2",
+                      const.AIRCRAFT_T134  : "TU3",
+                      const.AIRCRAFT_T154  : "TU5",
+                      const.AIRCRAFT_YK40  : "YK4",
+                      const.AIRCRAFT_B462  : "146" }
 
     # FIXME: copied from web.BookedFlight
     @staticmethod
@@ -310,7 +416,11 @@ class Client(object):
         if reply.result == Client.RESULT_OK:
             self._loginCount += 1
             self._sessionID = reply.value["sessionID"]
-            return (reply.value["name"], reply.value["rank"])
+
+            types = [BookedFlight.TYPECODE2TYPE[typeCode]
+                     for typeCode in reply.value["typeCodes"]]
+
+            return (reply.value["name"], reply.value["rank"], types)
         else:
             return None
 
@@ -403,6 +513,20 @@ class Client(object):
         """Delete the flights with the given IDs."""
         self._performCall(lambda sessionID:
                           self._server.deleteFlights(sessionID, flightIDs))
+
+    def getTimetable(self, date, types = None):
+        """Get the time table for the given date restricted to the given list
+        of type codes, if any."""
+        typeCodes = None if types is None else \
+            [BookedFlight.TYPE2TYPECODE[type] for type in types]
+
+        values = self._performCall(lambda sessionID:
+                                   self._server.getTimetable(sessionID,
+                                                             date.strftime("%Y-%m-%d"),
+                                                             date.weekday() + 1,
+                                                             typeCodes))
+        return ScheduledFlightPair.scheduledFlights2Pairs([ScheduledFlight(value)
+                                                          for value in values])
 
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.

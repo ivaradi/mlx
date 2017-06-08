@@ -69,6 +69,39 @@ msgstr "Yakovlev Yak-40"
 msgid "aircraft_b462"
 msgstr "British Aerospace 146-200"
 
+msgid "aircraft_family_b737ng"
+msgstr "Boeing 737NG"
+
+msgid "aircraft_family_b737cl"
+msgstr "Boeing 737 Classic"
+
+msgid "aircraft_family_dh8d"
+msgstr "Bombardier Dash-8 Q400"
+
+msgid "aircraft_family_b767"
+msgstr "Boeing 767"
+
+msgid "aircraft_family_crj2"
+msgstr "Canadair Regional Jet CRJ-200"
+
+msgid "aircraft_family_f70"
+msgstr "Fokker F70"
+
+msgid "aircraft_family_dc3"
+msgstr "Lisunov Li-2"
+
+msgid "aircraft_family_t134"
+msgstr "Tupolev Tu-134"
+
+msgid "aircraft_family_t154"
+msgstr "Tupolev Tu-154"
+
+msgid "aircraft_family_yk40"
+msgstr "Yakovlev Yak-40"
+
+msgid "aircraft_family_b462"
+msgstr "British Aerospace 146-200"
+
 msgid "file_filter_all"
 msgstr "All files"
 
@@ -131,6 +164,12 @@ msgstr "Accepted _flights"
 
 msgid "menu_tools_flights_key"
 msgstr "f"
+
+msgid "menu_tools_timetable"
+msgstr "B_ook flights"
+
+msgid "menu_tools_timetable_key"
+msgstr "o"
 
 msgid "menu_tools_chklst"
 msgstr "_Checklist Editor"
@@ -2571,6 +2610,63 @@ msgstr "Fuel"
 
 msgid "acceptedflt_rating"
 msgstr "Rating"
+
+msgid "timetable_query_busy"
+msgstr "Downloading timetable..."
+
+msgid "timetable_title"
+msgstr "Flight booking"
+
+msgid "timetable_no"
+msgstr "Flight no."
+
+msgid "timetable_type"
+msgstr "Aircraft"
+
+msgid "timetable_from"
+msgstr "From"
+
+msgid "timetable_to"
+msgstr "To"
+
+msgid "timetable_dep"
+msgstr "Departure"
+
+msgid "timetable_arr"
+msgstr "Arrival"
+
+msgid "timetable_duration"
+msgstr "Duration"
+
+msgid "timetable_vip"
+msgstr "VIP"
+
+msgid "timetable_busy"
+msgstr "Loading timetable"
+
+msgid "timetable_failed"
+msgstr "Failed to load the timetable."
+
+msgid "timetable_flightdate"
+msgstr "Flight _date:"
+
+msgid "timetable_flightdate_tooltip"
+msgstr "Click here to select another date."
+
+msgid "timetable_show_regular"
+msgstr "Show _regular flights"
+
+msgid "timetable_show_regular_tooltip"
+msgstr "If selected, regular (i.e. non-VIP) flights will be shown."
+
+msgid "timetable_show_vip"
+msgstr "Show _VIP flights"
+
+msgid "timetable_show_vip_tooltip"
+msgstr "If selected, VIP flights will be shown."
+
+msgid "timetable_filter"
+msgstr "Filtering criteria"
 
 msgid "error_communication"
 msgstr "Communication error"

@@ -121,6 +121,80 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
 
 #-------------------------------------------------------------------------------
 
+## Aircraft type family: Boeing 737 NG
+AIRCRAFT_FAMILY_B737NG = 1
+
+## Aircraft type family: Boeing 737 Classic
+AIRCRAFT_FAMILY_B737CL = 2
+
+## Aircraft type family: Bombardier Dash-8 Q400
+AIRCRAFT_FAMILY_DH8D = 3
+
+## Aircraft type family: Boeing 767
+AIRCRAFT_FAMILY_B767 = 4
+
+## Aircraft type family: Canadair CRJ-200
+AIRCRAFT_FAMILY_CRJ2 = 5
+
+## Aircraft type family: Fokker F-70
+AIRCRAFT_FAMILY_F70 = 6
+
+## Aircraft type family: Lisunov Li-2
+AIRCRAFT_FAMILY_DC3 = 7
+
+## Aircraft type family: Tupolev Tu-134
+AIRCRAFT_FAMILY_T134 = 8
+
+## Aircraft type family: Tupolev Tu-154
+AIRCRAFT_FAMILY_T154 = 9
+
+## Aircraft type family: Yakovlev Yak-40
+AIRCRAFT_FAMILY_YK40 = 10
+
+## Aircraft type family: British Aerospace BAe-146
+AIRCRAFT_FAMILY_B462 = 11
+
+#-------------------------------------------------------------------------------
+
+## Map aircraft families to the list of the types they comprise of
+aircraftFamily2Types = {
+    AIRCRAFT_FAMILY_B737NG: [AIRCRAFT_B736, AIRCRAFT_B737, AIRCRAFT_B738,
+                             AIRCRAFT_B738C],
+
+    AIRCRAFT_FAMILY_B737CL: [AIRCRAFT_B732, AIRCRAFT_B733, AIRCRAFT_B734,
+                             AIRCRAFT_B735],
+
+    AIRCRAFT_FAMILY_DH8D: [AIRCRAFT_DH8D],
+
+    AIRCRAFT_FAMILY_B767: [AIRCRAFT_B762, AIRCRAFT_B763],
+
+    AIRCRAFT_FAMILY_CRJ2: [AIRCRAFT_CRJ2],
+
+    AIRCRAFT_FAMILY_F70: [AIRCRAFT_F70],
+
+    AIRCRAFT_FAMILY_DC3: [AIRCRAFT_DC3],
+
+    AIRCRAFT_FAMILY_T134: [AIRCRAFT_T134],
+
+    AIRCRAFT_FAMILY_T154: [AIRCRAFT_T154],
+
+    AIRCRAFT_FAMILY_YK40: [AIRCRAFT_YK40],
+
+    AIRCRAFT_FAMILY_B462: [AIRCRAFT_B462]
+
+    }
+
+#-------------------------------------------------------------------------------
+
+def aircraftType2Family(aircraftType):
+    """Get the family for the given aircraft type."""
+    for (family, types) in aircraftFamily2Types.iteritems():
+        if aircraftType in types:
+            return family
+    assert False
+
+#-------------------------------------------------------------------------------
+
 ## A mapping of aircraft types to their 'internal' ICAO codes (which are
 # the same as the real ICAO codes, except in a few cases)
 icaoCodes = { AIRCRAFT_B736  : "B736",

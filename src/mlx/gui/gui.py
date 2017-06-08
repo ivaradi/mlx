@@ -16,6 +16,7 @@ from mlx.gui.flightlist import AcceptedFlightsWindow
 from mlx.gui.pirep import PIREPViewer, PIREPEditor
 from mlx.gui.bugreport import BugReportDialog
 from mlx.gui.acars import ACARS
+from mlx.gui.timetable import TimetableWindow
 import cef
 
 import mlx.const as const
@@ -119,6 +120,8 @@ class GUI(fs.ConnectionListener):
         window.add(mainVBox)
 
         self._preferences = Preferences(self)
+        self._timetableWindow = TimetableWindow(self)
+        self._timetableWindow.connect("delete-event", self._hideTimetableWindow)
         self._flightsWindow = AcceptedFlightsWindow(self)
         self._flightsWindow.connect("delete-event", self._hideFlightsWindow)
         self._checklistEditor = ChecklistEditor(self)
@@ -1063,6 +1066,17 @@ class GUI(fs.ConnectionListener):
         toolsMenuItem.set_submenu(toolsMenu)
         menuBar.append(toolsMenuItem)
 
+        self._timetableMenuItem = timetableMenuItem = \
+          gtk.ImageMenuItem(gtk.STOCK_INDENT)
+        timetableMenuItem.set_use_stock(True)
+        timetableMenuItem.set_label(xstr("menu_tools_timetable"))
+        timetableMenuItem.add_accelerator("activate", accelGroup,
+                                          ord(xstr("menu_tools_timetable_key")),
+                                          CONTROL_MASK, ACCEL_VISIBLE)
+        timetableMenuItem.connect("activate", self.showTimetable)
+        self._timetableMenuItem.set_sensitive(False)
+        toolsMenu.append(timetableMenuItem)
+
         self._flightsMenuItem = flightsMenuItem = \
           gtk.ImageMenuItem(gtk.STOCK_SPELL_CHECK)
         flightsMenuItem.set_use_stock(True)
@@ -1239,10 +1253,56 @@ class GUI(fs.ConnectionListener):
     def loginSuccessful(self):
         """Called when the login is successful."""
         self._flightsMenuItem.set_sensitive(True)
+        self._timetableMenuItem.set_sensitive(True)
 
     def isWizardActive(self):
         """Determine if the flight wizard is active."""
         return self._notebook.get_current_page()==0
+
+    def showTimetable(self, menuItem):
+        """Callback for showing the timetable."""
+        if self._timetableWindow.hasFlightPairs:
+            self._timetableWindow.show_all()
+        else:
+            date = datetime.date.today()
+            self._timetableWindow.setTypes(self.loginResult.types)
+            self._timetableWindow.setDate(date)
+            self.updateTimeTable(date)
+            self.beginBusy(xstr("timetable_query_busy"))
+
+    def updateTimeTable(self, date):
+        """Update the time table for the given date."""
+        self.beginBusy(xstr("timetable_query_busy"))
+        self._timetableWindow.set_sensitive(False)
+        window = self._timetableWindow.get_window()
+        if window is not None:
+            window.set_cursor(self._busyCursor)
+        self.webHandler.getTimetable(self._timetableCallback, date,
+                                     self.loginResult.types)
+
+    def _timetableCallback(self, returned, result):
+        """Called when the timetable has been received."""
+        gobject.idle_add(self._handleTimetable, returned, result)
+
+    def _handleTimetable(self, returned, result):
+        """Handle the result of the query for the timetable."""
+        self.endBusy()
+        window = self._timetableWindow.get_window()
+        if window is not None:
+            window.set_cursor(None)
+        self._timetableWindow.set_sensitive(True)
+        if returned:
+            self._timetableWindow.setFlightPairs(result.flightPairs)
+            self._timetableWindow.show_all()
+        else:
+            dialog = gtk.MessageDialog(parent = self.mainWindow,
+                                       type = MESSAGETYPE_ERROR,
+                                       message_format = xstr("timetable_failed"))
+            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.set_title(WINDOW_TITLE_BASE)
+            dialog.run()
+            dialog.hide()
+            self._timetableWindow.clear()
 
     def showFlights(self, menuItem):
         """Callback for showing the flight list."""
@@ -1272,6 +1332,11 @@ class GUI(fs.ConnectionListener):
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
+
+    def _hideTimetableWindow(self, window, event):
+        """Hide the window of the timetable."""
+        self._timetableWindow.hide()
+        return True
 
     def _hideFlightsWindow(self, window, event):
         """Hide the window of the accepted flights."""

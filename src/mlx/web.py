@@ -812,6 +812,7 @@ class LoginRPC(RPCRequest):
             result.pilotID = pilotID
             result.pilotName = loginResult[0]
             result.rank = loginResult[1]
+            result.types = loginResult[2]
             result.password = password
             flights = client.getFlights()
             result.flights = flights[0]
@@ -824,6 +825,7 @@ class LoginRPC(RPCRequest):
                 result.checkFlightStatus = reply[2]
                 if reply[3]:
                     result.rank = "FO"
+
 
     def __init__(self, client, callback, pilotID, password):
         """Construct the login request with the given pilot ID and
@@ -1341,6 +1343,24 @@ class GetAcceptedFlights(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class GetTimetable(RPCRequest):
+    """Request to get the timetable."""
+    def __init__(self, client, callback, date, types):
+        """Construct the request with the given client and callback function."""
+        super(GetTimetable, self).__init__(client, callback)
+        self._date = date
+        self._types = types
+
+    def run(self):
+        """Perform the login request."""
+        result = Result()
+
+        result.flightPairs = self._client.getTimetable(self._date, self._types)
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1437,6 +1457,10 @@ class Handler(threading.Thread):
     def getAcceptedFlights(self, callback):
         """Enqueue a request to get the accepted flights."""
         self._addRequest(GetAcceptedFlights(self._rpcClient, callback))
+
+    def getTimetable(self, callback, date, types):
+        """Enqueue a request to get the timetable."""
+        self._addRequest(GetTimetable(self._rpcClient, callback, date, types))
 
     def run(self):
         """Process the requests."""

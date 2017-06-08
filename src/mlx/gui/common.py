@@ -106,6 +106,8 @@ if not pygobject:
 
     SELECTION_MULTIPLE = gtk.SELECTION_MULTIPLE
 
+    WINDOW_POPUP = gtk.WINDOW_POPUP
+
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
     def text2unicode(text):
@@ -545,6 +547,32 @@ aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
                   _const.AIRCRAFT_T154  : xstr("aircraft_t154"),
                   _const.AIRCRAFT_YK40  : xstr("aircraft_yk40"),
                   _const.AIRCRAFT_B462  : xstr("aircraft_b462") }
+
+#------------------------------------------------------------------------------
+
+aircraftFamilyNames = {
+    _const.AIRCRAFT_FAMILY_B737NG: xstr("aircraft_family_b737ng"),
+
+    _const.AIRCRAFT_FAMILY_B737CL: xstr("aircraft_family_b737cl"),
+
+    _const.AIRCRAFT_FAMILY_DH8D: xstr("aircraft_family_dh8d"),
+
+    _const.AIRCRAFT_FAMILY_B767: xstr("aircraft_family_b767"),
+
+    _const.AIRCRAFT_FAMILY_CRJ2: xstr("aircraft_family_crj2"),
+
+    _const.AIRCRAFT_FAMILY_F70: xstr("aircraft_family_f70"),
+
+    _const.AIRCRAFT_FAMILY_DC3: xstr("aircraft_family_dc3"),
+
+    _const.AIRCRAFT_FAMILY_T134: xstr("aircraft_family_t134"),
+
+    _const.AIRCRAFT_FAMILY_T154: xstr("aircraft_family_t154"),
+
+    _const.AIRCRAFT_FAMILY_YK40: xstr("aircraft_family_yk40"),
+
+    _const.AIRCRAFT_FAMILY_B462: xstr("aircraft_family_b462")
+}
 
 #------------------------------------------------------------------------------
 

@@ -41,8 +41,14 @@ class ColumnDescriptor(object):
         """Get a new column object for a tree view.
 
         @param index is the 0-based index of the column."""
-        column = gtk.TreeViewColumn(self._heading, self._renderer,
-                                    text = index)
+        if isinstance(self._renderer, gtk.CellRendererText):
+            column = gtk.TreeViewColumn(self._heading, self._renderer,
+                                        text = index)
+        elif isinstance(self._renderer, gtk.CellRendererToggle):
+            column = gtk.TreeViewColumn(self._heading, self._renderer,
+                                        active = index)
+        else:
+            column = gtk.TreeViewColumn(self._heading, self._renderer)
         column.set_expand(True)
         if self._sortable:
             column.set_sort_column_id(index)
