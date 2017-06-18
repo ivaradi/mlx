@@ -491,6 +491,13 @@ class FlightSelectionPage(Page):
 
         flightButtonWidthBox.pack_start(self._printButton, True, True, 4)
 
+        self._deleteButton = gtk.Button(xstr("flightsel_delete"))
+        self._deleteButton.set_use_underline(True)
+        self._deleteButton.set_sensitive(False)
+        self._deleteButton.set_tooltip_text(xstr("flightsel_delete_tooltip"))
+        self._deleteButton.connect("clicked", self._deleteClicked)
+
+        flightButtonWidthBox.pack_start(self._deleteButton, True, True, 4)
 
         flightButtonWidthAlignment.add(flightButtonWidthBox)
         flightButtonBox.pack_start(flightButtonWidthAlignment, False, False, 0)
@@ -647,6 +654,10 @@ class FlightSelectionPage(Page):
 
     def _printClicked(self, button):
         """Called when the Print briefing button is clicked."""
+        self._printSelected()
+
+    def _printSelected(self):
+        """Print the briefing for the selected flight."""
         wizard = self._wizard
         flight = self._getSelectedFlight()
 
@@ -842,6 +853,42 @@ class FlightSelectionPage(Page):
         cr.line_to(valueX - 5 * scale, y - 2 * scale)
         cr.stroke()
 
+    def _deleteClicked(self, button):
+        """Called when the Delete flight button is clicked."""
+        self._deleteSelected()
+
+    def _deleteSelected(self):
+        """Delete the selected flight."""
+        if askYesNo(xstr("flightsel_delete_confirm"),
+                    parent = self._wizard.gui.mainWindow):
+            flight = self._getSelectedFlight()
+            gui = self._wizard.gui
+            gui.beginBusy(xstr("flightsel_delete_busy"))
+
+            gui.webHandler.deleteFlights(self._deleteResultCallback,
+                                         [flight.id])
+
+    def _deleteResultCallback(self, returned, result):
+        """Called when the deletion result is available."""
+        gobject.idle_add(self._handleDeleteResult, returned, result)
+
+    def _handleDeleteResult(self, returned, result):
+        """Handle the delete result."""
+        gui = self._wizard.gui
+        gui.endBusy()
+
+        if returned:
+            indexes = self._flightList.selectedIndexes
+
+            flights = [self._flights[index] for index in indexes]
+
+            self._flightList.removeFlights(indexes)
+            for index in indexes[::-1]:
+                del self._flights[index]
+        else:
+            communicationErrorDialog()
+
+
     def _refreshClicked(self, button):
         """Called when the refresh button is clicked."""
         self._wizard.reloadFlights(self._refreshCallback)
@@ -857,6 +904,7 @@ class FlightSelectionPage(Page):
         """Called when the selection is changed."""
         self._saveButton.set_sensitive(len(indexes)==1)
         self._printButton.set_sensitive(len(indexes)==1)
+        self._deleteButton.set_sensitive(len(indexes)==1)
         self._updateNextButton()
 
     def _updatePendingButton(self):
@@ -1041,6 +1089,14 @@ class FlightSelectionPage(Page):
 
         menu.append(menuItem)
 
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("flightsel_popup_delete"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupDelete)
+        menuItem.show()
+
+        menu.append(menuItem)
+
         return menu
 
     def _popupSelect(self, menuItem):
@@ -1052,6 +1108,11 @@ class FlightSelectionPage(Page):
         """Called when the Save menu item is activated in the popup menu."""
         if not self._completed:
             self._saveSelected()
+
+    def _popupDelete(self, menuItem):
+        """Called when the Delete menu item is activated in the popup menu."""
+        if not self._completed:
+            self._deleteSelected()
 
 #-----------------------------------------------------------------------------
 

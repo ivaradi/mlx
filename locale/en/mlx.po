@@ -481,6 +481,18 @@ msgstr ""
 msgid "flightsel_print_failed"
 msgstr "Printing failed"
 
+msgid "flightsel_delete"
+msgstr "_Delete flight..."
+
+msgid "flightsel_delete_tooltip"
+msgstr "Click here to delete the currently selected flight."
+
+msgid "flightsel_delete_confirm"
+msgstr "Are you sure to delete the selected flight?"
+
+msgid "flightsel_delete_busy"
+msgstr "Deleting flight..."
+
 msgid "flightsel_save_title"
 msgstr "Save a flight into a file"
 
@@ -519,6 +531,9 @@ msgstr "_Select"
 
 msgid "flightsel_popup_save"
 msgstr "S_ave..."
+
+msgid "flightsel_popup_delete"
+msgstr "_Delete..."
 
 msgid "fleet_busy"
 msgstr "Retrieving fleet..."
