@@ -286,7 +286,9 @@ class PendingFlightsFrame(gtk.Frame):
         self._flights = []
         self._flightList = FlightList(columnDescriptors =
                                       PendingFlightsFrame.columnDescriptors,
-                                      widthRequest = 500, multiSelection = True)
+                                      widthRequest = 500, multiSelection = True,
+                                      popupMenuProducer =
+                                      self._producePopupMenu)
         self._flightList.connect("selection-changed", self._selectionChanged)
 
         hbox.pack_start(self._flightList, True, True, 4)
@@ -297,16 +299,19 @@ class PendingFlightsFrame(gtk.Frame):
                                            ("edit" if pirepEditable else
                                             "view") + "_" + which))
         self._editButton.set_sensitive(False)
+        self._editButton.set_use_underline(True)
         self._editButton.connect("clicked", self._editClicked)
         buttonBox.pack_start(self._editButton, False, False, 2)
 
         self._reflyButton = gtk.Button(xstr("pendflt_refly_" + which))
         self._reflyButton.set_sensitive(False)
+        self._reflyButton.set_use_underline(True)
         self._reflyButton.connect("clicked", self._reflyClicked)
         buttonBox.pack_start(self._reflyButton, False, False, 2)
 
         self._deleteButton = gtk.Button(xstr("pendflt_delete_" + which))
         self._deleteButton.set_sensitive(False)
+        self._deleteButton.set_use_underline(True)
         self._deleteButton.connect("clicked", self._deleteClicked)
         buttonBox.pack_start(self._deleteButton, False, False, 2)
 
@@ -338,6 +343,10 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _editClicked(self, button):
         """Called when the Edit button is clicked."""
+        self._editSelected()
+
+    def _editSelected(self):
+        """Edit or view the selected flight."""
         gui = self._wizard.gui
         gui.beginBusy(xstr("pendflt_pirep_busy"))
         self.set_sensitive(False)
@@ -367,6 +376,10 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _reflyClicked(self, button):
         """Called when the Refly button is clicked."""
+        self._reflySelected()
+
+    def _reflySelected(self):
+        """Mark the selected flight(s) to refly."""
         if askYesNo(xstr("pendflt_refly_question"), parent = self._window):
             gui = self._wizard.gui
             gui.beginBusy(xstr("pendflt_refly_busy"))
@@ -406,6 +419,10 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _deleteClicked(self, button):
         """Called when the Delete button is clicked."""
+        self._deleteSelected()
+
+    def _deleteSelected(self):
+        """Delete the selected flight."""
         if askYesNo(xstr("flight_delete_question"), parent = self._window):
             gui = self._wizard.gui
             gui.beginBusy(xstr("pendflt_refly_busy"))
@@ -442,6 +459,51 @@ class PendingFlightsFrame(gtk.Frame):
             self._window.checkFlights()
         else:
             communicationErrorDialog()
+
+    def _producePopupMenu(self):
+        """Create the popup menu for the flights."""
+        menu = gtk.Menu()
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("pendflt_" +
+                                ("edit" if self._pirepEditable else "view") +
+                                "_" + self._which))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupEdit)
+        menuItem.show()
+
+        menu.append(menuItem)
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("pendflt_refly_" + self._which))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupRefly)
+        menuItem.show()
+
+        menu.append(menuItem)
+
+        menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("pendflt_delete_" + self._which))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupDelete)
+        menuItem.show()
+
+        menu.append(menuItem)
+
+        return menu
+
+    def _popupEdit(self, menuitem):
+        """Called when the Edit or View menu item is selected from the popup
+        menu."""
+        self._editSelected()
+
+    def _popupRefly(self, menuitem):
+        """Called when the Refly menu item is selected from the popup menu."""
+        self._reflySelected()
+
+    def _popupDelete(self, menuitem):
+        """Called when the Delete menu item is selected from the popup menu."""
+        self._deleteSelected()
 
 #-----------------------------------------------------------------------------
 
