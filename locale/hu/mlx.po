@@ -471,6 +471,16 @@ msgstr ""
 "Kattints ide az éppen kiválasztott járatnak fájlba mentéséhez. "
 "A fájl később visszatölthető, és így a járat offline is teljesíthető lesz."
 
+msgid "flightsel_print"
+msgstr "_Eligazítás nyomtatása..."
+
+msgid "flightsel_print_tooltip"
+msgstr ""
+"Kattints ide az éppen kiválasztott járat eligazításának a kinyomtatásához."
+
+msgid "flightsel_print_failed"
+msgstr "A nyomtatás nem sikerült"
+
 msgid "flightsel_save_title"
 msgstr "Járat mentése fájlba"
 

@@ -464,12 +464,22 @@ msgstr "Click here to review the list of the flights you have "
 "reported, but are either not reviewed yet or have been rejected."
 
 msgid "flightsel_save"
-msgstr "_Save flight"
+msgstr "_Save flight..."
 
 msgid "flightsel_save_tooltip"
 msgstr ""
 "Click here to save the currently selected flight into a "
 "file that can be loaded later."
+
+msgid "flightsel_print"
+msgstr "Print _briefing..."
+
+msgid "flightsel_print_tooltip"
+msgstr ""
+"Click here to print the briefing for the currently selected flight."
+
+msgid "flightsel_print_failed"
+msgstr "Printing failed"
 
 msgid "flightsel_save_title"
 msgstr "Save a flight into a file"

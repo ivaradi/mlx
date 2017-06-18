@@ -636,7 +636,7 @@ def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
 
 #------------------------------------------------------------------------------
 
-def errroDialog(message, parent = None, secondary = None,
+def errorDialog(message, parent = None, secondary = None,
                 title = WINDOW_TITLE_BASE):
     """Display an error dialog box with the given message."""
     dialog = gtk.MessageDialog(parent = parent,
@@ -654,7 +654,7 @@ def errroDialog(message, parent = None, secondary = None,
 
 def communicationErrorDialog(parent = None, title = WINDOW_TITLE_BASE):
     """Display a communication error dialog."""
-    errroDialog(xstr("error_communication"), parent = parent,
+    errorDialog(xstr("error_communication"), parent = parent,
                 secondary = xstr("error_communication_secondary"),
                 title = title)
 

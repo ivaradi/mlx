@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 
 from mlx.gui.common import *
 import mlx.gui.cef as cef
@@ -470,17 +471,29 @@ class FlightSelectionPage(Page):
         alignment.set_size_request(150, 0)
         flightButtonBox.pack_start(alignment, False, False, 0)
 
-        saveButtonAlignment = gtk.Alignment(xscale=0.5, yscale=0.0,
-                                            xalign=0.0, yalign=0.0)
+        flightButtonWidthAlignment = gtk.Alignment(xscale=0.5, yscale=0.0,
+                                                   xalign=0.0, yalign=0.0)
+        flightButtonWidthBox = gtk.VBox()
+
         self._saveButton = gtk.Button(xstr("flightsel_save"))
         self._saveButton.set_use_underline(True)
         self._saveButton.set_sensitive(False)
         self._saveButton.set_tooltip_text(xstr("flightsel_save_tooltip"))
         self._saveButton.connect("clicked", self._saveClicked)
 
-        saveButtonAlignment.add(self._saveButton)
+        flightButtonWidthBox.pack_start(self._saveButton, True, True, 4)
 
-        flightButtonBox.pack_start(saveButtonAlignment, False, False, 4)
+        self._printButton = gtk.Button(xstr("flightsel_print"))
+        self._printButton.set_use_underline(True)
+        self._printButton.set_sensitive(False)
+        self._printButton.set_tooltip_text(xstr("flightsel_print_tooltip"))
+        self._printButton.connect("clicked", self._printClicked)
+
+        flightButtonWidthBox.pack_start(self._printButton, True, True, 4)
+
+
+        flightButtonWidthAlignment.add(flightButtonWidthBox)
+        flightButtonBox.pack_start(flightButtonWidthAlignment, False, False, 0)
 
         mainBox.pack_start(flightButtonBox, True, True, 0)
 
@@ -513,6 +526,8 @@ class FlightSelectionPage(Page):
         self._pendingFlightsWindowShown = False
         self._pendingFlightsWindow.connect("delete-event",
                                            self._deletePendingFlightsWindow)
+
+        self._printSettings = None
 
     def activate(self):
         """Fill the flight list."""
@@ -630,6 +645,203 @@ class FlightSelectionPage(Page):
                 dialog.run()
                 dialog.hide()
 
+    def _printClicked(self, button):
+        """Called when the Print briefing button is clicked."""
+        wizard = self._wizard
+        flight = self._getSelectedFlight()
+
+        printOperation = gtk.PrintOperation()
+        if self._printSettings is not None:
+            printOperation.set_print_settings(self._printSettings)
+
+        printOperation.set_n_pages(1)
+        printOperation.set_show_progress(True)
+        printOperation.connect("draw_page", self._drawBriefing)
+
+        name = "MAVA Briefing %s %s %s" % (wizard.loginResult.pilotID,
+                                           flight.callsign,
+                                           flight.departureTime.strftime("%Y-%m-%d %H:%M"))
+        printOperation.set_job_name(name)
+        printOperation.set_export_filename(name)
+        printOperation.set_use_full_page(False)
+
+        result = printOperation.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG,
+                                    wizard.gui.mainWindow)
+
+        if result == gtk.PRINT_OPERATION_RESULT_APPLY:
+            self._printSettings = printOperation.get_print_settings()
+        elif result == gtk.PRINT_OPERATION_RESULT_ERROR:
+            errorDialog(xstr("flightsel_print_failed",
+                             wizard.gui.mainWindow,
+                             secondary = printOperation.get_error()))
+
+    def _drawBriefing(self, printOperation, context, pageNumber):
+        """Draw the briefing."""
+        wizard = self._wizard
+        loginResult = wizard.loginResult
+        flight=self._getSelectedFlight()
+
+        print "DPI", context.get_dpi_x(), context.get_dpi_y()
+
+        scale = context.get_dpi_x() / 72.0
+
+        cr = context.get_cairo_context()
+        cr.set_antialias(cairo.ANTIALIAS_GRAY)
+
+        cr.set_source_rgb(0.0, 0.0, 0.0)
+        cr.set_line_width(2.0 * scale)
+        cr.rectangle(0, 0, context.get_width(), context.get_height())
+        cr.stroke()
+
+        layout = cr.create_layout()
+        layout.set_text(u"Malév VA official briefing")
+        font = pango.FontDescription("sans")
+        font.set_size(int(32 * scale * pango.SCALE))
+        font.set_weight(pango.WEIGHT_NORMAL)
+        layout.set_font_description(font)
+
+        (_ink, (x0, y0, x1, y1)) = layout.get_extents()
+        width = float(x1 + 1 - x0) / pango.SCALE
+
+        y = 25 * scale
+
+        cr.move_to((context.get_width() - width)/2.0, y)
+        cr.set_line_width(0.1 * scale)
+        cr.layout_path(layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += float(y1 + 1 - y0) / pango.SCALE
+        y += 6 * scale
+
+        layout = cr.create_layout()
+        layout.set_text(u"%s (%s) részére" %
+                        (loginResult.pilotName, loginResult.pilotID))
+        font = pango.FontDescription("sans")
+        font.set_size(int(16 * scale * pango.SCALE))
+        font.set_weight(450)
+        layout.set_font_description(font)
+        (_ink, (x0, y0, x1, y1)) = layout.get_extents()
+        width = float(x1 + 1 - x0) / pango.SCALE
+
+        cr.move_to((context.get_width() - width)/2.0, y)
+        cr.set_line_width(0.1 * scale)
+        cr.layout_path(layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += float(y1 + 1 - y0) / pango.SCALE
+        y += 4 * scale
+
+        cr.move_to(0, y)
+        cr.line_to(context.get_width(), y)
+        cr.set_line_width(1.0 * scale)
+        cr.stroke()
+
+        y += 20 * scale
+
+        font = pango.FontDescription("sans")
+        font.set_size(int(7 * scale * pango.SCALE))
+        font.set_weight(150)
+
+        table = []
+        table.append(("Flight", flight.callsign))
+        table.append(("Date", flight.date))
+        table.append(("Aircraft",
+                      aircraftNames[flight.aircraftType] + ", Lajstrom: " +
+                      flight.tailNumber))
+        table.append(("DOW",
+                      str(acft.getClass(flight.aircraftType).dow) + " kgs"))
+        table.append(("From", flight.departureICAO))
+        table.append(("To", flight.arrivalICAO))
+        table.append(("ETD (UTC)", flight.departureTime.strftime("%H:%M:%S")))
+        table.append(("ETA (UTC)", flight.arrivalTime.strftime("%H:%M:%S")))
+        table.append(("Crew", str(flight.numCrew)))
+        table.append(("Pass", str(flight.numPassengers)))
+        table.append(("Bag", str(flight.bagWeight)))
+        table.append(("Mail", str(flight.mailWeight)))
+        table.append(("Route", flight.route))
+
+        tableY = y
+        tableX = 15 * scale
+        labelFill = 5 * scale
+        labelValueFill = 25 * scale
+        valueFill = 5 * scale
+        labelX = tableX + labelFill
+        tableWidth = context.get_width() * 55 / 100 - tableX
+
+        labelLayouts = []
+        maxLabelWidth = 0
+        totalHeight = 0
+        for (label, value) in table:
+            labelLayout = cr.create_layout()
+            labelLayout.set_text(label)
+            labelLayout.set_font_description(font)
+
+            (_ink, (x0, y0, x1, y1)) = labelLayout.get_extents()
+            maxLabelWidth = max(maxLabelWidth, x1 + 1 - x0)
+            labelHeight = y1 + 1 - y0
+
+            valueLayout = cr.create_layout()
+            valueLayout.set_text(value)
+            valueLayout.set_font_description(font)
+
+            labelLayouts.append((labelLayout, valueLayout, labelHeight))
+
+        maxLabelWidth = maxLabelWidth / pango.SCALE
+
+        valueX = labelX + labelValueFill + maxLabelWidth
+
+        layouts = []
+        valueWidth = tableWidth - \
+            (labelFill + maxLabelWidth + labelValueFill + valueFill)
+        for (labelLayout, valueLayout, labelHeight) in labelLayouts:
+            valueLayout.set_width(int(valueWidth * pango.SCALE))
+
+            (_ink, (x0, y0, x1, y1)) = valueLayout.get_extents()
+            valueHeight = y1 + 1 - y0
+
+            height = float(max(labelHeight, valueHeight))/pango.SCALE
+            layouts.append((labelLayout, valueLayout, height))
+
+        rowIndex = 0
+        for (labelLayout, valueLayout, height) in layouts:
+            if (rowIndex%2)==0:
+                cr.set_source_rgb(0.85, 0.85, 0.85)
+            else:
+                cr.set_source_rgb(0.9, 0.9, 0.9)
+
+            cr.rectangle(tableX, y-2*scale, tableWidth, height + 4 * scale)
+            cr.fill()
+
+            cr.set_source_rgb(0.0, 0.0, 0.0)
+
+            cr.move_to(labelX, y)
+            cr.set_line_width(0.1)
+            cr.layout_path(labelLayout)
+            cr.stroke_preserve()
+            cr.fill()
+
+            cr.move_to(valueX, y)
+            cr.set_line_width(0.1)
+            cr.layout_path(valueLayout)
+            cr.stroke_preserve()
+            cr.fill()
+
+            y += height
+            y += 4 * scale
+
+            rowIndex += 1
+
+        cr.set_source_rgb(0.0, 0.0, 0.0)
+        cr.set_line_width(1.0 * scale)
+        cr.rectangle(tableX, tableY - 2 * scale, tableWidth, y - tableY)
+        cr.stroke()
+
+        cr.move_to(valueX - 5 * scale, tableY - 2 * scale)
+        cr.line_to(valueX - 5 * scale, y - 2 * scale)
+        cr.stroke()
+
     def _refreshClicked(self, button):
         """Called when the refresh button is clicked."""
         self._wizard.reloadFlights(self._refreshCallback)
@@ -644,6 +856,7 @@ class FlightSelectionPage(Page):
     def _selectionChanged(self, flightList, indexes):
         """Called when the selection is changed."""
         self._saveButton.set_sensitive(len(indexes)==1)
+        self._printButton.set_sensitive(len(indexes)==1)
         self._updateNextButton()
 
     def _updatePendingButton(self):
