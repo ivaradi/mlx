@@ -29,6 +29,11 @@ class ColumnDescriptor(object):
         self._cellDataFn = cellDataFn
 
     @property
+    def attribute(self):
+        """Get the attribute the column belongs to."""
+        return self._attribute
+
+    @property
     def defaultSortable(self):
         """Determine if this column is the default sortable one."""
         return self._defaultSortable

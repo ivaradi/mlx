@@ -96,6 +96,9 @@ class GUI(fs.ConnectionListener):
         self._credentialsUserName = None
         self._credentialsPassword = None
 
+        self._bookFlightsUserCallback = None
+        self._bookFlightsBusyCallback = None
+
         self.webHandler = web.Handler(config, self._getCredentialsCallback)
         self.webHandler.start()
 
@@ -556,6 +559,39 @@ class GUI(fs.ConnectionListener):
         """Enable the flight info tab."""
         self._flightInfo.enable(aircraftType)
 
+    def bookFlights(self, callback, flightIDs, date, tailNumber,
+                    busyCallback = None):
+        """Initiate the booking of flights with the given timetable IDs and
+        other data"""
+        self._bookFlightsUserCallback = callback
+        self._bookFlightsBusyCallback = busyCallback
+
+        self.beginBusy(xstr("bookflights_busy"))
+        if busyCallback is not None:
+            busyCallback(True)
+
+        self.webHandler.bookFlights(self._bookFlightsCallback,
+                                    flightIDs, date, tailNumber)
+
+    def _bookFlightsCallback(self, returned, result):
+        """Called when the booking of flights has finished."""
+        gobject.idle_add(self._handleBookFlightsResult, returned, result)
+
+    def _handleBookFlightsResult(self, returned, result):
+        """Called when the booking of flights is done.
+
+        If it was successful, the booked flights are added to the list of the
+        flight selector."""
+        if self._bookFlightsBusyCallback is not None:
+            self._bookFlightsBusyCallback(False)
+        self.endBusy()
+
+        if returned:
+            for bookedFlight in result.bookedFlights:
+                self._wizard.addFlight(bookedFlight)
+
+        self._bookFlightsUserCallback(returned, result)
+
     def cancelFlight(self):
         """Cancel the current file, if the user confirms it."""
         dialog = gtk.MessageDialog(parent = self._mainWindow,
@@ -852,13 +888,16 @@ class GUI(fs.ConnectionListener):
         """Get the fleet asynchronously."""
         gobject.idle_add(self.getFleet, callback, force)
 
-    def getFleet(self, callback = None, force = False):
+    def getFleet(self, callback = None, force = False, busyCallback = None):
         """Get the fleet.
 
         If force is False, and we already have a fleet retrieved,
         that one will be used."""
         if self._fleet is None or force:
             self._fleetCallback = callback
+            self._fleetBusyCallback = busyCallback
+            if busyCallback is not None:
+                busyCallback(True)
             self.beginBusy(xstr("fleet_busy"))
             self.webHandler.getFleet(self._fleetResultCallback)
         else:
@@ -895,6 +934,8 @@ class GUI(fs.ConnectionListener):
     def _handleFleetResult(self, returned, result):
         """Handle the fleet result."""
         self.endBusy()
+        if self._fleetBusyCallback is not None:
+            self._fleetBusyCallback(False)
         if returned:
             self._fleet = result.fleet
         else:
@@ -910,6 +951,7 @@ class GUI(fs.ConnectionListener):
 
         callback = self._fleetCallback
         self._fleetCallback = None
+        self._fleetBusyCallback = None
         if  callback is not None:
             callback(self._fleet)
         self._fleetGateStatus.handleFleet(self._fleet)

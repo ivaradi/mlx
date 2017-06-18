@@ -65,14 +65,24 @@ class ScheduledFlight(RPCObject):
         "departureTime": lambda value: ScheduledFlight._decodeTime(value),
         "arrivalTime": lambda value: ScheduledFlight._decodeTime(value),
         "duration": lambda value: ScheduledFlight._decodeDuration(value),
-        "type": int,
-        "spec": int
+        "spec": int,
+        "validFrom": lambda value: ScheduledFlight._decodeDate(value),
+        "validTo": lambda value: ScheduledFlight._decodeDate(value),
+        "date": lambda value: ScheduledFlight._decodeDate(value)
         }
 
     @staticmethod
     def _decodeTime(value):
         """Decode the given value as a time value."""
         return datetime.datetime.strptime(value, "%H:%M:%S").time()
+
+    @staticmethod
+    def _decodeDate(value):
+        """Decode the given value as a date value."""
+        if not value or value=="0000-00-00":
+            return const.defaultDate
+        else:
+            return datetime.datetime.strptime(value, "%Y-%m-%d").date()
 
     @staticmethod
     def _decodeDuration(value):
@@ -89,12 +99,29 @@ class ScheduledFlight(RPCObject):
         self.aircraftType = self.typeCode
         del self.typeCode
 
+        self.type = ScheduledFlight.TYPE_VIP if self.spec==1 \
+          else ScheduledFlight.TYPE_NORMAL
+        del self.spec
+
+    def compareBy(self, other, name):
+        """Compare this flight with the other one according to the given
+        attribute name."""
+        if name=="callsign":
+            try:
+                cs1 = int(self.callsign[2:])
+                cs2 = int(other.callsign[2:])
+                return cmp(cs1, cs2)
+            except:
+                return cmp(self.callsign, other.callsign)
+        else:
+            return cmp(getattr(self, name), getattr(other, name))
+
     def __repr__(self):
         return "ScheduledFlight<%d, %d, %s, %s (%s) - %s (%s) -> %d, %d>" % \
           (self.id, self.pairID, BookedFlight.TYPE2TYPECODE[self.aircraftType],
            self.departureICAO, str(self.departureTime),
            self.arrivalICAO, str(self.arrivalTime),
-           self.duration, self.spec)
+           self.duration, self.type)
 
 #---------------------------------------------------------------------------------------
 
@@ -103,28 +130,43 @@ class ScheduledFlightPair(object):
 
     Occasionally, one of the flights may be missing."""
     @staticmethod
-    def scheduledFlights2Pairs(scheduledFlights):
+    def scheduledFlights2Pairs(scheduledFlights, date):
         """Convert the given list of scheduled flights into a list of flight
         pairs."""
+        weekday = str(date.weekday()+1)
+
         flights = {}
+        weekdayFlights = {}
         for flight in scheduledFlights:
             flights[flight.id] = flight
+            if (flight.type==ScheduledFlight.TYPE_NORMAL and
+                flight.arrivalICAO!="LHBP" and weekday in flight.days and
+                flight.validFrom<=date and flight.validTo>=date) or \
+               flight.type==ScheduledFlight.TYPE_VIP:
+                weekdayFlights[flight.id] = flight
 
         flightPairs = []
 
-        while flights:
-            (id, flight) = flights.popitem()
-            pairID = flight.pairID
-            if pairID in flights:
-                pairFlight = flights[pairID]
-                if flight.departureICAO=="LHBP" or \
-                  (pairFlight.departureICAO!="LHBP" and id<pairID):
-                    flightPairs.append(ScheduledFlightPair(flight, pairFlight))
-                else:
-                    flightPairs.append(ScheduledFlightPair(pairFlight, flight))
-                del flights[pairID]
-            else:
+        while weekdayFlights:
+            (id, flight) = weekdayFlights.popitem()
+            if flight.type==ScheduledFlight.TYPE_NORMAL:
+                pairID = flight.pairID
+                if pairID in flights:
+                    pairFlight = flights[pairID]
+                    if flight.departureICAO=="LHBP" or \
+                      (pairFlight.departureICAO!="LHBP" and
+                       flight.callsign<pairFlight.callsign):
+                        flightPairs.append(ScheduledFlightPair(flight, pairFlight))
+                    else:
+                        flightPairs.append(ScheduledFlightPair(pairFlight, flight))
+                    del flights[pairID]
+                    if pairID in weekdayFlights:
+                        del weekdayFlights[pairID]
+            elif flight.type==ScheduledFlight.TYPE_VIP:
                 flightPairs.append(ScheduledFlightPair(flight))
+
+        flightPairs.sort(cmp = lambda pair1, pair2:
+                         cmp(pair1.flight0.date, pair2.flight0.date))
 
         return flightPairs
 
@@ -132,6 +174,16 @@ class ScheduledFlightPair(object):
         """Construct the pair with the given flights."""
         self.flight0 = flight0
         self.flight1 = flight1
+
+    def compareBy(self, other, name):
+        """Compare this flight pair with the other one according to the given
+        attribute name, considering the first flights."""
+        return self.flight0.compareBy(other.flight0, name)
+
+    def __repr__(self):
+        return "ScheduledFlightPair<%s, %s, %s>" % \
+          (self.flight0.callsign, self.flight0.departureICAO,
+           self.flight0.arrivalICAO)
 
 #---------------------------------------------------------------------------------------
 
@@ -279,12 +331,15 @@ class Plane(rpccommon.Plane, RPCObject):
     """An airplane in the fleet."""
     _instructions = {
         "status" : lambda value: rpccommon.Plane.str2status(value),
-        "gateNumber" : lambda value: value if value else None
+        "gateNumber" : lambda value: value if value else None,
+        "typeCode": lambda value: BookedFlight._decodeAircraftType(value)
         }
 
     def __init__(self, value):
         """Construct the plane."""
         RPCObject.__init__(self, value, instructions = Plane._instructions)
+        self.aircraftType = self.typeCode
+        del self.typeCode
 
 #---------------------------------------------------------------------------------------
 
@@ -523,10 +578,21 @@ class Client(object):
         values = self._performCall(lambda sessionID:
                                    self._server.getTimetable(sessionID,
                                                              date.strftime("%Y-%m-%d"),
-                                                             date.weekday() + 1,
+                                                             date.weekday()+1,
                                                              typeCodes))
         return ScheduledFlightPair.scheduledFlights2Pairs([ScheduledFlight(value)
-                                                          for value in values])
+                                                          for value in values],
+                                                          date)
+
+    def bookFlights(self, flightIDs, date, tailNumber):
+        """Book the flights with the given IDs on the given date to be flown
+        with the plane of the given tail number."""
+        values = self._performCall(lambda sessionID:
+                                   self._server.bookFlights(sessionID,
+                                                            flightIDs,
+                                                            date.strftime("%Y-%m-%d"),
+                                                            tailNumber))
+        return [BookedFlight(value) for value in values]
 
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.

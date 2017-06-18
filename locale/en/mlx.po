@@ -138,6 +138,12 @@ msgstr "Cancel flight"
 msgid "button_save"
 msgstr "_Save"
 
+msgid "button_book"
+msgstr "_Book"
+
+msgid "button_close"
+msgstr "_Close"
+
 msgid "menu_file"
 msgstr "File"
 
@@ -2667,6 +2673,59 @@ msgstr "If selected, VIP flights will be shown."
 
 msgid "timetable_filter"
 msgstr "Filtering criteria"
+
+msgid "timetable_popup_book"
+msgstr "_Book"
+
+msgid "timetable_book_title"
+msgstr "Book flight"
+
+msgid "timetable_book_frame_title"
+msgstr "Flight details"
+
+msgid "timetable_book_callsign"
+msgstr "<b>Flight number</b>:"
+
+msgid "timetable_book_from_to"
+msgstr "<b>From - to</b>:"
+
+msgid "timetable_book_flightDate"
+msgstr "<b>Flight date</b>:"
+
+msgid "timetable_book_flightDate_tooltip"
+msgstr "You can select a different date for your flight."
+
+msgid "timetable_book_dep_arr"
+msgstr "<b>Departure - arrival</b>:"
+
+msgid "timetable_book_duration"
+msgstr "<b>Duration</b>:"
+
+msgid "timetable_book_tailNumber"
+msgstr "<b>Tail number</b>:"
+
+msgid "timetable_book_tailNumber_tooltip"
+msgstr ""
+"Select the tail number of aircraft which "
+"you would like to perform the flight with"
+
+msgid "bookflights_busy"
+msgstr "Booking flights..."
+
+msgid "bookflights_successful"
+msgstr "The booking is successful."
+
+msgid "bookflights_successful_secondary"
+msgstr "Have a nice flight!"
+
+msgid "bookflights_failed"
+msgstr "Failed to book flights."
+
+msgid "bookflights_failed_secondary"
+msgstr ""
+"The MAVA server may not work temporarily. "
+"Retry the booking some time later. "
+"If the problem persists, report a bug."
 
 msgid "error_communication"
 msgstr "Communication error"

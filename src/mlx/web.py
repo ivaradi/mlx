@@ -1361,6 +1361,27 @@ class GetTimetable(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class BookFlights(RPCRequest):
+    """Request to book flights."""
+    def __init__(self, client, callback, flightIDs, date, tailNumber):
+        """Construct the request with the given client and callback function."""
+        super(BookFlights, self).__init__(client, callback)
+        self._flightIDs = flightIDs
+        self._date = date
+        self._tailNumber = tailNumber
+
+    def run(self):
+        """Perform the login request."""
+        result = Result()
+
+        result.bookedFlights = self._client.bookFlights(self._flightIDs,
+                                                        self._date,
+                                                        self._tailNumber)
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -1461,6 +1482,11 @@ class Handler(threading.Thread):
     def getTimetable(self, callback, date, types):
         """Enqueue a request to get the timetable."""
         self._addRequest(GetTimetable(self._rpcClient, callback, date, types))
+
+    def bookFlights(self, callback, flightIDs, date, tailNumber):
+        """Enqueue a request to book some flights."""
+        self._addRequest(BookFlights(self._rpcClient, callback,
+                                     flightIDs, date, tailNumber))
 
     def run(self):
         """Process the requests."""

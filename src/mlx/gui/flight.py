@@ -527,7 +527,7 @@ class FlightSelectionPage(Page):
         loginResult = self._wizard.loginResult
         if self._wizard.loggedIn:
             for flight in loginResult.flights:
-                self._addFlight(flight)
+                self.addFlight(flight)
             for flight in loginResult.reportedFlights:
                 self._pendingFlightsWindow.addReportedFlight(flight)
             for flight in loginResult.rejectedFlights:
@@ -535,14 +535,14 @@ class FlightSelectionPage(Page):
 
         self._updatePendingButton()
 
-    def _addFlight(self, flight):
+    def addFlight(self, flight):
         """Add the given file to the list of flights."""
         self._flights.append(flight)
         self._flightList.addFlight(flight)
 
     def _reflyFlight(self, flight):
         """Refly the given flight."""
-        self._addFlight(flight)
+        self.addFlight(flight)
         self._updatePending()
 
     def _updatePending(self):
@@ -640,7 +640,7 @@ class FlightSelectionPage(Page):
             try:
                 with open(fileName, "rt") as f:
                     bookedFlight.readFromFile(f)
-                self._addFlight(bookedFlight)
+                self.addFlight(bookedFlight)
             except Exception, e:
                 print "Failed to load flight:", util.utf2unicode(str(e))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
@@ -5478,6 +5478,10 @@ class Wizard(gtk.VBox):
     def reloadFlights(self, callback):
         """Reload the flights from the MAVA server."""
         self.login(callback, None, None)
+
+    def addFlight(self, bookedFlight):
+        """Add the given booked flight to the flight selection page."""
+        self._flightSelectionPage.addFlight(bookedFlight)
 
     def reflyFlight(self, bookedFlight):
         """Add the given booked flight to the flight selection page."""

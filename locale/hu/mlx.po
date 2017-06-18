@@ -138,6 +138,12 @@ msgstr "Járat megszakítása"
 msgid "button_save"
 msgstr "_Mentés"
 
+msgid "button_book"
+msgstr "_Foglalás"
+
+msgid "button_close"
+msgstr "_Bezár"
+
 msgid "menu_file"
 msgstr "Fájl"
 
@@ -2684,6 +2690,59 @@ msgstr "Ha kijelölöd, a VIP járatok szerepelnek a listában."
 
 msgid "timetable_filter"
 msgstr "Szűrési feltételek"
+
+msgid "timetable_popup_book"
+msgstr "_Fogalás"
+
+msgid "timetable_book_title"
+msgstr "Járat lefoglalása"
+
+msgid "timetable_book_frame_title"
+msgstr "A járat részletei"
+
+msgid "timetable_book_callsign"
+msgstr "<b>Járatszám</b>:"
+
+msgid "timetable_book_flightDate"
+msgstr "<b>Dátum</b>:"
+
+msgid "timetable_book_flightDate_tooltip"
+msgstr "A megadottól eltérő dátumot is választhatsz."
+
+msgid "timetable_book_from_to"
+msgstr "<b>Honnan - hová</b>:"
+
+msgid "timetable_book_dep_arr"
+msgstr "<b>Érkezés - indulás</b>:"
+
+msgid "timetable_book_duration"
+msgstr "<b>Duration</b>:"
+
+msgid "timetable_book_tailNumber"
+msgstr "<b>Lajstromjel</b>:"
+
+msgid "timetable_book_tailNumber_tooltip"
+msgstr ""
+"Válaszd ki annak a gépnek a lajstromjelét, "
+"amelyikkel teljesíteni szeretnéd a járatot."
+
+msgid "bookflights_busy"
+msgstr "Járat foglalása..."
+
+msgid "bookflights_successful"
+msgstr "A foglalás sikerült."
+
+msgid "bookflights_successful_secondary"
+msgstr "Jó repülést!"
+
+msgid "bookflights_failed"
+msgstr "Nem sikerült lefoglalni a járatot."
+
+msgid "bookflights_failed_secondary"
+msgstr ""
+"Lehet, hogy a MAVA szerver átmenetileg nem működik. "
+"Próbáld meg később a foglalást. "
+"Ha a hiba továbbra is fennáll, jelents be."
 
 msgid "error_communication"
 msgstr "Kommunikációs hiba"
