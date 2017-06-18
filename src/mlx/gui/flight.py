@@ -473,6 +473,10 @@ class FlightSelectionPage(Page):
 
         flightButtonWidthAlignment = gtk.Alignment(xscale=0.5, yscale=0.0,
                                                    xalign=0.0, yalign=0.0)
+        flightButtonWidthAlignment.set_padding(padding_top = 0,
+                                               padding_bottom = 0,
+                                               padding_left = 8,
+                                               padding_right = 0)
         flightButtonWidthBox = gtk.VBox()
 
         self._saveButton = gtk.Button(xstr("flightsel_save"))
