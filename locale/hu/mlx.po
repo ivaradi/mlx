@@ -457,7 +457,7 @@ msgid "flightsel_to"
 msgstr "Hová"
 
 msgid "flightsel_book"
-msgstr "_Járatfoglalás..."
+msgstr "Járatf_oglalás..."
 
 msgid "flightsel_book_tooltip"
 msgstr "Kattints ide járat(ok) foglalásához."""
@@ -478,7 +478,7 @@ msgstr ""
 "A fájl később visszatölthető, és így a járat offline is teljesíthető lesz."
 
 msgid "flightsel_print"
-msgstr "_Eligazítás nyomtatása..."
+msgstr "Eligazítás n_yomtatása..."
 
 msgid "flightsel_print_tooltip"
 msgstr ""
