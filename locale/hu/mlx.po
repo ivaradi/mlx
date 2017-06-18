@@ -535,6 +535,9 @@ msgstr "_Kiválasztás"
 msgid "flightsel_popup_save"
 msgstr "_Mentés..."
 
+msgid "flightsel_popup_print"
+msgstr "Eligazítás _nyomtatása..."
+
 msgid "flightsel_popup_delete"
 msgstr "_Törlés..."
 

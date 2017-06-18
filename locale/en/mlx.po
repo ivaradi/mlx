@@ -532,6 +532,9 @@ msgstr "_Select"
 msgid "flightsel_popup_save"
 msgstr "S_ave..."
 
+msgid "flightsel_popup_print"
+msgstr "_Print briefing..."
+
 msgid "flightsel_popup_delete"
 msgstr "_Delete..."
 

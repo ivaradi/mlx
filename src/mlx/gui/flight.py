@@ -1090,6 +1090,14 @@ class FlightSelectionPage(Page):
         menu.append(menuItem)
 
         menuItem = gtk.MenuItem()
+        menuItem.set_label(xstr("flightsel_popup_print"))
+        menuItem.set_use_underline(True)
+        menuItem.connect("activate", self._popupPrint)
+        menuItem.show()
+
+        menu.append(menuItem)
+
+        menuItem = gtk.MenuItem()
         menuItem.set_label(xstr("flightsel_popup_delete"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupDelete)
@@ -1108,6 +1116,11 @@ class FlightSelectionPage(Page):
         """Called when the Save menu item is activated in the popup menu."""
         if not self._completed:
             self._saveSelected()
+
+    def _popupPrint(self, menuItem):
+        """Called when the Print briefing menu item is activated in the popup menu."""
+        if not self._completed:
+            self._printSelected()
 
     def _popupDelete(self, menuItem):
         """Called when the Delete menu item is activated in the popup menu."""
