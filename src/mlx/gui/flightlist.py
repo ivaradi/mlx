@@ -656,6 +656,7 @@ class AcceptedFlightsWindow(gtk.Window):
                                       widthRequest = 750,
                                       multiSelection = False)
         self._flightList.connect("selection-changed", self._selectionChanged)
+        self._flightList.connect("row-activated", self._rowActivated)
 
         hbox.pack_start(self._flightList, True, True, 4)
 
@@ -712,6 +713,11 @@ class AcceptedFlightsWindow(gtk.Window):
         """Called when the selection has changed."""
         self._viewButton.set_sensitive(len(selectedIndexes)==1)
 
+    def _rowActivated(self, timetable, index):
+        """Called when a row has been activated (e.g. double-clicked) in the
+        flight list."""
+        self._viewSelected()
+
     def _refreshClicked(self, button):
         """Called when the refresh button has been clicked."""
         self.clear()
@@ -719,6 +725,10 @@ class AcceptedFlightsWindow(gtk.Window):
 
     def _viewClicked(self, button):
         """Called when the view button has been clicked."""
+        self._viewSelected()
+
+    def _viewSelected(self):
+        """View the selected flight."""
         gui = self._gui
         gui.beginBusy(xstr("pendflt_pirep_busy"))
         self.set_sensitive(False)
