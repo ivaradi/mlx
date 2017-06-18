@@ -444,23 +444,53 @@ class FlightSelectionPage(Page):
                                                   xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
+        mainBox = gtk.HBox()
+        mainBox.set_homogeneous(False)
+
+        leftVBox = gtk.VBox()
+
+        alignment = gtk.Alignment(xscale = 1.0)
+        alignment.set_size_request(150, 0)
+
+        leftVBox.pack_start(alignment, False, False, 0)
+
+        mainBox.pack_start(leftVBox, True, True, 0)
+
         self._flightList = FlightList(popupMenuProducer =
                                       self._createListPopupMenu,
                                       widthRequest = 400)
         self._flightList.connect("row-activated", self._rowActivated)
         self._flightList.connect("selection-changed", self._selectionChanged)
 
-        self.setMainWidget(self._flightList)
+        mainBox.pack_start(self._flightList, False, False, 8)
+
+        flightButtonBox = gtk.VBox()
+
+        alignment = gtk.Alignment(xscale = 1.0)
+        alignment.set_size_request(150, 0)
+        flightButtonBox.pack_start(alignment, False, False, 0)
+
+        saveButtonAlignment = gtk.Alignment(xscale=0.5, yscale=0.0,
+                                            xalign=0.0, yalign=0.0)
+        self._saveButton = gtk.Button(xstr("flightsel_save"))
+        self._saveButton.set_use_underline(True)
+        self._saveButton.set_sensitive(False)
+        self._saveButton.set_tooltip_text(xstr("flightsel_save_tooltip"))
+        self._saveButton.connect("clicked", self._saveClicked)
+
+        saveButtonAlignment.add(self._saveButton)
+
+        flightButtonBox.pack_start(saveButtonAlignment, False, False, 4)
+
+        mainBox.pack_start(flightButtonBox, True, True, 0)
+
+        self.setMainWidget(mainBox)
 
         self._pendingButton = self.addButton(xstr("flightsel_pending"),
                                              sensitive = False,
                                              clicked = self._pendingClicked,
                                              tooltip = xstr("flightsel_pending_tooltip"))
 
-        self._saveButton = self.addButton(xstr("flightsel_save"),
-                                          sensitive = False,
-                                          clicked = self._saveClicked,
-                                          tooltip = xstr("flightsel_save_tooltip"))
         self._saveDialog = None
 
         self._refreshButton = self.addButton(xstr("flightsel_refresh"),
