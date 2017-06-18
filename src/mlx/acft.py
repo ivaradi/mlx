@@ -1265,6 +1265,12 @@ _classes = { const.AIRCRAFT_B736  : B736,
 
 #---------------------------------------------------------------------------------------
 
+def getClass(aircraftType):
+    """Get the class representing the given aircraft types"""
+    return _classes[aircraftType]
+
+#---------------------------------------------------------------------------------------
+
 if __name__ == "__main__":
     value = SmoothedValue()
 
