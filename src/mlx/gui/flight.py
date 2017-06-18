@@ -510,6 +510,11 @@ class FlightSelectionPage(Page):
 
         self.setMainWidget(mainBox)
 
+        self._bookButton = self.addButton(xstr("flightsel_book"),
+                                          sensitive = True,
+                                          clicked = self._bookClicked,
+                                          tooltip = xstr("flightsel_book_tooltip"))
+
         self._pendingButton = self.addButton(xstr("flightsel_pending"),
                                              sensitive = False,
                                              clicked = self._pendingClicked,
@@ -605,6 +610,10 @@ class FlightSelectionPage(Page):
         """Update the stuff depending on the set of pending flights."""
         self._setupHelp()
         self._updatePendingButton()
+
+    def _bookClicked(self, button):
+        """Called when the Book flights button is clicked."""
+        self._wizard.gui.showTimetable()
 
     def _pendingClicked(self, button):
         """Called when the Pending flights button is clicked."""

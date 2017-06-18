@@ -456,6 +456,12 @@ msgstr "Honnan"
 msgid "flightsel_to"
 msgstr "Hová"
 
+msgid "flightsel_book"
+msgstr "_Járatfoglalás..."
+
+msgid "flightsel_book_tooltip"
+msgstr "Kattints ide járat(ok) foglalásához."""
+
 msgid "flightsel_pending"
 msgstr "Fü_ggő járatok..."
 

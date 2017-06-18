@@ -456,6 +456,12 @@ msgstr "From"
 msgid "flightsel_to"
 msgstr "To"
 
+msgid "flightsel_book"
+msgstr "_Book flights..."
+
+msgid "flightsel_book_tooltip"
+msgstr "Click here to be able to book one or more flights."""
+
 msgid "flightsel_pending"
 msgstr "_Pending flights..."
 

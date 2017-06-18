@@ -1301,7 +1301,7 @@ class GUI(fs.ConnectionListener):
         """Determine if the flight wizard is active."""
         return self._notebook.get_current_page()==0
 
-    def showTimetable(self, menuItem):
+    def showTimetable(self, menuItem = None):
         """Callback for showing the timetable."""
         if self._timetableWindow.hasFlightPairs:
             self._timetableWindow.show_all()
