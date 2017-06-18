@@ -730,9 +730,10 @@ class Boeing737(Aircraft):
 
 class B736(Boeing737):
     """Boeing 737-600 aircraft."""
+    dow = 38307
+
     def __init__(self, flight):
         super(B736, self).__init__(flight)
-        self.dow = 38307
         self.mtow = 58328
         self.mlw = 54657
         self.mzfw = 51482
@@ -746,9 +747,10 @@ class B736(Boeing737):
 
 class B737(Boeing737):
     """Boeing 737-700 aircraft."""
+    dow = 39250
+
     def __init__(self, flight):
         super(B737, self).__init__(flight)
-        self.dow = 39250
         self.mtow = 61410
         self.mlw = 58059
         self.mzfw = 54657
@@ -762,9 +764,10 @@ class B737(Boeing737):
 
 class B738(Boeing737):
     """Boeing 737-800 aircraft."""
+    dow = 42690
+
     def __init__(self, flight):
         super(B738, self).__init__(flight)
-        self.dow = 42690
         self.mtow = 71791
         self.mlw = 65317
         self.mzfw = 61688
@@ -797,9 +800,10 @@ class Boeing737CL(Boeing737):
 
 class B732(Boeing737CL):
     """Boeing 737-200 aircraft."""
+    dow = 27646
+
     def __init__(self, flight):
         super(B732, self).__init__(flight)
-        self.dow = 27646
         self.mtow = 52390
         self.mlw = 46720
         self.mzfw = 43091
@@ -810,9 +814,10 @@ class B732(Boeing737CL):
 
 class B733(Boeing737CL):
     """Boeing 737-300 aircraft."""
+    dow = 32900
+
     def __init__(self, flight):
         super(B733, self).__init__(flight)
-        self.dow = 32900
         self.mtow = 56472
         self.mlw = 51710
         self.mzfw = 47625
@@ -836,9 +841,10 @@ class B734(Boeing737CL):
 
 class B735(Boeing737CL):
     """Boeing 737-500 aircraft."""
+    dow = 31900
+
     def __init__(self, flight):
         super(B735, self).__init__(flight)
-        self.dow = 31900
         self.mtow = 62823
         self.mlw = 49895
         self.mzfw = 46720
@@ -855,10 +861,10 @@ class DH8D(Aircraft):
     - fuel: left, right
     - n1: left, right
     - reverser: left, right."""
+    dow = 18508
 
     def __init__(self, flight):
         super(DH8D, self).__init__(flight, minLandingFuel = 2000)
-        self.dow = 18508
         self.mtow = 29574
         self.mlw = 28123
         self.mzfw = 26308
@@ -904,9 +910,10 @@ class Boeing767(Aircraft):
 
 class B762(Boeing767):
     """Boeing 767-200 aircraft."""
+    dow = 84507
+
     def __init__(self, flight):
         super(B762, self).__init__(flight)
-        self.dow = 84507
         self.mtow = 159210
         self.mlw = 126098
         self.mzfw = 114758
@@ -917,9 +924,10 @@ class B762(Boeing767):
 
 class B763(Boeing767):
     """Boeing 767-300 aircraft."""
+    dow = 91311
+
     def __init__(self, flight):
         super(B763, self).__init__(flight)
-        self.dow = 91311
         self.mtow = 181436
         self.mlw = 137892
         self.mzfw = 114758
@@ -945,9 +953,10 @@ class CRJ2(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
+    dow = 14549
+
     def __init__(self, flight):
         super(CRJ2, self).__init__(flight, minLandingFuel = 1000)
-        self.dow = 14549
         self.mtow = 22995
         self.mlw = 21319
         self.mzfw = 19958
@@ -972,9 +981,10 @@ class F70(Aircraft):
     - fuel: left, centre, right
     - n1: left, right
     - reverser: left, right."""
+    dow = 24283
+
     def __init__(self, flight):
         super(F70, self).__init__(flight, minLandingFuel = 1900)
-        self.dow = 24283
         self.mtow = 38100 # FIXME: differentiate by registration number,
                           # MTOW of HA-LMF: 41955
         self.mlw = 36740
@@ -1003,9 +1013,10 @@ class DC3(Aircraft):
     - fuel: left aux, left, right, right aux
     - rpm: left, right
     - reverser: left, right."""
+    dow = 8627
+
     def __init__(self, flight):
         super(DC3, self).__init__(flight)
-        self.dow = 8627
         self.mtow = 11884
         self.mlw = 11793
         self.mzfw = 11780
@@ -1033,9 +1044,10 @@ class T134(Aircraft):
     external 2
     - n1: left, right
     - reverser: left, right."""
+    dow = 29500
+
     def __init__(self, flight):
         super(T134, self).__init__(flight, minLandingFuel = 3000)
-        self.dow = 29500
         self.mtow = 49000
         self.mlw = 43000
         self.mzfw = 38500
@@ -1088,9 +1100,10 @@ class T154(Aircraft):
     - fuel: left aux, left, centre, centre 2, right, right aux
     - n1: left, centre, right
     - reverser: left, right"""
+    dow = 29500
+
     def __init__(self, flight):
         super(T154, self).__init__(flight, minLandingFuel = 5000)
-        self.dow = 53259
         self.mtow = 98000
         self.mlw = 78000
         self.mzfw = 72000
@@ -1153,9 +1166,10 @@ class YK40(Aircraft):
     - fuel: left, right
     - n1: left, right
     - reverser: left, right"""
+    dow = 9400
+
     def __init__(self, flight):
         super(YK40, self).__init__(flight)
-        self.dow = 9400
         self.mtow = 17200
         self.mlw = 16800
         self.mzfw = 12100
@@ -1202,9 +1216,10 @@ class B462(Aircraft):
     - fuel: left, centre, right
     - n1: left outer, left inner, right inner, right outer
     - reverser: empty (the plane has no reversers)"""
+    dow = 25706
+
     def __init__(self, flight):
         super(B462, self).__init__(flight)
-        self.dow = 25706
         self.mtow = 43998
         self.mlw = 38599
         self.mzfw = 33792
