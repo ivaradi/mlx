@@ -18,8 +18,11 @@ for language in ["en", "hu"]:
     data_files.append((os.path.join("locale", language, "LC_MESSAGES"),
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
-data_files.append(("", ["logo.png",
-                        "conn_grey.png", "conn_red.png", "conn_green.png"]))
+
+rootFiles = ["logo.png", "conn_grey.png", "conn_red.png", "conn_green.png"]
+if os.name!="nt":
+    rootFiles.append("Microsoft.VC90.CRT.manifest")
+data_files.append(("", rootFiles))
 
 if os.name=="nt":
     import py2exe
@@ -28,8 +31,11 @@ if os.name=="nt":
 
     msvcrDir = os.environ["MSVCRDIR"] if "MSVCRDIR" in os.environ else None
     if msvcrDir:
-        data_files.append(("Microsoft.VC90.CRT", glob(os.path.join(msvcrDir, "*.*"))))
+        data_files.append(("Microsoft.VC90.CRT",
+                           ["Microsoft.VC90.CRT.manifest"] +
+                           glob(os.path.join(msvcrDir, "*.*"))))
         os.environ["PATH"] = os.environ["PATH"] + ";" + glob(os.path.join(msvcrDir))[0]
+
 
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
@@ -67,7 +73,6 @@ else:
             filenames = [os.path.join(dirpath, filename)
                          for filename in filenames]
             data_files.append((dirpath, filenames))
-
 
 
 long_description="""MAVA Logger X
