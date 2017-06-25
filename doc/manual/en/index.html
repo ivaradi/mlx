@@ -367,11 +367,31 @@
 
   <p>
   If you have selected a flight, you can also save it by using
-  the <b>Save flight</b> button. This is useful when planning to fly
+  the <b>Save flight...</b> button. This is useful when planning to fly
   offline at some later time. When preparing for that flight, you can
   properly log in to the MAVA server, and acquire the list of your
   booked flights. Then you can save the flight you wish to perform
   later offline, on which occasion, you can load the saved flight.
+  </p>
+
+  <p>
+  The briefing for a flight can be printed using the <b>Print briefing...</b>
+  button. The booking can be cancelled by pressing the
+  <b>Delete flight...</b> button. Saving, printing and deleting are also
+  available from the right-button menu as well.
+  </p>
+
+  <p>
+  If you have no booked flights or you do not like the ones booked,
+  you can <a href="#flightBooking">book</a> a new flight if you click
+  on the <b>Book flights...</b> button.
+  </p>
+
+  <p>
+  If you have flights reported but not yet reviewed or rejected,
+  the numbers of them are displayed at the top and the
+  <b>Pending flights...</b> is available
+  to <a href="#pendingFlights">review</a> them.
   </p>
 
   <p>
@@ -887,6 +907,122 @@
   report. It can help a lot with finding a solution to the problem.
   </p>
 
+  <h2><a name="flightBooking">Booking flights</a></h2>
+
+  <div align="center">
+    <img src="flightBooking.png" alt="The flight booking window"/>
+  </div>
+
+  <p>
+  This window can be displayed either by clicking the <b>Book flights...</b>
+  button on the <a href="#flightSelectionPage">flight selection page</a>
+  of the wizard, by selecting the <b>Tools/Book flights...</b> menu item or
+  by pressing <b>Ctrl+O</b>.
+  </p>
+
+  <p>
+  At the top, you can select the date of your flight. By default, all flights
+  available on the selected day are listed, including regular, scheduled
+  flights and VIP flights. The checkboxes at the top can be used to restrict
+  the type of the flights to be displayed.
+  </p>
+
+  <p>
+  In the frame below you can select the aircraft type(s) for which to list the
+  flights. Only those types are available for which you are rated. By default
+  all such types are enabled.
+  </p>
+
+  <p>
+  If you select a flight from the list, the <b>Book</b> button at the bottom is
+  highlighted. By clicking it or by double clicking on the flight, you can
+  initiate booking it. For regular flights the following dialog box is
+  displayed:
+  </p>
+
+  <div align="center">
+    <img src="flightBookingRegular.png"
+         alt="The flight booking window for regular flights"/>
+  </div>
+
+  <p>
+  As regular flights are actually two flights, one outbound, one inbound, some
+  data for both are displayed. You can also select which aircraft you would
+  like to fly with from the fleet, though one is randomly offered as a default.
+  </p>
+
+  <p>
+  The dialog for VIP flights is slightly different:
+  </p>
+
+  <div align="center">
+    <img src="flightBookingVIP.png"
+         alt="The flight booking window for VIP flights"/>
+  </div>
+
+  <p>
+  VIP flights are considered one-way flights, even if there is a series of
+  them. They also have an intended date on which to fly them, but the dialog
+  allows you to select the actual date. As for regular flights, you can
+  also select the plane to use.
+  </p>
+
+  <p>
+  When you confirm the booking by pressing the <b>Book</b> button, the new
+  flight(s) appear in the flight list and can be flown.
+  </p>
+
+  <h2><a name="pendingFlights">Pending flights</a></h2>
+
+  <div align="center">
+    <img src="pendingFlights.png" alt="Pending flights"/>
+  </div>
+
+  <p>
+  This window contains two lists. The top one contains the flights you have
+  performed and reported, but have not yet been reviewed. If you select a
+  flight from this list, you can edit the corresponding PIREP using the
+  <b>Edit...</b> button. The PIREP editor dialog is similar to the
+  <a href="#pirepViewer">PIREP viewer dialog</a>, but you can modify certain
+  data. If the modifications are ready, click the <b>Save</b> to store
+  your changes in the server.
+  </p>
+
+  <p>
+  To perform a flight again, press the <b>Refly</b>, to delete it,
+  press <b>Delete</b>. These buttons are also available when you select more
+  than one flights, in which case, the operation will affect all selected
+  flights.
+  <p>
+
+  <p>
+  The list at the bottom consists of the flights that have been reviewed and
+  rejected by the reviewer. The <b>View...</b> button displays the
+  <a href="#pirepViewer">PIREP Viewer</a> for the flight, with a new
+  tab <i>Message</i>, containing the reviewer's message, if any.
+  </p>
+
+  <p>
+  The <b>Refly</b> and <b>Delete</b> buttons work here too.
+  </p>
+
+  <h2><a name="acceptedFlights">Accepted fligts</a></h2>
+
+  <p>
+  By selecting the <b>Tools/Accepted flights...</b> menu item, you can
+  display a list of the flights you have performed and have been accepted:
+  </p>
+
+  <div align="center">
+    <img src="acceptedFlights.png" alt="Accepted flights"/>
+  </div>
+
+  <p>
+  Selecting a flight and clicking <b>View</b> displays the
+  <a href="#pirepViewer">PIREP Viewer</a> dialog for the given flight with the
+  <i>Message</i> tab optionally containing the reviewer's message.
+  </p>
+
   <h2><a name="loadingPIREPs">Loading PIREPs</a></h2>
 
   <p>
@@ -921,9 +1057,9 @@
   user. The <i>Log</i> tab contains the flight log.
   </p>
 
-  <div align="center">
+  <a name="pirepViewer"><div align="center">
     <img src="pirepViewer.png" alt="The PIREP Viewer"/>
-  </div>
+  </div></a>
 
   <h2><a name="checklistEditor">Editing checklists</a></h2>
 

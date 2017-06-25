@@ -364,12 +364,32 @@
 
   <p>
   Ha a listából kijelölünk egy járatot, akkor azt a <b>Járat
-  mentése</b> gombbal elmenthetjük. Ez akkor lehet hasznos, ha egy
+  mentése...</b> gombbal elmenthetjük. Ez akkor lehet hasznos, ha egy
   későbbi időpontban, offline szeretnénk repülni. A repülés
   előkészítése során a loggerrel bejelentkezhetünk a MAVA szerverére
   és lekérhetjük a foglalt járatok listáját. Ezután a később offline
   végrehajtani kívánt járatot elmenthetjük, majd a tényleges
   végrehajtáskor visszatölthetjük.
+  </p>
+
+  <p>
+  A kiválasztot járatra vonatkozó eligazítás kinyomtatható az
+  <b>Eligazítás nyomtatása...</b> gomb segítéségvel. A járat foglalása
+  lemondható a <b>Járat törlése...</b> gombbal. A mentés, a nyomtatás és
+  a törlés a jobb-gombos menüből is elvégezhető.
+  </p>
+
+  <p>
+  Ha nincs foglalt járatunk, vagy a meglévők egyike sem tetszik,
+  új járatot lehet <a href="#flightBooking">foglalni</a> a
+  <b>Járatfoglalás...</b> gomb alkalmazásával.
+  </p>
+
+  <p>
+  Ha van olyan járatunk, amelyet már jelentettünk, de még nem
+  javították ki vagy pedig visszautasította a javító, akkor azok száma
+  az oldal tetején megfelenik és a <b>Függő járatok...</b> gombra
+  kattintva <a href="#pendingFlights">megnézhetjük</a> azokat.
   </p>
 
   <p>
@@ -895,6 +915,124 @@
   szövegbe.
   </p>
 
+  <h2><a name="flightBooking">Járatfoglalás</a></h2>
+
+  <div align="center">
+    <img src="flightBooking.png" alt="A Járatfoglalás ablak"/>
+  </div>
+
+  <p>
+  Ezt az ablakot a
+  <a href="#flightSelectionPage">járatválasztás oldalon</a>
+  található <b>Járatfoglalás</b> gombra kattinva, az
+  <b>Eszközök/Járatfoglalás...</b> menüpontot kiválasztva vagy a <b>Ctrl+O</b>
+  billentyűkombinációt megnyomva jeleníthetjük meg.
+  </p>
+
+  <p>
+  Az ablak felső részén a járat dátumát kiválaszhatjuk. Alapértelmezésben az
+  adott napon repülhető összes járat megjelenik, mind a menetrend szerinti,
+  mind a VIP járatok. A dátum melletti részen található jelölődobozokkal
+  beállíthatjuk, hogy mely járatok maradjanak a listában.
+  </p>
+
+  <p>
+  A lejjeb lévő részen kiválaszhatjuk, hogy mely típusokkal repülhető járatok
+  maradjanak a listában. Csak azok a típusok választhatók, amelyekre
+  jogosultsággal rendelkezünk. Alaphelyzetben az összes ilyen típus ki van
+  jelölve.
+  </p>
+
+  <p>
+  Ha a listából kiválasztunk egy járatot, az ablak alján található
+  <b>Foglalás</b> gomb aktívvá válik. Rákattintva, vagy a járatra duplán
+  kattinva a foglalás folyamata elindul. Ha a járat menetrend szerinti, az
+  alábbi dialógus ablak jelenik ekkor meg:
+  </p>
+
+  <div align="center">
+    <img src="flightBookingRegular.png"
+         alt="Járatfoglaló ablak menetrend szerinti járathoz"/>
+  </div>
+
+  <p>
+  Mivel a menetrend szerinti járatok valójában két, egy induló és egy érkező
+  járatot jelentenek, mindkét irányra vonatkozóan szerepelnek adatok az
+  ablakban. Kiválaszthatjuk, hogy melyik repülőgéppel szeretnénk lerepülni
+  a járatot, bár az egyiket véletlenszerűen felkínálja a program.
+  </p>
+
+  <p>
+  A VIP járatokhoz tartozó ablak egy kicsit eltér:
+  </p>
+
+  <div align="center">
+    <img src="flightBookingVIP.png"
+         alt="Járatfoglaló ablak VIP járathoz"/>
+  </div>
+
+  <p>
+  A VIP járatok egyirányúak, még ha esetleg egymás után következnek
+  is. Emellett van egy előre megadott repülési dátumuk is, amit azonban az
+  ablakban meg lehet változtatni. A menetrend szerint járatokhoz hasonlóan a
+  repülőgépet is kiválaszthatjuk.
+  </p>
+
+  <p>
+  Ha a <b>Foglalás</b> gomb megnyomásával megerősítjük a foglalást, az új
+  járat(ok) megjelennek a listában és lerepülhetjük azokat.
+  </p>
+
+  <h2><a name="pendingFlights">Függő járatok</a></h2>
+
+  <div align="center">
+    <img src="pendingFlights.png" alt="Függő járatok"/>
+  </div>
+
+  <p>
+  Ez az ablak két listát tartalmaz. A felső a lerepült és jelentett, de még
+  nem javított járatokat tartalmazza. A <b>Szerkesztés...</b> gombra kattintva
+  az éppen kijelölt járatot PIREP-jét szerkeszthetjük. A PIREP szerkesztő ablak
+  hasonlít a <a href="#pirepViewer">PIREP megjelenítő</a> ablakhoz, de bizonyos
+  adatok módosíthatók. Ha elkészültünk a módosításokkal, a <b>Mentés</b>
+  gombbal elmenthetjük azokat a szerverre.
+  </p>
+
+  <p>
+  Ha egy járatot megint le szeretnénk repülni, nyomjuk meg az <b>Újra</b>
+  gombot, a járat törléséhez pedig a <b>Törlés</b>t. E két gomb akkor is aktív,
+  ha több járatot jelöltünk ki, amely esetben a választot művelet az összes
+  kiválasztott járatra vonatkozik.
+  <p>
+
+  <p>
+  Az alsó lista az elutasított járatokat tartalmazza.
+  A <b>Megtekintés...</b> gomb megjeleníti a
+  <a href="#pirepViewer">PIREP megtekintő ablakot</a> a járat adataival,
+  valamint egy új, <i>Üzenet</i> című fület a javító esetleges üzenetével.
+  </p>
+
+  <p>
+  Az <b>Újra</b> és a <b>Törlés</b> gomb ennél a listánál is működik.
+  </p>
+
+  <h2><a name="acceptedFlights">Elfogadott járatok</a></h2>
+
+  <p>
+  Az  <b>Eszközök/Elfogadott járatok...</b> menüpont kiválasztásával
+  kilistázhatjuk a már lerepült és elfogadott járatokat:
+  </p>
+
+  <div align="center">
+    <img src="acceptedFlights.png" alt="Elfogadott járatok"/>
+  </div>
+
+  <p>
+  Ha kiválasztunk egy járatot és rákattintunk a <b>Megtekintés</b> gombra,
+  megjelenik a <a href="#pirepViewer">PIREP megtekintő</a> ablak a kiválasztott
+  járat adataival és a korábban már említett <i>Üzenet</i> fül.
+  </p>
+
   <h2><a name="loadingPIREPs">PIREP-ek betöltése</a></h2>
 
   <p>
@@ -932,9 +1070,9 @@
   napló olvasható.
   </p>
 
-  <div align="center">
+  <a name="pirepViewer"><div align="center">
     <img src="pirepViewer.png" alt="PIREP megtekintő ablak"/>
-  </div>
+  </div></a>
 
   <h2><a name="checklistEditor">Ellenőrzőlisták szerkeszése</a></h2>
 
