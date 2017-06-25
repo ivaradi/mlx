@@ -451,7 +451,7 @@ class FlightSelectionPage(Page):
         leftVBox = gtk.VBox()
 
         alignment = gtk.Alignment(xscale = 1.0)
-        alignment.set_size_request(150, 0)
+        alignment.set_size_request(100, 0)
 
         leftVBox.pack_start(alignment, False, False, 0)
 
@@ -468,10 +468,10 @@ class FlightSelectionPage(Page):
         flightButtonBox = gtk.VBox()
 
         alignment = gtk.Alignment(xscale = 1.0)
-        alignment.set_size_request(150, 0)
+        alignment.set_size_request(100, 0)
         flightButtonBox.pack_start(alignment, False, False, 0)
 
-        flightButtonWidthAlignment = gtk.Alignment(xscale=0.5, yscale=0.0,
+        flightButtonWidthAlignment = gtk.Alignment(xscale=1.0, yscale=0.0,
                                                    xalign=0.0, yalign=0.0)
         flightButtonWidthAlignment.set_padding(padding_top = 0,
                                                padding_bottom = 0,
