@@ -222,27 +222,32 @@ class Timetable(gtk.Alignment):
     def _updateTooltip(self, widget, event):
         """Update the tooltip for the position of the given event."""
         try:
-            (path, col, x, y) = widget.get_path_at_pos( int(event.x), int(event.y))
-            index = self._getIndexForPath(path)
-
-            flight = self._flightPairs[index].flight0
-            comment = flight.comment
-            date = flight.date
-
-            if comment or date!=const.defaultDate:
-                text = ""
-                if comment:
-                    text = comment
-                if date!=const.defaultDate:
-                    if text:
-                        text += "; "
-                    text += date.strftime("%Y-%m-%d")
-
-                self._tooltips.set_tip(widget, text)
-                self._tooltips.enable()
-            else:
+            result = widget.get_path_at_pos( int(event.x), int(event.y))
+            if result is None:
                 self._tooltips.set_tip(widget, "")
                 self._tooltips.disable()
+            else:
+                (path, col, x, y) = result
+                index = self._getIndexForPath(path)
+
+                flight = self._flightPairs[index].flight0
+                comment = flight.comment
+                date = flight.date
+
+                if comment or date!=const.defaultDate:
+                    text = ""
+                    if comment:
+                        text = comment
+                    if date!=const.defaultDate:
+                        if text:
+                            text += "; "
+                        text += date.strftime("%Y-%m-%d")
+
+                    self._tooltips.set_tip(widget, text)
+                    self._tooltips.enable()
+                else:
+                    self._tooltips.set_tip(widget, "")
+                    self._tooltips.disable()
         except Exception, e:
             print e
             self._tooltips.set_tip(widget, "")
