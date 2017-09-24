@@ -1859,9 +1859,9 @@ class T134Model(GenericAircraftModel):
 
 class T154Model(GenericAircraftModel):
     """Generic model for the Tupolev Tu-134 aircraft."""
-    fuelTanks = [const.FUELTANK_LEFT_AUX, const.FUELTANK_LEFT,
-                 const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
-                 const.FUELTANK_RIGHT, const.FUELTANK_RIGHT_AUX]
+    fuelTanks = [const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
+                 const.FUELTANK_RIGHT, const.FUELTANK_LEFT,
+                 const.FUELTANK_RIGHT_AUX, const.FUELTANK_LEFT_AUX]
 
     def __init__(self):
         """Construct the model."""
