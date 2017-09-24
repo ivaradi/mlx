@@ -31,7 +31,7 @@ library/encodings/mac_croatian.pyc	2755	425b44ba614eff660b863cb7cc12e509
 library/stringprep.pyc	14089	1c0d248fa5ff974c44479a82d8deb72c
 library/WINHTTP.dll	354304	d29f2889baa10e19ad9ff70c8d5ecf50
 locales/ca.pak	7484	6490335e2837ffefb296ff1fabb50372
-library/mlx/gui/timetable.pyc	27409	b5a5a1697bfb4e91f7d39a99ecadef53
+library/mlx/gui/timetable.pyc	27480	9ef0c7c9b50df08d7c1bc75d14dac825
 library/encodings/cp720.pyc	2736	a0f8bdcf6477a00166d2a38b1ba3ce7c
 library/xml/sax/_exceptions.pyc	5829	9f1abe12a091b6808b131a0b4e179b5a
 doc/manual/en/prefsMessages.png	22653	9002bdcc9f1ecd395c67e0662dec62dc
