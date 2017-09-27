@@ -1100,7 +1100,7 @@ class T154(Aircraft):
     - fuel: left aux, left, centre, centre 2, right, right aux
     - n1: left, centre, right
     - reverser: left, right"""
-    dow = 29500
+    dow = 53259
 
     def __init__(self, flight):
         super(T154, self).__init__(flight, minLandingFuel = 5000)
