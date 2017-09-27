@@ -294,6 +294,31 @@ class BookedFlight(RPCObject):
         if self.arrivalTime<self.departureTime:
             self.arrivalTime += datetime.timedelta(days = 1)
 
+    def writeIntoFile(self, f):
+        """Write the flight into a file."""
+        print >> f, "callsign=%s" % (self.callsign,)
+        date = self.departureTime.date()
+        print >> f, "date=%04d-%02d-%0d" % (date.year, date.month, date.day)
+        print >> f, "dep_airport=%s" % (self.departureICAO,)
+        print >> f, "dest_airport=%s" % (self.arrivalICAO,)
+        print >> f, "planecode=%s" % \
+              (BookedFlight.TYPE2TYPECODE[self.aircraftType],)
+        print >> f, "planetype=%s" % (self.aircraftTypeName,)
+        print >> f, "tail_nr=%s" % (self.tailNumber,)
+        print >> f, "passenger=%d" % (self.numPassengers,)
+        print >> f, "crew=%d" % (self.numCrew,)
+        print >> f, "bag=%d" % (self.bagWeight,)
+        print >> f, "cargo=%d" % (self.cargoWeight,)
+        print >> f, "mail=%d" % (self.mailWeight,)
+        print >> f, "flight_route=%s" % (self.route,)
+        departureTime = self.departureTime
+        print >> f, "departure_time=%02d\\:%02d\\:%02d" % \
+              (departureTime.hour, departureTime.minute, departureTime.second)
+        arrivalTime = self.arrivalTime
+        print >> f, "arrival_time=%02d\\:%02d\\:%02d" % \
+              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second)
+        print >> f, "foglalas_id=%s" % ("0" if self.id is None else self.id,)
+
 #---------------------------------------------------------------------------------------
 
 class AcceptedFlight(RPCObject):
