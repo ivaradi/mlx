@@ -656,17 +656,6 @@ class Simulator(object):
     TIME_SYNC_INTERVAL = 3.0
 
     @staticmethod
-    def _getTimestamp(data):
-        """Convert the given data into a timestamp."""
-        year = datetime.date.today().year
-        timestamp = calendar.timegm(time.struct_time([year,
-                                                      1, 1, 0, 0, 0, -1, 1, 0]))
-        timestamp += data[0] * 24 * 3600
-        timestamp += data[1]
-
-        return timestamp
-
-    @staticmethod
     def _getHotkeyCode(hotkey):
         """Get the hotkey code for the given hot key."""
         code = ord(hotkey.key)
@@ -707,6 +696,10 @@ class Simulator(object):
 
         self._syncTime = False
         self._nextSyncTime = -1
+
+        self._timestampBase = None
+        self._timestampDaysOffset = 0
+        self._lastZuluSeconds = None
 
         self._normalRequestID = None
 
@@ -930,9 +923,35 @@ class Simulator(object):
             self._clearHotkeyRequest()
         self._connectionListener.disconnected()
 
+    def _getTimestamp(self, data):
+        """Convert the given data into a timestamp."""
+        if self._timestampBase is None:
+            year = datetime.date.today().year
+            self._timestampBase  = \
+              calendar.timegm(time.struct_time([year, 1, 1, 0, 0, 0, -1, 1, 0]))
+            self._timestampBase += data[0] * 24 * 3600
+            self._timestampDaysOffset = 0
+            self._lastZuluSeconds = None
+
+        zuluSeconds = data[1]
+        if self._lastZuluSeconds is not None and \
+           zuluSeconds<self._lastZuluSeconds:
+            print "xplane.Simulator._getTimestamp: Zulu seconds have gone backwards (%f -> %f), increasing day offset" % \
+              (self._lastZuluSeconds, zuluSeconds)
+            self._timestampDaysOffset += 1
+
+        self._lastZuluSeconds = zuluSeconds
+
+        timestamp = self._timestampBase
+        timestamp += self._timestampDaysOffset * 24 * 3600
+        timestamp += zuluSeconds
+
+        return timestamp
+
     def _startDefaultNormal(self):
         """Start the default normal periodic request."""
         assert self._normalRequestID is None
+        self._timestampBase = None
         self._normalRequestID = \
              self._handler.requestPeriodicRead(1.0,
                                                Simulator.normalData,
@@ -952,7 +971,7 @@ class Simulator(object):
         monitoring is started, it contains the result also for the
         aircraft-specific values.
         """
-        timestamp = Simulator._getTimestamp(data)
+        timestamp = self._getTimestamp(data)
 
         createdNewModel = self._setAircraftName(timestamp,
                                                 data.getString(2),
@@ -1103,7 +1122,7 @@ class Simulator(object):
 
     def _handleTime(self, data, callback):
         """Callback for a time retrieval request."""
-        callback(Simulator._getTimestamp(data))
+        callback(self._getTimestamp(data))
 
     def _handleWeights(self, data, callback):
         """Callback for the weights retrieval request."""
