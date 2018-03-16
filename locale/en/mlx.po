@@ -641,11 +641,17 @@ msgstr ""
 "\n"
 "You can also query the ZFW reported by the simulator."
 
-msgid "payload_crew"
-msgstr "C_rew:"
+msgid "payload_cockpit_crew"
+msgstr "Cockpit c_rew:"
 
-msgid "payload_crew_tooltip"
-msgstr "The number of the crew members on your flight."
+msgid "payload_cockpit_crew_tooltip"
+msgstr "The number of the cockpit crew members on your flight."
+
+msgid "payload_cabin_crew"
+msgstr "Cabin cr_ew:"
+
+msgid "payload_cabin_crew_tooltip"
+msgstr "The number of the cabin crew members on your flight."
 
 msgid "payload_pax"
 msgstr "P_assengers:"
@@ -1499,8 +1505,11 @@ msgstr ""
 "<b><span foreground=\"red\">red</span></b>, otherwise in "
 "<b><span foreground=\"orange\">yellow</span></b>."
 
-msgid "weighthelp_crew"
-msgstr "Crew (%s):"
+msgid "weighthelp_cockpit_crew"
+msgstr "Cockpit crew (%s):"
+
+msgid "weighthelp_cabin_crew"
+msgstr "Cabin crew (%s):"
 
 msgid "weighthelp_pax"
 msgstr "Passengers (%s):"

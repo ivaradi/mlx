@@ -127,7 +127,9 @@ class Aircraft(object):
         self._vrefLineIndex = None
         self._landingAntiIceLineID = None
 
-        self.humanWeight = 82.0
+        self.cockpitCrewWeight = 85.0
+        self.cabinCrewWeight = 75.0
+        self.humanWeight = 84.0
 
         self.initialClimbSpeedAltitude = 1500
         self.reverseMinSpeed = 50

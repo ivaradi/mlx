@@ -31,7 +31,7 @@ import webbrowser
 # The flight "wizard".
 #
 # This module implements the main tab of the application, the flight
-# wizard. The wizard consists of \ref Page "pages", that come one after the
+# wizard. The wizard consists of \ref Page "pages", that come one yafter the
 # other. As some pages might be skipped, the pages dynamically store the index
 # of the previous page so that going back to it is simpler. The \ref
 # Page.activate "activate" function is called before a page is first shown
@@ -2124,113 +2124,130 @@ class PayloadPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 3)
+        table = gtk.Table(8, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label(xstr("payload_crew"))
+        label = gtk.Label(xstr("payload_cockpit_crew"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
-        self._numCrew = IntegerEntry(defaultValue = 0)
-        self._numCrew.set_width_chars(6)
-        self._numCrew.connect("integer-changed", self._weightChanged)
-        self._numCrew.set_tooltip_text(xstr("payload_crew_tooltip"))
-        table.attach(self._numCrew, 1, 2, 0, 1)
-        label.set_mnemonic_widget(self._numCrew)
+        self._numCockpitCrew = IntegerEntry(defaultValue = 0)
+        self._numCockpitCrew.set_width_chars(6)
+        self._numCockpitCrew.connect("integer-changed", self._weightChanged)
+        self._numCockpitCrew.set_tooltip_text(xstr("payload_cockpit_crew_tooltip"))
+        table.attach(self._numCockpitCrew, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._numCockpitCrew)
+
+        label = gtk.Label(xstr("payload_cabin_crew"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 1, 2)
+
+        self._numCabinCrew = IntegerEntry(defaultValue = 0)
+        self._numCabinCrew.set_width_chars(6)
+        self._numCabinCrew.connect("integer-changed", self._weightChanged)
+        self._numCabinCrew.set_tooltip_text(xstr("payload_cabin_crew_tooltip"))
+        table.attach(self._numCabinCrew, 1, 2, 1, 2)
+        label.set_mnemonic_widget(self._numCabinCrew)
 
         label = gtk.Label(xstr("payload_pax"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 1, 2)
+        table.attach(label, 0, 1, 2, 3)
 
         self._numPassengers = IntegerEntry(defaultValue = 0)
         self._numPassengers.set_width_chars(6)
         self._numPassengers.connect("integer-changed", self._weightChanged)
         self._numPassengers.set_tooltip_text(xstr("payload_pax_tooltip"))
-        table.attach(self._numPassengers, 1, 2, 1, 2)
+        table.attach(self._numPassengers, 1, 2, 2, 3)
         label.set_mnemonic_widget(self._numPassengers)
 
         label = gtk.Label(xstr("payload_bag"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 2, 3)
+        table.attach(label, 0, 1, 3, 4)
 
         self._bagWeight = IntegerEntry(defaultValue = 0)
         self._bagWeight.set_width_chars(6)
         self._bagWeight.connect("integer-changed", self._weightChanged)
         self._bagWeight.set_tooltip_text(xstr("payload_bag_tooltip"))
-        table.attach(self._bagWeight, 1, 2, 2, 3)
+        table.attach(self._bagWeight, 1, 2, 3, 4)
         label.set_mnemonic_widget(self._bagWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 2, 3)
+        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
 
         label = gtk.Label(xstr("payload_cargo"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 3, 4)
+        table.attach(label, 0, 1, 4, 5)
 
         self._cargoWeight = IntegerEntry(defaultValue = 0)
         self._cargoWeight.set_width_chars(6)
         self._cargoWeight.connect("integer-changed", self._weightChanged)
         self._cargoWeight.set_tooltip_text(xstr("payload_cargo_tooltip"))
-        table.attach(self._cargoWeight, 1, 2, 3, 4)
+        table.attach(self._cargoWeight, 1, 2, 4, 5)
         label.set_mnemonic_widget(self._cargoWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
+        table.attach(gtk.Label("kg"), 2, 3, 4, 5)
 
         label = gtk.Label(xstr("payload_mail"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 4, 5)
+        table.attach(label, 0, 1, 5, 6)
 
         self._mailWeight = IntegerEntry(defaultValue = 0)
         self._mailWeight.set_width_chars(6)
         self._mailWeight.connect("integer-changed", self._weightChanged)
         self._mailWeight.set_tooltip_text(xstr("payload_mail_tooltip"))
-        table.attach(self._mailWeight, 1, 2, 4, 5)
+        table.attach(self._mailWeight, 1, 2, 5, 6)
         label.set_mnemonic_widget(self._mailWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 4, 5)
+        table.attach(gtk.Label("kg"), 2, 3, 5, 6)
 
         label = gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
         label.set_alignment(0.0, 0.5)
         label.set_use_markup(True)
-        table.attach(label, 0, 1, 5, 6)
+        table.attach(label, 0, 1, 6, 7)
 
         self._calculatedZFW = gtk.Label()
         self._calculatedZFW.set_width_chars(6)
         self._calculatedZFW.set_alignment(1.0, 0.5)
-        table.attach(self._calculatedZFW, 1, 2, 5, 6)
+        table.attach(self._calculatedZFW, 1, 2, 6, 7)
 
-        table.attach(gtk.Label("kg"), 2, 3, 5, 6)
+        table.attach(gtk.Label("kg"), 2, 3, 6, 7)
 
         self._zfwButton = gtk.Button(xstr("payload_fszfw"))
         self._zfwButton.set_use_underline(True)
         self._zfwButton.connect("clicked", self._zfwRequested)
         self._zfwButton.set_tooltip_text(xstr("payload_fszfw_tooltip"))
-        table.attach(self._zfwButton, 0, 1, 6, 7)
+        table.attach(self._zfwButton, 0, 1, 7, 8)
 
         self._simulatorZFW = gtk.Label("-")
         self._simulatorZFW.set_width_chars(6)
         self._simulatorZFW.set_alignment(1.0, 0.5)
-        table.attach(self._simulatorZFW, 1, 2, 6, 7)
+        table.attach(self._simulatorZFW, 1, 2, 7, 8)
         self._simulatorZFWValue = None
 
-        table.attach(gtk.Label("kg"), 2, 3, 6, 7)
+        table.attach(gtk.Label("kg"), 2, 3, 7, 8)
 
         self.addCancelFlightButton()
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
         self._button = self.addNextButton(clicked = self._forwardClicked)
 
     @property
-    def numCrew(self):
-        """The number of the crew members on the flight."""
-        return self._numCrew.get_int()
+    def numCockpitCrew(self):
+        """The number of the cockpit crew members on the flight."""
+        return self._numCockpitCrew.get_int()
+
+    @property
+    def numCabinCrew(self):
+        """The number of the cabin crew members on the flight."""
+        return self._numCabinCrew.get_int()
 
     @property
     def numPassengers(self):
@@ -2255,9 +2272,16 @@ class PayloadPage(Page):
     def activate(self):
         """Setup the information."""
         bookedFlight = self._wizard._bookedFlight
+        aircraft = self._wizard.gui._flight.aircraft
 
-        self._numCrew.set_int(bookedFlight.numCrew)
-        self._numCrew.set_sensitive(True)
+        numCrew = bookedFlight.numCrew
+        numCockpitCrew = min(numCrew, aircraft.dowCockpit)
+        numCabinCrew = numCrew - numCockpitCrew
+
+        self._numCockpitCrew.set_int(numCockpitCrew)
+        self._numCockpitCrew.set_sensitive(True)
+        self._numCabinCrew.set_int(numCabinCrew)
+        self._numCabinCrew.set_sensitive(True)
         self._numPassengers.set_int(bookedFlight.numPassengers)
         self._numPassengers.set_sensitive(True)
 
@@ -2275,7 +2299,8 @@ class PayloadPage(Page):
 
     def finalize(self):
         """Finalize the payload page."""
-        self._numCrew.set_sensitive(False)
+        self._numCockpitCrew.set_sensitive(False)
+        self._numCabinCrew.set_sensitive(False)
         self._numPassengers.set_sensitive(False)
         self._bagWeight.set_sensitive(False)
         self._cargoWeight.set_sensitive(False)
@@ -2284,11 +2309,15 @@ class PayloadPage(Page):
 
     def calculateZFW(self):
         """Calculate the ZFW value."""
+        aircraft = self._wizard.gui._flight.aircraft
         zfw = self._wizard.gui._flight.aircraft.dow
-        zfw += (self._numCrew.get_int() + self._numPassengers.get_int()) * 82
+        zfw += (self.numCockpitCrew - aircraft.dowCockpit) * aircraft.cockpitCrewWeight
+        zfw += (self.numCabinCrew - aircraft.dowCabin) * aircraft.cabinCrewWeight
+        zfw += (self._numPassengers.get_int()) * aircraft.humanWeight
         zfw += self._bagWeight.get_int()
         zfw += self._cargoWeight.get_int()
         zfw += self._mailWeight.get_int()
+        zfw = int(zfw)
         return zfw
 
     def _updateCalculatedZFW(self):
@@ -5540,9 +5569,14 @@ class Wizard(gtk.VBox):
         return self._bookedFlight
 
     @property
-    def numCrew(self):
-        """Get the number of crew members."""
-        return self._payloadPage.numCrew
+    def numCockpitCrew(self):
+        """Get the number of cockpit crew members."""
+        return self._payloadPage.numCockpitCrew
+
+    @property
+    def numCabinCrew(self):
+        """Get the number of cabin crew members."""
+        return self._payloadPage.numCabinCrew
 
     @property
     def numPassengers(self):
@@ -5890,6 +5924,7 @@ class Wizard(gtk.VBox):
             if result.loggedIn:
                 self._loginResult = result
                 self.gui.loginSuccessful()
+                acft.setupTypes(result.aircraftTypes)
             else:
                 if isReload:
                     message = xstr("reload_failed")

@@ -151,9 +151,19 @@ class Flight(object):
         return self._gui.bookedFlight
 
     @property
+    def numCockpitCrew(self):
+        """Get the number of cockpit crew members on the flight."""
+        return self._gui.numCockpitCrew
+
+    @property
+    def numCabinCrew(self):
+        """Get the number of cabon crew members on the flight."""
+        return self._gui.numCabinCrew
+
+    @property
     def numCrew(self):
         """Get the number of crew members on the flight."""
-        return self._gui.numCrew
+        return self.numCockpitCrew + self.numCabinCrew
 
     @property
     def numPassengers(self):

@@ -645,11 +645,17 @@ msgstr ""
 "\n"
 "Azt is ellenőrizheted, hogy a szimulátor milyen ZFW-t jelent."
 
-msgid "payload_crew"
-msgstr "_Legénység:"
+msgid "payload_cockpit_crew"
+msgstr "_Pilóták:"
 
-msgid "payload_crew_tooltip"
-msgstr "A legénység létszáma."
+msgid "payload_cockpit_crew_tooltip"
+msgstr "A pilóták létszáma."
+
+msgid "payload_cabin_crew"
+msgstr "_Utaskísérők:"
+
+msgid "payload_cabin_crew_tooltip"
+msgstr "A légiutaskísérők létszáma."
 
 msgid "payload_pax"
 msgstr "_Utasok:"
@@ -1502,8 +1508,11 @@ msgstr ""
 "<b><span foreground=\"red\">piros</span></b>, egyébként "
 "<b><span foreground=\"orange\">sárga</span></b> színben olvasható."
 
-msgid "weighthelp_crew"
-msgstr "Legénység (%s):"
+msgid "weighthelp_cockpit_crew"
+msgstr "Pilóták (%s):"
+
+msgid "weighthelp_cabin_crew"
+msgstr "Utaskísérők (%s):"
 
 msgid "weighthelp_pax"
 msgstr "Utasok (%s):"

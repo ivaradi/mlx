@@ -263,9 +263,14 @@ class GUI(fs.ConnectionListener):
         return self._wizard.bookedFlight
 
     @property
-    def numCrew(self):
-        """Get the number of crew members."""
-        return self._wizard.numCrew
+    def numCockpitCrew(self):
+        """Get the number of cockpit crew members."""
+        return self._wizard.numCockpitCrew
+
+    @property
+    def numCabinCrew(self):
+        """Get the number of cabin crew members."""
+        return self._wizard.numCabinCrew
 
     @property
     def numPassengers(self):
