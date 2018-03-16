@@ -223,7 +223,30 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_T134  : "T134",
               AIRCRAFT_T154  : "T154",
               AIRCRAFT_YK40  : "YK40",
-              AIRCRAFT_B462  : "B462" }
+              AIRCRAFT_B462  : "B462",
+              AIRCRAFT_IL62  : "IL62" }
+
+#-------------------------------------------------------------------------------
+
+## A mapping from ICAO codes to the corresponding aircraft types
+icao2Type = { "B736" : AIRCRAFT_B736,
+              "B737" : AIRCRAFT_B737,
+              "B738" : AIRCRAFT_B738,
+              "B732" : AIRCRAFT_B732,
+              "B733" : AIRCRAFT_B733,
+              "B734" : AIRCRAFT_B734,
+              "B735" : AIRCRAFT_B735,
+              "DH8D" : AIRCRAFT_DH8D,
+              "B762" : AIRCRAFT_B762,
+              "B763" : AIRCRAFT_B763,
+              "CRJ2" : AIRCRAFT_CRJ2,
+              "F70"  : AIRCRAFT_F70,
+              "DC3"  : AIRCRAFT_DC3,
+              "T134" : AIRCRAFT_T134,
+              "T154" : AIRCRAFT_T154,
+              "YK40" : AIRCRAFT_YK40,
+              "B462" : AIRCRAFT_B462,
+              "IL62" : AIRCRAFT_IL62 }
 
 #-------------------------------------------------------------------------------
 

@@ -380,6 +380,24 @@ class Fleet(rpccommon.Fleet):
 
 #---------------------------------------------------------------------------------------
 
+class AircraftTypeInfo(RPCObject):
+    """Information about an aircraft type."""
+    # The instructions for the construction
+    _instructions = {
+        "dow" : int,
+        "dowCockpit" : int,
+        "dowCabin" : int,
+        }
+
+    def __init__(self, value):
+        """Construct the booked flight object from the given RPC result
+        value."""
+        super(AircraftTypeInfo, self).__init__(value,
+                                               AircraftTypeInfo._instructions)
+        self.aircraftType = const.icao2Type[value["typeCode"]]
+
+#---------------------------------------------------------------------------------------
+
 class Registration(object):
     """Data for registration."""
     def __init__(self, surName, firstName, nameOrder,
@@ -505,6 +523,13 @@ class Client(object):
             return (reply.value["name"], reply.value["rank"], types)
         else:
             return None
+
+    def getTypes(self):
+        """Get the data of the aircraft types supported by us."""
+        value = self._performCall(lambda sessionID:
+                                  self._server.getTypes(sessionID))
+
+        return [AircraftTypeInfo(t) for t in value]
 
     def getFlights(self):
         """Get the flights available for performing."""

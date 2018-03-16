@@ -96,6 +96,9 @@ class SimBriefData(object):
 
 class Aircraft(object):
     """Base class for aircraft."""
+    dowCockpit = 2
+    dowCabin = 3
+
     @staticmethod
     def create(flight, bookedFlight):
         """Create an aircraft instance for the type in the given flight."""
@@ -828,9 +831,10 @@ class B733(Boeing737CL):
 
 class B734(Boeing737CL):
     """Boeing 737-400 aircraft."""
+    dow = 35100
+
     def __init__(self, flight):
         super(B734, self).__init__(flight)
-        self.dow = 35100
         self.mtow = 62822
         self.mlw = 54885
         self.mzfw = 51256
@@ -1297,6 +1301,18 @@ _classes = { const.AIRCRAFT_B736  : B736,
 def getClass(aircraftType):
     """Get the class representing the given aircraft types"""
     return _classes[aircraftType]
+
+#---------------------------------------------------------------------------------------
+
+def setupTypes(aircraftTypes):
+    """Setup the values in the given types using the info retrieved
+    from the server."""
+    for aircraftTypeInfo in aircraftTypes:
+        clazz = getClass(aircraftTypeInfo.aircraftType)
+
+        clazz.dow = aircraftTypeInfo.dow
+        clazz.dowCockpit = aircraftTypeInfo.dowCockpit
+        clazz.dowCabin = aircraftTypeInfo.dowCabin
 
 #---------------------------------------------------------------------------------------
 

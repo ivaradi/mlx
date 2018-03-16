@@ -816,10 +816,14 @@ class LoginRPC(RPCRequest):
             result.rank = loginResult[1]
             result.types = loginResult[2]
             result.password = password
+
+            result.aircraftTypes = client.getTypes()
+
             flights = client.getFlights()
             result.flights = flights[0]
             result.reportedFlights = flights[1]
             result.rejectedFlights = flights[2]
+
             if result.rank=="STU":
                 reply = client.getEntryExamStatus()
                 result.entryExamPassed = reply[0]
