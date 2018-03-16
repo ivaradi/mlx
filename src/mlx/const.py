@@ -105,6 +105,9 @@ AIRCRAFT_YK40 = 15
 ## Aircraft type: British Aerospace BAe-146
 AIRCRAFT_B462 = 17
 
+## Aircraft type: British Aerospace BAe-146
+AIRCRAFT_IL62 = 19
+
 #-------------------------------------------------------------------------------
 
 ## The list of aircraft types that we know of
@@ -118,7 +121,7 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
                  AIRCRAFT_B732, AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
                  AIRCRAFT_T154, AIRCRAFT_T134,
                  AIRCRAFT_YK40, AIRCRAFT_DC3,
-                 AIRCRAFT_B462]
+                 AIRCRAFT_B462, AIRCRAFT_IL62]
 
 #-------------------------------------------------------------------------------
 
@@ -155,6 +158,9 @@ AIRCRAFT_FAMILY_YK40 = 10
 ## Aircraft type family: British Aerospace BAe-146
 AIRCRAFT_FAMILY_B462 = 11
 
+## Aircraft type family: Ilyushin IL-62
+AIRCRAFT_FAMILY_IL62 = 12
+
 #-------------------------------------------------------------------------------
 
 ## Map aircraft families to the list of the types they comprise of
@@ -181,7 +187,9 @@ aircraftFamily2Types = {
 
     AIRCRAFT_FAMILY_YK40: [AIRCRAFT_YK40],
 
-    AIRCRAFT_FAMILY_B462: [AIRCRAFT_B462]
+    AIRCRAFT_FAMILY_B462: [AIRCRAFT_B462],
+
+    AIRCRAFT_FAMILY_IL62: [AIRCRAFT_IL62]
 
     }
 

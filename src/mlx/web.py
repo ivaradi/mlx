@@ -72,7 +72,8 @@ class BookedFlight(object):
                       "TU3"  : const.AIRCRAFT_T134,
                       "TU5"  : const.AIRCRAFT_T154,
                       "YK4"  : const.AIRCRAFT_YK40,
-                      "146"  : const.AIRCRAFT_B462 }
+                      "146"  : const.AIRCRAFT_B462,
+                      "IL6"  : const.AIRCRAFT_IL62 }
 
     TYPE2TYPECODE = { const.AIRCRAFT_B736  : "736",
                       const.AIRCRAFT_B737  : "73G",
@@ -91,7 +92,8 @@ class BookedFlight(object):
                       const.AIRCRAFT_T134  : "TU3",
                       const.AIRCRAFT_T154  : "TU5",
                       const.AIRCRAFT_YK40  : "YK4",
-                      const.AIRCRAFT_B462  : "146" }
+                      const.AIRCRAFT_B462  : "146",
+                      const.AIRCRAFT_IL62  : "IL6" }
 
     checkFlightTypes = [ const.AIRCRAFT_B736, const.AIRCRAFT_B737,
                          const.AIRCRAFT_B738, const.AIRCRAFT_DH8D ]

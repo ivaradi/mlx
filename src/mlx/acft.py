@@ -1236,6 +1236,34 @@ class B462(Aircraft):
 
 #---------------------------------------------------------------------------------------
 
+class IL62(Aircraft):
+    """Ilyushin IL-62 aircraft.
+
+    The aircraft type-specific values in the aircraft state have the following
+    structure:
+    - fuel: left, centre, right
+    - n1: left outer, left inner, right inner, right outer
+    - reverser: empty (the plane has no reversers)"""
+    dow = 69500
+
+    def __init__(self, flight):
+        super(B462, self).__init__(flight)
+        self.mtow = 165000
+        self.mlw = 165000
+        self.mzfw = 165000
+        self.gearSpeedLimit = 210
+        self.flapSpeedLimits = { 18 : 217,
+                                 24 : 180,
+                                 30 : 170,
+                                 33 : 150 }
+
+    @property
+    def derateType(self):
+        """Get the derate type for this type."""
+        return DERATE_NONE
+
+#---------------------------------------------------------------------------------------
+
 mostFuelTanks = [const.FUELTANK_LEFT_TIP, const.FUELTANK_EXTERNAL1,
                  const.FUELTANK_LEFT_AUX,
                  const.FUELTANK_CENTRE,
@@ -1261,7 +1289,8 @@ _classes = { const.AIRCRAFT_B736  : B736,
              const.AIRCRAFT_T134  : T134,
              const.AIRCRAFT_T154  : T154,
              const.AIRCRAFT_YK40  : YK40,
-             const.AIRCRAFT_B462  : B462 }
+             const.AIRCRAFT_B462  : B462,
+             const.AIRCRAFT_IL62  : IL62 }
 
 #---------------------------------------------------------------------------------------
 

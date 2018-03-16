@@ -546,7 +546,8 @@ aircraftNames = { _const.AIRCRAFT_B736  : xstr("aircraft_b736"),
                   _const.AIRCRAFT_T134  : xstr("aircraft_t134"),
                   _const.AIRCRAFT_T154  : xstr("aircraft_t154"),
                   _const.AIRCRAFT_YK40  : xstr("aircraft_yk40"),
-                  _const.AIRCRAFT_B462  : xstr("aircraft_b462") }
+                  _const.AIRCRAFT_B462  : xstr("aircraft_b462"),
+                  _const.AIRCRAFT_IL62  : xstr("aircraft_il62") }
 
 #------------------------------------------------------------------------------
 
@@ -571,7 +572,9 @@ aircraftFamilyNames = {
 
     _const.AIRCRAFT_FAMILY_YK40: xstr("aircraft_family_yk40"),
 
-    _const.AIRCRAFT_FAMILY_B462: xstr("aircraft_family_b462")
+    _const.AIRCRAFT_FAMILY_B462: xstr("aircraft_family_b462"),
+
+    _const.AIRCRAFT_FAMILY_IL62: xstr("aircraft_family_il62")
 }
 
 #------------------------------------------------------------------------------

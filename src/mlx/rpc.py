@@ -207,7 +207,8 @@ class BookedFlight(RPCObject):
                       "TU3"  : const.AIRCRAFT_T134,
                       "TU5"  : const.AIRCRAFT_T154,
                       "YK4"  : const.AIRCRAFT_YK40,
-                      "146"  : const.AIRCRAFT_B462 }
+                      "146"  : const.AIRCRAFT_B462,
+                      "IL6"  : const.AIRCRAFT_IL62 }
 
     # FIXME: copied from web.BookedFlight
     TYPE2TYPECODE = { const.AIRCRAFT_B736  : "736",
@@ -227,7 +228,8 @@ class BookedFlight(RPCObject):
                       const.AIRCRAFT_T134  : "TU3",
                       const.AIRCRAFT_T154  : "TU5",
                       const.AIRCRAFT_YK40  : "YK4",
-                      const.AIRCRAFT_B462  : "146" }
+                      const.AIRCRAFT_B462  : "146",
+                      const.AIRCRAFT_IL62  : "IL6" }
 
     # FIXME: copied from web.BookedFlight
     @staticmethod
