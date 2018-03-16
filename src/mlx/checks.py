@@ -1412,7 +1412,7 @@ class StallChecker(WindSensitiveFaultChecker):
 
 class PayloadChecker(SimpleFaultChecker):
     """Check if the payload matches the specification."""
-    TOLERANCE=550
+    TOLERANCE=50
 
     @staticmethod
     def isZFWFaulty(aircraftZFW, flightZFW):
