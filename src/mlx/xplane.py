@@ -1437,6 +1437,8 @@ class AircraftModel(object):
         state.flapsSet = 0 if flapsIndex<1 else self._flapsNotches[flapsIndex]
 
         state.flaps = self._flapsNotches[-1]*data[self._monidx_flapsLeft]
+        print "flapsControl:", flapsControl, "flapsIndex:", flapsIndex, "flaps:", state.flaps
+        print "flapsSet", state.flapsSet
 
         state.navLightsOn = data[self._monidx_navLights] != 0
         state.antiCollisionLightsOn = data[self._monidx_beaconLights] != 0
