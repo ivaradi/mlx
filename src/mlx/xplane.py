@@ -1433,7 +1433,7 @@ class AircraftModel(object):
         state.gLoad = data[self._monidx_gLoad]
 
         flapsControl = data[self._monidx_flapsControl]
-        flapsIndex = int(flapsControl * (len(self._flapsNotches)-1))
+        flapsIndex = int(round(flapsControl * (len(self._flapsNotches)-1)))
         state.flapsSet = 0 if flapsIndex<1 else self._flapsNotches[flapsIndex]
 
         state.flaps = self._flapsNotches[-1]*data[self._monidx_flapsLeft]
