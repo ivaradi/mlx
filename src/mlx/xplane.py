@@ -1879,7 +1879,7 @@ class T134Model(GenericAircraftModel):
 #------------------------------------------------------------------------------
 
 class T154Model(GenericAircraftModel):
-    """Generic model for the Tupolev Tu-134 aircraft."""
+    """Generic model for the Tupolev Tu-154 aircraft."""
     fuelTanks = [const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
                  const.FUELTANK_RIGHT, const.FUELTANK_LEFT,
                  const.FUELTANK_RIGHT_AUX, const.FUELTANK_LEFT_AUX]
@@ -1903,6 +1903,31 @@ class T154Model(GenericAircraftModel):
         state = super(T154Model, self).getAircraftState(aircraft, timestamp, data)
         del state.reverser[1]
         return state
+
+#------------------------------------------------------------------------------
+
+class FelisT154Model(T154Model):
+    """Model for Felis' Tupolev Tu-154-M aircraft."""
+    @staticmethod
+    def doesHandle(aircraft, (tailnum, author, description, notes,
+                              icao, liveryPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type==const.AIRCRAFT_T154 and \
+          author.find("Felis")!=-1 and \
+          description.find("Tu154M")!=-1
+
+    def __init__(self):
+        """Construct the model."""
+        super(T154Model, self). \
+            __init__(flapsNotches = [0, 15, 28, 36, 45],
+                     fuelTanks = T154Model.fuelTanks,
+                     numEngines = 3)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "X-Plane/Felis Tupolev Tu-154-M"
 
 #------------------------------------------------------------------------------
 
@@ -1945,6 +1970,7 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 #------------------------------------------------------------------------------
 
 AircraftModel.registerSpecial(FJSDH8DModel)
+AircraftModel.registerSpecial(FelisT154Model)
 
 #------------------------------------------------------------------------------
 

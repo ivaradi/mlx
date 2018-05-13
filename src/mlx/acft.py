@@ -1149,6 +1149,7 @@ class T154(Aircraft):
 
             self.flapSpeedLimits = { 15 : 227,
                                      28 : 194,
+                                     36 : 178,
                                      45 : 162 }
 
     def _appendLightsLoggers(self):
