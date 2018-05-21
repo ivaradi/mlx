@@ -129,6 +129,8 @@ class BookedFlight(object):
         flight.callsign = "HA-CHK"
 
         flight.numPassengers = 0
+        flight.numCockpitCrew = 2
+        flight.numCabinCrew = 2
         flight.numCrew = 2
         flight.bagWeight = 0
         flight.cargoWeight = 0
@@ -247,10 +249,13 @@ class BookedFlight(object):
                 self.arrivalTime = BookedFlight.getDateTime(date,
                                                             arrivalTime)
 
+        self.numCockpitCrew = self.numCrew
+        self.numCabinCrew = 0
+
         d = dir(self)
         for attribute in ["callsign", "departureICAO", "arrivalICAO",
-                          "aircraftType", "tailNumber",
-                          "numPassengers", "numCrew",
+                          "aircraftType", "tailNumber", "numPassengers",
+                          "numCrew", "numCockpitCrew", "numCabinCrew",
                           "bagWeight", "cargoWeight", "mailWeight",
                           "route", "departureTime", "arrivalTime"]:
             if attribute not in d:
@@ -280,10 +285,12 @@ class BookedFlight(object):
         self.arrivalICAO = bookedFlightData["arrivalICAO"]
 
         self.aircraftType = \
-          self._decodeAircraftType(bookedFlightData["aircraftType"])
+          self._decodeAircraftICAOType(bookedFlightData["aircraftType"])
         self.tailNumber = bookedFlightData["tailNumber"]
         self.numPassengers = int(bookedFlightData["numPassengers"])
-        self.numCrew = int(bookedFlightData["numCrew"])
+        self.numCockpitCrew = int(bookedFlightData["numCockpitCrew"])
+        self.numCabinCrew = int(bookedFlightData["numCabinCrew"])
+        self.numCrew = self.numCockpitCrew + self.numCabinCrew
         self.bagWeight = int(bookedFlightData["bagWeight"])
         self.cargoWeight = int(bookedFlightData["cargoWeight"])
         self.mailWeight = int(bookedFlightData["mailWeight"])
@@ -325,6 +332,13 @@ class BookedFlight(object):
         """Decode the aircraft type from the given typeCode."""
         if typeCode in self.TYPECODE2TYPE:
             return self.TYPECODE2TYPE[typeCode]
+        else:
+            raise Exception("Invalid aircraft type code: '" + typeCode + "'")
+
+    def _decodeAircraftICAOType(self, typeCode):
+        """Decode the aircraft type from the given typeCode."""
+        if typeCode in const.icao2Type:
+            return const.icao2Type[typeCode]
         else:
             raise Exception("Invalid aircraft type code: '" + typeCode + "'")
 

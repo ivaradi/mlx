@@ -135,6 +135,8 @@ class PIREP(object):
 
         self.bookedFlight = flight.bookedFlight
 
+        self.numCockpitCrew = flight.numCockpitCrew
+        self.numCabinCrew = flight.numCabinCrew
         self.numCrew = flight.numCrew
         self.numPassengers = flight.numPassengers
         self.bagWeight = flight.bagWeight
@@ -181,7 +183,9 @@ class PIREP(object):
 
         self.bookedFlight = bookedFlight
 
-        self.numCrew = int(pirepData["numCrew"])
+        self.numCockpitCrew = int(pirepData["numCockpitCrew"])
+        self.numCabinCrew = int(pirepData["numCabinCrew"])
+        self.numCrew = self.numCockpitCrew + self.numCabinCrew
         self.numPassengers = int(pirepData["numPassengers"])
         self.bagWeight = int(pirepData["bagWeight"])
         self.cargoWeight = int(pirepData["cargoWeight"])
@@ -380,6 +384,8 @@ class PIREP(object):
         attrs["departureICAO"] = self.bookedFlight.departureICAO
         attrs["arrivalICAO"] = self.bookedFlight.arrivalICAO
         attrs["numPassengers"] = self.numPassengers
+        attrs["numCockpitCrew"] = self.numCockpitCrew
+        attrs["numCabinCrew"] = self.numCabinCrew
         attrs["numCrew"] = self.numCrew
         attrs["cargoWeight"] = self.cargoWeight
         attrs["bagWeight"] = self.bagWeight

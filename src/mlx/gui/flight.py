@@ -2274,9 +2274,9 @@ class PayloadPage(Page):
         bookedFlight = self._wizard._bookedFlight
         aircraft = self._wizard.gui._flight.aircraft
 
-        numCrew = bookedFlight.numCrew
-        numCockpitCrew = min(numCrew, aircraft.dowCockpit)
-        numCabinCrew = numCrew - numCockpitCrew
+        numCockpitCrew = bookedFlight.numCockpitCrew
+        numCabinCrew = bookedFlight.numCabinCrew
+        numCrew = numCockpitCrew + numCabinCrew
 
         self._numCockpitCrew.set_int(numCockpitCrew)
         self._numCockpitCrew.set_sensitive(True)

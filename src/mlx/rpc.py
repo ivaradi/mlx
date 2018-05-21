@@ -235,8 +235,8 @@ class BookedFlight(RPCObject):
     @staticmethod
     def _decodeAircraftType(typeCode):
         """Decode the aircraft type from the given typeCode."""
-        if typeCode in BookedFlight.TYPECODE2TYPE:
-            return BookedFlight.TYPECODE2TYPE[typeCode]
+        if typeCode in const.icao2Type:
+            return const.icao2Type[typeCode]
         else:
             raise Exception("Invalid aircraft type code: '" + typeCode + "'")
 
@@ -276,7 +276,8 @@ class BookedFlight(RPCObject):
     # The instructions for the construction
     _instructions = {
         "numPassengers" : int,
-        "numCrew" : int,
+        "numCockpitCrew" : int,
+        "numCabinCrew" : int,
         "bagWeight" : int,
         "cargoWeight" : int,
         "mailWeight" : int,
@@ -308,7 +309,7 @@ class BookedFlight(RPCObject):
         print >> f, "planetype=%s" % (self.aircraftTypeName,)
         print >> f, "tail_nr=%s" % (self.tailNumber,)
         print >> f, "passenger=%d" % (self.numPassengers,)
-        print >> f, "crew=%d" % (self.numCrew,)
+        print >> f, "crew=%d" % (self.numCockpitrew + self.numCabinCrew,)
         print >> f, "bag=%d" % (self.bagWeight,)
         print >> f, "cargo=%d" % (self.cargoWeight,)
         print >> f, "mail=%d" % (self.mailWeight,)
@@ -517,7 +518,7 @@ class Client(object):
             self._loginCount += 1
             self._sessionID = reply.value["sessionID"]
 
-            types = [BookedFlight.TYPECODE2TYPE[typeCode]
+            types = [const.icao2Type[typeCode]
                      for typeCode in reply.value["typeCodes"]]
 
             return (reply.value["name"], reply.value["rank"], types)
@@ -625,7 +626,7 @@ class Client(object):
         """Get the time table for the given date restricted to the given list
         of type codes, if any."""
         typeCodes = None if types is None else \
-            [BookedFlight.TYPE2TYPECODE[type] for type in types]
+          [const.icaoCodes[type] for type in types]
 
         values = self._performCall(lambda sessionID:
                                    self._server.getTimetable(sessionID,
