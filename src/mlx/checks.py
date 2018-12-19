@@ -1020,16 +1020,16 @@ class BankChecker(SimpleFaultChecker):
     """Check for the bank is within limits."""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
+        isXPlane = (flight.aircraftType==const.AIRCRAFT_DH8D or
+                    flight.aircraftType==const.AIRCRAFT_B733) and \
+                    (flight.fsType==const.SIM_XPLANE11 or
+                     flight.fsType==const.SIM_XPLANE10 or
+                     flight.fsType==const.SIM_XPLANE9)
         if flight.stage==const.STAGE_CRUISE:
-            isXPlane = (flight.aircraftType==const.AIRCRAFT_DH8D or
-                        flight.aircraftType==const.AIRCRAFT_B733) and \
-                        (flight.fsType==const.SIM_XPLANE11 or
-                         flight.fsType==const.SIM_XPLANE10 or
-                         flight.fsType==const.SIM_XPLANE9)
-            bankLimit = 35 if isXPlane else 30
+            bankLimit = 40 if isXPlane else 30
         elif flight.stage in [const.STAGE_TAKEOFF, const.STAGE_CLIMB,
                               const.STAGE_DESCENT, const.STAGE_LANDING]:
-            bankLimit = 35
+            bankLimit = 45 if isXPlane else 35
         else:
             return False
 
