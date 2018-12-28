@@ -308,7 +308,7 @@ def getContainer():
         container.set_property("can-focus", True)
         container.connect("size-allocate", _handleSizeAllocate)
     else:
-        container = gtk.VBox(True, 0)
+        container = gtk.DrawingArea()
 
     container.show()
 
@@ -326,9 +326,7 @@ def startInContainer(container, url, browserSettings = {}):
         else:
             windowID = window.handle
     else:
-        m = re.search("GtkVBox at 0x(\w+)", str(container))
-        hexID = m.group(1)
-        windowID = int(hexID, 16)
+        windowID = container.window.xid
 
     windowInfo = cefpython.WindowInfo()
     if windowID is not None:
