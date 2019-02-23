@@ -25,7 +25,7 @@ echo "Installing extra packages..."
 export WINEARCH=win32
 
 echo "exit" | wine cmd
-wine msiexec /i python-2.7.2.msi
+wine msiexec /i python-2.7.15.msi
 wine msiexec /i cefpython3-31.2.py2.7-win32.msi
 wine msiexec /i pygtk-all-in-one-2.24.1.win32-py2.7.msi
 wine msiexec /i pyuipc-0.4.win32-py2.7.msi
@@ -39,11 +39,6 @@ mkdir "${ctmpdir}"
 cp chromedriver.exe "${ctmpdir}"
 
 tar xzf Python27.extra.tar.gz -C "${cpythondir}"
-
-touch -d "2015-02-22 14:50:07" "${cpythondir}/Lib/site-packages/win32/lib/win32con.py"
-touch -d "2015-02-22 14:50:07" "${cpythondir}/Lib/site-packages/win32/lib/winerror.py"
-
-cp python27.dll WINHTTP.dll "${cwinsysdir}"
 
 echo
 echo "Removing extra packages..."
