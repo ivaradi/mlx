@@ -62,6 +62,42 @@ if os.name=="nt":
         data_files.append(("locales",
                            glob(os.path.join(cefDir, "locales", "*"))))
 
+    if os.getenv("WINE")=="yes":
+        winsysdir=os.getenv("WINSYSDIR")
+        data_files.append(("", [os.path.join(winsysdir, "python27.dll")]))
+        data_files.append(("library", [
+                            os.path.join(winsysdir, "pywintypes27.dll"),
+                            os.path.join(winsysdir, "WINHTTP.dll")]))
+
+        if gtkRuntimeDir:
+            gtkBinDir = os.path.join(gtkRuntimeDir, "bin")
+            data_files.append(("library", [
+                                os.path.join(gtkBinDir, "freetype6.dll"),
+                                os.path.join(gtkBinDir, "intl.dll"),
+                                os.path.join(gtkBinDir, "zlib1.dll"),
+                                os.path.join(gtkBinDir, "libglib-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libatk-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libcairo-2.dll"),
+                                os.path.join(gtkBinDir, "libexpat-1.dll"),
+                                os.path.join(gtkBinDir, "libpangowin32-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgio-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgdk-win32-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libpng14-14.dll"),
+                                os.path.join(gtkBinDir, "libgobject-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgdk_pixbuf-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libfontconfig-1.dll"),
+                                os.path.join(gtkBinDir, "libpangoft2-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgmodule-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libpango-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libpangocairo-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgtk-win32-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgthread-2.0-0.dll")
+                              ]))
+        if cefDir:
+            data_files.append(("library", [
+                                os.path.join(cefDir, "libcef.dll")
+                              ]))
+
     print data_files
 
     with open("mlx-common.nsh", "wt") as f:

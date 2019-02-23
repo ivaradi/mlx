@@ -505,7 +505,8 @@ class Handler(threading.Thread):
                 description = "(X-Plane version: %d, XPLM version: %d, XPLRA version: %03d)" % \
                   (xplaneVersion, xplmVersion, xplraVersion)
                 if not autoReconnection:
-                    fsType = const.SIM_XPLANE10 if xplaneVersion>=10000 else const.SIM_XPLANE9
+                    fsType = const.SIM_XPLANE11 if xplaneVersion>=11000 else \
+                      (const.SIM_XPLANE10 if xplaneVersion>=10000 else const.SIM_XPLANE9)
 
                     Handler._callSafe(lambda:
                                       self._connectionListener.connected(fsType,
@@ -1433,7 +1434,7 @@ class AircraftModel(object):
         state.gLoad = data[self._monidx_gLoad]
 
         flapsControl = data[self._monidx_flapsControl]
-        flapsIndex = int(flapsControl * (len(self._flapsNotches)-1))
+        flapsIndex = int(round(flapsControl * (len(self._flapsNotches)-1)))
         state.flapsSet = 0 if flapsIndex<1 else self._flapsNotches[flapsIndex]
 
         state.flaps = self._flapsNotches[-1]*data[self._monidx_flapsLeft]
@@ -1877,7 +1878,7 @@ class T134Model(GenericAircraftModel):
 #------------------------------------------------------------------------------
 
 class T154Model(GenericAircraftModel):
-    """Generic model for the Tupolev Tu-134 aircraft."""
+    """Generic model for the Tupolev Tu-154 aircraft."""
     fuelTanks = [const.FUELTANK_CENTRE, const.FUELTANK_CENTRE2,
                  const.FUELTANK_RIGHT, const.FUELTANK_LEFT,
                  const.FUELTANK_RIGHT_AUX, const.FUELTANK_LEFT_AUX]
@@ -1901,6 +1902,31 @@ class T154Model(GenericAircraftModel):
         state = super(T154Model, self).getAircraftState(aircraft, timestamp, data)
         del state.reverser[1]
         return state
+
+#------------------------------------------------------------------------------
+
+class FelisT154Model(T154Model):
+    """Model for Felis' Tupolev Tu-154-M aircraft."""
+    @staticmethod
+    def doesHandle(aircraft, (tailnum, author, description, notes,
+                              icao, liveryPath)):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        return aircraft.type==const.AIRCRAFT_T154 and \
+          author.find("Felis")!=-1 and \
+          description.find("Tu154M")!=-1
+
+    def __init__(self):
+        """Construct the model."""
+        super(T154Model, self). \
+            __init__(flapsNotches = [0, 15, 28, 36, 45],
+                     fuelTanks = T154Model.fuelTanks,
+                     numEngines = 3)
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "X-Plane/Felis Tupolev Tu-154-M"
 
 #------------------------------------------------------------------------------
 
@@ -1943,6 +1969,7 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 #------------------------------------------------------------------------------
 
 AircraftModel.registerSpecial(FJSDH8DModel)
+AircraftModel.registerSpecial(FelisT154Model)
 
 #------------------------------------------------------------------------------
 

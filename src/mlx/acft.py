@@ -1148,6 +1148,15 @@ class T154(Aircraft):
                                        "HA-LCR", "HA-LCU", "HA-LCV"]:
             self.mtow = 100000
             self.mlw = 80000
+        elif bookedFlight.tailNumber=="HA-LCX":
+            self.mtow = 100000
+            self.mlw = 80000
+            self.mzfw = 74000
+
+            self.flapSpeedLimits = { 15 : 227,
+                                     28 : 194,
+                                     36 : 178,
+                                     45 : 162 }
 
     def _appendLightsLoggers(self):
         """Append the loggers needed for the lights."""
