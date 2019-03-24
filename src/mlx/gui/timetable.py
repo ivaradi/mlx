@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 
 from mlx.gui.common import *
-from flightlist import ColumnDescriptor
+from .flightlist import ColumnDescriptor
 from mlx.rpc import ScheduledFlight
 
 import mlx.const as const
@@ -248,8 +248,8 @@ class Timetable(gtk.Alignment):
                 else:
                     self._tooltips.set_tip(widget, "")
                     self._tooltips.disable()
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             self._tooltips.set_tip(widget, "")
             self._tooltips.disable()
 
@@ -655,7 +655,7 @@ class TimetableWindow(gtk.Window):
         for aircraftType in aircraftTypes:
             typeFamilies.add(const.aircraftType2Family(aircraftType))
 
-        for (typeFamily, checkButton) in self._typeFamilyButtons.iteritems():
+        for (typeFamily, checkButton) in self._typeFamilyButtons.items():
             checkButton.set_sensitive(typeFamily in typeFamilies)
 
     def clear(self):
@@ -711,7 +711,7 @@ class TimetableWindow(gtk.Window):
     def _updateList(self):
         """Update the timetable list."""
         aircraftTypes = []
-        for (aircraftFamily, button) in self._typeFamilyButtons.iteritems():
+        for (aircraftFamily, button) in self._typeFamilyButtons.items():
             if button.get_active():
                 aircraftTypes += const.aircraftFamily2Types[aircraftFamily]
 

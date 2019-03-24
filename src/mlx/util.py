@@ -42,9 +42,9 @@ def getDegMinSec(degrees):
 
 #------------------------------------------------------------------------------
 
-def getCoordinateString((latitude, longitude)):
+def getCoordinateString(xxx_todo_changeme):
     """Get the string representation of the given coordinate pair."""
-
+    (latitude, longitude) = xxx_todo_changeme
     latitude_str = getLatitudeString(latitude)
     longitude_str = getLongitudeString(longitude)
 
@@ -78,7 +78,7 @@ def getDegreeString(degree, prefixes):
 
     (deg, min, sec, _sign) = getDegMinSec(degree)
 
-    return u"%s%d\u00b0%02d\u2032%02d\u2033" % (prefix, deg, min, sec)
+    return "%s%d\u00b0%02d\u2032%02d\u2033" % (prefix, deg, min, sec)
 
 #------------------------------------------------------------------------------
 
@@ -174,9 +174,9 @@ _latin2decoder = codecs.getdecoder("iso8859-2")
 def utf2unicode(text):
     """Convert the given text from UTF-8 encoding to unicode."""
     try:
-        return unicode(_utf8decoder(text)[0])
+        return str(_utf8decoder(text)[0])
     except:
         try:
-            return unicode(_latin2decoder(text)[0])
+            return str(_latin2decoder(text)[0])
         except:
-            return unicode(list(text))
+            return str(list(text))

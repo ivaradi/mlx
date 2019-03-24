@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 from mlx.gui.delaycodes import DelayCodeTable
 from mlx.gui.faultexplain import FaultExplainWidget

@@ -192,7 +192,7 @@ aircraftFamily2Types = {
 
 def aircraftType2Family(aircraftType):
     """Get the family for the given aircraft type."""
-    for (family, types) in aircraftFamily2Types.iteritems():
+    for (family, types) in aircraftFamily2Types.items():
         if aircraftType in types:
             return family
     assert False
@@ -423,7 +423,7 @@ def messageLevel2string(messageLevel):
 
 def string2messageLevel(str):
     """Get the message level for the given string."""
-    for (value, s) in _messageLevelStrings.iteritems():
+    for (value, s) in _messageLevelStrings.items():
         if str==s:
             return value
     return MESSAGELEVEL_NONE

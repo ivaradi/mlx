@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 
-from dcdata import CAPTION, DELAYCODE, getTable
+from .dcdata import CAPTION, DELAYCODE, getTable
 
 from mlx.gui.common import *
 

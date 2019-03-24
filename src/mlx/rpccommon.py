@@ -2,7 +2,7 @@
 
 #------------------------------------------------------------------------------
 
-import const
+from . import const
 
 #------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ class Fleet(object):
     def isGateConflicting(self, plane):
         """Check if the gate of the given plane conflicts with another plane's
         position."""
-        for p in self._planes.itervalues():
+        for p in self._planes.values():
             if p.tailNumber!=plane.tailNumber and \
                p.status==const.PLANE_HOME and \
                p.gateNumber==plane.gateNumber:
@@ -61,7 +61,7 @@ class Fleet(object):
     def getOccupiedGateNumbers(self):
         """Get a set containing the numbers of the gates occupied by planes."""
         gateNumbers = set()
-        for p in self._planes.itervalues():
+        for p in self._planes.values():
             if p.status==const.PLANE_HOME and p.gateNumber:
                 gateNumbers.add(p.gateNumber)
         return gateNumbers
@@ -79,7 +79,7 @@ class Fleet(object):
 
     def __iter__(self):
         """Get an iterator over the planes."""
-        for plane in self._planes.itervalues():
+        for plane in self._planes.values():
             yield plane
 
     def __getitem__(self, tailNumber):

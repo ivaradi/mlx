@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
 
-import const
-from util import secondaryInstallation, utf2unicode
+from . import const
+from .util import secondaryInstallation, utf2unicode
 
 import os
 import sys
 import traceback
-import ConfigParser
+import configparser
 
 ## @package mlx.config
 #
@@ -162,7 +162,7 @@ class ApproachCallouts(object):
         """Add this checklist to the given config."""
         baseName = "callouts." + const.icaoCodes[aircraftType] + "."
         index = 0
-        for (altitude, path) in self._mapping.iteritems():
+        for (altitude, path) in self._mapping.items():
             option = baseName + str(index)
             config.set(ApproachCallouts.SECTION, option,
                        "%d, %s" % (altitude, path))
@@ -170,11 +170,11 @@ class ApproachCallouts(object):
 
     def getAltitudes(self, descending = True):
         """Get the altitudes in decreasing order by default."""
-        altitudes = self._mapping.keys()
+        altitudes = list(self._mapping.keys())
         altitudes.sort(reverse = descending)
         return altitudes
 
-    def __nonzero__(self):
+    def __bool__(self):
         """Return if there is anything in the mapping."""
         return not not self._mapping
 
@@ -703,7 +703,7 @@ class Config(object):
     def load(self):
         """Load the configuration from its default location."""
         try:
-            config = ConfigParser.RawConfigParser()
+            config = configparser.RawConfigParser()
             config.read(configPath)
         except:
             traceback.print_exc()
@@ -805,7 +805,7 @@ class Config(object):
         if not self._modified:
             return
 
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
 
         config.add_section("login")
         config.set("login", "id", self._pilotID)
@@ -891,17 +891,17 @@ class Config(object):
 
         try:
             fd = os.open(configPath, os.O_CREAT|os.O_TRUNC|os.O_WRONLY,
-                         0600)
+                         0o600)
             with os.fdopen(fd, "wt") as f:
                 config.write(f)
             self._modified = False
 
-            print "Configuration saved:"
+            print("Configuration saved:")
             self.log()
 
-        except Exception, e:
-            print >> sys.stderr, "Failed to update config: " + \
-                                 utf2unicode(str(e))
+        except Exception as e:
+            print("Failed to update config: " + \
+                                 utf2unicode(str(e)), file=sys.stderr)
 
     def _getBoolean(self, config, section, option, default):
         """Get the given option as a boolean, if found in the given config,
@@ -944,7 +944,7 @@ class Config(object):
         Return True if a specific language was set, False otherwise."""
         import locale
         if self._language:
-            print "Setting up locale for", self._language
+            print("Setting up locale for", self._language)
             os.environ["LANGUAGE"] = self._language
             langAndEncoding = self._language + "." + locale.getpreferredencoding()
             os.environ["LANG"] = langAndEncoding
@@ -977,63 +977,63 @@ class Config(object):
 
     def log(self):
         """Log the configuration by printing the values"""
-        print "  pilot ID:", self._pilotID
-        print "  rememberPassword:", self._rememberPassword
+        print("  pilot ID:", self._pilotID)
+        print("  rememberPassword:", self._rememberPassword)
 
-        print "  language:", self._language
+        print("  language:", self._language)
 
-        print "  hideMinimizedWindow:", self._hideMinimizedWindow
-        print "  quitOnClose:", self._quitOnClose
+        print("  hideMinimizedWindow:", self._hideMinimizedWindow)
+        print("  quitOnClose:", self._quitOnClose)
 
-        print "  onlineGateSystem:", self._onlineGateSystem
-        print "  onlineACARS:", self._onlineACARS
+        print("  onlineGateSystem:", self._onlineGateSystem)
+        print("  onlineACARS:", self._onlineACARS)
 
-        print "  flareTimeFromFS:", self._flareTimeFromFS
-        print "  syncFSTime:", self._syncFSTime
-        print "  usingFS2Crew:", self._usingFS2Crew
+        print("  flareTimeFromFS:", self._flareTimeFromFS)
+        print("  syncFSTime:", self._syncFSTime)
+        print("  usingFS2Crew:", self._usingFS2Crew)
 
-        print "  iasSmoothingLength:", self._iasSmoothingLength
-        print "  vsSmoothingLength:", self._vsSmoothingLength
+        print("  iasSmoothingLength:", self._iasSmoothingLength)
+        print("  vsSmoothingLength:", self._vsSmoothingLength)
 
-        print "  useSimBrief:", self._useSimBrief
-        print "  simBriefUserName:", self._simBriefUserName
-        print "  rememberSimBriefPassword:", self._rememberSimBriefPassword
+        print("  useSimBrief:", self._useSimBrief)
+        print("  simBriefUserName:", self._simBriefUserName)
+        print("  rememberSimBriefPassword:", self._rememberSimBriefPassword)
 
-        print "  pirepDirectory:", self._pirepDirectory
-        print "  pirepAutoSave:", self._pirepAutoSave
+        print("  pirepDirectory:", self._pirepDirectory)
+        print("  pirepAutoSave:", self._pirepAutoSave)
 
-        print "  defaultMSFS:", self._defaultMSFS
+        print("  defaultMSFS:", self._defaultMSFS)
 
-        print "  enableSounds:", self._enableSounds
+        print("  enableSounds:", self._enableSounds)
 
-        print "  pilotControlsSounds:", self._pilotControlsSounds
-        print "  pilotHotkey:", str(self._pilotHotkey)
+        print("  pilotControlsSounds:", self._pilotControlsSounds)
+        print("  pilotHotkey:", str(self._pilotHotkey))
 
-        print "  enableApproachCallouts:", self._enableApproachCallouts
-        print "  speedbrakeAtTD:", self._speedbrakeAtTD
+        print("  enableApproachCallouts:", self._enableApproachCallouts)
+        print("  speedbrakeAtTD:", self._speedbrakeAtTD)
 
-        print "  enableChecklists:", self._enableChecklists
-        print "  checklistHotkey:", str(self._checklistHotkey)
+        print("  enableChecklists:", self._enableChecklists)
+        print("  checklistHotkey:", str(self._checklistHotkey))
 
-        print "  autoUpdate:", self._autoUpdate
-        print "  updateURL:", self._updateURL
-        print "  useRPC:", self._useRPC
+        print("  autoUpdate:", self._autoUpdate)
+        print("  updateURL:", self._updateURL)
+        print("  useRPC:", self._useRPC)
 
-        print "  messageTypeLevels:"
-        for (type, level) in self._messageTypeLevels.iteritems():
-            print "    %s: %s" % (const.messageType2string(type),
-                                  const.messageLevel2string(level))
+        print("  messageTypeLevels:")
+        for (type, level) in self._messageTypeLevels.items():
+            print("    %s: %s" % (const.messageType2string(type),
+                                  const.messageLevel2string(level)))
 
-        print "  checklists:"
-        for (type, checklist) in self._checklists.iteritems():
-            print "    %s:" % (const.icaoCodes[type],)
+        print("  checklists:")
+        for (type, checklist) in self._checklists.items():
+            print("    %s:" % (const.icaoCodes[type],))
             for path in checklist:
-                print "      " + path
+                print("      " + path)
 
-        print "  approachCallouts:"
-        for (type, approachCallouts) in self._approachCallouts.iteritems():
-            print "    %s:" % (const.icaoCodes[type],)
+        print("  approachCallouts:")
+        for (type, approachCallouts) in self._approachCallouts.items():
+            print("    %s:" % (const.icaoCodes[type],))
             for (altitude, path) in approachCallouts:
-                print "      %d: %s" % (altitude, path)
+                print("      %d: %s" % (altitude, path))
 
 #-------------------------------------------------------------------------------

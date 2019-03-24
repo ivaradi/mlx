@@ -1,25 +1,25 @@
 
-import const
-import util
-from rpc import Registration
-import rpc
-import rpccommon
+from . import const
+from . import util
+from .rpc import Registration
+from . import rpc
+from . import rpccommon
 
-from common import MAVA_BASE_URL
-from pirep import PIREP
+from .common import MAVA_BASE_URL
+from .pirep import PIREP
 
 import threading
 import sys
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import hashlib
 import time
 import datetime
 import codecs
 import traceback
 import xml.sax
-import xmlrpclib
-import HTMLParser
+import xmlrpc.client
+import html.parser
 
 #---------------------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ class BookedFlight(object):
         self.callsign = readline(f)
 
         date = readline(f)
-        print "web.BookedFlight.readFromWeb: date:", date
+        print("web.BookedFlight.readFromWeb: date:", date)
         if date=="0000-00-00": date = "0001-01-01"
 
         self.departureICAO = readline(f)
@@ -232,8 +232,8 @@ class BookedFlight(object):
                     else: lineOK = False
 
                 if not lineOK:
-                    print "web.BookedFlight.readFromFile: line %d is invalid" % \
-                          (lineNumber,)
+                    print("web.BookedFlight.readFromFile: line %d is invalid" % \
+                          (lineNumber,))
 
             line = f.readline()
 
@@ -289,28 +289,28 @@ class BookedFlight(object):
 
     def writeIntoFile(self, f):
         """Write the flight into a file."""
-        print >> f, "callsign=%s" % (self.callsign,)
+        print("callsign=%s" % (self.callsign,), file=f)
         date = self.departureTime.date()
-        print >> f, "date=%04d-%02d-%0d" % (date.year, date.month, date.day)
-        print >> f, "dep_airport=%s" % (self.departureICAO,)
-        print >> f, "dest_airport=%s" % (self.arrivalICAO,)
-        print >> f, "planecode=%s" % \
-              (BookedFlight.TYPE2TYPECODE[self.aircraftType],)
-        print >> f, "planetype=%s" % (self.aircraftTypeName,)
-        print >> f, "tail_nr=%s" % (self.tailNumber,)
-        print >> f, "passenger=%d" % (self.numPassengers,)
-        print >> f, "crew=%d" % (self.numCrew,)
-        print >> f, "bag=%d" % (self.bagWeight,)
-        print >> f, "cargo=%d" % (self.cargoWeight,)
-        print >> f, "mail=%d" % (self.mailWeight,)
-        print >> f, "flight_route=%s" % (self.route,)
+        print("date=%04d-%02d-%0d" % (date.year, date.month, date.day), file=f)
+        print("dep_airport=%s" % (self.departureICAO,), file=f)
+        print("dest_airport=%s" % (self.arrivalICAO,), file=f)
+        print("planecode=%s" % \
+              (BookedFlight.TYPE2TYPECODE[self.aircraftType],), file=f)
+        print("planetype=%s" % (self.aircraftTypeName,), file=f)
+        print("tail_nr=%s" % (self.tailNumber,), file=f)
+        print("passenger=%d" % (self.numPassengers,), file=f)
+        print("crew=%d" % (self.numCrew,), file=f)
+        print("bag=%d" % (self.bagWeight,), file=f)
+        print("cargo=%d" % (self.cargoWeight,), file=f)
+        print("mail=%d" % (self.mailWeight,), file=f)
+        print("flight_route=%s" % (self.route,), file=f)
         departureTime = self.departureTime
-        print >> f, "departure_time=%02d\\:%02d\\:%02d" % \
-              (departureTime.hour, departureTime.minute, departureTime.second)
+        print("departure_time=%02d\\:%02d\\:%02d" % \
+              (departureTime.hour, departureTime.minute, departureTime.second), file=f)
         arrivalTime = self.arrivalTime
-        print >> f, "arrival_time=%02d\\:%02d\\:%02d" % \
-              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second)
-        print >> f, "foglalas_id=%s" % ("0" if self.id is None else self.id,)
+        print("arrival_time=%02d\\:%02d\\:%02d" % \
+              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second), file=f)
+        print("foglalas_id=%s" % ("0" if self.id is None else self.id,), file=f)
 
     def _readAircraftType(self, f):
         """Read the aircraft type from the given file."""
@@ -363,7 +363,7 @@ class Plane(rpccommon.Plane):
             self.gateNumber = gateNumber if gateNumber else None
 
         except:
-            print >> sys.stderr, "Plane string is invalid: '" + s + "'"
+            print("Plane string is invalid: '" + s + "'", file=sys.stderr)
             self.tailNumber = None
 
 #------------------------------------------------------------------------------
@@ -469,11 +469,11 @@ class NOTAMHandler(xml.sax.handler.ContentHandler):
 
 #------------------------------------------------------------------------------
 
-class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
+class PilotsWebNOTAMsParser(html.parser.HTMLParser):
     """XML handler for the NOTAM query results on the PilotsWeb website."""
     def __init__(self):
         """Construct the handler."""
-        HTMLParser.HTMLParser.__init__(self)
+        html.parser.HTMLParser.__init__(self)
 
         self._notams = []
         self._currentNOTAM = ""
@@ -512,11 +512,11 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
         notam = None
         try:
             notam = self._parseCurrentNOTAM2()
-        except Exception, e:
-            print "Error parsing current NOTAM: " + str(e)
+        except Exception as e:
+            print("Error parsing current NOTAM: " + str(e))
 
         if notam is None:
-            print "Could not parse NOTAM: " + self._currentNOTAM
+            print("Could not parse NOTAM: " + self._currentNOTAM)
             if self._currentNOTAM:
                 self._notams.append(self._currentNOTAM + "\n")
         else:
@@ -525,7 +525,7 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
     def _parseCurrentNOTAM(self):
         """Parse the current NOTAM, if possible, and return a NOTAM object."""
         lines = self._currentNOTAM.splitlines()
-        lines = map(lambda line: line.strip(), lines)
+        lines = [line.strip() for line in lines]
 
         if len(lines)<4:
             return None
@@ -578,7 +578,7 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
     def _parseCurrentNOTAM2(self):
         """Parse the current NOTAM with a second, more flexible method."""
         lines = self._currentNOTAM.splitlines()
-        lines = map(lambda line: line.strip(), lines)
+        lines = [line.strip() for line in lines]
 
         if not lines:
             return None
@@ -591,7 +591,7 @@ class PilotsWebNOTAMsParser(HTMLParser.HTMLParser):
             if l.startswith("created:") or l.startswith("source:"):
                 lines = lines[:-1]
 
-        lines = map(lambda line: line.strip(), lines)
+        lines = [line.strip() for line in lines]
         contents = " ".join(lines).split()
 
         items = {}
@@ -652,8 +652,8 @@ class Result(object):
     def __repr__(self):
         """Get a representation of the result."""
         s = "<Result:"
-        for (key, value) in self.__dict__.iteritems():
-            s += " " + key + "=" + unicode(value)
+        for (key, value) in self.__dict__.items():
+            s += " " + key + "=" + str(value)
         s += ">"
         return s
 
@@ -687,15 +687,15 @@ class Request(object):
         try:
             result = self.run()
             returned = True
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc()
             result = e
             returned = False
 
         try:
             self._callback(returned, result)
-        except Exception, e:
-            print >> sys.stderr, "web.Handler.Request.perform: callback throwed an exception: " + util.utf2unicode(str(e))
+        except Exception as e:
+            print("web.Handler.Request.perform: callback throwed an exception: " + util.utf2unicode(str(e)), file=sys.stderr)
             #traceback.print_exc()
 
 #------------------------------------------------------------------------------
@@ -768,7 +768,7 @@ class Login(Request):
 
         result = Result()
 
-        f = urllib2.urlopen(url, timeout = 10.0)
+        f = urllib.request.urlopen(url, timeout = 10.0)
 
         status = readline(f)
         result.loggedIn = status == ".OK."
@@ -879,7 +879,7 @@ class GetFleet(Request):
         """Perform the login request."""
         url = MAVA_BASE_URL + "/onlinegates_get.php"
 
-        f = urllib2.urlopen(url, timeout = 10.0)
+        f = urllib.request.urlopen(url, timeout = 10.0)
         result = Result()
         result.fleet = Fleet(f)
         f.close()
@@ -921,11 +921,11 @@ class UpdatePlane(Request):
 
         gateNumber = self._gateNumber if self._gateNumber else ""
 
-        data = urllib.urlencode([("lajstrom", self._tailNumber),
+        data = urllib.parse.urlencode([("lajstrom", self._tailNumber),
                                  ("status", status),
                                  ("kapu", gateNumber)])
 
-        f = urllib2.urlopen(url, data, timeout = 10.0)
+        f = urllib.request.urlopen(url, data, timeout = 10.0)
         line = readline(f)
 
         result = Result()
@@ -982,7 +982,7 @@ class GetNOTAMs(Request):
 
             url = "http://notams.euroutepro.com/notams.xml"
 
-            f = urllib2.urlopen(url, timeout = 10.0)
+            f = urllib.request.urlopen(url, timeout = 10.0)
             try:
                 xmlParser.parse(f)
             finally:
@@ -1011,7 +1011,7 @@ class GetNOTAMs(Request):
             url = "https://pilotweb.nas.faa.gov/PilotWeb/notamRetrievalByICAOAction.do?method=displayByICAOs&formatType=ICAO&retrieveLocId=%s&reportType=RAW&actionType=notamRetrievalByICAOs" % \
               (icao.upper(),)
 
-            f = urllib2.urlopen(url, timeout = 10.0)
+            f = urllib.request.urlopen(url, timeout = 10.0)
             try:
                 data = f.read(16384)
                 while data:
@@ -1022,10 +1022,10 @@ class GetNOTAMs(Request):
 
             return parser.getNOTAMs()
 
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc()
-            print "mlx.web.GetNOTAMs.getPilotsWebNOTAMs: failed to get NOTAMs for '%s': %s" % \
-                  (icao, str(e))
+            print("mlx.web.GetNOTAMs.getPilotsWebNOTAMs: failed to get NOTAMs for '%s': %s" % \
+                  (icao, str(e)))
             return None
 
 #------------------------------------------------------------------------------
@@ -1041,14 +1041,14 @@ class GetMETARs(Request):
     def run(self):
         """Perform the retrieval opf the METARs."""
         url = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?"
-        data = urllib.urlencode([ ("dataSource" , "metars"),
+        data = urllib.parse.urlencode([ ("dataSource" , "metars"),
                                   ("requestType",  "retrieve"),
                                   ("format", "csv"),
                                   ("stationString", " ".join(self._airports)),
                                   ("hoursBeforeNow", "24"),
                                   ("mostRecentForEachStation", "constraint")])
         url += data
-        f = urllib2.urlopen(url, timeout = 10.0)
+        f = urllib.request.urlopen(url, timeout = 10.0)
         try:
             result = Result()
             result.metars = {}
@@ -1127,12 +1127,12 @@ class SendPIREP(Request):
         data["distance"] = "%.3f" % (pirep.flownDistance,)
         data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
 
-        postData = urllib.urlencode(data)
-        f = urllib2.urlopen(url, postData, timeout = 10.0)
+        postData = urllib.parse.urlencode(data)
+        f = urllib.request.urlopen(url, postData, timeout = 10.0)
         try:
             result = Result()
             line = f.readline().strip()
-            print "PIREP result from website:", line
+            print("PIREP result from website:", line)
             result.success = line=="OK"
             result.alreadyFlown = line=="MARVOLT"
             result.notAvailable = line=="NOMORE"
@@ -1177,7 +1177,7 @@ class SendACARS(Request):
 
     def run(self):
         """Perform the sending of the ACARS."""
-        print "Sending the online ACARS"
+        print("Sending the online ACARS")
 
         url = MAVA_BASE_URL  + "/acars2/acarsonline.php"
 
@@ -1203,7 +1203,7 @@ class SendACARS(Request):
 
         data["event"] = acars.getEventText()
 
-        f = urllib2.urlopen(url, urllib.urlencode(data), timeout = 10.0)
+        f = urllib.request.urlopen(url, urllib.parse.urlencode(data), timeout = 10.0)
         try:
             result = Result()
         finally:
@@ -1222,7 +1222,7 @@ class SendACARSRPC(RPCRequest):
 
     def run(self):
         """Perform the sending of the ACARS."""
-        print "Sending the online ACARS via JSON-RPC"
+        print("Sending the online ACARS via JSON-RPC")
 
         self._client.updateOnlineACARS(self._acars)
         return Result()
@@ -1242,7 +1242,7 @@ class SendBugReport(Request):
 
     def run(self):
         """Perform the sending of the bug report."""
-        serverProxy = xmlrpclib.ServerProxy("http://mlx.varadiistvan.hu/rpc")
+        serverProxy = xmlrpc.client.ServerProxy("http://mlx.varadiistvan.hu/rpc")
 
         result = Result()
         result.success = False
@@ -1253,7 +1253,7 @@ class SendBugReport(Request):
 
         result.ticketID = serverProxy.ticket.create(self._summary, self._description,
                                                     attributes, True)
-        print "Created ticket with ID:", result.ticketID
+        print("Created ticket with ID:", result.ticketID)
         result.success = True
 
         return result
@@ -1287,7 +1287,7 @@ class GetPIREP(RPCRequest):
         result = Result()
 
         pirepData = self._client.getPIREP(self._flightID)
-        print "pirepData:", pirepData
+        print("pirepData:", pirepData)
 
         bookedFlight = BookedFlight(self._flightID)
         bookedFlight.setupFromPIREPData(pirepData)
@@ -1511,7 +1511,7 @@ if __name__ == "__main__":
     import time
 
     def callback(returned, result):
-        print returned, unicode(result)
+        print(returned, str(result))
 
     handler = Handler()
     handler.start()

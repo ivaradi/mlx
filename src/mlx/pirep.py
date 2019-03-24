@@ -1,9 +1,9 @@
 
-from util import utf2unicode
-from flight import Flight
+from .util import utf2unicode
+from .flight import Flight
 
-import const
-import cPickle as pickle
+from . import const
+import pickle as pickle
 import calendar
 import datetime
 import time
@@ -64,7 +64,7 @@ class PIREP(object):
     @staticmethod
     def decodeFlightTypeText(s):
         """Decode the given flight type text."""
-        for (flighType, text) in PIREP._flightTypes.iteritems():
+        for (flighType, text) in PIREP._flightTypes.items():
             if s==text:
                 return flighType
         return const.FLIGHTTYPE_SCHEDULED
@@ -123,9 +123,9 @@ class PIREP(object):
                 if "mailWeight" not in dir(pirep):
                     pirep.mailWeight = pirep.bookedFlight.mailWeight
                 return pirep
-        except Exception, e:
-            print "Failed loading PIREP from %s: %s" % (path,
-                                                        utf2unicode(str(e)))
+        except Exception as e:
+            print("Failed loading PIREP from %s: %s" % (path,
+                                                        utf2unicode(str(e))))
             return None
 
     def __init__(self, flight):
@@ -366,9 +366,9 @@ class PIREP(object):
             with open(path, "wb") as f:
                 pickle.dump(self, f)
             return None
-        except Exception, e:
+        except Exception as e:
             error = utf2unicode(str(e))
-            print u"Failed saving PIREP to %s: %s" % (path, error)
+            print("Failed saving PIREP to %s: %s" % (path, error))
             return error
 
     def _serialize(self):

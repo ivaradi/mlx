@@ -1,11 +1,11 @@
 
-from common import *
+from .common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
 import mlx.config as config
 
-import urlparse
+import urllib.parse
 
 #------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ class Hotkey(gtk.HBox):
         self.pack_start(self._shift, False, False, 4)
 
         self._hotkeyModel = gtk.ListStore(str)
-        for keyCode in range(ord("0"), ord("9")+1) + range(ord("A"), ord("Z")+1):
+        for keyCode in list(range(ord("0"), ord("9")+1)) + list(range(ord("A"), ord("Z")+1)):
             self._hotkeyModel.append([chr(keyCode)])
 
         self._hotkey = gtk.ComboBox(model = self._hotkeyModel)
@@ -828,7 +828,7 @@ class Preferences(gtk.Dialog):
         """Set the sensitive state of the OK button."""
         sensitive = False
         try:
-            result = urlparse.urlparse(self._updateURL.get_text())
+            result = urllib.parse.urlparse(self._updateURL.get_text())
             sensitive = result.scheme!="" and (result.netloc + result.path)!=""
         except:
             pass

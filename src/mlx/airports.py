@@ -87,12 +87,12 @@ def getWelcomeMessage(icao):
 #-----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    for (town, airport) in airportNames.itervalues():
-        print town, airport
-    print getWelcomeMessage("LIRF")
-    print getWelcomeMessage("LHDC")
-    print getWelcomeMessage("LIRN")
-    print getWelcomeMessage("LHBP")
-    print getWelcomeMessage("EDDF")
+    for (town, airport) in airportNames.values():
+        print(town, airport)
+    print(getWelcomeMessage("LIRF"))
+    print(getWelcomeMessage("LHDC"))
+    print(getWelcomeMessage("LIRN"))
+    print(getWelcomeMessage("LHBP"))
+    print(getWelcomeMessage("EDDF"))
 
 #-----------------------------------------------------------------------------

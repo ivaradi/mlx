@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
@@ -104,7 +104,7 @@ class BugReportDialog(gtk.Dialog):
         self.show_all()
         response = super(BugReportDialog, self).run()
 
-        print "response", response, RESPONSETYPE_ACCEPT
+        print("response", response, RESPONSETYPE_ACCEPT)
         if response==RESPONSETYPE_ACCEPT:
             self._send()
         else:

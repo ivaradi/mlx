@@ -1,10 +1,10 @@
 
-from config import Config
-from util import utf2unicode
+from .config import Config
+from .util import utf2unicode
 
 import os
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import tempfile
 import socket
 import subprocess
@@ -56,7 +56,7 @@ class Manifest(object):
         """Get an iterator over the files.
 
         Each file is returned as a 3-tuple with items as in the file."""
-        for (path, (size, sum)) in self._files.iteritems():
+        for (path, (size, sum)) in self._files.items():
             yield (path, size, sum)
 
     def copy(self):
@@ -98,7 +98,7 @@ class Manifest(object):
 
     def writeInto(self, file):
         """Write the manifest into the file at the given path."""
-        for (path, (size, sum)) in self._files.iteritems():
+        for (path, (size, sum)) in self._files.items():
             file.write("%s\t%d\t%s\n" % (path, size, sum))
 
     def compare(self, other):
@@ -206,8 +206,8 @@ def readLocalManifest(directory):
     try:
         with open(manifestPath, "rt") as f:
             manifest.readFrom(f)
-    except Exception, e:
-        print "Error reading the manifest, ignoring:", utf2unicode(str(e))
+    except Exception as e:
+        print("Error reading the manifest, ignoring:", utf2unicode(str(e)))
         manifest = Manifest()
 
     return manifest
@@ -225,12 +225,12 @@ def prepareUpdate(directory, updateURL, listener):
     f = None
     try:
         updateManifest = Manifest()
-        f= urllib2.urlopen(updateURL + "/" + manifestName)
+        f= urllib.request.urlopen(updateURL + "/" + manifestName)
         updateManifest.readFrom(f)
 
-    except Exception, e:
+    except Exception as e:
         error = utf2unicode(str(e))
-        print >> sys.stderr, "Error downloading manifest:", error
+        print("Error downloading manifest:", error, file=sys.stderr)
         listener.failed(error)
         return None
     finally:
@@ -297,8 +297,8 @@ def removeFile(toremoveDir, directory, path):
             except:
                 pass
             os.rename(path, targetPath)
-        except Exception, e:
-            print "Cannot remove file " + path + ": " + utf2unicode(str(e))
+        except Exception as e:
+            print("Cannot remove file " + path + ": " + utf2unicode(str(e)))
 
 #------------------------------------------------------------------------------
 
@@ -358,7 +358,7 @@ def updateFiles(directory, updateURL, listener,
                 os.makedirs(targetDirectory)
                 
             with open(targetFile, "wb") as fout:
-                fin = urllib2.urlopen(updateURL + "/" + path)
+                fin = urllib.request.urlopen(updateURL + "/" + path)
                 while True:
                     data = fin.read(4096)
                     if not data:
@@ -390,12 +390,12 @@ def updateFiles(directory, updateURL, listener,
             manifest.writeInto(f)
         
         listener.done()
-    except Exception, e:
+    except Exception as e:
         exc = traceback.format_exc()
-        print >> sys.stderr, utf2unicode(exc)
+        print(utf2unicode(exc), file=sys.stderr)
         
         error = utf2unicode(str(e))
-        print >> sys.stderr, "Error:", error
+        print("Error:", error, file=sys.stderr)
 
         listener.failed(error)
 
@@ -408,7 +408,7 @@ def isDirectoryWritable(directory):
         f = open(checkFile, "wt")
         f.close()
         return True
-    except Exception, e:
+    except Exception as e:
         return False
     finally:
         try:
@@ -438,10 +438,10 @@ def processMLXUpdate(buffer, listener):
             elif command=="downloadedManifest":
                 listener.downloadedManifest()
             elif command=="setTotalSize":
-                listener.setTotalSize(int(words[1]), long(words[2]),
+                listener.setTotalSize(int(words[1]), int(words[2]),
                                       int(words[3]), int(words[4]))
             elif command=="setDownloaded":
-                listener.setDownloaded(long(words[1]))
+                listener.setDownloaded(int(words[1]))
             elif command=="startRenaming":
                 listener.startRenaming()
             elif command=="renamed":
@@ -456,9 +456,9 @@ def processMLXUpdate(buffer, listener):
                 listener.done()
             elif command=="failed":
                 listener.failed(words[1])
-        except Exception, e:
-            print >> sys.stderr, "Failed to parse line '%s': %s" % \
-                  (line, utf2unicode(str(e)))
+        except Exception as e:
+            print("Failed to parse line '%s': %s" % \
+                  (line, utf2unicode(str(e))), file=sys.stderr)
 
     return buffer
 
@@ -513,9 +513,9 @@ def sudoUpdate(directory, updateURL, listener, manifest):
         if os.name!="nt":
             process.wait()
         
-    except Exception, e:
+    except Exception as e:
         error = utf2unicode(str(e))
-        print >> sys.stderr, "Failed updating:", error
+        print("Failed updating:", error, file=sys.stderr)
         listener.failed(error)
     finally:
         if serverSocket is not None:
@@ -562,12 +562,12 @@ def update(directory, updateURL, listener, fromGUI = False):
         else:
             updateFiles(directory, updateURL, listener, updateManifest,
                         modifiedAndNew, removed, localRemoved)
-    except Exception, e:
+    except Exception as e:
         exc = traceback.format_exc()
-        print >> sys.stderr, utf2unicode(exc)
+        print(utf2unicode(exc), file=sys.stderr)
         
         error = utf2unicode(str(e))
-        print >> sys.stderr, "Update error:", error
+        print("Update error:", error, file=sys.stderr)
         
         listener.failed(error)
 
@@ -595,7 +595,7 @@ def updateProcess():
                     updateManifest, modifiedAndNew, removed, localRemoved)
     except:
         exc = traceback.format_exc()
-        print >> sys.stderr, utf2unicode(exc)
+        print(utf2unicode(exc), file=sys.stderr)
 
 #------------------------------------------------------------------------------
 

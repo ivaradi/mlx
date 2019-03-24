@@ -60,7 +60,7 @@ class ColumnDescriptor(object):
             column.set_sort_indicator(True)
 
         if self._extraColumnAttributes is not None:
-            for (key, value) in self._extraColumnAttributes.iteritems():
+            for (key, value) in self._extraColumnAttributes.items():
                 if key=="alignment":
                     self._renderer.set_alignment(value, 0.5)
                 else:
@@ -400,7 +400,7 @@ class PendingFlightsFrame(gtk.Frame):
         gui = self._wizard.gui
         gui.endBusy()
 
-        print "PendingFlightsFrame._handleReflyResult", returned, result
+        print("PendingFlightsFrame._handleReflyResult", returned, result)
 
         if returned:
             indexes = self._flightList.selectedIndexes
@@ -443,7 +443,7 @@ class PendingFlightsFrame(gtk.Frame):
         gui = self._wizard.gui
         gui.endBusy()
 
-        print "PendingFlightsFrame._handleDeleteResult", returned, result
+        print("PendingFlightsFrame._handleDeleteResult", returned, result)
 
         if returned:
             indexes = self._flightList.selectedIndexes

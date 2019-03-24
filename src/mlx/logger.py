@@ -1,7 +1,7 @@
 
-from fs import sendMessage
-import const
-import util
+from .fs import sendMessage
+from . import const
+from . import util
 
 import sys
 import time
@@ -234,7 +234,7 @@ class Logger(object):
 
     def debug(self, msg):
         """Log a debug message."""
-        print "[DEBUG]", msg
+        print("[DEBUG]", msg)
 
     def stage(self, timestamp, stage):
         """Report a change in the flight stage."""
@@ -325,7 +325,7 @@ class Logger(object):
     def getRating(self):
         """Get the rating of the flight so far."""
         totalScore = 100
-        for fault in self._faults.itervalues():
+        for fault in self._faults.values():
             score = fault.score
             if score==Logger.NO_GO_SCORE:
                 return -score

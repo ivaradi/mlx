@@ -1,10 +1,10 @@
 
-import const
-import gates
-import checks
-import fs
-from i18n import xstr
-import util
+from . import const
+from . import gates
+from . import checks
+from . import fs
+from .i18n import xstr
+from . import util
 
 import sys
 import time
@@ -307,7 +307,7 @@ class Aircraft(object):
             return "Derate setting: %s" % \
               ("-" if value is None else "enabled" if value else "disabled",)
         elif dt!=DERATE_NONE:
-            print "mlx.acft.getDerateLine: invalid derate type: " + dt
+            print("mlx.acft.getDerateLine: invalid derate type: " + dt)
 
         return None
 
@@ -342,7 +342,7 @@ class Aircraft(object):
                     checker.check(self._flight, self, self._flight.logger,
                                   self._aircraftState, aircraftState)
                 except:
-                    print >> sys.stderr, "Checker", checker, "failed"
+                    print("Checker", checker, "failed", file=sys.stderr)
                     traceback.print_exc()
 
             self._flight.handleState(self._aircraftState, aircraftState)
@@ -350,7 +350,7 @@ class Aircraft(object):
             self._maxVS = max(self._maxVS, aircraftState.vs)
             self._minVS = min(self._minVS, aircraftState.vs)
         except:
-            print >> sys.stderr, "Failed to handle the state"
+            print("Failed to handle the state", file=sys.stderr)
             traceback.print_exc()
         finally:
             self._aircraftState = aircraftState
@@ -402,7 +402,7 @@ class Aircraft(object):
                 if newStage==const.STAGE_LANDING:
                     self._logQNH(aircraftState)
             elif newStage==const.STAGE_GOAROUND:
-                from logger import Logger
+                from .logger import Logger
                 self._flight.handleFault("goaround",
                                          aircraftState.timestamp,
                                          "Go-around detected, please, explain!",
@@ -1283,48 +1283,48 @@ def getClass(aircraftType):
 if __name__ == "__main__":
     value = SmoothedValue()
 
-    print "Adding 1, 12.0"
+    print("Adding 1, 12.0")
     value.add(1, 12.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 1, 15.0"
+    print("Adding 1, 15.0")
     value.add(1, 15.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 2, 18.0"
+    print("Adding 2, 18.0")
     value.add(2, 18.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 2, 20.0"
+    print("Adding 2, 20.0")
     value.add(2, 20.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 5, 22.0"
+    print("Adding 5, 22.0")
     value.add(5, 22.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 5, 25.0"
+    print("Adding 5, 25.0")
     value.add(5, 25.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 5, 29.0"
+    print("Adding 5, 29.0")
     value.add(5, 29.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 5, 21.0"
+    print("Adding 5, 21.0")
     value.add(5, 21.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 5, 26.0"
+    print("Adding 5, 26.0")
     value.add(5, 26.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 2, 30.0"
+    print("Adding 2, 30.0")
     value.add(2, 30.0)
-    print value.get()
+    print(value.get())
 
-    print "Adding 2, 55.0"
+    print("Adding 2, 55.0")
     value.add(2, 55.0)
-    print value.get()
+    print(value.get())
 
 #---------------------------------------------------------------------------------------

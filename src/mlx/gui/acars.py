@@ -1,10 +1,10 @@
 
-from common import *
+from .common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
 
-import cef
+from . import cef
 
 #------------------------------------------------------------------------------
 

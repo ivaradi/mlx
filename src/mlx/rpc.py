@@ -1,7 +1,7 @@
-import const
-import rpccommon
+from . import const
+from . import rpccommon
 
-from common import MAVA_BASE_URL
+from .common import MAVA_BASE_URL
 
 import jsonrpclib
 import hashlib
@@ -27,7 +27,7 @@ class RPCObject(object):
 
         For all other names, the value will be stored as the same-named
         attribute."""
-        for (key, value) in value.iteritems():
+        for (key, value) in value.items():
             if key in instructions:
                 instruction = instructions[key]
                 if instruction is None:
@@ -36,8 +36,8 @@ class RPCObject(object):
                 try:
                     value = instruction(value)
                 except:
-                    print >> sys.stderr, "Failed to convert value '%s' of attribute '%s':" % \
-                        (value, key)
+                    print("Failed to convert value '%s' of attribute '%s':" % \
+                        (value, key), file=sys.stderr)
                     import traceback
                     traceback.print_exc()
             setattr(self, key, value)
@@ -296,28 +296,28 @@ class BookedFlight(RPCObject):
 
     def writeIntoFile(self, f):
         """Write the flight into a file."""
-        print >> f, "callsign=%s" % (self.callsign,)
+        print("callsign=%s" % (self.callsign,), file=f)
         date = self.departureTime.date()
-        print >> f, "date=%04d-%02d-%0d" % (date.year, date.month, date.day)
-        print >> f, "dep_airport=%s" % (self.departureICAO,)
-        print >> f, "dest_airport=%s" % (self.arrivalICAO,)
-        print >> f, "planecode=%s" % \
-              (BookedFlight.TYPE2TYPECODE[self.aircraftType],)
-        print >> f, "planetype=%s" % (self.aircraftTypeName,)
-        print >> f, "tail_nr=%s" % (self.tailNumber,)
-        print >> f, "passenger=%d" % (self.numPassengers,)
-        print >> f, "crew=%d" % (self.numCrew,)
-        print >> f, "bag=%d" % (self.bagWeight,)
-        print >> f, "cargo=%d" % (self.cargoWeight,)
-        print >> f, "mail=%d" % (self.mailWeight,)
-        print >> f, "flight_route=%s" % (self.route,)
+        print("date=%04d-%02d-%0d" % (date.year, date.month, date.day), file=f)
+        print("dep_airport=%s" % (self.departureICAO,), file=f)
+        print("dest_airport=%s" % (self.arrivalICAO,), file=f)
+        print("planecode=%s" % \
+              (BookedFlight.TYPE2TYPECODE[self.aircraftType],), file=f)
+        print("planetype=%s" % (self.aircraftTypeName,), file=f)
+        print("tail_nr=%s" % (self.tailNumber,), file=f)
+        print("passenger=%d" % (self.numPassengers,), file=f)
+        print("crew=%d" % (self.numCrew,), file=f)
+        print("bag=%d" % (self.bagWeight,), file=f)
+        print("cargo=%d" % (self.cargoWeight,), file=f)
+        print("mail=%d" % (self.mailWeight,), file=f)
+        print("flight_route=%s" % (self.route,), file=f)
         departureTime = self.departureTime
-        print >> f, "departure_time=%02d\\:%02d\\:%02d" % \
-              (departureTime.hour, departureTime.minute, departureTime.second)
+        print("departure_time=%02d\\:%02d\\:%02d" % \
+              (departureTime.hour, departureTime.minute, departureTime.second), file=f)
         arrivalTime = self.arrivalTime
-        print >> f, "arrival_time=%02d\\:%02d\\:%02d" % \
-              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second)
-        print >> f, "foglalas_id=%s" % ("0" if self.id is None else self.id,)
+        print("arrival_time=%02d\\:%02d\\:%02d" % \
+              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second), file=f)
+        print("foglalas_id=%s" % ("0" if self.id is None else self.id,), file=f)
 
 #---------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-from common import *
+from .common import *
 
 from mlx.util import secondaryInstallation
 
@@ -9,13 +9,13 @@ import json
 import time
 import os
 import re
-import thread
+import _thread
 import threading
 import tempfile
 import traceback
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from lxml import etree
-from StringIO import StringIO
+from io import StringIO
 import lxml.html
 
 #------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ class SimBriefHandler(object):
     def _onLoadEnd(self, browser, frame, httpCode):
         """Called when a page has been loaded in the SimBrief browser."""
         url = frame.GetUrl()
-        print "gui.cef.SimBriefHandler._onLoadEnd", httpCode, url
+        print("gui.cef.SimBriefHandler._onLoadEnd", httpCode, url)
         if httpCode>=300:
             self._updateProgress(self._lastProgress,
                                  SIMBRIEF_RESULT_ERROR_OTHER, None)
@@ -126,9 +126,9 @@ class SimBriefHandler(object):
                                  SIMBRIEF_RESULT_NONE, None)
 
             js = "form=document.getElementById(\"sbapiform\");"
-            for (name, value) in self._plan.iteritems():
+            for (name, value) in self._plan.items():
                 js += "form." + name + ".value=\"" + value + "\";"
-            for (name, value) in SimBriefHandler._querySettings.iteritems():
+            for (name, value) in SimBriefHandler._querySettings.items():
                 if isinstance(value, bool):
                     js += "form." + name + ".checked=" + \
                       ("true" if value else "false") + ";"
@@ -174,8 +174,8 @@ class SimBriefHandler(object):
                                  SIMBRIEF_RESULT_NONE, None)
 
             thread = threading.Thread(target = self._getResults, args = (link,))
-            thread.daemon = True
-            thread.start()
+            _thread.daemon = True
+            _thread.start()
         else:
             self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
                                  SIMBRIEF_RESULT_ERROR_OTHER, None)
@@ -218,7 +218,7 @@ class SimBriefHandler(object):
         flightInfo = {}
 
         # Obtaining the xml
-        response = urllib2.urlopen(link)
+        response = urllib.request.urlopen(link)
         xmlContent = response.read()
         # Processing xml
         content = etree.iterparse(StringIO(xmlContent))
@@ -241,7 +241,7 @@ class SimBriefHandler(object):
                 if imageLink[1] == 'src':
                     imageLinks.append(imageLink[2])
         flightInfo["image_links"] = imageLinks
-        print(sorted(availableInfo.keys()))
+        print((sorted(availableInfo.keys())))
         htmlFilePath = "simbrief_plan.html" if self._htmlFilePath is None \
           else self._htmlFilePath
         with open(htmlFilePath, 'w') as f:
@@ -265,7 +265,7 @@ def initialize(initializedCallback):
 
 def _initializeCEF(args, initializedCallback):
     """Perform the actual initialization of CEF using the given arguments."""
-    print "Initializing CEF with args:", args
+    print("Initializing CEF with args:", args)
 
     settings = {
         "debug": True, # cefpython debug messages in console and in log_file
@@ -289,13 +289,13 @@ def _initializeCEF(args, initializedCallback):
                 else:
                     switches[arg[2:assignIndex]] = arg[assignIndex+1:]
         else:
-            print "Unhandled switch", arg
+            print("Unhandled switch", arg)
 
     cefpython.Initialize(settings, switches)
 
     gobject.timeout_add(10, _handleTimeout)
 
-    print "Initialized, executing callback..."
+    print("Initialized, executing callback...")
     initializedCallback()
 
 #------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ def startInContainer(container, url, browserSettings = {}):
     if os.name=="nt":
         window = container.get_window()
         if window is None:
-            print "mlx.gui.cef.startInContainer: no window found!"
+            print("mlx.gui.cef.startInContainer: no window found!")
             windowID = None
         else:
             windowID = window.handle

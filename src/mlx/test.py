@@ -1,16 +1,16 @@
 # Test module
 
-import fs
-import flight
-import logger
-import acft
-import const
+from . import fs
+from . import flight
+from . import logger
+from . import acft
+from . import const
 
 import time
 import sys
 
 def callback(data, extra):
-    print data
+    print(data)
 
 def main():
     with open(sys.argv[1], "wt") as output:

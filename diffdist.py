@@ -17,7 +17,7 @@ tarName = "diffdist.tar.bz2"
 
 def usage():
     """Print a usage message."""
-    print "Usage: %s <old dist dir> <new dist dir>" % (sys.argv[0],)
+    print("Usage: %s <old dist dir> <new dist dir>" % (sys.argv[0],))
 
 #--------------------------------------------------------------------------
 
@@ -61,29 +61,29 @@ if __name__ == "__main__":
                     if oldData[i]!=newData[i]: numDiffs += 1
 
                 if numDiffs<=4:
-                    print "File %s is considered to be the same in both versions with %d changes" % \
-                          (path, numDiffs)
+                    print("File %s is considered to be the same in both versions with %d changes" % \
+                          (path, numDiffs))
                     finalManifest.addFile(path, oldSize, oldSum)
                     copyOld = True
 
         if not copyOld:
-            print ">>> File %s is being copied" % (path,)
+            print(">>> File %s is being copied" % (path,))
             tarFile.add(os.path.join(newDirectory, path), arcname = path)
             
     (fd, path) = tempfile.mkstemp()
     with os.fdopen(fd, "wt") as f:
         finalManifest.writeInto(f)
-    os.chmod(path, 0644)
+    os.chmod(path, 0o644)
     tarFile.add(path, arcname = manifestName)
     tarFile.close()
 
     os.remove(path)
 
-    print
-    print "%s created" % (tarName,)
+    print()
+    print("%s created" % (tarName,))
     if removed:
-        print
-        print "Files to remove:"
-        print
+        print()
+        print("Files to remove:")
+        print()
         for path in removed:
-            print "  ", path
+            print("  ", path)

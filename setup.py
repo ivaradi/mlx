@@ -98,10 +98,10 @@ if os.name=="nt":
                                 os.path.join(cefDir, "libcef.dll")
                               ]))
 
-    print data_files
+    print(data_files)
 
     with open("mlx-common.nsh", "wt") as f:
-            print >>f, '!define MLX_VERSION "%s"' % (mlx.const.VERSION)
+            print('!define MLX_VERSION "%s"' % (mlx.const.VERSION), file=f)
             f.close()
 else:
     for (dirpath, dirnames, filenames) in os.walk("patches"):
@@ -144,5 +144,5 @@ if os.name=="nt":
               os.path.join(scriptdir, "dist", "libcef.dll"))
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
     with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
-        print >> f, "StartMenuFolder=MAVA Logger X"
-        print >> f, "LinkName=MAVA Logger X"
+        print("StartMenuFolder=MAVA Logger X", file=f)
+        print("LinkName=MAVA Logger X", file=f)

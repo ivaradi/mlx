@@ -1,11 +1,11 @@
 
-import const
-from sound import startSound
+from . import const
+from .sound import startSound
 
 import os
 
-import fsuipc
-import xplane
+from . import fsuipc
+from . import xplane
 
 import threading
 import time
@@ -35,15 +35,15 @@ class ConnectionListener(object):
     def connected(self, fsType, descriptor):
         """Called when a connection has been established to the flight
         simulator of the given type."""
-        print "fs.ConnectionListener.connected, fsType:", fsType, ", descriptor:", descriptor
+        print("fs.ConnectionListener.connected, fsType:", fsType, ", descriptor:", descriptor)
 
     def connectionFailed(self):
         """Called when the connection could not be established."""
-        print "fs.ConnectionListener.connectionFailed"
+        print("fs.ConnectionListener.connectionFailed")
 
     def disconnected(self):
         """Called when a connection to the flight simulator has been broken."""
-        print "fs.ConnectionListener.disconnected"
+        print("fs.ConnectionListener.disconnected")
 
 #-------------------------------------------------------------------------------
 

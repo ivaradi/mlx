@@ -1,10 +1,10 @@
 
-from config import Config
-from i18n import setLanguage
-from sound import preInitializeSound, initializeSound, finalizeSound
-from util import secondaryInstallation
-from const import VERSION
-from watchdog import Watchdog
+from .config import Config
+from .i18n import setLanguage
+from .sound import preInitializeSound, initializeSound, finalizeSound
+from .util import secondaryInstallation
+from .const import VERSION
+from .watchdog import Watchdog
 
 import os
 import sys
@@ -59,7 +59,7 @@ def restart(args = []):
 
 def main():
     """The main operation of the program."""
-    from singleton import SingleInstance, raiseCallbackWrapper
+    from .singleton import SingleInstance, raiseCallbackWrapper
 
     global instance
     instance = SingleInstance("mlx" + ("-secondary" if secondaryInstallation
@@ -85,8 +85,8 @@ def main():
     sys.stdout = StdIOHandler(gui)
     sys.stderr = StdIOHandler(gui)
 
-    print "MAVA Logger X " + VERSION + " debug log"
-    print "The initial configuration:"
+    print("MAVA Logger X " + VERSION + " debug log")
+    print("The initial configuration:")
     config.log()
 
     initializeSound(os.path.join(programDirectory, "sounds"))

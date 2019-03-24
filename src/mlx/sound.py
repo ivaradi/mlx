@@ -1,5 +1,5 @@
 
-from util import utf2unicode
+from .util import utf2unicode
 
 import os
 import traceback
@@ -112,12 +112,12 @@ if os.name=="nt":
                 for (alias, (finishCallback, extra)) in toClose:
                     success = True
                     try:
-                        print "Closing", alias
+                        print("Closing", alias)
                         self._mci.send("close " + alias)
-                        print "Closed", alias
-                    except Exception, e:
-                        print "Failed closing " + alias + ":",
-                        print utf2unicode(str(e))
+                        print("Closed", alias)
+                    except Exception as e:
+                        print("Failed closing " + alias + ":", end=' ')
+                        print(utf2unicode(str(e)))
                         success = False
 
                     if finishCallback is not None:
@@ -129,7 +129,7 @@ if os.name=="nt":
                 for (path, finishData, counter) in requests:
                     try:
                         alias = "mlxsound%d" % (counter,)
-                        print "Starting to play", path, "as", alias
+                        print("Starting to play", path, "as", alias)
                         self._mci.send("open \"%s\" alias %s" % \
                                        (path, alias))
                         self._mci.send("set %s time format milliseconds" % \
@@ -143,10 +143,10 @@ if os.name=="nt":
                         with self._requestCondition:
                             self._pending.append((timeout, (alias, finishData)))
                             self._pending.sort()
-                        print "Started to play", path
-                    except Exception, e:
-                        print "Failed to start playing " + path + ":",
-                        print utf2unicode(str(e))
+                        print("Started to play", path)
+                    except Exception as e:
+                        print("Failed to start playing " + path + ":", end=' ')
+                        print(utf2unicode(str(e)))
                         (finishCallback, extra) = finishData
                         if finishCallback is not None:
                             try:
@@ -219,7 +219,7 @@ else: # os.name!="nt"
             from gi.repository import GObject as gobject
 
             Gst.init(None)
-        except Exception, e:
+        except Exception as e:
             outQueue.put(False)
             outQueue.put(e)
             return
@@ -350,8 +350,8 @@ else: # os.name!="nt"
             _outQueue.put(soundsDirectory)
         else:
             exception = _inQueue.get()
-            print "The Gst library is missing from your system. It is needed for sound playback on Linux:"
-            print exception
+            print("The Gst library is missing from your system. It is needed for sound playback on Linux:")
+            print(exception)
 
     def startSound(name, finishCallback = None, extra = None):
         """Start playing back the given sound.
@@ -386,13 +386,13 @@ if __name__ == "__main__":
     import time
 
     def callback(result, extra):
-        print "callback", result, extra
+        print("callback", result, extra)
 
     preInitializeSound()
 
     soundsPath = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                               "..", "..", "sounds"))
-    print "soundsPath:", soundsPath
+    print("soundsPath:", soundsPath)
     initializeSound(soundsPath)
     startSound("notam.mp3", finishCallback = callback, extra= "notam.mp3")
     time.sleep(5)

@@ -763,14 +763,14 @@ def generateMsgStr(file, text):
     lines = text.splitlines()
     numLines = len(lines)
     if numLines==0:
-        print >> file, "msgstr \"\""
+        print("msgstr \"\"", file=file)
     elif numLines==1:
-        print >> file, "msgstr \"%s\"" % (lines[0])
+        print("msgstr \"%s\"" % (lines[0]), file=file)
     else:
-        print >> file, "msgstr \"\""
+        print("msgstr \"\"", file=file)
         for i in range(0, numLines):
-            print >> file, "\"%s%s\"" % (lines[i], "" if i==(numLines-1) else "\\n")
-    print >> file
+            print("\"%s%s\"" % (lines[i], "" if i==(numLines-1) else "\\n"), file=file)
+    print(file=file)
 
 #-------------------------------------------------------------------------------
 
@@ -788,10 +788,10 @@ def generateFiles(baseDir):
             poPath = os.path.join(baseDir, "locale", language, "mlx_delay.po")
             poFile = open(poPath, "wt")
             poFiles.append(poFile)
-            print >> poFile, "msgid \"\""
-            print >> poFile, "msgstr \"\""
-            print >> poFile, "\"Content-Type: text/plain; charset=utf-8\\n\""
-            print >> poFile, "\"Content-Transfer-Encoding: 8bit\\n\""
+            print("msgid \"\"", file=poFile)
+            print("msgstr \"\"", file=poFile)
+            print("\"Content-Type: text/plain; charset=utf-8\\n\"", file=poFile)
+            print("\"Content-Transfer-Encoding: 8bit\\n\"", file=poFile)
 
         (baseData, headings, headingFlags, rows) = table
         (poPrefix, extractor) = baseData
@@ -800,7 +800,7 @@ def generateFiles(baseDir):
             heading = headings[i]
             for j in range(0, numLanguages):
                 poFile = poFiles[j]
-                print >> poFile, "msgid \"%sheading%d\"" % (poPrefix, i)
+                print("msgid \"%sheading%d\"" % (poPrefix, i), file=poFile)
                 generateMsgStr(poFile, heading[j])
 
 
@@ -809,7 +809,7 @@ def generateFiles(baseDir):
             if type==CAPTION:
                 for i in range(0, numLanguages):
                     poFile = poFiles[i]
-                    print >> poFile, "msgid \"%srow%d\"" % (poPrefix, rowIndex)
+                    print("msgid \"%srow%d\"" % (poPrefix, rowIndex), file=poFile)
                     generateMsgStr(poFile, columns[i])
             elif type==DELAYCODE:
                 columnIndex = 0
@@ -818,22 +818,22 @@ def generateFiles(baseDir):
                         for i in range(0, numLanguages):
                             if column[i]:
                                 poFile = poFiles[i]
-                                print >> poFile, "msgid \"%srow%d_col%d\"" % \
-                                  (poPrefix, rowIndex, columnIndex)
+                                print("msgid \"%srow%d_col%d\"" % \
+                                  (poPrefix, rowIndex, columnIndex), file=poFile)
                                 generateMsgStr(poFile, column[i])
                     columnIndex += 1
             rowIndex += 1
 
-        print >> dcdata, "import mlx.const as const"
-        print >> dcdata, "from mlx.i18n import xstr"
-        print >> dcdata
-        print >> dcdata, "CAPTION = 1"
-        print >> dcdata, "DELAYCODE = 2"
-        print >> dcdata
+        print("import mlx.const as const", file=dcdata)
+        print("from mlx.i18n import xstr", file=dcdata)
+        print(file=dcdata)
+        print("CAPTION = 1", file=dcdata)
+        print("DELAYCODE = 2", file=dcdata)
+        print(file=dcdata)
 
         tableMask = 1
         for i in range(0, len(tablePrefixes)):
-            print >> dcdata, "_%s_code2meaning = {" % (tablePrefixes[i],)
+            print("_%s_code2meaning = {" % (tablePrefixes[i],), file=dcdata)
 
             columnIndexes = []
             for j in range(0, len(headings)):
@@ -849,39 +849,39 @@ def generateFiles(baseDir):
                     continue
 
                 if type==DELAYCODE:
-                    print >> dcdata, "    \"%s\": \"%s\"," % \
-                      (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", ""))
+                    print("    \"%s\": \"%s\"," % \
+                      (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", "")), file=dcdata)
 
-            print >> dcdata, "}"
-            print >> dcdata
+            print("}", file=dcdata)
+            print(file=dcdata)
 
             tableMask <<= 1
 
-        print >> dcdata, "def _extract(table, row):"
-        print >> dcdata, "    code = row[0].strip()"
-        print >> dcdata, "    meaning = table[code] if code in table else None"
-        print >> dcdata, "    return code + ((\" (\" + meaning + \")\") if meaning else \"\")"
-        print >> dcdata
+        print("def _extract(table, row):", file=dcdata)
+        print("    code = row[0].strip()", file=dcdata)
+        print("    meaning = table[code] if code in table else None", file=dcdata)
+        print("    return code + ((\" (\" + meaning + \")\") if meaning else \"\")", file=dcdata)
+        print(file=dcdata)
 
         tableMask = 1
         for i in range(0, len(tablePrefixes)):
 
-            print >> dcdata, "_%s_data = (" % (tablePrefixes[i],)
-            print >> dcdata, "    lambda row: _extract(_%s_code2meaning, row)," % \
-              (tablePrefixes[i],)
-            print >> dcdata, "    [",
+            print("_%s_data = (" % (tablePrefixes[i],), file=dcdata)
+            print("    lambda row: _extract(_%s_code2meaning, row)," % \
+              (tablePrefixes[i],), file=dcdata)
+            print("    [", end=' ', file=dcdata)
 
             columnIndexes = []
             for j in range(0, len(headings)):
                 if ( (headingFlags[j]&tableMask)==tableMask ):
                     if columnIndexes:
-                        print >> dcdata, ",",
-                    print >> dcdata, "xstr(\"%sheading%d\")" % (poPrefix, j),
+                        print(",", end=' ', file=dcdata)
+                    print("xstr(\"%sheading%d\")" % (poPrefix, j), end=' ', file=dcdata)
                     columnIndexes.append(j)
 
-            print >> dcdata, "],"
+            print("],", file=dcdata)
 
-            print >> dcdata, "    ["
+            print("    [", file=dcdata)
 
             rowIndex = 0
             for (type, mask, columns) in rows:
@@ -890,45 +890,45 @@ def generateFiles(baseDir):
                     continue
 
                 if type==CAPTION:
-                    print >> dcdata, "        (CAPTION, xstr(\"%srow%d\"))," % \
-                      (poPrefix, rowIndex)
+                    print("        (CAPTION, xstr(\"%srow%d\"))," % \
+                      (poPrefix, rowIndex), file=dcdata)
                 elif type==DELAYCODE:
-                    print >> dcdata, "        (DELAYCODE, ["
+                    print("        (DELAYCODE, [", file=dcdata)
                     for j in columnIndexes:
                         column = columns[j]
                         if j!=columnIndexes[0]:
-                            print >> dcdata, ","
+                            print(",", file=dcdata)
                         if isinstance(column, list):
                             if column[0]:
-                                print >> dcdata, "            xstr(\"%srow%d_col%d\")"  % \
-                                (poPrefix, rowIndex, j),
+                                print("            xstr(\"%srow%d_col%d\")"  % \
+                                (poPrefix, rowIndex, j), end=' ', file=dcdata)
                             else:
-                                print >> dcdata, "            \"\"",
+                                print("            \"\"", end=' ', file=dcdata)
                         else:
-                            print >> dcdata, "            \"%s\""  % \
-                              (column,),
-                    print >> dcdata, "] ),"
+                            print("            \"%s\""  % \
+                              (column,), end=' ', file=dcdata)
+                    print("] ),", file=dcdata)
                 rowIndex += 1
 
-            print >> dcdata, "    ]"
+            print("    ]", file=dcdata)
 
-            print >> dcdata, ")"
-            print >> dcdata
+            print(")", file=dcdata)
+            print(file=dcdata)
 
             tableMask <<= 1
 
-        print >> dcdata, "def getTable(aircraftType):"
+        print("def getTable(aircraftType):", file=dcdata)
         first = True
         for i in range(0, len(tablePrefixes)):
             tablePrefix = tablePrefixes[i]
             for typeSuffix in typeGroups[i]:
-                print >> dcdata, "    %s aircraftType==const.AIRCRAFT_%s:" % \
-                  ("if" if first else "elif", typeSuffix)
-                print >> dcdata, "        return _%s_data" % (tablePrefix,)
+                print("    %s aircraftType==const.AIRCRAFT_%s:" % \
+                  ("if" if first else "elif", typeSuffix), file=dcdata)
+                print("        return _%s_data" % (tablePrefix,), file=dcdata)
                 first = False
 
-        print >> dcdata, "    else:"
-        print >> dcdata, "        return None"
+        print("    else:", file=dcdata)
+        print("        return None", file=dcdata)
     finally:
         for poFile in poFiles:
             poFile.close()

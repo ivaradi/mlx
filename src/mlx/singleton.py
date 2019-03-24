@@ -1,5 +1,5 @@
 
-from util import utf2unicode
+from .util import utf2unicode
 
 import os
 import time
@@ -58,29 +58,29 @@ if os.name=="nt":
                     if handle is None:
                         break
 
-                    print "singleton._PipeServer.run: created the pipe"
+                    print("singleton._PipeServer.run: created the pipe")
                     try:
                         if win32pipe.ConnectNamedPipe(handle)==0:
-                            print "singleton._PipeServer.run: client connection received"
+                            print("singleton._PipeServer.run: client connection received")
                             (code, message) = \
                                 win32file.ReadFile(handle,
                                                    _PipeServer.BUFFER_SIZE,
                                                    None)
 
                             if code==0:
-                                print "singleton._PipeServer.run: message received from client"
+                                print("singleton._PipeServer.run: message received from client")
                                 self._raiseCallback()
                             else:
-                                print "singleton._PipeServer.run: failed to read from the pipe"
-                    except Exception, e:
-                        print "singleton._PipeServer.run: exception:",
-                        print utf2unicode(str(e))
+                                print("singleton._PipeServer.run: failed to read from the pipe")
+                    except Exception as e:
+                        print("singleton._PipeServer.run: exception:", end=' ')
+                        print(utf2unicode(str(e)))
                     finally:
                         win32pipe.DisconnectNamedPipe(handle)
                         win32file.CloseHandle(handle)
-            except Exception, e:
-                print "singleton._PipeServer.run: fatal exception:",
-                print utf2unicode(str(e))
+            except Exception as e:
+                print("singleton._PipeServer.run: fatal exception:", end=' ')
+                print(utf2unicode(str(e)))
                             
         def _createPipe(self):
             """Create the pipe."""
@@ -95,7 +95,7 @@ if os.name=="nt":
                                                1000,
                                                None)
             if handle==win32file.INVALID_HANDLE_VALUE:
-                print "singleton._PipeServer.run: could not create the handle"
+                print("singleton._PipeServer.run: could not create the handle")
                 return None
             else:
                 return handle            
@@ -143,12 +143,12 @@ if os.name=="nt":
                     f.write("hello")
                     f.close()
                     return
-                except Exception, e:
-                    print "SingleInstance._notifySingleton: failed:",
-                    print utf2unicode(str(e))
+                except Exception as e:
+                    print("SingleInstance._notifySingleton: failed:", end=' ')
+                    print(utf2unicode(str(e)))
                     time.sleep(0.5)
         
-        def __nonzero__(self):
+        def __bool__(self):
             """Return a boolean representation of the object.
 
             It is True, if this is the single instance of the program."""
@@ -193,9 +193,9 @@ else:     # os.name=="nt"
                 while True:
                     s.recv(64)
                     self._raiseCallback()
-            except Exception, e:
-                print "singleton._SocketServer.run: fatal exception:",
-                print utf2unicode(str(e))
+            except Exception as e:
+                print("singleton._SocketServer.run: fatal exception:", end=' ')
+                print(utf2unicode(str(e)))
     
     class SingleInstance(object):
         """Creating an instance of this object checks if only one instance of
@@ -217,7 +217,7 @@ else:     # os.name=="nt"
             try:
                 fcntl.lockf(self._lockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 self._isSingle = True
-            except Exception, e:
+            except Exception as e:
                 self._lockFile.close()
                 self._lockFile = None
                 pass
@@ -258,12 +258,12 @@ else:     # os.name=="nt"
                     s.send("hello")
                     s.close()
                     return
-                except Exception, e:
-                    print "singleton.SingleInstance._notifySingleton: failed:",
-                    print utf2unicode(str(e))
+                except Exception as e:
+                    print("singleton.SingleInstance._notifySingleton: failed:", end=' ')
+                    print(utf2unicode(str(e)))
                     time.sleep(0.5)
 
-        def __nonzero__(self):
+        def __bool__(self):
             """Return a boolean representation of the object.
 
             It is True, if this is the single instance of the program."""
@@ -298,12 +298,12 @@ def raiseCallbackWrapper():
 
 if __name__=="__main__":
     def raiseCallback():
-        print "Raise the window!"
+        print("Raise the window!")
 
     instance = SingleInstance("mlx", raiseCallback)
     if instance:
-        print "The first instance"
+        print("The first instance")
         time.sleep(10)
     else:
-        print "The program is already running."
+        print("The program is already running.")
 

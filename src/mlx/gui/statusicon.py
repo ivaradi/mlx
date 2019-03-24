@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 import mlx.const as const
 from mlx.i18n import xstr
@@ -153,7 +153,7 @@ class StatusIcon(FlightStatusHandler):
 
     def _updateFlightStatus(self):
         """Update the flight status."""
-        stage = u"-" if self._stage is None \
+        stage = "-" if self._stage is None \
                 else xstr("flight_stage_" + const.stage2string(self._stage))
 
         if self._noGoReason is None:
@@ -171,7 +171,7 @@ class StatusIcon(FlightStatusHandler):
         else:
             if self._noGoReason is not None:
                 rating = '<span foreground="red">' + rating + '</span>'
-            markup = u"MAVA Logger X %s\n\n%s: %s\n%s: %s" %\
+            markup = "MAVA Logger X %s\n\n%s: %s\n%s: %s" %\
                      (const.VERSION, xstr("statusicon_stage"), stage,
                       xstr("statusicon_rating"), rating)
             self._statusIcon.set_tooltip_markup(markup)

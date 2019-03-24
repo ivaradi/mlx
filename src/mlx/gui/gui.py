@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from statusicon import StatusIcon
-from statusbar import Statusbar
-from info import FlightInfo
-from update import Updater
+from .statusicon import StatusIcon
+from .statusbar import Statusbar
+from .info import FlightInfo
+from .update import Updater
 from mlx.gui.common import *
 from mlx.gui.flight import Wizard
 from mlx.gui.monitor import MonitorWindow
@@ -17,7 +17,7 @@ from mlx.gui.pirep import PIREPViewer, PIREPEditor
 from mlx.gui.bugreport import BugReportDialog
 from mlx.gui.acars import ACARS
 from mlx.gui.timetable import TimetableWindow
-import cef
+from . import cef
 
 import mlx.const as const
 import mlx.fs as fs
@@ -50,15 +50,15 @@ import webbrowser
 
 class GUI(fs.ConnectionListener):
     """The main GUI class."""
-    _authors = [ (u"Váradi", u"István", "prog_test"),
-                 (u"Galyassy", u"Tamás", "negotiation"),
-                 (u"Kurják", u"Ákos", "test"),
-                 (u"Nagy", u"Dániel", "test"),
-                 (u"Radó", u"Iván", "test"),
-                 (u"Petrovszki", u"Gábor", "test"),
-                 (u"Serfőző", u"Tamás", "test"),
-                 (u"Szebenyi", u"Bálint", "test"),
-                 (u"Zsebényi-Loksa", u"Gergely", "test") ]
+    _authors = [ ("Váradi", "István", "prog_test"),
+                 ("Galyassy", "Tamás", "negotiation"),
+                 ("Kurják", "Ákos", "test"),
+                 ("Nagy", "Dániel", "test"),
+                 ("Radó", "Iván", "test"),
+                 ("Petrovszki", "Gábor", "test"),
+                 ("Serfőző", "Tamás", "test"),
+                 ("Szebenyi", "Bálint", "test"),
+                 ("Zsebényi-Loksa", "Gergely", "test") ]
 
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
@@ -1461,7 +1461,7 @@ class GUI(fs.ConnectionListener):
                 messageFormat = xstr("sendPIREP_unknown")
                 secondaryMarkup = xstr("sendPIREP_unknown_sec")
         else:
-            print "PIREP sending failed", result
+            print("PIREP sending failed", result)
             messageFormat = xstr("sendPIREP_failed")
             secondaryMarkup = xstr("sendPIREP_failed_sec")
 
@@ -1685,7 +1685,7 @@ class GUI(fs.ConnectionListener):
                 messageFormat = xstr("sendPIREP_unknown")
                 secondaryMarkup = xstr("sendPIREP_unknown_sec")
         else:
-            print "PIREP sending failed", result
+            print("PIREP sending failed", result)
             messageFormat = xstr("sendPIREP_failed")
             secondaryMarkup = xstr("sendPIREP_failed_sec")
 
@@ -1710,7 +1710,7 @@ class GUI(fs.ConnectionListener):
         description += "\n\nThe contents of the log:\n\n"
 
         for (timestampString, text) in self._logger.lines:
-            description += unicode(formatFlightLogLine(timestampString, text))
+            description += str(formatFlightLogLine(timestampString, text))
 
         description += "\n\n" + ("=" * 40)
         description += "\n\nThe contents of the debug log:\n\n"
@@ -1797,13 +1797,13 @@ class GUI(fs.ConnectionListener):
         if id==self._hotkeySetID:
             for index in hotkeys:
                 if index==self._pilotHotkeyIndex:
-                    print "gui.GUI._handleHotkeys: pilot hotkey pressed"
+                    print("gui.GUI._handleHotkeys: pilot hotkey pressed")
                     self._flight.pilotHotkeyPressed()
                 elif index==self._checklistHotkeyIndex:
-                    print "gui.GUI._handleHotkeys: checklist hotkey pressed"
+                    print("gui.GUI._handleHotkeys: checklist hotkey pressed")
                     self._flight.checklistHotkeyPressed()
                 else:
-                    print "gui.GUI._handleHotkeys: unhandled hotkey index:", index
+                    print("gui.GUI._handleHotkeys: unhandled hotkey index:", index)
 
     def _showManual(self, menuitem):
         """Show the user's manual."""

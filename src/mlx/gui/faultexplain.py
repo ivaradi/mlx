@@ -246,7 +246,7 @@ class FaultExplainWidget(gtk.Frame):
 
     def reset(self):
         """Reset the widget by removing all faults."""
-        for (alignment, faultFrame) in self._faultWidgets.itervalues():
+        for (alignment, faultFrame) in self._faultWidgets.values():
             self._faults.remove(alignment)
         self._faults.show_all()
 

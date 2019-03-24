@@ -1,7 +1,7 @@
 
-from sound import startSound
-import const
-import fs
+from .sound import startSound
+from . import const
+from . import fs
 
 import threading
 
@@ -63,9 +63,9 @@ class Sound(object):
     def _playbackDone(self, success, extra):
         """Called when the playback of thee sound has finished (or failed)."""
         if success is None:
-            print "Failed to start sound", self._name
+            print("Failed to start sound", self._name)
         elif not success:
-            print "Failed to finish sound", self._name
+            print("Failed to finish sound", self._name)
         with Sound._lock:            
             self._playing -= 1
 

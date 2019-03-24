@@ -59,9 +59,9 @@ class _ClientState(object):
                 self._timedout = True
 
         if logTimeout:
-            print "Watchdog client %s has timed out!" % (self._name)
+            print("Watchdog client %s has timed out!" % (self._name))
         elif logCleared:
-            print "Watchdog client %s has been cleared." % (self._name)
+            print("Watchdog client %s has been cleared." % (self._name))
 
 #-----------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ class Watchdog(Thread):
                 nextWakeupTime += self.WAKEUP_INTERVAL
 
             if t>=nextLogTime:
-                print "Watchdog.run: running"
+                print("Watchdog.run: running")
                 while t>=nextLogTime:
                     nextLogTime += self.LOG_INTERVAL
 

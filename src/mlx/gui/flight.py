@@ -404,12 +404,12 @@ class LoginPage(Page):
 
     def _offlineClicked(self, button):
         """Called when the offline button was clicked."""
-        print "mlx.flight.LoginPage: offline flight selected"
+        print("mlx.flight.LoginPage: offline flight selected")
         self._wizard.nextPage()
 
     def _loginClicked(self, button):
         """Called when the login button was clicked."""
-        print "mlx.flight.LoginPage: logging in"
+        print("mlx.flight.LoginPage: logging in")
         self._wizard.login(self._handleLoginResult,
                            self._pilotID.get_text(),
                            self._password.get_text())
@@ -648,12 +648,12 @@ class FlightSelectionPage(Page):
 
         if response==RESPONSETYPE_OK:
             fileName = text2unicode(dialog.get_filename())
-            print "Saving", fileName
+            print("Saving", fileName)
             try:
                 with open(fileName, "wt") as f:
                     flight.writeIntoFile(f)
-            except Exception, e:
-                print "Failed to save flight:", util.utf2unicode(str(e))
+            except Exception as e:
+                print("Failed to save flight:", util.utf2unicode(str(e)))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
@@ -705,7 +705,7 @@ class FlightSelectionPage(Page):
         loginResult = wizard.loginResult
         flight=self._getSelectedFlight()
 
-        print "DPI", context.get_dpi_x(), context.get_dpi_y()
+        print("DPI", context.get_dpi_x(), context.get_dpi_y())
 
         scale = context.get_dpi_x() / 72.0
 
@@ -718,7 +718,7 @@ class FlightSelectionPage(Page):
         cr.stroke()
 
         layout = cr.create_layout()
-        layout.set_text(u"Malév VA official briefing")
+        layout.set_text("Malév VA official briefing")
         font = pango.FontDescription("sans")
         font.set_size(int(32 * scale * pango.SCALE))
         font.set_weight(pango.WEIGHT_NORMAL)
@@ -739,7 +739,7 @@ class FlightSelectionPage(Page):
         y += 6 * scale
 
         layout = cr.create_layout()
-        layout.set_text(u"%s (%s) részére" %
+        layout.set_text("%s (%s) részére" %
                         (loginResult.pilotName, loginResult.pilotID))
         font = pango.FontDescription("sans")
         font.set_size(int(16 * scale * pango.SCALE))
@@ -939,14 +939,14 @@ class FlightSelectionPage(Page):
 
         if response==RESPONSETYPE_OK:
             fileName = text2unicode(dialog.get_filename())
-            print "Loading", fileName
+            print("Loading", fileName)
             bookedFlight = web.BookedFlight()
             try:
                 with open(fileName, "rt") as f:
                     bookedFlight.readFromFile(f)
                 self.addFlight(bookedFlight)
-            except Exception, e:
-                print "Failed to load flight:", util.utf2unicode(str(e))
+            except Exception as e:
+                print("Failed to load flight:", util.utf2unicode(str(e)))
                 dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
@@ -1628,15 +1628,15 @@ class RegisterPage(Page):
                                             self.vatsimID, self.ivaoID,
                                             self.phoneNumber, self.nationality,
                                             self.password)
-        print "Registering with data:"
-        print "  name:", self.name1, self.name2, registrationData.firstName, registrationData.surName, requestedNameOrder
-        print "  yearOfBirth:", self.yearOfBirth, registrationData.yearOfBirth
-        print "  emailAddress:", self.emailAddress, registrationData.emailAddress
-        print "  emailAddressPublic:", self.emailAddressPublic, registrationData.emailAddressPublic
-        print "  vatsimID:", self.vatsimID, registrationData.vatsimID
-        print "  ivaoID:", self.ivaoID, registrationData.ivaoID
-        print "  phoneNumber:", self.phoneNumber, registrationData.phoneNumber
-        print "  nationality:", self.nationality, registrationData.nationality
+        print("Registering with data:")
+        print("  name:", self.name1, self.name2, registrationData.firstName, registrationData.surName, requestedNameOrder)
+        print("  yearOfBirth:", self.yearOfBirth, registrationData.yearOfBirth)
+        print("  emailAddress:", self.emailAddress, registrationData.emailAddress)
+        print("  emailAddressPublic:", self.emailAddressPublic, registrationData.emailAddressPublic)
+        print("  vatsimID:", self.vatsimID, registrationData.vatsimID)
+        print("  ivaoID:", self.ivaoID, registrationData.ivaoID)
+        print("  phoneNumber:", self.phoneNumber, registrationData.phoneNumber)
+        print("  nationality:", self.nationality, registrationData.nationality)
 
         gui = self._wizard.gui
         gui.beginBusy(xstr("register_busy"))
@@ -1652,15 +1652,15 @@ class RegisterPage(Page):
 
         gui.endBusy()
 
-        print "Registration result:"
-        print "  returned:", returned
+        print("Registration result:")
+        print("  returned:", returned)
         if returned:
-            print "  registered:", result.registered
+            print("  registered:", result.registered)
             if result.registered:
-                print "  pilotID", result.pilotID
-                print "  loggedIn", result.loggedIn
-            print "  emailAlreadyRegistered:", result.emailAlreadyRegistered
-            print "  invalidData:", result.invalidData
+                print("  pilotID", result.pilotID)
+                print("  loggedIn", result.loggedIn)
+            print("  emailAlreadyRegistered:", result.emailAlreadyRegistered)
+            print("  invalidData:", result.invalidData)
 
         registrationOK = returned and result.registered
 
@@ -1829,7 +1829,7 @@ class StudentPage(Page):
 
     def activate(self):
         """Activate the student page."""
-        print "StudentPage.activate"
+        print("StudentPage.activate")
         self._getEntryExamStatusCancelled = False
 
         loginResult = self._wizard.loginResult
@@ -1843,7 +1843,7 @@ class StudentPage(Page):
 
     def finalize(self):
         """Finalize the page."""
-        print "StudentPage.finalize"
+        print("StudentPage.finalize")
         self._getEntryExamStatusCancelled = True
 
     def _entryExamClicked(self, button):
@@ -1863,7 +1863,7 @@ class StudentPage(Page):
 
     def _handleEntryExamStatus(self, returned, result):
         """Called when the entry exam status is availabe."""
-        print "_handleEntryExamStatus", returned, result
+        print("_handleEntryExamStatus", returned, result)
         if returned and not self._getEntryExamStatusCancelled:
             self._entryExamLink = result.entryExamLink
             self._updateEntryExamStatus(result.entryExamPassed)
@@ -2990,7 +2990,7 @@ class SimBriefSetupPage(Page):
             config.save()
 
             plan = self._getPlan()
-            print "plan:", plan
+            print("plan:", plan)
 
             takeoffRunway = self._takeoffRunway.get_text()
             if takeoffRunway:
@@ -3026,7 +3026,7 @@ class SimBriefSetupPage(Page):
         If count is 0, the user name and password entered into the setup page
         are returned. Otherwise a dialog box is displayed informing the user of
         invalid credentials and requesting another set of them."""
-        print "_getCredentials", count
+        print("_getCredentials", count)
         if count==0:
             return (self._userName.get_text(), self._password.get_text())
         else:
@@ -3060,7 +3060,7 @@ class SimBriefSetupPage(Page):
 
     def _simBriefProgress(self, progress, result, flightInfo):
         """The real SimBrief progress handler."""
-        print "_simBriefProgress", progress, result, flightInfo
+        print("_simBriefProgress", progress, result, flightInfo)
         if result==cef.SIMBRIEF_RESULT_NONE:
             message = SimBriefSetupPage.progress2Message.get(progress,
                                                              "simbrief_progress_unknown")
@@ -3757,7 +3757,7 @@ class BriefingPage(Page):
 
     def _metarChanged(self, buffer):
         """Called when the METAR has changed."""
-        print "BriefingPage.metarChanged", self._updatingMETAR
+        print("BriefingPage.metarChanged", self._updatingMETAR)
         if not self._updatingMETAR:
             self.metarEdited = True
             self._updateButton()
@@ -3769,7 +3769,7 @@ class BriefingPage(Page):
         """Called when new characters are inserted into the METAR.
 
         It uppercases all characters."""
-        print "BriefingPage.metarInserted", self._updatingMETAR
+        print("BriefingPage.metarInserted", self._updatingMETAR)
         if not self._updatingMETAR:
             self._updatingMETAR = True
 
@@ -4024,7 +4024,7 @@ class TakeoffPage(Page):
 
     def activate(self):
         """Activate the page."""
-        print "TakeoffPage.activate"
+        print("TakeoffPage.activate")
 
         self._updatingMETAR = True
         self._metar.get_buffer().set_text(self._wizard.departureMETAR, -1)
@@ -4068,13 +4068,13 @@ class TakeoffPage(Page):
 
     def allowForward(self):
         """Allow going to the next page."""
-        print "TakeoffPage.allowForward"
+        print("TakeoffPage.allowForward")
         self._forwardAllowed = True
         self._updateForwardButton()
 
     def reset(self):
         """Reset the page if the wizard is reset."""
-        print "TakeoffPage.reset"
+        print("TakeoffPage.reset")
 
         super(TakeoffPage, self).reset()
         self._v1.reset()
@@ -4094,7 +4094,7 @@ class TakeoffPage(Page):
         """Change the METAR as a result of an edit on one of the other
         pages."""
         if self._active:
-            print "TakeoffPage.changeMETAR"
+            print("TakeoffPage.changeMETAR")
             self._updatingMETAR = True
             self._metar.get_buffer().set_text(metar, -1)
             self._updatingMETAR = False
@@ -4115,29 +4115,29 @@ class TakeoffPage(Page):
                     (self._derateType==acft.DERATE_NONE or
                      self.derate is not None)
 
-        print "TakeoffPage._updateForwardButton: forwardAllowed:", self._forwardAllowed, ", sensitive:", sensitive
+        print("TakeoffPage._updateForwardButton: forwardAllowed:", self._forwardAllowed, ", sensitive:", sensitive)
         if self._forwardAllowed:
-            print "  METAR: ", self._metar.get_text()
-            print "  runway: ", self._runway.get_text()
-            print "  SID:", self.sid
-            print "  V1:", self.v1
-            print "  VR:", self.vr
-            print "  V2:", self.v2
-            print "  derateType:", self._derateType
-            print "  derate:", self.derate
+            print("  METAR: ", self._metar.get_text())
+            print("  runway: ", self._runway.get_text())
+            print("  SID:", self.sid)
+            print("  V1:", self.v1)
+            print("  VR:", self.vr)
+            print("  V2:", self.v2)
+            print("  derateType:", self._derateType)
+            print("  derate:", self.derate)
 
         self._button.set_sensitive(sensitive)
 
     def _valueChanged(self, widget, arg = None):
         """Called when the value of some widget has changed."""
-        print "TakeoffPage._valueChanged"
+        print("TakeoffPage._valueChanged")
 
         self._updateForwardButton()
 
     def _upperChanged(self, entry, arg = None):
         """Called when the value of some entry widget has changed and the value
         should be converted to uppercase."""
-        print "TakeoffPage._upperChanged"
+        print("TakeoffPage._upperChanged")
         entry.set_text(entry.get_text().upper())
         self._valueChanged(entry, arg)
 
@@ -4150,7 +4150,7 @@ class TakeoffPage(Page):
 
     def _derateChanged(self, entry):
         """Called when the value of the derate is changed."""
-        print "TakeoffPage._derateChanged"
+        print("TakeoffPage._derateChanged")
         self._updateForwardButton()
 
     def _rtoToggled(self, button):
@@ -4261,7 +4261,7 @@ class TakeoffPage(Page):
 
     def _metarChanged(self, entry):
         """Called when the METAR has changed."""
-        print "TakeoffPage.metarChanged", self._updatingMETAR
+        print("TakeoffPage.metarChanged", self._updatingMETAR)
         if not self._updatingMETAR:
             self._updateForwardButton()
             self._wizard.metarChanged(entry.get_text(), self)
@@ -4270,7 +4270,7 @@ class TakeoffPage(Page):
         """Called when new characters are inserted into the METAR.
 
         It uppercases all characters."""
-        print "TakeoffPage.metarInserted", self._updatingMETAR
+        print("TakeoffPage.metarInserted", self._updatingMETAR)
         if not self._updatingMETAR:
             self._updatingMETAR = True
 
@@ -4627,7 +4627,7 @@ class LandingPage(Page):
         """Change the METAR as a result of an edit on one of the other
         pages."""
         if self._active:
-            print "LandingPage.changeMETAR"
+            print("LandingPage.changeMETAR")
             self._updatingMETAR = True
             self._metar.get_buffer().set_text(metar, -1)
             self._updatingMETAR = False
@@ -4688,7 +4688,7 @@ class LandingPage(Page):
 
     def _metarChanged(self, entry):
         """Called when the METAR has changed."""
-        print "LandingPage.metarChanged", self._updatingMETAR
+        print("LandingPage.metarChanged", self._updatingMETAR)
         if not self._updatingMETAR:
             self._updateForwardButton()
             self._wizard.metarChanged(entry.get_text(), self)
@@ -4697,7 +4697,7 @@ class LandingPage(Page):
         """Called when new characters are inserted into the METAR.
 
         It uppercases all characters."""
-        print "LandingPage.metarInserted", self._updatingMETAR
+        print("LandingPage.metarInserted", self._updatingMETAR)
         if not self._updatingMETAR:
             self._updatingMETAR = True
 
@@ -5216,9 +5216,10 @@ class FinishPage(Page):
         """Callback for the plane updating."""
         pass
 
-    def _formatTime(self, scheduledTime, realTimestamp, (warning, error)):
+    def _formatTime(self, scheduledTime, realTimestamp, xxx_todo_changeme):
         """Format the departure or arrival time based on the given data as a
         markup for a label."""
+        (warning, error) = xxx_todo_changeme
         realTime = time.gmtime(realTimestamp)
 
         if warning:
@@ -5751,7 +5752,7 @@ class Wizard(gtk.VBox):
             self._takeoffPage.allowForward()
         elif stage==const.STAGE_LANDING:
             if not self._arrivalBriefingPage.metarEdited:
-                print "Downloading arrival METAR again"
+                print("Downloading arrival METAR again")
                 self.gui.webHandler.getMETARs(self._arrivalMETARCallback,
                                               [self._bookedFlight.arrivalICAO])
 

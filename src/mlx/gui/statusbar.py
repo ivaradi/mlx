@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 import mlx.const as const
 from mlx.i18n import xstr

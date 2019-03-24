@@ -1,9 +1,9 @@
 
-import fs
-import const
-import util
-from acars import ACARS
-from sound import startSound
+from . import fs
+from . import const
+from . import util
+from .acars import ACARS
+from .sound import startSound
 
 import time
 
@@ -128,11 +128,11 @@ class ACARSSender(StateChecker):
     def _acarsCallback(self, returned, result):
         """Callback for ACARS sending."""
         if returned:
-            print "Sent online ACARS"
+            print("Sent online ACARS")
             self._lastSent = time.time() if self._lastSent is None \
                              else self._lastSent + ACARSSender.INTERVAL
         else:
-            print "Failed to send the ACARS"
+            print("Failed to send the ACARS")
         self._sending = False
 
 #---------------------------------------------------------------------------------------
@@ -516,8 +516,8 @@ class NAVLogger(StateChangeLogger, DelayedChangeMixin, ForceableLoggerMixin):
     @staticmethod
     def getMessage(logName, frequency, obs):
         """Get the message for the given NAV radio setting."""
-        message = u"%-5s %s" % (logName + ":", frequency)
-        if obs is not None: message += u" (%03d\u00b0)" % (obs,)
+        message = "%-5s %s" % (logName + ":", frequency)
+        if obs is not None: message += " (%03d\u00b0)" % (obs,)
         return message
 
     def __init__(self, attrName, logName):
@@ -746,9 +746,9 @@ class APLogger(StateChangeLogger, DelayedChangeMixin):
         """Log a numerical value."""
         message = what
         if value is None:
-            message += u" cannot be detected, will not log"
+            message += " cannot be detected, will not log"
         else:
-            message += u": " + format % (value,)
+            message += ": " + format % (value,)
         logger.message(timestamp, message)
 
     @staticmethod
@@ -766,8 +766,8 @@ class APLogger(StateChangeLogger, DelayedChangeMixin):
     @staticmethod
     def _logAPHeading(logger, timestamp, state):
         """Log the AP heading."""
-        APLogger._logNumeric(logger, timestamp, u"AP heading",
-                             u"%03.0f\u00b0", state.apHeading)
+        APLogger._logNumeric(logger, timestamp, "AP heading",
+                             "%03.0f\u00b0", state.apHeading)
 
     @staticmethod
     def _logAPAltitudeHold(logger, timestamp, state):
@@ -778,8 +778,8 @@ class APLogger(StateChangeLogger, DelayedChangeMixin):
     @staticmethod
     def _logAPAltitude(logger, timestamp, state):
         """Log the AP heading."""
-        APLogger._logNumeric(logger, timestamp, u"AP altitude",
-                             u"%.0f ft", state.apAltitude)
+        APLogger._logNumeric(logger, timestamp, "AP altitude",
+                             "%.0f ft", state.apAltitude)
 
     def __init__(self):
         """Construct the state logger."""

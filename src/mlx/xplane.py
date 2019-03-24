@@ -1,8 +1,8 @@
 
-import fs
-import const
-import util
-from watchdog import Watchdog
+from . import fs
+from . import const
+from . import util
+from .watchdog import Watchdog
 
 import threading
 import time
@@ -105,7 +105,7 @@ class DataRequest(Request):
                 return True
             else:
                 return False
-        except ProtocolException, e:
+        except ProtocolException as e:
             self._result = None
             return True
 
@@ -240,8 +240,8 @@ class Handler(threading.Thread):
         """Call the given function and swallow any exceptions."""
         try:
             return fun()
-        except Exception, e:
-            print >> sys.stderr, util.utf2unicode(str(e))
+        except Exception as e:
+            print(util.utf2unicode(str(e)), file=sys.stderr)
             return None
 
     # The number of times a read is attempted
@@ -311,8 +311,8 @@ class Handler(threading.Thread):
         while attemptsLeft>0:
             try:
                 multiGetter.execute()
-            except ProtocolException, e:
-                print "xplane.Handler._performRead: " + str(e)
+            except ProtocolException as e:
+                print("xplane.Handler._performRead: " + str(e))
                 raise
 
             if validator is None or \
@@ -513,10 +513,10 @@ class Handler(threading.Thread):
                                                                          description))
                 self._connected = True
                 return attempts
-            except Exception, e:
-                print "xplane.Handler._connect: connection failed: " + \
+            except Exception as e:
+                print("xplane.Handler._connect: connection failed: " + \
                       util.utf2unicode(str(e)) + \
-                      " (attempts: %d)" % (attempts,)
+                      " (attempts: %d)" % (attempts,))
                 if attempts<self.NUM_CONNECTATTEMPTS:
                     time.sleep(self.CONNECT_INTERVAL)
                 self._xplane.disconnect()
@@ -548,7 +548,7 @@ class Handler(threading.Thread):
 
     def _disconnect(self):
         """Disconnect from the flight simulator."""
-        print "xplane.Handler._disconnect"
+        print("xplane.Handler._disconnect")
         if self._connected:
             try:
                 self._xplane.disconnect()
@@ -577,12 +577,12 @@ class Handler(threading.Thread):
             self._watchdogClient.set()
             try:
                 if not request.process(time):
-                    print "xplane.Handler._processRequest: X-Plane returned invalid data too many times, reconnecting"
+                    print("xplane.Handler._processRequest: X-Plane returned invalid data too many times, reconnecting")
                     needReconnect = True
             except Exception as e:
-                print "xplane.Handler._processRequest: X-Plane connection failed (" + \
+                print("xplane.Handler._processRequest: X-Plane connection failed (" + \
                       util.utf2unicode(str(e)) + \
-                      "), reconnecting (attempts=%d)." % (attempts,)
+                      "), reconnecting (attempts=%d)." % (attempts,))
                 needReconnect = True
 
             if needReconnect:
@@ -803,7 +803,7 @@ class Simulator(object):
         """Send a message to the pilot via the simulator.
 
         duration is the number of seconds to keep the message displayed."""
-        print "xplra.Simulator.sendMessage:", message
+        print("xplra.Simulator.sendMessage:", message)
         self._handler.requestShowMessage(message, duration,
                                          self._handleMessageSent,
                                          extra = _disconnect)
@@ -886,7 +886,7 @@ class Simulator(object):
         """Disconnect from the simulator."""
         assert not self._monitoringRequested
 
-        print "xplra.Simulator.disconnect", closingMessage, duration
+        print("xplra.Simulator.disconnect", closingMessage, duration)
 
         self._stopNormal()
         self.clearHotkeys()
@@ -937,8 +937,8 @@ class Simulator(object):
         zuluSeconds = data[1]
         if self._lastZuluSeconds is not None and \
            zuluSeconds<self._lastZuluSeconds:
-            print "xplane.Simulator._getTimestamp: Zulu seconds have gone backwards (%f -> %f), increasing day offset" % \
-              (self._lastZuluSeconds, zuluSeconds)
+            print("xplane.Simulator._getTimestamp: Zulu seconds have gone backwards (%f -> %f), increasing day offset" % \
+              (self._lastZuluSeconds, zuluSeconds))
             self._timestampDaysOffset += 1
 
         self._lastZuluSeconds = zuluSeconds
@@ -1015,8 +1015,8 @@ class Simulator(object):
         if aircraftInfo==self._aircraftInfo:
             return False
 
-        print "xplane.Simulator: new data: %s, %s, %s, %s, %s, %s" % \
-              (tailnum, author, description, notes, icao, liveryPath)
+        print("xplane.Simulator: new data: %s, %s, %s, %s, %s, %s" % \
+              (tailnum, author, description, notes, icao, liveryPath))
 
         self._aircraftInfo = aircraftInfo
         needNew = self._aircraftModel is None
@@ -1139,8 +1139,9 @@ class Simulator(object):
         if disconnect:
             self._handler.disconnect()
 
-    def _handleHotkeysRegistered(self, success, (id, generation)):
+    def _handleHotkeysRegistered(self, success, xxx_todo_changeme2):
         """Handle the result of the hotkeys having been written."""
+        (id, generation) = xxx_todo_changeme2
         with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
@@ -1149,8 +1150,9 @@ class Simulator(object):
                                                     self._handleHotkeys,
                                                     (id, generation))
 
-    def _handleHotkeys(self, data, (id, generation)):
+    def _handleHotkeys(self, data, xxx_todo_changeme3):
         """Handle the hotkeys."""
+        (id, generation) = xxx_todo_changeme3
         with self._hotkeyLock:
             if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
                 return
@@ -1616,8 +1618,8 @@ class GenericAircraftModel(AircraftModel):
                               (TYPE_FLOAT_ARRAY, 1, index),
                               [level * self._fuelTankCapacities[index]]) )
             except:
-                print "xplane.Simulator.setFuelLevel: invalid tank constant: %d" % \
-                  (tank,)
+                print("xplane.Simulator.setFuelLevel: invalid tank constant: %d" % \
+                  (tank,))
 
         handler.requestWrite(data, self._handleFuelWritten)
 
@@ -1747,10 +1749,11 @@ class DH8DModel(GenericAircraftModel):
 class FJSDH8DModel(DH8DModel):
     """Model handler for the FlyJSim Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, (tailnum, author, description, notes,
-                              icao, liveryPath)):
+    def doesHandle(aircraft, xxx_todo_changeme):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (tailnum, author, description, notes,
+                              icao, liveryPath) = xxx_todo_changeme
         return aircraft.type==const.AIRCRAFT_DH8D and \
           description.find("Dash 8 Q400")!=-1 and \
           ((author in ["2012", "2013"] and tailnum=="N62890") or \
@@ -1908,10 +1911,11 @@ class T154Model(GenericAircraftModel):
 class FelisT154Model(T154Model):
     """Model for Felis' Tupolev Tu-154-M aircraft."""
     @staticmethod
-    def doesHandle(aircraft, (tailnum, author, description, notes,
-                              icao, liveryPath)):
+    def doesHandle(aircraft, xxx_todo_changeme1):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (tailnum, author, description, notes,
+                              icao, liveryPath) = xxx_todo_changeme1
         return aircraft.type==const.AIRCRAFT_T154 and \
           author.find("Felis")!=-1 and \
           description.find("Tu154M")!=-1

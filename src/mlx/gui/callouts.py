@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
@@ -207,7 +207,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
             self._saveApproachCallouts()
             config = self._gui.config
             for (aircraftType, approachCallouts) in \
-                    self._approachCallouts.iteritems():
+                    self._approachCallouts.items():
                 config.setApproachCallouts(aircraftType, approachCallouts)
             config.save()
 

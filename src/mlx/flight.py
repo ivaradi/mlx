@@ -1,9 +1,9 @@
 
-from soundsched import SoundScheduler, ChecklistScheduler
-from checks import SpeedChecker
+from .soundsched import SoundScheduler, ChecklistScheduler
+from .checks import SpeedChecker
 
-import const
-import util
+from . import const
+from . import util
 import time
 
 import threading

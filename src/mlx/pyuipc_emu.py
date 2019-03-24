@@ -216,11 +216,11 @@ def read(data):
         elif offset==0x02c8:    # Vertical speed (256*m/s)
             results.append(int(vs / 60.0 * 0.3048 * 256))
         elif offset==0x0560:  # Latitude
-            results.append(long(latitude*10001750.0*65536.0*65536.0/90.0))
+            results.append(int(latitude*10001750.0*65536.0*65536.0/90.0))
         elif offset==0x0568:  # Longitude
-            results.append(long(longitude*65536.9*65536.0*65536.0*65536.0/360.0))
+            results.append(int(longitude*65536.9*65536.0*65536.0*65536.0/360.0))
         elif offset==0x0570:  # Aircraft altitude in metres (fractional part)
-            results.append(long( (altitude*0.3048*65536*65536)%(65536*65536)))
+            results.append(int( (altitude*0.3048*65536*65536)%(65536*65536)))
         elif offset==0x0574:  # Aircraft altitude in metres (whole part)
             results.append(int(altitude*.3048))
         elif offset==0x0918 or \
@@ -236,23 +236,23 @@ def read(data):
         elif offset==0x0b74:  # Centre tank level (%*128*65536)
             centre_fuel = fuel_remaining - 2*side_tank_capacity
             if centre_fuel<0: centre_fuel = 0.0
-            results.append(long(round(centre_fuel/centre_tank_capacity*128.0*65536.0)))
+            results.append(int(round(centre_fuel/centre_tank_capacity*128.0*65536.0)))
         elif offset==0x0b78:  # Centre tank capacity (gallons)
-            results.append(long(round(centre_tank_capacity*KGTOLBS/fuel_weight)))
+            results.append(int(round(centre_tank_capacity*KGTOLBS/fuel_weight)))
         elif offset==0x0b7c or \
              offset==0x0b94:  # Left and right main tank level (%*128*65536)
             fuel = fuel_remaining/2
             if fuel>side_tank_capacity: fuel = side_tank_capacity
-            results.append(long(round(fuel/side_tank_capacity*128.0*65536.0)))
+            results.append(int(round(fuel/side_tank_capacity*128.0*65536.0)))
         elif offset==0x0b80 or \
              offset==0x0b98:  # Left and right main tank capacity (gallons)
-            results.append(long(round(side_tank_capacity*KGTOLBS/fuel_weight)))
+            results.append(int(round(side_tank_capacity*KGTOLBS/fuel_weight)))
         elif offset in [0x0b84, 0x0b88, 0x0b8c, 0x0b90,
                         0x0b9c, 0x0ba0, 0x0ba4, 0x0ba8,
                         0x1244, 0x1248, 0x124c, 0x1250,
                         0x1254, 0x1258, 0x125c, 0x1260]:
                               # Other tank capacities and levels
-            results.append(long(0))
+            results.append(int(0))
         elif offset==0x023a:  # Second of time
             results.append(int(tm[5]))
         elif offset==0x023b:  # Hour of UTC time

@@ -1,8 +1,8 @@
 
-from common import *
-from dcdata import getTable
-from info import FlightInfo
-from flight import comboModel
+from .common import *
+from .dcdata import getTable
+from .info import FlightInfo
+from .flight import comboModel
 
 from mlx.pirep import PIREP
 from mlx.flight import Flight

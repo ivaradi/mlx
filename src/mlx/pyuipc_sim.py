@@ -1,5 +1,5 @@
 
-import const
+from . import const
 
 import cmd
 import threading
@@ -8,7 +8,7 @@ import time
 import calendar
 import sys
 import struct
-import cPickle
+import pickle
 import math
 
 #------------------------------------------------------------------------------
@@ -341,8 +341,8 @@ class Values(object):
         """Read the value at the given offset."""
         try:
             return self._read(offset, type)
-        except Exception, e:
-            print "failed to read offset %04x: %s" % (offset, str(e))
+        except Exception as e:
+            print("failed to read offset %04x: %s" % (offset, str(e)))
             raise FSUIPCException(ERR_DATA)
 
     def _getFlapsControl(self):
@@ -413,11 +413,11 @@ class Values(object):
         elif offset==0x036d:       # Overspeed
             return 1 if self.overspeed else 0
         elif offset==0x0560:       # Latitude
-            return long(self.latitude * 10001750.0 * 65536.0 * 65536.0 / 90.0)
+            return int(self.latitude * 10001750.0 * 65536.0 * 65536.0 / 90.0)
         elif offset==0x0568:       # Longitude
-            return long(self.longitude * 65536.0 * 65536.0 * 65536.0 * 65536.0 / 360.0)
+            return int(self.longitude * 65536.0 * 65536.0 * 65536.0 * 65536.0 / 360.0)
         elif offset==0x0570:       # Altitude
-            return long(self.altitude * const.FEETTOMETRES * 65536.0 * 65536.0)
+            return int(self.altitude * const.FEETTOMETRES * 65536.0 * 65536.0)
         elif offset==0x0578:       # Pitch
             return int(self.pitch * 65536.0 * 65536.0 / 360.0)
         elif offset==0x057c:       # Bank
@@ -583,10 +583,10 @@ class Values(object):
                     value |= hotkey[0]
                     return value
                 else:
-                    print "Unhandled offset: %04x" % (offset,)
+                    print("Unhandled offset: %04x" % (offset,))
                     raise FSUIPCException(ERR_DATA)
             else:
-                print "Unhandled offset: %04x" % (offset,)
+                print("Unhandled offset: %04x" % (offset,))
                 raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             return self.messageDuration
@@ -615,17 +615,17 @@ class Values(object):
         elif offset==0x7b91:       # Transponder standby
             return 0 if self.xpdrC else 1
         else:
-            print "Unhandled offset: %04x" % (offset,)
+            print("Unhandled offset: %04x" % (offset,))
             raise FSUIPCException(ERR_DATA)
 
     def write(self, offset, value, type):
         """Write the value at the given offset."""
         try:
             return self._write(offset, value, type)
-        except TypeError, e:
+        except TypeError as e:
             raise e
-        except Exception, e:
-            print "failed to write offset %04x: %s" % (offset, str(e))
+        except Exception as e:
+            print("failed to write offset %04x: %s" % (offset, str(e)))
             raise FSUIPCException(ERR_DATA)
 
     def _write(self, offset, value, type):
@@ -851,10 +851,10 @@ class Values(object):
                     hotkey[2] = (value>>16) & 0xff
                     hotkey[3] = (value>>24) & 0xff
                 else:
-                    print "Unhandled offset: %04x for type '%s'" % (offset, type)
+                    print("Unhandled offset: %04x for type '%s'" % (offset, type))
                     raise FSUIPCException(ERR_DATA)
             else:
-                print "Unhandled offset: %04x for type '%s'" % (offset, type)
+                print("Unhandled offset: %04x for type '%s'" % (offset, type))
                 raise FSUIPCException(ERR_DATA)
         elif offset==0x32fa:       # Message duration
             self.messageDuration = value
@@ -881,7 +881,7 @@ class Values(object):
         elif offset==0x7b91:       # Transponder standby
             self.xpdrC = value==0
         else:
-            print "Unhandled offset: %04x" % (offset,)
+            print("Unhandled offset: %04x" % (offset,))
             raise FSUIPCException(ERR_DATA)
 
     def _readUTC(self):
@@ -1038,7 +1038,7 @@ class Server(threading.Thread):
             while True:
                 (length,) = struct.unpack("I", clientSocket.recv(4))
                 data = clientSocket.recv(length)
-                (call, args) = cPickle.loads(data)
+                (call, args) = pickle.loads(data)
                 exception = None
 
                 try:
@@ -1060,16 +1060,16 @@ class Server(threading.Thread):
                         result = None
                     else:
                         break
-                except Exception, e:
+                except Exception as e:
                     exception = e
 
                 if exception is None:
-                    data = cPickle.dumps((RESULT_RETURNED, result))
+                    data = pickle.dumps((RESULT_RETURNED, result))
                 else:
-                    data = cPickle.dumps((RESULT_EXCEPTION, str(exception)))
+                    data = pickle.dumps((RESULT_EXCEPTION, str(exception)))
                 clientSocket.send(struct.pack("I", len(data)) + data)
-        except Exception, e:
-            print >> sys.stderr, "pyuipc_sim.Server._process: failed with exception:", str(e)
+        except Exception as e:
+            print("pyuipc_sim.Server._process: failed with exception:", str(e), file=sys.stderr)
         finally:
             try:
                 socketFile.close()
@@ -1111,16 +1111,16 @@ class Client(object):
 
     def quit(self):
         """Quit from the simulator."""
-        data = cPickle.dumps((CALL_QUIT, None))
+        data = pickle.dumps((CALL_QUIT, None))
         self._socket.send(struct.pack("I", len(data)) + data)
 
     def _call(self, command, data):
         """Perform a call with the given command and data."""
-        data = cPickle.dumps((command, [data]))
+        data = pickle.dumps((command, [data]))
         self._socket.send(struct.pack("I", len(data)) + data)
         (length,) = struct.unpack("I", self._socket.recv(4))
         data = self._socket.recv(length)
-        (resultCode, result) = cPickle.loads(data)
+        (resultCode, result) = pickle.loads(data)
         if resultCode==RESULT_RETURNED:
             return result
         else:
@@ -1233,13 +1233,13 @@ class CLI(cmd.Cmd):
         self._valueHandlers["latitude"] = ([(0x0560, "l")],
                                            lambda value: value * 90.0 /
                                            10001750.0 / 65536.0 / 65536.0,
-                                           lambda word: long(float(word) *
+                                           lambda word: int(float(word) *
                                                              10001750.0 *
                                                              65536.0 * 65536.0 / 90.0))
         self._valueHandlers["longitude"] = ([(0x0568, "l")],
                                             lambda value: value * 360.0 /
                                             65536.0 / 65536.0 / 65536.0 / 65536.0,
-                                            lambda word: long(float(word) *
+                                            lambda word: int(float(word) *
                                                               65536.0 * 65536.0 *
                                                               65536.0 * 65536.0 /
                                                               360.0))
@@ -1299,7 +1299,7 @@ class CLI(cmd.Cmd):
                                            lambda value: value /
                                            const.FEETTOMETRES / 65536.0 /
                                            65536.0,
-                                           lambda word: long(float(word) *
+                                           lambda word: int(float(word) *
                                                              const.FEETTOMETRES *
                                                              65536.0 * 65536.0))
         self._valueHandlers["gLoad"] = ([(0x11ba, "H")],
@@ -1486,7 +1486,7 @@ class CLI(cmd.Cmd):
         for i in range(0, Values.HOTKEY_SIZE):
             self._valueHandlers["hotkey%d" % (i,)] = ([(0x3210 + i*4, "u")],
                                                       lambda value: "0x%08x" % (value,),
-                                                      lambda word: long(word, 16))
+                                                      lambda word: int(word, 16))
 
         self._valueHandlers["cog"] = ([(0x2ef8, "f")], lambda value: value,
                                        lambda word: float(word))
@@ -1536,7 +1536,7 @@ class CLI(cmd.Cmd):
     def default(self, line):
         """Handle unhandle commands."""
         if line=="EOF":
-            print
+            print()
             return self.do_quit("")
         else:
             return super(CLI, self).default(line)
@@ -1547,7 +1547,7 @@ class CLI(cmd.Cmd):
         data = []
         for name in names:
             if name not in self._valueHandlers:
-                print >> sys.stderr, "Unknown variable: " + name
+                print("Unknown variable: " + name, file=sys.stderr)
                 return False
             valueHandler = self._valueHandlers[name]
             data += valueHandler[0]
@@ -1564,18 +1564,18 @@ class CLI(cmd.Cmd):
                 value = valueHandler[1](thisResults[0] if numResults==1
                                         else thisResults)
 
-                print name + "=" + str(value)
+                print(name + "=" + str(value))
 
                 index += numResults
                 i+=1
-        except Exception, e:
-            print >> sys.stderr, "Failed to read data: " + str(e)
+        except Exception as e:
+            print("Failed to read data: " + str(e), file=sys.stderr)
 
         return False
 
     def help_get(self):
         """Print help for the get command."""
-        print "get <variable> [<variable>...]"
+        print("get <variable> [<variable>...]")
 
     def complete_get(self, text, line, begidx, endidx):
         """Try to complete the get command."""
@@ -1607,12 +1607,12 @@ class CLI(cmd.Cmd):
         for argument in arguments:
             words = argument.split("=")
             if len(words)!=2:
-                print >> sys.stderr, "Invalid argument: " + argument
+                print("Invalid argument: " + argument, file=sys.stderr)
                 return False
 
             (name, value) = words
             if name not in self._valueHandlers:
-                print >> sys.stderr, "Unknown variable: " + name
+                print("Unknown variable: " + name, file=sys.stderr)
                 return False
 
             valueHandler = self._valueHandlers[name]
@@ -1624,22 +1624,22 @@ class CLI(cmd.Cmd):
                 for (offset, type) in valueHandler[0]:
                     data.append((offset, type, values[index]))
                     index += 1
-            except Exception, e:
-                print >> sys.stderr, "Invalid value '%s' for variable %s: %s" % \
-                      (value, name, str(e))
+            except Exception as e:
+                print("Invalid value '%s' for variable %s: %s" % \
+                      (value, name, str(e)), file=sys.stderr)
                 return False
 
         try:
             self._client.write(data)
-            print "Data written"
-        except Exception, e:
-            print >> sys.stderr, "Failed to write data: " + str(e)
+            print("Data written")
+        except Exception as e:
+            print("Failed to write data: " + str(e), file=sys.stderr)
 
         return False
 
     def help_set(self):
         """Print help for the set command."""
-        print "set <variable>=<value> [<variable>=<value>...]"
+        print("set <variable>=<value> [<variable>=<value>...]")
 
     def complete_set(self, text, line, begidx, endidx):
         """Try to complete the set command."""
@@ -1653,36 +1653,36 @@ class CLI(cmd.Cmd):
         try:
             value = int(args)
             self._client.setVersion(value)
-            print "Emulating version %d" % (value,)
-        except Exception, e:
-            print >> sys.stderr, "Failed to set the version: " + str(e)
+            print("Emulating version %d" % (value,))
+        except Exception as e:
+            print("Failed to set the version: " + str(e), file=sys.stderr)
 
     def help_setversion(self, usage = False):
         """Help for the setversion command"""
-        if usage: print "Usage:",
-        print "setversion <number>"
+        if usage: print("Usage:", end=' ')
+        print("setversion <number>")
 
     def do_close(self, args):
         """Close an existing connection so that FS will fail."""
         try:
             self._client.close()
-            print "Connection closed"
-        except Exception, e:
-            print >> sys.stderr, "Failed to close the connection: " + str(e)
+            print("Connection closed")
+        except Exception as e:
+            print("Failed to close the connection: " + str(e), file=sys.stderr)
 
     def do_failopen(self, args):
         """Enable/disable the failing of opens."""
         try:
             value = self.str2bool(args)
             self._client.failOpen(value)
-            print "Opening will%s fail" % ("" if value else " not",)
-        except Exception, e:
-            print >> sys.stderr, "Failed to set open failure: " + str(e)
+            print("Opening will%s fail" % ("" if value else " not",))
+        except Exception as e:
+            print("Failed to set open failure: " + str(e), file=sys.stderr)
 
     def help_failopen(self, usage = False):
         """Help for the failopen command"""
-        if usage: print "Usage:",
-        print "failopen yes|no"
+        if usage: print("Usage:", end=' ')
+        print("failopen yes|no")
 
     def complete_failopen(self, text, line, begidx, endidx):
         if text:

@@ -1,9 +1,9 @@
 
-import fs
-import const
-import util
-import acft
-from watchdog import Watchdog
+from . import fs
+from . import const
+from . import util
+from . import acft
+from .watchdog import Watchdog
 
 import threading
 import os
@@ -16,7 +16,7 @@ import math
 if os.name == "nt" and "FORCE_PYUIPC_SIM" not in os.environ:
     import pyuipc
 else:
-    import pyuipc_sim as pyuipc
+    from . import pyuipc_sim as pyuipc
 
 #------------------------------------------------------------------------------
 
@@ -103,8 +103,8 @@ class Handler(threading.Thread):
         """Call the given function and swallow any exceptions."""
         try:
             return fun()
-        except Exception, e:
-            print >> sys.stderr, util.utf2unicode(str(e))
+        except Exception as e:
+            print(util.utf2unicode(str(e)), file=sys.stderr)
             return None
 
     # The number of times a read is attempted
@@ -132,7 +132,7 @@ class Handler(threading.Thread):
             exception = None
             try:
                 values = pyuipc.read(data)
-            except TypeError, e:
+            except TypeError as e:
                 exception = e
 
             failed = True
@@ -173,7 +173,7 @@ class Handler(threading.Thread):
                 exception = None
                 try:
                     pyuipc.write(self._data)
-                except TypeError, e:
+                except TypeError as e:
                     exception = e
 
                 if exception is None or self.unimportant:
@@ -419,10 +419,10 @@ class Handler(threading.Thread):
                                                                          description))
                 self._connected = True
                 return attempts
-            except Exception, e:
-                print "fsuipc.Handler._connect: connection failed: " + \
+            except Exception as e:
+                print("fsuipc.Handler._connect: connection failed: " + \
                       util.utf2unicode(str(e)) + \
-                      " (attempts: %d)" % (attempts,)
+                      " (attempts: %d)" % (attempts,))
                 if attempts<self.NUM_CONNECTATTEMPTS:
                     time.sleep(self.CONNECT_INTERVAL)
 
@@ -453,7 +453,7 @@ class Handler(threading.Thread):
 
     def _disconnect(self):
         """Disconnect from the flight simulator."""
-        print "fsuipc.Handler._disconnect"
+        print("fsuipc.Handler._disconnect")
         if self._connected:
             pyuipc.close()
             self._connected = False
@@ -478,18 +478,18 @@ class Handler(threading.Thread):
             self._watchdogClient.set()
             try:
                 if not request.process(time):
-                    print "fsuipc.Handler._processRequest: FSUIPC returned invalid data too many times, reconnecting"
+                    print("fsuipc.Handler._processRequest: FSUIPC returned invalid data too many times, reconnecting")
                     needReconnect = True
             except TypeError as e:
-                print "fsuipc.Handler._processRequest: type error: " + \
+                print("fsuipc.Handler._processRequest: type error: " + \
                       util.utf2unicode(str(e)) + \
                       ("." if request.unimportant else
-                       (", reconnecting (attempts=%d)." % (attempts,)))
+                       (", reconnecting (attempts=%d)." % (attempts,))))
                 needReconnect = not request.unimportant
             except Exception as e:
-                print "fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
+                print("fsuipc.Handler._processRequest: FSUIPC connection failed (" + \
                       util.utf2unicode(str(e)) + \
-                      "), reconnecting (attempts=%d)." % (attempts,)
+                      "), reconnecting (attempts=%d)." % (attempts,))
                 needReconnect = True
 
             if needReconnect:
@@ -722,7 +722,7 @@ class Simulator(object):
 
         duration is the number of seconds to keep the message displayed."""
 
-        print "fsuipc.Simulator.sendMessage:", message
+        print("fsuipc.Simulator.sendMessage:", message)
 
         if self._scroll:
             if duration==0: duration = -1
@@ -731,8 +731,8 @@ class Simulator(object):
 
         try:
             message = str(message)
-        except Exception, e:
-            print "fsuipc.Simulator.sendMessage: failed to convert the message to a string:", e
+        except Exception as e:
+            print("fsuipc.Simulator.sendMessage: failed to convert the message to a string:", e)
 
         data = [(0x3380, -1 - len(message), message),
                 (0x32fa, 'h', duration)]
@@ -821,7 +821,7 @@ class Simulator(object):
         """Disconnect from the simulator."""
         assert not self._monitoringRequested
 
-        print "fsuipc.Simulator.disconnect", closingMessage, duration
+        print("fsuipc.Simulator.disconnect", closingMessage, duration)
 
         self._stopNormal()
         self.clearHotkeys()
@@ -952,8 +952,8 @@ class Simulator(object):
         if aircraftName==self._aircraftName:
             return False
 
-        print "fsuipc.Simulator: new aircraft name and air file path: %s, %s" % \
-              (name, airPath)
+        print("fsuipc.Simulator: new aircraft name and air file path: %s, %s" % \
+              (name, airPath))
 
         self._aircraftName = aircraftName
         needNew = self._aircraftModel is None
@@ -1087,12 +1087,13 @@ class Simulator(object):
         if disconnect:
             self._handler.disconnect()
 
-    def _handleNumHotkeys(self, data, (id, generation)):
+    def _handleNumHotkeys(self, data, xxx_todo_changeme5):
         """Handle the result of the query of the number of hotkeys"""
+        (id, generation) = xxx_todo_changeme5
         with self._hotkeyLock:
             if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
                 numHotkeys = data[0]
-                print "fsuipc.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys
+                print("fsuipc.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys)
                 data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]
                 self._handler.requestRead(data, self._handleHotkeyTable,
                                           (id, generation))
@@ -1134,12 +1135,13 @@ class Simulator(object):
                                         hotkeys[i])
 
         for offset in oldHotkeyOffsets:
-            writeData.append((offset, "u", long(0)))
+            writeData.append((offset, "u", int(0)))
 
         return writeData
 
-    def _handleHotkeyTable(self, data, (id, generation)):
+    def _handleHotkeyTable(self, data, xxx_todo_changeme6):
         """Handle the result of the query of the hotkey table."""
+        (id, generation) = xxx_todo_changeme6
         with self._hotkeyLock:
             if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
                 writeData = self._setupHotkeys(data)
@@ -1147,8 +1149,9 @@ class Simulator(object):
                                            self._handleHotkeysWritten,
                                            (id, generation))
 
-    def _handleHotkeysWritten(self, success, (id, generation)):
+    def _handleHotkeysWritten(self, success, xxx_todo_changeme7):
         """Handle the result of the hotkeys having been written."""
+        (id, generation) = xxx_todo_changeme7
         with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
@@ -1159,8 +1162,9 @@ class Simulator(object):
                                                       self._handleHotkeys,
                                                       (id, generation))
 
-    def _handleHotkeys(self, data, (id, generation)):
+    def _handleHotkeys(self, data, xxx_todo_changeme8):
         """Handle the hotkeys."""
+        (id, generation) = xxx_todo_changeme8
         with self._hotkeyLock:
             if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
                 return
@@ -1405,10 +1409,10 @@ class AircraftModel(object):
                 flapsIndex += 1
         state.flapsSet = self._flapsNotches[flapsIndex]
         if state.flapsSet != self._flapsSet:
-            print "flapsControl: %d, flapsLeft: %d, flapsRight: %d, flapsAxis: %d, flapsIncrement: %d, flapsSet: %d, numNotchesM1: %d" % \
+            print("flapsControl: %d, flapsLeft: %d, flapsRight: %d, flapsAxis: %d, flapsIncrement: %d, flapsSet: %d, numNotchesM1: %d" % \
                   (flapsControl, data[self._monidx_flapsLeft],
                    data[self._monidx_flapsRight], data[self._monidx_flapsAxis],
-                   data[self._monidx_flapsIncrement], state.flapsSet, numNotchesM1)
+                   data[self._monidx_flapsIncrement], state.flapsSet, numNotchesM1))
             self._flapsSet = state.flapsSet
 
         flapsLeft = data[self._monidx_flapsLeft]
@@ -1587,7 +1591,7 @@ class GenericAircraftModel(AircraftModel):
         data = []
         for (tank, level) in levels:
             offset = _tank2offset[tank]
-            value = long(level * 128.0 * 65536.0)
+            value = int(level * 128.0 * 65536.0)
             data.append( (offset, "u", value) )
 
         handler.requestWrite(data, self._handleFuelWritten)
@@ -1697,9 +1701,10 @@ class B737Model(GenericAircraftModel):
 class PMDGBoeing737NGModel(B737Model):
     """A model handler for the PMDG Boeing 737NG model."""
     @staticmethod
-    def doesHandle(aircraft, (name, airPath)):
+    def doesHandle(aircraft, xxx_todo_changeme):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (name, airPath) = xxx_todo_changeme
         return aircraft.type in [const.AIRCRAFT_B736,
                                  const.AIRCRAFT_B737,
                                  const.AIRCRAFT_B738,
@@ -1729,8 +1734,8 @@ class PMDGBoeing737NGModel(B737Model):
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
         if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D:
-            print "%s detected, adding PMDG 737 NGX-specific offsets" % \
-                  ("FSX" if fsType==const.SIM_MSFSX else "P3D",)
+            print("%s detected, adding PMDG 737 NGX-specific offsets" % \
+                  ("FSX" if fsType==const.SIM_MSFSX else "P3D",))
             self._addOffsetWithIndexMember(data, 0x6500, "b",
                                            "_pmdgidx_lts_positionsw")
             self._addOffsetWithIndexMember(data, 0x6545, "b", "_pmdgidx_cmda")
@@ -1740,7 +1745,7 @@ class PMDGBoeing737NGModel(B737Model):
             self._addOffsetWithIndexMember(data, 0x652e, "H", "_pmdgidx_apalt")
             self._addOffsetWithIndexMember(data, 0x65cd, "b", "_pmdgidx_xpdr")
         else:
-            print "FS9 detected, adding PMDG 737 NG-specific offsets"
+            print("FS9 detected, adding PMDG 737 NG-specific offsets")
             self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
             self._addOffsetWithIndexMember(data, 0x6216, "b", "_pmdgidx_xpdr")
             self._addOffsetWithIndexMember(data, 0x6227, "b", "_pmdgidx_ap")
@@ -1785,7 +1790,7 @@ class PMDGBoeing737NGModel(B737Model):
         noseGear = data[self._monidx_noseGear]
 
         if gearControl!=self._lastGearControl or noseGear!=self._lastNoseGear:
-            print "gearControl:", gearControl, " noseGear:", noseGear
+            print("gearControl:", gearControl, " noseGear:", noseGear)
             self._lastGearControl = gearControl
             self._lastNoseGear = noseGear
 
@@ -1832,9 +1837,10 @@ class DH8DModel(GenericAircraftModel):
 class DreamwingsDH8DModel(DH8DModel):
     """Model handler for the Dreamwings Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, (name, airPath)):
+    def doesHandle(aircraft, xxx_todo_changeme1):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (name, airPath) = xxx_todo_changeme1
         return aircraft.type==const.AIRCRAFT_DH8D and \
             (name.find("Dreamwings")!=-1 or airPath.find("Dreamwings")!=-1) and \
             (name.find("Dash")!=-1 or airPath.find("Dash")!=-1) and \
@@ -1869,9 +1875,10 @@ class DreamwingsDH8DModel(DH8DModel):
 class MajesticDH8DModel(DH8DModel):
     """Model handler for the Majestic Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, (name, airPath)):
+    def doesHandle(aircraft, xxx_todo_changeme2):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (name, airPath) = xxx_todo_changeme2
         return aircraft.type==const.AIRCRAFT_DH8D and \
             (name.find("MJC8Q400")!=-1 or \
              airPath.lower().find("mjc8q400") or \
@@ -1947,9 +1954,10 @@ class F70Model(GenericAircraftModel):
 class DAF70Model(F70Model):
     """Model for the Digital Aviation F70 implementation on FS9."""
     @staticmethod
-    def doesHandle(aircraft, (name, airPath)):
+    def doesHandle(aircraft, xxx_todo_changeme3):
         """Determine if this model handler handles the aircraft with the given
         name."""
+        (name, airPath) = xxx_todo_changeme3
         return aircraft.type == const.AIRCRAFT_F70 and \
                (airPath.endswith("fokker70_2k4_v4.1.air") or
                 airPath.endswith("fokker70_2k4_v4.3.air") or
@@ -2136,10 +2144,11 @@ class T154Model(GenericAircraftModel):
 class PTT154Model(T154Model):
     """Project Tupolev Tu-154."""
     @staticmethod
-    def doesHandle(aircraft, (name, airPath)):
+    def doesHandle(aircraft, xxx_todo_changeme4):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        print "PTT154Model.doesHandle", aircraft.type, name, airPath
+        (name, airPath) = xxx_todo_changeme4
+        print("PTT154Model.doesHandle", aircraft.type, name, airPath)
         return aircraft.type==const.AIRCRAFT_T154 and \
                (name.find("Tu-154")!=-1 or name.find("Tu154B")!=-1) and \
                os.path.basename(airPath).startswith("154b_")

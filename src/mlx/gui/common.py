@@ -30,7 +30,7 @@ import calendar
 appIndicator = False
 
 if not pygobject:
-    print "Using PyGTK"
+    print("Using PyGTK")
     pygobject = False
     import pygtk
     pygtk.require("2.0")
@@ -41,7 +41,7 @@ if not pygobject:
     try:
         import appindicator
         appIndicator = True
-    except Exception, e:
+    except Exception as e:
         pass
 
     MESSAGETYPE_ERROR = gtk.MESSAGE_ERROR
@@ -112,7 +112,7 @@ if not pygobject:
 
     def text2unicode(text):
         """Convert the given text, returned by a Gtk widget, to Unicode."""
-        return unicode(text)
+        return str(text)
 
     def text2str(text):
         """Convert the given text, returned by xstr to a string."""

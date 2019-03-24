@@ -142,7 +142,7 @@ class FleetGateStatus(gtk.VBox):
         If fleet is None, the data will be cleared."""
         self._fleetStore.clear()
         if fleet is None:
-            for (gateNumber, label) in self._gateLabels.iteritems():
+            for (gateNumber, label) in self._gateLabels.items():
                 label.set_markup("<b>" + gateNumber + "</b>")
         else:        
             for plane in fleet:

@@ -1,5 +1,5 @@
 
-from common import *
+from .common import *
 
 from mlx.i18n import xstr
 import mlx.const as const
@@ -189,7 +189,7 @@ class ChecklistEditor(gtk.Dialog):
         if response==RESPONSETYPE_ACCEPT:
             self._saveChecklist()
             config = self._gui.config
-            for (aircraftType, checklist) in self._checklists.iteritems():
+            for (aircraftType, checklist) in self._checklists.items():
                 config.setChecklist(aircraftType, checklist)
             config.save()
 

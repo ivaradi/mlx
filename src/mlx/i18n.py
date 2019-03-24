@@ -23,7 +23,7 @@ _language = None
 
 def setLanguage(programDirectory, language):
     """Setup the internationalization support for the given language."""
-    print "i18n.setLanguage", language
+    print("i18n.setLanguage", language)
     translation = _getTranslation(programDirectory, language)
     fallback = _getFallbackFor(programDirectory, language)
     if translation is None:
