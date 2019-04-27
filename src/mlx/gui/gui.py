@@ -108,6 +108,8 @@ class GUI(fs.ConnectionListener):
         """Build the GUI."""
 
         self._mainWindow = window = gtk.Window()
+        if os.name!="nt":
+            window.set_visual(window.get_screen().lookup_visual(0x21))
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.set_resizable(False)
