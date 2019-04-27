@@ -125,10 +125,14 @@ else: # pygobject
     from gi.repository import GdkPixbuf as gdkPixbuf
     gi.require_version("Gtk", "3.0")
     from gi.repository import Gtk as gtk
-    from gi.repository import AppIndicator3 as appindicator
+    try:
+        gi.require_version("AppIndicator3", "0.1")
+        from gi.repository import AppIndicator3 as appindicator
+        appIndicator = True
+    except:
+        pass
     from gi.repository import Pango as pango
 
-    appIndicator = True
 
 
     MESSAGETYPE_ERROR = gtk.MessageType.ERROR
@@ -298,7 +302,8 @@ class TimeEntry(gtk.Entry):
     """Widget to display and edit a time value in HH:MM format."""
     def __init__(self):
         """Construct the entry"""
-        super(TimeEntry, self).__init__(max = 5)
+        super(TimeEntry, self).__init__()
+        self.set_max_width_chars(5)
 
         self.connect("insert-text", self._insertText)
         self.connect("delete-text", self._deleteText)
