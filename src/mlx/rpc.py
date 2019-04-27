@@ -110,11 +110,14 @@ class ScheduledFlight(RPCObject):
             try:
                 cs1 = int(self.callsign[2:])
                 cs2 = int(other.callsign[2:])
-                return cmp(cs1, cs2)
+                return 0 if cs1==cs2 else -1 if cs1<cs2 else 1
             except:
-                return cmp(self.callsign, other.callsign)
+                return 0 if self.callsign==other.callsign \
+                    else -1 if self.callsign<other.callsign else 1
         else:
-            return cmp(getattr(self, name), getattr(other, name))
+            v1 = getattr(self, name)
+            v2 = getattr(other, name)
+            return 0 if v1==v2 else -1 if v1<v2 else 1
 
     def __repr__(self):
         return "ScheduledFlight<%d, %d, %s, %s (%s) - %s (%s) -> %d, %d>" % \
@@ -165,8 +168,7 @@ class ScheduledFlightPair(object):
             elif flight.type==ScheduledFlight.TYPE_VIP:
                 flightPairs.append(ScheduledFlightPair(flight))
 
-        flightPairs.sort(cmp = lambda pair1, pair2:
-                         cmp(pair1.flight0.date, pair2.flight0.date))
+        flightPairs.sort(key = lambda pair: pair.flight0.date)
 
         return flightPairs
 
@@ -522,8 +524,7 @@ class Client(object):
                 rejectedFlights.append(flight)
 
         for flights in [bookedFlights, reportedFlights, rejectedFlights]:
-            flights.sort(cmp = lambda flight1, flight2:
-                         cmp(flight1.departureTime, flight2.departureTime))
+            flights.sort(key = lambda flight: flight.departureTime)
 
         return (bookedFlights, reportedFlights, rejectedFlights)
 

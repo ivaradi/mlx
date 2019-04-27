@@ -751,7 +751,7 @@ class TimetableWindow(gtk.Window):
         aircraftType = flightPair.flight0.aircraftType
         planes = [plane for plane in fleet
                   if plane.aircraftType == aircraftType]
-        planes.sort(cmp = lambda p1, p2: cmp(p1.tailNumber, p2.tailNumber))
+        planes.sort(key = lambda p: p.tailNumber)
 
         dialog = BookDialog(self, flightPair, planes)
         dialog.show_all()
