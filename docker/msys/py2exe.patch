@@ -1,0 +1,723 @@
+diff --git a/py2exe/distutils_buildexe.py b/py2exe/distutils_buildexe.py
+index ae8aca3..d809641 100644
+--- a/py2exe/distutils_buildexe.py
++++ b/py2exe/distutils_buildexe.py
+@@ -154,6 +154,7 @@ class py2exe(Command):
+         self.ascii = 0
+         self.custom_boot_script = None
+         self.use_assembly = False
++        self.gi_namespaces = []
+ 
+     def finalize_options (self):
+         self.optimize = int(self.optimize)
+@@ -239,6 +240,7 @@ class py2exe(Command):
+                             excludes = self.excludes,
+                             ignores = self.ignores,
+                             packages = self.packages,
++                            gi_namespaces = self.gi_namespaces,
+                             dist_dist = self.dist_dir,
+                             dll_excludes = self.dll_excludes,
+                             typelibs = self.typelibs,
+diff --git a/py2exe/dllfinder.py b/py2exe/dllfinder.py
+index 4e5e76c..bb43f9e 100644
+--- a/py2exe/dllfinder.py
++++ b/py2exe/dllfinder.py
+@@ -68,7 +68,8 @@ class DllFinder:
+             if dll in self._loaded_dlls:
+                 continue
+             for dep_dll in self.bind_image(dll):
+-                if dep_dll in self._loaded_dlls:
++                bname = os.path.basename(dep_dll).lower()
++                if bname in self._loaded_dlls:
+                     continue
+                 dll_type = self.determine_dll_type(dep_dll)
+                 if dll_type is None:
+@@ -144,7 +145,8 @@ class DllFinder:
+         deps = self.bind_image(imagename)
+         if pydll in [d.lower() for d in deps]:
+             return "EXT"
+-        if fnm.startswith(windir + os.sep) or fnm.startswith(sysdir + os.sep):
++        if fnm.startswith(windir + os.sep) or fnm.startswith(sysdir + os.sep) or \
++           fnm.startswith(windir + '\\') or fnm.startswith(sysdir + '\\'):
+             return None
+         return "DLL"
+ 
+diff --git a/py2exe/gihelper.py b/py2exe/gihelper.py
+index e69de29..f597692 100644
+--- a/py2exe/gihelper.py
++++ b/py2exe/gihelper.py
+@@ -0,0 +1,58 @@
++
++import cffi
++
++class GIHelper(object):
++    _cdef="""
++        typedef char gchar;
++        typedef int gint;
++        typedef uint32_t guint32;
++        typedef guint32 GQuark;
++
++        typedef struct {
++          GQuark    domain;
++          gint      code;
++          gchar     *message;
++        } GError;
++
++        typedef struct _GITypelib GITypelib;
++        typedef struct _GIRepository         GIRepository;
++
++        typedef enum
++        {
++          G_IREPOSITORY_LOAD_FLAG_LAZY = 1
++        } GIRepositoryLoadFlags;
++
++        GIRepository *g_irepository_get_default   (void);
++
++        GITypelib *    g_irepository_require       (GIRepository *repository,
++                               const gchar  *namespace_,
++                               const gchar  *version,
++                               GIRepositoryLoadFlags flags,
++                               GError      **error);
++
++        const gchar * g_irepository_get_shared_library (GIRepository *repository,
++                                const gchar  *namespace_);
++        """
++
++    def __init__(self):
++        self._ffi = cffi.FFI()
++        self._ffi.cdef(self._cdef)
++
++        self._lib = self._ffi.dlopen("libgirepository-1.0-1.dll")
++
++        self._repo=self._lib.g_irepository_get_default()
++
++        self._error = self._ffi.new("GError**")
++
++    def getSharedLibraries(self, namespace, version):
++        typelib = self._lib.g_irepository_require(self._repo,
++                                        bytes(namespace, "utf-8"),
++                                        bytes(version, "utf-8"),
++                                        0, self._error)
++        if typelib == self._ffi.NULL:
++            return []
++        else:
++            return str(
++                self._ffi.string(
++                    self._lib.g_irepository_get_shared_library(
++                        self._repo, bytes(namespace, "utf-8"))), "utf-8").split(",")
+diff --git a/py2exe/mf3.py b/py2exe/mf3.py
+index f645740..ec1f261 100644
+--- a/py2exe/mf3.py
++++ b/py2exe/mf3.py
+@@ -5,6 +5,7 @@
+ 
+ # XXX XXX XXX Does not yet support PEP 452 namespace packages!
+ 
++from . import gihelper
+ from collections import defaultdict
+ import dis
+ import importlib
+@@ -21,6 +22,9 @@ LOAD_CONST = dis.opname.index('LOAD_CONST')
+ IMPORT_NAME = dis.opname.index('IMPORT_NAME')
+ STORE_NAME = dis.opname.index('STORE_NAME')
+ STORE_GLOBAL = dis.opname.index('STORE_GLOBAL')
++LOAD_NAME = dis.opname.index('LOAD_NAME')
++LOAD_METHOD = dis.opname.index('LOAD_METHOD')
++CALL_METHOD = dis.opname.index('CALL_METHOD')
+ STORE_OPS = [STORE_NAME, STORE_GLOBAL]
+ HAVE_ARGUMENT = dis.HAVE_ARGUMENT
+ 
+@@ -63,7 +67,7 @@ class ModuleFinder:
+         self._depgraph = defaultdict(set)
+         self._indent = ""
+         self._package_paths = defaultdict(list)
+-
++        self._gihelper = gihelper.GIHelper()
+ 
+     def add_packagepath(self, packagename, path):
+         """ModuleFinder can not handle __path__ modifications packages
+@@ -416,7 +420,6 @@ class ModuleFinder:
+         We also take note of 'static' global symbols in the module and
+         add them to __globalnames__.
+         """
+-
+         for what, args in self._scan_opcodes(code):
+             if what == "store":
+                 name, = args
+@@ -424,6 +427,11 @@ class ModuleFinder:
+             elif what == "import":
+                 level, fromlist, name = args
+                 self.safe_import_hook(name, mod, fromlist, level)
++            elif what == "gi_request":
++                for sharedLibrary in \
++                    self._gihelper.getSharedLibraries(args[0], args[1]):
++                    from . dllfinder import SearchPath
++                    self.add_dll(SearchPath(sharedLibrary))
+             else:
+                 # We don't expect anything else from the generator.
+                 raise RuntimeError(what)
+@@ -442,10 +450,15 @@ class ModuleFinder:
+             # dis.get_instructions() is only available in python 3.4
+             # and higher
+             instructions = []
++
++            requireCallLevel = 0
++            requiredNamespace = None
++            requiredVersion = None
+             for inst in dis.get_instructions(co):
+                 instructions.append(inst)
+                 c = inst.opcode
+                 if c == IMPORT_NAME:
++                    requireCallLevel = 0
+                     assert instructions[-3].opcode == LOAD_CONST
+                     level = instructions[-3].argval
+                     assert instructions[-2].opcode == LOAD_CONST
+@@ -453,7 +466,34 @@ class ModuleFinder:
+                     name = inst.argval
+                     yield "import", (level, fromlist, name)
+                 elif c in STORE_OPS:
++                    requireCallLevel = 0
+                     yield "store", (inst.argval,)
++                elif c == LOAD_NAME:
++                    if requireCallLevel==0 and inst.argval=="gi":
++                        requireCallLevel += 1
++                    else:
++                        requireCallLevel = 0
++                elif c == LOAD_METHOD:
++                    if requireCallLevel==1 and inst.argval=="require_version":
++                        requireCallLevel += 1
++                    else:
++                        requireCallLevel = 0
++                elif c==LOAD_CONST:
++                    if requireCallLevel==2:
++                        requiredNamespace = inst.argval
++                        requireCallLevel += 1
++                    elif requireCallLevel==3:
++                        requiredVersion = inst.argval
++                        requireCallLevel += 1
++                    else:
++                        requireCallLevel = 0
++                elif c==CALL_METHOD:
++                    if requireCallLevel==4:
++                        yield ("gi_request", (requiredNamespace, requiredVersion))
++                    requireCallLevel = 0
++                    requiredNamespace = None
++                    requiredVersion = None
++
+         else:
+             code = co.co_code
+             names = co.co_names
+diff --git a/py2exe/py2exe_distutils.py b/py2exe/py2exe_distutils.py
+index 3918849..fe97b90 100644
+--- a/py2exe/py2exe_distutils.py
++++ b/py2exe/py2exe_distutils.py
+@@ -1,5 +1,5 @@
+ # This file is only used when BUILDING py2exe.
+-import os, sys
++import os, sys, types, copy
+ 
+ from distutils.core import Extension
+ from distutils.dist import Distribution
+@@ -8,12 +8,17 @@ from distutils.sysconfig import customize_compiler
+ from distutils.dep_util import newer_group
+ from distutils.errors import DistutilsError, DistutilsSetupError, DistutilsPlatformError
+ from distutils.errors import CCompilerError, CompileError
++from distutils.file_util import write_file
+ from distutils.util import get_platform
+ from distutils import log
+ 
+-# We don't need a manifest in the executable, so monkeypatch the code away:
+-from distutils.msvc9compiler import MSVCCompiler
+-MSVCCompiler.manifest_setup_ldargs = lambda *args: None
++from distutils import ccompiler
++isMingw32 = ccompiler.get_default_compiler()=='mingw32'
++
++if not isMingw32:
++    # We don't need a manifest in the executable, so monkeypatch the code away:
++    from distutils.msvc9compiler import MSVCCompiler
++    MSVCCompiler.manifest_setup_ldargs = lambda *args: None
+ 
+ class Interpreter(Extension):
+     def __init__(self, *args, **kw):
+@@ -38,6 +43,82 @@ class Dist(Distribution):
+     def has_extensions(self):
+         return False
+ 
++def mingw32_link(self, target_desc, objects, output_filename, output_dir=None,
++             libraries=None, library_dirs=None, runtime_library_dirs=None,
++             export_symbols=None, debug=0, extra_preargs=None,
++             extra_postargs=None, build_temp=None, target_lang=None):
++    """Link the objects."""
++    from distutils.unixccompiler import UnixCCompiler
++
++    # use separate copies, so we can modify the lists
++    extra_preargs = copy.copy(extra_preargs or [])
++    libraries = copy.copy(libraries or [])
++    objects = copy.copy(objects or [])
++
++    # Additional libraries
++    libraries.extend(self.dll_libraries)
++
++    # handle export symbols by creating a def-file
++    # with executables this only works with gcc/ld as linker
++    if ((export_symbols is not None) and
++        (target_desc != self.EXECUTABLE or self.linker_dll == "gcc")):
++        # (The linker doesn't do anything if output is up-to-date.
++        # So it would probably better to check if we really need this,
++        # but for this we had to insert some unchanged parts of
++        # UnixCCompiler, and this is not what we want.)
++
++        # we want to put some files in the same directory as the
++        # object files are, build_temp doesn't help much
++        # where are the object files
++        temp_dir = os.path.dirname(objects[0])
++        # name of dll to give the helper files the same base name
++        (dll_name, dll_extension) = os.path.splitext(
++            os.path.basename(output_filename))
++
++        # generate the filenames for these files
++        def_file = os.path.join(temp_dir, dll_name + ".def")
++        lib_file = os.path.join(temp_dir, 'lib' + dll_name + ".a")
++
++        # Generate .def file
++        contents = ["EXPORTS"]
++        for sym in export_symbols:
++            contents.append(sym)
++        self.execute(write_file, (def_file, contents),
++                     "writing %s" % def_file)
++
++        # next add options for def-file and to creating import libraries
++
++        # dllwrap uses different options than gcc/ld
++        if self.linker_dll == "dllwrap":
++            extra_preargs.extend(["--output-lib", lib_file])
++            # for dllwrap we have to use a special option
++            extra_preargs.extend(["--def", def_file])
++            # we use gcc/ld here and can be sure ld is >= 2.9.10
++        else:
++            # doesn't work: bfd_close build\...\libfoo.a: Invalid operation
++            #extra_preargs.extend(["-Wl,--out-implib,%s" % lib_file])
++            # for gcc/ld the def-file is specified as any object files
++            objects.append(def_file)
++
++    #end: if ((export_symbols is not None) and
++    #        (target_desc != self.EXECUTABLE or self.linker_dll == "gcc")):
++
++    # who wants symbols and a many times larger output file
++    # should explicitly switch the debug mode on
++    # otherwise we let dllwrap/ld strip the output file
++    # (On my machine: 10KiB < stripped_file < ??100KiB
++    #   unstripped_file = stripped_file + XXX KiB
++    #  ( XXX=254 for a typical python extension))
++    if not debug and not hasattr(sys, 'gettotalrefcount'):
++        extra_preargs.append("-s")
++
++    UnixCCompiler.link(self, target_desc, objects, output_filename,
++                       output_dir, libraries, library_dirs,
++                       runtime_library_dirs,
++                       None, # export_symbols, we do this in our def-file
++                       debug, extra_preargs, extra_postargs, build_temp,
++                       target_lang)
++
+ class BuildInterpreters(build_ext.build_ext):
+     description = "build special python interpreter stubs"
+ 
+@@ -67,6 +148,9 @@ class BuildInterpreters(build_ext.build_ext):
+         if os.name == 'nt' and self.plat_name != get_platform():
+             self.compiler.initialize(self.plat_name)
+ 
++        if isMingw32:
++            self.compiler.link = types.MethodType(mingw32_link, self.compiler)
++
+         # And make sure that any compile/link-related options (which might
+         # come from the command-line or from the setup script) are set in
+         # that CCompiler object -- that way, they automatically apply to
+@@ -190,7 +274,7 @@ class BuildInterpreters(build_ext.build_ext):
+                            libraries=self.get_libraries(ext),
+                            library_dirs=ext.library_dirs,
+                            runtime_library_dirs=ext.runtime_library_dirs,
+-                           export_symbols=ext.export_symbols,
++                           export_symbols=ext.export_symbols if ext.export_symbols else None,
+                            extra_postargs=extra_args,
+                            debug=self.debug)
+ 
+diff --git a/py2exe/runtime.py b/py2exe/runtime.py
+index 10b0fa9..d154ff7 100644
+--- a/py2exe/runtime.py
++++ b/py2exe/runtime.py
+@@ -19,8 +19,8 @@ from .icons import BuildIcons
+ 
+ logger = logging.getLogger("runtime")
+ 
+-#from importlib.machinery import EXTENSION_SUFFIXES
+-EXTENSION_SUFFIXES = ['.pyd']
++from importlib.machinery import EXTENSION_SUFFIXES
++#EXTENSION_SUFFIXES = ['.pyd']
+ from importlib.machinery import DEBUG_BYTECODE_SUFFIXES, OPTIMIZED_BYTECODE_SUFFIXES
+ 
+ RT_MANIFEST = 24
+@@ -248,12 +248,15 @@ class Runtime(object):
+             if os.path.isfile(libpath):
+                 os.remove(libpath)
+ 
+-            if not os.path.exists(os.path.dirname(libpath)):
+-                os.mkdir(os.path.dirname(libpath))
+-
+-            dll_bytes = pkgutil.get_data("py2exe", "resources.dll")
+-            with open(libpath, "wb") as ofi:
+-                  ofi.write(dll_bytes)
++            if self.options.skip_archive:
++                if not os.path.exists(libpath):
++                    os.makedirs(libpath)
++            else:
++                if not os.path.exists(os.path.dirname(libpath)):
++                    os.mkdir(os.path.dirname(libpath))
++                dll_bytes = pkgutil.get_data("py2exe", "resources.dll")
++                with open(libpath, "wb") as ofi:
++                    ofi.write(dll_bytes)
+             if options.verbose:
+                 print("Building shared code archive '%s'." % libpath)
+             # Archive is appended to resources.dll; remove the icon
+@@ -263,7 +266,7 @@ class Runtime(object):
+ 
+         self.copy_files(destdir)
+ 
+-        # data directories from modulefinder
++        # data directories from modulefinder
+         for name, (src, recursive) in self.mf._data_directories.items():
+             if recursive:
+                 dst = os.path.join(destdir, name)
+@@ -274,11 +277,11 @@ class Runtime(object):
+             else:
+                 raise RuntimeError("not yet supported")
+ 
+-        # data files from modulefinder
+-        for name, src in self.mf._data_files.items():
+-            dst = os.path.join(destdir, name)
+-            shutil.copy2(src, dst)
+-
++        # data files from modulefinder
++        for name, src in self.mf._data_files.items():
++            dst = os.path.join(destdir, name)
++            shutil.copy2(src, dst)
++
+         # other data files
+         if self.options.data_files:
+             for subdir, files in self.options.data_files:
+@@ -410,46 +413,38 @@ class Runtime(object):
+             compression = zipfile.ZIP_STORED
+ 
+         # Create a zipfile and append it to the library file
+-        arc = zipfile.ZipFile(libpath, "a",
+-                              compression=compression)
+-
+-        # The same modules may be in self.ms.modules under different
+-        # keys; we only need one of them in the archive.
+-        for mod in set(self.mf.modules.values()):
+-            if mod.__code__:
+-                if hasattr(mod, "__path__"):
+-                    path = mod.__name__.replace(".", "\\") + "\\__init__" + bytecode_suffix
+-                else:
+-                    path = mod.__name__.replace(".", "\\") + bytecode_suffix
+-                stream = io.BytesIO()
+-                stream.write(imp.get_magic())
+-                if sys.version_info >= (3,7,0):
+-                    stream.write(b"\0\0\0\0") # null flags
+-                stream.write(b"\0\0\0\0") # null timestamp
+-                stream.write(b"\0\0\0\0") # null size
+-                marshal.dump(mod.__code__, stream)
+-                arc.writestr(path, stream.getvalue())
+-
+-            elif hasattr(mod, "__file__"):
+-                #assert mod.__file__.endswith(EXTENSION_SUFFIXES[0])
+-                if self.options.bundle_files <= 2:
+-                    # put .pyds into the archive
+-                    arcfnm = mod.__name__.replace(".", "\\") + EXTENSION_SUFFIXES[0]
+-                    if self.options.verbose > 1:
+-                        print("Add %s to %s" % (os.path.basename(mod.__file__), libpath))
+-                    arc.write(mod.__file__, arcfnm)
+-                else:
+-                    # The extension modules will be copied into
+-                    # dlldir.  To be able to import it without dlldir
+-                    # being on sys.path, create a loader module and
+-                    # put that into the archive.
+-                    pydfile = mod.__name__ + EXTENSION_SUFFIXES[0]
+-                    if self.options.verbose > 1:
+-                        print("Add Loader for %s to %s" % (os.path.basename(mod.__file__), libpath))
+-                    loader = LOAD_FROM_DIR.format(pydfile)
+-
+-                    code = compile(loader, "<loader>", "exec",
+-                                   optimize=self.options.optimize)
++        if self.options.skip_archive:
++            for mod in set(self.mf.modules.values()):
++                if hasattr(mod, "__file__"):
++                    path = os.path.join(*mod.__name__.split("."))
++                    if hasattr(mod, "__path__"):
++                        path = os.path.join(path, "__init__")
++                    path += bytecode_suffix if mod.__code__ else EXTENSION_SUFFIXES[0]
++                    path = os.path.join(libpath, path)
++                    dirpath = os.path.dirname(path)
++                    if not os.path.isdir(dirpath):
++                        os.makedirs(dirpath)
++                    if mod.__code__:
++                        with open(mod.__file__, "rt") as fin:
++                            code = compile(fin.read(), mod.__file__, "exec",
++                                           optimize=self.options.optimize)
++                        with open(path, "wb") as fout:
++                            fout.write(imp.get_magic())
++                            if sys.version_info >= (3,7,0):
++                                fout.write(b"\0\0\0\0") # null flags
++                            fout.write(b"\0\0\0\0") # null timestamp
++                            fout.write(b"\0\0\0\0") # null size
++                            marshal.dump(code, fout)
++                    else:
++                        shutil.copy2(mod.__file__, path)
++        else:
++            arc = zipfile.ZipFile(libpath, "a",
++                                  compression=compression)
++
++            # The same modules may be in self.ms.modules under different
++            # keys; we only need one of them in the archive.
++            for mod in set(self.mf.modules.values()):
++                if mod.__code__:
+                     if hasattr(mod, "__path__"):
+                         path = mod.__name__.replace(".", "\\") + "\\__init__" + bytecode_suffix
+                     else:
+@@ -457,28 +452,61 @@ class Runtime(object):
+                     stream = io.BytesIO()
+                     stream.write(imp.get_magic())
+                     if sys.version_info >= (3,7,0):
+-                        stream.write(b"\0\0\0\0") # null flags
++                        stream.write(b"\0\0\0\0") # null flags
+                     stream.write(b"\0\0\0\0") # null timestamp
+                     stream.write(b"\0\0\0\0") # null size
+-                    marshal.dump(code, stream)
++                    marshal.dump(mod.__code__, stream)
+                     arc.writestr(path, stream.getvalue())
+ 
+-        if self.options.bundle_files == 0:
+-            # put everything into the arc
+-            files = self.mf.all_dlls()
+-        elif self.options.bundle_files in (1, 2):
+-            # put only extension dlls into the arc
+-            files = self.mf.extension_dlls()
+-        else:
+-            arc.close()
+-            return
++                elif hasattr(mod, "__file__"):
++                    #assert mod.__file__.endswith(EXTENSION_SUFFIXES[0])
++                    if self.options.bundle_files <= 2:
++                        # put .pyds into the archive
++                        arcfnm = mod.__name__.replace(".", "\\") + EXTENSION_SUFFIXES[0]
++                        if self.options.verbose > 1:
++                            print("Add %s to %s" % (os.path.basename(mod.__file__), libpath))
++                        arc.write(mod.__file__, arcfnm)
++                    else:
++                        # The extension modules will be copied into
++                        # dlldir.  To be able to import it without dlldir
++                        # being on sys.path, create a loader module and
++                        # put that into the archive.
++                        pydfile = mod.__name__ + EXTENSION_SUFFIXES[0]
++                        if self.options.verbose > 1:
++                            print("Add Loader for %s to %s" % (os.path.basename(mod.__file__), libpath))
++                        loader = LOAD_FROM_DIR.format(pydfile)
++
++                        code = compile(loader, "<loader>", "exec",
++                                       optimize=self.options.optimize)
++                        if hasattr(mod, "__path__"):
++                            path = mod.__name__.replace(".", "\\") + "\\__init__" + bytecode_suffix
++                        else:
++                            path = mod.__name__.replace(".", "\\") + bytecode_suffix
++                        stream = io.BytesIO()
++                        stream.write(imp.get_magic())
++                        if sys.version_info >= (3,7,0):
++                            stream.write(b"\0\0\0\0") # null flags
++                        stream.write(b"\0\0\0\0") # null timestamp
++                        stream.write(b"\0\0\0\0") # null size
++                        marshal.dump(code, stream)
++                        arc.writestr(path, stream.getvalue())
++
++            if self.options.bundle_files == 0:
++                # put everything into the arc
++                files = self.mf.all_dlls()
++            elif self.options.bundle_files in (1, 2):
++                # put only extension dlls into the arc
++                files = self.mf.extension_dlls()
++            else:
++                arc.close()
++                return
+ 
+-        for src in files:
+-            if self.options.verbose > 1:
+-                print("Add DLL %s to %s" % (os.path.basename(src), libpath))
+-            arc.write(src, os.path.basename(src))
++            for src in files:
++                if self.options.verbose > 1:
++                    print("Add DLL %s to %s" % (os.path.basename(src), libpath))
++                arc.write(src, os.path.basename(src))
+ 
+-        arc.close()
++            arc.close()
+ 
+     def copy_files(self, destdir):
+         """Copy files (pyds, dlls, depending on the bundle_files value,
+@@ -498,17 +526,19 @@ class Runtime(object):
+             with UpdateResources(dst, delete_existing=False) as resource:
+                 resource.add_string(1000, "py2exe")
+ 
+-        if self.options.bundle_files == 3:
++        if not self.options.skip_archive and self.options.bundle_files == 3:
+             # copy extension modules; they go to libdir
+             for mod in self.mf.modules.values():
+                 if mod.__code__:
+                     # nothing to do for python modules.
+                     continue
+                 if hasattr(mod, "__file__"):
+-                    assert mod.__file__.endswith(EXTENSION_SUFFIXES[0])
+-                    pydfile = mod.__name__ + EXTENSION_SUFFIXES[0]
++                    if mod.__file__.endswith(EXTENSION_SUFFIXES[0]):
++                        pydfile = mod.__name__ + EXTENSION_SUFFIXES[0]
+ 
+-                    dst = os.path.join(libdir, pydfile)
++                        dst = os.path.join(libdir, pydfile)
++                    else:
++                        dst = os.path.join(libdir, os.path.basename(mod.__file__))
+                     if self.options.verbose:
+                         print("Copy %s to %s" % (mod.__file__, dst))
+                     shutil.copy2(mod.__file__, dst)
+@@ -638,9 +668,11 @@ def __load():
+     dllpath = os.path.join(os.path.dirname(__loader__.archive), r'{0}')
+     try:
+         mod = imp.load_dynamic(__name__, dllpath)
++        mod.frozen = 1
+     except ImportError as details:
+         raise ImportError('(%s) %r' % (details, dllpath)) from None
+-    mod.frozen = 1
++    except AttributeError:
++        pass
+ __load()
+ del __load
+ """
+diff --git a/setup.py b/setup.py
+index 342d194..5fb5a9a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -12,6 +12,8 @@ if sys.version_info < (3, 3):
+ ############################################################################
+ 
+ from setuptools import setup
++from distutils import ccompiler
++isMingw32 = ccompiler.get_default_compiler()=='mingw32'
+ ##from distutils.core import setup
+ 
+ from py2exe.py2exe_distutils import Dist, Interpreter, BuildInterpreters
+@@ -26,11 +28,11 @@ def _is_debug_build():
+     return False
+ 
+ if _is_debug_build():
+-    macros = [("PYTHONDLL", '\\"python%d%d_d.dll\\"' % sys.version_info[:2]),
++    macros = [("PYTHONDLL", ('"libpython%d.%dm_d.dll"' if isMingw32 else '"\\python%d%d_d.dll\\"') % sys.version_info[:2]),
+ ##              ("PYTHONCOM", '\\"pythoncom%d%d_d.dll\\"' % sys.version_info[:2]),
+               ("_CRT_SECURE_NO_WARNINGS", '1')]
+ else:
+-    macros = [("PYTHONDLL", '\\"python%d%d.dll\\"' % sys.version_info[:2]),
++    macros = [("PYTHONDLL", ('"libpython%d.%dm.dll"' if isMingw32 else '"\\python%d%d.dll\\"') % sys.version_info[:2]),
+ ##              ("PYTHONCOM", '\\"pythoncom%d%d.dll\\"' % sys.version_info[:2]),
+               ("_CRT_SECURE_NO_WARNINGS", '1'),]
+ 
+@@ -39,9 +41,10 @@ macros.append(("Py_BUILD_CORE", '1'))
+ extra_compile_args = []
+ extra_link_args = []
+ 
+-extra_compile_args.append("-IC:\\Program Files\\Microsoft SDKs\\Windows\\v7.0\\Include")
+-extra_compile_args.append("-IC:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include")
+-extra_compile_args.append("-IC:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10586.0\\ucrt")
++if not isMingw32:
++    extra_compile_args.append("-IC:\\Program Files\\Microsoft SDKs\\Windows\\v7.0\\Include")
++    extra_compile_args.append("-IC:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include")
++    extra_compile_args.append("-IC:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10586.0\\ucrt")
+ 
+ if 0:
+     # enable this to debug a release build
+@@ -63,7 +66,11 @@ run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
+                               "source/python-dynload.c",
+                               ],
+                              libraries=["user32", "shell32"],
+-                             export_symbols=["DllCanUnloadNow,PRIVATE",
++                             export_symbols=["DllCanUnloadNow",
++                                             "DllGetClassObject",
++                                             "DllRegisterServer",
++                                             "DllUnregisterServer",
++                                             ] if isMingw32 else ["DllCanUnloadNow,PRIVATE",
+                                              "DllGetClassObject,PRIVATE",
+                                              "DllRegisterServer,PRIVATE",
+                                              "DllUnregisterServer,PRIVATE",
+@@ -71,7 +78,7 @@ run_ctypes_dll = Interpreter("py2exe.run_ctypes_dll",
+                              target_desc = "shared_library",
+                              define_macros=macros,
+                              extra_compile_args=extra_compile_args,
+-                             extra_link_args=extra_link_args + ["/DLL"],
++                             extra_link_args=extra_link_args + ([] if isMingw32 else ["/DLL"]),
+                              )
+ 
+ run = Interpreter("py2exe.run",
+@@ -123,7 +130,7 @@ resource_dll = Interpreter("py2exe.resources",
+                            ["source/dll.c",
+                             "source/icon.rc"],
+                            target_desc = "shared_library",
+-                           extra_link_args=["/DLL"],
++                           extra_link_args=[] if isMingw32 else ["/DLL"],
+                            )
+ 
+ interpreters = [run, run_w, resource_dll,
+diff --git a/source/python-dynload.c b/source/python-dynload.c
+index 2a60b86..373bb62 100644
+--- a/source/python-dynload.c
++++ b/source/python-dynload.c
+@@ -31,7 +31,7 @@ static HMODULE hmod_pydll;
+ 
+ #define FUNC(res, name, args) \
+   static res(*proc)args; \
+-  if (!proc) (FARPROC)proc = MyGetProcAddress(hmod_pydll, #name)
++  if (!proc) proc = (res (*)args)MyGetProcAddress(hmod_pydll, #name)
+ 
+ #define DATA(type, name)				\
+   static type pflag; \
+@@ -158,7 +158,7 @@ void PyErr_Print(void)
+   proc();
+ }
+ 
+-void Py_SetProgramName(wchar_t *name)
++void Py_SetProgramName(const wchar_t *name)
+ {
+   FUNC(void, Py_SetProgramName, (wchar_t *));
+   proc(name);
+diff --git a/source/run.c b/source/run.c
+index e1f630e..933ae77 100644
+--- a/source/run.c
++++ b/source/run.c
+@@ -54,7 +54,11 @@ extern int start(int argc, wchar_t **argv);
+ /*
+   The main function for our exe.
+ */
++#if defined(__MINGW32__)
++int main (int argc, wchar_t **argv)
++#else
+ int wmain (int argc, wchar_t **argv)
++#endif
+ {
+ 	int result;
+ 	result = init("console_exe");
+diff --git a/source/start.c b/source/start.c
+index e894ae6..6b61624 100644
+--- a/source/start.c
++++ b/source/start.c
+@@ -128,7 +128,7 @@ BOOL locate_script(HMODULE hmod)
+ 		SystemError(GetLastError(), "Could not load script resource:");
+ 		return FALSE;
+ 	}
+-	p_script_info = (struct scriptinfo *)pScript = LockResource(hgbl);
++	p_script_info = (struct scriptinfo *)(pScript = LockResource(hgbl));
+ 	if (!pScript)  {
+ 		SystemError(GetLastError(), "Could not lock script resource:");
+ 		return FALSE;
