@@ -1013,7 +1013,7 @@ class GetNOTAMs(Request):
             try:
                 data = f.read(16384)
                 while data:
-                    parser.feed(data)
+                    parser.feed(str(data))
                     data = f.read(16384)
             finally:
                 f.close()
@@ -1050,7 +1050,8 @@ class GetMETARs(Request):
         try:
             result = Result()
             result.metars = {}
-            for line in iter(f.readline, ""):
+            for line in f.readlines():
+                line = str(line, "iso-8859-1")
                 if len(line)>5 and line[4]==' ':
                     icao = line[0:4]
                     if icao in self._airports:

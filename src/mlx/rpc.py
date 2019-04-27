@@ -469,7 +469,7 @@ class Client(object):
         self._userName = userName
 
         md5 = hashlib.md5()
-        md5.update(password)
+        md5.update(password.encode("utf-8"))
         self._passwordHash = md5.hexdigest()
 
         self._sessionID = None

@@ -50,7 +50,7 @@ def xstr(key):
 
     If not found, the fallback language is searched. If that is not found
     either, the key itself is returned within curly braces."""
-    return _translation.ugettext(key)
+    return _translation.gettext(key)
     
 #------------------------------------------------------------------------------
 
