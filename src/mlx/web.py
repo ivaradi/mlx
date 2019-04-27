@@ -14,6 +14,7 @@ import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 import hashlib
 import time
+import re
 import datetime
 import codecs
 import traceback
@@ -577,7 +578,10 @@ class PilotsWebNOTAMsParser(html.parser.HTMLParser):
 
     def _parseCurrentNOTAM2(self):
         """Parse the current NOTAM with a second, more flexible method."""
+        self._currentNOTAM = self._currentNOTAM.replace("\\n", "\n")
         lines = self._currentNOTAM.splitlines()
+        if len(lines)==1:
+            lines = lines[0].splitlines()
         lines = [line.strip() for line in lines]
 
         if not lines:
@@ -613,6 +617,7 @@ class PilotsWebNOTAMsParser(html.parser.HTMLParser):
             return None
 
         def parseTime(item):
+            item = re.sub("([0-9]+).*", "\\1", item)
             try:
                 return datetime.datetime.strptime(item, "%y%m%d%H%M")
             except ValueError:
