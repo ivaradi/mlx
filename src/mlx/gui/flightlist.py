@@ -170,7 +170,7 @@ class FlightList(gtk.Alignment):
     @property
     def hasFlights(self):
         """Determine if there are any flights in the list."""
-        return self._model.get_iter_root() is not None
+        return self._model.get_iter_first() is not None
 
     def clear(self):
         """Clear the model."""
@@ -270,7 +270,8 @@ class PendingFlightsFrame(gtk.Frame):
 
     def __init__(self, which, wizard, window, pirepEditable = False):
         """Construct the frame with the given title."""
-        super(PendingFlightsFrame, self).__init__(xstr("pendflt_title_" + which))
+        super(PendingFlightsFrame, self).__init__()
+        self.set_label(xstr("pendflt_title_" + which))
 
         self._which = which
         self._wizard = wizard

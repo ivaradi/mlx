@@ -81,8 +81,6 @@ class Timetable(gtk.Alignment):
             self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
         self._view = gtk.TreeView(self._model)
 
-        self._tooltips = gtk.Tooltips()
-        self._tooltips.disable()
         self._view.connect("motion-notify-event", self._updateTooltip)
 
         flightPairIndexColumn = gtk.TreeViewColumn()
@@ -224,8 +222,7 @@ class Timetable(gtk.Alignment):
         try:
             result = widget.get_path_at_pos( int(event.x), int(event.y))
             if result is None:
-                self._tooltips.set_tip(widget, "")
-                self._tooltips.disable()
+                widget.set_tooltip_text("")
             else:
                 (path, col, x, y) = result
                 index = self._getIndexForPath(path)
@@ -243,15 +240,20 @@ class Timetable(gtk.Alignment):
                             text += "; "
                         text += date.strftime("%Y-%m-%d")
 
-                    self._tooltips.set_tip(widget, text)
-                    self._tooltips.enable()
+                    widget.set_tooltip_text(text)
                 else:
-                    self._tooltips.set_tip(widget, "")
-                    self._tooltips.disable()
+                    widget.set_tooltip_text("")
         except Exception as e:
             print(e)
-            self._tooltips.set_tip(widget, "")
-            self._tooltips.disable()
+            widget.set_tooltip_text("")
+
+#-----------------------------------------------------------------------------
+
+gobject.signal_new("row-activated", Timetable, gobject.SIGNAL_RUN_FIRST,
+                   None, (int,))
+
+gobject.signal_new("selection-changed", Timetable, gobject.SIGNAL_RUN_FIRST,
+                   None, (object,))
 
 #-----------------------------------------------------------------------------
 
@@ -519,7 +521,8 @@ class TimetableWindow(gtk.Window):
         filterAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                         xscale = 1.0, yscale = 1.0)
 
-        filterFrame = gtk.Frame(xstr("timetable_filter"))
+        filterFrame = gtk.Frame()
+        filterFrame.set_label(xstr("timetable_filter"))
 
         filterVBox = gtk.VBox()
 
