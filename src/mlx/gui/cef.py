@@ -326,7 +326,8 @@ def startInContainer(container, url, browserSettings = {}):
         else:
             windowID = window.handle
     else:
-        windowID = container.window.xid
+        container.set_visual(container.get_screen().lookup_visual(0x21))
+        windowID = container.get_window().get_xid()
 
     windowInfo = cefpython.WindowInfo()
     if windowID is not None:
