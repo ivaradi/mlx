@@ -4,6 +4,7 @@ import sys
 import os
 from glob import glob
 from distutils.core import setup
+from pathlib import Path
 
 scriptdir=os.path.dirname(sys.argv[0])
 sys.path.insert(0, os.path.join(scriptdir, "src"))
@@ -39,24 +40,57 @@ if os.name=="nt":
 
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
-        path = os.path.join("lib", "gtk-2.0", "2.10.0", "engines")
-        data_files.append((os.path.join("library", path),
-                           [os.path.join(gtkRuntimeDir, path, "libwimp.dll")]))
+        if gtkRuntimeDir.endswith("/mingw32"):
+            path = os.path.join("lib", "girepository-1.0")
+            data_files.append((path,
+                               glob(os.path.join(gtkRuntimeDir, path, "*"))))
 
-        path = os.path.join("share", "themes", "MS-Windows", "gtk-2.0")
-        data_files.append((os.path.join("library", path),
-                           glob(os.path.join(gtkRuntimeDir, path, "*"))))
+            files = {}
 
-        path = os.path.join("share", "locale", "hu", "LC_MESSAGES")
-        data_files.append((os.path.join("library", path),
-                           glob(os.path.join(gtkRuntimeDir, path, "*"))))
-        path = os.path.join("share", "icons", "hicolor")
-        data_files.append((os.path.join("library", path),
-                           glob(os.path.join(gtkRuntimeDir, path, "*"))))
+            for components in [ ["lib", "girepository-1.0"],
+                                ["lib", "gdk-pixbuf-2.0", "2.10.0"],
+                                ["share", "icons"],
+                                ["share", "locale", "hu"],
+                                ["share", "locale", "en"],
+                                ["share", "themes"],
+                                ["share", "glib-2.0", "schemas"]]:
+                path = os.path.join(*components)
+                p = Path(os.path.join(gtkRuntimeDir, path))
+                for f in p.glob("**/*"):
+                    if f.is_file():
+                        d = os.path.join(path, str(f.parent.relative_to(p)))
+                        if d in files:
+                            files[d].append(str(f))
+                        else:
+                            files[d] = [str(f)]
+
+            for path in files:
+                data_files.append((path, files[path]))
+            data_files.append(("",
+                               [os.path.join(gtkRuntimeDir, "bin", "librsvg-2-2.dll"),
+                                os.path.join(gtkRuntimeDir, "bin", "libcroco-0.6-3.dll")]))
+        else:
+            path = os.path.join("lib", "gtk-2.0", "2.10.0", "engines")
+            data_files.append((os.path.join("library", path),
+                               [os.path.join(gtkRuntimeDir, path, "libwimp.dll")]))
+
+            path = os.path.join("share", "themes", "MS-Windows", "gtk-2.0")
+            data_files.append((os.path.join("library", path),
+                               glob(os.path.join(gtkRuntimeDir, path, "*"))))
+
+            path = os.path.join("share", "locale", "hu", "LC_MESSAGES")
+            data_files.append((os.path.join("library", path),
+                               glob(os.path.join(gtkRuntimeDir, path, "*"))))
+            path = os.path.join("share", "icons", "hicolor")
+            data_files.append((os.path.join("library", path),
+                               glob(os.path.join(gtkRuntimeDir, path, "*"))))
 
     cefDir = os.environ.get("CEFDIR")
     if cefDir:
-        for fileName in ["icudt.dll", "subprocess.exe"]:
+        for fileName in ["icudtl.dat", "subprocess.exe", "natives_blob.bin",
+                         "snapshot_blob.bin", "v8_context_snapshot.bin",
+                         "cef.pak", "cef_100_percent.pak",
+                         "cef_200_percent.pak", "cef_extensions.pak"]:
             data_files.append(("", [os.path.join(cefDir, fileName)]))
 
         data_files.append(("locales",
@@ -131,17 +165,15 @@ setup(name = "mlx",
                    "icon_resources" : [(1, "logo.ico")]},
                  { "script" : "mlxupdate.py",
                    "uac_info" : "requireAdministrator"}],
-      options = { "py2exe" : { "includes": "gio, pango, atk, pangocairo, lxml._elementpath",
+      options = { "py2exe" : { "packages" : "gi, lxml",
                                "skip_archive": True} },
-      zipfile = "library/.",
+      zipfile = "library",
       data_files = data_files,
       platforms = ["Win32", "Linux"],
       license = "Public Domain"
       )
 
 if os.name=="nt":
-    os.rename(os.path.join(scriptdir, "dist", "library", "libcef.dll"),
-              os.path.join(scriptdir, "dist", "libcef.dll"))
     mlx.update.buildManifest(os.path.join(scriptdir, "dist"))
     with open(os.path.join(scriptdir, "dist", "Uninstall.conf"), "wt") as f:
         print("StartMenuFolder=MAVA Logger X", file=f)
