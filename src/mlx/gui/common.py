@@ -119,8 +119,11 @@ if not pygobject:
         return str(text)
 
 else: # pygobject
+    import gi
+    gi.require_version("Gdk", "3.0")
     from gi.repository import Gdk as gdk
     from gi.repository import GdkPixbuf as gdkPixbuf
+    gi.require_version("Gtk", "3.0")
     from gi.repository import Gtk as gtk
     from gi.repository import AppIndicator3 as appindicator
     from gi.repository import Pango as pango
