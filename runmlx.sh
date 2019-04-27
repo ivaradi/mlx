@@ -7,4 +7,7 @@ export PYTHONPATH
 
 https_proxy=
 
-exec python -m runmlx "$@"
+FORCE_PYGOBJECT=true
+export FORCE_PYGOBJECT
+
+exec python3 -m runmlx "$@"
