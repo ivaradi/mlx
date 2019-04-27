@@ -173,9 +173,18 @@ _latin2decoder = codecs.getdecoder("iso8859-2")
 
 def utf2unicode(text):
     """Convert the given text from UTF-8 encoding to unicode."""
+    if isinstance(text, str):
+        if text.startswith("list indices must be"):
+            import traceback
+            traceback.print_exc()
+
+        return text
+
     try:
         return str(_utf8decoder(text)[0])
     except:
+        import traceback
+        traceback.print_exc()
         try:
             return str(_latin2decoder(text)[0])
         except:
