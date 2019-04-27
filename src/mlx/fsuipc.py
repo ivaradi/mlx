@@ -12,6 +12,7 @@ import calendar
 import sys
 import codecs
 import math
+from functools import total_ordering
 
 if os.name == "nt" and "FORCE_PYUIPC_SIM" not in os.environ:
     import pyuipc
@@ -196,6 +197,7 @@ class Handler(threading.Thread):
             else:
                 Handler._callSafe(lambda: self._callback(None, self._extra))
 
+    @total_ordering
     class PeriodicRequest(object):
         """A periodic request."""
         def __init__(self, id,  period, data, callback, extra, validator):
@@ -249,10 +251,17 @@ class Handler(threading.Thread):
             """Handle the failure of this request."""
             pass
 
-        def __cmp__(self, other):
-            """Compare two periodic requests. They are ordered by their next
-            firing times."""
-            return cmp(self._nextFire, other._nextFire)
+        def __eq__(self, other):
+            """Equality comparison by the firing times"""
+            return self._nextFire == other._nextFire
+
+        def __ne__(self, other):
+            """Non-equality comparison by the firing times"""
+            return self._nextFire != other._nextFire
+
+        def __lt__(self, other):
+            """Less-than comparison by the firing times"""
+            return self._nextFire < other._nextFire
 
     def __init__(self, connectionListener,
                  connectAttempts = -1, connectInterval = 0.2):

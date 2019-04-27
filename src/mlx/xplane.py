@@ -11,6 +11,7 @@ import datetime
 import sys
 import codecs
 import math
+from functools import total_ordering
 
 from xplra import XPlane, MultiGetter, MultiSetter, ProtocolException
 from xplra import TYPE_INT, TYPE_FLOAT, TYPE_DOUBLE
@@ -147,6 +148,7 @@ class UnregisterHotkeysRequest(Request):
         self._result = True
         return True
 
+@total_ordering
 class PeriodicRequest(object):
     """A periodic request."""
     def __init__(self, handler, id, period, callback, extra):
@@ -197,10 +199,17 @@ class PeriodicRequest(object):
         """Handle the failure of this request."""
         pass
 
-    def __cmp__(self, other):
-        """Compare two periodic requests. They are ordered by their next
-        firing times."""
-        return cmp(self._nextFire, other._nextFire)
+    def __eq__(self, other):
+        """Equality comparison by the firing times"""
+        return self._nextFire == other._nextFire
+
+    def __ne__(self, other):
+        """Non-equality comparison by the firing times"""
+        return self._nextFire != other._nextFire
+
+    def __lt__(self, other):
+        """Less-than comparison by the firing times"""
+        return self._nextFire < other._nextFire
 
 class PeriodicDataRequest(PeriodicRequest):
     """A periodic request."""

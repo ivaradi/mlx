@@ -6,6 +6,7 @@ from . import util
 import sys
 import time
 import bisect
+from functools import total_ordering
 
 #--------------------------------------------------------------------------------------
 
@@ -33,6 +34,7 @@ class Logger(object):
     It contains a list of entries ordered by their timestamps and their ever
     increasing IDs."""
 
+    @total_ordering
     class Entry(object):
         """An entry in the log."""
 
@@ -118,15 +120,21 @@ class Logger(object):
 
                                 id = self._id)
 
-        def __cmp__(self, other):
-            """Compare two entries
+        def __eq__(self, other):
+            """Equality comparison"""
+            return self._timestamp == other.timestamp and \
+                self._id == other._id
 
-            First their timestamps are compared, and if those are equal, then
-            their IDs."""
-            result = cmp(self._timestamp, other.timestamp)
-            if result==0:
-                result = cmp(self._id, other._id)
-            return result
+        def __ne__(self, other):
+            """Non-equality comparison"""
+            return self._timestamp != other.timestamp or \
+                self._id != other._id
+
+        def __lt__(self, other):
+            """Less-than comparison"""
+            return self._timestamp < other.timestamp or \
+                (self._timestamp == other.timestamp and
+                 self._id < other._id)
 
     class Fault(object):
         """Information about a fault.
