@@ -1409,9 +1409,9 @@ class AircraftModel(object):
         state.gLoad = data[self._monidx_gLoad] / 625.0
 
         numNotchesM1 = len(self._flapsNotches) - 1
-        flapsIncrement = 16383 / numNotchesM1
+        flapsIncrement = 16383 // numNotchesM1
         flapsControl = data[self._monidx_flapsControl]
-        flapsIndex = flapsControl / flapsIncrement
+        flapsIndex = flapsControl // flapsIncrement
         if flapsIndex < numNotchesM1:
             if (flapsControl - (flapsIndex*flapsIncrement) >
                 (flapsIndex+1)*flapsIncrement - flapsControl):

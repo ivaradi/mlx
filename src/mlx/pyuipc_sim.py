@@ -183,11 +183,11 @@ class Values(object):
     @staticmethod
     def _readBCD(value):
         """Convert the given value into BCD format."""
-        bcd = (value/1000) % 10
+        bcd = (value//1000) % 10
         bcd <<= 4
-        bcd |= (value/100) % 10
+        bcd |= (value//100) % 10
         bcd <<= 4
-        bcd |= (value/10) % 10
+        bcd |= (value//10) % 10
         bcd <<= 4
         bcd |= value % 10
         return bcd
@@ -359,7 +359,7 @@ class Values(object):
         else:
             return int(index * flapsIncrement +
                        (self.flapsControl-self.flapsNotches[index]) *
-                       flapsIncrement /
+                       flapsIncrement //
                        (self.flapsNotches[index+1] - self.flapsNotches[index]))
 
     def _read(self, offset, type):
@@ -541,7 +541,7 @@ class Values(object):
             return self.payloadCount
         elif offset>=0x1400 and offset<=0x1f40 and \
              ((offset-0x1400)%48)==0: # Payload
-            return self.payload[ (offset - 0x1400) / 48 ]
+            return self.payload[ (offset - 0x1400) // 48 ]
         elif offset==0x2000:       # Engine #1 N1
             return self.n1[self.ENGINE_1]
         elif offset==0x2100:       # Engine #2 N1
@@ -567,7 +567,7 @@ class Values(object):
             return Values.HOTKEY_SIZE
         elif offset>=0x3210 and offset<0x3210+Values.HOTKEY_SIZE*4:
             tableOffset = offset - 0x3210
-            hotkeyIndex = tableOffset / 4
+            hotkeyIndex = tableOffset // 4
             index = tableOffset % 4
             if type=="b" or type=="c":
                 return self.hotkeyTable[hotkeyIndex][index]
@@ -601,7 +601,7 @@ class Values(object):
         elif offset==0x3414:       # Flaps axis
             return self._getFlapsControl()
         elif offset==0x3bfa:       # Flaps increment
-            return 16383 / (len(self.flapsNotches)-1)
+            return 16383 // (len(self.flapsNotches)-1)
         elif offset==0x3bfc:       # ZFW
             return int(self.zfw * 256.0 * const.KGSTOLB)
         elif offset==0x3c00:       # Path of the current AIR file
@@ -757,7 +757,7 @@ class Values(object):
             self.spoilersArmed = value!=0
         elif offset==0x0bd0:       # Spoilers
             self.spoilters = 0 if value==0 \
-                             else (value - 4800) / (16383 - 4800)
+                             else (value - 4800) // (16383 - 4800)
         elif offset==0x0bdc:       # Flaps control
             numNotchesM1 = len(self.flapsNotches) - 1
             flapsIncrement = 16383.0 / numNotchesM1
@@ -767,7 +767,7 @@ class Values(object):
             else:
                 self.flapsControl = self.flapsNotches[index]
                 self.flapsControl += (value - index * flapsIncrement) * \
-                    (self.flapsNotches[index+1] - self.flapsNotches[index]) / \
+                    (self.flapsNotches[index+1] - self.flapsNotches[index]) // \
                     flapsIncrement
         elif offset==0x0be0 or offset==0x0be4:    # Flaps left and  right
             self.flaps = value * self.flapsNotches[-1] / 16383.0
@@ -815,7 +815,7 @@ class Values(object):
             self.payloadCount = int(value)
         elif offset>=0x1400 and offset<=0x1f40 and \
              ((offset-0x1400)%48)==0: # Payload
-            self.payload[ (offset - 0x1400) / 48 ] = value
+            self.payload[ (offset - 0x1400) // 48 ] = value
         elif offset==0x2000:       # Engine #1 N1
             self.n1[self.ENGINE_1] = value
         elif offset==0x2100:       # Engine #2 N1
@@ -839,7 +839,7 @@ class Values(object):
             return Values.HOTKEY_SIZE
         elif offset>=0x3210 and offset<0x3210+Values.HOTKEY_SIZE*4:
             tableOffset = offset - 0x3210
-            hotkeyIndex = tableOffset / 4
+            hotkeyIndex = tableOffset // 4
             index = tableOffset % 4
             if type=="b" or type=="c":
                 self.hotkeyTable[hotkeyIndex][index] = value
