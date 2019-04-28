@@ -111,11 +111,11 @@ class SimBriefHandler(object):
         self._updateProgress(SIMBRIEF_PROGRESS_LOADING_FORM,
                              SIMBRIEF_RESULT_NONE, None)
 
-    def _onLoadEnd(self, browser, frame, httpCode):
+    def _onLoadEnd(self, browser, frame, http_code):
         """Called when a page has been loaded in the SimBrief browser."""
         url = frame.GetUrl()
-        print("gui.cef.SimBriefHandler._onLoadEnd", httpCode, url)
-        if httpCode>=300:
+        print("gui.cef.SimBriefHandler._onLoadEnd", http_code, url)
+        if http_code>=300:
             self._updateProgress(self._lastProgress,
                                  SIMBRIEF_RESULT_ERROR_OTHER, None)
         elif url.startswith("http://flare.privatedns.org/mava_simbrief/simbrief_form.html"):
@@ -340,14 +340,14 @@ def startInContainer(container, url, browserSettings = {}):
 #------------------------------------------------------------------------------
 
 class OffscreenRenderHandler(object):
-    def GetRootScreenRect(self, browser, rect):
+    def GetRootScreenRect(self, browser, rect_out):
         #print "GetRootScreenRect"
-        rect += [0, 0, 800, 600]
+        rect_out += [0, 0, 800, 600]
         return True
 
-    def GetViewRect(self, browser, rect):
+    def GetViewRect(self, browser, rect_out):
         #print "GetViewRect"
-        rect += [0, 0, 800, 600]
+        rect_out += [0, 0, 800, 600]
         return True
 
     def GetScreenPoint(self, browser, viewX, viewY, screenCoordinates):
@@ -367,7 +367,7 @@ class OffscreenRenderHandler(object):
         #print "OnPopupSize", rect
         pass
 
-    def OnPaint(self, browser, paintElementType, dirtyRects, buffer, width, height):
+    def OnPaint(self, browser, element_type, dirty_rects, paint_buffer, width, height):
         #print "OnPaint", paintElementType, dirtyRects, buffer, width, height
         pass
 
