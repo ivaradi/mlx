@@ -21,8 +21,7 @@ MAVA_BASE_URL = os.environ.get("MAVA_BASE_URL", "http://virtualairlines.hu")
 
 #-------------------------------------------------------------------------------
 
-# Due to CEF, PyGTK is the default
-if "FORCE_PYGOBJECT" not in os.environ:
+if "FORCE_PYGTK" in os.environ:
     print("Using PyGTK")
     pygobject = False
     import gobject
