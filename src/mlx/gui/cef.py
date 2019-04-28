@@ -193,10 +193,12 @@ class SimBriefHandler(object):
         """Update the progress."""
         self._lastProgress = progress
         if results!=SIMBRIEF_RESULT_NONE:
-            gobject.source_remove(self._timeoutID)
+            if self._timeoutID is not None:
+                gobject.source_remove(self._timeoutID)
             self._plan = None
 
-        self._updateProgressFn(progress, results, flightInfo)
+        if self._updateProgressFn is not None:
+            self._updateProgressFn(progress, results, flightInfo)
 
     def _timedOut(self):
         """Called when the timeout occurs."""
