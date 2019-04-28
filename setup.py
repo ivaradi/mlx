@@ -98,38 +98,58 @@ if os.name=="nt":
 
     if os.getenv("WINE")=="yes":
         winsysdir=os.getenv("WINSYSDIR")
-        data_files.append(("", [os.path.join(winsysdir, "python27.dll")]))
-        data_files.append(("library", [
-                            os.path.join(winsysdir, "pywintypes27.dll"),
-                            os.path.join(winsysdir, "WINHTTP.dll")]))
 
         if gtkRuntimeDir:
             gtkBinDir = os.path.join(gtkRuntimeDir, "bin")
-            data_files.append(("library", [
-                                os.path.join(gtkBinDir, "freetype6.dll"),
-                                os.path.join(gtkBinDir, "intl.dll"),
-                                os.path.join(gtkBinDir, "zlib1.dll"),
-                                os.path.join(gtkBinDir, "libglib-2.0-0.dll"),
+            data_files.append(("", [
                                 os.path.join(gtkBinDir, "libatk-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libbz2-1.dll"),
                                 os.path.join(gtkBinDir, "libcairo-2.dll"),
+                                os.path.join(gtkBinDir, "libcairo-gobject-2.dll"),
+                                os.path.join(gtkBinDir, "libcroco-0.6-3.dll"),
+                                os.path.join(gtkBinDir, "libcrypto-1_1.dll"),
+                                os.path.join(gtkBinDir, "libdatrie-1.dll"),
+                                os.path.join(gtkBinDir, "libepoxy-0.dll"),
                                 os.path.join(gtkBinDir, "libexpat-1.dll"),
-                                os.path.join(gtkBinDir, "libpangowin32-1.0-0.dll"),
-                                os.path.join(gtkBinDir, "libgio-2.0-0.dll"),
-                                os.path.join(gtkBinDir, "libgdk-win32-2.0-0.dll"),
-                                os.path.join(gtkBinDir, "libpng14-14.dll"),
-                                os.path.join(gtkBinDir, "libgobject-2.0-0.dll"),
-                                os.path.join(gtkBinDir, "libgdk_pixbuf-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libexslt-0.dll"),
+                                os.path.join(gtkBinDir, "libffi-6.dll"),
                                 os.path.join(gtkBinDir, "libfontconfig-1.dll"),
-                                os.path.join(gtkBinDir, "libpangoft2-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libfreetype-6.dll"),
+                                os.path.join(gtkBinDir, "libfribidi-0.dll"),
+                                os.path.join(gtkBinDir, "libgcc_s_dw2-1.dll"),
+                                os.path.join(gtkBinDir, "libgdk_pixbuf-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgio-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgirepository-1.0-1.dll"),
+                                os.path.join(gtkBinDir, "libglib-2.0-0.dll"),
                                 os.path.join(gtkBinDir, "libgmodule-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgobject-2.0-0.dll"),
+                                os.path.join(gtkBinDir, "libgraphite2.dll"),
+                                os.path.join(gtkBinDir, "libharfbuzz-0.dll"),
+                                os.path.join(gtkBinDir, "libiconv-2.dll"),
+                                os.path.join(gtkBinDir, "libintl-8.dll"),
+                                os.path.join(gtkBinDir, "liblzma-5.dll"),
+                                os.path.join(gtkBinDir, "libmpdec-2.dll"),
                                 os.path.join(gtkBinDir, "libpango-1.0-0.dll"),
                                 os.path.join(gtkBinDir, "libpangocairo-1.0-0.dll"),
-                                os.path.join(gtkBinDir, "libgtk-win32-2.0-0.dll"),
-                                os.path.join(gtkBinDir, "libgthread-2.0-0.dll")
+                                os.path.join(gtkBinDir, "libpangoft2-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libpangowin32-1.0-0.dll"),
+                                os.path.join(gtkBinDir, "libpcre-1.dll"),
+                                os.path.join(gtkBinDir, "libpixman-1-0.dll"),
+                                os.path.join(gtkBinDir, "libpng16-16.dll"),
+                                os.path.join(gtkBinDir, "librsvg-2-2.dll"),
+                                os.path.join(gtkBinDir, "libssl-1_1.dll"),
+                                os.path.join(gtkBinDir, "libssp-0.dll"),
+                                os.path.join(gtkBinDir, "libstdc++-6.dll"),
+                                os.path.join(gtkBinDir, "libthai-0.dll"),
+                                os.path.join(gtkBinDir, "libwinpthread-1.dll"),
+                                os.path.join(gtkBinDir, "libxml2-2.dll"),
+                                os.path.join(gtkBinDir, "libxslt-1.dll"),
+                                os.path.join(gtkBinDir, "zlib1.dll"),
                               ]))
         if cefDir:
-            data_files.append(("library", [
-                                os.path.join(cefDir, "libcef.dll")
+            data_files.append(("", [
+                                os.path.join(cefDir, "libcef.dll"),
+                                os.path.join(cefDir, "chrome_elf.dll")
                               ]))
 
     print(data_files)
