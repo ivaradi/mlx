@@ -721,3 +721,16 @@ index e894ae6..6b61624 100644
  	if (!pScript)  {
  		SystemError(GetLastError(), "Could not lock script resource:");
  		return FALSE;
+diff --git a/setup.py b/setup.py
+index 342d194..1fe1e43 100644
+--- a/setup.py
++++ b/setup.py
+@@ -107,7 +107,7 @@ run_w = Interpreter("py2exe.run_w",
+                     libraries=["user32", "shell32"],
+                     define_macros=macros,
+                     extra_compile_args=extra_compile_args,
+-                    extra_link_args=extra_link_args,
++                    extra_link_args=extra_link_args + (["-Wl,--subsystem,windows"] if isMingw32 else []),
+                     )
+ 
+ # The py2exe.resources name is special handled in BuildInterpreters;
