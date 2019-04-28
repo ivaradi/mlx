@@ -17,7 +17,8 @@ tar xf "dist/${sdistname}"
 
 cd "${mlxdirname}"
 
-echo "winemakeinst.bat" | wine cmd
+export WINE=yes
+./makeinst.sh
 
 echo
 echo "Copying the 'dist' directory..."

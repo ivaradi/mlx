@@ -7,6 +7,7 @@ RUN dpkg --add-architecture i386 && \
         wget \
         wine \
         wine32 && \
+    apt-get clean && \
     echo "Europe/Budapest" > /etc/timezone && \
     rm -f /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata

@@ -1,6 +1,5 @@
 include mlx.nsi
-include makeinst.bat
-include winemakeinst.bat
+include makeinst.sh
 include license.txt
 include runmlx.py
 include mlxupdate.py
