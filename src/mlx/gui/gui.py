@@ -198,8 +198,6 @@ class GUI(fs.ConnectionListener):
         self._pirepEditor = PIREPEditor(self)
 
         window.show_all()
-        if os.name=="nt":
-            window.get_window().focus()
 
         self._wizard.grabDefault()
         self._weightHelp.reset()
@@ -766,7 +764,7 @@ class GUI(fs.ConnectionListener):
 
         Here we reset the focus to the main window as CEF might have acquired
         it earlier."""
-        self._mainWindow.get_window().focus()
+        self._mainWindow.get_window().focus(0)
 
     def raiseCallback(self):
         """Callback for the singleton handling code."""

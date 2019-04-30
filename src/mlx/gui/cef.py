@@ -13,6 +13,7 @@ import _thread
 import threading
 import tempfile
 import traceback
+import ctypes
 import urllib.request, urllib.error, urllib.parse
 from lxml import etree
 from io import StringIO
@@ -321,12 +322,16 @@ def getContainer():
 def startInContainer(container, url, browserSettings = {}):
     """Start a browser instance in the given container with the given URL."""
     if os.name=="nt":
-        window = container.get_window()
-        if window is None:
-            print("mlx.gui.cef.startInContainer: no window found!")
-            windowID = None
-        else:
-            windowID = window.handle
+        gdk.threads_enter()
+        ctypes.pythonapi.PyCapsule_GetPointer.restype = ctypes.c_void_p
+        ctypes.pythonapi.PyCapsule_GetPointer.argtypes = \
+            [ctypes.py_object]
+        gpointer = ctypes.pythonapi.PyCapsule_GetPointer(
+            container.get_property("window").__gpointer__, None)
+        libgdk = ctypes.CDLL("libgdk-3-0.dll")
+        windowID = libgdk.gdk_win32_window_get_handle(gpointer)
+        container.windowID = windowID
+        gdk.threads_leave()
     else:
         container.set_visual(container.get_screen().lookup_visual(0x21))
         windowID = container.get_window().get_xid()
@@ -426,7 +431,6 @@ def _handleTimeout():
 #------------------------------------------------------------------------------
 
 def _handleSizeAllocate(widget, sizeAlloc):
-    """Handle the size-allocate event."""
-    window = widget.get_window()
+    """Handle the size-allocate event on Windows."""
     if widget is not None:
-        cefpython.WindowUtils.OnSize(window.handle, 0, 0, 0)
+        cefpython.WindowUtils.OnSize(widget.windowID, 0, 0, 0)
