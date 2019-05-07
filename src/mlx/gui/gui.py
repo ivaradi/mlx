@@ -461,8 +461,6 @@ class GUI(fs.ConnectionListener):
         else:
             self.updateDone()
 
-        cef.initialize(self._cefInitialized)
-
         singleton.raiseCallback = self.raiseCallback
         gtk.main()
         singleton.raiseCallback = None
@@ -1928,6 +1926,8 @@ class GUI(fs.ConnectionListener):
 
         It checks if we already know the PID, and if not, asks the user whether
         to register."""
+        cef.initialize(self._cefInitialized)
+
         if not self.config.pilotID and not self.config.password:
             dialog = gtk.MessageDialog(parent = self._mainWindow,
                                        type = MESSAGETYPE_QUESTION,
