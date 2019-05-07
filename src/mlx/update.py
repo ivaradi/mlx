@@ -118,7 +118,13 @@ class Manifest(object):
             else:
                 modifiedAndNew.append((path, otherSize, otherSum))
 
-        removed = [path for path in self._files if path not in other._files]
+        if os.name=="nt":
+            otherFiles = [path.lower() for path in other._files]
+        else:
+            otherFiles = other._files
+
+        removed = [path for path in self._files if
+                   (path.lower() if os.name=="nt" else path) not in otherFiles]
         
         return (modifiedAndNew, removed)
 
