@@ -10,6 +10,7 @@ import socket
 import subprocess
 import hashlib
 import traceback
+import io
 
 if os.name=="nt":
     import win32api
@@ -194,7 +195,7 @@ class ClientListener(object):
 
     def _send(self, words):
         """Send the given words via the socket."""
-        self._sock.send("\t".join(words) + "\n")
+        self._sock.send(bytes("\t".join(words) + "\n", "utf-8"))
 
 #------------------------------------------------------------------------------
 
@@ -225,8 +226,10 @@ def prepareUpdate(directory, updateURL, listener):
     f = None
     try:
         updateManifest = Manifest()
-        f= urllib.request.urlopen(updateURL + "/" + manifestName)
-        updateManifest.readFrom(f)
+        reply = urllib.request.urlopen(updateURL + "/" + manifestName)
+        charset = reply.headers.get_content_charset()
+        content = reply.read().decode("utf-8" if charset is None else charset)
+        updateManifest.readFrom(io.StringIO(content))
 
     except Exception as e:
         error = utf2unicode(str(e))
@@ -289,7 +292,7 @@ def removeFile(toremoveDir, directory, path):
     except:
         try:
             sum = hashlib.md5()
-            sum.update(path)
+            sum.update(bytes(path, "utf-8"))
             toremoveDir = getToremoveDir(toremoveDir, directory)
             targetPath = os.path.join(toremoveDir, sum.hexdigest())
             try:
@@ -504,7 +507,7 @@ def sudoUpdate(directory, updateURL, listener, manifest):
             if not data:
                 break;
 
-            buffer += data
+            buffer += str(data, "utf-8")
             buffer = processMLXUpdate(buffer, listener)
 
         mlxUpdateSocket.close()
