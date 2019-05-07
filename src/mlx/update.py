@@ -360,7 +360,7 @@ def updateFiles(directory, updateURL, listener,
             targetFile += sum
 
             targetDirectory = os.path.dirname(targetFile)
-            if not os.path.isdir(targetDirectory):
+            if targetDirectory and not os.path.isdir(targetDirectory):
                 os.makedirs(targetDirectory)
                 
             with open(targetFile, "wb") as fout:
