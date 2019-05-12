@@ -366,7 +366,7 @@ def updateFiles(directory, updateURL, listener,
             with open(targetFile, "wb") as fout:
                 fin = urllib2.urlopen(updateURL + "/" + path)
                 while True:
-                    data = fin.read(4096)
+                    data = fin.read(256*1024)
                     if not data:
                         break
                     fout.write(data)
