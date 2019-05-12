@@ -1,6 +1,7 @@
 
 from .util import utf2unicode
 from .flight import Flight
+from .common import fixUnpickled
 
 from . import const
 import pickle as pickle
@@ -113,7 +114,7 @@ class PIREP(object):
         Returns the PIREP object, or None on error."""
         try:
             with open(path, "rb") as f:
-                pirep = pickle.load(f)
+                pirep = pickle.load(f, fix_imports = True, encoding = "bytes")
                 if "numCrew" not in dir(pirep):
                     pirep.numCrew = pirep.bookedFlight.numCrew
                 if "numPassengers" not in dir(pirep):
@@ -411,3 +412,7 @@ class PIREP(object):
         attrs["performDate"] = datetime.date.today().strftime("%Y-%m-%d")
 
         return ([], attrs)
+
+    def __setstate__(self, state):
+        """Set the state from the given unpickled dictionary."""
+        self.__dict__.update(fixUnpickled(state))

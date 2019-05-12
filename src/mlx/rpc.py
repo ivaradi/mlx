@@ -1,7 +1,7 @@
 from . import const
 from . import rpccommon
 
-from .common import MAVA_BASE_URL
+from .common import MAVA_BASE_URL, fixUnpickled
 
 import jsonrpclib
 import hashlib
@@ -320,6 +320,10 @@ class BookedFlight(RPCObject):
         print("arrival_time=%02d\\:%02d\\:%02d" % \
               (arrivalTime.hour, arrivalTime.minute, arrivalTime.second), file=f)
         print("foglalas_id=%s" % ("0" if self.id is None else self.id,), file=f)
+
+    def __setstate__(self, state):
+        """Set the state from the given unpickled dictionary."""
+        self.__dict__.update(fixUnpickled(state))
 
 #---------------------------------------------------------------------------------------
 
