@@ -107,8 +107,8 @@ class FlightInfo(gtk.VBox):
     def comments(self):
         """Get the comments."""
         buffer = self._comments.get_buffer()
-        return text2unicode(buffer.get_text(buffer.get_start_iter(),
-                                            buffer.get_end_iter(), True))
+        return buffer.get_text(buffer.get_start_iter(),
+                               buffer.get_end_iter(), True)
 
     @comments.setter
     def comments(self, comments):

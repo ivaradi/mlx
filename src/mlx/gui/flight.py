@@ -647,7 +647,7 @@ class FlightSelectionPage(Page):
         dialog.hide()
 
         if response==RESPONSETYPE_OK:
-            fileName = text2unicode(dialog.get_filename())
+            fileName = dialog.get_filename()
             print("Saving", fileName)
             try:
                 with open(fileName, "wt") as f:
@@ -938,7 +938,7 @@ class FlightSelectionPage(Page):
         dialog.hide()
 
         if response==RESPONSETYPE_OK:
-            fileName = text2unicode(dialog.get_filename())
+            fileName = dialog.get_filename()
             print("Loading", fileName)
             bookedFlight = web.BookedFlight()
             try:
@@ -4739,7 +4739,7 @@ class PIREPSaveHelper(object):
         """Perform the automatic saving of the PIREP."""
         self._lastSavePath = os.path.join(self._wizard.gui.config.pirepDirectory,
                                           self._getDefaultPIREPName())
-        self._lastSavePath = text2unicode(self._lastSavePath)
+        self._lastSavePath = self._lastSavePath
         self._savePIREP(page, automatic = True)
 
     def _getDefaultPIREPName(self):
@@ -4776,7 +4776,7 @@ class PIREPSaveHelper(object):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            self._lastSavePath = text2unicode(dialog.get_filename())
+            self._lastSavePath = dialog.get_filename()
             self._savePIREP(page)
 
     def _savePIREP(self, page, automatic = False):
@@ -4796,7 +4796,7 @@ class PIREPSaveHelper(object):
         if error:
             type = MESSAGETYPE_ERROR
             message = xstr("finish_save_failed")
-            secondary = xstr("finish_save_failed_sec") % (text2unicode(error),)
+            secondary = xstr("finish_save_failed_sec") % (error,)
         else:
             type = MESSAGETYPE_INFO
             message = xstr("finish_save_done")

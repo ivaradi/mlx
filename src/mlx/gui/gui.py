@@ -1491,7 +1491,7 @@ class GUI(fs.ConnectionListener):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            self._lastLoadedPIREP = text2unicode(dialog.get_filename())
+            self._lastLoadedPIREP = dialog.get_filename()
 
             pirep = PIREP.load(self._lastLoadedPIREP)
             if pirep is None:

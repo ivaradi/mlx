@@ -110,14 +110,6 @@ if not pygobject:
 
     pixbuf_new_from_file = gdk.pixbuf_new_from_file
 
-    def text2unicode(text):
-        """Convert the given text, returned by a Gtk widget, to Unicode."""
-        return str(text)
-
-    def text2str(text):
-        """Convert the given text, returned by xstr to a string."""
-        return str(text)
-
 else: # pygobject
     import gi
     gi.require_version("Gdk", "3.0")
@@ -198,14 +190,6 @@ else: # pygobject
 
     import codecs
     _utf8Decoder = codecs.getdecoder("utf-8")
-
-    def text2unicode(str):
-        """Convert the given text, returned by a Gtk widget, to Unicode."""
-        return _utf8Decoder(str)[0]
-
-    def text2str(text):
-        """Convert the given text, returned by xstr to a string."""
-        return _utf8Decoder(text)[0]
 
 import cairo
 

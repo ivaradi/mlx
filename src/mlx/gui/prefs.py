@@ -295,7 +295,7 @@ class Preferences(gtk.Dialog):
         config.vsSmoothingLength = self._getSmoothing(self._vsSmoothingEnabled,
                                                        self._vsSmoothingLength)
         config.useSimBrief = self._useSimBrief.get_active()
-        config.pirepDirectory = text2unicode(self._pirepDirectory.get_text())
+        config.pirepDirectory = self._pirepDirectory.get_text()
         config.pirepAutoSave = self._pirepAutoSave.get_active()
 
         for messageType in const.messageTypes:
@@ -564,7 +564,7 @@ class Preferences(gtk.Dialog):
         dialog.hide()
 
         if result==RESPONSETYPE_OK:
-            self._pirepDirectory.set_text(text2unicode(dialog.get_filename()))
+            self._pirepDirectory.set_text(dialog.get_filename())
 
     def _pirepDirectoryChanged(self, entry):
         """Called when the PIREP directory is changed."""
