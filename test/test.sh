@@ -1,7 +1,11 @@
 #!/bin/bash
 
 scriptdir=`dirname $0`
-sim="${scriptdir}/../src/mlx/pyuipc_sim.py"
+
+PYTHONPATH="${scriptdir}/../src"
+export PYTHONPATH
+
+sim="mlx.pyuipc_sim"
 
 host="localhost"
 if test $# -gt 1; then
@@ -12,6 +16,6 @@ oldIFS="${IFS}"
 IFS=$'\n'
 for line in `cat $1`; do
     read -p "$line"
-    echo $line | python "${sim}" "${host}" >/dev/null
+    echo $line | python3 -m "${sim}" "${host}" >/dev/null
 done
 IFS="${oldIFS}"
