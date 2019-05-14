@@ -656,7 +656,6 @@ class Simulator(object):
         self._hotkeyRequestID = None
         self._hotkeyCallback = None
 
-        self._latin1decoder = codecs.getdecoder("iso-8859-1")
         self._fuelCallback = None
 
     def connect(self, aircraft):
@@ -954,9 +953,6 @@ class Simulator(object):
         If so, also notifty the aircraft about the change.
 
         Return if a new model was created."""
-        name = self._latin1decoder(name)[0]
-        airPath = self._latin1decoder(airPath)[0]
-
         aircraftName = (name, airPath)
         if aircraftName==self._aircraftName:
             return False
