@@ -56,6 +56,7 @@ data_files.append(("", rootFiles))
 
 if os.name=="nt":
     import py2exe
+    import certifi
 
     data_files.append(("", ["logo.ico"]))
 
@@ -66,6 +67,8 @@ if os.name=="nt":
                            glob(os.path.join(msvcrDir, "*.*"))))
         os.environ["PATH"] = os.environ["PATH"] + ";" + glob(os.path.join(msvcrDir))[0]
 
+
+    data_files.append((os.path.join("library", "certifi"), [certifi.where()]))
 
     gtkRuntimeDir = os.environ["GTKRTDIR"] if "GTKRTDIR" in os.environ else None
     if gtkRuntimeDir:
