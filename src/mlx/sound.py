@@ -42,7 +42,7 @@ if os.name=="nt":
         def send(self, command):
             """Send the given command to the MCI."""
             buffer = c_buffer(255)
-            errorCode = self.w32mci(str(command), buffer, 254, 0)
+            errorCode = self.w32mci(str(command).encode(), buffer, 254, 0)
             if errorCode:
                 raise MCIException(self, command, errorCode)
             else:
@@ -136,6 +136,7 @@ if os.name=="nt":
                                        (alias,))
                         lengthBuffer = self._mci.send("status %s length" % \
                                                       (alias,))
+                        lengthBuffer = str(lengthBuffer, "ascii")
                         self._mci.send("play %s from 0 to %s" % \
                                        (alias, lengthBuffer))
                         length = int(lengthBuffer)
