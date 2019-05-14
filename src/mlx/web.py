@@ -21,6 +21,7 @@ import traceback
 import xml.sax
 import xmlrpc.client
 import html.parser
+import certifi
 
 #---------------------------------------------------------------------------------------
 
@@ -1014,7 +1015,7 @@ class GetNOTAMs(Request):
             url = "https://pilotweb.nas.faa.gov/PilotWeb/notamRetrievalByICAOAction.do?method=displayByICAOs&formatType=ICAO&retrieveLocId=%s&reportType=RAW&actionType=notamRetrievalByICAOs" % \
               (icao.upper(),)
 
-            f = urllib.request.urlopen(url, timeout = 10.0)
+            f = urllib.request.urlopen(url, timeout = 10.0, cafile=certifi.where())
             try:
                 data = f.read(16384)
                 while data:
@@ -1051,7 +1052,7 @@ class GetMETARs(Request):
                                   ("hoursBeforeNow", "24"),
                                   ("mostRecentForEachStation", "constraint")])
         url += data
-        f = urllib.request.urlopen(url, timeout = 10.0)
+        f = urllib.request.urlopen(url, timeout = 10.0, cafile=certifi.where())
         try:
             result = Result()
             result.metars = {}
