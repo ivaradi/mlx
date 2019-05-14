@@ -1051,19 +1051,24 @@ class GetMETARs(Request):
                                   ("stationString", " ".join(self._airports)),
                                   ("hoursBeforeNow", "24"),
                                   ("mostRecentForEachStation", "constraint")])
-        url += data
-        f = urllib.request.urlopen(url, timeout = 10.0, cafile=certifi.where())
+        result = Result()
+        result.metars = {}
         try:
-            result = Result()
-            result.metars = {}
-            for line in f.readlines():
-                line = str(line, "iso-8859-1")
-                if len(line)>5 and line[4]==' ':
-                    icao = line[0:4]
-                    if icao in self._airports:
-                        result.metars[icao] = line.strip().split(",")[0]
-        finally:
-            f.close()
+            url += data
+            f = urllib.request.urlopen(url, timeout = 10.0, cafile = certifi.where())
+            try:
+                for line in f.readlines():
+                    line = str(line, "iso-8859-1")
+                    if len(line)>5 and line[4]==' ':
+                        icao = line[0:4]
+                        if icao in self._airports:
+                            result.metars[icao] = line.strip().split(",")[0]
+            finally:
+                f.close()
+        except Exception as e:
+            traceback.print_exc()
+            print("mlx.web.GetMETARs.run: failed to get METARs for %s: %s" % \
+                  (self._airports, str(e)))
 
         return result
 
