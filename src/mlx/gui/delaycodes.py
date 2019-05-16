@@ -34,6 +34,7 @@ if pygobject:
             The height in the allocation object is modified so that it is only
             so high to fit into the VBox."""
             if self._vboxHeight is not None:
+                allocation.y += 1
                 allocation.height = self._vboxHeight - allocation.y
                 self._vboxHeight = None
             gtk.Viewport.do_size_allocate(self, allocation)
@@ -124,6 +125,11 @@ if pygobject:
             """Called with the new size allocation."""
             self.allocatedWidth = allocation.width
             gtk.Alignment.do_size_allocate(self, allocation)
+
+    class TreeView(gtk.TreeView):
+        def do_size_allocate(self, allocation):
+            allocation.height += 1
+            gtk.TreeView.do_size_allocate(self, allocation)
 
 #------------------------------------------------------------------------------
 
@@ -240,7 +246,7 @@ class DelayCodeTable(DelayCodeTableBase):
 
         self._delayCodeData = None
 
-        self._treeView = gtk.TreeView(gtk.ListStore(str, str))
+        self._treeView = TreeView(gtk.ListStore(str, str))
         self._treeView.set_rules_hint(True)
 
         self.pack_start(self._treeView, False, False, 0)
