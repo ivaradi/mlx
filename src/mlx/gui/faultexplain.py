@@ -298,7 +298,7 @@ class FaultExplainWidget(gtk.Frame):
                                                      blue=0.0, alpha=0.0)
             else:
                 outerColour = \
-                  styleContext.get_background_color(gtk.StateFlags.SELECTED)
+                  styleContext.get_border_color(gtk.StateFlags.DROP_ACTIVE)
                 innerColour = self._gui.backgroundColour
 
             self._outerBox.override_background_color(gtk.StateFlags.NORMAL,
