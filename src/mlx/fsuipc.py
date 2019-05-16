@@ -1706,10 +1706,10 @@ class B737Model(GenericAircraftModel):
 class PMDGBoeing737NGModel(B737Model):
     """A model handler for the PMDG Boeing 737NG model."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme):
+    def doesHandle(aircraft, aircraftName):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (name, airPath) = xxx_todo_changeme
+        (name, airPath) = aircraftName
         return aircraft.type in [const.AIRCRAFT_B736,
                                  const.AIRCRAFT_B737,
                                  const.AIRCRAFT_B738,
@@ -1842,10 +1842,10 @@ class DH8DModel(GenericAircraftModel):
 class DreamwingsDH8DModel(DH8DModel):
     """Model handler for the Dreamwings Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme1):
+    def doesHandle(aircraft, aircraftName):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (name, airPath) = xxx_todo_changeme1
+        (name, airPath) = aircraftName
         return aircraft.type==const.AIRCRAFT_DH8D and \
             (name.find("Dreamwings")!=-1 or airPath.find("Dreamwings")!=-1) and \
             (name.find("Dash")!=-1 or airPath.find("Dash")!=-1) and \
@@ -1880,10 +1880,10 @@ class DreamwingsDH8DModel(DH8DModel):
 class MajesticDH8DModel(DH8DModel):
     """Model handler for the Majestic Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme2):
+    def doesHandle(aircraft, aircraftName):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (name, airPath) = xxx_todo_changeme2
+        (name, airPath) = aircraftName
         return aircraft.type==const.AIRCRAFT_DH8D and \
             (name.find("MJC8Q400")!=-1 or \
              airPath.lower().find("mjc8q400") or \
@@ -1959,10 +1959,10 @@ class F70Model(GenericAircraftModel):
 class DAF70Model(F70Model):
     """Model for the Digital Aviation F70 implementation on FS9."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme3):
+    def doesHandle(aircraft, aircraftName):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (name, airPath) = xxx_todo_changeme3
+        (name, airPath) = aircraftName
         return aircraft.type == const.AIRCRAFT_F70 and \
                (airPath.endswith("fokker70_2k4_v4.1.air") or
                 airPath.endswith("fokker70_2k4_v4.3.air") or
@@ -2149,10 +2149,10 @@ class T154Model(GenericAircraftModel):
 class PTT154Model(T154Model):
     """Project Tupolev Tu-154."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme4):
+    def doesHandle(aircraft, aircraftName):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (name, airPath) = xxx_todo_changeme4
+        (name, airPath) = aircraftName
         print("PTT154Model.doesHandle", aircraft.type, name, airPath)
         return aircraft.type==const.AIRCRAFT_T154 and \
                (name.find("Tu-154")!=-1 or name.find("Tu154B")!=-1) and \
