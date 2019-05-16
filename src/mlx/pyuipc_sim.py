@@ -605,9 +605,9 @@ class Values(object):
         elif offset==0x3bfc:       # ZFW
             return int(self.zfw * 256.0 * const.KGSTOLB)
         elif offset==0x3c00:       # Path of the current AIR file
-            return bytes(self.airPath, "iso-8859-1")
+            return self.airPath
         elif offset==0x3d00:       # Name of the current aircraft
-            return bytes(self.aircraftName, "iso-8859-1")
+            return self.aircraftName
         elif offset==0x6202:       # PMDG 737NG switches
             return self.pmdg_737ng_switches
         elif offset==0x6500:       # PMDG 737NGX lights position SW
