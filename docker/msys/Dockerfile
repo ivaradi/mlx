@@ -13,13 +13,17 @@ RUN $WebClient = New-Object System.Net.WebClient ; `
     Remove-Item msys2.tar.xz ; `
     Remove-Item 7z.msi
 
-RUN $env:MSYSTEM='MINGW32' ; `
-    Start-Process C:\msys64\usr\bin\pacman.exe -ArgumentList '-Syu --noconfirm' -Wait -PassThru -Verbose -WorkingDirectory 'C:\msys64' ; `
-    Start-Process C:\msys64\usr\bin\pacman.exe -ArgumentList '-Su --noconfirm' -Wait -PassThru -Verbose -WorkingDirectory 'C:\msys64' ; `
-    Start-Process C:\msys64\usr\bin\bash.exe -ArgumentList '--login -c /usr/bin/true.exe' -Wait -PassThru -Verbose -WorkingDirectory 'C:\msys64'; `
-    mkdir C:\msys64\build
+RUN $env:MSYSTEM='MINGW32'  ; `
+    C:\msys64\usr\bin\bash.exe --login -c /usr/bin/true.exe ; `
+    C:\msys64\usr\bin\pacman.exe -Syu --noconfirm ; `
+    C:\msys64\usr\bin\pacman.exe -Su --noconfirm ; `
+    C:\msys64\usr\bin\pacman.exe -Scc --noconfirm
 
-COPY setup.sh pywin32.patch pywin32git.patch cef_binary_3.3359.1774.gd49d25f_windows32.patch cefpython-66.0.patch py2exe.patch C:\msys64\build\
+COPY setup.sh  C:\msys64\build\
 
 RUN $env:MSYSTEM='MINGW32'; `
-    C:\msys64\usr\bin\bash.exe --login  C:\msys64\build\setup.sh ;
+    C:\msys64\usr\bin\bash.exe --login -c /build/setup.sh
+
+COPY build.bat build.sh pywin32.patch pywin32git.patch cef_binary_3.3359.1774.gd49d25f_windows32.patch cefpython-66.0.patch py2exe.patch id_rsa C:\msys64\build\
+
+CMD ["powershell.exe"]

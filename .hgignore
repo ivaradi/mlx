@@ -11,3 +11,4 @@ xplra.py
 chromedriver.exe
 debug.log
 moodlesetup.txt
+docker/msys/id_rsa
