@@ -11,6 +11,7 @@ import subprocess
 import hashlib
 import traceback
 import io
+import certifi
 
 if os.name=="nt":
     import win32api
@@ -232,7 +233,8 @@ def prepareUpdate(directory, updateURL, listener):
     f = None
     try:
         updateManifest = Manifest()
-        reply = urllib.request.urlopen(updateURL + "/" + manifestName)
+        reply = urllib.request.urlopen(updateURL + "/" + manifestName,
+                                       cafile = certifi.where())
         charset = reply.headers.get_content_charset()
         content = reply.read().decode("utf-8" if charset is None else charset)
         updateManifest.readFrom(io.StringIO(content))
@@ -367,7 +369,8 @@ def updateFiles(directory, updateURL, listener,
                 os.makedirs(targetDirectory)
                 
             with open(targetFile, "wb") as fout:
-                fin = urllib.request.urlopen(updateURL + "/" + path)
+                fin = urllib.request.urlopen(updateURL + "/" + path,
+                                             cafile = certifi.where())
                 while True:
                     data = fin.read(256*1024)
                     if not data:
