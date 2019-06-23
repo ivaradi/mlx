@@ -540,6 +540,7 @@ class PendingFlightsWindow(gtk.Window):
                                   xscale = 0.0, yscale = 0.0)
         self._closeButton = gtk.Button(xstr("button_ok"))
         self._closeButton.connect("clicked", self._closeClicked)
+        self._closeButton.set_use_underline(True)
         alignment.add(self._closeButton)
         vbox.pack_start(alignment, False, False, 2)
 
@@ -665,6 +666,7 @@ class AcceptedFlightsWindow(gtk.Window):
 
         self._refreshButton = gtk.Button(xstr("acceptedflt_refresh"))
         self._refreshButton.set_sensitive(True)
+        self._refreshButton.set_use_underline(True)
         self._refreshButton.connect("clicked", self._refreshClicked)
         buttonBox.pack_start(self._refreshButton, False, False, 2)
 
@@ -675,6 +677,7 @@ class AcceptedFlightsWindow(gtk.Window):
 
         self._viewButton = gtk.Button(xstr("acceptedflt_view"))
         self._viewButton.set_sensitive(False)
+        self._viewButton.set_use_underline(True)
         self._viewButton.connect("clicked", self._viewClicked)
         buttonBox.pack_start(self._viewButton, False, False, 2)
 
@@ -685,6 +688,7 @@ class AcceptedFlightsWindow(gtk.Window):
 
         self._closeButton =  gtk.Button(xstr("button_ok"))
         self._closeButton.connect("clicked", self._closeClicked)
+        self._closeButton.set_use_underline(True)
 
         buttonAlignment.add(self._closeButton)
         vbox.pack_start(buttonAlignment, False, False, 2)
