@@ -10,4 +10,8 @@
   - make the windows smaller, if possible
   - check some colours on Windows (e.g. the tab background)
   - flightexplain: why is it higher initially
+  - Accepted flights:
+    - Rating: do not display decimal digits
+    - Make underlines work
+    - Huge amounts of error messages
   - eliminate initial resize

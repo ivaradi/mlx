@@ -72,21 +72,33 @@ if os.name=="nt":
             files = {}
 
             for components in [ ["lib", "girepository-1.0"],
-                                ["lib", "gdk-pixbuf-2.0", "2.10.0"],
-                                ["share", "icons"],
+                                ["lib", "gdk-pixbuf-2.0", "2.10.0", "loaders.cache"],
+                                ["lib", "gdk-pixbuf-2.0", "2.10.0", "loaders", "libpixbufloader-ico.dll"],
+                                ["lib", "gdk-pixbuf-2.0", "2.10.0", "loaders", "libpixbufloader-png.dll"],
+                                ["lib", "gdk-pixbuf-2.0", "2.10.0", "loaders", "libpixbufloader-svg.dll"],
+                                ["share", "icons", "Adwaita", "icon-theme.cache"],
+                                ["share", "icons", "Adwaita", "index.theme"],
+                                ["share", "icons", "Adwaita", "16x16"],
                                 ["share", "locale", "hu"],
                                 ["share", "locale", "en"],
                                 ["share", "themes"],
                                 ["share", "glib-2.0", "schemas"]]:
-                path = os.path.join(*components)
-                p = Path(os.path.join(gtkRuntimeDir, path))
-                for f in p.glob("**/*"):
-                    if f.is_file():
-                        d = os.path.join(path, str(f.parent.relative_to(p)))
-                        if d in files:
-                            files[d].append(str(f))
-                        else:
-                            files[d] = [str(f)]
+                 path = os.path.join(*components)
+                 p = Path(os.path.join(gtkRuntimeDir, path))
+                 if p.is_file():
+                     d = os.path.dirname(path)
+                     if d in files:
+                         files[d].append(str(p))
+                     else:
+                         files[d] = [str(p)]
+                 else:
+                     for f in p.glob("**/*"):
+                         if f.is_file():
+                             d = os.path.join(path, str(f.parent.relative_to(p)))
+                             if d in files:
+                                 files[d].append(str(f))
+                             else:
+                                 files[d] = [str(f)]
 
             for path in files:
                 data_files.append((path, files[path]))
@@ -118,7 +130,10 @@ if os.name=="nt":
             data_files.append(("", [os.path.join(cefDir, fileName)]))
 
         data_files.append(("locales",
-                           glob(os.path.join(cefDir, "locales", "*"))))
+                           [os.path.join(cefDir, "locales", "hu.pak"),
+                            os.path.join(cefDir, "locales", "en-GB.pak"),
+                            os.path.join(cefDir, "locales", "en-US.pak"),
+                            os.path.join(cefDir, "locales", "ru.pak")]))
 
     if os.getenv("WINE")=="yes":
         winsysdir=os.getenv("WINSYSDIR")
