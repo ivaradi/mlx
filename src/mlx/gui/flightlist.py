@@ -627,7 +627,7 @@ class AcceptedFlightsWindow(gtk.Window):
                          type = float, sortable = True,
                          extraColumnAttributes =
                              { "alignment": 1.0 },
-                         cellDataFn = lambda col, cell, model, iter:
+                         cellDataFn = lambda col, cell, model, iter, data:
                              cell.set_property("text",
                                                "%.0f" %
                                                (model.get(iter, 9)[0],)))
