@@ -10,8 +10,7 @@
   - make the windows smaller, if possible
   - check some colours on Windows (e.g. the tab background)
   - flightexplain: why is it higher initially
-  - Accepted flights:
-    - Rating: do not display decimal digits
-    - Make underlines work
-    - Huge amounts of error messages
+  - PIREP viewer:
+    - The PIREP corretor's ID and name are displayed only when a new line
+      is entered in the message field - why can we edit it at all?
   - eliminate initial resize
