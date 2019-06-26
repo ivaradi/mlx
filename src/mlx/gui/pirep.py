@@ -57,6 +57,8 @@ class MessageFrame(gtk.Frame):
 
         self._messageView = messageView = gtk.TextView()
         messageView.set_wrap_mode(WRAP_WORD)
+        messageView.set_editable(False)
+        messageView.set_can_focus(False)
         messageView.set_accepts_tab(False)
         messageView.set_size_request(-1, 60)
 
