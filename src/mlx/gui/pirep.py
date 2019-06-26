@@ -40,6 +40,7 @@ class MessageFrame(gtk.Frame):
         heading.set_editable(False)
         heading.set_can_focus(False)
         heading.set_wrap_mode(WRAP_WORD)
+        heading.set_size_request(-1, 16)
 
         buffer = heading.get_buffer()
         self._headingTag  = buffer.create_tag("heading", weight=WEIGHT_BOLD)
