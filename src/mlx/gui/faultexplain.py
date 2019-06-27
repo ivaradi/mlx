@@ -31,13 +31,10 @@ class FaultFrame(gtk.Frame):
 
         vbox = gtk.VBox()
 
-        self._fault = fault = gtk.TextView()
-        fault.set_editable(False)
-        fault.set_can_focus(False)
-        fault.set_wrap_mode(WRAP_WORD)
-
-        buffer = fault.get_buffer()
-        self._faultTag  = buffer.create_tag("fault", weight=WEIGHT_BOLD)
+        self._fault = fault = gtk.Label()
+        fault.set_xalign(0.0)
+        fault.set_justify(JUSTIFY_LEFT)
+        fault.set_line_wrap(True)
 
         self.faultText = faultText
 
@@ -80,11 +77,7 @@ class FaultFrame(gtk.Frame):
     def faultText(self, faultText):
         """Update the text of the fault."""
         self._faultText = faultText
-
-        buffer = self._fault.get_buffer()
-        buffer.set_text(faultText)
-        buffer.apply_tag(self._faultTag,
-                         buffer.get_start_iter(), buffer.get_end_iter())
+        self._fault.set_markup("<b>" + faultText + "</b>")
 
     @property
     def explanation(self):
@@ -168,7 +161,7 @@ class FaultExplainWidget(gtk.Frame):
 
         self._faults = gtk.VBox()
         self._faults.set_homogeneous(False)
-        scroller.add_with_viewport(self._faults)
+        scroller.add(self._faults)
 
         alignment.add(scroller)
 
