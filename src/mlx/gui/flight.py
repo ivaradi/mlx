@@ -3259,15 +3259,14 @@ class FuelTank(gtk.VBox):
         self.currentWeight = currentWeight
         self.expectedWeight = currentWeight
 
-        label = gtk.Label("<b>" + name + "</b>")
+        self._label = label = gtk.Label("<b>" + name + "</b>")
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
-        self.pack_start(label, False, False, 4)
 
         self._tankFigure = gtk.EventBox()
-        self._tankFigure.set_size_request(38, -1)
+        self._tankFigure.set_size_request(38, 200)
         self._tankFigure.set_visible_window(False)
         self._tankFigure.set_tooltip_markup(xstr("fuel_tank_tooltip"))
 
@@ -3296,10 +3295,15 @@ class FuelTank(gtk.VBox):
 
         label.set_mnemonic_widget(self._expectedButton)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                  xscale = 0.0, yscale = 1.0)
-        alignment.add(self._expectedButton)
-        self.pack_start(alignment, False, False, 4)
+    @property
+    def label(self):
+        """Get the label with the caption."""
+        return self._label
+
+    @property
+    def expectedButton(self):
+        """Get the button containing the expected value."""
+        return self._expectedButton
 
     def setCurrent(self, currentWeight):
         """Set the current weight."""
@@ -3495,16 +3499,36 @@ class FuelPage(Page):
             self._fuelAlignment.remove(self._fuelTable)
 
         self._fuelTanks = []
-        self._fuelTable = gtk.Table(numTanks, 1)
-        self._fuelTable.set_col_spacings(16)
+        self._fuelTable = gtk.Grid()
+        self._fuelTable.set_column_homogeneous(True)
+        self._fuelTable.set_row_spacing(4)
         index = 0
         for (tank, current, capacity) in tankData:
             fuelTank = FuelTank(tank,
                                 xstr("fuel_tank_" +
                                      const.fuelTank2string(tank)),
                                 capacity, current)
-            self._fuelTable.attach(fuelTank, index, index+1, 0, 1)
             self._fuelTanks.append(fuelTank)
+
+            alignment = gtk.Alignment(xalign = 0.5, yalign = 1.0,
+                                      xscale = 1.0, yscale = 0.0)
+            alignment.add(fuelTank.label)
+            self._fuelTable.attach(alignment, index*2, 0, 3, 1)
+
+            alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                      xscale = 0.0, yscale = 1.0)
+            alignment.add(fuelTank)
+            self._fuelTable.attach(alignment, index*2+1, 1, 1, 1)
+
+
+            alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                      xscale = 1.0, yscale = 0.0)
+            alignment.add(fuelTank.expectedButton)
+
+            self._fuelTable.attach(alignment, index*2,
+                                   2 if (index%2)==0 or numTanks==2 else 3,
+                                   3, 1)
+
             index += 1
 
         self._fuelAlignment.add(self._fuelTable)
