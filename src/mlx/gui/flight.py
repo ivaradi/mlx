@@ -1276,9 +1276,9 @@ class RegisterPage(Page):
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(12, 3)
+        table = gtk.Table(12, 4)
         table.set_row_spacings(4)
-        table.set_col_spacings(32)
+        table.set_col_spacings(24)
         alignment.add(table)
         self.setMainWidget(alignment)
 
@@ -1298,20 +1298,18 @@ class RegisterPage(Page):
         table.attach(self._name1, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._name1)
 
-        row += 1
-
         labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_name2"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, row, row+1)
+        table.attach(labelAlignment, 2, 3, row, row+1)
 
         self._name2 = gtk.Entry()
         self._name2.connect("changed", self._updateButtons)
         self._name2.set_tooltip_text(xstr("register_name2_tooltip"))
         self._name2.set_width_chars(15)
-        table.attach(self._name2, 1, 2, row, row+1)
+        table.attach(self._name2, 3, 4, row, row+1)
         label.set_mnemonic_widget(self._name2)
 
         row += 1
@@ -1357,7 +1355,7 @@ class RegisterPage(Page):
         self._emailAddressPublic = gtk.CheckButton(xstr("register_email_public"))
         self._emailAddressPublic.set_use_underline(True)
         self._emailAddressPublic.set_tooltip_text(xstr("register_email_public_tooltip"))
-        table.attach(self._emailAddressPublic, 2, 3, row, row+1)
+        table.attach(self._emailAddressPublic, 2, 4, row, row+1)
 
         row += 1
 
@@ -1378,14 +1376,12 @@ class RegisterPage(Page):
         table.attach(alignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._vatsimID)
 
-        row += 1
-
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         label = gtk.Label(xstr("register_ivao_id"))
         label.set_use_underline(True)
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, row, row+1)
+        table.attach(labelAlignment, 2, 3, row, row+1)
 
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
@@ -1394,7 +1390,7 @@ class RegisterPage(Page):
         self._ivaoID.set_tooltip_text(xstr("register_ivao_id_tooltip"))
         self._ivaoID.set_width_chars(7)
         alignment.add(self._ivaoID)
-        table.attach(alignment, 1, 2, row, row+1)
+        table.attach(alignment, 3, 4, row, row+1)
         label.set_mnemonic_widget(self._ivaoID)
 
         row += 1
@@ -1433,7 +1429,7 @@ class RegisterPage(Page):
         placeholder.set_use_markup(True)
         placeholder.set_child_visible(False)
         placeholder.hide()
-        table.attach(placeholder, 2, 3, row, row+1)
+        table.attach(placeholder, 2, 4, row, row+1)
 
         row += 1
 
@@ -1455,7 +1451,7 @@ class RegisterPage(Page):
                                   xscale = 0.0, yscale = 0.0)
         self._passwordStatus = gtk.Label()
         alignment.add(self._passwordStatus)
-        table.attach(alignment, 2, 3, row, row+1)
+        table.attach(alignment, 2, 4, row, row+1)
 
         row += 1
 
@@ -1477,14 +1473,14 @@ class RegisterPage(Page):
                                   xscale = 0.0, yscale = 0.0)
         self._password2Status = gtk.Label()
         alignment.add(self._password2Status)
-        table.attach(alignment, 2, 3, row, row+1)
+        table.attach(alignment, 2, 4, row, row+1)
 
         row += 1
 
         self._rememberButton = gtk.CheckButton(xstr("remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
-        table.attach(self._rememberButton, 1, 2, row, row+1)
+        table.attach(self._rememberButton, 1, 3, row, row+1)
 
         cancelButton = \
           self.addButton(xstr("button_cancel"))
