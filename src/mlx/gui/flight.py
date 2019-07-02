@@ -5474,11 +5474,20 @@ class Wizard(gtk.VBox):
             page.setStyle()
 
         self._initialize()
+        self._allocateSize()
 
     def _sizeAllocate(self, widget, allocation):
         if self._requestedWidth is not None and \
            self._requestedHeight is not None:
            return
+
+        (maxWidth, maxHeight) = self._allocateSize()
+
+        self._requestedWidth = maxWidth
+        self._requestedHeight = maxHeight
+
+    def _allocateSize(self):
+        """Perform the real size allocation."""
 
         if self._currentPage is not None:
             self.remove(self._pages[self._currentPage])
@@ -5498,9 +5507,9 @@ class Wizard(gtk.VBox):
         if self._currentPage is not None:
             self.add(self._pages[self._currentPage])
 
-        self._requestedWidth = maxWidth
-        self._requestedHeight = maxHeight
         self.set_size_request(maxWidth, maxHeight)
+
+        return (maxWidth, maxHeight)
 
     @property
     def pilotID(self):
