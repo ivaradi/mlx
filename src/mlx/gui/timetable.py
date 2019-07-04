@@ -291,7 +291,7 @@ class CalendarWindow(Gtk.Window):
 
         If the Escape key is pressed, 'delete-event' is emitted to close the
         window."""
-        keyName = gdk.keyval_name(event.keyval)
+        keyName = Gdk.keyval_name(event.keyval)
         if keyName =="Escape":
             self.emit("delete-event", None)
             return True
@@ -701,7 +701,7 @@ class TimetableWindow(Gtk.Window):
 
         If the Escape key is pressed, 'delete-event' is emitted to close the
         window."""
-        if gdk.keyval_name(event.keyval) == "Escape":
+        if Gdk.keyval_name(event.keyval) == "Escape":
             self.emit("delete-event", None)
             return True
 

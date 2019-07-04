@@ -22,7 +22,7 @@ appIndicator = False
 
 import gi
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk as gdk
+from gi.repository import Gdk
 from gi.repository import GdkPixbuf as gdkPixbuf
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -46,18 +46,18 @@ RESPONSETYPE_ACCEPT = Gtk.ResponseType.ACCEPT
 RESPONSETYPE_REJECT = Gtk.ResponseType.REJECT
 RESPONSETYPE_CANCEL = Gtk.ResponseType.CANCEL
 ACCEL_VISIBLE = Gtk.AccelFlags.VISIBLE
-CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
+CONTROL_MASK = Gdk.ModifierType.CONTROL_MASK
 DIALOG_MODAL = Gtk.DialogFlags.MODAL
 WRAP_WORD = Gtk.WrapMode.WORD
 JUSTIFY_CENTER = Gtk.Justification.CENTER
 JUSTIFY_LEFT = Gtk.Justification.LEFT
 
-CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
-SHIFT_MASK = gdk.ModifierType.SHIFT_MASK
-BUTTON1_MASK = gdk.ModifierType.BUTTON1_MASK
+CONTROL_MASK = Gdk.ModifierType.CONTROL_MASK
+SHIFT_MASK = Gdk.ModifierType.SHIFT_MASK
+BUTTON1_MASK = Gdk.ModifierType.BUTTON1_MASK
 
-SCROLL_UP = gdk.ScrollDirection.UP
-SCROLL_DOWN = gdk.ScrollDirection.DOWN
+SCROLL_UP = Gdk.ScrollDirection.UP
+SCROLL_DOWN = Gdk.ScrollDirection.DOWN
 
 SPIN_USER_DEFINED = Gtk.SpinType.USER_DEFINED
 
@@ -77,13 +77,13 @@ POLICY_ALWAYS = Gtk.PolicyType.ALWAYS
 WEIGHT_NORMAL = pango.Weight.NORMAL
 WEIGHT_BOLD = pango.Weight.BOLD
 
-WINDOW_STATE_ICONIFIED = gdk.WindowState.ICONIFIED
-WINDOW_STATE_WITHDRAWN = gdk.WindowState.WITHDRAWN
+WINDOW_STATE_ICONIFIED = Gdk.WindowState.ICONIFIED
+WINDOW_STATE_WITHDRAWN = Gdk.WindowState.WITHDRAWN
 
 SORT_ASCENDING = Gtk.SortType.ASCENDING
 SORT_DESCENDING = Gtk.SortType.DESCENDING
 
-EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
+EVENT_BUTTON_PRESS = Gdk.EventType.BUTTON_PRESS
 
 TREE_VIEW_COLUMN_FIXED = Gtk.TreeViewColumnSizing.FIXED
 

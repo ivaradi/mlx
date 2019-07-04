@@ -322,7 +322,7 @@ def getContainer():
 def startInContainer(container, url, browserSettings = {}):
     """Start a browser instance in the given container with the given URL."""
     if os.name=="nt":
-        gdk.threads_enter()
+        Gdk.threads_enter()
         ctypes.pythonapi.PyCapsule_GetPointer.restype = ctypes.c_void_p
         ctypes.pythonapi.PyCapsule_GetPointer.argtypes = \
             [ctypes.py_object]
@@ -331,7 +331,7 @@ def startInContainer(container, url, browserSettings = {}):
         libgdk = ctypes.CDLL("libgdk-3-0.dll")
         windowID = libgdk.gdk_win32_window_get_handle(gpointer)
         container.windowID = windowID
-        gdk.threads_leave()
+        Gdk.threads_leave()
     else:
         container.set_visual(container.get_screen().lookup_visual(0x21))
         windowID = container.get_window().get_xid()

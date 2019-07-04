@@ -579,7 +579,7 @@ class PendingFlightsWindow(Gtk.Window):
 
         If the Escape key is pressed, 'delete-event' is emitted to close the
         window."""
-        if gdk.keyval_name(event.keyval) == "Escape":
+        if Gdk.keyval_name(event.keyval) == "Escape":
             self.emit("delete-event", None)
             return True
 
@@ -762,7 +762,7 @@ class AcceptedFlightsWindow(Gtk.Window):
 
         If the Escape key is pressed, 'delete-event' is emitted to close the
         window."""
-        if gdk.keyval_name(event.keyval) == "Escape":
+        if Gdk.keyval_name(event.keyval) == "Escape":
             self.emit("delete-event", None)
             return True
 

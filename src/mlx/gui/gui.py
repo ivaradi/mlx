@@ -205,7 +205,7 @@ class GUI(fs.ConnectionListener):
 
         self._statusIcon = StatusIcon(iconDirectory, self)
 
-        self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH)
+        self._busyCursor = Gdk.Cursor(Gdk.CursorType.WATCH)
 
         self._loadPIREPDialog = None
         self._lastLoadedPIREP = None
@@ -738,7 +738,7 @@ class GUI(fs.ConnectionListener):
 
     def _handleMainWindowState(self, window, event):
         """Hande a change in the state of the window"""
-        iconified = gdk.WindowState.ICONIFIED
+        iconified = Gdk.WindowState.ICONIFIED
 
         if (event.changed_mask&WINDOW_STATE_WITHDRAWN)!=0:
             if (event.new_window_state&WINDOW_STATE_WITHDRAWN)!=0:

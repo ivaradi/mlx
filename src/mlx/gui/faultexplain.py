@@ -282,7 +282,7 @@ class FaultExplainWidget(Gtk.Frame):
         allExplained = self._numExplanations >= self._numFaults
         styleContext = self.get_style_context()
         if allExplained:
-            outerColour = innerColour = gdk.RGBA(red = 0.0, green=0.0,
+            outerColour = innerColour = Gdk.RGBA(red = 0.0, green=0.0,
                                                  blue=0.0, alpha=0.0)
         else:
             outerColour = \

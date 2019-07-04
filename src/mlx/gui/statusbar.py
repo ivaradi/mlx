@@ -125,7 +125,7 @@ class Statusbar(Gtk.Frame, FlightStatusHandler):
         else:
             icon = self._connGreyIcon
 
-        gdk.cairo_set_source_pixbuf(eventOrContext, icon, 0, 0)
+        Gdk.cairo_set_source_pixbuf(eventOrContext, icon, 0, 0)
         eventOrContext.paint()
 
     def _updateFlightStatus(self):
