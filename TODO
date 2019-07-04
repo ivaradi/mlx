@@ -1,10 +1,10 @@
 - Python 3:
+  - Book flight:
+    "Book" button -> crash
+  - Print briefing -> crash
+  - Fuel setup: mouse wheel does not work
+  - Remove: xxx_todo
   - icons besides menus
-  - remove "if gobject" ->
-    - gtk -> Gtk
-    - gdk -> Gdk
-    - Gtk3 constant names
-    - etc.
   - X-Plane on Linux and Windows
   - streamline distribution (remove unnecessary stuff)
   - check some colours on Windows (e.g. the tab background)
