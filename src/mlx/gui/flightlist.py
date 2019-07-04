@@ -226,10 +226,10 @@ class FlightList(gtk.Alignment):
 
 #-------------------------------------------------------------------------------
 
-gobject.signal_new("row-activated", FlightList, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("row-activated", FlightList, GObject.SIGNAL_RUN_FIRST,
                    None, (int,))
 
-gobject.signal_new("selection-changed", FlightList, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("selection-changed", FlightList, GObject.SIGNAL_RUN_FIRST,
                    None, (object,))
 
 #-----------------------------------------------------------------------------
@@ -354,7 +354,7 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _pirepResultCallback(self, returned, result):
         """Called when the PIREP query result is available."""
-        gobject.idle_add(self._handlePIREPResult, returned, result)
+        GObject.idle_add(self._handlePIREPResult, returned, result)
 
     def _handlePIREPResult(self, returned, result):
         """Handle the refly result."""
@@ -386,7 +386,7 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _reflyResultCallback(self, returned, result):
         """Called when the refly result is available."""
-        gobject.idle_add(self._handleReflyResult, returned, result)
+        GObject.idle_add(self._handleReflyResult, returned, result)
 
     def _handleReflyResult(self, returned, result):
         """Handle the refly result."""
@@ -429,7 +429,7 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _deleteResultCallback(self, returned, result):
         """Called when the deletion result is available."""
-        gobject.idle_add(self._handleDeleteResult, returned, result)
+        GObject.idle_add(self._handleDeleteResult, returned, result)
 
     def _handleDeleteResult(self, returned, result):
         """Handle the delete result."""
@@ -740,7 +740,7 @@ class AcceptedFlightsWindow(gtk.Window):
 
     def _pirepResultCallback(self, returned, result):
         """Called when the PIREP query result is available."""
-        gobject.idle_add(self._handlePIREPResult, returned, result)
+        GObject.idle_add(self._handlePIREPResult, returned, result)
 
     def _handlePIREPResult(self, returned, result):
         """Handle the refly result."""

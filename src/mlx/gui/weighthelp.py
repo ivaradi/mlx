@@ -465,7 +465,7 @@ class WeightHelp(gtk.VBox):
 
     def _handleWeights(self, dow, payload, zfw, grossWeight):
         """Handle the given weights."""
-        gobject.idle_add(self._processWeights, dow, payload, zfw, grossWeight)
+        GObject.idle_add(self._processWeights, dow, payload, zfw, grossWeight)
 
     def _processWeights(self, dow, payload, zfw, grossWeight):
         """Process the given weights."""

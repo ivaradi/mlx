@@ -243,10 +243,10 @@ class Timetable(gtk.Alignment):
 
 #-----------------------------------------------------------------------------
 
-gobject.signal_new("row-activated", Timetable, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("row-activated", Timetable, GObject.SIGNAL_RUN_FIRST,
                    None, (int,))
 
-gobject.signal_new("selection-changed", Timetable, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("selection-changed", Timetable, GObject.SIGNAL_RUN_FIRST,
                    None, (object,))
 
 #-----------------------------------------------------------------------------
@@ -299,7 +299,7 @@ class CalendarWindow(gtk.Window):
             self.emit("date-selected")
             return True
 
-gobject.signal_new("date-selected", CalendarWindow, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("date-selected", CalendarWindow, GObject.SIGNAL_RUN_FIRST,
                    None, ())
 
 #-----------------------------------------------------------------------------

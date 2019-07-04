@@ -62,7 +62,7 @@ class GUI(fs.ConnectionListener):
 
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
-        gobject.threads_init()
+        GObject.threads_init()
 
         self._programDirectory = programDirectory
         self.config = config
@@ -359,7 +359,7 @@ class GUI(fs.ConnectionListener):
     @takeoffAntiIceOn.setter
     def takeoffAntiIceOn(self, value):
         """Set the anti-ice on indicator."""
-        gobject.idle_add(self._setTakeoffAntiIceOn, value)
+        GObject.idle_add(self._setTakeoffAntiIceOn, value)
 
     @property
     def rtoIndicated(self):
@@ -399,7 +399,7 @@ class GUI(fs.ConnectionListener):
     @landingAntiIceOn.setter
     def landingAntiIceOn(self, value):
         """Set the anti-ice on indicator."""
-        gobject.idle_add(self._setLandingAntiIceOn, value)
+        GObject.idle_add(self._setLandingAntiIceOn, value)
 
     @property
     def flightType(self):
@@ -469,7 +469,7 @@ class GUI(fs.ConnectionListener):
 
     def updateDone(self):
         """Called when the update is done (and there is no need to restart)."""
-        gobject.idle_add(self._updateDone)
+        GObject.idle_add(self._updateDone)
 
     def connected(self, fsType, descriptor):
         """Called when we have connected to the simulator."""
@@ -478,7 +478,7 @@ class GUI(fs.ConnectionListener):
                                     (const.VERSION, descriptor))
         fs.sendMessage(const.MESSAGETYPE_INFORMATION,
                        "Welcome to MAVA Logger X " + const.VERSION)
-        gobject.idle_add(self._handleConnected, fsType, descriptor)
+        GObject.idle_add(self._handleConnected, fsType, descriptor)
 
     def _handleConnected(self, fsType, descriptor):
         """Called when the connection to the simulator has succeeded."""
@@ -493,7 +493,7 @@ class GUI(fs.ConnectionListener):
     def connectionFailed(self):
         """Called when the connection failed."""
         self._logger.untimedMessage("Connection to the simulator failed")
-        gobject.idle_add(self._connectionFailed)
+        GObject.idle_add(self._connectionFailed)
 
     def _connectionFailed(self):
         """Called when the connection failed."""
@@ -526,7 +526,7 @@ class GUI(fs.ConnectionListener):
         if self._flight is not None:
             self._flight.disconnected()
 
-        gobject.idle_add(self._disconnected)
+        GObject.idle_add(self._disconnected)
 
     def _disconnected(self):
         """Called when we have disconnected from the simulator unexpectedly."""
@@ -571,7 +571,7 @@ class GUI(fs.ConnectionListener):
 
     def _bookFlightsCallback(self, returned, result):
         """Called when the booking of flights has finished."""
-        gobject.idle_add(self._handleBookFlightsResult, returned, result)
+        GObject.idle_add(self._handleBookFlightsResult, returned, result)
 
     def _handleBookFlightsResult(self, returned, result):
         """Called when the booking of flights is done.
@@ -652,7 +652,7 @@ class GUI(fs.ConnectionListener):
 
     def insertFlightLogLine(self, index, timestampString, text, isFault):
         """Insert the flight log line with the given data."""
-        gobject.idle_add(self._insertFlightLogLine, index,
+        GObject.idle_add(self._insertFlightLogLine, index,
                          formatFlightLogLine(timestampString, text),
                          isFault)
 
@@ -667,21 +667,21 @@ class GUI(fs.ConnectionListener):
 
     def removeFlightLogLine(self, index):
         """Remove the flight log line with the given index."""
-        gobject.idle_add(self._removeFlightLogLine, index)
+        GObject.idle_add(self._removeFlightLogLine, index)
 
     def addFault(self, id, timestampString, text):
         """Add a fault to the list of faults."""
         faultText = formatFlightLogLine(timestampString, text).strip()
-        gobject.idle_add(self._flightInfo.addFault, id, faultText)
+        GObject.idle_add(self._flightInfo.addFault, id, faultText)
 
     def updateFault(self, id, timestampString, text):
         """Update a fault in the list of faults."""
         faultText = formatFlightLogLine(timestampString, text).strip()
-        gobject.idle_add(self._flightInfo.updateFault, id, faultText)
+        GObject.idle_add(self._flightInfo.updateFault, id, faultText)
 
     def clearFault(self, id):
         """Clear a fault in the list of faults."""
-        gobject.idle_add(self._flightInfo.clearFault, id)
+        GObject.idle_add(self._flightInfo.clearFault, id)
 
     def _removeFlightLogLine(self, index):
         """Perform the real removal."""
@@ -693,8 +693,8 @@ class GUI(fs.ConnectionListener):
 
     def check(self, flight, aircraft, logger, oldState, state):
         """Update the data."""
-        gobject.idle_add(self._monitorWindow.setData, state)
-        gobject.idle_add(self._statusbar.updateTime, state.timestamp)
+        GObject.idle_add(self._monitorWindow.setData, state)
+        GObject.idle_add(self._statusbar.updateTime, state.timestamp)
 
     def resetFlightStatus(self):
         """Reset the status of the flight."""
@@ -704,7 +704,7 @@ class GUI(fs.ConnectionListener):
 
     def setStage(self, stage):
         """Set the stage of the flight."""
-        gobject.idle_add(self._setStage, stage)
+        GObject.idle_add(self._setStage, stage)
 
     def _setStage(self, stage):
         """Set the stage of the flight."""
@@ -720,7 +720,7 @@ class GUI(fs.ConnectionListener):
 
     def setRating(self, rating):
         """Set the rating of the flight."""
-        gobject.idle_add(self._setRating, rating)
+        GObject.idle_add(self._setRating, rating)
 
     def _setRating(self, rating):
         """Set the rating of the flight."""
@@ -729,7 +729,7 @@ class GUI(fs.ConnectionListener):
 
     def setNoGo(self, reason):
         """Set the rating of the flight to No-Go with the given reason."""
-        gobject.idle_add(self._setNoGo, reason)
+        GObject.idle_add(self._setNoGo, reason)
 
     def _setNoGo(self, reason):
         """Set the rating of the flight."""
@@ -759,7 +759,7 @@ class GUI(fs.ConnectionListener):
 
     def raiseCallback(self):
         """Callback for the singleton handling code."""
-        gobject.idle_add(self.raiseMainWindow)
+        GObject.idle_add(self.raiseMainWindow)
 
     def raiseMainWindow(self):
         """Show the main window if invisible, and raise it."""
@@ -847,7 +847,7 @@ class GUI(fs.ConnectionListener):
         with self._stdioLock:
             self._stdioText += text
 
-        gobject.idle_add(self._writeStdIO)
+        GObject.idle_add(self._writeStdIO)
 
     def beginBusy(self, message):
         """Begin a period of background processing."""
@@ -874,7 +874,7 @@ class GUI(fs.ConnectionListener):
 
     def getFleetAsync(self, callback = None, force = None):
         """Get the fleet asynchronously."""
-        gobject.idle_add(self.getFleet, callback, force)
+        GObject.idle_add(self.getFleet, callback, force)
 
     def getFleet(self, callback = None, force = False, busyCallback = None):
         """Get the fleet.
@@ -909,7 +909,7 @@ class GUI(fs.ConnectionListener):
         if inLoop:
             self._wizard.updateRTO()
         else:
-            gobject.idle_add(self.updateRTO, True)
+            GObject.idle_add(self.updateRTO, True)
 
     def rtoToggled(self, indicated):
         """Called when the user has toggled the RTO checkbox."""
@@ -917,7 +917,7 @@ class GUI(fs.ConnectionListener):
 
     def _fleetResultCallback(self, returned, result):
         """Called when the fleet has been queried."""
-        gobject.idle_add(self._handleFleetResult, returned, result)
+        GObject.idle_add(self._handleFleetResult, returned, result)
 
     def _handleFleetResult(self, returned, result):
         """Handle the fleet result."""
@@ -960,7 +960,7 @@ class GUI(fs.ConnectionListener):
 
     def _updatePlaneResultCallback(self, returned, result):
         """Called when the status of a plane has been updated."""
-        gobject.idle_add(self._handleUpdatePlaneResult, returned, result)
+        GObject.idle_add(self._handleUpdatePlaneResult, returned, result)
 
     def _handleUpdatePlaneResult(self, returned, result):
         """Handle the plane update result."""
@@ -1273,7 +1273,7 @@ class GUI(fs.ConnectionListener):
     def _notebookPageSwitch(self, notebook, page, page_num):
         """Called when the current page of the notebook has changed."""
         if page_num==0:
-            gobject.idle_add(self._wizard.grabDefault)
+            GObject.idle_add(self._wizard.grabDefault)
         else:
             self._mainWindow.set_default(None)
 
@@ -1309,7 +1309,7 @@ class GUI(fs.ConnectionListener):
 
     def _timetableCallback(self, returned, result):
         """Called when the timetable has been received."""
-        gobject.idle_add(self._handleTimetable, returned, result)
+        GObject.idle_add(self._handleTimetable, returned, result)
 
     def _handleTimetable(self, returned, result):
         """Handle the result of the query for the timetable."""
@@ -1341,7 +1341,7 @@ class GUI(fs.ConnectionListener):
 
     def _acceptedFlightsCallback(self, returned, result):
         """Called when the accepted flights have been received."""
-        gobject.idle_add(self._handleAcceptedFlights, returned, result)
+        GObject.idle_add(self._handleAcceptedFlights, returned, result)
 
     def _handleAcceptedFlights(self, returned, result):
         """Handle the result of the query for accepted flights."""
@@ -1427,7 +1427,7 @@ class GUI(fs.ConnectionListener):
 
     def _pirepUpdatedCallback(self, returned, result):
         """Callback for the PIREP updating result."""
-        gobject.idle_add(self._handlePIREPUpdated, returned, result)
+        GObject.idle_add(self._handlePIREPUpdated, returned, result)
 
     def _handlePIREPUpdated(self, returned, result):
         """Callback for the PIREP updating result."""
@@ -1649,7 +1649,7 @@ class GUI(fs.ConnectionListener):
 
     def _pirepSentCallback(self, returned, result):
         """Callback for the PIREP sending result."""
-        gobject.idle_add(self._handlePIREPSent, returned, result)
+        GObject.idle_add(self._handlePIREPSent, returned, result)
 
     def _handlePIREPSent(self, returned, result):
         """Callback for the PIREP sending result."""
@@ -1716,7 +1716,7 @@ class GUI(fs.ConnectionListener):
 
     def _bugReportSentCallback(self, returned, result):
         """Callback function for the bug report sending result."""
-        gobject.idle_add(self._handleBugReportSent, returned, result)
+        GObject.idle_add(self._handleBugReportSent, returned, result)
 
     def _handleBugReportSent(self, returned, result):
         """Callback for the bug report sending result."""
@@ -1858,7 +1858,7 @@ class GUI(fs.ConnectionListener):
         with self._credentialsCondition:
             self._credentialsAvailable = False
 
-            gobject.idle_add(self._getCredentials)
+            GObject.idle_add(self._getCredentials)
 
             while not self._credentialsAvailable:
                 self._credentialsCondition.wait()

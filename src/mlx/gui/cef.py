@@ -100,7 +100,7 @@ class SimBriefHandler(object):
 
     def call(self, plan, getCredentials, updateProgress, htmlFilePath):
         """Call SimBrief with the given plan."""
-        self._timeoutID = gobject.timeout_add(120*1000, self._timedOut)
+        self._timeoutID = GObject.timeout_add(120*1000, self._timedOut)
 
         self._plan = plan
         self._getCredentials = getCredentials
@@ -195,7 +195,7 @@ class SimBriefHandler(object):
         self._lastProgress = progress
         if results!=SIMBRIEF_RESULT_NONE:
             if self._timeoutID is not None:
-                gobject.source_remove(self._timeoutID)
+                GObject.source_remove(self._timeoutID)
             self._plan = None
 
         if self._updateProgressFn is not None:
@@ -250,7 +250,7 @@ class SimBriefHandler(object):
         with open(htmlFilePath, 'w') as f:
             f.write(availableInfo["plan_html"])
 
-        gobject.idle_add(self._resultsAvailable, flightInfo)
+        GObject.idle_add(self._resultsAvailable, flightInfo)
 
 #------------------------------------------------------------------------------
 
@@ -259,7 +259,7 @@ def initialize(initializedCallback):
     global _toQuit, _simBriefHandler
     _toQuit = False
 
-    gobject.threads_init()
+    GObject.threads_init()
 
     _simBriefHandler = SimBriefHandler()
     _initializeCEF([], initializedCallback)
@@ -296,7 +296,7 @@ def _initializeCEF(args, initializedCallback):
 
     cefpython.Initialize(settings, switches)
 
-    gobject.timeout_add(10, _handleTimeout)
+    GObject.timeout_add(10, _handleTimeout)
 
     print("Initialized, executing callback...")
     initializedCallback()

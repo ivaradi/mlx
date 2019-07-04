@@ -113,7 +113,7 @@ class FaultFrame(gtk.Frame):
 
 #-------------------------------------------------------------------------------
 
-gobject.signal_new("explanation-changed", FaultFrame, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("explanation-changed", FaultFrame, GObject.SIGNAL_RUN_FIRST,
                    None, (bool,))
 
 #-------------------------------------------------------------------------------
@@ -296,5 +296,5 @@ class FaultExplainWidget(gtk.Frame):
 
 #-------------------------------------------------------------------------------
 
-gobject.signal_new("explanations-changed", FaultExplainWidget,
-                   gobject.SIGNAL_RUN_FIRST, None, (bool,))
+GObject.signal_new("explanations-changed", FaultExplainWidget,
+                   GObject.SIGNAL_RUN_FIRST, None, (bool,))

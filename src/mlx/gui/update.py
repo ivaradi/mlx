@@ -116,15 +116,15 @@ class Updater(threading.Thread):
 
     def run(self):
         """Execute the thread's operation."""
-        gobject.idle_add(self._startUpdate)
+        GObject.idle_add(self._startUpdate)
         update(self._programDirectory, self._updateURL, self, fromGUI = True)
         if not self._waitAfterFinish:
-            gobject.idle_add(self._progressWindow.hide)
+            GObject.idle_add(self._progressWindow.hide)
             self._gui.updateDone()
 
     def downloadingManifest(self):
         """Called when the downloading of the manifest has started."""
-        gobject.idle_add(self._downloadingManifest)
+        GObject.idle_add(self._downloadingManifest)
 
     def _downloadingManifest(self):
         """Called when the downloading of the manifest has started."""
@@ -133,7 +133,7 @@ class Updater(threading.Thread):
 
     def downloadedManifest(self):
         """Called when the downloading of the manifest has finished."""
-        gobject.idle_add(self._downloadedManifest)
+        GObject.idle_add(self._downloadedManifest)
 
     def _downloadedManifest(self):
         """Called when the downloading of the manifest has finished."""
@@ -143,7 +143,7 @@ class Updater(threading.Thread):
     def needSudo(self):
         """Called when the program is interested in whether we want to run a
         program with administrator rights to do the update."""
-        gobject.idle_add(self._needSudo)
+        GObject.idle_add(self._needSudo)
         with self._sudoCondition:
             while self._sudoReply is None:
                 self._sudoCondition.wait(1)
@@ -183,7 +183,7 @@ class Updater(threading.Thread):
     def setDownloaded(self, downloaded):
         """Called when a certain number of bytes are downloaded."""
         self._downloaded = downloaded
-        gobject.idle_add(self._setDownloaded, downloaded)
+        GObject.idle_add(self._setDownloaded, downloaded)
 
     def _setDownloaded(self, downloaded):
         """Called when a certain number of bytes are downloaded."""
@@ -193,7 +193,7 @@ class Updater(threading.Thread):
 
     def startRenaming(self):
         """Called when the renaming of files has started."""
-        gobject.idle_add(self._startRenaming)
+        GObject.idle_add(self._startRenaming)
 
     def _startRenaming(self):
         """Called when the renaming of files has started."""
@@ -202,7 +202,7 @@ class Updater(threading.Thread):
     def renamed(self, path, count):
         """Called when a file has been renamed."""
         self._numModifiedOrNew = count
-        gobject.idle_add(self._renamed, path, count)
+        GObject.idle_add(self._renamed, path, count)
 
     def _renamed(self, path, count):
         """Called when a file has been renamed."""
@@ -211,7 +211,7 @@ class Updater(threading.Thread):
 
     def startRemoving(self):
         """Called when the removing of files has started."""
-        gobject.idle_add(self._startRemoving)
+        GObject.idle_add(self._startRemoving)
 
     def _startRemoving(self):
         """Called when the removing of files has started."""
@@ -220,7 +220,7 @@ class Updater(threading.Thread):
     def removed(self, path, count):
         """Called when a file has been removed."""
         self._numRemoved = count
-        gobject.idle_add(self._removed, path, count)
+        GObject.idle_add(self._removed, path, count)
 
     def _removed(self, path, count):
         """Called when a file has been removed."""
@@ -229,7 +229,7 @@ class Updater(threading.Thread):
 
     def writingManifest(self):
         """Called when the writing of the new manifest file has started."""
-        gobject.idle_add(self._writingManifest)
+        GObject.idle_add(self._writingManifest)
 
     def _writingManifest(self):
         """Called when the writing of the new manifest file has started."""
@@ -237,7 +237,7 @@ class Updater(threading.Thread):
         
     def done(self):
         """Called when the update has been done."""
-        gobject.idle_add(self._done)
+        GObject.idle_add(self._done)
         self._restart = self._waitAfterFinish
 
     def _done(self):
@@ -260,7 +260,7 @@ class Updater(threading.Thread):
     def failed(self, what):
         """Called when the downloading has failed."""
         self._waitAfterFinish = True
-        gobject.idle_add(self._failed, what)
+        GObject.idle_add(self._failed, what)
 
     def _failed(self, what):
         """Called when the downloading has failed."""        

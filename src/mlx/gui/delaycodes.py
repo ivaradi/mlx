@@ -42,20 +42,20 @@ class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
                              "vscroll-policy",
                              "The vertical scrolling policy",
                              gtk.ScrollablePolicy.MINIMUM,
-                             gobject.PARAM_READWRITE ),
+                             GObject.PARAM_READWRITE ),
         "vadjustment" : ( gtk.Adjustment,
                           "vadjustment",
                           "The vertical adjustment",
-                          gobject.PARAM_READWRITE ),
+                          GObject.PARAM_READWRITE ),
         "hscroll-policy" : ( gtk.ScrollablePolicy,
                              "hscroll-policy",
                              "The horizontal scrolling policy",
                              gtk.ScrollablePolicy.MINIMUM,
-                             gobject.PARAM_READWRITE ),
+                             GObject.PARAM_READWRITE ),
         "hadjustment" : ( gtk.Adjustment,
                           "hadjustment",
                           "The horizontal adjustment",
-                          gobject.PARAM_READWRITE )  }
+                          GObject.PARAM_READWRITE )  }
 
 
     @staticmethod

@@ -238,7 +238,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         Makes the treeview to edit the altitude in the given row."""
         if self._addingFile:
-            gobject.idle_add(self._selectFile)
+            GObject.idle_add(self._selectFile)
             self._fileList.grab_focus()
             self.grab_focus()
 

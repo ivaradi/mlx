@@ -211,13 +211,13 @@ else: # os.name!="nt"
         quits.
 
         In case of successful initialization, the directory of the sound files
-        is read, the command reader thread is created and the gobject main loop
+        is read, the command reader thread is created and the GObject main loop
         is executed."""
         try:
             import gi.repository
             gi.require_version("Gst", "1.0")
             from gi.repository import Gst
-            from gi.repository import GObject as gobject
+            from gi.repository import GObject
 
             Gst.init(None)
         except Exception as e:
@@ -274,14 +274,14 @@ else: # os.name!="nt"
 
             It is to be executed in a separate thread and it reads the incoming
             queue for commands. The commands with their arguments are added to the
-            idle queue of gobject so that _handleCommand will be called by them.
+            idle queue of GObject so that _handleCommand will be called by them.
 
             If COMMAND_QUIT is received, the thread exits."""
 
             while True:
                 (command, args) = inQueue.get()
 
-                gobject.idle_add(_handleCommand, command, args)
+                GObject.idle_add(_handleCommand, command, args)
                 if command==COMMAND_QUIT:
                     break
 
@@ -290,7 +290,7 @@ else: # os.name!="nt"
         commandThread.start()
 
 
-        mainLoop = gobject.MainLoop()
+        mainLoop = GObject.MainLoop()
         mainLoop.run()
 
         commandThread.join()

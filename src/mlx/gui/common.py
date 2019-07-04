@@ -415,7 +415,7 @@ class CredentialsDialog(gtk.Dialog):
 
 #------------------------------------------------------------------------------
 
-gobject.signal_new("integer-changed", IntegerEntry, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("integer-changed", IntegerEntry, GObject.SIGNAL_RUN_FIRST,
                    None, (object,))
 
 #------------------------------------------------------------------------------

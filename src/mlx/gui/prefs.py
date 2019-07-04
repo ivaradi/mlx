@@ -160,7 +160,7 @@ class Hotkey(gtk.HBox):
 
 #------------------------------------------------------------------------------
 
-gobject.signal_new("hotkey-changed", Hotkey, gobject.SIGNAL_RUN_FIRST,
+GObject.signal_new("hotkey-changed", Hotkey, GObject.SIGNAL_RUN_FIRST,
                    None, (int,))
 
 #------------------------------------------------------------------------------

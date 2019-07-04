@@ -12,7 +12,7 @@ MAVA_BASE_URL = os.environ.get("MAVA_BASE_URL", "http://virtualairlines.hu")
 
 #-------------------------------------------------------------------------------
 
-from gi.repository import GObject as gobject
+from gi.repository import GObject
 
 #-------------------------------------------------------------------------------
 

@@ -56,7 +56,7 @@ import webbrowser
 
 #-----------------------------------------------------------------------------
 
-comboModel = gtk.ListStore(gobject.TYPE_STRING)
+comboModel = gtk.ListStore(GObject.TYPE_STRING)
 comboModel.append(("N/A",))
 comboModel.append(("VECTORS",))
 
@@ -877,7 +877,7 @@ class FlightSelectionPage(Page):
 
     def _deleteResultCallback(self, returned, result):
         """Called when the deletion result is available."""
-        gobject.idle_add(self._handleDeleteResult, returned, result)
+        GObject.idle_add(self._handleDeleteResult, returned, result)
 
     def _handleDeleteResult(self, returned, result):
         """Handle the delete result."""
@@ -1631,7 +1631,7 @@ class RegisterPage(Page):
 
     def _registerResultCallback(self, returned, result):
         """Called when the registration result is available."""
-        gobject.idle_add(self._handleRegisterResult, returned, result)
+        GObject.idle_add(self._handleRegisterResult, returned, result)
 
     def _handleRegisterResult(self, returned, result):
         """Handle the registration result."""
@@ -1840,13 +1840,13 @@ class StudentPage(Page):
     def _getEntryExamStatus(self):
         """Initiate the query of the entry exam status after the interval."""
         if not self._getEntryExamStatusCancelled:
-            gobject.timeout_add(StudentPage._entryExamStatusQueryInterval,
+            GObject.timeout_add(StudentPage._entryExamStatusQueryInterval,
                                 lambda: self._wizard.gui.webHandler. \
                                 getEntryExamStatus(self._entryExamStatusCallback))
 
     def _entryExamStatusCallback(self, returned, result):
         """Called when the entry exam status is available."""
-        gobject.idle_add(self._handleEntryExamStatus, returned, result)
+        GObject.idle_add(self._handleEntryExamStatus, returned, result)
 
     def _handleEntryExamStatus(self, returned, result):
         """Called when the entry exam status is availabe."""
@@ -2297,7 +2297,7 @@ class PayloadPage(Page):
 
     def _handleZFW(self, zfw):
         """Called when the ZFW value is retrieved."""
-        gobject.idle_add(self._processZFW, zfw)
+        GObject.idle_add(self._processZFW, zfw)
 
     def _processZFW(self, zfw):
         """Process the given ZFW value received from the simulator."""
@@ -2387,7 +2387,7 @@ class TimePage(Page):
 
     def _handleTime(self, timestamp):
         """Handle the result of a time retrieval."""
-        gobject.idle_add(self._processTime, timestamp)
+        GObject.idle_add(self._processTime, timestamp)
 
     def _processTime(self, timestamp):
         """Process the given time."""
@@ -2431,7 +2431,7 @@ class TimePage(Page):
 
     def _handleFuel(self, fuelData):
         """Callback for the fuel query operation."""
-        gobject.idle_add(self._processFuel, fuelData)
+        GObject.idle_add(self._processFuel, fuelData)
 
     def _processFuel(self, fuelData):
         """Process the given fuel data."""
@@ -3546,11 +3546,11 @@ class FuelPage(Page):
             fuelTank.setCurrent(currentLevel * fuelTank.capacity)
             self._wizard.gui.simulator.setFuelLevel([(fuelTank.fuelTank,
                                                       currentLevel)])
-            gobject.timeout_add(50, self._pump)
+            GObject.timeout_add(50, self._pump)
 
     def _notamsCallback(self, returned, result):
         """Callback for the NOTAMs."""
-        gobject.idle_add(self._handleNOTAMs, returned, result)
+        GObject.idle_add(self._handleNOTAMs, returned, result)
 
     def _handleNOTAMs(self, returned, result):
         """Handle the NOTAMs."""
@@ -3569,7 +3569,7 @@ class FuelPage(Page):
 
     def _metarsCallback(self, returned, result):
         """Callback for the METARs."""
-        gobject.idle_add(self._handleMETARs, returned, result)
+        GObject.idle_add(self._handleMETARs, returned, result)
 
     def _handleMETARs(self, returned, result):
         """Handle the METARs."""
@@ -5337,7 +5337,7 @@ class CheckFlightFinishPage(Page):
 
     def _checkFlightPassedSetCallback(self, returned, result):
         """Called when the check flight status has been set."""
-        gobject.idle_add(self._checkFlightPassedSet, returned, result)
+        GObject.idle_add(self._checkFlightPassedSet, returned, result)
 
     def _checkFlightPassedSet(self, returned, result):
         """Handle the result of an attempt to set the check flight status."""
@@ -5863,7 +5863,7 @@ class Wizard(gtk.VBox):
 
     def _loginResultCallback(self, returned, result):
         """The login result callback, called in the web handler's thread."""
-        gobject.idle_add(self._handleLoginResult, returned, result)
+        GObject.idle_add(self._handleLoginResult, returned, result)
 
     def _handleLoginResult(self, returned, result):
         """Handle the login result."""
@@ -5963,7 +5963,7 @@ class Wizard(gtk.VBox):
 
     def _arrivalMETARCallback(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
-        gobject.idle_add(self._handleArrivalMETAR, returned, result)
+        GObject.idle_add(self._handleArrivalMETAR, returned, result)
 
     def _handleArrivalMETAR(self, returned, result):
         """Called when the METAR of the arrival airport is retrieved."""
