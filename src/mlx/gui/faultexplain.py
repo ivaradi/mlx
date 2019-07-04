@@ -18,34 +18,34 @@ from mlx.gui.common import *
 
 #-------------------------------------------------------------------------------
 
-class FaultFrame(gtk.Frame):
+class FaultFrame(Gtk.Frame):
     """A frame containing the information about a single fault.
 
     It consists of a text view with the text of the fault and an editable text
     view for the explanation."""
     def __init__(self, faultText):
         """Construct the frame."""
-        gtk.Frame.__init__(self)
+        Gtk.Frame.__init__(self)
 
         self._faultText = faultText
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
-        self._fault = fault = gtk.Label()
+        self._fault = fault = Gtk.Label()
         fault.set_xalign(0.0)
         fault.set_justify(JUSTIFY_LEFT)
         fault.set_line_wrap(True)
 
         self.faultText = faultText
 
-        faultAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        faultAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                        xscale = 1.0, yscale = 0.0)
         faultAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                    padding_left = 2, padding_right = 2)
         faultAlignment.add(fault)
         vbox.pack_start(faultAlignment, True, True, 4)
 
-        self._explanation = explanation = gtk.TextView()
+        self._explanation = explanation = Gtk.TextView()
         explanation.set_wrap_mode(WRAP_WORD)
         explanation.set_accepts_tab(False)
         explanation.set_size_request(-1, 100)
@@ -59,7 +59,7 @@ class FaultFrame(gtk.Frame):
         self.show_all()
 
         styleContext = self.get_style_context()
-        color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
+        color = styleContext.get_background_color(Gtk.StateFlags.NORMAL)
         fault.override_background_color(0, color)
 
         self._hasExplanation = False
@@ -118,7 +118,7 @@ GObject.signal_new("explanation-changed", FaultFrame, GObject.SIGNAL_RUN_FIRST,
 
 #-------------------------------------------------------------------------------
 
-class FaultExplainWidget(gtk.Frame):
+class FaultExplainWidget(Gtk.Frame):
     """The widget for the faults and their explanations."""
     @staticmethod
     def getFaultFrame(alignment):
@@ -126,36 +126,36 @@ class FaultExplainWidget(gtk.Frame):
         return alignment.get_children()[0]
 
     def __init__(self, gui):
-        gtk.Frame.__init__(self)
+        Gtk.Frame.__init__(self)
 
         self._gui = gui
         self.set_label(xstr("info_faults"))
         label = self.get_label_widget()
         label.set_use_underline(True)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
 
-        self._outerBox = outerBox = gtk.EventBox()
+        self._outerBox = outerBox = Gtk.EventBox()
         outerBox.add(alignment)
 
-        self._innerBox = innerBox = gtk.EventBox()
+        self._innerBox = innerBox = Gtk.EventBox()
         alignment.add(self._innerBox)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 0,
                               padding_left = 0, padding_right = 0)
 
         innerBox.add(alignment)
 
-        scroller = gtk.ScrolledWindow()
+        scroller = Gtk.ScrolledWindow()
         scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scroller.set_shadow_type(SHADOW_NONE)
 
-        self._faults = gtk.VBox()
+        self._faults = Gtk.VBox()
         self._faults.set_homogeneous(False)
         scroller.add(self._faults)
 
@@ -188,7 +188,7 @@ class FaultExplainWidget(gtk.Frame):
     def addFault(self, id, faultText):
         """Add a fault with the given ID and text."""
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 0.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 2,
                               padding_left = 4, padding_right = 4)
@@ -286,12 +286,12 @@ class FaultExplainWidget(gtk.Frame):
                                                  blue=0.0, alpha=0.0)
         else:
             outerColour = \
-                styleContext.get_border_color(gtk.StateFlags.DROP_ACTIVE)
+                styleContext.get_border_color(Gtk.StateFlags.DROP_ACTIVE)
             innerColour = self._gui.backgroundColour
 
-        self._outerBox.override_background_color(gtk.StateFlags.NORMAL,
+        self._outerBox.override_background_color(Gtk.StateFlags.NORMAL,
                                                  outerColour)
-        self._innerBox.override_background_color(gtk.StateFlags.NORMAL,
+        self._innerBox.override_background_color(Gtk.StateFlags.NORMAL,
                                                  innerColour)
 
 #-------------------------------------------------------------------------------

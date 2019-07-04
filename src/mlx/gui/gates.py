@@ -18,7 +18,7 @@ from mlx.gates import Gates, lhbpGates
 
 #-------------------------------------------------------------------------------
 
-class FleetGateStatus(gtk.VBox):
+class FleetGateStatus(Gtk.VBox):
     """The tab to display the fleet and gate status."""
     def __init__(self, gui):
         """Construct the tab."""
@@ -26,63 +26,63 @@ class FleetGateStatus(gtk.VBox):
 
         self._gui = gui
 
-        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 1.0)
         mainAlignment.set_padding(padding_top = 4, padding_bottom = 4,
                                   padding_left = 12, padding_right = 12)
         self.add(mainAlignment)
 
-        self._mainBox = mainBox = gtk.VBox()
+        self._mainBox = mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
     
-        self._statusBox = statusBox = gtk.HBox()
+        self._statusBox = statusBox = Gtk.HBox()
         mainBox.pack_start(statusBox, True, True, 4)
 
-        fleetFrame = gtk.Frame(label = xstr("gates_fleet_title"))
+        fleetFrame = Gtk.Frame(label = xstr("gates_fleet_title"))
         fleetLabel = fleetFrame.get_label_widget()
         fleetLabel.set_use_underline(True)
         statusBox.pack_start(fleetFrame, False, False, 4)
 
-        self._fleetStore = gtk.ListStore(str, str)
-        self._fleetList = gtk.TreeView(self._fleetStore)
+        self._fleetStore = Gtk.ListStore(str, str)
+        self._fleetList = Gtk.TreeView(self._fleetStore)
         self._fleetList.set_tooltip_markup(xstr("gates_planes_tooltip"))
         fleetLabel.set_mnemonic_widget(self._fleetList)
-        column = gtk.TreeViewColumn(xstr("gates_tailno"), gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(xstr("gates_tailno"), Gtk.CellRendererText(),
                                     text = 0)
         column.set_expand(True)
         column.set_sort_column_id(0)
         self._fleetList.append_column(column)
 
-        column = gtk.TreeViewColumn(xstr("gates_planestatus"), gtk.CellRendererText(),
+        column = Gtk.TreeViewColumn(xstr("gates_planestatus"), Gtk.CellRendererText(),
                                     markup = 1)
         column.set_expand(True)
         column.set_sort_column_id(1)
         self._fleetList.append_column(column)
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._fleetList)
         scrolledWindow.set_size_request(200, -1)
         # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
 
         self._fleetAlignment =  alignment = \
-                               gtk.Alignment(xalign = 0.5, yalign = 0.0,
+                               Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                              xscale = 0.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
         alignment.add(scrolledWindow)
         fleetFrame.add(alignment)        
         
-        self._gatesFrame = gatesFrame = gtk.Frame(label = xstr("gates_gates_title"))
+        self._gatesFrame = gatesFrame = Gtk.Frame(label = xstr("gates_gates_title"))
         statusBox.pack_start(gatesFrame, True, True, 4)        
 
-        self._gatesTable = table = gtk.Table(lhbpGates.numRows,
+        self._gatesTable = table = Gtk.Table(lhbpGates.numRows,
                                              lhbpGates.numColumns)
         table.set_tooltip_markup(xstr("gates_gates_tooltip"))
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
@@ -96,7 +96,7 @@ class FleetGateStatus(gtk.VBox):
             if type==Gates.DISPLAY_GATE:
                 gate = data
 
-                label = gtk.Label()
+                label = Gtk.Label()
                 label.set_markup("<b>" + gate.number + "</b>")
                 table.attach(label, column, column + 1, row, row + 1)
 
@@ -108,12 +108,12 @@ class FleetGateStatus(gtk.VBox):
                 row = 0
                 column += 1
 
-        button = gtk.Button(xstr("gates_refresh"))
+        button = Gtk.Button(xstr("gates_refresh"))
         button.set_use_underline(True)
         button.set_tooltip_text(xstr("gates_refresh_tooltip"))
         button.connect("clicked", self._refreshClicked)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(button)
         mainBox.pack_start(alignment, False, False, 4)
@@ -161,7 +161,7 @@ class FleetGateStatus(gtk.VBox):
 
                 self._fleetStore.append([tailNumber, status])
             # FIXME: this should be a constant in common.py
-            self._fleetStore.set_sort_column_id(0, gtk.SortType.ASCENDING)
+            self._fleetStore.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
             occupiedGateNumbers = fleet.getOccupiedGateNumbers()
             for gate in lhbpGates.gates:

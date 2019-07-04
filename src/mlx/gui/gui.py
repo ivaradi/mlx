@@ -107,7 +107,7 @@ class GUI(fs.ConnectionListener):
     def build(self, iconDirectory):
         """Build the GUI."""
 
-        self._mainWindow = window = gtk.Window()
+        self._mainWindow = window = Gtk.Window()
         if os.name!="nt":
             window.set_visual(window.get_screen().lookup_visual(0x21))
         window.set_title(WINDOW_TITLE_BASE)
@@ -117,11 +117,11 @@ class GUI(fs.ConnectionListener):
         window.connect("window-state-event", self._handleMainWindowState)
         if os.name=="nt":
             window.connect("leave-notify-event", self._handleLeaveNotify)
-        accelGroup = gtk.AccelGroup()
+        accelGroup = Gtk.AccelGroup()
         window.add_accel_group(accelGroup)
         window.realize()
 
-        mainVBox = gtk.VBox()
+        mainVBox = Gtk.VBox()
         window.add(mainVBox)
 
         self._preferences = Preferences(self)
@@ -136,50 +136,50 @@ class GUI(fs.ConnectionListener):
         menuBar = self._buildMenuBar(accelGroup)
         mainVBox.pack_start(menuBar, False, False, 0)
 
-        self._notebook = gtk.Notebook()
+        self._notebook = Gtk.Notebook()
         mainVBox.pack_start(self._notebook, True, True, 4)
 
         self._wizard = Wizard(self)
-        label = gtk.Label(xstr("tab_flight"))
+        label = Gtk.Label(xstr("tab_flight"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_flight_tooltip"))
         self._notebook.append_page(self._wizard, label)
 
         self._flightInfo = FlightInfo(self)
-        label = gtk.Label(xstr("tab_flight_info"))
+        label = Gtk.Label(xstr("tab_flight_info"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_flight_info_tooltip"))
         self._notebook.append_page(self._flightInfo, label)
         self._flightInfo.disable()
 
         self._weightHelp = WeightHelp(self)
-        label = gtk.Label(xstr("tab_weight_help"))
+        label = Gtk.Label(xstr("tab_weight_help"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_weight_help_tooltip"))
         self._notebook.append_page(self._weightHelp, label)
 
         (logWidget, self._logView)  = self._buildLogWidget()
         addFaultTag(self._logView.get_buffer())
-        label = gtk.Label(xstr("tab_log"))
+        label = Gtk.Label(xstr("tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_log_tooltip"))
         self._notebook.append_page(logWidget, label)
 
         self._fleetGateStatus = FleetGateStatus(self)
-        label = gtk.Label(xstr("tab_gates"))
+        label = Gtk.Label(xstr("tab_gates"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_gates_tooltip"))
         self._notebook.append_page(self._fleetGateStatus, label)
 
         self._acars = ACARS(self)
-        label = gtk.Label("ACARS")
+        label = Gtk.Label("ACARS")
         label.set_use_underline(True)
         self._notebook.append_page(self._acars, label)
 
         (self._debugLogWidget, self._debugLogView) = self._buildLogWidget()
         self._debugLogWidget.show_all()
 
-        mainVBox.pack_start(gtk.HSeparator(), False, False, 0)
+        mainVBox.pack_start(Gtk.HSeparator(), False, False, 0)
 
         self._statusbar = Statusbar(iconDirectory)
         mainVBox.pack_start(self._statusbar, False, False, 0)
@@ -446,7 +446,7 @@ class GUI(fs.ConnectionListener):
     def backgroundColour(self):
         """Get the background colour of the main window."""
         return self._mainWindow.get_style_context().\
-            get_background_color(gtk.StateFlags.NORMAL)
+            get_background_color(Gtk.StateFlags.NORMAL)
 
     def run(self):
         """Run the GUI."""
@@ -460,7 +460,7 @@ class GUI(fs.ConnectionListener):
             self.updateDone()
 
         singleton.raiseCallback = self.raiseCallback
-        gtk.main()
+        Gtk.main()
         singleton.raiseCallback = None
 
         cef.finalize()
@@ -500,7 +500,7 @@ class GUI(fs.ConnectionListener):
         self.endBusy()
         self._statusbar.updateConnection(self._connecting, self._connected)
 
-        dialog = gtk.MessageDialog(parent = self._mainWindow,
+        dialog = Gtk.MessageDialog(parent = self._mainWindow,
                                    type = MESSAGETYPE_ERROR,
                                    message_format = xstr("conn_failed"))
 
@@ -532,7 +532,7 @@ class GUI(fs.ConnectionListener):
         """Called when we have disconnected from the simulator unexpectedly."""
         self._statusbar.updateConnection(self._connecting, self._connected)
 
-        dialog = gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+        dialog = Gtk.MessageDialog(type = MESSAGETYPE_ERROR,
                                    message_format = xstr("conn_broken"),
                                    parent = self._mainWindow)
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -590,7 +590,7 @@ class GUI(fs.ConnectionListener):
 
     def cancelFlight(self):
         """Cancel the current file, if the user confirms it."""
-        dialog = gtk.MessageDialog(parent = self._mainWindow,
+        dialog = Gtk.MessageDialog(parent = self._mainWindow,
                                    type = MESSAGETYPE_QUESTION,
                                    message_format = xstr("cancelFlight_question"))
 
@@ -929,7 +929,7 @@ class GUI(fs.ConnectionListener):
         else:
             self._fleet = None
 
-            dialog = gtk.MessageDialog(parent = self.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("fleet_failed"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -974,7 +974,7 @@ class GUI(fs.ConnectionListener):
                                             self._updatePlaneGateNumber)
                     self._fleetGateStatus.handleFleet(self._fleet)
         else:
-            dialog = gtk.MessageDialog(parent = self.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("fleet_update_failed"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
@@ -1064,14 +1064,14 @@ class GUI(fs.ConnectionListener):
 
     def _buildMenuBar(self, accelGroup):
         """Build the main menu bar."""
-        menuBar = gtk.MenuBar()
+        menuBar = Gtk.MenuBar()
 
-        fileMenuItem = gtk.MenuItem(xstr("menu_file"))
-        fileMenu = gtk.Menu()
+        fileMenuItem = Gtk.MenuItem(xstr("menu_file"))
+        fileMenu = Gtk.Menu()
         fileMenuItem.set_submenu(fileMenu)
         menuBar.append(fileMenuItem)
 
-        loadPIREPMenuItem = gtk.ImageMenuItem(gtk.STOCK_OPEN)
+        loadPIREPMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_OPEN)
         loadPIREPMenuItem.set_use_stock(True)
         loadPIREPMenuItem.set_label(xstr("menu_file_loadPIREP"))
         loadPIREPMenuItem.add_accelerator("activate", accelGroup,
@@ -1080,9 +1080,9 @@ class GUI(fs.ConnectionListener):
         loadPIREPMenuItem.connect("activate", self._loadPIREP)
         fileMenu.append(loadPIREPMenuItem)
 
-        fileMenu.append(gtk.SeparatorMenuItem())
+        fileMenu.append(Gtk.SeparatorMenuItem())
 
-        quitMenuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+        quitMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_QUIT)
         quitMenuItem.set_use_stock(True)
         quitMenuItem.set_label(xstr("menu_file_quit"))
         quitMenuItem.add_accelerator("activate", accelGroup,
@@ -1091,13 +1091,13 @@ class GUI(fs.ConnectionListener):
         quitMenuItem.connect("activate", self._quit)
         fileMenu.append(quitMenuItem)
 
-        toolsMenuItem = gtk.MenuItem(xstr("menu_tools"))
-        toolsMenu = gtk.Menu()
+        toolsMenuItem = Gtk.MenuItem(xstr("menu_tools"))
+        toolsMenu = Gtk.Menu()
         toolsMenuItem.set_submenu(toolsMenu)
         menuBar.append(toolsMenuItem)
 
         self._timetableMenuItem = timetableMenuItem = \
-          gtk.ImageMenuItem(gtk.STOCK_INDENT)
+          Gtk.ImageMenuItem(Gtk.STOCK_INDENT)
         timetableMenuItem.set_use_stock(True)
         timetableMenuItem.set_label(xstr("menu_tools_timetable"))
         timetableMenuItem.add_accelerator("activate", accelGroup,
@@ -1108,7 +1108,7 @@ class GUI(fs.ConnectionListener):
         toolsMenu.append(timetableMenuItem)
 
         self._flightsMenuItem = flightsMenuItem = \
-          gtk.ImageMenuItem(gtk.STOCK_SPELL_CHECK)
+          Gtk.ImageMenuItem(Gtk.STOCK_SPELL_CHECK)
         flightsMenuItem.set_use_stock(True)
         flightsMenuItem.set_label(xstr("menu_tools_flights"))
         flightsMenuItem.add_accelerator("activate", accelGroup,
@@ -1118,7 +1118,7 @@ class GUI(fs.ConnectionListener):
         self._flightsMenuItem.set_sensitive(False)
         toolsMenu.append(flightsMenuItem)
 
-        checklistMenuItem = gtk.ImageMenuItem(gtk.STOCK_APPLY)
+        checklistMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_APPLY)
         checklistMenuItem.set_use_stock(True)
         checklistMenuItem.set_label(xstr("menu_tools_chklst"))
         checklistMenuItem.add_accelerator("activate", accelGroup,
@@ -1127,7 +1127,7 @@ class GUI(fs.ConnectionListener):
         checklistMenuItem.connect("activate", self._editChecklist)
         toolsMenu.append(checklistMenuItem)
 
-        approachCalloutsMenuItem = gtk.ImageMenuItem(gtk.STOCK_EDIT)
+        approachCalloutsMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_EDIT)
         approachCalloutsMenuItem.set_use_stock(True)
         approachCalloutsMenuItem.set_label(xstr("menu_tools_callouts"))
         approachCalloutsMenuItem.add_accelerator("activate", accelGroup,
@@ -1136,7 +1136,7 @@ class GUI(fs.ConnectionListener):
         approachCalloutsMenuItem.connect("activate", self._editApproachCallouts)
         toolsMenu.append(approachCalloutsMenuItem)
 
-        prefsMenuItem = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        prefsMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
         prefsMenuItem.set_use_stock(True)
         prefsMenuItem.set_label(xstr("menu_tools_prefs"))
         prefsMenuItem.add_accelerator("activate", accelGroup,
@@ -1145,9 +1145,9 @@ class GUI(fs.ConnectionListener):
         prefsMenuItem.connect("activate", self._editPreferences)
         toolsMenu.append(prefsMenuItem)
 
-        toolsMenu.append(gtk.SeparatorMenuItem())
+        toolsMenu.append(Gtk.SeparatorMenuItem())
 
-        bugReportMenuItem = gtk.ImageMenuItem(gtk.STOCK_PASTE)
+        bugReportMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PASTE)
         bugReportMenuItem.set_use_stock(True)
         bugReportMenuItem.set_label(xstr("menu_tools_bugreport"))
         bugReportMenuItem.add_accelerator("activate", accelGroup,
@@ -1156,12 +1156,12 @@ class GUI(fs.ConnectionListener):
         bugReportMenuItem.connect("activate", self._reportBug)
         toolsMenu.append(bugReportMenuItem)
 
-        viewMenuItem = gtk.MenuItem(xstr("menu_view"))
-        viewMenu = gtk.Menu()
+        viewMenuItem = Gtk.MenuItem(xstr("menu_view"))
+        viewMenu = Gtk.Menu()
         viewMenuItem.set_submenu(viewMenu)
         menuBar.append(viewMenuItem)
 
-        self._showMonitorMenuItem = gtk.CheckMenuItem()
+        self._showMonitorMenuItem = Gtk.CheckMenuItem()
         self._showMonitorMenuItem.set_label(xstr("menu_view_monitor"))
         self._showMonitorMenuItem.set_use_underline(True)
         self._showMonitorMenuItem.set_active(False)
@@ -1171,7 +1171,7 @@ class GUI(fs.ConnectionListener):
         self._showMonitorMenuItem.connect("toggled", self._toggleMonitorWindow)
         viewMenu.append(self._showMonitorMenuItem)
 
-        showDebugMenuItem = gtk.CheckMenuItem()
+        showDebugMenuItem = Gtk.CheckMenuItem()
         showDebugMenuItem.set_label(xstr("menu_view_debug"))
         showDebugMenuItem.set_use_underline(True)
         showDebugMenuItem.set_active(False)
@@ -1181,12 +1181,12 @@ class GUI(fs.ConnectionListener):
         showDebugMenuItem.connect("toggled", self._toggleDebugLog)
         viewMenu.append(showDebugMenuItem)
 
-        helpMenuItem = gtk.MenuItem(xstr("menu_help"))
-        helpMenu = gtk.Menu()
+        helpMenuItem = Gtk.MenuItem(xstr("menu_help"))
+        helpMenu = Gtk.Menu()
         helpMenuItem.set_submenu(helpMenu)
         menuBar.append(helpMenuItem)
 
-        manualMenuItem = gtk.ImageMenuItem(gtk.STOCK_HELP)
+        manualMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_HELP)
         manualMenuItem.set_use_stock(True)
         manualMenuItem.set_label(xstr("menu_help_manual"))
         manualMenuItem.add_accelerator("activate", accelGroup,
@@ -1195,9 +1195,9 @@ class GUI(fs.ConnectionListener):
         manualMenuItem.connect("activate", self._showManual)
         helpMenu.append(manualMenuItem)
 
-        helpMenu.append(gtk.SeparatorMenuItem())
+        helpMenu.append(Gtk.SeparatorMenuItem())
 
-        aboutMenuItem = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
+        aboutMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_ABOUT)
         aboutMenuItem.set_use_stock(True)
         aboutMenuItem.set_label(xstr("menu_help_about"))
         aboutMenuItem.add_accelerator("activate", accelGroup,
@@ -1211,7 +1211,7 @@ class GUI(fs.ConnectionListener):
     def _toggleDebugLog(self, menuItem):
         """Toggle the debug log."""
         if menuItem.get_active():
-            label = gtk.Label(xstr("tab_debug_log"))
+            label = Gtk.Label(xstr("tab_debug_log"))
             label.set_use_underline(True)
             label.set_tooltip_text(xstr("tab_debug_log_tooltip"))
             self._debugLogPage = self._notebook.append_page(self._debugLogWidget, label)
@@ -1221,22 +1221,22 @@ class GUI(fs.ConnectionListener):
 
     def _buildLogWidget(self):
         """Build the widget for the log."""
-        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0, yscale = 1.0)
 
         alignment.set_padding(padding_top = 8, padding_bottom = 8,
                               padding_left = 16, padding_right = 16)
 
-        logScroller = gtk.ScrolledWindow()
+        logScroller = Gtk.ScrolledWindow()
         # FIXME: these should be constants in common
-        logScroller.set_policy(gtk.PolicyType.AUTOMATIC,
-                               gtk.PolicyType.AUTOMATIC)
-        logScroller.set_shadow_type(gtk.ShadowType.IN)
-        logView = gtk.TextView()
+        logScroller.set_policy(Gtk.PolicyType.AUTOMATIC,
+                               Gtk.PolicyType.AUTOMATIC)
+        logScroller.set_shadow_type(Gtk.ShadowType.IN)
+        logView = Gtk.TextView()
         logView.set_editable(False)
         logView.set_cursor_visible(False)
         logScroller.add(logView)
 
-        logBox = gtk.VBox()
+        logBox = Gtk.VBox()
         logBox.pack_start(logScroller, True, True, 0)
         logBox.set_size_request(-1, 200)
 
@@ -1255,7 +1255,7 @@ class GUI(fs.ConnectionListener):
         if force:
             result=RESPONSETYPE_YES
         else:
-            dialog = gtk.MessageDialog(parent = self._mainWindow,
+            dialog = Gtk.MessageDialog(parent = self._mainWindow,
                                        type = MESSAGETYPE_QUESTION,
                                        message_format = xstr("quit_question"))
 
@@ -1268,7 +1268,7 @@ class GUI(fs.ConnectionListener):
 
         if result==RESPONSETYPE_YES:
             self._statusIcon.destroy()
-            return gtk.main_quit()
+            return Gtk.main_quit()
 
     def _notebookPageSwitch(self, notebook, page, page_num):
         """Called when the current page of the notebook has changed."""
@@ -1322,7 +1322,7 @@ class GUI(fs.ConnectionListener):
             self._timetableWindow.setFlightPairs(result.flightPairs)
             self._timetableWindow.show_all()
         else:
-            dialog = gtk.MessageDialog(parent = self.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("timetable_failed"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -1352,7 +1352,7 @@ class GUI(fs.ConnectionListener):
                 self._flightsWindow.addFlight(flight)
             self._flightsWindow.show_all()
         else:
-            dialog = gtk.MessageDialog(parent = self.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("acceptedflt_failed"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -1451,7 +1451,7 @@ class GUI(fs.ConnectionListener):
             secondaryMarkup = xstr("sendPIREP_failed_sec")
 
         if type is not None:
-            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = type, message_format = messageFormat)
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
             dialog.set_title(WINDOW_TITLE_BASE)
@@ -1482,7 +1482,7 @@ class GUI(fs.ConnectionListener):
 
             pirep = PIREP.load(self._lastLoadedPIREP)
             if pirep is None:
-                dialog = gtk.MessageDialog(parent = self._mainWindow,
+                dialog = Gtk.MessageDialog(parent = self._mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format = xstr("loadPIREP_failed"))
                 dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -1510,22 +1510,22 @@ class GUI(fs.ConnectionListener):
 
         If it is not created yet, it will be created."""
         if self._loadPIREPDialog is None:
-            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+            dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("loadPIREP_browser_title"),
                                            action = FILE_CHOOSER_ACTION_OPEN,
-                                           buttons = (gtk.STOCK_CANCEL,
+                                           buttons = (Gtk.STOCK_CANCEL,
                                                       RESPONSETYPE_CANCEL,
-                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
                                            parent = self._mainWindow)
             dialog.set_modal(True)
 
 
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
 
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
             dialog.add_filter(filter)
@@ -1537,23 +1537,23 @@ class GUI(fs.ConnectionListener):
     def _getSendLoadedDialog(self, pirep):
         """Get a dialog displaying the main information of the flight from the
         PIREP and providing Cancel and Send buttons."""
-        dialog = gtk.Dialog(title = WINDOW_TITLE_BASE + " - " +
+        dialog = Gtk.Dialog(title = WINDOW_TITLE_BASE + " - " +
                             xstr("loadPIREP_send_title"),
                             parent = self._mainWindow,
                             flags = DIALOG_MODAL)
 
         contentArea = dialog.get_content_area()
 
-        label = gtk.Label(xstr("loadPIREP_send_help"))
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        label = Gtk.Label(xstr("loadPIREP_send_help"))
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.set_padding(padding_top = 16, padding_bottom = 0,
                               padding_left = 48, padding_right = 48)
         alignment.add(label)
         contentArea.pack_start(alignment, False, False, 8)
 
-        table = gtk.Table(5, 2)
-        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        table = Gtk.Table(5, 2)
+        tableAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         tableAlignment.set_padding(padding_top = 0, padding_bottom = 32,
                                    padding_left = 48, padding_right = 48)
@@ -1564,73 +1564,73 @@ class GUI(fs.ConnectionListener):
 
         bookedFlight = pirep.bookedFlight
 
-        label = gtk.Label("<b>" + xstr("loadPIREP_send_flightno") + "</b>")
+        label = Gtk.Label("<b>" + xstr("loadPIREP_send_flightno") + "</b>")
         label.set_use_markup(True)
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
-        label = gtk.Label(bookedFlight.callsign)
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        label = Gtk.Label(bookedFlight.callsign)
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 0, 1)
 
-        label = gtk.Label("<b>" + xstr("loadPIREP_send_date") + "</b>")
+        label = Gtk.Label("<b>" + xstr("loadPIREP_send_date") + "</b>")
         label.set_use_markup(True)
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
-        label = gtk.Label(str(bookedFlight.departureTime.date()))
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        label = Gtk.Label(str(bookedFlight.departureTime.date()))
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 1, 2)
 
-        label = gtk.Label("<b>" + xstr("loadPIREP_send_from") + "</b>")
+        label = Gtk.Label("<b>" + xstr("loadPIREP_send_from") + "</b>")
         label.set_use_markup(True)
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 2, 3)
 
-        label = gtk.Label(bookedFlight.departureICAO)
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        label = Gtk.Label(bookedFlight.departureICAO)
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 2, 3)
 
-        label = gtk.Label("<b>" + xstr("loadPIREP_send_to") + "</b>")
+        label = Gtk.Label("<b>" + xstr("loadPIREP_send_to") + "</b>")
         label.set_use_markup(True)
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 3, 4)
 
-        label = gtk.Label(bookedFlight.arrivalICAO)
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        label = Gtk.Label(bookedFlight.arrivalICAO)
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 3, 4)
 
-        label = gtk.Label("<b>" + xstr("loadPIREP_send_rating") + "</b>")
+        label = Gtk.Label("<b>" + xstr("loadPIREP_send_rating") + "</b>")
         label.set_use_markup(True)
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 4, 5)
 
         rating = pirep.rating
-        label = gtk.Label()
+        label = Gtk.Label()
         if rating<0:
             label.set_markup('<b><span foreground="red">NO GO</span></b>')
         else:
             label.set_text("%.1f %%" % (rating,))
 
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 4, 5)
@@ -1674,7 +1674,7 @@ class GUI(fs.ConnectionListener):
             messageFormat = xstr("sendPIREP_failed")
             secondaryMarkup = xstr("sendPIREP_failed_sec")
 
-        dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+        dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                    type = type, message_format = messageFormat)
         dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -1735,7 +1735,7 @@ class GUI(fs.ConnectionListener):
             messageFormat = xstr("sendBugReport_error")
             secondaryMarkup = xstr("sendBugReport_error_sec")
 
-        dialog = gtk.MessageDialog(parent = self._wizard.gui._bugReportDialog,
+        dialog = Gtk.MessageDialog(parent = self._wizard.gui._bugReportDialog,
                                    type = type, message_format = messageFormat)
         dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -1809,7 +1809,7 @@ class GUI(fs.ConnectionListener):
 
         If it does not exist yet, it will be created."""
         if self._aboutDialog is None:
-            dialog = gtk.AboutDialog()
+            dialog = Gtk.AboutDialog()
             dialog.set_transient_for(self._mainWindow)
             dialog.set_modal(True)
 
@@ -1913,7 +1913,7 @@ class GUI(fs.ConnectionListener):
         cef.initialize(self._cefInitialized)
 
         if not self.config.pilotID and not self.config.password:
-            dialog = gtk.MessageDialog(parent = self._mainWindow,
+            dialog = Gtk.MessageDialog(parent = self._mainWindow,
                                        type = MESSAGETYPE_QUESTION,
                                        message_format = xstr("register_ask"))
 

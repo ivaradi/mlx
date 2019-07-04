@@ -17,7 +17,7 @@ from . import cef
 
 #------------------------------------------------------------------------------
 
-class ACARS(gtk.VBox):
+class ACARS(Gtk.VBox):
     """The flight info tab."""
     # The URL of the ACARS map
     URL = MAVA_BASE_URL + "/acars2/show.html"

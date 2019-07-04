@@ -21,7 +21,7 @@ class ColumnDescriptor(object):
         self._type = type
         self._convertFn = convertFn
         self._renderer = \
-          gtk.CellRendererText() if renderer is None else renderer
+          Gtk.CellRendererText() if renderer is None else renderer
         self._extraColumnAttributes = extraColumnAttributes
         self._sortable = sortable
         self._defaultSortable = defaultSortable
@@ -46,14 +46,14 @@ class ColumnDescriptor(object):
         """Get a new column object for a tree view.
 
         @param index is the 0-based index of the column."""
-        if isinstance(self._renderer, gtk.CellRendererText):
-            column = gtk.TreeViewColumn(self._heading, self._renderer,
+        if isinstance(self._renderer, Gtk.CellRendererText):
+            column = Gtk.TreeViewColumn(self._heading, self._renderer,
                                         text = index)
-        elif isinstance(self._renderer, gtk.CellRendererToggle):
-            column = gtk.TreeViewColumn(self._heading, self._renderer,
+        elif isinstance(self._renderer, Gtk.CellRendererToggle):
+            column = Gtk.TreeViewColumn(self._heading, self._renderer,
                                         active = index)
         else:
-            column = gtk.TreeViewColumn(self._heading, self._renderer)
+            column = Gtk.TreeViewColumn(self._heading, self._renderer)
         column.set_expand(True)
         if self._sortable:
             column.set_sort_column_id(index)
@@ -82,7 +82,7 @@ class ColumnDescriptor(object):
 
 #-----------------------------------------------------------------------------
 
-class FlightList(gtk.Alignment):
+class FlightList(Gtk.Alignment):
     """Construct the flight list.
 
     This is a complete widget with a scroll window. It is alignment centered
@@ -113,15 +113,15 @@ class FlightList(gtk.Alignment):
                 defaultSortableIndex = len(types)
             columnDescriptor.appendType(types)
 
-        self._model = gtk.ListStore(*types)
+        self._model = Gtk.ListStore(*types)
         if defaultSortableIndex is not None:
             sortOrder = SORT_DESCENDING \
               if self._columnDescriptors[defaultSortableIndex-1]._defaultDescending \
               else SORT_ASCENDING
             self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
-        self._view = gtk.TreeView(self._model)
+        self._view = Gtk.TreeView(self._model)
 
-        flightIndexColumn = gtk.TreeViewColumn()
+        flightIndexColumn = Gtk.TreeViewColumn()
         flightIndexColumn.set_visible(False)
         self._view.append_column(flightIndexColumn)
 
@@ -139,14 +139,14 @@ class FlightList(gtk.Alignment):
         if multiSelection:
             selection.set_mode(SELECTION_MULTIPLE)
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._view)
         if widthRequest is not None:
             scrolledWindow.set_size_request(widthRequest, -1)
         # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
         super(FlightList, self).__init__(xalign = 0.5, yalign = 0.0,
                                          xscale = 0.0, yscale = 1.0)
@@ -234,7 +234,7 @@ GObject.signal_new("selection-changed", FlightList, GObject.SIGNAL_RUN_FIRST,
 
 #-----------------------------------------------------------------------------
 
-class PendingFlightsFrame(gtk.Frame):
+class PendingFlightsFrame(Gtk.Frame):
     """A frame for a list of pending (reported or rejected) flights.
 
     It contains the list and the buttons available."""
@@ -272,11 +272,11 @@ class PendingFlightsFrame(gtk.Frame):
         self._window = window
         self._pirepEditable = pirepEditable
 
-        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 8,
                               padding_left = 4, padding_right = 4)
 
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
 
         self._flights = []
         self._flightList = FlightList(columnDescriptors =
@@ -288,9 +288,9 @@ class PendingFlightsFrame(gtk.Frame):
 
         hbox.pack_start(self._flightList, True, True, 4)
 
-        buttonBox = gtk.VBox()
+        buttonBox = Gtk.VBox()
 
-        self._editButton = gtk.Button(xstr("pendflt_" +
+        self._editButton = Gtk.Button(xstr("pendflt_" +
                                            ("edit" if pirepEditable else
                                             "view") + "_" + which))
         self._editButton.set_sensitive(False)
@@ -298,13 +298,13 @@ class PendingFlightsFrame(gtk.Frame):
         self._editButton.connect("clicked", self._editClicked)
         buttonBox.pack_start(self._editButton, False, False, 2)
 
-        self._reflyButton = gtk.Button(xstr("pendflt_refly_" + which))
+        self._reflyButton = Gtk.Button(xstr("pendflt_refly_" + which))
         self._reflyButton.set_sensitive(False)
         self._reflyButton.set_use_underline(True)
         self._reflyButton.connect("clicked", self._reflyClicked)
         buttonBox.pack_start(self._reflyButton, False, False, 2)
 
-        self._deleteButton = gtk.Button(xstr("pendflt_delete_" + which))
+        self._deleteButton = Gtk.Button(xstr("pendflt_delete_" + which))
         self._deleteButton.set_sensitive(False)
         self._deleteButton.set_use_underline(True)
         self._deleteButton.connect("clicked", self._deleteClicked)
@@ -457,9 +457,9 @@ class PendingFlightsFrame(gtk.Frame):
 
     def _producePopupMenu(self):
         """Create the popup menu for the flights."""
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("pendflt_" +
                                 ("edit" if self._pirepEditable else "view") +
                                 "_" + self._which))
@@ -469,7 +469,7 @@ class PendingFlightsFrame(gtk.Frame):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("pendflt_refly_" + self._which))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupRefly)
@@ -477,7 +477,7 @@ class PendingFlightsFrame(gtk.Frame):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("pendflt_delete_" + self._which))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupDelete)
@@ -502,7 +502,7 @@ class PendingFlightsFrame(gtk.Frame):
 
 #-----------------------------------------------------------------------------
 
-class PendingFlightsWindow(gtk.Window):
+class PendingFlightsWindow(Gtk.Window):
     """The window to display the lists of the pending (reported or rejected)
     flights."""
     def __init__(self, wizard):
@@ -516,12 +516,12 @@ class PendingFlightsWindow(gtk.Window):
         self.set_transient_for(gui.mainWindow)
         self.set_modal(True)
 
-        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 1.0)
         mainAlignment.set_padding(padding_top = 0, padding_bottom = 12,
                                   padding_left = 8, padding_right = 8)
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
         self._reportedFrame = PendingFlightsFrame("reported", wizard, self,
                                                   True)
@@ -530,9 +530,9 @@ class PendingFlightsWindow(gtk.Window):
         self._rejectedFrame = PendingFlightsFrame("rejected", wizard, self)
         vbox.pack_start(self._rejectedFrame, True, True, 2)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        self._closeButton = gtk.Button(xstr("button_ok"))
+        self._closeButton = Gtk.Button(xstr("button_ok"))
         self._closeButton.connect("clicked", self._closeClicked)
         self._closeButton.set_use_underline(True)
         alignment.add(self._closeButton)
@@ -585,7 +585,7 @@ class PendingFlightsWindow(gtk.Window):
 
 #-----------------------------------------------------------------------------
 
-class AcceptedFlightsWindow(gtk.Window):
+class AcceptedFlightsWindow(Gtk.Window):
     """A window for a list of accepted flights."""
     def getFlightDuration(flightTimeStart, flight):
         """Get the flight duration for the given flight."""
@@ -637,13 +637,13 @@ class AcceptedFlightsWindow(gtk.Window):
         self.set_size_request(-1, 700)
         self.set_transient_for(gui.mainWindow)
 
-        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 8,
                               padding_left = 4, padding_right = 4)
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         vbox.pack_start(hbox, True, True, 4)
 
         self._flights = []
@@ -656,20 +656,20 @@ class AcceptedFlightsWindow(gtk.Window):
 
         hbox.pack_start(self._flightList, True, True, 4)
 
-        buttonBox = gtk.VBox()
+        buttonBox = Gtk.VBox()
 
-        self._refreshButton = gtk.Button(xstr("acceptedflt_refresh"))
+        self._refreshButton = Gtk.Button(xstr("acceptedflt_refresh"))
         self._refreshButton.set_sensitive(True)
         self._refreshButton.set_use_underline(True)
         self._refreshButton.connect("clicked", self._refreshClicked)
         buttonBox.pack_start(self._refreshButton, False, False, 2)
 
-        filler = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        filler = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                xscale = 1.0, yscale = 1.0)
         filler.set_size_request(-1, 4)
         buttonBox.pack_start(filler, False, False, 0)
 
-        self._viewButton = gtk.Button(xstr("acceptedflt_view"))
+        self._viewButton = Gtk.Button(xstr("acceptedflt_view"))
         self._viewButton.set_sensitive(False)
         self._viewButton.set_use_underline(True)
         self._viewButton.connect("clicked", self._viewClicked)
@@ -677,10 +677,10 @@ class AcceptedFlightsWindow(gtk.Window):
 
         hbox.pack_start(buttonBox, False, False, 4)
 
-        buttonAlignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+        buttonAlignment = Gtk.Alignment(xscale = 0.0, yscale = 0.0,
                                         xalign = 0.5, yalign = 0.5)
 
-        self._closeButton =  gtk.Button(xstr("button_ok"))
+        self._closeButton =  Gtk.Button(xstr("button_ok"))
         self._closeButton.connect("clicked", self._closeClicked)
         self._closeButton.set_use_underline(True)
 

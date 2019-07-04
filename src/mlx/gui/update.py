@@ -45,7 +45,7 @@ class Updater(threading.Thread):
         if Updater._progressWindow is not None:
             return
 
-        Updater._progressWindow = window = gtk.Window()
+        Updater._progressWindow = window = Gtk.Window()
         window.set_title(WINDOW_TITLE_BASE + " " + xstr("update_title"))
         window.set_transient_for(parentWindow)
         #win.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
@@ -54,46 +54,46 @@ class Updater(threading.Thread):
         window.set_modal(True)
         window.connect("delete-event", lambda a, b: True)
         window.set_deletable(False)
-        window.set_position(gtk.WindowPosition.CENTER_ON_PARENT)
+        window.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
 
-        mainAlignment = gtk.Alignment(xscale = 1.0)
+        mainAlignment = Gtk.Alignment(xscale = 1.0)
         mainAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                   padding_left = 16, padding_right = 16)
         window.add(mainAlignment)
 
-        mainVBox = gtk.VBox()
+        mainVBox = Gtk.VBox()
         mainAlignment.add(mainVBox)
 
-        labelAlignment = gtk.Alignment(xalign = 0.0, xscale = 0.0)
-        Updater._progressLabel = progressLabel = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign = 0.0, xscale = 0.0)
+        Updater._progressLabel = progressLabel = Gtk.Label()
         labelAlignment.add(progressLabel)
         mainVBox.pack_start(labelAlignment, True, True, 4)
         
-        Updater._progressBar = progressBar = gtk.ProgressBar()
+        Updater._progressBar = progressBar = Gtk.ProgressBar()
         mainVBox.pack_start(progressBar, True, True, 4)
 
-        buttonAlignment = gtk.Alignment(xalign = 0.5, xscale = 0.1)
-        Updater._progressOKButton = progressOKButton = gtk.Button("OK")
+        buttonAlignment = Gtk.Alignment(xalign = 0.5, xscale = 0.1)
+        Updater._progressOKButton = progressOKButton = Gtk.Button("OK")
         buttonAlignment.add(progressOKButton)        
         mainVBox.pack_start(buttonAlignment, True, True, 4)
 
         Updater._sudoDialog = sudoDialog = \
-            gtk.Dialog(WINDOW_TITLE_BASE + " " + xstr("update_title"),
+            Gtk.Dialog(WINDOW_TITLE_BASE + " " + xstr("update_title"),
                        parentWindow,
-                       gtk.DialogFlags.MODAL)
+                       Gtk.DialogFlags.MODAL)
         sudoDialog.add_button(xstr("button_cancel"), 0)
         sudoDialog.add_button(xstr("button_ok"), 1)
                        
-        infoLabelAlignment = gtk.Alignment(xalign = 0.5, xscale = 0.1)
+        infoLabelAlignment = Gtk.Alignment(xalign = 0.5, xscale = 0.1)
         infoLabelAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                        padding_left = 16, padding_right = 16)
 
-        infoLabel = gtk.Label(xstr("update_needsudo"))
-        infoLabel.set_justify(gtk.Justification.CENTER)
+        infoLabel = Gtk.Label(xstr("update_needsudo"))
+        infoLabel.set_justify(Gtk.Justification.CENTER)
         infoLabelAlignment.add(infoLabel)
         sudoDialog.vbox.pack_start(infoLabelAlignment, True, True, 4)
 
-        sudoDialog.set_position(gtk.WindowPosition.CENTER_ON_PARENT)
+        sudoDialog.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
 
     def __init__(self, gui, programDirectory, updateURL, parentWindow):
         """Construct the updater. If not created yet, the windows used by the

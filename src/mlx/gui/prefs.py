@@ -19,7 +19,7 @@ import urllib.parse
 
 #------------------------------------------------------------------------------
 
-class Hotkey(gtk.HBox):
+class Hotkey(Gtk.HBox):
     """A widget to handle a hotkey."""
 
     # Constant to denote that the status of the Ctrl modifier is changed
@@ -42,31 +42,31 @@ class Hotkey(gtk.HBox):
         - the shift check box."""
         super(Hotkey, self).__init__()
 
-        label = gtk.Label(labelText)
+        label = Gtk.Label(labelText)
         label.set_use_underline(True)
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         labelAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                    padding_left = 0, padding_right = 4)
         labelAlignment.add(label)
         self.pack_start(labelAlignment, False, False, 0)
 
-        self._ctrl = gtk.CheckButton("Ctrl")
+        self._ctrl = Gtk.CheckButton("Ctrl")
         self._ctrl.set_tooltip_text(tooltips[1])
         self._ctrl.connect("toggled", self._ctrlToggled)
         self.pack_start(self._ctrl, False, False, 4)
 
-        self._shift = gtk.CheckButton("Shift")
+        self._shift = Gtk.CheckButton("Shift")
         self._shift.set_tooltip_text(tooltips[2])
         self._shift.connect("toggled", self._shiftToggled)
         self.pack_start(self._shift, False, False, 4)
 
-        self._hotkeyModel = gtk.ListStore(str)
+        self._hotkeyModel = Gtk.ListStore(str)
         for keyCode in list(range(ord("0"), ord("9")+1)) + list(range(ord("A"), ord("Z")+1)):
             self._hotkeyModel.append([chr(keyCode)])
 
-        self._hotkey = gtk.ComboBox(model = self._hotkeyModel)
-        cell = gtk.CellRendererText()
+        self._hotkey = Gtk.ComboBox(model = self._hotkeyModel)
+        cell = Gtk.CellRendererText()
         self._hotkey.pack_start(cell, True)
         self._hotkey.add_attribute(cell, 'text', 0)
         self._hotkey.set_tooltip_text(tooltips[0])
@@ -165,7 +165,7 @@ GObject.signal_new("hotkey-changed", Hotkey, GObject.SIGNAL_RUN_FIRST,
 
 #------------------------------------------------------------------------------
 
-class Preferences(gtk.Dialog):
+class Preferences(Gtk.Dialog):
     """The preferences dialog."""
     def __init__(self, gui):
         """Construct the dialog."""
@@ -183,29 +183,29 @@ class Preferences(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        notebook = gtk.Notebook()
+        notebook = Gtk.Notebook()
         contentArea.pack_start(notebook, True, True, 4)
 
         general = self._buildGeneral()
-        label = gtk.Label(xstr("prefs_tab_general"))
+        label = Gtk.Label(xstr("prefs_tab_general"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("prefs_tab_general_tooltip"))
         notebook.append_page(general, label)
 
         messages = self._buildMessages()
-        label = gtk.Label(xstr("prefs_tab_messages"))
+        label = Gtk.Label(xstr("prefs_tab_messages"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("prefs_tab_message_tooltip"))
         notebook.append_page(messages, label)
 
         sounds = self._buildSounds()
-        label = gtk.Label(xstr("prefs_tab_sounds"))
+        label = Gtk.Label(xstr("prefs_tab_sounds"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("prefs_tab_sounds_tooltip"))
         notebook.append_page(sounds, label)
 
         advanced = self._buildAdvanced()
-        label = gtk.Label(xstr("prefs_tab_advanced"))
+        label = Gtk.Label(xstr("prefs_tab_advanced"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("prefs_tab_advanced_tooltip"))
         notebook.append_page(advanced, label)
@@ -325,31 +325,31 @@ class Preferences(gtk.Dialog):
 
     def _buildGeneral(self):
         """Build the page for the general settings."""
-        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        mainAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 0.0)
         mainAlignment.set_padding(padding_top = 0, padding_bottom = 8,
                                   padding_left = 4, padding_right = 4)
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
 
         guiBox = self._createFrame(mainBox, xstr("prefs_frame_gui"))
 
-        languageBox = gtk.HBox()
+        languageBox = Gtk.HBox()
         guiBox.pack_start(languageBox, False, False, 4)
 
-        label = gtk.Label(xstr("prefs_language"))
+        label = Gtk.Label(xstr("prefs_language"))
         label.set_use_underline(True)
 
         languageBox.pack_start(label, False, False, 4)
 
-        self._languageList = gtk.ListStore(str, str)
+        self._languageList = Gtk.ListStore(str, str)
         for language in const.languages:
             self._languageList.append([xstr("prefs_lang_" + language),
                                        language])
 
         self._languageComboBox = languageComboBox = \
-            gtk.ComboBox(model = self._languageList)
-        cell = gtk.CellRendererText()
+            Gtk.ComboBox(model = self._languageList)
+        cell = Gtk.CellRendererText()
         languageComboBox.pack_start(cell, True)
         languageComboBox.add_attribute(cell, 'text', 0)
         languageComboBox.set_tooltip_text(xstr("prefs_language_tooltip"))
@@ -361,41 +361,41 @@ class Preferences(gtk.Dialog):
         self._changingLanguage = False
         self._warnedRestartNeeded = False
 
-        self._hideMinimizedWindow = gtk.CheckButton(xstr("prefs_hideMinimizedWindow"))
+        self._hideMinimizedWindow = Gtk.CheckButton(xstr("prefs_hideMinimizedWindow"))
         self._hideMinimizedWindow.set_use_underline(True)
         self._hideMinimizedWindow.set_tooltip_text(xstr("prefs_hideMinimizedWindow_tooltip"))
         guiBox.pack_start(self._hideMinimizedWindow, False, False, 4)
 
-        self._quitOnClose = gtk.CheckButton(xstr("prefs_quitOnClose"))
+        self._quitOnClose = Gtk.CheckButton(xstr("prefs_quitOnClose"))
         self._quitOnClose.set_use_underline(True)
         self._quitOnClose.set_tooltip_text(xstr("prefs_quitOnClose_tooltip"))
         guiBox.pack_start(self._quitOnClose, False, False, 4)
 
         onlineBox = self._createFrame(mainBox, xstr("prefs_frame_online"))
 
-        self._onlineGateSystem = gtk.CheckButton(xstr("prefs_onlineGateSystem"))
+        self._onlineGateSystem = Gtk.CheckButton(xstr("prefs_onlineGateSystem"))
         self._onlineGateSystem.set_use_underline(True)
         self._onlineGateSystem.set_tooltip_text(xstr("prefs_onlineGateSystem_tooltip"))
         onlineBox.pack_start(self._onlineGateSystem, False, False, 4)
 
-        self._onlineACARS = gtk.CheckButton(xstr("prefs_onlineACARS"))
+        self._onlineACARS = Gtk.CheckButton(xstr("prefs_onlineACARS"))
         self._onlineACARS.set_use_underline(True)
         self._onlineACARS.set_tooltip_text(xstr("prefs_onlineACARS_tooltip"))
         onlineBox.pack_start(self._onlineACARS, False, False, 4)
 
         simulatorBox = self._createFrame(mainBox, xstr("prefs_frame_simulator"))
 
-        self._flareTimeFromFS = gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
+        self._flareTimeFromFS = Gtk.CheckButton(xstr("prefs_flaretimeFromFS"))
         self._flareTimeFromFS.set_use_underline(True)
         self._flareTimeFromFS.set_tooltip_text(xstr("prefs_flaretimeFromFS_tooltip"))
         simulatorBox.pack_start(self._flareTimeFromFS, False, False, 4)
 
-        self._syncFSTime = gtk.CheckButton(xstr("prefs_syncFSTime"))
+        self._syncFSTime = Gtk.CheckButton(xstr("prefs_syncFSTime"))
         self._syncFSTime.set_use_underline(True)
         self._syncFSTime.set_tooltip_text(xstr("prefs_syncFSTime_tooltip"))
         simulatorBox.pack_start(self._syncFSTime, False, False, 4)
 
-        self._usingFS2Crew = gtk.CheckButton(xstr("prefs_usingFS2Crew"))
+        self._usingFS2Crew = Gtk.CheckButton(xstr("prefs_usingFS2Crew"))
         self._usingFS2Crew.set_use_underline(True)
         self._usingFS2Crew.set_tooltip_text(xstr("prefs_usingFS2Crew_tooltip"))
         simulatorBox.pack_start(self._usingFS2Crew, False, False, 4)
@@ -412,30 +412,30 @@ class Preferences(gtk.Dialog):
                                     xstr("prefs_vsSmoothingEnabledTooltip"))
         simulatorBox.pack_start(vsSmoothingBox, False, False, 4)
 
-        self._useSimBrief = gtk.CheckButton(xstr("prefs_useSimBrief"))
+        self._useSimBrief = Gtk.CheckButton(xstr("prefs_useSimBrief"))
         self._useSimBrief.set_use_underline(True)
         self._useSimBrief.set_tooltip_text(xstr("prefs_useSimBrief_tooltip"))
         mainBox.pack_start(self._useSimBrief, False, False, 0)
 
-        pirepBox = gtk.HBox()
+        pirepBox = Gtk.HBox()
         mainBox.pack_start(pirepBox, False, False, 8)
 
-        label = gtk.Label(xstr("prefs_pirepDirectory"))
+        label = Gtk.Label(xstr("prefs_pirepDirectory"))
         label.set_use_underline(True)
         pirepBox.pack_start(label, False, False, 4)
 
-        self._pirepDirectory = gtk.Entry()
+        self._pirepDirectory = Gtk.Entry()
         self._pirepDirectory.set_tooltip_text(xstr("prefs_pirepDirectory_tooltip"))
         self._pirepDirectory.connect("changed", self._pirepDirectoryChanged)
         label.set_mnemonic_widget(self._pirepDirectory)
         pirepBox.pack_start(self._pirepDirectory, True, True, 4)
 
-        self._pirepDirectoryButton = gtk.Button(xstr("button_browse"))
+        self._pirepDirectoryButton = Gtk.Button(xstr("button_browse"))
         self._pirepDirectoryButton.connect("clicked",
                                            self._pirepDirectoryButtonClicked)
         pirepBox.pack_start(self._pirepDirectoryButton, False, False, 4)
 
-        self._pirepAutoSave = gtk.CheckButton(xstr("prefs_pirepAutoSave"))
+        self._pirepAutoSave = Gtk.CheckButton(xstr("prefs_pirepAutoSave"))
         self._pirepAutoSave.set_use_underline(True)
         self._pirepAutoSave.set_tooltip_text(xstr("prefs_pirepAutoSave_tooltip"))
         mainBox.pack_start(self._pirepAutoSave, False, False, 0)
@@ -446,14 +446,14 @@ class Preferences(gtk.Dialog):
         """Create a frame with an inner alignment and VBox.
 
         Return the vbox."""
-        frame = gtk.Frame(label = label)
+        frame = Gtk.Frame(label = label)
         mainBox.pack_start(frame, False, False, 4)
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 0.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 0,
                               padding_left = 0, padding_right = 0)
         frame.add(alignment)
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         alignment.add(vbox)
 
         return vbox
@@ -461,15 +461,15 @@ class Preferences(gtk.Dialog):
     def _createSmoothingBox(self, checkBoxLabel, checkBoxTooltip,
                             maxSeconds = 10):
         """Create a HBox that contains entry fields for smoothing some value."""
-        smoothingBox = gtk.HBox()
+        smoothingBox = Gtk.HBox()
 
-        smoothingEnabled = gtk.CheckButton(checkBoxLabel)
+        smoothingEnabled = Gtk.CheckButton(checkBoxLabel)
         smoothingEnabled.set_use_underline(True)
         smoothingEnabled.set_tooltip_text(checkBoxTooltip)
 
         smoothingBox.pack_start(smoothingEnabled, False, False, 0)
 
-        smoothingLength = gtk.SpinButton()
+        smoothingLength = Gtk.SpinButton()
         smoothingLength.set_numeric(True)
         smoothingLength.set_range(2, maxSeconds)
         smoothingLength.set_increments(1, 1)
@@ -478,7 +478,7 @@ class Preferences(gtk.Dialog):
 
         smoothingBox.pack_start(smoothingLength, False, False, 0)
 
-        smoothingBox.pack_start(gtk.Label(xstr("prefs_smoothing_seconds")),
+        smoothingBox.pack_start(Gtk.Label(xstr("prefs_smoothing_seconds")),
                                 False, False, 4)
 
         smoothingEnabled.connect("toggled", self._smoothingToggled,
@@ -510,7 +510,7 @@ class Preferences(gtk.Dialog):
     def _languageChanged(self, comboBox):
         """Called when the language has changed."""
         if not self._changingLanguage and not self._warnedRestartNeeded:
-            dialog = gtk.MessageDialog(parent = self,
+            dialog = Gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,
                                        message_format = xstr("prefs_restart"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -547,11 +547,11 @@ class Preferences(gtk.Dialog):
 
     def _pirepDirectoryButtonClicked(self, button):
         """Called when the PIREP directory button is clicked."""
-        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+        dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("prefs_pirepDirectory_browser_title"),
                                        action = FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                       buttons = (gtk.STOCK_CANCEL, RESPONSETYPE_CANCEL,
-                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                       buttons = (Gtk.STOCK_CANCEL, RESPONSETYPE_CANCEL,
+                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
                                        parent = self)
         dialog.set_modal(True)
         dialog.set_transient_for(self)
@@ -577,25 +577,25 @@ class Preferences(gtk.Dialog):
     def _buildMessages(self):
         """Build the page for the message settings."""
 
-        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        mainAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 0.0, yscale = 0.0)
         mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
                                   padding_left = 4, padding_right = 4)
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
 
-        table = gtk.Table(len(const.messageTypes) + 1, 3)
+        table = Gtk.Table(len(const.messageTypes) + 1, 3)
         table.set_row_spacings(8)
         table.set_col_spacings(32)
         table.set_homogeneous(False)
         mainBox.pack_start(table, False, False, 4)
 
-        label = gtk.Label(xstr("prefs_msgs_fs"))
+        label = Gtk.Label(xstr("prefs_msgs_fs"))
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 1, 2, 0, 1)
 
-        label = gtk.Label(xstr("prefs_msgs_sound"))
+        label = Gtk.Label(xstr("prefs_msgs_sound"))
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 2, 3, 0, 1)
@@ -605,27 +605,27 @@ class Preferences(gtk.Dialog):
         row = 1
         for messageType in const.messageTypes:
             messageTypeStr = const.messageType2string(messageType)
-            label = gtk.Label(xstr("prefs_msgs_type_" + messageTypeStr))
+            label = Gtk.Label(xstr("prefs_msgs_type_" + messageTypeStr))
             label.set_justify(JUSTIFY_CENTER)
             label.set_use_underline(True)
             label.set_alignment(0.5, 0.5)
             table.attach(label, 0, 1, row, row+1)
 
-            fsCheckButton = gtk.CheckButton()
-            alignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+            fsCheckButton = Gtk.CheckButton()
+            alignment = Gtk.Alignment(xscale = 0.0, yscale = 0.0,
                                       xalign = 0.5, yalign = 0.5)
             alignment.add(fsCheckButton)
             table.attach(alignment, 1, 2, row, row+1)
             self._msgFSCheckButtons[messageType] = fsCheckButton
 
-            soundCheckButton = gtk.CheckButton()
-            alignment = gtk.Alignment(xscale = 0.0, yscale = 0.0,
+            soundCheckButton = Gtk.CheckButton()
+            alignment = Gtk.Alignment(xscale = 0.0, yscale = 0.0,
                                       xalign = 0.5, yalign = 0.5)
             alignment.add(soundCheckButton)
             table.attach(alignment, 2, 3, row, row+1)
             self._msgSoundCheckButtons[messageType] = soundCheckButton
 
-            mnemonicWidget = gtk.Label("")
+            mnemonicWidget = Gtk.Label("")
             table.attach(mnemonicWidget, 3, 4, row, row+1)
             label.set_mnemonic_widget(mnemonicWidget)
             mnemonicWidget.connect("mnemonic-activate",
@@ -654,36 +654,36 @@ class Preferences(gtk.Dialog):
 
     def _buildSounds(self):
         """Build the page for the sounds."""
-        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        mainAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 1.0)
         mainAlignment.set_padding(padding_top = 8, padding_bottom = 8,
                                   padding_left = 4, padding_right = 4)
 
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
 
-        backgroundFrame = gtk.Frame(label = xstr("prefs_sounds_frame_bg"))
+        backgroundFrame = Gtk.Frame(label = xstr("prefs_sounds_frame_bg"))
         mainBox.pack_start(backgroundFrame, False, False, 4)
 
-        backgroundAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        backgroundAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                             xscale = 1.0, yscale = 0.0)
         backgroundAlignment.set_padding(padding_top = 4, padding_bottom = 4,
                                         padding_left = 4, padding_right = 4)
         backgroundFrame.add(backgroundAlignment)
 
-        backgroundBox = gtk.VBox()
+        backgroundBox = Gtk.VBox()
         backgroundAlignment.add(backgroundBox)
 
-        self._enableSounds = gtk.CheckButton(xstr("prefs_sounds_enable"))
+        self._enableSounds = Gtk.CheckButton(xstr("prefs_sounds_enable"))
         self._enableSounds.set_use_underline(True)
         self._enableSounds.set_tooltip_text(xstr("prefs_sounds_enable_tooltip"))
         self._enableSounds.connect("toggled", self._enableSoundsToggled)
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 1.0, yscale = 0.0)
         alignment.add(self._enableSounds)
         backgroundBox.pack_start(alignment, False, False, 4)
 
-        self._pilotControlsSounds = gtk.CheckButton(xstr("prefs_sounds_pilotControls"))
+        self._pilotControlsSounds = Gtk.CheckButton(xstr("prefs_sounds_pilotControls"))
         self._pilotControlsSounds.set_use_underline(True)
         self._pilotControlsSounds.set_tooltip_text(xstr("prefs_sounds_pilotControls_tooltip"))
         self._pilotControlsSounds.connect("toggled", self._pilotControlsSoundsToggled)
@@ -696,29 +696,29 @@ class Preferences(gtk.Dialog):
 
         backgroundBox.pack_start(self._pilotHotkey, False, False, 4)
 
-        self._enableApproachCallouts = gtk.CheckButton(xstr("prefs_sounds_approachCallouts"))
+        self._enableApproachCallouts = Gtk.CheckButton(xstr("prefs_sounds_approachCallouts"))
         self._enableApproachCallouts.set_use_underline(True)
         self._enableApproachCallouts.set_tooltip_text(xstr("prefs_sounds_approachCallouts_tooltip"))
         backgroundBox.pack_start(self._enableApproachCallouts, False, False, 4)
 
-        self._speedbrakeAtTD = gtk.CheckButton(xstr("prefs_sounds_speedbrakeAtTD"))
+        self._speedbrakeAtTD = Gtk.CheckButton(xstr("prefs_sounds_speedbrakeAtTD"))
         self._speedbrakeAtTD.set_use_underline(True)
         self._speedbrakeAtTD.set_tooltip_text(xstr("prefs_sounds_speedbrakeAtTD_tooltip"))
         backgroundBox.pack_start(self._speedbrakeAtTD, False, False, 4)
 
-        checklistFrame = gtk.Frame(label = xstr("prefs_sounds_frame_checklists"))
+        checklistFrame = Gtk.Frame(label = xstr("prefs_sounds_frame_checklists"))
         mainBox.pack_start(checklistFrame, False, False, 4)
 
-        checklistAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        checklistAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                            xscale = 1.0, yscale = 0.0)
         checklistAlignment.set_padding(padding_top = 4, padding_bottom = 4,
                                        padding_left = 4, padding_right = 4)
         checklistFrame.add(checklistAlignment)
 
-        checklistBox = gtk.VBox()
+        checklistBox = Gtk.VBox()
         checklistAlignment.add(checklistBox)
 
-        self._enableChecklists = gtk.CheckButton(xstr("prefs_sounds_enableChecklists"))
+        self._enableChecklists = Gtk.CheckButton(xstr("prefs_sounds_enableChecklists"))
         self._enableChecklists.set_use_underline(True)
         self._enableChecklists.set_tooltip_text(xstr("prefs_sounds_enableChecklists_tooltip"))
         self._enableChecklists.connect("toggled", self._enableChecklistsToggled)
@@ -788,14 +788,14 @@ class Preferences(gtk.Dialog):
     def _buildAdvanced(self):
         """Build the page for the advanced settings."""
 
-        mainAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        mainAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 0.0)
         mainAlignment.set_padding(padding_top = 16, padding_bottom = 8,
                                   padding_left = 4, padding_right = 4)
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
 
-        self._autoUpdate = gtk.CheckButton(xstr("prefs_update_auto"))
+        self._autoUpdate = Gtk.CheckButton(xstr("prefs_update_auto"))
         mainBox.pack_start(self._autoUpdate, False, False, 4)
 
         self._autoUpdate.set_use_underline(True)
@@ -803,20 +803,20 @@ class Preferences(gtk.Dialog):
         self._autoUpdate.set_tooltip_text(xstr("prefs_update_auto_tooltip"))
         self._warnedAutoUpdate = False
 
-        updateURLBox = gtk.HBox()
+        updateURLBox = Gtk.HBox()
         mainBox.pack_start(updateURLBox, False, False, 4)
-        label = gtk.Label(xstr("prefs_update_url"))
+        label = Gtk.Label(xstr("prefs_update_url"))
         label.set_use_underline(True)
         updateURLBox.pack_start(label, False, False, 4)
 
-        self._updateURL = gtk.Entry()
+        self._updateURL = Gtk.Entry()
         label.set_mnemonic_widget(self._updateURL)
         self._updateURL.set_width_chars(40)
         self._updateURL.set_tooltip_text(xstr("prefs_update_url_tooltip"))
         self._updateURL.connect("changed", self._updateURLChanged)
         updateURLBox.pack_start(self._updateURL, True, True, 4)
 
-        self._useRPC = gtk.CheckButton(xstr("prefs_use_rpc"))
+        self._useRPC = Gtk.CheckButton(xstr("prefs_use_rpc"))
         mainBox.pack_start(self._useRPC, False, False, 16)
 
         self._useRPC.set_use_underline(True)
@@ -840,7 +840,7 @@ class Preferences(gtk.Dialog):
         """Called when the auto update check button is toggled."""
         if not self._settingFromConfig and not self._warnedAutoUpdate and \
            not self._autoUpdate.get_active():
-            dialog = gtk.MessageDialog(parent = self,
+            dialog = Gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,
                                        message_format = xstr("prefs_update_auto_warning"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)

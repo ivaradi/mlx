@@ -56,13 +56,13 @@ import webbrowser
 
 #-----------------------------------------------------------------------------
 
-comboModel = gtk.ListStore(GObject.TYPE_STRING)
+comboModel = Gtk.ListStore(GObject.TYPE_STRING)
 comboModel.append(("N/A",))
 comboModel.append(("VECTORS",))
 
 #-----------------------------------------------------------------------------
 
-class Page(gtk.Alignment):
+class Page(Gtk.Alignment):
     """A page in the flight wizard."""
     def __init__(self, wizard, id, title, help, completedHelp = None):
         """Construct the page."""
@@ -71,18 +71,18 @@ class Page(gtk.Alignment):
         self.set_padding(padding_top = 4, padding_bottom = 4,
                          padding_left = 12, padding_right = 12)
 
-        frame = gtk.Frame()
+        frame = Gtk.Frame()
         self.add(frame)
 
-        self._vbox = gtk.VBox()
+        self._vbox = Gtk.VBox()
         self._vbox.set_homogeneous(False)
         frame.add(self._vbox)
 
-        eventBox = gtk.EventBox()
+        eventBox = Gtk.EventBox()
 
-        alignment = gtk.Alignment(xalign = 0.0, xscale = 0.0)
+        alignment = Gtk.Alignment(xalign = 0.0, xscale = 0.0)
 
-        titleLabel = gtk.Label(title)
+        titleLabel = Gtk.Label(title)
         titleLabel.modify_font(pango.FontDescription("bold 24"))
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 6, padding_right = 0)
@@ -95,16 +95,16 @@ class Page(gtk.Alignment):
         self._titleEventBox = eventBox
         self._titleLabel = titleLabel
 
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 16, padding_bottom = 16,
                               padding_left = 16, padding_right = 16)
         alignment.add(mainBox)
         self._vbox.pack_start(alignment, True, True, 0)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 16,
                               padding_left = 0, padding_right = 0)
@@ -118,22 +118,22 @@ class Page(gtk.Alignment):
         else:
             longerHelp = completedHelp
 
-        self._helpLabel = gtk.Label(longerHelp)
+        self._helpLabel = Gtk.Label(longerHelp)
         # FIXME: should be a constant in common
-        self._helpLabel.set_justify(gtk.Justification.CENTER)
+        self._helpLabel.set_justify(Gtk.Justification.CENTER)
         self._helpLabel.set_use_markup(True)
         alignment.add(self._helpLabel)
         mainBox.pack_start(alignment, False, False, 0)
 
-        self._mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        self._mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                             xscale = 1.0, yscale = 1.0)
         mainBox.pack_start(self._mainAlignment, True, True, 0)
 
-        buttonAlignment =  gtk.Alignment(xalign = 1.0, xscale=0.0, yscale = 0.0)
+        buttonAlignment =  Gtk.Alignment(xalign = 1.0, xscale=0.0, yscale = 0.0)
         buttonAlignment.set_padding(padding_top = 4, padding_bottom = 10,
                                     padding_left = 16, padding_right = 16)
 
-        self._buttonBox = gtk.HBox()
+        self._buttonBox = Gtk.HBox()
         self._buttonBox.set_homogeneous(False)
         self._defaultButton = None
         buttonAlignment.add(self._buttonBox)
@@ -174,7 +174,7 @@ class Page(gtk.Alignment):
         """Add a button with the given label.
 
         Return the button object created."""
-        button = gtk.Button(label)
+        button = Gtk.Button(label)
         self._buttonBox.pack_start(button, False, False, padding)
         button.set_use_underline(True)
         if default:
@@ -219,9 +219,9 @@ class Page(gtk.Alignment):
     def setStyle(self):
         """Set the styles of some of the items on the page."""
         context = self.get_style_context()
-        color = context.get_background_color(gtk.StateFlags.SELECTED)
+        color = context.get_background_color(Gtk.StateFlags.SELECTED)
         self._titleEventBox.modify_bg(0, color.to_color())
-        color = context.get_color(gtk.StateFlags.SELECTED)
+        color = context.get_color(Gtk.StateFlags.SELECTED)
         self._titleLabel.modify_fg(0, color.to_color())
 
     def initialize(self):
@@ -298,43 +298,43 @@ class LoginPage(Page):
         super(LoginPage, self).__init__(wizard, "login",
                                         xstr("login"), xstr("loginHelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(32)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("label_pilotID"))
+        label = Gtk.Label(xstr("label_pilotID"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
-        self._pilotID = gtk.Entry()
+        self._pilotID = Gtk.Entry()
         self._pilotID.connect("changed", self._pilotIDChanged)
         self._pilotID.set_tooltip_text(xstr("login_pilotID_tooltip"))
         table.attach(self._pilotID, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._pilotID)
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("label_password"))
+        label = Gtk.Label(xstr("label_password"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
-        self._password = gtk.Entry()
+        self._password = Gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed", self._setControls)
         self._password.set_tooltip_text(xstr("login_password_tooltip"))
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
-        self._rememberButton = gtk.CheckButton(xstr("remember_password"))
+        self._rememberButton = Gtk.CheckButton(xstr("remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
@@ -439,12 +439,12 @@ class FlightSelectionPage(Page):
                                                   xstr("flightsel_title"),
                                                   help, completedHelp = completedHelp)
 
-        mainBox = gtk.HBox()
+        mainBox = Gtk.HBox()
         mainBox.set_homogeneous(False)
 
-        leftVBox = gtk.VBox()
+        leftVBox = Gtk.VBox()
 
-        alignment = gtk.Alignment(xscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0)
         alignment.set_size_request(100, 0)
 
         leftVBox.pack_start(alignment, False, False, 0)
@@ -459,21 +459,21 @@ class FlightSelectionPage(Page):
 
         mainBox.pack_start(self._flightList, False, False, 8)
 
-        flightButtonBox = gtk.VBox()
+        flightButtonBox = Gtk.VBox()
 
-        alignment = gtk.Alignment(xscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0)
         alignment.set_size_request(100, 0)
         flightButtonBox.pack_start(alignment, False, False, 0)
 
-        flightButtonWidthAlignment = gtk.Alignment(xscale=1.0, yscale=0.0,
+        flightButtonWidthAlignment = Gtk.Alignment(xscale=1.0, yscale=0.0,
                                                    xalign=0.0, yalign=0.0)
         flightButtonWidthAlignment.set_padding(padding_top = 0,
                                                padding_bottom = 0,
                                                padding_left = 8,
                                                padding_right = 0)
-        flightButtonWidthBox = gtk.VBox()
+        flightButtonWidthBox = Gtk.VBox()
 
-        self._saveButton = gtk.Button(xstr("flightsel_save"))
+        self._saveButton = Gtk.Button(xstr("flightsel_save"))
         self._saveButton.set_use_underline(True)
         self._saveButton.set_sensitive(False)
         self._saveButton.set_tooltip_text(xstr("flightsel_save_tooltip"))
@@ -481,7 +481,7 @@ class FlightSelectionPage(Page):
 
         flightButtonWidthBox.pack_start(self._saveButton, True, True, 4)
 
-        self._printButton = gtk.Button(xstr("flightsel_print"))
+        self._printButton = Gtk.Button(xstr("flightsel_print"))
         self._printButton.set_use_underline(True)
         self._printButton.set_sensitive(False)
         self._printButton.set_tooltip_text(xstr("flightsel_print_tooltip"))
@@ -489,7 +489,7 @@ class FlightSelectionPage(Page):
 
         flightButtonWidthBox.pack_start(self._printButton, True, True, 4)
 
-        self._deleteButton = gtk.Button(xstr("flightsel_delete"))
+        self._deleteButton = Gtk.Button(xstr("flightsel_delete"))
         self._deleteButton.set_use_underline(True)
         self._deleteButton.set_sensitive(False)
         self._deleteButton.set_tooltip_text(xstr("flightsel_delete_tooltip"))
@@ -648,7 +648,7 @@ class FlightSelectionPage(Page):
                     flight.writeIntoFile(f)
             except Exception as e:
                 print("Failed to save flight:", util.utf2unicode(str(e)))
-                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
                                            xstr("flightsel_save_failed"))
@@ -668,7 +668,7 @@ class FlightSelectionPage(Page):
         wizard = self._wizard
         flight = self._getSelectedFlight()
 
-        printOperation = gtk.PrintOperation()
+        printOperation = Gtk.PrintOperation()
         if self._printSettings is not None:
             printOperation.set_print_settings(self._printSettings)
 
@@ -683,12 +683,12 @@ class FlightSelectionPage(Page):
         printOperation.set_export_filename(name)
         printOperation.set_use_full_page(False)
 
-        result = printOperation.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG,
+        result = printOperation.run(Gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG,
                                     wizard.gui.mainWindow)
 
-        if result == gtk.PRINT_OPERATION_RESULT_APPLY:
+        if result == Gtk.PRINT_OPERATION_RESULT_APPLY:
             self._printSettings = printOperation.get_print_settings()
-        elif result == gtk.PRINT_OPERATION_RESULT_ERROR:
+        elif result == Gtk.PRINT_OPERATION_RESULT_ERROR:
             errorDialog(xstr("flightsel_print_failed",
                              wizard.gui.mainWindow,
                              secondary = printOperation.get_error()))
@@ -941,7 +941,7 @@ class FlightSelectionPage(Page):
                 self.addFlight(bookedFlight)
             except Exception as e:
                 print("Failed to load flight:", util.utf2unicode(str(e)))
-                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
                                            xstr("flightsel_load_failed"))
@@ -1023,22 +1023,22 @@ class FlightSelectionPage(Page):
             return self._saveDialog
 
         gui = self._wizard.gui
-        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+        dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_save_title"),
                                        action = FILE_CHOOSER_ACTION_SAVE,
-                                       buttons = (gtk.STOCK_CANCEL,
+                                       buttons = (Gtk.STOCK_CANCEL,
                                                   RESPONSETYPE_CANCEL,
-                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
                                        parent = gui.mainWindow)
         dialog.set_modal(True)
         dialog.set_do_overwrite_confirmation(True)
 
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("flightsel_filter_flights"))
         filter.add_pattern("*.vaflight")
         dialog.add_filter(filter)
 
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         dialog.add_filter(filter)
@@ -1053,21 +1053,21 @@ class FlightSelectionPage(Page):
             return self._loadDialog
 
         gui = self._wizard.gui
-        dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+        dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_load_title"),
                                        action = FILE_CHOOSER_ACTION_OPEN,
-                                       buttons = (gtk.STOCK_CANCEL,
+                                       buttons = (Gtk.STOCK_CANCEL,
                                                   RESPONSETYPE_CANCEL,
-                                                  gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
                                        parent = gui.mainWindow)
         dialog.set_modal(True)
 
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("flightsel_filter_flights"))
         filter.add_pattern("*.vaflight")
         dialog.add_filter(filter)
 
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         dialog.add_filter(filter)
@@ -1078,9 +1078,9 @@ class FlightSelectionPage(Page):
 
     def _createListPopupMenu(self):
         """Get the flight list popup menu."""
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("flightsel_popup_select"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupSelect)
@@ -1088,7 +1088,7 @@ class FlightSelectionPage(Page):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("flightsel_popup_save"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupSave)
@@ -1096,7 +1096,7 @@ class FlightSelectionPage(Page):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("flightsel_popup_print"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupPrint)
@@ -1104,7 +1104,7 @@ class FlightSelectionPage(Page):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("flightsel_popup_delete"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupDelete)
@@ -1145,9 +1145,9 @@ class GateSelectionPage(Page):
                                                 xstr("gatesel_title"),
                                                 xstr("gatesel_help"))
 
-        self._listStore = gtk.ListStore(str)
-        self._gateList = gtk.TreeView(self._listStore)
-        column = gtk.TreeViewColumn(None, gtk.CellRendererText(),
+        self._listStore = Gtk.ListStore(str)
+        self._gateList = Gtk.TreeView(self._listStore)
+        column = Gtk.TreeViewColumn(None, Gtk.CellRendererText(),
                                     text = 0)
         column.set_expand(True)
         self._gateList.append_column(column)
@@ -1157,14 +1157,14 @@ class GateSelectionPage(Page):
         gateSelection = self._gateList.get_selection()
         gateSelection.connect("changed", self._selectionChanged)
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._gateList)
         scrolledWindow.set_size_request(50, -1)
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
         alignment.add(scrolledWindow)
 
         self.setMainWidget(alignment)
@@ -1226,7 +1226,7 @@ class GateSelectionPage(Page):
         if success is None or success:
             self._wizard.jumpPage("connect")
         else:
-            dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("gatesel_conflict"))
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -1264,10 +1264,10 @@ class RegisterPage(Page):
                                            xstr("register_title"),
                                            xstr("register_help"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(12, 4)
+        table = Gtk.Table(12, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(24)
         alignment.add(table)
@@ -1275,28 +1275,28 @@ class RegisterPage(Page):
 
         row = 0
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_name1"))
+        label = Gtk.Label(xstr("register_name1"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._name1 = gtk.Entry()
+        self._name1 = Gtk.Entry()
         self._name1.connect("changed", self._updateButtons)
         self._name1.set_tooltip_text(xstr("register_name1_tooltip"))
         self._name1.set_width_chars(15)
         table.attach(self._name1, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._name1)
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_name2"))
+        label = Gtk.Label(xstr("register_name2"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 2, 3, row, row+1)
 
-        self._name2 = gtk.Entry()
+        self._name2 = Gtk.Entry()
         self._name2.connect("changed", self._updateButtons)
         self._name2.set_tooltip_text(xstr("register_name2_tooltip"))
         self._name2.set_width_chars(15)
@@ -1305,17 +1305,17 @@ class RegisterPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_year_of_birth"))
+        label = Gtk.Label(xstr("register_year_of_birth"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
 
-        self._yearOfBirth = gtk.SpinButton()
+        self._yearOfBirth = Gtk.SpinButton()
         self._yearOfBirth.set_increments(step = 1, page = 10)
         self._yearOfBirth.set_range(min = RegisterPage._minYearOfBirth,
                                     max = RegisterPage._maxYearOfBirth)
@@ -1330,34 +1330,34 @@ class RegisterPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_email"))
+        label = Gtk.Label(xstr("register_email"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._emailAddress = gtk.Entry()
+        self._emailAddress = Gtk.Entry()
         self._emailAddress.connect("changed", self._updateButtons)
         self._emailAddress.set_tooltip_text(xstr("register_email_tooltip"))
         table.attach(self._emailAddress, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._emailAddress)
 
-        self._emailAddressPublic = gtk.CheckButton(xstr("register_email_public"))
+        self._emailAddressPublic = Gtk.CheckButton(xstr("register_email_public"))
         self._emailAddressPublic.set_use_underline(True)
         self._emailAddressPublic.set_tooltip_text(xstr("register_email_public_tooltip"))
         table.attach(self._emailAddressPublic, 2, 4, row, row+1)
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_vatsim_id"))
+        label = Gtk.Label(xstr("register_vatsim_id"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         self._vatsimID = IntegerEntry()
         self._vatsimID.connect("changed", self._updateButtons)
@@ -1367,14 +1367,14 @@ class RegisterPage(Page):
         table.attach(alignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._vatsimID)
 
-        labelAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_ivao_id"))
+        label = Gtk.Label(xstr("register_ivao_id"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 2, 3, row, row+1)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         self._ivaoID = IntegerEntry()
         self._ivaoID.connect("changed", self._updateButtons)
@@ -1386,36 +1386,36 @@ class RegisterPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_phone_num"))
+        label = Gtk.Label(xstr("register_phone_num"))
         label.set_use_underline(True)
         label.set_use_markup(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._phoneNumber = gtk.Entry()
+        self._phoneNumber = Gtk.Entry()
         self._phoneNumber.set_tooltip_text(xstr("register_phone_num_tooltip"))
         table.attach(self._phoneNumber, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._phoneNumber)
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_nationality"))
+        label = Gtk.Label(xstr("register_nationality"))
         label.set_use_underline(True)
         label.set_use_markup(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
 
-        self._nationality = gtk.Entry()
+        self._nationality = Gtk.Entry()
         self._nationality.set_tooltip_text(xstr("register_nationality_tooltip"))
         table.attach(self._nationality, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._nationality)
 
-        placeholder = gtk.Label()
+        placeholder = Gtk.Label()
         placeholder.set_text(xstr("register_password_mismatch"))
         placeholder.set_use_markup(True)
         placeholder.set_child_visible(False)
@@ -1424,51 +1424,51 @@ class RegisterPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_password"))
+        label = Gtk.Label(xstr("register_password"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._password = gtk.Entry()
+        self._password = Gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed", self._updateButtons)
         self._password.set_tooltip_text(xstr("register_password_tooltip"))
         table.attach(self._password, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._password)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        self._passwordStatus = gtk.Label()
+        self._passwordStatus = Gtk.Label()
         alignment.add(self._passwordStatus)
         table.attach(alignment, 2, 4, row, row+1)
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("register_password2"))
+        label = Gtk.Label(xstr("register_password2"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._password2 = gtk.Entry()
+        self._password2 = Gtk.Entry()
         self._password2.set_visibility(False)
         self._password2.connect("changed", self._updateButtons)
         self._password2.set_tooltip_text(xstr("register_password2_tooltip"))
         table.attach(self._password2, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._password2)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        self._password2Status = gtk.Label()
+        self._password2Status = Gtk.Label()
         alignment.add(self._password2Status)
         table.attach(alignment, 2, 4, row, row+1)
 
         row += 1
 
-        self._rememberButton = gtk.CheckButton(xstr("remember_password"))
+        self._rememberButton = Gtk.CheckButton(xstr("remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("login_remember_tooltip"))
         table.attach(self._rememberButton, 1, 3, row, row+1)
@@ -1680,7 +1680,7 @@ class RegisterPage(Page):
             secondaryMessage = xstr("register_error")
             messageType = MESSAGETYPE_ERROR
 
-        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+        dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                    type = messageType,
                                    message_format = message)
         dialog.set_title(WINDOW_TITLE_BASE + " - " +
@@ -1714,10 +1714,10 @@ class StudentPage(Page):
 
         self._getEntryExamStatusCancelled = False
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.5, yscale = 0.0)
 
-        table = gtk.Table(6, 4)
+        table = Gtk.Table(6, 4)
         table.set_row_spacings(4)
         table.set_col_spacings(0)
         table.set_homogeneous(False)
@@ -1726,17 +1726,17 @@ class StudentPage(Page):
 
         row = 0
 
-        labelAlignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                        xscale=0.0, yscale = 0.0)
-        label = gtk.Label(xstr("student_entry_exam_status"))
+        label = Gtk.Label(xstr("student_entry_exam_status"))
         label.set_alignment(0.0, 0.5)
         labelAlignment.add(label)
         labelAlignment.resize_children()
         table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
 
-        alignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                   xscale=1.0, yscale = 0.0)
-        self._entryExamStatus = gtk.Label()
+        self._entryExamStatus = Gtk.Label()
         self._entryExamStatus.set_use_markup(True)
         self._entryExamStatus.set_alignment(0.0, 0.5)
         alignment.add(self._entryExamStatus)
@@ -1745,8 +1745,8 @@ class StudentPage(Page):
 
         row += 1
 
-        buttonAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
-        button = self._entryExamButton = gtk.Button(xstr("student_entry_exam"))
+        buttonAlignment = Gtk.Alignment(xalign=0.0, xscale=1.0)
+        button = self._entryExamButton = Gtk.Button(xstr("student_entry_exam"))
         button.set_use_underline(True)
         button.connect("clicked", self._entryExamClicked)
         button.set_tooltip_text(xstr("student_entry_exam_tooltip"))
@@ -1757,15 +1757,15 @@ class StudentPage(Page):
 
         row += 3
 
-        labelAlignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+        labelAlignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                        xscale=0.0, yscale = 0.0)
-        label = gtk.Label(xstr("student_check_flight_status"))
+        label = Gtk.Label(xstr("student_check_flight_status"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
 
-        alignment = gtk.Alignment(xalign=0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                   xscale=1.0, yscale = 0.0)
-        self._checkFlightStatus = gtk.Label()
+        self._checkFlightStatus = Gtk.Label()
         self._checkFlightStatus.set_use_markup(True)
         self._checkFlightStatus.set_alignment(0.0, 0.5)
         alignment.add(self._checkFlightStatus)
@@ -1773,21 +1773,21 @@ class StudentPage(Page):
 
         row += 1
 
-        alignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+        alignment = Gtk.Alignment(xalign=0.0, xscale=1.0)
 
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         hbox.set_homogeneous(False)
         hbox.set_spacing(0)
 
-        aircraftTypesModel = gtk.ListStore(str, int)
+        aircraftTypesModel = Gtk.ListStore(str, int)
         for aircraftType in web.BookedFlight.checkFlightTypes:
             aircraftTypesModel.append([aircraftNames[aircraftType],
                                        aircraftType])
 
-        aircraftTypeAlignment = gtk.Alignment(xalign = 0.0, xscale = 1.0)
+        aircraftTypeAlignment = Gtk.Alignment(xalign = 0.0, xscale = 1.0)
 
-        self._aircraftType = gtk.ComboBox(model = aircraftTypesModel)
-        renderer = gtk.CellRendererText()
+        self._aircraftType = Gtk.ComboBox(model = aircraftTypesModel)
+        renderer = Gtk.CellRendererText()
         self._aircraftType.pack_start(renderer, True)
         self._aircraftType.add_attribute(renderer, "text", 0)
         self._aircraftType.set_tooltip_text(xstr("student_check_flight_type_tooltip"))
@@ -1797,8 +1797,8 @@ class StudentPage(Page):
 
         hbox.pack_start(aircraftTypeAlignment, False, False, 0)
 
-        buttonAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
-        button = self._checkFlightButton = gtk.Button(xstr("student_check_flight"))
+        buttonAlignment = Gtk.Alignment(xalign=0.0, xscale=1.0)
+        button = self._checkFlightButton = Gtk.Button(xstr("student_check_flight"))
         button.set_use_underline(True)
         button.connect("clicked", self._checkFlightClicked)
         button.set_tooltip_text(xstr("student_check_flight_tooltip"))
@@ -1893,7 +1893,7 @@ class StudentPage(Page):
 
         gui = wizard.gui
 
-        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+        dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                    type = MESSAGETYPE_INFO,
                                    message_format = xstr("student_fo"))
 
@@ -1923,93 +1923,93 @@ class ConnectPage(Page):
 
         self._selectSimulator = os.name=="nt" or "FORCE_SELECT_SIM" in os.environ
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7 if self._selectSimulator else 5, 2)
+        table = Gtk.Table(7 if self._selectSimulator else 5, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(True)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("connect_flightno"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("connect_flightno"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 0, 1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._flightNumber = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightNumber = Gtk.Label()
         self._flightNumber.set_width_chars(9)
         self._flightNumber.set_alignment(0.0, 0.5)
         labelAlignment.add(self._flightNumber)
         table.attach(labelAlignment, 1, 2, 0, 1)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("connect_acft"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("connect_acft"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 1, 2)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._aircraft = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._aircraft = Gtk.Label()
         self._aircraft.set_width_chars(25)
         self._aircraft.set_alignment(0.0, 0.5)
         labelAlignment.add(self._aircraft)
         table.attach(labelAlignment, 1, 2, 1, 2)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("connect_tailno"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("connect_tailno"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 2, 3)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._tailNumber = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._tailNumber = Gtk.Label()
         self._tailNumber.set_width_chars(10)
         self._tailNumber.set_alignment(0.0, 0.5)
         labelAlignment.add(self._tailNumber)
         table.attach(labelAlignment, 1, 2, 2, 3)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("connect_airport"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("connect_airport"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 3, 4)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._departureICAO = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._departureICAO = Gtk.Label()
         self._departureICAO.set_width_chars(6)
         self._departureICAO.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureICAO)
         table.attach(labelAlignment, 1, 2, 3, 4)
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("connect_gate"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("connect_gate"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, 4, 5)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._departureGate = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._departureGate = Gtk.Label()
         self._departureGate.set_width_chars(5)
         self._departureGate.set_alignment(0.0, 0.5)
         labelAlignment.add(self._departureGate)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
         if self._selectSimulator:
-            labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0, yalign=0.5)
-            label = gtk.Label(xstr("connect_sim"))
+            labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0, yalign=0.5)
+            label = Gtk.Label(xstr("connect_sim"))
             labelAlignment.add(label)
             table.attach(labelAlignment, 0, 1, 5, 7)
 
-            selectAlignment = gtk.Alignment(xalign=0.0, xscale=0.0, yalign=0.5)
+            selectAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0, yalign=0.5)
 
-            selectBox = gtk.HBox()
+            selectBox = Gtk.HBox()
             self._selectMSFS = \
-                gtk.RadioButton.new_with_mnemonic_from_widget(None,
+                Gtk.RadioButton.new_with_mnemonic_from_widget(None,
                                                               xstr("connect_sim_msfs"))
 
             selectBox.pack_start(self._selectMSFS, False, False, 0);
 
             self._selectXPlane = \
-                gtk.RadioButton.new_with_mnemonic_from_widget(self._selectMSFS,
+                Gtk.RadioButton.new_with_mnemonic_from_widget(self._selectMSFS,
                                                               xstr("connect_sim_xplane"))
 
             selectBox.pack_start(self._selectXPlane, False, False, 8);
@@ -2100,17 +2100,17 @@ class PayloadPage(Page):
                                           xstr("payload_help"),
                                           completedHelp = xstr("payload_chelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 3)
+        table = Gtk.Table(7, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label(xstr("payload_crew"))
+        label = Gtk.Label(xstr("payload_crew"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
@@ -2122,7 +2122,7 @@ class PayloadPage(Page):
         table.attach(self._numCrew, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._numCrew)
 
-        label = gtk.Label(xstr("payload_pax"))
+        label = Gtk.Label(xstr("payload_pax"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
@@ -2134,7 +2134,7 @@ class PayloadPage(Page):
         table.attach(self._numPassengers, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._numPassengers)
 
-        label = gtk.Label(xstr("payload_bag"))
+        label = Gtk.Label(xstr("payload_bag"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 2, 3)
@@ -2146,9 +2146,9 @@ class PayloadPage(Page):
         table.attach(self._bagWeight, 1, 2, 2, 3)
         label.set_mnemonic_widget(self._bagWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 2, 3)
+        table.attach(Gtk.Label("kg"), 2, 3, 2, 3)
 
-        label = gtk.Label(xstr("payload_cargo"))
+        label = Gtk.Label(xstr("payload_cargo"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
@@ -2160,9 +2160,9 @@ class PayloadPage(Page):
         table.attach(self._cargoWeight, 1, 2, 3, 4)
         label.set_mnemonic_widget(self._cargoWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
+        table.attach(Gtk.Label("kg"), 2, 3, 3, 4)
 
-        label = gtk.Label(xstr("payload_mail"))
+        label = Gtk.Label(xstr("payload_mail"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 4, 5)
@@ -2174,33 +2174,33 @@ class PayloadPage(Page):
         table.attach(self._mailWeight, 1, 2, 4, 5)
         label.set_mnemonic_widget(self._mailWeight)
 
-        table.attach(gtk.Label("kg"), 2, 3, 4, 5)
+        table.attach(Gtk.Label("kg"), 2, 3, 4, 5)
 
-        label = gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
+        label = Gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
         label.set_alignment(0.0, 0.5)
         label.set_use_markup(True)
         table.attach(label, 0, 1, 5, 6)
 
-        self._calculatedZFW = gtk.Label()
+        self._calculatedZFW = Gtk.Label()
         self._calculatedZFW.set_width_chars(6)
         self._calculatedZFW.set_alignment(1.0, 0.5)
         table.attach(self._calculatedZFW, 1, 2, 5, 6)
 
-        table.attach(gtk.Label("kg"), 2, 3, 5, 6)
+        table.attach(Gtk.Label("kg"), 2, 3, 5, 6)
 
-        self._zfwButton = gtk.Button(xstr("payload_fszfw"))
+        self._zfwButton = Gtk.Button(xstr("payload_fszfw"))
         self._zfwButton.set_use_underline(True)
         self._zfwButton.connect("clicked", self._zfwRequested)
         self._zfwButton.set_tooltip_text(xstr("payload_fszfw_tooltip"))
         table.attach(self._zfwButton, 0, 1, 6, 7)
 
-        self._simulatorZFW = gtk.Label("-")
+        self._simulatorZFW = Gtk.Label("-")
         self._simulatorZFW.set_width_chars(6)
         self._simulatorZFW.set_alignment(1.0, 0.5)
         table.attach(self._simulatorZFW, 1, 2, 6, 7)
         self._simulatorZFWValue = None
 
-        table.attach(gtk.Label("kg"), 2, 3, 6, 7)
+        table.attach(Gtk.Label("kg"), 2, 3, 6, 7)
 
         self.addCancelFlightButton()
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
@@ -2328,39 +2328,39 @@ class TimePage(Page):
                                        xstr("time_help"),
                                        completedHelp = xstr("time_chelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label(xstr("time_departure"))
+        label = Gtk.Label(xstr("time_departure"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
-        self._departure = gtk.Label()
+        self._departure = Gtk.Label()
         self._departure.set_alignment(0.0, 0.5)
         table.attach(self._departure, 1, 2, 0, 1)
 
-        label = gtk.Label(xstr("time_arrival"))
+        label = Gtk.Label(xstr("time_arrival"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
-        self._arrival = gtk.Label()
+        self._arrival = Gtk.Label()
         self._arrival.set_alignment(0.0, 0.5)
         table.attach(self._arrival, 1, 2, 1, 2)
 
-        self._timeButton = gtk.Button(xstr("time_fs"))
+        self._timeButton = Gtk.Button(xstr("time_fs"))
         self._timeButton.set_use_underline(True)
         self._timeButton.set_tooltip_text(xstr("time_fs_tooltip"))
         self._timeButton.connect("clicked", self._timeRequested)
         table.attach(self._timeButton, 0, 1, 2, 3)
 
-        self._simulatorTime = gtk.Label("-")
+        self._simulatorTime = Gtk.Label("-")
         self._simulatorTime.set_alignment(0.0, 0.5)
         table.attach(self._simulatorTime, 1, 2, 2, 3)
 
@@ -2450,20 +2450,20 @@ class RoutePage(Page):
                                         xstr("route_help"),
                                         completedHelp = xstr("route_chelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         alignment.add(mainBox)
         self.setMainWidget(alignment)
 
-        levelBox = gtk.HBox()
+        levelBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("route_level"))
+        label = Gtk.Label(xstr("route_level"))
         label.set_use_underline(True)
         levelBox.pack_start(label, True, True, 0)
 
-        self._cruiseLevel = gtk.SpinButton()
+        self._cruiseLevel = Gtk.SpinButton()
         self._cruiseLevel.set_increments(step = 10, page = 100)
         self._cruiseLevel.set_range(min = 0, max = 500)
         self._cruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
@@ -2474,31 +2474,31 @@ class RoutePage(Page):
 
         levelBox.pack_start(self._cruiseLevel, False, False, 8)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(levelBox)
 
         mainBox.pack_start(alignment, False, False, 0)
 
 
-        routeBox = gtk.VBox()
+        routeBox = Gtk.VBox()
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        label = gtk.Label(xstr("route_route"))
+        label = Gtk.Label(xstr("route_route"))
         label.set_use_underline(True)
         alignment.add(label)
         routeBox.pack_start(alignment, True, True, 0)
 
-        routeWindow = gtk.ScrolledWindow()
+        routeWindow = Gtk.ScrolledWindow()
         routeWindow.set_size_request(400, 80)
-        routeWindow.set_shadow_type(gtk.ShadowType.IN)
-        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                               gtk.PolicyType.AUTOMATIC)
+        routeWindow.set_shadow_type(Gtk.ShadowType.IN)
+        routeWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                               Gtk.PolicyType.AUTOMATIC)
 
         self._uppercasingRoute = False
 
-        self._route = gtk.TextView()
+        self._route = Gtk.TextView()
         self._route.set_tooltip_text(xstr("route_route_tooltip"))
         self._route.set_wrap_mode(WRAP_WORD)
         self._route.get_buffer().connect("changed", self._routeChanged)
@@ -2510,13 +2510,13 @@ class RoutePage(Page):
 
         mainBox.pack_start(routeBox, True, True, 8)
 
-        alternateBox = gtk.HBox()
+        alternateBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("route_altn"))
+        label = Gtk.Label(xstr("route_altn"))
         label.set_use_underline(True)
         alternateBox.pack_start(label, True, True, 0)
 
-        self._alternate = gtk.Entry()
+        self._alternate = Gtk.Entry()
         self._alternate.set_width_chars(6)
         self._alternate.connect("changed", self._alternateChanged)
         self._alternate.set_tooltip_text(xstr("route_altn_tooltip"))
@@ -2524,7 +2524,7 @@ class RoutePage(Page):
 
         alternateBox.pack_start(self._alternate, False, False, 8)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(alternateBox)
 
@@ -2618,7 +2618,7 @@ class RoutePage(Page):
 
 #-----------------------------------------------------------------------------
 
-class SimBriefCredentialsDialog(gtk.Dialog):
+class SimBriefCredentialsDialog(Gtk.Dialog):
     """A dialog window to ask for SimBrief credentials."""
     def __init__(self, gui, userName, password, rememberPassword):
         """Construct the dialog."""
@@ -2631,27 +2631,27 @@ class SimBriefCredentialsDialog(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        contentAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        contentAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                          xscale = 0.0, yscale = 0.0)
         contentAlignment.set_padding(padding_top = 4, padding_bottom = 16,
                                      padding_left = 8, padding_right = 8)
 
         contentArea.pack_start(contentAlignment, False, False, 0)
 
-        contentVBox = gtk.VBox()
+        contentVBox = Gtk.VBox()
         contentAlignment.add(contentVBox)
 
-        label = gtk.Label(xstr("simbrief_login_failed"))
+        label = Gtk.Label(xstr("simbrief_login_failed"))
         label.set_alignment(0.0, 0.0)
 
         contentVBox.pack_start(label, False, False, 0)
 
-        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        tableAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         tableAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                    padding_left = 0, padding_right = 0)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2659,12 +2659,12 @@ class SimBriefCredentialsDialog(gtk.Dialog):
         tableAlignment.add(table)
         contentVBox.pack_start(tableAlignment, True, True, 0)
 
-        label = gtk.Label(xstr("simbrief_username"))
+        label = Gtk.Label(xstr("simbrief_username"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
-        self._userName = gtk.Entry()
+        self._userName = Gtk.Entry()
         self._userName.set_width_chars(16)
         #self._userName.connect("changed",
         #                       lambda button: self._updateForwardButton())
@@ -2673,12 +2673,12 @@ class SimBriefCredentialsDialog(gtk.Dialog):
         table.attach(self._userName, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._userName)
 
-        label = gtk.Label(xstr("simbrief_password"))
+        label = Gtk.Label(xstr("simbrief_password"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
-        self._password = gtk.Entry()
+        self._password = Gtk.Entry()
         self._password.set_visibility(False)
         #self._password.connect("changed",
         #                       lambda button: self._updateForwardButton())
@@ -2687,7 +2687,7 @@ class SimBriefCredentialsDialog(gtk.Dialog):
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
-        self._rememberButton = gtk.CheckButton(xstr("simbrief_remember_password"))
+        self._rememberButton = Gtk.CheckButton(xstr("simbrief_remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
         self._rememberButton.set_active(rememberPassword)
@@ -2778,22 +2778,22 @@ class SimBriefSetupPage(Page):
                                                 xstr("simbrief_setup_help"),
                                                 xstr("simbrief_setup_chelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(9, 3)
+        table = Gtk.Table(9, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
         alignment.add(table)
         self.setMainWidget(alignment)
 
-        label = gtk.Label(xstr("simbrief_username"))
+        label = Gtk.Label(xstr("simbrief_username"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
-        self._userName = gtk.Entry()
+        self._userName = Gtk.Entry()
         self._userName.set_width_chars(16)
         self._userName.connect("changed",
                                lambda button: self._updateForwardButton())
@@ -2801,12 +2801,12 @@ class SimBriefSetupPage(Page):
         table.attach(self._userName, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._userName)
 
-        label = gtk.Label(xstr("simbrief_password"))
+        label = Gtk.Label(xstr("simbrief_password"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
-        self._password = gtk.Entry()
+        self._password = Gtk.Entry()
         self._password.set_visibility(False)
         self._password.connect("changed",
                                lambda button: self._updateForwardButton())
@@ -2814,12 +2814,12 @@ class SimBriefSetupPage(Page):
         table.attach(self._password, 1, 2, 1, 2)
         label.set_mnemonic_widget(self._password)
 
-        self._rememberButton = gtk.CheckButton(xstr("simbrief_remember_password"))
+        self._rememberButton = Gtk.CheckButton(xstr("simbrief_remember_password"))
         self._rememberButton.set_use_underline(True)
         self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
         table.attach(self._rememberButton, 1, 2, 2, 3, ypadding = 8)
 
-        label = gtk.Label(xstr("simbrief_extra_fuel"))
+        label = Gtk.Label(xstr("simbrief_extra_fuel"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 3, 4)
@@ -2830,65 +2830,65 @@ class SimBriefSetupPage(Page):
         table.attach(self._extraFuel, 1, 2, 3, 4)
         label.set_mnemonic_widget(self._extraFuel)
 
-        table.attach(gtk.Label("kg"), 2, 3, 3, 4)
+        table.attach(Gtk.Label("kg"), 2, 3, 3, 4)
 
-        label = gtk.Label(xstr("simbrief_takeoff_runway"))
+        label = Gtk.Label(xstr("simbrief_takeoff_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 4, 5)
 
-        self._takeoffRunway = gtk.Entry()
+        self._takeoffRunway = Gtk.Entry()
         self._takeoffRunway.set_width_chars(10)
         self._takeoffRunway.set_tooltip_text(xstr("simbrief_takeoff_runway_tooltip"))
         self._takeoffRunway.connect("changed", self._upperChanged)
         table.attach(self._takeoffRunway, 1, 2, 4, 5)
         label.set_mnemonic_widget(self._takeoffRunway)
 
-        label = gtk.Label(xstr("simbrief_landing_runway"))
+        label = Gtk.Label(xstr("simbrief_landing_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 5, 6)
 
-        self._landingRunway = gtk.Entry()
+        self._landingRunway = Gtk.Entry()
         self._landingRunway.set_width_chars(10)
         self._landingRunway.set_tooltip_text(xstr("simbrief_takeoff_runway_tooltip"))
         self._landingRunway.connect("changed", self._upperChanged)
         table.attach(self._landingRunway, 1, 2, 5, 6)
         label.set_mnemonic_widget(self._landingRunway)
 
-        label = gtk.Label(xstr("simbrief_climb_profile"))
+        label = Gtk.Label(xstr("simbrief_climb_profile"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 6, 7)
 
-        self._climbProfile = gtk.ComboBox()
-        renderer = gtk.CellRendererText()
+        self._climbProfile = Gtk.ComboBox()
+        renderer = Gtk.CellRendererText()
         self._climbProfile.pack_start(renderer, True)
         self._climbProfile.add_attribute(renderer, "text", 0)
         self._climbProfile.set_tooltip_text(xstr("simbrief_climb_profile_tooltip"))
         table.attach(self._climbProfile, 1, 2, 6, 7)
         label.set_mnemonic_widget(self._climbProfile)
 
-        label = gtk.Label(xstr("simbrief_cruise_profile"))
+        label = Gtk.Label(xstr("simbrief_cruise_profile"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 7, 8)
 
-        self._cruiseProfile = gtk.ComboBox()
-        renderer = gtk.CellRendererText()
+        self._cruiseProfile = Gtk.ComboBox()
+        renderer = Gtk.CellRendererText()
         self._cruiseProfile.pack_start(renderer, True)
         self._cruiseProfile.add_attribute(renderer, "text", 0)
         self._cruiseProfile.set_tooltip_text(xstr("simbrief_cruise_profile_tooltip"))
         table.attach(self._cruiseProfile, 1, 2, 7, 8)
         label.set_mnemonic_widget(self._cruiseProfile)
 
-        label = gtk.Label(xstr("simbrief_descent_profile"))
+        label = Gtk.Label(xstr("simbrief_descent_profile"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 8, 9)
 
-        self._descentProfile = gtk.ComboBox()
-        renderer = gtk.CellRendererText()
+        self._descentProfile = Gtk.ComboBox()
+        renderer = Gtk.CellRendererText()
         self._descentProfile.pack_start(renderer, True)
         self._descentProfile.add_attribute(renderer, "text", 0)
         self._descentProfile.set_tooltip_text(xstr("simbrief_descent_profile_tooltip"))
@@ -2929,7 +2929,7 @@ class SimBriefSetupPage(Page):
                                      simBriefData.cruiseProfiles),
                                     (self._descentProfile,
                                      simBriefData.descentProfiles)]:
-            model = gtk.ListStore(str)
+            model = Gtk.ListStore(str)
             for profile in profiles:
                 model.append([profile])
             control.set_model(model)
@@ -3052,7 +3052,7 @@ class SimBriefSetupPage(Page):
             else:
                 message = SimBriefSetupPage.result2Message.get(result,
                                                                "simbrief_result_unknown")
-                dialog = gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format =
                                            xstr(message) + "\n"+
@@ -3154,7 +3154,7 @@ class SimBriefingPage(Page):
         super(SimBriefingPage, self).__init__(wizard, "simbrief_result",
                                               xstr("simbrief_result_title"), "")
 
-        self._alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        self._alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 1.0, yscale = 1.0)
 
         self._container = cef.getContainer()
@@ -3223,7 +3223,7 @@ class SimBriefingPage(Page):
 
 #-----------------------------------------------------------------------------
 
-class FuelTank(gtk.VBox):
+class FuelTank(Gtk.VBox):
     """Widget for the fuel tank."""
     def __init__(self, fuelTank, name, capacity, currentWeight):
         """Construct the widget for the tank with the given name."""
@@ -3235,13 +3235,13 @@ class FuelTank(gtk.VBox):
         self.currentWeight = currentWeight
         self.expectedWeight = currentWeight
 
-        self._label = label = gtk.Label("<b>" + name + "</b>")
+        self._label = label = Gtk.Label("<b>" + name + "</b>")
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_justify(JUSTIFY_CENTER)
         label.set_alignment(0.5, 1.0)
 
-        self._tankFigure = gtk.EventBox()
+        self._tankFigure = Gtk.EventBox()
         self._tankFigure.set_size_request(38, 200)
         self._tankFigure.set_visible_window(False)
         self._tankFigure.set_tooltip_markup(xstr("fuel_tank_tooltip"))
@@ -3251,13 +3251,13 @@ class FuelTank(gtk.VBox):
         self._tankFigure.connect("motion_notify_event", self._motionNotify)
         self._tankFigure.connect("scroll-event", self._scrolled)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 1.0)
         alignment.add(self._tankFigure)
 
         self.pack_start(alignment, True, True, 4)
 
-        self._expectedButton = gtk.SpinButton()
+        self._expectedButton = Gtk.SpinButton()
         self._expectedButton.set_numeric(True)
         self._expectedButton.set_range(0, self.capacity)
         self._expectedButton.set_increments(10, 100)
@@ -3413,7 +3413,7 @@ class FuelPage(Page):
 
         self._fuelTanks = []
         self._fuelTable = None
-        self._fuelAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        self._fuelAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                             xscale = 0.0, yscale = 1.0)
         self.setMainWidget(self._fuelAlignment)
 
@@ -3469,7 +3469,7 @@ class FuelPage(Page):
             self._fuelAlignment.remove(self._fuelTable)
 
         self._fuelTanks = []
-        self._fuelTable = gtk.Grid()
+        self._fuelTable = Gtk.Grid()
         self._fuelTable.set_column_homogeneous(True)
         self._fuelTable.set_row_spacing(4)
         index = 0
@@ -3480,18 +3480,18 @@ class FuelPage(Page):
                                 capacity, current)
             self._fuelTanks.append(fuelTank)
 
-            alignment = gtk.Alignment(xalign = 0.5, yalign = 1.0,
+            alignment = Gtk.Alignment(xalign = 0.5, yalign = 1.0,
                                       xscale = 1.0, yscale = 0.0)
             alignment.add(fuelTank.label)
             self._fuelTable.attach(alignment, index*2, 0, 3, 1)
 
-            alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+            alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 0.0, yscale = 1.0)
             alignment.add(fuelTank)
             self._fuelTable.attach(alignment, index*2+1, 1, 1, 1)
 
 
-            alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+            alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 0.0)
             alignment.add(fuelTank.expectedButton)
 
@@ -3606,26 +3606,26 @@ class BriefingPage(Page):
                                            title, xstr("briefing_help"),
                                            completedHelp = xstr("briefing_chelp"))
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
 
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         alignment.add(mainBox)
         self.setMainWidget(alignment)
 
-        self._notamsFrame = gtk.Frame()
+        self._notamsFrame = Gtk.Frame()
         self._notamsFrame.set_label(xstr("briefing_notams_init"))
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 128)
         # FIXME: these constants should be in common
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
-        self._notams = gtk.TextView()
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        self._notams = Gtk.TextView()
         self._notams.set_editable(False)
         self._notams.set_accepts_tab(False)
-        self._notams.set_wrap_mode(gtk.WrapMode.WORD)
+        self._notams.set_wrap_mode(Gtk.WrapMode.WORD)
         scrolledWindow.add(self._notams)
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 0,
                               padding_left = 0, padding_right = 0)
@@ -3633,22 +3633,22 @@ class BriefingPage(Page):
         self._notamsFrame.add(alignment)
         mainBox.pack_start(self._notamsFrame, True, True, 4)
 
-        self._metarFrame = gtk.Frame()
+        self._metarFrame = Gtk.Frame()
         self._metarFrame.set_label(xstr("briefing_metar_init"))
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 32)
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
 
         self._updatingMETAR = False
 
-        self._metar = gtk.TextView()
+        self._metar = Gtk.TextView()
         self._metar.set_accepts_tab(False)
-        self._metar.set_wrap_mode(gtk.WrapMode.WORD)
+        self._metar.set_wrap_mode(Gtk.WrapMode.WORD)
         self._metar.get_buffer().connect("changed", self._metarChanged)
         self._metar.get_buffer().connect_after("insert-text", self._metarInserted)
         scrolledWindow.add(self._metar)
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 0,
                               padding_left = 0, padding_right = 0)
@@ -3793,10 +3793,10 @@ class TakeoffPage(Page):
 
         self._forwardAllowed = False
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(9, 24)
+        table = Gtk.Table(9, 24)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -3805,12 +3805,12 @@ class TakeoffPage(Page):
 
         row = 0
 
-        label = gtk.Label(xstr("takeoff_metar"))
+        label = Gtk.Label(xstr("takeoff_metar"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row+1)
 
-        self._metar = gtk.Entry()
+        self._metar = Gtk.Entry()
         self._metar.set_width_chars(40)
         self._metar.set_tooltip_text(xstr("takeoff_metar_tooltip"))
         self._metar.connect("changed", self._metarChanged)
@@ -3822,12 +3822,12 @@ class TakeoffPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("takeoff_runway"))
+        label = Gtk.Label(xstr("takeoff_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row+1)
 
-        self._runway = gtk.Entry()
+        self._runway = Gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("takeoff_runway_tooltip"))
         self._runway.connect("changed", self._upperChanged)
@@ -3836,12 +3836,12 @@ class TakeoffPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("takeoff_sid"))
+        label = Gtk.Label(xstr("takeoff_sid"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row+1)
 
-        self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._sid = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._sid.set_entry_text_column(0)
         self._sid.get_child().set_width_chars(10)
@@ -3852,7 +3852,7 @@ class TakeoffPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("takeoff_v1"))
+        label = Gtk.Label(xstr("takeoff_v1"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -3865,13 +3865,13 @@ class TakeoffPage(Page):
         table.attach(self._v1, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._v1)
 
-        self._v1Unit = gtk.Label(xstr("label_knots"))
+        self._v1Unit = Gtk.Label(xstr("label_knots"))
         self._v1Unit.set_alignment(0.0, 0.5)
         table.attach(self._v1Unit, 3, 4, row, row+1)
 
         row += 1
 
-        label = gtk.Label(xstr("takeoff_vr"))
+        label = Gtk.Label(xstr("takeoff_vr"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -3884,13 +3884,13 @@ class TakeoffPage(Page):
         table.attach(self._vr, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._vr)
 
-        self._vrUnit = gtk.Label(xstr("label_knots"))
+        self._vrUnit = Gtk.Label(xstr("label_knots"))
         self._vrUnit.set_alignment(0.0, 0.5)
         table.attach(self._vrUnit, 3, 4, row, row+1)
 
         row += 1
 
-        label = gtk.Label(xstr("takeoff_v2"))
+        label = Gtk.Label(xstr("takeoff_v2"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -3903,7 +3903,7 @@ class TakeoffPage(Page):
         table.attach(self._v2, 2, 3, row, row+1)
         label.set_mnemonic_widget(self._v2)
 
-        self._v2Unit = gtk.Label(xstr("label_knots"))
+        self._v2Unit = Gtk.Label(xstr("label_knots"))
         self._v2Unit.set_alignment(0.0, 0.5)
         table.attach(self._v2Unit, 3, 4, row, row+1)
 
@@ -3911,13 +3911,13 @@ class TakeoffPage(Page):
 
         self._derateType = acft.DERATE_NONE
 
-        self._derateLabel = gtk.Label()
+        self._derateLabel = Gtk.Label()
         self._derateLabel.set_use_underline(True)
         self._derateLabel.set_markup(xstr("takeoff_derate_tupolev"))
         self._derateLabel.set_alignment(0.0, 0.5)
         table.attach(self._derateLabel, 0, 1, row, row+1)
 
-        self._derate = gtk.Alignment()
+        self._derate = Gtk.Alignment()
         table.attach(self._derate, 2, 4, row, row+1)
         self._derateWidget = None
         self._derateEntry = None
@@ -3926,14 +3926,14 @@ class TakeoffPage(Page):
 
         row += 1
 
-        self._antiIceOn = gtk.CheckButton(xstr("takeoff_antiice"))
+        self._antiIceOn = Gtk.CheckButton(xstr("takeoff_antiice"))
         self._antiIceOn.set_use_underline(True)
         self._antiIceOn.set_tooltip_text(xstr("takeoff_antiice_tooltip"))
         table.attach(self._antiIceOn, 2, 4, row, row+1)
 
         row += 1
 
-        self._rto = gtk.CheckButton(xstr("takeoff_rto"))
+        self._rto = Gtk.CheckButton(xstr("takeoff_rto"))
         self._rto.set_use_underline(True)
         self._rto.set_tooltip_text(xstr("takeoff_rto_tooltip"))
         self._rto.connect("toggled", self._rtoToggled)
@@ -4167,17 +4167,17 @@ class TakeoffPage(Page):
             self._derateLabel.set_use_underline(True)
             self._derateLabel.set_sensitive(True)
 
-            self._derateEntry = gtk.Entry()
+            self._derateEntry = Gtk.Entry()
             self._derateEntry.set_width_chars(7)
             self._derateEntry.set_tooltip_text(xstr("takeoff_derate_boeing_tooltip"))
             self._derateEntry.set_alignment(1.0)
             self._derateEntry.connect("changed", self._derateChanged)
             self._derateLabel.set_mnemonic_widget(self._derateEntry)
 
-            self._derateUnit = gtk.Label("%")
+            self._derateUnit = Gtk.Label("%")
             self._derateUnit.set_alignment(0.0, 0.5)
 
-            self._derateWidget = gtk.Table(3, 1)
+            self._derateWidget = Gtk.Table(3, 1)
             self._derateWidget.set_row_spacings(4)
             self._derateWidget.set_col_spacings(16)
             self._derateWidget.set_homogeneous(False)
@@ -4191,7 +4191,7 @@ class TakeoffPage(Page):
             self._derateLabel.set_use_underline(True)
             self._derateLabel.set_sensitive(True)
 
-            self._derateWidget = gtk.Entry()
+            self._derateWidget = Gtk.Entry()
             self._derateWidget.set_width_chars(7)
             self._derateWidget.set_tooltip_text(xstr("takeoff_derate_epr_tooltip"))
             self._derateWidget.set_alignment(1.0)
@@ -4204,14 +4204,14 @@ class TakeoffPage(Page):
             self._derateLabel.set_use_underline(True)
             self._derateLabel.set_sensitive(True)
 
-            nominal = gtk.RadioButton.\
+            nominal = Gtk.RadioButton.\
                 new_with_label_from_widget(None,
                                            xstr("takeoff_derate_tupolev_nominal"))
             nominal.set_use_underline(True)
             nominal.set_tooltip_text(xstr("takeoff_derate_tupolev_nominal_tooltip"))
             nominal.connect("toggled", self._derateChanged)
 
-            takeoff = gtk.RadioButton.\
+            takeoff = Gtk.RadioButton.\
                 new_with_label_from_widget(nominal,
                                            xstr("takeoff_derate_tupolev_takeoff"))
 
@@ -4221,7 +4221,7 @@ class TakeoffPage(Page):
 
             self._derateButtons = [nominal, takeoff]
 
-            self._derateWidget = gtk.HBox()
+            self._derateWidget = Gtk.HBox()
             self._derateWidget.pack_start(nominal, False, False, 4)
             self._derateWidget.pack_start(takeoff, False, False, 4)
 
@@ -4229,7 +4229,7 @@ class TakeoffPage(Page):
         elif self._derateType==acft.DERATE_B462:
             self._derateLabel.set_text("")
 
-            self._derateWidget = gtk.CheckButton(xstr("takeoff_derate_b462"))
+            self._derateWidget = Gtk.CheckButton(xstr("takeoff_derate_b462"))
             self._derateWidget.set_tooltip_text(xstr("takeoff_derate_b462_tooltip"))
             self._derateWidget.set_use_underline(True)
             self._derate.add(self._derateWidget)
@@ -4272,24 +4272,24 @@ class CruisePage(Page):
         self._loggedCruiseLevel = 240
         self._activated = False
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                   xscale = 0.0, yscale = 1.0)
 
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
         alignment.add(mainBox)
         self.setMainWidget(alignment)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         mainBox.pack_start(alignment, False, False, 16)
 
-        levelBox = gtk.HBox()
+        levelBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("route_level"))
+        label = Gtk.Label(xstr("route_level"))
         label.set_use_underline(True)
         levelBox.pack_start(label, True, True, 0)
 
-        self._cruiseLevel = gtk.SpinButton()
+        self._cruiseLevel = Gtk.SpinButton()
         self._cruiseLevel.set_increments(step = 10, page = 100)
         self._cruiseLevel.set_range(min = 50, max = 500)
         self._cruiseLevel.set_tooltip_text(xstr("cruise_route_level_tooltip"))
@@ -4299,7 +4299,7 @@ class CruisePage(Page):
 
         levelBox.pack_start(self._cruiseLevel, False, False, 8)
 
-        self._updateButton = gtk.Button(xstr("cruise_route_level_update"));
+        self._updateButton = Gtk.Button(xstr("cruise_route_level_update"));
         self._updateButton.set_use_underline(True)
         self._updateButton.set_tooltip_text(xstr("cruise_route_level_update_tooltip"))
         self._updateButton.connect("clicked", self._updateButtonClicked)
@@ -4308,7 +4308,7 @@ class CruisePage(Page):
 
         mainBox.pack_start(levelBox, False, False, 0)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 1.0)
         mainBox.pack_start(alignment, True, True, 0)
 
@@ -4386,10 +4386,10 @@ class LandingPage(Page):
 
         self._flightEnded = False
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(7, 24)
+        table = Gtk.Table(7, 24)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -4398,12 +4398,12 @@ class LandingPage(Page):
 
         row = 0
 
-        label = gtk.Label(xstr("landing_metar"))
+        label = Gtk.Label(xstr("landing_metar"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row+1)
 
-        self._metar = gtk.Entry()
+        self._metar = Gtk.Entry()
         self._metar.set_width_chars(40)
         self._metar.set_tooltip_text(xstr("landing_metar_tooltip"))
         self._metar.connect("changed", self._metarChanged)
@@ -4415,12 +4415,12 @@ class LandingPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("landing_star"))
+        label = Gtk.Label(xstr("landing_star"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._star = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._star.set_entry_text_column(0)
         self._star.get_child().set_width_chars(10)
@@ -4432,12 +4432,12 @@ class LandingPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("landing_transition"))
+        label = Gtk.Label(xstr("landing_transition"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._transition = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._transition.set_entry_text_column(0)
         self._transition.get_child().set_width_chars(10)
@@ -4449,12 +4449,12 @@ class LandingPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("landing_runway"))
+        label = Gtk.Label(xstr("landing_runway"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._runway = gtk.Entry()
+        self._runway = Gtk.Entry()
         self._runway.set_width_chars(10)
         self._runway.set_tooltip_text(xstr("landing_runway_tooltip"))
         self._runway.connect("changed", self._upperChanged)
@@ -4463,12 +4463,12 @@ class LandingPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("landing_approach"))
+        label = Gtk.Label(xstr("landing_approach"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._approachType = gtk.Entry()
+        self._approachType = Gtk.Entry()
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
         self._approachType.connect("changed", self._upperChanged)
@@ -4477,7 +4477,7 @@ class LandingPage(Page):
 
         row += 1
 
-        label = gtk.Label(xstr("landing_vref"))
+        label = Gtk.Label(xstr("landing_vref"))
         label.set_use_markup(True)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
@@ -4490,12 +4490,12 @@ class LandingPage(Page):
         table.attach(self._vref, 3, 4, row, row + 1)
         label.set_mnemonic_widget(self._vref)
 
-        self._vrefUnit = gtk.Label(xstr("label_knots"))
+        self._vrefUnit = Gtk.Label(xstr("label_knots"))
         table.attach(self._vrefUnit, 4, 5, row, row + 1)
 
         row += 1
 
-        self._antiIceOn = gtk.CheckButton(xstr("landing_antiice"))
+        self._antiIceOn = Gtk.CheckButton(xstr("landing_antiice"))
         self._antiIceOn.set_use_underline(True)
         self._antiIceOn.set_tooltip_text(xstr("landing_antiice_tooltip"))
         table.attach(self._antiIceOn, 3, 5, row, row + 1)
@@ -4779,7 +4779,7 @@ class PIREPSaveHelper(object):
                 secondary = None
             page.setPIREPSaved()
 
-        dialog = gtk.MessageDialog(parent = gui.mainWindow,
+        dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                    type = type, message_format = message)
         dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -4795,22 +4795,22 @@ class PIREPSaveHelper(object):
         If it does not exist yet, create it."""
         if self._savePIREPDialog is None:
             gui = self._wizard.gui
-            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+            dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("finish_save_title"),
                                            action = FILE_CHOOSER_ACTION_SAVE,
-                                           buttons = (gtk.STOCK_CANCEL,
+                                           buttons = (Gtk.STOCK_CANCEL,
                                                       RESPONSETYPE_CANCEL,
-                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
                                            parent = gui.mainWindow)
             dialog.set_modal(True)
             dialog.set_do_overwrite_confirmation(True)
 
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_pireps"))
             filter.add_pattern("*.pirep")
             dialog.add_filter(filter)
 
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
             dialog.add_filter(filter)
@@ -4829,10 +4829,10 @@ class FinishPage(Page):
         super(FinishPage, self).__init__(wizard, "finish",
                                          xstr("finish_title"), help)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = gtk.Table(10, 2)
+        table = Gtk.Table(10, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -4841,13 +4841,13 @@ class FinishPage(Page):
 
         row = 0
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_rating"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_rating"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._flightRating = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightRating = Gtk.Label()
         self._flightRating.set_width_chars(8)
         self._flightRating.set_alignment(0.0, 0.5)
         self._flightRating.set_use_markup(True)
@@ -4856,13 +4856,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_dep_time"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_dep_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._depTime = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._depTime = Gtk.Label()
         self._depTime.set_width_chars(13)
         self._depTime.set_alignment(0.0, 0.5)
         self._depTime.set_use_markup(True)
@@ -4872,13 +4872,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_flight_time"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_flight_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._flightTime = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._flightTime = Gtk.Label()
         self._flightTime.set_width_chars(10)
         self._flightTime.set_alignment(0.0, 0.5)
         self._flightTime.set_use_markup(True)
@@ -4887,13 +4887,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_block_time"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_block_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._blockTime = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._blockTime = Gtk.Label()
         self._blockTime.set_width_chars(10)
         self._blockTime.set_alignment(0.0, 0.5)
         self._blockTime.set_use_markup(True)
@@ -4902,13 +4902,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_arr_time"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_arr_time"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._arrTime = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._arrTime = Gtk.Label()
         self._arrTime.set_width_chars(13)
         self._arrTime.set_alignment(0.0, 0.5)
         self._arrTime.set_use_markup(True)
@@ -4918,13 +4918,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_distance"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_distance"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._distanceFlown = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._distanceFlown = Gtk.Label()
         self._distanceFlown.set_width_chars(10)
         self._distanceFlown.set_alignment(0.0, 0.5)
         self._distanceFlown.set_use_markup(True)
@@ -4933,13 +4933,13 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign=1.0, xscale=0.0)
-        label = gtk.Label(xstr("finish_fuel"))
+        labelAlignment = Gtk.Alignment(xalign=1.0, xscale=0.0)
+        label = Gtk.Label(xstr("finish_fuel"))
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        labelAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
-        self._fuelUsed = gtk.Label()
+        labelAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
+        self._fuelUsed = Gtk.Label()
         self._fuelUsed.set_width_chars(10)
         self._fuelUsed.set_alignment(0.0, 0.5)
         self._fuelUsed.set_use_markup(True)
@@ -4948,9 +4948,9 @@ class FinishPage(Page):
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, xscale = 0.0,
                                        yalign = 0.5, yscale = 0.0)
-        label = gtk.Label(xstr("finish_type"))
+        label = Gtk.Label(xstr("finish_type"))
         label.set_use_underline(True)
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
@@ -4959,38 +4959,38 @@ class FinishPage(Page):
         self._flightType.set_tooltip_text(xstr("finish_type_tooltip"))
         self._flightType.set_active(0)
         self._flightType.connect("changed", self._flightTypeChanged)
-        flightTypeAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        flightTypeAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
         flightTypeAlignment.add(self._flightType)
         table.attach(flightTypeAlignment, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._flightType)
 
         row += 1
 
-        self._onlineFlight = gtk.CheckButton(xstr("finish_online"))
+        self._onlineFlight = Gtk.CheckButton(xstr("finish_online"))
         self._onlineFlight.set_use_underline(True)
         self._onlineFlight.set_tooltip_text(xstr("finish_online_tooltip"))
-        onlineFlightAlignment = gtk.Alignment(xalign=0.0, xscale=0.0)
+        onlineFlightAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
         onlineFlightAlignment.add(self._onlineFlight)
         table.attach(onlineFlightAlignment, 1, 2, row, row + 1)
 
         row += 1
 
-        labelAlignment = gtk.Alignment(xalign = 1.0, xscale = 0.0,
+        labelAlignment = Gtk.Alignment(xalign = 1.0, xscale = 0.0,
                                        yalign = 0.5, yscale = 0.0)
-        self._gateLabel = gtk.Label(xstr("finish_gate"))
+        self._gateLabel = Gtk.Label(xstr("finish_gate"))
         self._gateLabel.set_use_underline(True)
         labelAlignment.add(self._gateLabel)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._gatesModel = gtk.ListStore(str)
+        self._gatesModel = Gtk.ListStore(str)
 
-        self._gate = gtk.ComboBox(model = self._gatesModel)
-        renderer = gtk.CellRendererText()
+        self._gate = Gtk.ComboBox(model = self._gatesModel)
+        renderer = Gtk.CellRendererText()
         self._gate.pack_start(renderer, True)
         self._gate.add_attribute(renderer, "text", 0)
         self._gate.set_tooltip_text(xstr("finish_gate_tooltip"))
         self._gate.connect("changed", self._gateChanged)
-        gateAlignment = gtk.Alignment(xalign=0.0, xscale=1.0)
+        gateAlignment = Gtk.Alignment(xalign=0.0, xscale=1.0)
         gateAlignment.add(self._gate)
         table.attach(gateAlignment, 1, 2, row, row+1)
         self._gateLabel.set_mnemonic_widget(self._gate)
@@ -5142,7 +5142,7 @@ class FinishPage(Page):
         """Called when the new flight button is clicked."""
         gui = self._wizard.gui
         if not self._pirepSent and not self._pirepSaved:
-            dialog = gtk.MessageDialog(parent = gui.mainWindow,
+            dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                        type = MESSAGETYPE_QUESTION,
                                        message_format = xstr("finish_newFlight_question"))
 
@@ -5260,9 +5260,9 @@ class CheckFlightFinishPage(Page):
                                                     xstr("chkfinish_title"),
                                                     "")
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
-        self._label = gtk.Label()
+        self._label = Gtk.Label()
         alignment.add(self._label)
 
         self.setMainWidget(alignment)
@@ -5348,7 +5348,7 @@ class CheckFlightFinishPage(Page):
         if returned:
             self._resetGUI()
         else:
-            dialog = gtk.MessageDialog(parent = gui.mainWindow,
+            dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format =
                                        xstr("chkfinish_passedset_failed"))
@@ -5368,7 +5368,7 @@ class CheckFlightFinishPage(Page):
 
 #-----------------------------------------------------------------------------
 
-class Wizard(gtk.VBox):
+class Wizard(Gtk.VBox):
     """The flight wizard."""
     def __init__(self, gui):
         """Construct the wizard."""
@@ -5880,7 +5880,7 @@ class Wizard(gtk.VBox):
                     message = xstr("login_entranceExam_invalid"
                                    if self.entranceExam else
                                    xstr("login_invalid"))
-                dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+                dialog = Gtk.MessageDialog(parent = self.gui.mainWindow,
                                            type = MESSAGETYPE_ERROR,
                                            message_format = message)
                 dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -5897,7 +5897,7 @@ class Wizard(gtk.VBox):
         else:
             message = xstr("reload_failconn") if isReload \
                       else xstr("login_failconn")
-            dialog = gtk.MessageDialog(parent = self.gui.mainWindow,
+            dialog = Gtk.MessageDialog(parent = self.gui.mainWindow,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = message)
             dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)

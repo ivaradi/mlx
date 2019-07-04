@@ -26,7 +26,7 @@ import re
 
 #------------------------------------------------------------------------------
 
-class ApproachCalloutsEditor(gtk.Dialog):
+class ApproachCalloutsEditor(Gtk.Dialog):
     """The dialog to edit the approach callouts."""
     integerRE = re.compile("[0-9]+")
 
@@ -66,20 +66,20 @@ class ApproachCalloutsEditor(gtk.Dialog):
         contentArea = self.get_content_area()
 
         # FIXME: common code with the checklist editor
-        typeBox = gtk.HBox()
+        typeBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("callouts_aircraftType"))
+        label = Gtk.Label(xstr("callouts_aircraftType"))
         label.set_use_underline(True)
 
         typeBox.pack_start(label, False, False, 4)
 
-        self._aircraftTypeModel = gtk.ListStore(str, int)
+        self._aircraftTypeModel = Gtk.ListStore(str, int)
         for type in const.aircraftTypes:
             name = aircraftNames[type] if type in aircraftNames \
                    else "Aircraft type #%d" % (type,)
             self._aircraftTypeModel.append([name, type])
-        self._aircraftType = gtk.ComboBox(model = self._aircraftTypeModel)
-        renderer = gtk.CellRendererText()
+        self._aircraftType = Gtk.ComboBox(model = self._aircraftTypeModel)
+        renderer = Gtk.CellRendererText()
         self._aircraftType.pack_start(renderer, True)
         self._aircraftType.add_attribute(renderer, "text", 0)
         self._aircraftType.set_tooltip_text(xstr("callouts_aircraftType_tooltip"))
@@ -89,7 +89,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         typeBox.pack_start(self._aircraftType, True, True, 4)
 
-        typeBoxAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        typeBoxAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                          xscale = 0.0, yscale = 0.0)
         typeBoxAlignment.set_size_request(400, -1)
         typeBoxAlignment.add(typeBox)
@@ -97,57 +97,57 @@ class ApproachCalloutsEditor(gtk.Dialog):
         contentArea.pack_start(typeBoxAlignment, False, False, 12)
         # FIXME: common code until here, but note that some texts are different
 
-        contentBox = gtk.HBox()        
+        contentBox = Gtk.HBox()        
 
-        controlBox = gtk.VBox()
-        controlAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        controlBox = Gtk.VBox()
+        controlAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                          xscale = 0.0, yscale = 0.0)
         controlAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                      padding_left = 32, padding_right = 32)
         controlAlignment.add(controlBox)
         contentBox.pack_start(controlAlignment, False, False, 0)
 
-        self._addButton = gtk.Button(xstr("callouts_add"))
+        self._addButton = Gtk.Button(xstr("callouts_add"))
         self._addButton.set_use_underline(True)
         self._addButton.set_tooltip_text(xstr("callouts_add_tooltip"))
         self._addButton.connect("clicked", self._addButtonClicked)
-        addAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        addAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                      xscale = 0.0, yscale = 0.0)
         addAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                  padding_left = 0, padding_right = 0)
         addAlignment.add(self._addButton)
         controlBox.pack_start(addAlignment, False, False, 0)
 
-        self._removeButton = gtk.Button(xstr("callouts_remove"))
+        self._removeButton = Gtk.Button(xstr("callouts_remove"))
         self._removeButton.set_use_underline(True)
         self._removeButton.set_tooltip_text(xstr("callouts_remove_tooltip"))
         self._removeButton.set_sensitive(False)
         self._removeButton.connect("clicked", self._removeButtonClicked)
 
-        removeAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        removeAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 0.0)
         removeAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                     padding_left = 0, padding_right = 0)
         removeAlignment.add(self._removeButton)
         controlBox.pack_start(removeAlignment, False, False, 0)
 
-        self._fileListModel = gtk.ListStore(int, str, str)
+        self._fileListModel = Gtk.ListStore(int, str, str)
         self._fileListModel.set_sort_column_id(0, SORT_DESCENDING)
 
         self._addingFile = False
         self._fileListModel.connect("row-inserted", self._fileAdded)
         self._lastAddedAltitude = None
         
-        self._fileList = gtk.TreeView(model = self._fileListModel)
+        self._fileList = Gtk.TreeView(model = self._fileListModel)
 
-        renderer = gtk.CellRendererSpin()
+        renderer = Gtk.CellRendererSpin()
         renderer.set_property("editable", True)
 
-        adjustment = gtk.Adjustment(0, 0, 5000, 10, 100)
+        adjustment = Gtk.Adjustment(0, 0, 5000, 10, 100)
         renderer.set_property("adjustment", adjustment);
         renderer.connect("edited", self._altitudeEdited)
         
-        column = gtk.TreeViewColumn(xstr("callouts_header_altitude"),
+        column = Gtk.TreeViewColumn(xstr("callouts_header_altitude"),
                                     renderer, text = 0)
         self._fileList.append_column(column)
         column.set_expand(True)
@@ -158,8 +158,8 @@ class ApproachCalloutsEditor(gtk.Dialog):
         column.set_sort_order(SORT_DESCENDING)
         column.set_expand(False)
 
-        column = gtk.TreeViewColumn(xstr("callouts_header_path"),
-                                    gtk.CellRendererText(), text = 1)
+        column = Gtk.TreeViewColumn(xstr("callouts_header_path"),
+                                    Gtk.CellRendererText(), text = 1)
         self._fileList.append_column(column)
         column.set_expand(True)
         column.set_clickable(False)
@@ -177,13 +177,13 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         self._buildFileListPopupMenu()
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
         scrolledWindow.set_size_request(300, -1)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scrolledWindow.set_shadow_type(SHADOW_IN)
         
-        fileListAlignment = gtk.Alignment(xscale=1.0, yscale=1.0, 
+        fileListAlignment = Gtk.Alignment(xscale=1.0, yscale=1.0, 
                                           xalign=0.5, yalign=0.5)
         fileListAlignment.set_padding(padding_top = 0, padding_bottom = 16,
                                       padding_left = 0, padding_right = 8)
@@ -291,7 +291,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
         editedPath = model.get_path(editedIter)
         otherPath = self._hasAltitude(newAltitude, ignorePath = editedPath)
         if otherPath is not None:
-            dialog = gtk.MessageDialog(parent = self,
+            dialog = Gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_QUESTION,
                                        message_format =
                                        xstr("callouts_altitude_clash"))
@@ -345,25 +345,25 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
         If it does not exist yet, it will be created."""
         if self._fileOpenDialog is None:
-            dialog = gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
+            dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("callouts_open_title"),
                                            action = FILE_CHOOSER_ACTION_OPEN,
-                                           buttons = (gtk.STOCK_CANCEL,
+                                           buttons = (Gtk.STOCK_CANCEL,
                                                       RESPONSETYPE_CANCEL,
-                                                      gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
                                            parent = self)
             dialog.set_modal(True)            
             dialog.set_do_overwrite_confirmation(True)
       
             # FIXME: create the filters in one location and use them
             # from there
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_audio"))
             filter.add_pattern("*.wav")
             filter.add_pattern("*.mp3")
             dialog.add_filter(filter)
 
-            filter = gtk.FileFilter()
+            filter = Gtk.FileFilter()
             filter.set_name(xstr("file_filter_all"))
             filter.add_pattern("*.*")
             dialog.add_filter(filter)
@@ -480,9 +480,9 @@ class ApproachCalloutsEditor(gtk.Dialog):
 
     def _buildFileListPopupMenu(self):
         """Build the file list popup menu."""
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("callouts_remove"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupRemove)

@@ -10,12 +10,12 @@ import mlx.const as const
 
 #------------------------------------------------------------------------------
 
-class Viewport(gtk.Viewport):
+class Viewport(Gtk.Viewport):
     """Viewport implementation that alleviates the problem with improper
     resizing by the VBox."""
     def __init__(self):
         """Construct the viewport."""
-        gtk.Viewport.__init__(self)
+        Gtk.Viewport.__init__(self)
         self._recursive = False
         self._vboxHeight = None
 
@@ -33,26 +33,26 @@ class Viewport(gtk.Viewport):
             allocation.y += 1
             allocation.height = self._vboxHeight - allocation.y
             self._vboxHeight = None
-        gtk.Viewport.do_size_allocate(self, allocation)
+        Gtk.Viewport.do_size_allocate(self, allocation)
 
-class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
+class DelayCodeTableBase(Gtk.VBox, Gtk.Scrollable):
     """PyGObject-specific base class for the delay code table."""
     __gproperties__ = {
-        "vscroll-policy" : ( gtk.ScrollablePolicy,
+        "vscroll-policy" : ( Gtk.ScrollablePolicy,
                              "vscroll-policy",
                              "The vertical scrolling policy",
-                             gtk.ScrollablePolicy.MINIMUM,
+                             Gtk.ScrollablePolicy.MINIMUM,
                              GObject.PARAM_READWRITE ),
-        "vadjustment" : ( gtk.Adjustment,
+        "vadjustment" : ( Gtk.Adjustment,
                           "vadjustment",
                           "The vertical adjustment",
                           GObject.PARAM_READWRITE ),
-        "hscroll-policy" : ( gtk.ScrollablePolicy,
+        "hscroll-policy" : ( Gtk.ScrollablePolicy,
                              "hscroll-policy",
                              "The horizontal scrolling policy",
-                             gtk.ScrollablePolicy.MINIMUM,
+                             Gtk.ScrollablePolicy.MINIMUM,
                              GObject.PARAM_READWRITE ),
-        "hadjustment" : ( gtk.Adjustment,
+        "hadjustment" : ( Gtk.Adjustment,
                           "hadjustment",
                           "The horizontal adjustment",
                           GObject.PARAM_READWRITE )  }
@@ -73,7 +73,7 @@ class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
         This sets up the VBox height in the viewport and then calls the
         do_size_allocate() function of VBox()."""
         self._viewport.setVBOXHeight(allocation.height)
-        gtk.VBox.do_size_allocate(self, allocation)
+        Gtk.VBox.do_size_allocate(self, allocation)
         self.allocate_column_sizes(allocation)
 
     def do_get_property(self, prop):
@@ -108,7 +108,7 @@ class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
     def setStyle(self):
         """Set the style of the event box from the treeview."""
 
-class Alignment(gtk.Alignment):
+class Alignment(Gtk.Alignment):
     """An alignment that remembers the width it was given."""
     def __init__(self, xalign = 0.0, yalign=0.0,
                  xscale = 0.0, yscale = 0.0 ):
@@ -120,16 +120,16 @@ class Alignment(gtk.Alignment):
     def do_size_allocate(self, allocation):
         """Called with the new size allocation."""
         self.allocatedWidth = allocation.width
-        gtk.Alignment.do_size_allocate(self, allocation)
+        Gtk.Alignment.do_size_allocate(self, allocation)
 
-class TreeView(gtk.TreeView):
+class TreeView(Gtk.TreeView):
     def do_size_allocate(self, allocation):
         allocation.height += 1
-        gtk.TreeView.do_size_allocate(self, allocation)
+        Gtk.TreeView.do_size_allocate(self, allocation)
 
 #------------------------------------------------------------------------------
 
-class CheckButton(gtk.CheckButton):
+class CheckButton(Gtk.CheckButton):
     """A check button that contains a reference to a row in the delay code
     data table."""
     def __init__(self, delayCodeRow):
@@ -183,7 +183,7 @@ class DelayCodeTable(DelayCodeTableBase):
 
         self._delayCodeData = None
 
-        self._treeView = TreeView(gtk.ListStore(str, str))
+        self._treeView = TreeView(Gtk.ListStore(str, str))
         self._treeView.set_rules_hint(True)
 
         self.pack_start(self._treeView, False, False, 0)
@@ -191,7 +191,7 @@ class DelayCodeTable(DelayCodeTableBase):
         self._alignments = []
         self._checkButtons = []
 
-        self._eventBox = gtk.EventBox()
+        self._eventBox = Gtk.EventBox()
 
         self._table = None
 
@@ -253,16 +253,16 @@ class DelayCodeTable(DelayCodeTableBase):
         numColumns = len(headers) + 1
         numRows = len(rows)
 
-        column = gtk.TreeViewColumn("", gtk.CellRendererText())
+        column = Gtk.TreeViewColumn("", Gtk.CellRendererText())
         column.set_sizing(TREE_VIEW_COLUMN_FIXED)
         self._treeView.append_column(column)
 
         for header in headers:
-            column = gtk.TreeViewColumn(header, gtk.CellRendererText())
+            column = Gtk.TreeViewColumn(header, Gtk.CellRendererText())
             column.set_sizing(TREE_VIEW_COLUMN_FIXED)
             self._treeView.append_column(column)
 
-        self._table = gtk.Table(numRows, numColumns)
+        self._table = Gtk.Table(numRows, numColumns)
         self._table.set_homogeneous(False)
         self._table.set_col_spacings(16)
         self._table.set_row_spacings(4)
@@ -275,9 +275,9 @@ class DelayCodeTable(DelayCodeTableBase):
         for i in range(0, numRows):
             (type, elements) = rows[i]
             if type==CAPTION:
-                alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                           xscale = 1.0)
-                label = gtk.Label("<b>" + elements + "</b>")
+                label = Gtk.Label("<b>" + elements + "</b>")
                 label.set_use_markup(True)
                 label.set_alignment(0.0, 0.5)
                 alignment.add(label)
@@ -296,7 +296,7 @@ class DelayCodeTable(DelayCodeTableBase):
                     self._alignments.append(alignment)
 
                 for j in range(0, numColumns-1):
-                    label = gtk.Label(elements[j])
+                    label = Gtk.Label(elements[j])
                     label.set_alignment(0.0, 0.5)
                     alignment = Alignment(xalign = 0.5, yalign = 0.5,
                                           xscale = 1.0)

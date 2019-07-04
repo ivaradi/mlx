@@ -21,7 +21,7 @@ import os
 
 #------------------------------------------------------------------------------
 
-class ChecklistEditor(gtk.Dialog):
+class ChecklistEditor(Gtk.Dialog):
     """The dialog to edit the checklists."""
     def __init__(self, gui):
         super(ChecklistEditor, self).__init__(WINDOW_TITLE_BASE + " - " +
@@ -38,20 +38,20 @@ class ChecklistEditor(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        typeBox = gtk.HBox()
+        typeBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("chklst_aircraftType"))
+        label = Gtk.Label(xstr("chklst_aircraftType"))
         label.set_use_underline(True)
 
         typeBox.pack_start(label, False, False, 4)
 
-        self._aircraftTypeModel = gtk.ListStore(str, int)
+        self._aircraftTypeModel = Gtk.ListStore(str, int)
         for type in const.aircraftTypes:
             name = aircraftNames[type] if type in aircraftNames \
                    else "Aircraft type #%d" % (type,)
             self._aircraftTypeModel.append([name, type])
-        self._aircraftType = gtk.ComboBox(model = self._aircraftTypeModel)
-        renderer = gtk.CellRendererText()
+        self._aircraftType = Gtk.ComboBox(model = self._aircraftTypeModel)
+        renderer = Gtk.CellRendererText()
         self._aircraftType.pack_start(renderer, True)
         self._aircraftType.add_attribute(renderer, "text", 0)
         self._aircraftType.set_tooltip_text(xstr("chklst_aircraftType_tooltip"))
@@ -61,25 +61,25 @@ class ChecklistEditor(gtk.Dialog):
 
         typeBox.pack_start(self._aircraftType, True, True, 4)
 
-        typeBoxAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        typeBoxAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                          xscale = 0.0, yscale = 0.0)
         typeBoxAlignment.set_size_request(400, -1)
         typeBoxAlignment.add(typeBox)
 
         contentArea.pack_start(typeBoxAlignment, False, False, 12)
 
-        fileBox = gtk.HBox()        
+        fileBox = Gtk.HBox()        
 
-        self._fileChooser = gtk.FileChooserWidget()
+        self._fileChooser = Gtk.FileChooserWidget()
         self._fileChooser.set_select_multiple(True)
         
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("file_filter_audio"))
         filter.add_pattern("*.wav")
         filter.add_pattern("*.mp3")
         self._fileChooser.add_filter(filter)
             
-        filter = gtk.FileFilter()
+        filter = Gtk.FileFilter()
         filter.set_name(xstr("file_filter_all"))
         filter.add_pattern("*.*")
         self._fileChooser.add_filter(filter)
@@ -89,70 +89,70 @@ class ChecklistEditor(gtk.Dialog):
 
         fileBox.pack_start(self._fileChooser, True, True, 4)
 
-        controlBox = gtk.VBox()
-        controlAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        controlBox = Gtk.VBox()
+        controlAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                          xscale = 0.0, yscale = 0.0)
         controlAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                      padding_left = 32, padding_right = 32)
         controlAlignment.add(controlBox)
         fileBox.pack_start(controlAlignment, False, False, 0)
 
-        self._addButton = gtk.Button(xstr("chklst_add"))
+        self._addButton = Gtk.Button(xstr("chklst_add"))
         self._addButton.set_use_underline(True)
         self._addButton.set_tooltip_text(xstr("chklst_add_tooltip"))
         self._addButton.connect("clicked", self._addButtonClicked)
-        addAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        addAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                      xscale = 0.0, yscale = 0.0)
         addAlignment.set_padding(padding_top = 64, padding_bottom = 0,
                                  padding_left = 0, padding_right = 0)
         addAlignment.add(self._addButton)
         controlBox.pack_start(addAlignment, False, False, 0)
 
-        self._removeButton = gtk.Button(xstr("chklst_remove"))
+        self._removeButton = Gtk.Button(xstr("chklst_remove"))
         self._removeButton.set_use_underline(True)
         self._removeButton.set_tooltip_text(xstr("chklst_remove_tooltip"))
         self._removeButton.set_sensitive(False)
         self._removeButton.connect("clicked", self._removeButtonClicked)
 
-        removeAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        removeAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 0.0)
         removeAlignment.set_padding(padding_top = 64, padding_bottom = 0,
                                     padding_left = 0, padding_right = 0)
         removeAlignment.add(self._removeButton)
         controlBox.pack_start(removeAlignment, False, False, 0)
 
-        self._moveUpButton = gtk.Button(xstr("chklst_moveUp"))
+        self._moveUpButton = Gtk.Button(xstr("chklst_moveUp"))
         self._moveUpButton.set_use_underline(True)
         self._moveUpButton.set_tooltip_text(xstr("chklst_moveUp_tooltip"))
         self._moveUpButton.set_sensitive(False)
         self._moveUpButton.connect("clicked", self._moveUpButtonClicked)
 
-        moveUpAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        moveUpAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 0.0)
         moveUpAlignment.set_padding(padding_top = 16, padding_bottom = 0,
                                     padding_left = 0, padding_right = 0)
         moveUpAlignment.add(self._moveUpButton)
         controlBox.pack_start(moveUpAlignment, False, False, 0)
 
-        self._moveDownButton = gtk.Button(xstr("chklst_moveDown"))
+        self._moveDownButton = Gtk.Button(xstr("chklst_moveDown"))
         self._moveDownButton.set_use_underline(True)
         self._moveDownButton.set_tooltip_text(xstr("chklst_moveDown_tooltip"))
         self._moveDownButton.set_sensitive(False)
         self._moveDownButton.connect("clicked", self._moveDownButtonClicked)
 
-        moveDownAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.0,
+        moveDownAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 0.0)
         moveDownAlignment.set_padding(padding_top = 4, padding_bottom = 0,
                                     padding_left = 0, padding_right = 0)
         moveDownAlignment.add(self._moveDownButton)
         controlBox.pack_start(moveDownAlignment, False, False, 0)
 
-        self._fileListModel = gtk.ListStore(str, str)
-        self._fileList = gtk.TreeView(model = self._fileListModel)
+        self._fileListModel = Gtk.ListStore(str, str)
+        self._fileList = Gtk.TreeView(model = self._fileListModel)
         self._fileList.connect("button-press-event",
                                self._fileListButtonPressed)
-        column = gtk.TreeViewColumn(xstr("chklst_header"),
-                                    gtk.CellRendererText(), text = 0)
+        column = Gtk.TreeViewColumn(xstr("chklst_header"),
+                                    Gtk.CellRendererText(), text = 0)
         column.set_expand(True)
         column.set_clickable(False)
         column.set_reorderable(False)
@@ -166,7 +166,7 @@ class ChecklistEditor(gtk.Dialog):
 
         self._buildFileListPopupMenu()
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
         scrolledWindow.set_size_request(200, -1)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
@@ -328,9 +328,9 @@ class ChecklistEditor(gtk.Dialog):
 
     def _buildFileListPopupMenu(self):
         """Build the file list popup menu."""
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("chklst_remove"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupRemove)
@@ -339,7 +339,7 @@ class ChecklistEditor(gtk.Dialog):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("chklst_moveUp"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupMoveUp)
@@ -348,7 +348,7 @@ class ChecklistEditor(gtk.Dialog):
 
         menu.append(menuItem)
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("chklst_moveDown"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupMoveDown)

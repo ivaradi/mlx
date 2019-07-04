@@ -25,18 +25,18 @@ import re
 
 #------------------------------------------------------------------------------
 
-class MessageFrame(gtk.Frame):
+class MessageFrame(Gtk.Frame):
     """A frame containing the information about a PIREP message.
 
     It consists of a text view with the heading information (author, time) and
     another text view with the actual message."""
     def __init__(self, message, senderPID, senderName):
         """Construct the frame."""
-        gtk.Frame.__init__(self)
+        Gtk.Frame.__init__(self)
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
-        self._heading = heading = gtk.TextView()
+        self._heading = heading = Gtk.TextView()
         heading.set_editable(False)
         heading.set_can_focus(False)
         heading.set_wrap_mode(WRAP_WORD)
@@ -48,14 +48,14 @@ class MessageFrame(gtk.Frame):
         buffer.apply_tag(self._headingTag,
                          buffer.get_start_iter(), buffer.get_end_iter())
 
-        headingAlignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        headingAlignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                          xscale = 1.0, yscale = 0.0)
         headingAlignment.set_padding(padding_top = 0, padding_bottom = 0,
                                      padding_left = 2, padding_right = 2)
         headingAlignment.add(heading)
         vbox.pack_start(headingAlignment, True, True, 4)
 
-        self._messageView = messageView = gtk.TextView()
+        self._messageView = messageView = Gtk.TextView()
         messageView.set_wrap_mode(WRAP_WORD)
         messageView.set_editable(False)
         messageView.set_can_focus(False)
@@ -71,13 +71,13 @@ class MessageFrame(gtk.Frame):
         self.show_all()
 
         styleContext = self.get_style_context()
-        color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
+        color = styleContext.get_background_color(Gtk.StateFlags.NORMAL)
         heading.override_background_color(0, color)
 
 
 #-------------------------------------------------------------------------------
 
-class MessagesWidget(gtk.Frame):
+class MessagesWidget(Gtk.Frame):
     """The widget for the messages."""
     @staticmethod
     def getFaultFrame(alignment):
@@ -85,36 +85,36 @@ class MessagesWidget(gtk.Frame):
         return alignment.get_children()[0]
 
     def __init__(self, gui):
-        gtk.Frame.__init__(self)
+        Gtk.Frame.__init__(self)
 
         self._gui = gui
         self.set_label(xstr("pirep_messages"))
         label = self.get_label_widget()
         label.set_use_underline(True)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
 
-        self._outerBox = outerBox = gtk.EventBox()
+        self._outerBox = outerBox = Gtk.EventBox()
         outerBox.add(alignment)
 
-        self._innerBox = innerBox = gtk.EventBox()
+        self._innerBox = innerBox = Gtk.EventBox()
         alignment.add(self._innerBox)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 0,
                               padding_left = 0, padding_right = 0)
 
         innerBox.add(alignment)
 
-        scroller = gtk.ScrolledWindow()
+        scroller = Gtk.ScrolledWindow()
         scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scroller.set_shadow_type(SHADOW_NONE)
 
-        self._messages = gtk.VBox()
+        self._messages = Gtk.VBox()
         self._messages.set_homogeneous(False)
         scroller.add_with_viewport(self._messages)
 
@@ -128,7 +128,7 @@ class MessagesWidget(gtk.Frame):
     def addMessage(self, message):
         """Add a message from the given sender."""
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                       xscale = 1.0, yscale = 0.0)
         alignment.set_padding(padding_top = 2, padding_bottom = 2,
                               padding_left = 4, padding_right = 4)
@@ -153,7 +153,7 @@ class MessagesWidget(gtk.Frame):
 
 #------------------------------------------------------------------------------
 
-class PIREPViewer(gtk.Dialog):
+class PIREPViewer(Gtk.Dialog):
     """The dialog for PIREP viewing."""
     @staticmethod
     def createFrame(label):
@@ -166,14 +166,14 @@ class PIREPViewer(gtk.Dialog):
         The function returns a tuple with the following items:
         - the frame,
         - the inner VBox."""
-        frame = gtk.Frame(label = label)
+        frame = Gtk.Frame(label = label)
 
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
         frame.add(alignment)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 4, padding_right = 4)
-        box = gtk.VBox()
+        box = Gtk.VBox()
         alignment.add(box)
 
         return (frame, box)
@@ -181,7 +181,7 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def getLabel(text, extraText = ""):
         """Get a bold label with the given text."""
-        label = gtk.Label("<b>" + text + "</b>" + extraText)
+        label = Gtk.Label("<b>" + text + "</b>" + extraText)
         label.set_use_markup(True)
         label.set_alignment(0.0, 0.5)
         return label
@@ -189,7 +189,7 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def getDataLabel(width = None, xAlignment = 0.0):
         """Get a bold label with the given text."""
-        label = gtk.Label()
+        label = Gtk.Label()
         if width is not None:
             label.set_width_chars(width)
         label.set_alignment(xAlignment, 0.5)
@@ -202,11 +202,11 @@ class PIREPViewer(gtk.Dialog):
         Returns a tuple of the following items:
         - the window,
         - the text view."""
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_shadow_type(SHADOW_IN)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
 
-        textView = gtk.TextView()
+        textView = Gtk.TextView()
         textView.set_wrap_mode(WRAP_WORD)
         textView.set_editable(editable)
         textView.set_cursor_visible(editable)
@@ -225,7 +225,7 @@ class PIREPViewer(gtk.Dialog):
         label.
 
         Returns the data label attached."""
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         table.attach(dataBox, column, column+1, row, row+1)
 
         dataLabel = PIREPViewer.addLabeledData(dataBox, labelText,
@@ -250,7 +250,7 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def addHFiller(hBox, width = 8):
         """Add a filler to the given horizontal box."""
-        filler = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        filler = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                xscale = 1.0, yscale = 1.0)
         filler.set_size_request(width, -1)
         hBox.pack_start(filler, False, False, 0)
@@ -258,7 +258,7 @@ class PIREPViewer(gtk.Dialog):
     @staticmethod
     def addVFiller(vBox, height = 4):
         """Add a filler to the given vertical box."""
-        filler = gtk.Alignment(xalign = 0.0, yalign = 0.0,
+        filler = Gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                xscale = 1.0, yscale = 1.0)
         filler.set_size_request(-1, height)
         vBox.pack_start(filler, False, False, 0)
@@ -283,23 +283,23 @@ class PIREPViewer(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        self._notebook = gtk.Notebook()
+        self._notebook = Gtk.Notebook()
         contentArea.pack_start(self._notebook, False, False, 4)
 
         dataTab = self._buildDataTab()
-        label = gtk.Label(xstr("pirepView_tab_data"))
+        label = Gtk.Label(xstr("pirepView_tab_data"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_data_tooltip"))
         self._notebook.append_page(dataTab, label)
 
         commentsTab = self._buildCommentsTab()
-        label = gtk.Label(xstr("pirepView_tab_comments"))
+        label = Gtk.Label(xstr("pirepView_tab_comments"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_comments_tooltip"))
         self._notebook.append_page(commentsTab, label)
 
         logTab = self._buildLogTab()
-        label = gtk.Label(xstr("pirepView_tab_log"))
+        label = Gtk.Label(xstr("pirepView_tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
@@ -307,7 +307,7 @@ class PIREPViewer(gtk.Dialog):
         self._showMessages = showMessages
         if showMessages:
             messagesTab = self._buildMessagesTab()
-            label = gtk.Label(xstr("pirepView_tab_messages"))
+            label = Gtk.Label(xstr("pirepView_tab_messages"))
             label.set_use_underline(True)
             label.set_tooltip_text(xstr("pirepView_tab_messages_tooltip"))
             self._notebook.append_page(messagesTab, label)
@@ -416,15 +416,15 @@ class PIREPViewer(gtk.Dialog):
 
     def _buildDataTab(self):
         """Build the data tab of the viewer."""
-        table = gtk.Table(1, 2)
+        table = Gtk.Table(1, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(True)
 
-        box1 = gtk.VBox()
+        box1 = Gtk.VBox()
         table.attach(box1, 0, 1, 0, 1)
 
-        box2 = gtk.VBox()
+        box2 = Gtk.VBox()
         table.attach(box2, 1, 2, 0, 1)
 
         flightFrame = self._buildFlightFrame()
@@ -452,7 +452,7 @@ class PIREPViewer(gtk.Dialog):
 
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_flight"))
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
         self._callsign = \
@@ -467,7 +467,7 @@ class PIREPViewer(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
         self._aircraftType = \
@@ -477,7 +477,7 @@ class PIREPViewer(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -502,7 +502,7 @@ class PIREPViewer(gtk.Dialog):
                                     xstr("pirepView_arrival_time"),
                                     width = 6)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -548,7 +548,7 @@ class PIREPViewer(gtk.Dialog):
 
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_route"))
 
-        levelBox = gtk.HBox()
+        levelBox = Gtk.HBox()
         mainBox.pack_start(levelBox, False, False, 0)
 
         self._filedCruiseLevel = \
@@ -580,7 +580,7 @@ class PIREPViewer(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
         self._departureRunway = \
@@ -607,7 +607,7 @@ class PIREPViewer(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        table = gtk.Table(2, 2)
+        table = Gtk.Table(2, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -638,7 +638,7 @@ class PIREPViewer(gtk.Dialog):
         """Build the frame for the statistics data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_statistics"))
 
-        table = gtk.Table(4, 2)
+        table = Gtk.Table(4, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -684,7 +684,7 @@ class PIREPViewer(gtk.Dialog):
         """Build the frame for the miscellaneous data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_miscellaneous"))
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -736,7 +736,7 @@ class PIREPViewer(gtk.Dialog):
 
     def _buildCommentsTab(self):
         """Build the tab with the comments and flight defects."""
-        table = gtk.Table(2, 1)
+        table = Gtk.Table(2, 1)
         table.set_col_spacings(16)
 
         (frame, commentsBox) = \
@@ -759,7 +759,7 @@ class PIREPViewer(gtk.Dialog):
 
     def _buildLogTab(self):
         """Build the log tab."""
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
 
         (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
         addFaultTag(self._log.get_buffer())
@@ -769,7 +769,7 @@ class PIREPViewer(gtk.Dialog):
 
     def _buildMessagesTab(self):
         """Build the messages tab."""
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
 
         self._messages = MessagesWidget(self._gui)
         mainBox.pack_start(self._messages, True, True, 0)
@@ -778,7 +778,7 @@ class PIREPViewer(gtk.Dialog):
 
 #------------------------------------------------------------------------------
 
-class PIREPEditor(gtk.Dialog):
+class PIREPEditor(Gtk.Dialog):
     """A PIREP editor dialog."""
     _delayCodeRE = re.compile("([0-9]{2,3})( \([^\)]*\))")
 
@@ -788,9 +788,9 @@ class PIREPEditor(gtk.Dialog):
 
         The label will got to cell (column, row), the widget to cell
         (column+1, row)."""
-        label = gtk.Label("<b>" + labelText + "</b>")
+        label = Gtk.Label("<b>" + labelText + "</b>")
         label.set_use_markup(True)
-        alignment = gtk.Alignment(xalign = 0.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
         table.attach(alignment, column, column + 1, row, row + 1)
@@ -806,7 +806,7 @@ class PIREPEditor(gtk.Dialog):
 
         The label will got to cell (column, row), the spin button to cell
         (column+1, row)."""
-        button = gtk.SpinButton()
+        button = Gtk.SpinButton()
         button.set_range(min = minValue, max = maxValue)
         button.set_increments(step = stepIncrement, page = pageIncrement)
         button.set_numeric(True)
@@ -846,23 +846,23 @@ class PIREPEditor(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        self._notebook = gtk.Notebook()
+        self._notebook = Gtk.Notebook()
         contentArea.pack_start(self._notebook, False, False, 4)
 
         dataTab = self._buildDataTab()
-        label = gtk.Label(xstr("pirepView_tab_data"))
+        label = Gtk.Label(xstr("pirepView_tab_data"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_data_tooltip"))
         self._notebook.append_page(dataTab, label)
 
         self._flightInfo = self._buildCommentsTab()
-        label = gtk.Label(xstr("pirepView_tab_comments"))
+        label = Gtk.Label(xstr("pirepView_tab_comments"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_comments_tooltip"))
         self._notebook.append_page(self._flightInfo, label)
 
         logTab = self._buildLogTab()
-        label = gtk.Label(xstr("pirepView_tab_log"))
+        label = Gtk.Label(xstr("pirepView_tab_log"))
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
@@ -1013,15 +1013,15 @@ class PIREPEditor(gtk.Dialog):
 
     def _buildDataTab(self):
         """Build the data tab of the viewer."""
-        table = gtk.Table(1, 2)
+        table = Gtk.Table(1, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(True)
 
-        box1 = gtk.VBox()
+        box1 = Gtk.VBox()
         table.attach(box1, 0, 1, 0, 1)
 
-        box2 = gtk.VBox()
+        box2 = Gtk.VBox()
         table.attach(box2, 1, 2, 0, 1)
 
         flightFrame = self._buildFlightFrame()
@@ -1049,7 +1049,7 @@ class PIREPEditor(gtk.Dialog):
 
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_flight"))
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
         self._callsign = \
@@ -1064,7 +1064,7 @@ class PIREPEditor(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
         self._aircraftType = \
@@ -1074,7 +1074,7 @@ class PIREPEditor(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -1099,7 +1099,7 @@ class PIREPEditor(gtk.Dialog):
                                     xstr("pirepView_arrival_time"),
                                     width = 6)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -1144,14 +1144,14 @@ class PIREPEditor(gtk.Dialog):
 
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_route"))
 
-        levelBox = gtk.HBox()
+        levelBox = Gtk.HBox()
         mainBox.pack_start(levelBox, False, False, 0)
 
         label = PIREPViewer.getLabel(xstr("pirepView_filedCruiseLevel"),
                                      xstr("pirepEdit_FL"))
         levelBox.pack_start(label, False, False, 0)
 
-        self._filedCruiseLevel = gtk.SpinButton()
+        self._filedCruiseLevel = Gtk.SpinButton()
         self._filedCruiseLevel.set_increments(step = 10, page = 100)
         self._filedCruiseLevel.set_range(min = 0, max = 500)
         self._filedCruiseLevel.set_tooltip_text(xstr("route_level_tooltip"))
@@ -1166,7 +1166,7 @@ class PIREPEditor(gtk.Dialog):
                                      xstr("pirepEdit_FL"))
         levelBox.pack_start(label, False, False, 0)
 
-        self._modifiedCruiseLevel = gtk.SpinButton()
+        self._modifiedCruiseLevel = Gtk.SpinButton()
         self._modifiedCruiseLevel.set_increments(step = 10, page = 100)
         self._modifiedCruiseLevel.set_range(min = 0, max = 500)
         self._modifiedCruiseLevel.set_tooltip_text(xstr("pirepEdit_modified_route_level_tooltip"))
@@ -1200,27 +1200,27 @@ class PIREPEditor(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        dataBox = gtk.HBox()
+        dataBox = Gtk.HBox()
         mainBox.pack_start(dataBox, False, False, 0)
 
-        label = gtk.Label("<b>" + xstr("pirepView_runway") + "</b>")
+        label = Gtk.Label("<b>" + xstr("pirepView_runway") + "</b>")
         label.set_use_markup(True)
         dataBox.pack_start(label, False, False, 0)
 
         # FIXME: quite the same as the runway entry boxes in the wizard
-        self._departureRunway = gtk.Entry()
+        self._departureRunway = Gtk.Entry()
         self._departureRunway.set_width_chars(5)
         self._departureRunway.set_tooltip_text(xstr("takeoff_runway_tooltip"))
         self._departureRunway.connect("changed", self._upperChanged)
         dataBox.pack_start(self._departureRunway, False, False, 8)
 
-        label = gtk.Label("<b>" + xstr("pirepView_sid") + "</b>")
+        label = Gtk.Label("<b>" + xstr("pirepView_sid") + "</b>")
         label.set_use_markup(True)
         dataBox.pack_start(label, False, False, 0)
 
         # FIXME: quite the same as the SID combo box in
         # the flight wizard
-        self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._sid = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._sid.set_entry_text_column(0)
         self._sid.get_child().set_width_chars(10)
@@ -1246,13 +1246,13 @@ class PIREPEditor(gtk.Dialog):
 
         PIREPViewer.addVFiller(mainBox)
 
-        table = gtk.Table(2, 4)
+        table = Gtk.Table(2, 4)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
 
         # FIXME: quite the same as in the wizard
-        self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._star = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._star.set_entry_text_column(0)
         self._star.get_child().set_width_chars(10)
@@ -1264,7 +1264,7 @@ class PIREPEditor(gtk.Dialog):
                                       self._star)
 
         # FIXME: quite the same as in the wizard
-        self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
+        self._transition = Gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._transition.set_entry_text_column(0)
         self._transition.get_child().set_width_chars(10)
@@ -1277,7 +1277,7 @@ class PIREPEditor(gtk.Dialog):
 
 
         # FIXME: quite the same as in the wizard
-        self._approachType = gtk.Entry()
+        self._approachType = Gtk.Entry()
         self._approachType.set_width_chars(10)
         self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
         self._approachType.connect("changed", self._upperChanged)
@@ -1287,7 +1287,7 @@ class PIREPEditor(gtk.Dialog):
                                       self._approachType)
 
         # FIXME: quite the same as in the wizard
-        self._arrivalRunway = gtk.Entry()
+        self._arrivalRunway = Gtk.Entry()
         self._arrivalRunway.set_width_chars(10)
         self._arrivalRunway.set_tooltip_text(xstr("landing_runway_tooltip"))
         self._arrivalRunway.connect("changed", self._upperChanged)
@@ -1302,7 +1302,7 @@ class PIREPEditor(gtk.Dialog):
         """Build the frame for the statistics data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_statistics"))
 
-        table = gtk.Table(4, 4)
+        table = Gtk.Table(4, 4)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -1354,7 +1354,7 @@ class PIREPEditor(gtk.Dialog):
         """Build the frame for the miscellaneous data."""
         (frame, mainBox) = PIREPViewer.createFrame(xstr("pirepView_frame_miscellaneous"))
 
-        table = gtk.Table(6, 2)
+        table = Gtk.Table(6, 2)
         mainBox.pack_start(table, False, False, 0)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -1402,7 +1402,7 @@ class PIREPEditor(gtk.Dialog):
         self._flightType.connect("changed", self._updateButtons)
         self._flightType.set_tooltip_text(xstr("pirepEdit_flight_type_tooltip"))
 
-        self._online = gtk.CheckButton(xstr("pirepEdit_online"))
+        self._online = Gtk.CheckButton(xstr("pirepEdit_online"))
         table.attach(self._online, 2, 3, 2, 3)
         self._online.connect("toggled", self._updateButtons)
         self._online.set_tooltip_text(xstr("pirepEdit_online_tooltip"))
@@ -1424,7 +1424,7 @@ class PIREPEditor(gtk.Dialog):
 
     def _buildLogTab(self):
         """Build the log tab."""
-        mainBox = gtk.VBox()
+        mainBox = Gtk.VBox()
 
         (logWindow, self._log) = PIREPViewer.getTextWindow(heightRequest = -1)
         addFaultTag(self._log.get_buffer())

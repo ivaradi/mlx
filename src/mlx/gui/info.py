@@ -20,7 +20,7 @@ import mlx.const as const
 
 #------------------------------------------------------------------------------
 
-class FlightInfo(gtk.VBox):
+class FlightInfo(Gtk.VBox):
     """The flight info tab."""
     @staticmethod
     def _createCommentArea(label):
@@ -30,20 +30,20 @@ class FlightInfo(gtk.VBox):
         - the top-level widget of the comment area, and
         - the comment text editor."""
 
-        frame = gtk.Frame(label = label)
+        frame = Gtk.Frame(label = label)
         label = frame.get_label_widget()
         label.set_use_underline(True)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
-        scroller = gtk.ScrolledWindow()
+        scroller = Gtk.ScrolledWindow()
         scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
         scroller.set_shadow_type(SHADOW_IN)
 
-        comments = gtk.TextView()
+        comments = Gtk.TextView()
         comments.set_wrap_mode(WRAP_WORD)
         scroller.add(comments)
         alignment.add(scroller)
@@ -59,9 +59,9 @@ class FlightInfo(gtk.VBox):
         self._gui = gui
         self._callbackObject = callbackObject
 
-        self._commentsAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        self._commentsAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                                 xscale = 1.0, yscale = 1.0)
-        commentsBox = gtk.HBox()
+        commentsBox = Gtk.HBox()
         commentsBox.set_homogeneous(True)
 
         (frame, self._comments) = FlightInfo._createCommentArea(xstr("info_comments"))
@@ -76,17 +76,17 @@ class FlightInfo(gtk.VBox):
         self._commentsAlignment.add(commentsBox)
         self.pack_start(self._commentsAlignment, True, True, 8)
 
-        frame = gtk.Frame(label = xstr("info_delay"))
+        frame = Gtk.Frame(label = xstr("info_delay"))
         label = frame.get_label_widget()
         label.set_use_underline(True)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 1.0, yscale = 1.0)
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 8, padding_right = 8)
 
         self._delayCodeTable = table = DelayCodeTable(self)
-        self._delayWindow = scrolledWindow = gtk.ScrolledWindow()
+        self._delayWindow = scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(table)
         scrolledWindow.set_size_request(-1, 185)
         scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
@@ -95,7 +95,7 @@ class FlightInfo(gtk.VBox):
         alignment.add(scrolledWindow)
         frame.add(alignment)
 
-        self._delayAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        self._delayAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                              xscale = 1.0, yscale = 1.0)
         self._delayAlignment.add(frame)
         self._delayAlignment.set_padding(padding_top = 0, padding_bottom = 0,

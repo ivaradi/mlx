@@ -19,25 +19,25 @@ import time
 
 #-------------------------------------------------------------------------------
 
-class Statusbar(gtk.Frame, FlightStatusHandler):
+class Statusbar(Gtk.Frame, FlightStatusHandler):
     """A status bar for the logger."""
     def __init__(self, iconDirectory):
         """Construct the status bar."""
-        gtk.Frame.__init__(self)
+        Gtk.Frame.__init__(self)
         FlightStatusHandler.__init__(self)
 
         self._connecting = False
         self._connected = False
         
-        self.set_shadow_type(gtk.ShadowType.NONE)
+        self.set_shadow_type(Gtk.ShadowType.NONE)
 
-        frameAlignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        frameAlignment = Gtk.Alignment(xscale = 1.0, yscale = 1.0)
 
         frameAlignment.set_padding(padding_top = 2, padding_bottom = 2,
                                    padding_left = 16, padding_right = 16)
         self.add(frameAlignment)
 
-        statusBox = gtk.HBox()
+        statusBox = Gtk.HBox()
         frameAlignment.add(statusBox)
 
         iconPath = os.path.join(iconDirectory, "conn_grey.png")
@@ -49,20 +49,20 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         iconPath = os.path.join(iconDirectory, "conn_green.png")
         self._connGreenIcon = pixbuf_new_from_file(iconPath)
 
-        self._connStateArea = gtk.DrawingArea()
+        self._connStateArea = Gtk.DrawingArea()
         self._connStateArea.set_size_request(18, 18)
         self._connStateArea.set_tooltip_markup(xstr("statusbar_conn_tooltip"))
 
         self._connStateArea.connect("draw", self._drawConnState)
 
-        alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5)
+        alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5)
         alignment.add(self._connStateArea)        
 
         statusBox.pack_start(alignment, False, False, 8)
 
-        statusBox.pack_start(gtk.VSeparator(), False, False, 8)
+        statusBox.pack_start(Gtk.VSeparator(), False, False, 8)
 
-        self._stageLabel = gtk.Label()
+        self._stageLabel = Gtk.Label()
         longestStage = xstr("flight_stage_" +
                             const.stage2string(const.STAGE_PUSHANDTAXI))
         self._stageLabel.set_width_chars(len(longestStage) + 3)
@@ -71,25 +71,25 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         
         statusBox.pack_start(self._stageLabel, False, False, 8)
 
-        statusBox.pack_start(gtk.VSeparator(), False, False, 8)
+        statusBox.pack_start(Gtk.VSeparator(), False, False, 8)
 
-        self._timeLabel = gtk.Label("--:--:--")
+        self._timeLabel = Gtk.Label("--:--:--")
         self._timeLabel.set_width_chars(8)
         self._timeLabel.set_tooltip_text(xstr("statusbar_time_tooltip"))
         self._timeLabel.set_alignment(1.0, 0.5)
         
         statusBox.pack_start(self._timeLabel, False, False, 8)
 
-        statusBox.pack_start(gtk.VSeparator(), False, False, 8)
+        statusBox.pack_start(Gtk.VSeparator(), False, False, 8)
 
-        self._ratingLabel = gtk.Label()
+        self._ratingLabel = Gtk.Label()
         self._ratingLabel.set_width_chars(20)
         self._ratingLabel.set_tooltip_text(xstr("statusbar_rating_tooltip"))
         self._ratingLabel.set_alignment(0.0, 0.5)
         
         statusBox.pack_start(self._ratingLabel, False, False, 8)
 
-        self._busyLabel = gtk.Label()
+        self._busyLabel = Gtk.Label()
         self._busyLabel.set_width_chars(30)
         self._busyLabel.set_tooltip_text(xstr("statusbar_busy_tooltip"))
         self._busyLabel.set_alignment(1.0, 0.5)

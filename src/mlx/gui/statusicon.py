@@ -29,40 +29,40 @@ class StatusIcon(FlightStatusHandler):
         self._gui = gui
         self._selfToggling = False
 
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
         if appIndicator:
-            self._stageMenuItem = gtk.MenuItem("-")
+            self._stageMenuItem = Gtk.MenuItem("-")
             self._stageMenuItem.show()
             menu.append(self._stageMenuItem)
 
-            self._ratingMenuItem = gtk.MenuItem("-")
+            self._ratingMenuItem = Gtk.MenuItem("-")
             self._ratingMenuItem.show()
             menu.append(self._ratingMenuItem)
 
-            separator = gtk.SeparatorMenuItem()
+            separator = Gtk.SeparatorMenuItem()
             separator.show()
             menu.append(separator)
 
-        self._showHideMenuItem = gtk.CheckMenuItem()
+        self._showHideMenuItem = Gtk.CheckMenuItem()
         self._showHideMenuItem.set_label(xstr("statusicon_showmain"))
         self._showHideMenuItem.set_active(True)
         self._showHideMenuItem.connect("toggled", self._showHideToggled)
         self._showHideMenuItem.show()
         menu.append(self._showHideMenuItem)
 
-        self._showMonitorMenuItem = gtk.CheckMenuItem()
+        self._showMonitorMenuItem = Gtk.CheckMenuItem()
         self._showMonitorMenuItem.set_label(xstr("statusicon_showmonitor"))
         self._showMonitorMenuItem.set_active(False)
         self._showMonitorMenuItem.connect("toggled", self._showMonitorToggled)
         self._showMonitorMenuItem.show()
         menu.append(self._showMonitorMenuItem)
 
-        separator = gtk.SeparatorMenuItem()
+        separator = Gtk.SeparatorMenuItem()
         separator.show()
         menu.append(separator)
 
-        self._quitMenuItem = gtk.MenuItem()
+        self._quitMenuItem = Gtk.MenuItem()
         self._quitMenuItem.set_label(xstr("statusicon_quit"))
         self._quitMenuItem.show()
         self._quitMenuItem.connect("activate", self._gui._quit)
@@ -81,10 +81,10 @@ class StatusIcon(FlightStatusHandler):
             self._indicator = indicator
         else:
             def popup_menu(status, button, time):
-                menu.popup(None, None, gtk.status_icon_position_menu,
+                menu.popup(None, None, Gtk.status_icon_position_menu,
                            button, time, status)
 
-            statusIcon = gtk.StatusIcon()
+            statusIcon = Gtk.StatusIcon()
             statusIcon.set_from_file(iconFile)
             statusIcon.set_visible(True)
             statusIcon.connect('popup-menu', popup_menu)

@@ -307,11 +307,11 @@ def getContainer():
     """Get a container object suitable for running a browser instance
     within."""
     if os.name=="nt":
-        container = gtk.DrawingArea()
+        container = Gtk.DrawingArea()
         container.set_property("can-focus", True)
         container.connect("size-allocate", _handleSizeAllocate)
     else:
-        container = gtk.DrawingArea()
+        container = Gtk.DrawingArea()
 
     container.show()
 

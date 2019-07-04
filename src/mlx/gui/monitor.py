@@ -17,7 +17,7 @@ import time
 
 #------------------------------------------------------------------------------
 
-class MonitorWindow(gtk.Window):
+class MonitorWindow(Gtk.Window):
     """The window for the data monitor."""
     def __init__(self, gui, iconDirectory):
         """Construct the monitor window."""
@@ -31,12 +31,12 @@ class MonitorWindow(gtk.Window):
         self.connect("delete-event",
                      lambda a, b: self._gui.hideMonitorWindow())
 
-        alignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
+        alignment = Gtk.Alignment(xscale = 1.0, yscale = 1.0)
 
         alignment.set_padding(padding_top = 4, padding_bottom = 10,
                               padding_left = 16, padding_right = 16)
 
-        table = gtk.Table(rows = 9, columns = 14)
+        table = Gtk.Table(rows = 9, columns = 14)
         table.set_homogeneous(False)
         table.set_row_spacings(4)
         table.set_col_spacings(8)
@@ -45,22 +45,22 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 0, 1, 0, 1)
         table.attach(self._timestamp, 1, 2, 0, 1)
 
-        self._paused = gtk.Label("PAUSED")
+        self._paused = Gtk.Label("PAUSED")
         table.attach(self._paused, 2, 4, 0, 1)
 
-        self._trickMode = gtk.Label("TRICKMODE")
+        self._trickMode = Gtk.Label("TRICKMODE")
         table.attach(self._trickMode, 4, 6, 0, 1, xoptions = 0)
 
-        self._overspeed = gtk.Label("OVERSPEED")
+        self._overspeed = Gtk.Label("OVERSPEED")
         table.attach(self._overspeed, 6, 8, 0, 1)
 
-        self._stalled = gtk.Label("STALLED")
+        self._stalled = Gtk.Label("STALLED")
         table.attach(self._stalled, 8, 10, 0, 1)
 
-        self._onTheGround = gtk.Label("ONTHEGROUND")
+        self._onTheGround = Gtk.Label("ONTHEGROUND")
         table.attach(self._onTheGround, 10, 11, 0, 1)
 
-        self._antiIceOn = gtk.Label("ANTI-ICE")
+        self._antiIceOn = Gtk.Label("ANTI-ICE")
         table.attach(self._antiIceOn, 11, 12, 0, 1)
 
         (label, self._zfw) = self._createLabeledEntry("ZFW:", 6)
@@ -147,31 +147,31 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 8, 9, 4, 5)
         table.attach(self._reverser, 9, 12, 4, 5)
 
-        self._navLightsOn = gtk.Label("NAV")
+        self._navLightsOn = Gtk.Label("NAV")
         table.attach(self._navLightsOn, 0, 1, 5, 6)
 
-        self._antiCollisionLightsOn = gtk.Label("ANTICOLLISION")
+        self._antiCollisionLightsOn = Gtk.Label("ANTICOLLISION")
         table.attach(self._antiCollisionLightsOn, 1, 2, 5, 6)
 
-        self._strobeLightsOn = gtk.Label("STROBE")
+        self._strobeLightsOn = Gtk.Label("STROBE")
         table.attach(self._strobeLightsOn, 2, 3, 5, 6)
 
-        self._landingLightsOn = gtk.Label("LANDING")
+        self._landingLightsOn = Gtk.Label("LANDING")
         table.attach(self._landingLightsOn, 3, 4, 5, 6)
 
-        self._pitotHeatOn = gtk.Label("PITOT HEAT")
+        self._pitotHeatOn = Gtk.Label("PITOT HEAT")
         table.attach(self._pitotHeatOn, 4, 5, 5, 6)
 
-        self._parking = gtk.Label("PARKING")
+        self._parking = Gtk.Label("PARKING")
         table.attach(self._parking, 5, 6, 5, 6)
 
-        self._gearControlDown = gtk.Label("GEAR LEVER DOWN")
+        self._gearControlDown = Gtk.Label("GEAR LEVER DOWN")
         table.attach(self._gearControlDown, 6, 8, 5, 6)
 
-        self._gearsDown = gtk.Label("GEARS DOWN")
+        self._gearsDown = Gtk.Label("GEARS DOWN")
         table.attach(self._gearsDown, 8, 10, 5, 6)
 
-        self._spoilersArmed = gtk.Label("SPOILERS ARMED")
+        self._spoilersArmed = Gtk.Label("SPOILERS ARMED")
         table.attach(self._spoilersArmed, 10, 12, 5, 6)
 
         (label, self._spoilersExtension) = self._createLabeledEntry("Spoilers:", 3)
@@ -194,20 +194,20 @@ class MonitorWindow(gtk.Window):
         table.attach(label, 10, 11, 6, 7)
         table.attach(self._elevatorTrim, 11, 12, 6, 7)
 
-        self._apMaster = gtk.Label("AP MASTER")
+        self._apMaster = Gtk.Label("AP MASTER")
         table.attach(self._apMaster, 0, 1, 7, 8)
 
-        self._apHeadingHold = gtk.Label("AP HDG HOLD")
+        self._apHeadingHold = Gtk.Label("AP HDG HOLD")
         table.attach(self._apHeadingHold, 1, 2, 7, 8)
 
         (label, self._apHeading) = self._createLabeledEntry("AP HDG:", 5)
         table.attach(label, 2, 3, 7, 8)
         table.attach(self._apHeading, 3, 4, 7, 8)
 
-        self._xpdrC = gtk.Label("XPDR C")
+        self._xpdrC = Gtk.Label("XPDR C")
         table.attach(self._xpdrC, 4, 5, 7, 8)
 
-        self._apAltitudeHold = gtk.Label("AP ALT HOLD")
+        self._apAltitudeHold = Gtk.Label("AP ALT HOLD")
         table.attach(self._apAltitudeHold, 5, 6, 7, 8)
 
         (label, self._apAltitude) = self._createLabeledEntry("AP ALT:", 10)
@@ -261,12 +261,12 @@ class MonitorWindow(gtk.Window):
         - the box
         - the entry."""
 
-        alignment = gtk.Alignment(xalign = 1.0, yalign = 0.5, xscale = 1.0)
+        alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5, xscale = 1.0)
         alignment.set_padding(padding_top = 0, padding_bottom = 0,
                               padding_left = 0, padding_right = 16)
-        alignment.add(gtk.Label(label))
+        alignment.add(Gtk.Label(label))
 
-        entry = gtk.Entry()
+        entry = Gtk.Entry()
         entry.set_editable(False)
         entry.set_width_chars(width)
         entry.set_max_length(width)

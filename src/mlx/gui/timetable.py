@@ -13,11 +13,11 @@ import random
 
 #-----------------------------------------------------------------------------
 
-class Timetable(gtk.Alignment):
+class Timetable(Gtk.Alignment):
     """The widget for the time table."""
     def _getVIPRenderer():
         """Get the renderer for the VIP column."""
-        renderer = gtk.CellRendererToggle()
+        renderer = Gtk.CellRendererToggle()
         renderer.set_activatable(True)
         return renderer
 
@@ -73,17 +73,17 @@ class Timetable(gtk.Alignment):
                 defaultSortableIndex = len(types)
             columnDescriptor.appendType(types)
 
-        self._model = gtk.ListStore(*types)
+        self._model = Gtk.ListStore(*types)
         if defaultSortableIndex is not None:
             sortOrder = SORT_DESCENDING \
               if self._columnDescriptors[defaultSortableIndex-1]._defaultDescending \
               else SORT_ASCENDING
             self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
-        self._view = gtk.TreeView(self._model)
+        self._view = Gtk.TreeView(self._model)
 
         self._view.connect("motion-notify-event", self._updateTooltip)
 
-        flightPairIndexColumn = gtk.TreeViewColumn()
+        flightPairIndexColumn = Gtk.TreeViewColumn()
         flightPairIndexColumn.set_visible(False)
         self._view.append_column(flightPairIndexColumn)
 
@@ -101,14 +101,14 @@ class Timetable(gtk.Alignment):
         selection = self._view.get_selection()
         selection.connect("changed", self._selectionChanged)
 
-        scrolledWindow = gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._view)
         scrolledWindow.set_size_request(800, -1)
 
         # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
         super(Timetable, self).__init__(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 1.0)
@@ -251,7 +251,7 @@ GObject.signal_new("selection-changed", Timetable, GObject.SIGNAL_RUN_FIRST,
 
 #-----------------------------------------------------------------------------
 
-class CalendarWindow(gtk.Window):
+class CalendarWindow(Gtk.Window):
     """A window for a calendar."""
     def __init__(self):
         """Construct the window."""
@@ -261,12 +261,12 @@ class CalendarWindow(gtk.Window):
         self.set_modal(True)
         self.connect("key-press-event", self._keyPressed)
 
-        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 1.0)
         #mainAlignment.set_padding(padding_top = 0, padding_bottom = 12,
         #                              padding_left = 8, padding_right = 8)
 
-        self._calendar = gtk.Calendar()
+        self._calendar = Gtk.Calendar()
         self._calendar.connect("day-selected-double-click", self._daySelectedDoubleClick)
         mainAlignment.add(self._calendar)
 
@@ -304,7 +304,7 @@ GObject.signal_new("date-selected", CalendarWindow, GObject.SIGNAL_RUN_FIRST,
 
 #-----------------------------------------------------------------------------
 
-class BookDialog(gtk.Dialog):
+class BookDialog(Gtk.Dialog):
     """The dialog box to select additional data for a booking."""
     def __init__(self, timetableWindow, flightPair, planes):
         """Construct the dialog box."""
@@ -314,20 +314,20 @@ class BookDialog(gtk.Dialog):
                                          parent = timetableWindow)
         contentArea = self.get_content_area()
 
-        frame = gtk.Frame(xstr("timetable_book_frame_title"))
+        frame = Gtk.Frame(xstr("timetable_book_frame_title"))
         frame.set_size_request(600, -1)
 
-        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 0.0, yscale = 0.0)
         mainAlignment.set_padding(padding_top = 16, padding_bottom = 12,
                                   padding_left = 8, padding_right = 8)
 
-        table = gtk.Table(6, 2)
+        table = Gtk.Table(6, 2)
         table.set_row_spacings(8)
         table.set_col_spacings(16)
 
         row = 0
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup(xstr("timetable_book_callsign"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row + 1)
@@ -335,13 +335,13 @@ class BookDialog(gtk.Dialog):
         text = flightPair.flight0.callsign
         if flightPair.flight1 is not None:
             text += " / " + flightPair.flight1.callsign
-        label = gtk.Label(text)
+        label = Gtk.Label(text)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
         row += 1
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup(xstr("timetable_book_from_to"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row + 1)
@@ -350,7 +350,7 @@ class BookDialog(gtk.Dialog):
                flightPair.flight0.arrivalICAO
         if flightPair.flight1 is not None:
             text += " - " + flightPair.flight1.arrivalICAO
-        label = gtk.Label(text)
+        label = Gtk.Label(text)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
@@ -358,13 +358,13 @@ class BookDialog(gtk.Dialog):
 
         if flightPair.flight0.type==ScheduledFlight.TYPE_VIP and \
            flightPair.flight0.date!=const.defaultDate:
-            label = gtk.Label()
+            label = Gtk.Label()
             label.set_markup(xstr("timetable_book_flightDate"))
             label.set_use_underline(True)
             label.set_alignment(0.0, 0.5)
             table.attach(label, 0, 1, row, row + 1)
 
-            self._flightDate = gtk.Button()
+            self._flightDate = Gtk.Button()
             self._flightDate.connect("clicked", self._flightDateClicked)
             self._flightDate.set_tooltip_text(xstr("timetable_book_flightDate_tooltip"))
             label.set_mnemonic_widget(self._flightDate)
@@ -383,7 +383,7 @@ class BookDialog(gtk.Dialog):
             self._flightDate = None
             self._calendarWindow = None
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup(xstr("timetable_book_dep_arr"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row + 1)
@@ -393,13 +393,13 @@ class BookDialog(gtk.Dialog):
         if flightPair.flight1 is not None:
             text += " / " + str(flightPair.flight1.departureTime) + " - " + \
                     str(flightPair.flight1.arrivalTime)
-        label = gtk.Label(text)
+        label = Gtk.Label(text)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
         row += 1
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup(xstr("timetable_book_duration"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row + 1)
@@ -410,24 +410,24 @@ class BookDialog(gtk.Dialog):
         if flightPair.flight1 is not None:
             duration = flightPair.flight0.duration
             text += " / %02d:%02d" % (duration/3600, (duration%3600)/60)
-        label = gtk.Label(text)
+        label = Gtk.Label(text)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
         row += 2
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup(xstr("timetable_book_tailNumber"))
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row + 1)
 
         self._planes = planes
-        tailNumbersModel = gtk.ListStore(str)
+        tailNumbersModel = Gtk.ListStore(str)
         for plane in planes:
             tailNumbersModel.append((plane.tailNumber,))
 
-        self._tailNumber = gtk.ComboBox(model = tailNumbersModel)
-        renderer = gtk.CellRendererText()
+        self._tailNumber = Gtk.ComboBox(model = tailNumbersModel)
+        renderer = Gtk.CellRendererText()
         self._tailNumber.pack_start(renderer, True)
         self._tailNumber.add_attribute(renderer, "text", 0)
         self._tailNumber.set_tooltip_text(xstr("timetable_book_tailNumber_tooltip"))
@@ -464,7 +464,7 @@ class BookDialog(gtk.Dialog):
 
     def _flightDateClicked(self, button):
         """Called when the flight date button is clicked."""
-        self._calendarWindow.set_position(gtk.WIN_POS_MOUSE)
+        self._calendarWindow.set_position(Gtk.WIN_POS_MOUSE)
         self.set_focus(self._calendarWindow)
         self._calendarWindow.show_all()
 
@@ -480,7 +480,7 @@ class BookDialog(gtk.Dialog):
 
 #-----------------------------------------------------------------------------
 
-class TimetableWindow(gtk.Window):
+class TimetableWindow(Gtk.Window):
     """The window to display the timetable."""
     typeFamilies = [
         const.AIRCRAFT_FAMILY_B737NG,
@@ -505,48 +505,48 @@ class TimetableWindow(gtk.Window):
         self.set_modal(True)
         self.connect("key-press-event", self._keyPressed)
 
-        mainAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 1.0)
         mainAlignment.set_padding(padding_top = 0, padding_bottom = 12,
                                   padding_left = 8, padding_right = 8)
 
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
 
-        filterAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        filterAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                         xscale = 1.0, yscale = 1.0)
 
-        filterFrame = gtk.Frame()
+        filterFrame = Gtk.Frame()
         filterFrame.set_label(xstr("timetable_filter"))
 
-        filterVBox = gtk.VBox()
+        filterVBox = Gtk.VBox()
 
-        topAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        topAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                      xscale = 0.0, yscale = 0.0)
-        topHBox = gtk.HBox()
+        topHBox = Gtk.HBox()
 
-        label = gtk.Label(xstr("timetable_flightdate"))
+        label = Gtk.Label(xstr("timetable_flightdate"))
         label.set_use_underline(True)
         topHBox.pack_start(label, False, False, 4)
 
-        self._flightDate = gtk.Button()
+        self._flightDate = Gtk.Button()
         self._flightDate.connect("clicked", self._flightDateClicked)
         self._flightDate.connect("clicked", self._flightDateClicked)
         self._flightDate.set_tooltip_text(xstr("timetable_flightdate_tooltip"))
         label.set_mnemonic_widget(self._flightDate)
         topHBox.pack_start(self._flightDate, False, False, 4)
 
-        filler = gtk.Alignment()
+        filler = Gtk.Alignment()
         filler.set_size_request(48, 2)
         topHBox.pack_start(filler, False, True, 0)
 
-        self._regularFlights = gtk.CheckButton(xstr("timetable_show_regular"))
+        self._regularFlights = Gtk.CheckButton(xstr("timetable_show_regular"))
         self._regularFlights.set_use_underline(True)
         self._regularFlights.set_tooltip_text(xstr("timetable_show_regular_tooltip"))
         self._regularFlights.set_active(True)
         self._regularFlights.connect("toggled", self._filterChanged)
         topHBox.pack_start(self._regularFlights, False, False, 8)
 
-        self._vipFlights = gtk.CheckButton(xstr("timetable_show_vip"))
+        self._vipFlights = Gtk.CheckButton(xstr("timetable_show_vip"))
         self._vipFlights.set_use_underline(True)
         self._vipFlights.set_tooltip_text(xstr("timetable_show_vip_tooltip"))
         self._vipFlights.set_active(True)
@@ -557,22 +557,22 @@ class TimetableWindow(gtk.Window):
 
         filterVBox.pack_start(topAlignment, False, False, 4)
 
-        separator = gtk.HSeparator()
+        separator = Gtk.HSeparator()
         filterVBox.pack_start(separator, False, False, 4)
 
-        typeAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        typeAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 0.0, yscale = 0.0)
 
         numColumns = 4
         numRows = (len(TimetableWindow.typeFamilies)+numColumns-1)/numColumns
 
-        typeTable = gtk.Table(numRows, numColumns)
+        typeTable = Gtk.Table(numRows, numColumns)
         typeTable.set_col_spacings(8)
         row = 0
         column = 0
         self._typeFamilyButtons = {}
         for typeFamily in TimetableWindow.typeFamilies:
-            checkButton = gtk.CheckButton(aircraftFamilyNames[typeFamily])
+            checkButton = Gtk.CheckButton(aircraftFamilyNames[typeFamily])
             checkButton.set_active(True)
             checkButton.connect("toggled", self._filterChanged)
             self._typeFamilyButtons[typeFamily] = checkButton
@@ -598,18 +598,18 @@ class TimetableWindow(gtk.Window):
         self._timetable.connect("selection-changed", self._selectionChanged)
         vbox.pack_start(self._timetable, True, True, 2)
 
-        alignment = gtk.Alignment(xalign = 1.0, yalign = 0.5,
+        alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
-        buttonBox = gtk.HBox()
+        buttonBox = Gtk.HBox()
 
-        self._bookButton = gtk.Button(xstr("button_book"))
+        self._bookButton = Gtk.Button(xstr("button_book"))
         self._bookButton.set_use_underline(True)
         self._bookButton.set_can_default(True)
         self._bookButton.connect("clicked", self._bookClicked)
         self._bookButton.set_sensitive(False)
         buttonBox.pack_start(self._bookButton, False, False, 4);
 
-        self._closeButton = gtk.Button(xstr("button_close"))
+        self._closeButton = Gtk.Button(xstr("button_close"))
         self._closeButton.set_use_underline(True)
         self._closeButton.connect("clicked", self._closeClicked)
         buttonBox.pack_start(self._closeButton, False, False, 4);
@@ -677,7 +677,7 @@ class TimetableWindow(gtk.Window):
 
     def _flightDateClicked(self, button):
         """Called when the flight date button is clicked."""
-        self._calendarWindow.set_position(gtk.WIN_POS_MOUSE)
+        self._calendarWindow.set_position(Gtk.WIN_POS_MOUSE)
         self.set_focus(self._calendarWindow)
         self._calendarWindow.show_all()
 
@@ -770,12 +770,12 @@ class TimetableWindow(gtk.Window):
     def _bookFlightsCallback(self, returned, result):
         """Called when the booking has finished."""
         if returned:
-            dialog = gtk.MessageDialog(parent = self,
+            dialog = Gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_INFO,
                                        message_format = xstr("bookflights_successful"))
             dialog.format_secondary_markup(xstr("bookflights_successful_secondary"))
         else:
-            dialog = gtk.MessageDialog(parent = self,
+            dialog = Gtk.MessageDialog(parent = self,
                                        type = MESSAGETYPE_ERROR,
                                        message_format = xstr("bookflights_failed"))
             dialog.format_secondary_markup(xstr("bookflights_failed_secondary"))
@@ -788,9 +788,9 @@ class TimetableWindow(gtk.Window):
 
     def _createTimetablePopupMenu(self):
         """Get the popuop menu for the timetable."""
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
 
-        menuItem = gtk.MenuItem()
+        menuItem = Gtk.MenuItem()
         menuItem.set_label(xstr("timetable_popup_book"))
         menuItem.set_use_underline(True)
         menuItem.connect("activate", self._popupBook)

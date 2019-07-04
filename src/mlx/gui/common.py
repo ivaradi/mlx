@@ -25,7 +25,7 @@ gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk as gdk
 from gi.repository import GdkPixbuf as gdkPixbuf
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk as gtk
+from gi.repository import Gtk
 try:
     gi.require_version("AppIndicator3", "0.1")
     from gi.repository import AppIndicator3 as appindicator
@@ -35,22 +35,22 @@ except:
 from gi.repository import Pango as pango
 
 
-MESSAGETYPE_ERROR = gtk.MessageType.ERROR
-MESSAGETYPE_QUESTION = gtk.MessageType.QUESTION
-MESSAGETYPE_INFO = gtk.MessageType.INFO
-RESPONSETYPE_NONE = gtk.ResponseType.NONE
-RESPONSETYPE_OK = gtk.ResponseType.OK
-RESPONSETYPE_YES = gtk.ResponseType.YES
-RESPONSETYPE_NO = gtk.ResponseType.NO
-RESPONSETYPE_ACCEPT = gtk.ResponseType.ACCEPT
-RESPONSETYPE_REJECT = gtk.ResponseType.REJECT
-RESPONSETYPE_CANCEL = gtk.ResponseType.CANCEL
-ACCEL_VISIBLE = gtk.AccelFlags.VISIBLE
+MESSAGETYPE_ERROR = Gtk.MessageType.ERROR
+MESSAGETYPE_QUESTION = Gtk.MessageType.QUESTION
+MESSAGETYPE_INFO = Gtk.MessageType.INFO
+RESPONSETYPE_NONE = Gtk.ResponseType.NONE
+RESPONSETYPE_OK = Gtk.ResponseType.OK
+RESPONSETYPE_YES = Gtk.ResponseType.YES
+RESPONSETYPE_NO = Gtk.ResponseType.NO
+RESPONSETYPE_ACCEPT = Gtk.ResponseType.ACCEPT
+RESPONSETYPE_REJECT = Gtk.ResponseType.REJECT
+RESPONSETYPE_CANCEL = Gtk.ResponseType.CANCEL
+ACCEL_VISIBLE = Gtk.AccelFlags.VISIBLE
 CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
-DIALOG_MODAL = gtk.DialogFlags.MODAL
-WRAP_WORD = gtk.WrapMode.WORD
-JUSTIFY_CENTER = gtk.Justification.CENTER
-JUSTIFY_LEFT = gtk.Justification.LEFT
+DIALOG_MODAL = Gtk.DialogFlags.MODAL
+WRAP_WORD = Gtk.WrapMode.WORD
+JUSTIFY_CENTER = Gtk.Justification.CENTER
+JUSTIFY_LEFT = Gtk.Justification.LEFT
 
 CONTROL_MASK = gdk.ModifierType.CONTROL_MASK
 SHIFT_MASK = gdk.ModifierType.SHIFT_MASK
@@ -59,20 +59,20 @@ BUTTON1_MASK = gdk.ModifierType.BUTTON1_MASK
 SCROLL_UP = gdk.ScrollDirection.UP
 SCROLL_DOWN = gdk.ScrollDirection.DOWN
 
-SPIN_USER_DEFINED = gtk.SpinType.USER_DEFINED
+SPIN_USER_DEFINED = Gtk.SpinType.USER_DEFINED
 
-FILE_CHOOSER_ACTION_SELECT_FOLDER = gtk.FileChooserAction.SELECT_FOLDER
-FILE_CHOOSER_ACTION_OPEN = gtk.FileChooserAction.OPEN
-FILE_CHOOSER_ACTION_SAVE = gtk.FileChooserAction.SAVE
+FILE_CHOOSER_ACTION_SELECT_FOLDER = Gtk.FileChooserAction.SELECT_FOLDER
+FILE_CHOOSER_ACTION_OPEN = Gtk.FileChooserAction.OPEN
+FILE_CHOOSER_ACTION_SAVE = Gtk.FileChooserAction.SAVE
 
-SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
+SELECTION_MULTIPLE = Gtk.SelectionMode.MULTIPLE
 
-SHADOW_IN = gtk.ShadowType.IN
-SHADOW_NONE = gtk.ShadowType.NONE
+SHADOW_IN = Gtk.ShadowType.IN
+SHADOW_NONE = Gtk.ShadowType.NONE
 
-POLICY_AUTOMATIC = gtk.PolicyType.AUTOMATIC
-POLICY_NEVER = gtk.PolicyType.NEVER
-POLICY_ALWAYS = gtk.PolicyType.ALWAYS
+POLICY_AUTOMATIC = Gtk.PolicyType.AUTOMATIC
+POLICY_NEVER = Gtk.PolicyType.NEVER
+POLICY_ALWAYS = Gtk.PolicyType.ALWAYS
 
 WEIGHT_NORMAL = pango.Weight.NORMAL
 WEIGHT_BOLD = pango.Weight.BOLD
@@ -80,19 +80,19 @@ WEIGHT_BOLD = pango.Weight.BOLD
 WINDOW_STATE_ICONIFIED = gdk.WindowState.ICONIFIED
 WINDOW_STATE_WITHDRAWN = gdk.WindowState.WITHDRAWN
 
-SORT_ASCENDING = gtk.SortType.ASCENDING
-SORT_DESCENDING = gtk.SortType.DESCENDING
+SORT_ASCENDING = Gtk.SortType.ASCENDING
+SORT_DESCENDING = Gtk.SortType.DESCENDING
 
 EVENT_BUTTON_PRESS = gdk.EventType.BUTTON_PRESS
 
-TREE_VIEW_COLUMN_FIXED = gtk.TreeViewColumnSizing.FIXED
+TREE_VIEW_COLUMN_FIXED = Gtk.TreeViewColumnSizing.FIXED
 
-FILL = gtk.AttachOptions.FILL
-EXPAND = gtk.AttachOptions.EXPAND
+FILL = Gtk.AttachOptions.FILL
+EXPAND = Gtk.AttachOptions.EXPAND
 
-UPDATE_IF_VALID = gtk.SpinButtonUpdatePolicy.IF_VALID
+UPDATE_IF_VALID = Gtk.SpinButtonUpdatePolicy.IF_VALID
 
-SELECTION_MULTIPLE = gtk.SelectionMode.MULTIPLE
+SELECTION_MULTIPLE = Gtk.SelectionMode.MULTIPLE
 
 pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
 
@@ -138,11 +138,11 @@ class FlightStatusHandler(object):
 
 #------------------------------------------------------------------------------
 
-class IntegerEntry(gtk.Entry):
+class IntegerEntry(Gtk.Entry):
     """An entry that allows only either an empty value, or an integer."""
     def __init__(self, defaultValue = None):
         """Construct the entry."""
-        gtk.Entry.__init__(self)
+        Gtk.Entry.__init__(self)
 
         self.set_alignment(1.0)
 
@@ -190,7 +190,7 @@ class IntegerEntry(gtk.Entry):
 
 #------------------------------------------------------------------------------
 
-class TimeEntry(gtk.Entry):
+class TimeEntry(Gtk.Entry):
     """Widget to display and edit a time value in HH:MM format."""
     def __init__(self):
         """Construct the entry"""
@@ -295,12 +295,12 @@ class TimeEntry(gtk.Entry):
                                   (words[1].isdigit() and int(words[1])<60))):
             pass
         else:
-            gtk.gdk.display_get_default().beep()
+            Gtk.gdk.display_get_default().beep()
             self.stop_emission(signal)
 
 #------------------------------------------------------------------------------
 
-class CredentialsDialog(gtk.Dialog):
+class CredentialsDialog(Gtk.Dialog):
     """A dialog window to ask for a user name and a password."""
     def __init__(self, gui, userName, password,
                  titleLabel, cancelButtonLabel, okButtonLabel,
@@ -319,28 +319,28 @@ class CredentialsDialog(gtk.Dialog):
 
         contentArea = self.get_content_area()
 
-        contentAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        contentAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                          xscale = 0.0, yscale = 0.0)
         contentAlignment.set_padding(padding_top = 4, padding_bottom = 16,
                                      padding_left = 8, padding_right = 8)
 
         contentArea.pack_start(contentAlignment, False, False, 0)
 
-        contentVBox = gtk.VBox()
+        contentVBox = Gtk.VBox()
         contentAlignment.add(contentVBox)
 
         if infoText is not None:
-            label = gtk.Label(infoText)
+            label = Gtk.Label(infoText)
             label.set_alignment(0.0, 0.0)
 
             contentVBox.pack_start(label, False, False, 0)
 
-        tableAlignment = gtk.Alignment(xalign = 0.5, yalign = 0.5,
+        tableAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                        xscale = 0.0, yscale = 0.0)
         tableAlignment.set_padding(padding_top = 24, padding_bottom = 0,
                                    padding_left = 0, padding_right = 0)
 
-        table = gtk.Table(3, 2)
+        table = Gtk.Table(3, 2)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -348,12 +348,12 @@ class CredentialsDialog(gtk.Dialog):
         tableAlignment.add(table)
         contentVBox.pack_start(tableAlignment, True, True, 0)
 
-        label = gtk.Label(userNameLabel)
+        label = Gtk.Label(userNameLabel)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 0, 1)
 
-        self._userName = gtk.Entry()
+        self._userName = Gtk.Entry()
         self._userName.set_width_chars(16)
         # FIXME: enabled the OK button only when there is something in thr
         # user name and password fields
@@ -364,12 +364,12 @@ class CredentialsDialog(gtk.Dialog):
         table.attach(self._userName, 1, 2, 0, 1)
         label.set_mnemonic_widget(self._userName)
 
-        label = gtk.Label(passwordLabel)
+        label = Gtk.Label(passwordLabel)
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, 1, 2)
 
-        self._password = gtk.Entry()
+        self._password = Gtk.Entry()
         self._password.set_visibility(False)
         #self._password.connect("changed",
         #                       lambda button: self._updateForwardButton())
@@ -379,7 +379,7 @@ class CredentialsDialog(gtk.Dialog):
         label.set_mnemonic_widget(self._password)
 
         if rememberPassword is not None:
-            self._rememberButton = gtk.CheckButton(rememberLabel)
+            self._rememberButton = Gtk.CheckButton(rememberLabel)
             self._rememberButton.set_use_underline(True)
             self._rememberButton.set_tooltip_text(rememberTooltip)
             self._rememberButton.set_active(rememberPassword)
@@ -521,7 +521,7 @@ def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
     """Ask a Yes/No question.
 
     Return a boolean indicating the answer."""
-    dialog = gtk.MessageDialog(parent = parent,
+    dialog = Gtk.MessageDialog(parent = parent,
                                type = MESSAGETYPE_QUESTION,
                                message_format = question)
 
@@ -539,7 +539,7 @@ def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
 def errorDialog(message, parent = None, secondary = None,
                 title = WINDOW_TITLE_BASE):
     """Display an error dialog box with the given message."""
-    dialog = gtk.MessageDialog(parent = parent,
+    dialog = Gtk.MessageDialog(parent = parent,
                                type = MESSAGETYPE_ERROR,
                                message_format = message)
     dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
@@ -561,13 +561,13 @@ def communicationErrorDialog(parent = None, title = WINDOW_TITLE_BASE):
 #------------------------------------------------------------------------------
 
 def createFlightTypeComboBox():
-        flightTypeModel = gtk.ListStore(str, int)
+        flightTypeModel = Gtk.ListStore(str, int)
         for type in _const.flightTypes:
             name = "flighttype_" + _const.flightType2string(type)
             flightTypeModel.append([xstr(name), type])
 
-        flightType = gtk.ComboBox(model = flightTypeModel)
-        renderer = gtk.CellRendererText()
+        flightType = Gtk.ComboBox(model = flightTypeModel)
+        renderer = Gtk.CellRendererText()
         flightType.pack_start(renderer, True)
         flightType.add_attribute(renderer, "text", 0)
 
