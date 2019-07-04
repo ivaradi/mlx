@@ -10,185 +10,122 @@ import mlx.const as const
 
 #------------------------------------------------------------------------------
 
-if pygobject:
+class Viewport(gtk.Viewport):
+    """Viewport implementation that alleviates the problem with improper
+    resizing by the VBox."""
+    def __init__(self):
+        """Construct the viewport."""
+        gtk.Viewport.__init__(self)
+        self._recursive = False
+        self._vboxHeight = None
 
-#------------------------------------------------------------------------------
+    def setVBOXHeight(self, vboxHeight):
+        """Set the height of the VBox which will be used to calculate the
+        viewport's height."""
+        self._vboxHeight = vboxHeight
 
-    class Viewport(gtk.Viewport):
-        """Viewport implementation that alleviates the problem with improper
-        resizing by the VBox."""
-        def __init__(self):
-            """Construct the viewport."""
-            gtk.Viewport.__init__(self)
-            self._recursive = False
+    def do_size_allocate(self, allocation):
+        """Called when the viewport's size is allocated.
+
+        The height in the allocation object is modified so that it is only
+        so high to fit into the VBox."""
+        if self._vboxHeight is not None:
+            allocation.y += 1
+            allocation.height = self._vboxHeight - allocation.y
             self._vboxHeight = None
+        gtk.Viewport.do_size_allocate(self, allocation)
 
-        def setVBOXHeight(self, vboxHeight):
-            """Set the height of the VBox which will be used to calculate the
-            viewport's height."""
-            self._vboxHeight = vboxHeight
-
-        def do_size_allocate(self, allocation):
-            """Called when the viewport's size is allocated.
-
-            The height in the allocation object is modified so that it is only
-            so high to fit into the VBox."""
-            if self._vboxHeight is not None:
-                allocation.y += 1
-                allocation.height = self._vboxHeight - allocation.y
-                self._vboxHeight = None
-            gtk.Viewport.do_size_allocate(self, allocation)
-
-    class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
-        """PyGObject-specific base class for the delay code table."""
-        __gproperties__ = {
-            "vscroll-policy" : ( gtk.ScrollablePolicy,
-                                 "vscroll-policy",
-                                 "The vertical scrolling policy",
-                                 gtk.ScrollablePolicy.MINIMUM,
-                                 gobject.PARAM_READWRITE ),
-            "vadjustment" : ( gtk.Adjustment,
-                              "vadjustment",
-                              "The vertical adjustment",
-                              gobject.PARAM_READWRITE ),
-            "hscroll-policy" : ( gtk.ScrollablePolicy,
-                                 "hscroll-policy",
-                                 "The horizontal scrolling policy",
-                                 gtk.ScrollablePolicy.MINIMUM,
-                                 gobject.PARAM_READWRITE ),
-            "hadjustment" : ( gtk.Adjustment,
-                              "hadjustment",
-                              "The horizontal adjustment",
-                              gobject.PARAM_READWRITE )  }
+class DelayCodeTableBase(gtk.VBox, gtk.Scrollable):
+    """PyGObject-specific base class for the delay code table."""
+    __gproperties__ = {
+        "vscroll-policy" : ( gtk.ScrollablePolicy,
+                             "vscroll-policy",
+                             "The vertical scrolling policy",
+                             gtk.ScrollablePolicy.MINIMUM,
+                             gobject.PARAM_READWRITE ),
+        "vadjustment" : ( gtk.Adjustment,
+                          "vadjustment",
+                          "The vertical adjustment",
+                          gobject.PARAM_READWRITE ),
+        "hscroll-policy" : ( gtk.ScrollablePolicy,
+                             "hscroll-policy",
+                             "The horizontal scrolling policy",
+                             gtk.ScrollablePolicy.MINIMUM,
+                             gobject.PARAM_READWRITE ),
+        "hadjustment" : ( gtk.Adjustment,
+                          "hadjustment",
+                          "The horizontal adjustment",
+                          gobject.PARAM_READWRITE )  }
 
 
-        @staticmethod
-        def _createViewport():
-            """Create an instance of the viewport class used by this base class."""
-            return Viewport()
+    @staticmethod
+    def _createViewport():
+        """Create an instance of the viewport class used by this base class."""
+        return Viewport()
 
-        def __init__(self):
-            """Construct the delay code table."""
-            super(DelayCodeTableBase, self).__init__()
+    def __init__(self):
+        """Construct the delay code table."""
+        super(DelayCodeTableBase, self).__init__()
 
-        def do_size_allocate(self, allocation):
-            """Allocate the size for the table and its children.
+    def do_size_allocate(self, allocation):
+        """Allocate the size for the table and its children.
 
-            This sets up the VBox height in the viewport and then calls the
-            do_size_allocate() function of VBox()."""
-            self._viewport.setVBOXHeight(allocation.height)
-            gtk.VBox.do_size_allocate(self, allocation)
-            self.allocate_column_sizes(allocation)
+        This sets up the VBox height in the viewport and then calls the
+        do_size_allocate() function of VBox()."""
+        self._viewport.setVBOXHeight(allocation.height)
+        gtk.VBox.do_size_allocate(self, allocation)
+        self.allocate_column_sizes(allocation)
 
-        def do_get_property(self, prop):
-            """Get the value of one of the properties defined above.
+    def do_get_property(self, prop):
+        """Get the value of one of the properties defined above.
 
-            The request is forwarded to the viewport."""
-            if prop.name=="vscroll-policy":
-                return self._viewport.get_vscroll_policy()
-            elif prop.name=="hscroll-policy":
-                return self._viewport.get_hscroll_policy()
-            elif prop.name=="vadjustment":
-                return self._viewport.get_vadjustment()
-            elif prop.name=="hadjustment":
-                return self._viewport.get_hadjustment()
-            else:
-                raise AttributeError("mlx.gui.delaycodes.DelayCodeTableBase: property %s is not handled in do_get_property" %
-                                     (prop.name,))
+        The request is forwarded to the viewport."""
+        if prop.name=="vscroll-policy":
+            return self._viewport.get_vscroll_policy()
+        elif prop.name=="hscroll-policy":
+            return self._viewport.get_hscroll_policy()
+        elif prop.name=="vadjustment":
+            return self._viewport.get_vadjustment()
+        elif prop.name=="hadjustment":
+            return self._viewport.get_hadjustment()
+        else:
+            raise AttributeError("mlx.gui.delaycodes.DelayCodeTableBase: property %s is not handled in do_get_property" %
+                                 (prop.name,))
 
-        def do_set_property(self, prop, value):
-            """Set the value of the adjustment properties defined above.
+    def do_set_property(self, prop, value):
+        """Set the value of the adjustment properties defined above.
 
-            The adjustments are forwarded to the viewport."""
-            if prop.name=="vadjustment":
-                self._viewport.set_vadjustment(value)
-            elif prop.name=="hadjustment":
-                self._viewport.set_hadjustment(value)
-                self._treeView.set_hadjustment(value)
-            else:
-                raise AttributeError("mlx.gui.delaycodes.DelayCodeTableBase: property %s is not handled in do_set_property" %
-                                     (prop.name,))
+        The adjustments are forwarded to the viewport."""
+        if prop.name=="vadjustment":
+            self._viewport.set_vadjustment(value)
+        elif prop.name=="hadjustment":
+            self._viewport.set_hadjustment(value)
+            self._treeView.set_hadjustment(value)
+        else:
+            raise AttributeError("mlx.gui.delaycodes.DelayCodeTableBase: property %s is not handled in do_set_property" %
+                                 (prop.name,))
 
-        def setStyle(self):
-            """Set the style of the event box from the treeview."""
+    def setStyle(self):
+        """Set the style of the event box from the treeview."""
 
-    class Alignment(gtk.Alignment):
-        """An alignment that remembers the width it was given."""
-        def __init__(self, xalign = 0.0, yalign=0.0,
-                     xscale = 0.0, yscale = 0.0 ):
-            """Construct the alignment."""
-            super(Alignment, self).__init__(xalign = xalign, yalign = yalign,
-                                            xscale = xscale, yscale = yscale)
-            self.allocatedWidth = 0
+class Alignment(gtk.Alignment):
+    """An alignment that remembers the width it was given."""
+    def __init__(self, xalign = 0.0, yalign=0.0,
+                 xscale = 0.0, yscale = 0.0 ):
+        """Construct the alignment."""
+        super(Alignment, self).__init__(xalign = xalign, yalign = yalign,
+                                        xscale = xscale, yscale = yscale)
+        self.allocatedWidth = 0
 
-        def do_size_allocate(self, allocation):
-            """Called with the new size allocation."""
-            self.allocatedWidth = allocation.width
-            gtk.Alignment.do_size_allocate(self, allocation)
+    def do_size_allocate(self, allocation):
+        """Called with the new size allocation."""
+        self.allocatedWidth = allocation.width
+        gtk.Alignment.do_size_allocate(self, allocation)
 
-    class TreeView(gtk.TreeView):
-        def do_size_allocate(self, allocation):
-            allocation.height += 1
-            gtk.TreeView.do_size_allocate(self, allocation)
-
-#------------------------------------------------------------------------------
-
-else: # pygobject
-
-#------------------------------------------------------------------------------
-
-    class DelayCodeTableBase (gtk.VBox):
-        """Base class of the delay code table for PyGtk."""
-
-        __gsignals__ = {
-            "set-scroll-adjustments": (
-                gobject.SIGNAL_RUN_LAST,
-                gobject.TYPE_NONE, (gtk.Adjustment, gtk.Adjustment))
-                }
-
-        @staticmethod
-        def _createViewport():
-            """Create an instance of the viewport class used by this base class."""
-            return gtk.Viewport()
-
-        def __init__(self):
-            """Construct the base class."""
-            super(DelayCodeTableBase, self).__init__()
-            self.set_set_scroll_adjustments_signal("set-scroll-adjustments")
-            self.connect("size-allocate", self._do_size_allocate)
-
-        def do_set_scroll_adjustments(self, hAdjustment, vAdjustment):
-            """Set the adjustments on the viewport."""
-            self._viewport.set_hadjustment(hAdjustment)
-            self._viewport.set_vadjustment(vAdjustment)
-            self._treeView.set_hadjustment(hAdjustment)
-
-        def _do_size_allocate(self, widget, allocation):
-            """Handler of the size-allocate signal.
-
-            Calls allocate_column_sizes()."""
-            self.allocate_column_sizes(allocation)
-
-        def setStyle(self):
-            """Set the style of the event box from the treeview."""
-            if self._treeView is not None:
-                style = self._treeView.rc_get_style()
-                self._eventBox.modify_bg(0, style.bg[2])
-                self._eventBox.modify_fg(0, style.fg[2])
-
-    class Alignment(gtk.Alignment):
-        """An alignment that remembers the width it was given."""
-        def __init__(self, xalign = 0.0, yalign=0.0,
-                     xscale = 0.0, yscale = 0.0 ):
-            """Construct the alignment."""
-            super(Alignment, self).__init__(xalign = xalign, yalign = yalign,
-                                            xscale = xscale, yscale = yscale)
-            self.allocatedWidth = 0
-            self.connect("size-allocate", self._do_size_allocate)
-
-        def _do_size_allocate(self, widget, allocation):
-            """Called with the new size allocation."""
-            self.allocatedWidth = allocation.width
+class TreeView(gtk.TreeView):
+    def do_size_allocate(self, allocation):
+        allocation.height += 1
+        gtk.TreeView.do_size_allocate(self, allocation)
 
 #------------------------------------------------------------------------------
 

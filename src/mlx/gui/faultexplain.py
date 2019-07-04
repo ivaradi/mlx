@@ -58,13 +58,9 @@ class FaultFrame(gtk.Frame):
         self.add(vbox)
         self.show_all()
 
-        if pygobject:
-            styleContext = self.get_style_context()
-            color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
-            fault.override_background_color(0, color)
-        else:
-            style = self.rc_get_style()
-            fault.modify_base(0, style.bg[0])
+        styleContext = self.get_style_context()
+        color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
+        fault.override_background_color(0, color)
 
         self._hasExplanation = False
 
@@ -284,23 +280,19 @@ class FaultExplainWidget(gtk.Frame):
         """Set the color to indicate if an unexplained fault is present or
         not."""
         allExplained = self._numExplanations >= self._numFaults
-        if pygobject:
-            styleContext = self.get_style_context()
-            if allExplained:
-                outerColour = innerColour = gdk.RGBA(red = 0.0, green=0.0,
-                                                     blue=0.0, alpha=0.0)
-            else:
-                outerColour = \
-                  styleContext.get_border_color(gtk.StateFlags.DROP_ACTIVE)
-                innerColour = self._gui.backgroundColour
-
-            self._outerBox.override_background_color(gtk.StateFlags.NORMAL,
-                                                     outerColour)
-            self._innerBox.override_background_color(gtk.StateFlags.NORMAL,
-                                                     innerColour)
+        styleContext = self.get_style_context()
+        if allExplained:
+            outerColour = innerColour = gdk.RGBA(red = 0.0, green=0.0,
+                                                 blue=0.0, alpha=0.0)
         else:
-            style = self.rc_get_style()
-            self._outerBox.modify_bg(0, style.bg[0 if allExplained else 3])
+            outerColour = \
+                styleContext.get_border_color(gtk.StateFlags.DROP_ACTIVE)
+            innerColour = self._gui.backgroundColour
+
+        self._outerBox.override_background_color(gtk.StateFlags.NORMAL,
+                                                 outerColour)
+        self._innerBox.override_background_color(gtk.StateFlags.NORMAL,
+                                                 innerColour)
 
 #-------------------------------------------------------------------------------
 

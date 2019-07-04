@@ -120,8 +120,7 @@ class Page(gtk.Alignment):
 
         self._helpLabel = gtk.Label(longerHelp)
         # FIXME: should be a constant in common
-        self._helpLabel.set_justify(gtk.Justification.CENTER if pygobject
-                                    else gtk.JUSTIFY_CENTER)
+        self._helpLabel.set_justify(gtk.Justification.CENTER)
         self._helpLabel.set_use_markup(True)
         alignment.add(self._helpLabel)
         mainBox.pack_start(alignment, False, False, 0)
@@ -219,16 +218,11 @@ class Page(gtk.Alignment):
 
     def setStyle(self):
         """Set the styles of some of the items on the page."""
-        if pygobject:
-            context = self.get_style_context()
-            color = context.get_background_color(gtk.StateFlags.SELECTED)
-            self._titleEventBox.modify_bg(0, color.to_color())
-            color = context.get_color(gtk.StateFlags.SELECTED)
-            self._titleLabel.modify_fg(0, color.to_color())
-        else:
-            style = self.rc_get_style()
-            self._titleEventBox.modify_bg(0, style.bg[3])
-            self._titleLabel.modify_fg(0, style.fg[3])
+        context = self.get_style_context()
+        color = context.get_background_color(gtk.StateFlags.SELECTED)
+        self._titleEventBox.modify_bg(0, color.to_color())
+        color = context.get_color(gtk.StateFlags.SELECTED)
+        self._titleLabel.modify_fg(0, color.to_color())
 
     def initialize(self):
         """Initialize the page.
@@ -1166,12 +1160,9 @@ class GateSelectionPage(Page):
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.add(self._gateList)
         scrolledWindow.set_size_request(50, -1)
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                       else gtk.SHADOW_IN)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 0.0, yscale = 1.0)
         alignment.add(scrolledWindow)
@@ -2011,23 +2002,15 @@ class ConnectPage(Page):
             selectAlignment = gtk.Alignment(xalign=0.0, xscale=0.0, yalign=0.5)
 
             selectBox = gtk.HBox()
-            if pygobject:
-                self._selectMSFS = \
-                  gtk.RadioButton.new_with_mnemonic_from_widget(None,
-                                                                xstr("connect_sim_msfs"))
-            else:
-                self._selectMSFS = gtk.RadioButton(None,
-                                                   xstr("connect_sim_msfs"))
+            self._selectMSFS = \
+                gtk.RadioButton.new_with_mnemonic_from_widget(None,
+                                                              xstr("connect_sim_msfs"))
 
             selectBox.pack_start(self._selectMSFS, False, False, 0);
 
-            if pygobject:
-                self._selectXPlane = \
-                  gtk.RadioButton.new_with_mnemonic_from_widget(self._selectMSFS,
-                                                                xstr("connect_sim_xplane"))
-            else:
-                self._selectXPlane = gtk.RadioButton(self._selectMSFS,
-                                                     xstr("connect_sim_xplane"))
+            self._selectXPlane = \
+                gtk.RadioButton.new_with_mnemonic_from_widget(self._selectMSFS,
+                                                              xstr("connect_sim_xplane"))
 
             selectBox.pack_start(self._selectXPlane, False, False, 8);
 
@@ -2509,12 +2492,9 @@ class RoutePage(Page):
 
         routeWindow = gtk.ScrolledWindow()
         routeWindow.set_size_request(400, 80)
-        routeWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                    else gtk.SHADOW_IN)
-        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC,
-                               gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC)
+        routeWindow.set_shadow_type(gtk.ShadowType.IN)
+        routeWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                               gtk.PolicyType.AUTOMATIC)
 
         self._uppercasingRoute = False
 
@@ -3266,10 +3246,7 @@ class FuelTank(gtk.VBox):
         self._tankFigure.set_visible_window(False)
         self._tankFigure.set_tooltip_markup(xstr("fuel_tank_tooltip"))
 
-        if pygobject:
-            self._tankFigure.connect("draw", self._drawTankFigure)
-        else:
-            self._tankFigure.connect("expose_event", self._drawTankFigure)
+        self._tankFigure.connect("draw", self._drawTankFigure)
         self._tankFigure.connect("button_press_event", self._buttonPressed)
         self._tankFigure.connect("motion_notify_event", self._motionNotify)
         self._tankFigure.connect("scroll-event", self._scrolled)
@@ -3323,14 +3300,11 @@ class FuelTank(gtk.VBox):
         """Draw the tank figure."""
         triangleSize = 5
 
-        context = eventOrContext if pygobject else tankFigure.window.cairo_create()
-        (xOffset, yOffset) = (0, 0) if pygobject \
-                             else (tankFigure.allocation.x, tankFigure.allocation.y)
+        context = eventOrContext
+        (xOffset, yOffset) = (0, 0)
 
-        width = tankFigure.get_allocated_width() if pygobject \
-                else tankFigure.allocation.width
-        height = tankFigure.get_allocated_height() if pygobject \
-                 else tankFigure.allocation.height
+        width = tankFigure.get_allocated_width()
+        height = tankFigure.get_allocated_height()
 
         rectangleX0 = triangleSize
         rectangleY0 = triangleSize
@@ -3644,14 +3618,12 @@ class BriefingPage(Page):
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 128)
         # FIXME: these constants should be in common
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC)
         self._notams = gtk.TextView()
         self._notams.set_editable(False)
         self._notams.set_accepts_tab(False)
-        self._notams.set_wrap_mode(gtk.WrapMode.WORD if pygobject else gtk.WRAP_WORD)
+        self._notams.set_wrap_mode(gtk.WrapMode.WORD)
         scrolledWindow.add(self._notams)
         alignment = gtk.Alignment(xalign = 0.0, yalign = 0.0,
                                   xscale = 1.0, yscale = 1.0)
@@ -3665,16 +3637,14 @@ class BriefingPage(Page):
         self._metarFrame.set_label(xstr("briefing_metar_init"))
         scrolledWindow = gtk.ScrolledWindow()
         scrolledWindow.set_size_request(-1, 32)
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC)
 
         self._updatingMETAR = False
 
         self._metar = gtk.TextView()
         self._metar.set_accepts_tab(False)
-        self._metar.set_wrap_mode(gtk.WrapMode.WORD if pygobject else gtk.WRAP_WORD)
+        self._metar.set_wrap_mode(gtk.WrapMode.WORD)
         self._metar.get_buffer().connect("changed", self._metarChanged)
         self._metar.get_buffer().connect_after("insert-text", self._metarInserted)
         scrolledWindow.add(self._metar)
@@ -3871,10 +3841,7 @@ class TakeoffPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 0, 1, row, row+1)
 
-        if pygobject:
-            self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._sid = gtk.ComboBoxEntry(comboModel)
+        self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._sid.set_entry_text_column(0)
         self._sid.get_child().set_width_chars(10)
@@ -4237,24 +4204,16 @@ class TakeoffPage(Page):
             self._derateLabel.set_use_underline(True)
             self._derateLabel.set_sensitive(True)
 
-            if pygobject:
-                nominal = gtk.RadioButton.\
-                  new_with_label_from_widget(None,
-                                             xstr("takeoff_derate_tupolev_nominal"))
-            else:
-                nominal = gtk.RadioButton(None,
-                                          xstr("takeoff_derate_tupolev_nominal"))
+            nominal = gtk.RadioButton.\
+                new_with_label_from_widget(None,
+                                           xstr("takeoff_derate_tupolev_nominal"))
             nominal.set_use_underline(True)
             nominal.set_tooltip_text(xstr("takeoff_derate_tupolev_nominal_tooltip"))
             nominal.connect("toggled", self._derateChanged)
 
-            if pygobject:
-                takeoff = gtk.RadioButton.\
-                  new_with_label_from_widget(nominal,
-                                             xstr("takeoff_derate_tupolev_takeoff"))
-            else:
-                takeoff = gtk.RadioButton(nominal,
-                                          xstr("takeoff_derate_tupolev_takeoff"))
+            takeoff = gtk.RadioButton.\
+                new_with_label_from_widget(nominal,
+                                           xstr("takeoff_derate_tupolev_takeoff"))
 
             takeoff.set_use_underline(True)
             takeoff.set_tooltip_text(xstr("takeoff_derate_tupolev_takeoff_tooltip"))
@@ -4461,10 +4420,7 @@ class LandingPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        if pygobject:
-            self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._star = gtk.ComboBoxEntry(comboModel)
+        self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._star.set_entry_text_column(0)
         self._star.get_child().set_width_chars(10)
@@ -4481,10 +4437,7 @@ class LandingPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        if pygobject:
-            self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._transition = gtk.ComboBoxEntry(comboModel)
+        self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._transition.set_entry_text_column(0)
         self._transition.get_child().set_width_chars(10)
@@ -5498,8 +5451,8 @@ class Wizard(gtk.VBox):
             self.add(page)
             self.show_all()
             pageSizeRequest = page.size_request()
-            width = pageSizeRequest.width if pygobject else pageSizeRequest[0]
-            height = pageSizeRequest.height if pygobject else pageSizeRequest[1]
+            width = pageSizeRequest.width
+            height = pageSizeRequest.height
             maxWidth = max(maxWidth, width)
             maxHeight = max(maxHeight, height)
             self.remove(page)

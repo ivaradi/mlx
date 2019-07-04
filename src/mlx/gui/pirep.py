@@ -70,13 +70,9 @@ class MessageFrame(gtk.Frame):
         self.add(vbox)
         self.show_all()
 
-        if pygobject:
-            styleContext = self.get_style_context()
-            color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
-            heading.override_background_color(0, color)
-        else:
-            style = self.rc_get_style()
-            heading.modify_base(0, style.bg[0])
+        styleContext = self.get_style_context()
+        color = styleContext.get_background_color(gtk.StateFlags.NORMAL)
+        heading.override_background_color(0, color)
 
 
 #-------------------------------------------------------------------------------
@@ -1224,10 +1220,7 @@ class PIREPEditor(gtk.Dialog):
 
         # FIXME: quite the same as the SID combo box in
         # the flight wizard
-        if pygobject:
-            self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._sid = gtk.ComboBoxEntry(comboModel)
+        self._sid = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._sid.set_entry_text_column(0)
         self._sid.get_child().set_width_chars(10)
@@ -1259,10 +1252,7 @@ class PIREPEditor(gtk.Dialog):
         table.set_col_spacings(8)
 
         # FIXME: quite the same as in the wizard
-        if pygobject:
-            self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._star = gtk.ComboBoxEntry(comboModel)
+        self._star = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._star.set_entry_text_column(0)
         self._star.get_child().set_width_chars(10)
@@ -1274,10 +1264,7 @@ class PIREPEditor(gtk.Dialog):
                                       self._star)
 
         # FIXME: quite the same as in the wizard
-        if pygobject:
-            self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
-        else:
-            self._transition = gtk.ComboBoxEntry(comboModel)
+        self._transition = gtk.ComboBox.new_with_model_and_entry(comboModel)
 
         self._transition.set_entry_text_column(0)
         self._transition.get_child().set_width_chars(10)

@@ -54,8 +54,7 @@ class Updater(threading.Thread):
         window.set_modal(True)
         window.connect("delete-event", lambda a, b: True)
         window.set_deletable(False)
-        window.set_position(gtk.WindowPosition.CENTER_ON_PARENT if pygobject
-                            else gtk.WIN_POS_CENTER_ON_PARENT)
+        window.set_position(gtk.WindowPosition.CENTER_ON_PARENT)
 
         mainAlignment = gtk.Alignment(xscale = 1.0)
         mainAlignment.set_padding(padding_top = 4, padding_bottom = 10,
@@ -81,7 +80,7 @@ class Updater(threading.Thread):
         Updater._sudoDialog = sudoDialog = \
             gtk.Dialog(WINDOW_TITLE_BASE + " " + xstr("update_title"),
                        parentWindow,
-                       gtk.DialogFlags.MODAL if pygobject else gtk.DIALOG_MODAL)
+                       gtk.DialogFlags.MODAL)
         sudoDialog.add_button(xstr("button_cancel"), 0)
         sudoDialog.add_button(xstr("button_ok"), 1)
                        
@@ -90,13 +89,11 @@ class Updater(threading.Thread):
                                        padding_left = 16, padding_right = 16)
 
         infoLabel = gtk.Label(xstr("update_needsudo"))
-        infoLabel.set_justify(gtk.Justification.CENTER if pygobject
-                              else gtk.JUSTIFY_CENTER)
+        infoLabel.set_justify(gtk.Justification.CENTER)
         infoLabelAlignment.add(infoLabel)
         sudoDialog.vbox.pack_start(infoLabelAlignment, True, True, 4)
 
-        sudoDialog.set_position(gtk.WindowPosition.CENTER_ON_PARENT if pygobject
-                                else gtk.WIN_POS_CENTER_ON_PARENT)
+        sudoDialog.set_position(gtk.WindowPosition.CENTER_ON_PARENT)
 
     def __init__(self, gui, programDirectory, updateURL, parentWindow):
         """Construct the updater. If not created yet, the windows used by the

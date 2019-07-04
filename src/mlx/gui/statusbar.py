@@ -29,8 +29,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._connecting = False
         self._connected = False
         
-        self.set_shadow_type(gtk.ShadowType.NONE if pygobject
-                             else gtk.SHADOW_NONE)
+        self.set_shadow_type(gtk.ShadowType.NONE)
 
         frameAlignment = gtk.Alignment(xscale = 1.0, yscale = 1.0)
 
@@ -54,10 +53,7 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         self._connStateArea.set_size_request(18, 18)
         self._connStateArea.set_tooltip_markup(xstr("statusbar_conn_tooltip"))
 
-        if pygobject:
-            self._connStateArea.connect("draw", self._drawConnState)
-        else:
-            self._connStateArea.connect("expose_event", self._drawConnState)
+        self._connStateArea.connect("draw", self._drawConnState)
 
         alignment = gtk.Alignment(xalign = 0.5, yalign = 0.5)
         alignment.add(self._connStateArea)        
@@ -129,13 +125,8 @@ class Statusbar(gtk.Frame, FlightStatusHandler):
         else:
             icon = self._connGreyIcon
 
-        if pygobject:
-            gdk.cairo_set_source_pixbuf(eventOrContext, icon, 0, 0)
-            eventOrContext.paint()
-        else:
-            gc = connStateArea.get_style().fg_gc[gtk.STATE_NORMAL]
-            drawable = connStateArea.get_window()
-            drawable.draw_pixbuf(gc, icon, 0, 0, 0, 0)
+        gdk.cairo_set_source_pixbuf(eventOrContext, icon, 0, 0)
+        eventOrContext.paint()
 
     def _updateFlightStatus(self):
         """Update the flight status information."""

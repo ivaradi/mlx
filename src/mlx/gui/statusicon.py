@@ -73,14 +73,9 @@ class StatusIcon(FlightStatusHandler):
         iconFile = os.path.join(iconDirectory, "logo.ico")
 
         if appIndicator:
-            if pygobject:
-                indicator = appindicator.Indicator.new ("mava-logger-x", iconFile,
-                                                        appindicator.IndicatorCategory.APPLICATION_STATUS)
-                indicator.set_status (appindicator.IndicatorStatus.ACTIVE)
-            else:
-                indicator = appindicator.Indicator ("mava-logger-x", iconFile,
-                                                    appindicator.CATEGORY_APPLICATION_STATUS)
-                indicator.set_status (appindicator.STATUS_ACTIVE)
+            indicator = appindicator.Indicator.new ("mava-logger-x", iconFile,
+                                                    appindicator.IndicatorCategory.APPLICATION_STATUS)
+            indicator.set_status (appindicator.IndicatorStatus.ACTIVE)
 
             indicator.set_menu(menu)
             self._indicator = indicator
@@ -126,10 +121,7 @@ class StatusIcon(FlightStatusHandler):
     def destroy(self):
         """Hide and destroy the status icon."""
         if appIndicator:
-            if pygobject:
-                self._indicator.set_status(appindicator.IndicatorStatus.PASSIVE)
-            else:
-                self._indicator.set_status(appindicator.STATUS_PASSIVE)
+            self._indicator.set_status(appindicator.IndicatorStatus.PASSIVE)
         else:
             self._statusIcon.set_visible(False)
 

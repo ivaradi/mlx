@@ -205,8 +205,7 @@ class GUI(fs.ConnectionListener):
 
         self._statusIcon = StatusIcon(iconDirectory, self)
 
-        self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH if pygobject
-                                      else gdk.WATCH)
+        self._busyCursor = gdk.Cursor(gdk.CursorType.WATCH)
 
         self._loadPIREPDialog = None
         self._lastLoadedPIREP = None
@@ -443,12 +442,11 @@ class GUI(fs.ConnectionListener):
         user."""
         return self._flightInfo.faultsFullyExplained
 
-    if pygobject:
-        @property
-        def backgroundColour(self):
-            """Get the background colour of the main window."""
-            return self._mainWindow.get_style_context().\
-              get_background_color(gtk.StateFlags.NORMAL)
+    @property
+    def backgroundColour(self):
+        """Get the background colour of the main window."""
+        return self._mainWindow.get_style_context().\
+            get_background_color(gtk.StateFlags.NORMAL)
 
     def run(self):
         """Run the GUI."""
@@ -740,8 +738,7 @@ class GUI(fs.ConnectionListener):
 
     def _handleMainWindowState(self, window, event):
         """Hande a change in the state of the window"""
-        iconified = gdk.WindowState.ICONIFIED if pygobject \
-                    else gdk.WINDOW_STATE_ICONIFIED
+        iconified = gdk.WindowState.ICONIFIED
 
         if (event.changed_mask&WINDOW_STATE_WITHDRAWN)!=0:
             if (event.new_window_state&WINDOW_STATE_WITHDRAWN)!=0:
@@ -749,12 +746,8 @@ class GUI(fs.ConnectionListener):
             else:
                 self._statusIcon.mainWindowShown()
 
-        if self.config.hideMinimizedWindow and not pygobject and \
-           (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
-           (event.new_window_state&WINDOW_STATE_ICONIFIED)!=0:
-            self.hideMainWindow(savePosition = False)
-        elif (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
-             (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
+        if (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
+           (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
             self._mainWindow.present()
 
     def _handleLeaveNotify(self, widget, event):
@@ -797,10 +790,7 @@ class GUI(fs.ConnectionListener):
         if self._mainWindowX is not None and self._mainWindowY is not None:
             self._mainWindow.move(self._mainWindowX, self._mainWindowY)
 
-        if pygobject:
-            self._mainWindow.show()
-        else:
-            self._mainWindow.present()
+        self._mainWindow.show()
         self._mainWindow.deiconify()
 
     def toggleMainWindow(self):
@@ -1238,12 +1228,9 @@ class GUI(fs.ConnectionListener):
 
         logScroller = gtk.ScrolledWindow()
         # FIXME: these should be constants in common
-        logScroller.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC,
-                               gtk.PolicyType.AUTOMATIC if pygobject
-                               else gtk.POLICY_AUTOMATIC)
-        logScroller.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                    else gtk.SHADOW_IN)
+        logScroller.set_policy(gtk.PolicyType.AUTOMATIC,
+                               gtk.PolicyType.AUTOMATIC)
+        logScroller.set_shadow_type(gtk.ShadowType.IN)
         logView = gtk.TextView()
         logView.set_editable(False)
         logView.set_cursor_visible(False)
@@ -1847,9 +1834,6 @@ class GUI(fs.ConnectionListener):
             dialog.set_authors(authors)
 
             dialog.set_license(xstr("about_license"))
-
-            if not pygobject:
-                gtk.about_dialog_set_url_hook(self._showAboutURL, None)
 
             self._aboutDialog = dialog
 

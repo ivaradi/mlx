@@ -106,12 +106,9 @@ class Timetable(gtk.Alignment):
         scrolledWindow.set_size_request(800, -1)
 
         # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                       else gtk.SHADOW_IN)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
 
         super(Timetable, self).__init__(xalign = 0.5, yalign = 0.0,
                                         xscale = 0.0, yscale = 1.0)
@@ -190,10 +187,7 @@ class Timetable(gtk.Alignment):
         if self._popupMenu is None:
             self._popupMenu = self._popupMenuProducer()
         menu = self._popupMenu
-        if pygobject:
-            menu.popup(None, None, None, None, event.button, event.time)
-        else:
-            menu.popup(None, None, None, event.button, event.time)
+        menu.popup(None, None, None, None, event.button, event.time)
 
     def _selectionChanged(self, selection):
         """Called when the selection has changed."""

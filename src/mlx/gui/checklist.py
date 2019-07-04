@@ -242,8 +242,7 @@ class ChecklistEditor(gtk.Dialog):
         """Move the selected files up or down."""
         selection = self._fileList.get_selection()
         (model, paths) = selection.get_selected_rows()
-        indexes = [(path.get_indices() if pygobject else path)[0]
-                   for path in paths]        
+        indexes = [path.get_indices()[0] for path in paths]
         indexes.sort()
         if not up:
             indexes.reverse()
@@ -272,7 +271,7 @@ class ChecklistEditor(gtk.Dialog):
             minIndex = None
             maxIndex = None
             for path in paths:
-                [index] = path.get_indices() if pygobject else path
+                [index] = path.get_indices()
                 if minIndex is None or index<minIndex: minIndex = index
                 if maxIndex is None or index>maxIndex: maxIndex = index
                         
@@ -325,10 +324,7 @@ class ChecklistEditor(gtk.Dialog):
             return
 
         menu = self._fileListPopupMenu
-        if pygobject:
-            menu.popup(None, None, None, None, event.button, event.time)
-        else:
-            menu.popup(None, None, None, event.button, event.time)
+        menu.popup(None, None, None, None, event.button, event.time)
 
     def _buildFileListPopupMenu(self):
         """Build the file list popup menu."""

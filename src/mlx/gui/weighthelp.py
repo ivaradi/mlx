@@ -71,8 +71,7 @@ class WeightHelp(gtk.VBox):
         label = gtk.Label(xstr("weighthelp_header_calculated"))
         label.set_use_markup(True)
         # FIXME: should be a constant in common
-        label.set_justify(gtk.Justification.CENTER if pygobject
-                          else gtk.JUSTIFY_CENTER)        
+        label.set_justify(gtk.Justification.CENTER)
         alignment.add(label)
         table.attach(alignment, 1, 2, 0, 1)
         
@@ -84,8 +83,7 @@ class WeightHelp(gtk.VBox):
         button.set_tooltip_markup(xstr("weighthelp_header_simulator_tooltip"))
         button.connect("clicked", self._fsButtonClicked)
         label = button.get_child()
-        label.set_justify(gtk.Justification.CENTER if pygobject
-                          else gtk.JUSTIFY_CENTER)        
+        label.set_justify(gtk.Justification.CENTER)
         alignment.add(button)
         table.attach(alignment, 3, 4, 0, 1)
         

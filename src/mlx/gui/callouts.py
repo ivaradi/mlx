@@ -476,10 +476,7 @@ class ApproachCalloutsEditor(gtk.Dialog):
             return
 
         menu = self._fileListPopupMenu
-        if pygobject:
-            menu.popup(None, None, None, None, event.button, event.time)
-        else:
-            menu.popup(None, None, None, event.button, event.time)
+        menu.popup(None, None, None, None, event.button, event.time)
 
     def _buildFileListPopupMenu(self):
         """Build the file list popup menu."""

@@ -63,12 +63,9 @@ class FleetGateStatus(gtk.VBox):
         scrolledWindow.add(self._fleetList)
         scrolledWindow.set_size_request(200, -1)
         # FIXME: these should be constants in common.py
-        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC,
-                                  gtk.PolicyType.AUTOMATIC if pygobject
-                                  else gtk.POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(gtk.ShadowType.IN if pygobject
-                                       else gtk.SHADOW_IN)
+        scrolledWindow.set_policy(gtk.PolicyType.AUTOMATIC,
+                                  gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(gtk.ShadowType.IN)
 
 
         self._fleetAlignment =  alignment = \
@@ -164,9 +161,7 @@ class FleetGateStatus(gtk.VBox):
 
                 self._fleetStore.append([tailNumber, status])
             # FIXME: this should be a constant in common.py
-            self._fleetStore.set_sort_column_id(0,
-                                                gtk.SortType.ASCENDING if pygobject
-                                                else gtk.SORT_ASCENDING)
+            self._fleetStore.set_sort_column_id(0, gtk.SortType.ASCENDING)
 
             occupiedGateNumbers = fleet.getOccupiedGateNumbers()
             for gate in lhbpGates.gates:
