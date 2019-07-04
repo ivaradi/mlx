@@ -34,68 +34,6 @@ except:
     pass
 from gi.repository import Pango
 
-
-MESSAGETYPE_ERROR = Gtk.MessageType.ERROR
-MESSAGETYPE_QUESTION = Gtk.MessageType.QUESTION
-MESSAGETYPE_INFO = Gtk.MessageType.INFO
-RESPONSETYPE_NONE = Gtk.ResponseType.NONE
-RESPONSETYPE_OK = Gtk.ResponseType.OK
-RESPONSETYPE_YES = Gtk.ResponseType.YES
-RESPONSETYPE_NO = Gtk.ResponseType.NO
-RESPONSETYPE_ACCEPT = Gtk.ResponseType.ACCEPT
-RESPONSETYPE_REJECT = Gtk.ResponseType.REJECT
-RESPONSETYPE_CANCEL = Gtk.ResponseType.CANCEL
-ACCEL_VISIBLE = Gtk.AccelFlags.VISIBLE
-CONTROL_MASK = Gdk.ModifierType.CONTROL_MASK
-DIALOG_MODAL = Gtk.DialogFlags.MODAL
-WRAP_WORD = Gtk.WrapMode.WORD
-JUSTIFY_CENTER = Gtk.Justification.CENTER
-JUSTIFY_LEFT = Gtk.Justification.LEFT
-
-CONTROL_MASK = Gdk.ModifierType.CONTROL_MASK
-SHIFT_MASK = Gdk.ModifierType.SHIFT_MASK
-BUTTON1_MASK = Gdk.ModifierType.BUTTON1_MASK
-
-SCROLL_UP = Gdk.ScrollDirection.UP
-SCROLL_DOWN = Gdk.ScrollDirection.DOWN
-
-SPIN_USER_DEFINED = Gtk.SpinType.USER_DEFINED
-
-FILE_CHOOSER_ACTION_SELECT_FOLDER = Gtk.FileChooserAction.SELECT_FOLDER
-FILE_CHOOSER_ACTION_OPEN = Gtk.FileChooserAction.OPEN
-FILE_CHOOSER_ACTION_SAVE = Gtk.FileChooserAction.SAVE
-
-SELECTION_MULTIPLE = Gtk.SelectionMode.MULTIPLE
-
-SHADOW_IN = Gtk.ShadowType.IN
-SHADOW_NONE = Gtk.ShadowType.NONE
-
-POLICY_AUTOMATIC = Gtk.PolicyType.AUTOMATIC
-POLICY_NEVER = Gtk.PolicyType.NEVER
-POLICY_ALWAYS = Gtk.PolicyType.ALWAYS
-
-WEIGHT_NORMAL = Pango.Weight.NORMAL
-WEIGHT_BOLD = Pango.Weight.BOLD
-
-WINDOW_STATE_ICONIFIED = Gdk.WindowState.ICONIFIED
-WINDOW_STATE_WITHDRAWN = Gdk.WindowState.WITHDRAWN
-
-SORT_ASCENDING = Gtk.SortType.ASCENDING
-SORT_DESCENDING = Gtk.SortType.DESCENDING
-
-EVENT_BUTTON_PRESS = Gdk.EventType.BUTTON_PRESS
-
-TREE_VIEW_COLUMN_FIXED = Gtk.TreeViewColumnSizing.FIXED
-
-FILL = Gtk.AttachOptions.FILL
-EXPAND = Gtk.AttachOptions.EXPAND
-
-UPDATE_IF_VALID = Gtk.SpinButtonUpdatePolicy.IF_VALID
-
-SELECTION_MULTIPLE = Gtk.SelectionMode.MULTIPLE
-
-pixbuf_new_from_file = GdkPixbuf.Pixbuf.new_from_file
-
 import codecs
 _utf8Decoder = codecs.getdecoder("utf-8")
 
@@ -313,9 +251,9 @@ class CredentialsDialog(Gtk.Dialog):
         super(CredentialsDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
                                                 titleLabel,
                                                 gui.mainWindow,
-                                                DIALOG_MODAL)
-        self.add_button(cancelButtonLabel, RESPONSETYPE_CANCEL)
-        self.add_button(okButtonLabel, RESPONSETYPE_OK)
+                                                Gtk.DialogFlags.MODAL)
+        self.add_button(cancelButtonLabel, Gtk.ResponseType.CANCEL)
+        self.add_button(okButtonLabel, Gtk.ResponseType.OK)
 
         contentArea = self.get_content_area()
 
@@ -487,7 +425,7 @@ def formatFlightLogLine(timeStr, line):
 
 def addFaultTag(buffer):
     """Add a tag named 'fault' to the given buffer."""
-    buffer.create_tag("fault", foreground="red", weight=WEIGHT_BOLD)
+    buffer.create_tag("fault", foreground="red", weight=Pango.Weight.BOLD)
 
 #------------------------------------------------------------------------------
 
@@ -522,17 +460,17 @@ def askYesNo(question, parent = None, title = WINDOW_TITLE_BASE):
 
     Return a boolean indicating the answer."""
     dialog = Gtk.MessageDialog(parent = parent,
-                               type = MESSAGETYPE_QUESTION,
+                               type = Gtk.MessageType.QUESTION,
                                message_format = question)
 
-    dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-    dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+    dialog.add_button(xstr("button_no"), Gtk.ResponseType.NO)
+    dialog.add_button(xstr("button_yes"), Gtk.ResponseType.YES)
 
     dialog.set_title(title)
     result = dialog.run()
     dialog.hide()
 
-    return result==RESPONSETYPE_YES
+    return result==Gtk.ResponseType.YES
 
 #------------------------------------------------------------------------------
 
@@ -540,9 +478,9 @@ def errorDialog(message, parent = None, secondary = None,
                 title = WINDOW_TITLE_BASE):
     """Display an error dialog box with the given message."""
     dialog = Gtk.MessageDialog(parent = parent,
-                               type = MESSAGETYPE_ERROR,
+                               type = Gtk.MessageType.ERROR,
                                message_format = message)
-    dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+    dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
     dialog.set_title(title)
     if secondary is not None:
         dialog.format_secondary_markup(secondary)

@@ -23,10 +23,10 @@ class BugReportDialog(Gtk.Dialog):
         super(BugReportDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
                                               xstr("bugreport_title"),
                                               gui.mainWindow,
-                                              DIALOG_MODAL)
+                                              Gtk.DialogFlags.MODAL)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
-        self._sendButton = self.add_button(xstr("button_send"), RESPONSETYPE_ACCEPT)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
+        self._sendButton = self.add_button(xstr("button_send"), Gtk.ResponseType.ACCEPT)
         self._sendButton.set_can_default(True)
         self._gui = gui
 
@@ -63,14 +63,15 @@ class BugReportDialog(Gtk.Dialog):
 
         self._description = description = Gtk.TextView()
         description.set_tooltip_text(xstr("bugreport_description_tooltip"))
-        description.set_wrap_mode(WRAP_WORD)
+        description.set_wrap_mode(Gtk.WrapMode.WORD)
         label.set_mnemonic_widget(description)
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(description)
         scrolledWindow.set_size_request(-1, 200)
-        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(SHADOW_IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
         alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.0, xscale = 1.0, yscale = 1.0)
         alignment.add(scrolledWindow)
@@ -104,8 +105,8 @@ class BugReportDialog(Gtk.Dialog):
         self.show_all()
         response = super(BugReportDialog, self).run()
 
-        print("response", response, RESPONSETYPE_ACCEPT)
-        if response==RESPONSETYPE_ACCEPT:
+        print("response", response, Gtk.ResponseType.ACCEPT)
+        if response==Gtk.ResponseType.ACCEPT:
             self._send()
         else:
             self.hide()

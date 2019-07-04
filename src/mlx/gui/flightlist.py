@@ -115,9 +115,9 @@ class FlightList(Gtk.Alignment):
 
         self._model = Gtk.ListStore(*types)
         if defaultSortableIndex is not None:
-            sortOrder = SORT_DESCENDING \
+            sortOrder = Gtk.SortType.DESCENDING \
               if self._columnDescriptors[defaultSortableIndex-1]._defaultDescending \
-              else SORT_ASCENDING
+              else Gtk.SortType.ASCENDING
             self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
         self._view = Gtk.TreeView(self._model)
 
@@ -137,7 +137,7 @@ class FlightList(Gtk.Alignment):
         selection = self._view.get_selection()
         selection.connect("changed", self._selectionChanged)
         if multiSelection:
-            selection.set_mode(SELECTION_MULTIPLE)
+            selection.set_mode(Gtk.SelectionMode.MULTIPLE)
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._view)
@@ -205,7 +205,7 @@ class FlightList(Gtk.Alignment):
 
     def _buttonPressEvent(self, widget, event):
         """Called when a mouse button is pressed or released."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3 or \
+        if event.type!=Gdk.EventType.BUTTON_PRESS or event.button!=3 or \
            self._popupMenuProducer is None:
             return
 

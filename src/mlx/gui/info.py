@@ -40,11 +40,11 @@ class FlightInfo(Gtk.VBox):
                               padding_left = 8, padding_right = 8)
 
         scroller = Gtk.ScrolledWindow()
-        scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scroller.set_shadow_type(SHADOW_IN)
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroller.set_shadow_type(Gtk.ShadowType.IN)
 
         comments = Gtk.TextView()
-        comments.set_wrap_mode(WRAP_WORD)
+        comments.set_wrap_mode(Gtk.WrapMode.WORD)
         scroller.add(comments)
         alignment.add(scroller)
         frame.add(alignment)
@@ -89,8 +89,9 @@ class FlightInfo(Gtk.VBox):
         self._delayWindow = scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(table)
         scrolledWindow.set_size_request(-1, 185)
-        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(SHADOW_IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
         alignment.add(scrolledWindow)
         frame.add(alignment)

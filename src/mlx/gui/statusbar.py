@@ -41,13 +41,13 @@ class Statusbar(Gtk.Frame, FlightStatusHandler):
         frameAlignment.add(statusBox)
 
         iconPath = os.path.join(iconDirectory, "conn_grey.png")
-        self._connGreyIcon = pixbuf_new_from_file(iconPath)
+        self._connGreyIcon = GdkPixbuf.Pixbuf.new_from_file(iconPath)
 
         iconPath = os.path.join(iconDirectory, "conn_red.png")
-        self._connRedIcon = pixbuf_new_from_file(iconPath)
+        self._connRedIcon = GdkPixbuf.Pixbuf.new_from_file(iconPath)
 
         iconPath = os.path.join(iconDirectory, "conn_green.png")
-        self._connGreenIcon = pixbuf_new_from_file(iconPath)
+        self._connGreenIcon = GdkPixbuf.Pixbuf.new_from_file(iconPath)
 
         self._connStateArea = Gtk.DrawingArea()
         self._connStateArea.set_size_request(18, 18)

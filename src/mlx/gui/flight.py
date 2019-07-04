@@ -640,7 +640,7 @@ class FlightSelectionPage(Page):
         response = dialog.run()
         dialog.hide()
 
-        if response==RESPONSETYPE_OK:
+        if response==Gtk.ResponseType.OK:
             fileName = dialog.get_filename()
             print("Saving", fileName)
             try:
@@ -649,10 +649,10 @@ class FlightSelectionPage(Page):
             except Exception as e:
                 print("Failed to save flight:", util.utf2unicode(str(e)))
                 dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                           type = MESSAGETYPE_ERROR,
+                                           type = Gtk.MessageType.ERROR,
                                            message_format =
                                            xstr("flightsel_save_failed"))
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 secondary = xstr("flightsel_save_failed_sec")
                 dialog.format_secondary_markup(secondary)
@@ -715,7 +715,7 @@ class FlightSelectionPage(Page):
         layout.set_text("Malév VA official briefing")
         font = Pango.FontDescription("sans")
         font.set_size(int(32 * scale * Pango.SCALE))
-        font.set_weight(Pango.WEIGHT_NORMAL)
+        font.set_weight(Pango.Weight.NORMAL)
         layout.set_font_description(font)
 
         (_ink, (x0, y0, x1, y1)) = layout.get_extents()
@@ -931,7 +931,7 @@ class FlightSelectionPage(Page):
         response = dialog.run()
         dialog.hide()
 
-        if response==RESPONSETYPE_OK:
+        if response==Gtk.ResponseType.OK:
             fileName = dialog.get_filename()
             print("Loading", fileName)
             bookedFlight = web.BookedFlight()
@@ -942,10 +942,10 @@ class FlightSelectionPage(Page):
             except Exception as e:
                 print("Failed to load flight:", util.utf2unicode(str(e)))
                 dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                           type = MESSAGETYPE_ERROR,
+                                           type = Gtk.MessageType.ERROR,
                                            message_format =
                                            xstr("flightsel_load_failed"))
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 secondary = xstr("flightsel_load_failed_sec")
                 dialog.format_secondary_markup(secondary)
@@ -1025,10 +1025,10 @@ class FlightSelectionPage(Page):
         gui = self._wizard.gui
         dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_save_title"),
-                                       action = FILE_CHOOSER_ACTION_SAVE,
+                                       action = Gtk.FileChooserAction.SAVE,
                                        buttons = (Gtk.STOCK_CANCEL,
-                                                  RESPONSETYPE_CANCEL,
-                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                  Gtk.ResponseType.CANCEL,
+                                                  Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                        parent = gui.mainWindow)
         dialog.set_modal(True)
         dialog.set_do_overwrite_confirmation(True)
@@ -1055,10 +1055,10 @@ class FlightSelectionPage(Page):
         gui = self._wizard.gui
         dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("flightsel_load_title"),
-                                       action = FILE_CHOOSER_ACTION_OPEN,
+                                       action = Gtk.FileChooserAction.OPEN,
                                        buttons = (Gtk.STOCK_CANCEL,
-                                                  RESPONSETYPE_CANCEL,
-                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                  Gtk.ResponseType.CANCEL,
+                                                  Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                        parent = gui.mainWindow)
         dialog.set_modal(True)
 
@@ -1227,9 +1227,9 @@ class GateSelectionPage(Page):
             self._wizard.jumpPage("connect")
         else:
             dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("gatesel_conflict"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.format_secondary_markup(xstr("gatesel_conflict_sec"))
             dialog.run()
@@ -1659,7 +1659,7 @@ class RegisterPage(Page):
                 secondaryMessage = xstr("register_info") % (result.pilotID,)
             else:
                 secondaryMessage = xstr("register_nologin") % (result.pilotID,)
-            messageType = MESSAGETYPE_INFO
+            messageType = Gtk.MessageType.INFO
 
             config = gui.config
             config.pilotID = result.pilotID
@@ -1672,13 +1672,13 @@ class RegisterPage(Page):
             config.save()
         elif returned and result.emailAlreadyRegistered:
             secondaryMessage = xstr("register_email_already")
-            messageType = MESSAGETYPE_ERROR
+            messageType = Gtk.MessageType.ERROR
         elif returned and result.invalidData:
             secondaryMessage = xstr("register_invalid_data")
-            messageType = MESSAGETYPE_ERROR
+            messageType = Gtk.MessageType.ERROR
         else:
             secondaryMessage = xstr("register_error")
-            messageType = MESSAGETYPE_ERROR
+            messageType = Gtk.MessageType.ERROR
 
         dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                    type = messageType,
@@ -1732,7 +1732,8 @@ class StudentPage(Page):
         label.set_alignment(0.0, 0.5)
         labelAlignment.add(label)
         labelAlignment.resize_children()
-        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
+        table.attach(labelAlignment, 0, 1, row, row + 1,
+                     xoptions = Gtk.AttachOptions.FILL)
 
         alignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                   xscale=1.0, yscale = 0.0)
@@ -1752,7 +1753,8 @@ class StudentPage(Page):
         button.set_tooltip_text(xstr("student_entry_exam_tooltip"))
 
         buttonAlignment.add(button)
-        table.attach(buttonAlignment, 0, 4, row, row + 1, xoptions = FILL,
+        table.attach(buttonAlignment, 0, 4, row, row + 1,
+                     xoptions = Gtk.AttachOptions.FILL,
                      ypadding = 4)
 
         row += 3
@@ -1761,7 +1763,8 @@ class StudentPage(Page):
                                        xscale=0.0, yscale = 0.0)
         label = Gtk.Label(xstr("student_check_flight_status"))
         labelAlignment.add(label)
-        table.attach(labelAlignment, 0, 1, row, row + 1, xoptions = FILL)
+        table.attach(labelAlignment, 0, 1, row, row + 1,
+                     xoptions = Gtk.AttachOptions.FILL)
 
         alignment = Gtk.Alignment(xalign=0.0, yalign = 0.5,
                                   xscale=1.0, yscale = 0.0)
@@ -1806,7 +1809,8 @@ class StudentPage(Page):
         hbox.pack_start(button, True, True, 0)
 
         alignment.add(hbox)
-        table.attach(alignment, 0, 4, row, row + 1, xoptions = FILL)
+        table.attach(alignment, 0, 4, row, row + 1,
+                     xoptions = Gtk.AttachOptions.FILL)
 
     @property
     def aircraftType(self):
@@ -1894,10 +1898,10 @@ class StudentPage(Page):
         gui = wizard.gui
 
         dialog = Gtk.MessageDialog(parent = gui.mainWindow,
-                                   type = MESSAGETYPE_INFO,
+                                   type = Gtk.MessageType.INFO,
                                    message_format = xstr("student_fo"))
 
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         secondary = xstr("student_fo_secondary")
         dialog.format_secondary_markup(secondary)
@@ -2500,7 +2504,7 @@ class RoutePage(Page):
 
         self._route = Gtk.TextView()
         self._route.set_tooltip_text(xstr("route_route_tooltip"))
-        self._route.set_wrap_mode(WRAP_WORD)
+        self._route.set_wrap_mode(Gtk.WrapMode.WORD)
         self._route.get_buffer().connect("changed", self._routeChanged)
         self._route.get_buffer().connect_after("insert-text", self._routeInserted)
         routeWindow.add(self._route)
@@ -2625,9 +2629,9 @@ class SimBriefCredentialsDialog(Gtk.Dialog):
         super(SimBriefCredentialsDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
                                                         xstr("simbrief_credentials_title"),
                                                         gui.mainWindow,
-                                                        DIALOG_MODAL)
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
-        self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                                                        Gtk.DialogFlags.MODAL)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.CANCEL)
+        self.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
 
         contentArea = self.get_content_area()
 
@@ -3015,7 +3019,7 @@ class SimBriefSetupPage(Page):
                                                config.rememberSimBriefPassword)
             response = dialog.run()
 
-            if response==RESPONSETYPE_OK:
+            if response==Gtk.ResponseType.OK:
                 userName = dialog.userName
                 self._userName.set_text(userName)
                 password = dialog.password
@@ -3053,12 +3057,12 @@ class SimBriefSetupPage(Page):
                 message = SimBriefSetupPage.result2Message.get(result,
                                                                "simbrief_result_unknown")
                 dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-                                           type = MESSAGETYPE_ERROR,
+                                           type = Gtk.MessageType.ERROR,
                                            message_format =
                                            xstr(message) + "\n"+
                                            xstr("simbrief_cancelled"))
 
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 secondary = xstr("flightsel_save_failed_sec")
                 dialog.format_secondary_markup(secondary)
@@ -3238,7 +3242,7 @@ class FuelTank(Gtk.VBox):
         self._label = label = Gtk.Label("<b>" + name + "</b>")
         label.set_use_markup(True)
         label.set_use_underline(True)
-        label.set_justify(JUSTIFY_CENTER)
+        label.set_justify(Gtk.Justification.CENTER)
         label.set_alignment(0.5, 1.0)
 
         self._tankFigure = Gtk.EventBox()
@@ -3378,19 +3382,19 @@ class FuelTank(Gtk.VBox):
 
     def _motionNotify(self, tankFigure, event):
         """Called when the mouse pointer moves within the area of a tank figure."""
-        if self._enabled and event.state==BUTTON1_MASK:
+        if self._enabled and event.state==Gdk.ModifierType.BUTTON1_MASK:
             self._setExpectedFromY(event.y)
 
     def _scrolled(self, tankFigure, event):
         """Called when a scroll event is received."""
         if self._enabled:
-            increment = 1 if event.state==CONTROL_MASK \
-                        else 100 if event.state==SHIFT_MASK \
+            increment = 1 if event.state==Gdk.ModifierType.CONTROL_MASK \
+                        else 100 if event.state==Gdk.ModifierType.SHIFT_MASK \
                         else 10 if event.state==0 else 0
             if increment!=0:
-                if event.direction==SCROLL_DOWN:
+                if event.direction==Gdk.ScrollDirection.DOWN:
                     increment *= -1
-                self._expectedButton.spin(SPIN_USER_DEFINED, increment)
+                self._expectedButton.spin(Gtk.SpinType.USER_DEFINED, increment)
 
     def _expectedChanged(self, spinButton):
         """Called when the expected value has changed."""
@@ -4748,7 +4752,7 @@ class PIREPSaveHelper(object):
         result = dialog.run()
         dialog.hide()
 
-        if result==RESPONSETYPE_OK:
+        if result==Gtk.ResponseType.OK:
             self._lastSavePath = dialog.get_filename()
             self._savePIREP(page)
 
@@ -4767,11 +4771,11 @@ class PIREPSaveHelper(object):
             gui.endBusy()
 
         if error:
-            type = MESSAGETYPE_ERROR
+            type = Gtk.MessageType.ERROR
             message = xstr("finish_save_failed")
             secondary = xstr("finish_save_failed_sec") % (error,)
         else:
-            type = MESSAGETYPE_INFO
+            type = Gtk.MessageType.INFO
             message = xstr("finish_save_done")
             if automatic:
                 secondary = xstr("finish_save_done_sec") % (self._lastSavePath,)
@@ -4781,7 +4785,7 @@ class PIREPSaveHelper(object):
 
         dialog = Gtk.MessageDialog(parent = gui.mainWindow,
                                    type = type, message_format = message)
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         if secondary is not None:
             dialog.format_secondary_markup(secondary)
@@ -4797,10 +4801,10 @@ class PIREPSaveHelper(object):
             gui = self._wizard.gui
             dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("finish_save_title"),
-                                           action = FILE_CHOOSER_ACTION_SAVE,
+                                           action = Gtk.FileChooserAction.SAVE,
                                            buttons = (Gtk.STOCK_CANCEL,
-                                                      RESPONSETYPE_CANCEL,
-                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.ResponseType.CANCEL,
+                                                      Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                            parent = gui.mainWindow)
             dialog.set_modal(True)
             dialog.set_do_overwrite_confirmation(True)
@@ -5143,16 +5147,16 @@ class FinishPage(Page):
         gui = self._wizard.gui
         if not self._pirepSent and not self._pirepSaved:
             dialog = Gtk.MessageDialog(parent = gui.mainWindow,
-                                       type = MESSAGETYPE_QUESTION,
+                                       type = Gtk.MessageType.QUESTION,
                                        message_format = xstr("finish_newFlight_question"))
 
-            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+            dialog.add_button(xstr("button_no"), Gtk.ResponseType.NO)
+            dialog.add_button(xstr("button_yes"), Gtk.ResponseType.YES)
 
             dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()
             dialog.hide()
-            if result!=RESPONSETYPE_YES:
+            if result!=Gtk.ResponseType.YES:
                 return
 
         gui.reset()
@@ -5349,7 +5353,7 @@ class CheckFlightFinishPage(Page):
             self._resetGUI()
         else:
             dialog = Gtk.MessageDialog(parent = gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format =
                                        xstr("chkfinish_passedset_failed"))
             dialog.set_title(WINDOW_TITLE_BASE + " - " +
@@ -5881,9 +5885,9 @@ class Wizard(Gtk.VBox):
                                    if self.entranceExam else
                                    xstr("login_invalid"))
                 dialog = Gtk.MessageDialog(parent = self.gui.mainWindow,
-                                           type = MESSAGETYPE_ERROR,
+                                           type = Gtk.MessageType.ERROR,
                                            message_format = message)
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 if isReload:
                     secondary = xstr("reload_failed_sec")
@@ -5898,9 +5902,9 @@ class Wizard(Gtk.VBox):
             message = xstr("reload_failconn") if isReload \
                       else xstr("login_failconn")
             dialog = Gtk.MessageDialog(parent = self.gui.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = message)
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             secondary = xstr("reload_failconn_sec") if isReload \
                         else xstr("login_failconn_sec")

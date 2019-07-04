@@ -197,7 +197,7 @@ class DelayCodeTable(DelayCodeTableBase):
 
         self._viewport = self._createViewport()
         self._viewport.add(self._eventBox)
-        self._viewport.set_shadow_type(SHADOW_NONE)
+        self._viewport.set_shadow_type(Gtk.ShadowType.NONE)
 
         self.pack_start(self._viewport, True, True, 0)
 
@@ -254,12 +254,12 @@ class DelayCodeTable(DelayCodeTableBase):
         numRows = len(rows)
 
         column = Gtk.TreeViewColumn("", Gtk.CellRendererText())
-        column.set_sizing(TREE_VIEW_COLUMN_FIXED)
+        column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self._treeView.append_column(column)
 
         for header in headers:
             column = Gtk.TreeViewColumn(header, Gtk.CellRendererText())
-            column.set_sizing(TREE_VIEW_COLUMN_FIXED)
+            column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
             self._treeView.append_column(column)
 
         self._table = Gtk.Table(numRows, numColumns)
@@ -282,7 +282,7 @@ class DelayCodeTable(DelayCodeTableBase):
                 label.set_alignment(0.0, 0.5)
                 alignment.add(label)
                 self._table.attach(alignment, 1, numColumns, i, i+1,
-                                   yoptions = FILL)
+                                   yoptions = Gtk.AttachOptions.FILL)
                 self._table.set_row_spacing(i, 8)
             elif type==DELAYCODE:
                 checkButton = CheckButton(elements)
@@ -291,7 +291,8 @@ class DelayCodeTable(DelayCodeTableBase):
                 alignment = Alignment(xalign = 0.5, yalign = 0.5, xscale = 1.0)
                 alignment.add(checkButton)
                 self._table.attach(alignment, 0, 1, i, i+1,
-                                   xoptions = FILL, yoptions = FILL)
+                                   xoptions = Gtk.AttachOptions.FILL,
+                                   yoptions = Gtk.AttachOptions.FILL)
                 if firstDelayCodeRow:
                     self._alignments.append(alignment)
 
@@ -301,10 +302,11 @@ class DelayCodeTable(DelayCodeTableBase):
                     alignment = Alignment(xalign = 0.5, yalign = 0.5,
                                           xscale = 1.0)
                     alignment.add(label)
-                    xoptions = FILL
-                    if j==(numColumns-2): xoptions |= EXPAND
+                    xoptions = Gtk.AttachOptions.FILL
+                    if j==(numColumns-2): xoptions |= Gtk.AttachOptions.EXPAND
                     self._table.attach(alignment, j+1, j+2, i, i+1,
-                                       xoptions = xoptions, yoptions = FILL)
+                                       xoptions = xoptions,
+                                       yoptions = Gtk.AttachOptions.FILL)
                     if firstDelayCodeRow:
                         self._alignments.append(alignment)
                 firstDelayCodeRow = False

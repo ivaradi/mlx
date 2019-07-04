@@ -501,7 +501,7 @@ class GUI(fs.ConnectionListener):
         self._statusbar.updateConnection(self._connecting, self._connected)
 
         dialog = Gtk.MessageDialog(parent = self._mainWindow,
-                                   type = MESSAGETYPE_ERROR,
+                                   type = Gtk.MessageType.ERROR,
                                    message_format = xstr("conn_failed"))
 
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -532,7 +532,7 @@ class GUI(fs.ConnectionListener):
         """Called when we have disconnected from the simulator unexpectedly."""
         self._statusbar.updateConnection(self._connecting, self._connected)
 
-        dialog = Gtk.MessageDialog(type = MESSAGETYPE_ERROR,
+        dialog = Gtk.MessageDialog(type = Gtk.MessageType.ERROR,
                                    message_format = xstr("conn_broken"),
                                    parent = self._mainWindow)
         dialog.set_title(WINDOW_TITLE_BASE)
@@ -591,17 +591,17 @@ class GUI(fs.ConnectionListener):
     def cancelFlight(self):
         """Cancel the current file, if the user confirms it."""
         dialog = Gtk.MessageDialog(parent = self._mainWindow,
-                                   type = MESSAGETYPE_QUESTION,
+                                   type = Gtk.MessageType.QUESTION,
                                    message_format = xstr("cancelFlight_question"))
 
-        dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-        dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+        dialog.add_button(xstr("button_no"), Gtk.ResponseType.NO)
+        dialog.add_button(xstr("button_yes"), Gtk.ResponseType.YES)
 
         dialog.set_title(WINDOW_TITLE_BASE)
         result = dialog.run()
         dialog.hide()
 
-        if result==RESPONSETYPE_YES:
+        if result==Gtk.ResponseType.YES:
             self.reset()
 
     def reset(self):
@@ -740,14 +740,14 @@ class GUI(fs.ConnectionListener):
         """Hande a change in the state of the window"""
         iconified = Gdk.WindowState.ICONIFIED
 
-        if (event.changed_mask&WINDOW_STATE_WITHDRAWN)!=0:
-            if (event.new_window_state&WINDOW_STATE_WITHDRAWN)!=0:
+        if (event.changed_mask&Gdk.WindowState.WITHDRAWN)!=0:
+            if (event.new_window_state&Gdk.WindowState.WITHDRAWN)!=0:
                 self._statusIcon.mainWindowHidden()
             else:
                 self._statusIcon.mainWindowShown()
 
-        if (event.changed_mask&WINDOW_STATE_ICONIFIED)!=0 and \
-           (event.new_window_state&WINDOW_STATE_ICONIFIED)==0:
+        if (event.changed_mask&Gdk.WindowState.ICONIFIED)!=0 and \
+           (event.new_window_state&Gdk.WindowState.ICONIFIED)==0:
             self._mainWindow.present()
 
     def _handleLeaveNotify(self, widget, event):
@@ -930,9 +930,9 @@ class GUI(fs.ConnectionListener):
             self._fleet = None
 
             dialog = Gtk.MessageDialog(parent = self.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("fleet_failed"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -975,9 +975,9 @@ class GUI(fs.ConnectionListener):
                     self._fleetGateStatus.handleFleet(self._fleet)
         else:
             dialog = Gtk.MessageDialog(parent = self.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("fleet_update_failed"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.ACCEPT)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -1076,7 +1076,8 @@ class GUI(fs.ConnectionListener):
         loadPIREPMenuItem.set_label(xstr("menu_file_loadPIREP"))
         loadPIREPMenuItem.add_accelerator("activate", accelGroup,
                                           ord(xstr("menu_file_loadPIREP_key")),
-                                          CONTROL_MASK, ACCEL_VISIBLE)
+                                          Gdk.ModifierType.CONTROL_MASK,
+                                          Gtk.AccelFlags.VISIBLE)
         loadPIREPMenuItem.connect("activate", self._loadPIREP)
         fileMenu.append(loadPIREPMenuItem)
 
@@ -1087,7 +1088,8 @@ class GUI(fs.ConnectionListener):
         quitMenuItem.set_label(xstr("menu_file_quit"))
         quitMenuItem.add_accelerator("activate", accelGroup,
                                      ord(xstr("menu_file_quit_key")),
-                                     CONTROL_MASK, ACCEL_VISIBLE)
+                                     Gdk.ModifierType.CONTROL_MASK,
+                                     Gtk.AccelFlags.VISIBLE)
         quitMenuItem.connect("activate", self._quit)
         fileMenu.append(quitMenuItem)
 
@@ -1102,7 +1104,8 @@ class GUI(fs.ConnectionListener):
         timetableMenuItem.set_label(xstr("menu_tools_timetable"))
         timetableMenuItem.add_accelerator("activate", accelGroup,
                                           ord(xstr("menu_tools_timetable_key")),
-                                          CONTROL_MASK, ACCEL_VISIBLE)
+                                          Gdk.ModifierType.CONTROL_MASK,
+                                          Gtk.AccelFlags.VISIBLE)
         timetableMenuItem.connect("activate", self.showTimetable)
         self._timetableMenuItem.set_sensitive(False)
         toolsMenu.append(timetableMenuItem)
@@ -1113,7 +1116,8 @@ class GUI(fs.ConnectionListener):
         flightsMenuItem.set_label(xstr("menu_tools_flights"))
         flightsMenuItem.add_accelerator("activate", accelGroup,
                                         ord(xstr("menu_tools_flights_key")),
-                                        CONTROL_MASK, ACCEL_VISIBLE)
+                                        Gdk.ModifierType.CONTROL_MASK,
+                                        Gtk.AccelFlags.VISIBLE)
         flightsMenuItem.connect("activate", self.showFlights)
         self._flightsMenuItem.set_sensitive(False)
         toolsMenu.append(flightsMenuItem)
@@ -1123,7 +1127,8 @@ class GUI(fs.ConnectionListener):
         checklistMenuItem.set_label(xstr("menu_tools_chklst"))
         checklistMenuItem.add_accelerator("activate", accelGroup,
                                           ord(xstr("menu_tools_chklst_key")),
-                                          CONTROL_MASK, ACCEL_VISIBLE)
+                                          Gdk.ModifierType.CONTROL_MASK,
+                                          Gtk.AccelFlags.VISIBLE)
         checklistMenuItem.connect("activate", self._editChecklist)
         toolsMenu.append(checklistMenuItem)
 
@@ -1132,7 +1137,8 @@ class GUI(fs.ConnectionListener):
         approachCalloutsMenuItem.set_label(xstr("menu_tools_callouts"))
         approachCalloutsMenuItem.add_accelerator("activate", accelGroup,
                                                  ord(xstr("menu_tools_callouts_key")),
-                                                 CONTROL_MASK, ACCEL_VISIBLE)
+                                                 Gdk.ModifierType.CONTROL_MASK,
+                                                 Gtk.AccelFlags.VISIBLE)
         approachCalloutsMenuItem.connect("activate", self._editApproachCallouts)
         toolsMenu.append(approachCalloutsMenuItem)
 
@@ -1141,7 +1147,8 @@ class GUI(fs.ConnectionListener):
         prefsMenuItem.set_label(xstr("menu_tools_prefs"))
         prefsMenuItem.add_accelerator("activate", accelGroup,
                                       ord(xstr("menu_tools_prefs_key")),
-                                      CONTROL_MASK, ACCEL_VISIBLE)
+                                      Gdk.ModifierType.CONTROL_MASK,
+                                      Gtk.AccelFlags.VISIBLE)
         prefsMenuItem.connect("activate", self._editPreferences)
         toolsMenu.append(prefsMenuItem)
 
@@ -1152,7 +1159,8 @@ class GUI(fs.ConnectionListener):
         bugReportMenuItem.set_label(xstr("menu_tools_bugreport"))
         bugReportMenuItem.add_accelerator("activate", accelGroup,
                                           ord(xstr("menu_tools_bugreport_key")),
-                                          CONTROL_MASK, ACCEL_VISIBLE)
+                                          Gdk.ModifierType.CONTROL_MASK,
+                                          Gtk.AccelFlags.VISIBLE)
         bugReportMenuItem.connect("activate", self._reportBug)
         toolsMenu.append(bugReportMenuItem)
 
@@ -1167,7 +1175,8 @@ class GUI(fs.ConnectionListener):
         self._showMonitorMenuItem.set_active(False)
         self._showMonitorMenuItem.add_accelerator("activate", accelGroup,
                                                   ord(xstr("menu_view_monitor_key")),
-                                                  CONTROL_MASK, ACCEL_VISIBLE)
+                                                  Gdk.ModifierType.CONTROL_MASK,
+                                                  Gtk.AccelFlags.VISIBLE)
         self._showMonitorMenuItem.connect("toggled", self._toggleMonitorWindow)
         viewMenu.append(self._showMonitorMenuItem)
 
@@ -1177,7 +1186,8 @@ class GUI(fs.ConnectionListener):
         showDebugMenuItem.set_active(False)
         showDebugMenuItem.add_accelerator("activate", accelGroup,
                                           ord(xstr("menu_view_debug_key")),
-                                          CONTROL_MASK, ACCEL_VISIBLE)
+                                          Gdk.ModifierType.CONTROL_MASK,
+                                          Gtk.AccelFlags.VISIBLE)
         showDebugMenuItem.connect("toggled", self._toggleDebugLog)
         viewMenu.append(showDebugMenuItem)
 
@@ -1191,7 +1201,8 @@ class GUI(fs.ConnectionListener):
         manualMenuItem.set_label(xstr("menu_help_manual"))
         manualMenuItem.add_accelerator("activate", accelGroup,
                                        ord(xstr("menu_help_manual_key")),
-                                       CONTROL_MASK, ACCEL_VISIBLE)
+                                       Gdk.ModifierType.CONTROL_MASK,
+                                       Gtk.AccelFlags.VISIBLE)
         manualMenuItem.connect("activate", self._showManual)
         helpMenu.append(manualMenuItem)
 
@@ -1202,7 +1213,8 @@ class GUI(fs.ConnectionListener):
         aboutMenuItem.set_label(xstr("menu_help_about"))
         aboutMenuItem.add_accelerator("activate", accelGroup,
                                       ord(xstr("menu_help_about_key")),
-                                      CONTROL_MASK, ACCEL_VISIBLE)
+                                      Gdk.ModifierType.CONTROL_MASK,
+                                      Gtk.AccelFlags.VISIBLE)
         aboutMenuItem.connect("activate", self._showAbout)
         helpMenu.append(aboutMenuItem)
 
@@ -1253,20 +1265,20 @@ class GUI(fs.ConnectionListener):
     def _quit(self, what = None, force = False):
         """Quit from the application."""
         if force:
-            result=RESPONSETYPE_YES
+            result=Gtk.ResponseType.YES
         else:
             dialog = Gtk.MessageDialog(parent = self._mainWindow,
-                                       type = MESSAGETYPE_QUESTION,
+                                       type = Gtk.MessageType.QUESTION,
                                        message_format = xstr("quit_question"))
 
-            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+            dialog.add_button(xstr("button_no"), Gtk.ResponseType.NO)
+            dialog.add_button(xstr("button_yes"), Gtk.ResponseType.YES)
 
             dialog.set_title(WINDOW_TITLE_BASE)
             result = dialog.run()
             dialog.hide()
 
-        if result==RESPONSETYPE_YES:
+        if result==Gtk.ResponseType.YES:
             self._statusIcon.destroy()
             return Gtk.main_quit()
 
@@ -1323,9 +1335,9 @@ class GUI(fs.ConnectionListener):
             self._timetableWindow.show_all()
         else:
             dialog = Gtk.MessageDialog(parent = self.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("timetable_failed"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -1353,9 +1365,9 @@ class GUI(fs.ConnectionListener):
             self._flightsWindow.show_all()
         else:
             dialog = Gtk.MessageDialog(parent = self.mainWindow,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("acceptedflt_failed"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             dialog.run()
             dialog.hide()
@@ -1418,7 +1430,7 @@ class GUI(fs.ConnectionListener):
         """Display the PIREP editor window and allow editing the PIREP."""
         self._pirepEditor.setPIREP(pirep)
         self._pirepEditor.show_all()
-        if self._pirepEditor.run()==RESPONSETYPE_OK:
+        if self._pirepEditor.run()==Gtk.ResponseType.OK:
             self.beginBusy(xstr("pirepEdit_save_busy"))
             self.webHandler.sendPIREP(self._pirepUpdatedCallback, pirep,
                                       update = True)
@@ -1433,7 +1445,7 @@ class GUI(fs.ConnectionListener):
         """Callback for the PIREP updating result."""
         self.endBusy()
         secondaryMarkup = None
-        type = MESSAGETYPE_ERROR
+        type = Gtk.MessageType.ERROR
         if returned:
             if result.success:
                 type = None
@@ -1453,7 +1465,7 @@ class GUI(fs.ConnectionListener):
         if type is not None:
             dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                        type = type, message_format = messageFormat)
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(WINDOW_TITLE_BASE)
             if secondaryMarkup is not None:
                 dialog.format_secondary_markup(secondaryMarkup)
@@ -1477,15 +1489,15 @@ class GUI(fs.ConnectionListener):
         result = dialog.run()
         dialog.hide()
 
-        if result==RESPONSETYPE_OK:
+        if result==Gtk.ResponseType.OK:
             self._lastLoadedPIREP = dialog.get_filename()
 
             pirep = PIREP.load(self._lastLoadedPIREP)
             if pirep is None:
                 dialog = Gtk.MessageDialog(parent = self._mainWindow,
-                                           type = MESSAGETYPE_ERROR,
+                                           type = Gtk.MessageType.ERROR,
                                            message_format = xstr("loadPIREP_failed"))
-                dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
                 dialog.set_title(WINDOW_TITLE_BASE)
                 dialog.format_secondary_markup(xstr("loadPIREP_failed_sec"))
                 dialog.run()
@@ -1496,7 +1508,7 @@ class GUI(fs.ConnectionListener):
                 while True:
                     result = dialog.run()
 
-                    if result==RESPONSETYPE_OK:
+                    if result==Gtk.ResponseType.OK:
                         self.sendPIREP(pirep)
                     elif result==1:
                         self.viewPIREP(pirep)
@@ -1512,10 +1524,10 @@ class GUI(fs.ConnectionListener):
         if self._loadPIREPDialog is None:
             dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("loadPIREP_browser_title"),
-                                           action = FILE_CHOOSER_ACTION_OPEN,
+                                           action = Gtk.FileChooserAction.OPEN,
                                            buttons = (Gtk.STOCK_CANCEL,
-                                                      RESPONSETYPE_CANCEL,
-                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.ResponseType.CANCEL,
+                                                      Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                            parent = self._mainWindow)
             dialog.set_modal(True)
 
@@ -1540,7 +1552,7 @@ class GUI(fs.ConnectionListener):
         dialog = Gtk.Dialog(title = WINDOW_TITLE_BASE + " - " +
                             xstr("loadPIREP_send_title"),
                             parent = self._mainWindow,
-                            flags = DIALOG_MODAL)
+                            flags = Gtk.DialogFlags.MODAL)
 
         contentArea = dialog.get_content_area()
 
@@ -1635,9 +1647,9 @@ class GUI(fs.ConnectionListener):
         labelAlignment.add(label)
         table.attach(labelAlignment, 1, 2, 4, 5)
 
-        dialog.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
+        dialog.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
         dialog.add_button(xstr("viewPIREP"), 1)
-        dialog.add_button(xstr("sendPIREP"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("sendPIREP"), Gtk.ResponseType.OK)
 
         return dialog
 
@@ -1655,10 +1667,10 @@ class GUI(fs.ConnectionListener):
         """Callback for the PIREP sending result."""
         self.endBusy()
         secondaryMarkup = None
-        type = MESSAGETYPE_ERROR
+        type = Gtk.MessageType.ERROR
         if returned:
             if result.success:
-                type = MESSAGETYPE_INFO
+                type = Gtk.MessageType.INFO
                 messageFormat = xstr("sendPIREP_success")
                 secondaryMarkup = xstr("sendPIREP_success_sec")
             elif result.alreadyFlown:
@@ -1676,7 +1688,7 @@ class GUI(fs.ConnectionListener):
 
         dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
                                    type = type, message_format = messageFormat)
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         if secondaryMarkup is not None:
             dialog.format_secondary_markup(secondaryMarkup)
@@ -1722,10 +1734,10 @@ class GUI(fs.ConnectionListener):
         """Callback for the bug report sending result."""
         self.endBusy()
         secondaryMarkup = None
-        type = MESSAGETYPE_ERROR
+        type = Gtk.MessageType.ERROR
         if returned:
             if result.success:
-                type = MESSAGETYPE_INFO
+                type = Gtk.MessageType.INFO
                 messageFormat = xstr("sendBugReport_success") % (result.ticketID,)
                 secondaryMarkup = xstr("sendBugReport_success_sec")
             else:
@@ -1737,7 +1749,7 @@ class GUI(fs.ConnectionListener):
 
         dialog = Gtk.MessageDialog(parent = self._wizard.gui._bugReportDialog,
                                    type = type, message_format = messageFormat)
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         if secondaryMarkup is not None:
             dialog.format_secondary_markup(secondaryMarkup)
@@ -1814,7 +1826,7 @@ class GUI(fs.ConnectionListener):
             dialog.set_modal(True)
 
             logoPath = os.path.join(self._programDirectory, "logo.png")
-            logo = pixbuf_new_from_file(logoPath)
+            logo = GdkPixbuf.Pixbuf.new_from_file(logoPath)
             dialog.set_logo(logo)
 
             dialog.set_program_name(PROGRAM_NAME)
@@ -1886,7 +1898,7 @@ class GUI(fs.ConnectionListener):
                                        xstr("login_remember_tooltip"))
             response = dialog.run()
 
-            if response==RESPONSETYPE_OK:
+            if response==Gtk.ResponseType.OK:
                 self._credentialsUserName = dialog.userName
                 self._credentialsPassword = dialog.password
                 rememberPassword = dialog.rememberPassword
@@ -1914,7 +1926,7 @@ class GUI(fs.ConnectionListener):
 
         if not self.config.pilotID and not self.config.password:
             dialog = Gtk.MessageDialog(parent = self._mainWindow,
-                                       type = MESSAGETYPE_QUESTION,
+                                       type = Gtk.MessageType.QUESTION,
                                        message_format = xstr("register_ask"))
 
             dialog.set_title(WINDOW_TITLE_BASE)

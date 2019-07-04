@@ -53,10 +53,10 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         super(ApproachCalloutsEditor, self).__init__(WINDOW_TITLE_BASE + " - " +
                                                      xstr("callouts_title"),
                                                      gui.mainWindow,
-                                                     DIALOG_MODAL)
+                                                     Gtk.DialogFlags.MODAL)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
-        self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
+        self.add_button(xstr("button_ok"), Gtk.ResponseType.ACCEPT)
 
         self._gui = gui
         self._approachCallouts = {}
@@ -132,7 +132,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         controlBox.pack_start(removeAlignment, False, False, 0)
 
         self._fileListModel = Gtk.ListStore(int, str, str)
-        self._fileListModel.set_sort_column_id(0, SORT_DESCENDING)
+        self._fileListModel.set_sort_column_id(0, Gtk.SortType.DESCENDING)
 
         self._addingFile = False
         self._fileListModel.connect("row-inserted", self._fileAdded)
@@ -155,7 +155,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         column.set_reorderable(False)
         column.set_sort_indicator(True)
         column.set_sort_column_id(0)
-        column.set_sort_order(SORT_DESCENDING)
+        column.set_sort_order(Gtk.SortType.DESCENDING)
         column.set_expand(False)
 
         column = Gtk.TreeViewColumn(xstr("callouts_header_path"),
@@ -172,7 +172,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         self._fileList.connect("button-press-event",
                                self._fileListButtonPressed)
         selection = self._fileList.get_selection()
-        selection.set_mode(SELECTION_MULTIPLE)
+        selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
 
         self._buildFileListPopupMenu()
@@ -180,8 +180,9 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
         scrolledWindow.set_size_request(300, -1)
-        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(SHADOW_IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
         
         fileListAlignment = Gtk.Alignment(xscale=1.0, yscale=1.0, 
                                           xalign=0.5, yalign=0.5)
@@ -203,7 +204,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         response = super(ApproachCalloutsEditor, self).run()
         self.hide()
 
-        if response==RESPONSETYPE_ACCEPT:
+        if response==Gtk.ResponseType.ACCEPT:
             self._saveApproachCallouts()
             config = self._gui.config
             for (aircraftType, approachCallouts) in \
@@ -224,7 +225,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         result = dialog.run()
         dialog.hide()
 
-        if result==RESPONSETYPE_OK:
+        if result==Gtk.ResponseType.OK:
             filePath = dialog.get_filename()
             baseName = os.path.basename(filePath)
             altitude = self._getNewAltitude(baseName)
@@ -292,18 +293,18 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         otherPath = self._hasAltitude(newAltitude, ignorePath = editedPath)
         if otherPath is not None:
             dialog = Gtk.MessageDialog(parent = self,
-                                       type = MESSAGETYPE_QUESTION,
+                                       type = Gtk.MessageType.QUESTION,
                                        message_format =
                                        xstr("callouts_altitude_clash"))
             dialog.format_secondary_markup(xstr("callouts_altitude_clash_sec"))
-            dialog.add_button(xstr("button_no"), RESPONSETYPE_NO)
-            dialog.add_button(xstr("button_yes"), RESPONSETYPE_YES)
+            dialog.add_button(xstr("button_no"), Gtk.ResponseType.NO)
+            dialog.add_button(xstr("button_yes"), Gtk.ResponseType.YES)
             dialog.set_title(WINDOW_TITLE_BASE)
 
             result = dialog.run()
             dialog.hide()
 
-            if result!=RESPONSETYPE_YES:
+            if result!=Gtk.ResponseType.YES:
                 newAltitude = None
                 
         if newAltitude is not None:
@@ -347,10 +348,10 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         if self._fileOpenDialog is None:
             dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                            xstr("callouts_open_title"),
-                                           action = FILE_CHOOSER_ACTION_OPEN,
+                                           action = Gtk.FileChooserAction.OPEN,
                                            buttons = (Gtk.STOCK_CANCEL,
-                                                      RESPONSETYPE_CANCEL,
-                                                      Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                                      Gtk.ResponseType.CANCEL,
+                                                      Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                            parent = self)
             dialog.set_modal(True)            
             dialog.set_do_overwrite_confirmation(True)
@@ -388,7 +389,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         altitude = self._getNewAltitudeFromFileName(baseName)
         if altitude is not None: return altitude
 
-        descending = self._fileList.get_column(0).get_sort_order()==SORT_DESCENDING
+        descending = self._fileList.get_column(0).get_sort_order()==Gtk.SortType.DESCENDING
         model = self._fileListModel
         numEntries = model.iter_n_children(None)
         if numEntries==0:
@@ -472,7 +473,7 @@ class ApproachCalloutsEditor(Gtk.Dialog):
         
     def _fileListButtonPressed(self, widget, event):
         """Called when a mouse button is pressed on the file list."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+        if event.type!=Gdk.EventType.BUTTON_PRESS or event.button!=3:
             return
 
         menu = self._fileListPopupMenu

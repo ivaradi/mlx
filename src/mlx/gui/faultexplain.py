@@ -33,7 +33,7 @@ class FaultFrame(Gtk.Frame):
 
         self._fault = fault = Gtk.Label()
         fault.set_xalign(0.0)
-        fault.set_justify(JUSTIFY_LEFT)
+        fault.set_justify(Gtk.Justification.LEFT)
         fault.set_line_wrap(True)
 
         self.faultText = faultText
@@ -46,7 +46,7 @@ class FaultFrame(Gtk.Frame):
         vbox.pack_start(faultAlignment, True, True, 4)
 
         self._explanation = explanation = Gtk.TextView()
-        explanation.set_wrap_mode(WRAP_WORD)
+        explanation.set_wrap_mode(Gtk.WrapMode.WORD)
         explanation.set_accepts_tab(False)
         explanation.set_size_request(-1, 100)
 
@@ -152,8 +152,8 @@ class FaultExplainWidget(Gtk.Frame):
         innerBox.add(alignment)
 
         scroller = Gtk.ScrolledWindow()
-        scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scroller.set_shadow_type(SHADOW_NONE)
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroller.set_shadow_type(Gtk.ShadowType.NONE)
 
         self._faults = Gtk.VBox()
         self._faults.set_homogeneous(False)

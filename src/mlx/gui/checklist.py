@@ -27,10 +27,10 @@ class ChecklistEditor(Gtk.Dialog):
         super(ChecklistEditor, self).__init__(WINDOW_TITLE_BASE + " - " +
                                               xstr("chklst_title"),
                                               gui.mainWindow,
-                                              DIALOG_MODAL)
+                                              Gtk.DialogFlags.MODAL)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
-        self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
+        self.add_button(xstr("button_ok"), Gtk.ResponseType.ACCEPT)
 
         self._gui = gui
         self._checklists = {}
@@ -161,7 +161,7 @@ class ChecklistEditor(Gtk.Dialog):
         self._fileList.set_reorderable(True)
         self._fileListPopupMenu = None
         selection = self._fileList.get_selection()
-        selection.set_mode(SELECTION_MULTIPLE)
+        selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         selection.connect("changed", self._fileListSelectionChanged)
 
         self._buildFileListPopupMenu()
@@ -169,8 +169,9 @@ class ChecklistEditor(Gtk.Dialog):
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._fileList)
         scrolledWindow.set_size_request(200, -1)
-        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scrolledWindow.set_shadow_type(SHADOW_IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
 
         fileBox.pack_start(scrolledWindow, False, False, 4)
 
@@ -186,7 +187,7 @@ class ChecklistEditor(Gtk.Dialog):
         response = super(ChecklistEditor, self).run()
         self.hide()
 
-        if response==RESPONSETYPE_ACCEPT:
+        if response==Gtk.ResponseType.ACCEPT:
             self._saveChecklist()
             config = self._gui.config
             for (aircraftType, checklist) in self._checklists.items():
@@ -320,7 +321,7 @@ class ChecklistEditor(Gtk.Dialog):
         
     def _fileListButtonPressed(self, widget, event):
         """Called when a mouse button is pressed on the file list."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3:
+        if event.type!=Gdk.EventType.BUTTON_PRESS or event.button!=3:
             return
 
         menu = self._fileListPopupMenu

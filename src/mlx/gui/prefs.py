@@ -172,10 +172,10 @@ class Preferences(Gtk.Dialog):
         super(Preferences, self).__init__(WINDOW_TITLE_BASE + " " +
                                           xstr("prefs_title"),
                                           gui.mainWindow,
-                                          DIALOG_MODAL)
+                                          Gtk.DialogFlags.MODAL)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_REJECT)
-        self.add_button(xstr("button_ok"), RESPONSETYPE_ACCEPT)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
+        self.add_button(xstr("button_ok"), Gtk.ResponseType.ACCEPT)
         self.set_resizable(False)
 
         self._gui = gui
@@ -221,7 +221,7 @@ class Preferences(Gtk.Dialog):
         response = super(Preferences, self).run()
         self.hide()
 
-        if response==RESPONSETYPE_ACCEPT:
+        if response==Gtk.ResponseType.ACCEPT:
             self._toConfig(config)
             config.save()
 
@@ -511,9 +511,9 @@ class Preferences(Gtk.Dialog):
         """Called when the language has changed."""
         if not self._changingLanguage and not self._warnedRestartNeeded:
             dialog = Gtk.MessageDialog(parent = self,
-                                       type = MESSAGETYPE_INFO,
+                                       type = Gtk.MessageType.INFO,
                                        message_format = xstr("prefs_restart"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(self.get_title())
             dialog.format_secondary_markup(xstr("prefs_language_restart_sec"))
             dialog.run()
@@ -549,9 +549,9 @@ class Preferences(Gtk.Dialog):
         """Called when the PIREP directory button is clicked."""
         dialog = Gtk.FileChooserDialog(title = WINDOW_TITLE_BASE + " - " +
                                        xstr("prefs_pirepDirectory_browser_title"),
-                                       action = FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                       buttons = (Gtk.STOCK_CANCEL, RESPONSETYPE_CANCEL,
-                                                  Gtk.STOCK_OK, RESPONSETYPE_OK),
+                                       action = Gtk.FileChooserAction.SELECT_FOLDER,
+                                       buttons = (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                                  Gtk.STOCK_OK, Gtk.ResponseType.OK),
                                        parent = self)
         dialog.set_modal(True)
         dialog.set_transient_for(self)
@@ -563,7 +563,7 @@ class Preferences(Gtk.Dialog):
         result = dialog.run()
         dialog.hide()
 
-        if result==RESPONSETYPE_OK:
+        if result==Gtk.ResponseType.OK:
             self._pirepDirectory.set_text(dialog.get_filename())
 
     def _pirepDirectoryChanged(self, entry):
@@ -591,12 +591,12 @@ class Preferences(Gtk.Dialog):
         mainBox.pack_start(table, False, False, 4)
 
         label = Gtk.Label(xstr("prefs_msgs_fs"))
-        label.set_justify(JUSTIFY_CENTER)
+        label.set_justify(Gtk.Justification.CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 1, 2, 0, 1)
 
         label = Gtk.Label(xstr("prefs_msgs_sound"))
-        label.set_justify(JUSTIFY_CENTER)
+        label.set_justify(Gtk.Justification.CENTER)
         label.set_alignment(0.5, 1.0)
         table.attach(label, 2, 3, 0, 1)
 
@@ -606,7 +606,7 @@ class Preferences(Gtk.Dialog):
         for messageType in const.messageTypes:
             messageTypeStr = const.messageType2string(messageType)
             label = Gtk.Label(xstr("prefs_msgs_type_" + messageTypeStr))
-            label.set_justify(JUSTIFY_CENTER)
+            label.set_justify(Gtk.Justification.CENTER)
             label.set_use_underline(True)
             label.set_alignment(0.5, 0.5)
             table.attach(label, 0, 1, row, row+1)
@@ -833,7 +833,7 @@ class Preferences(Gtk.Dialog):
         except:
             pass
 
-        okButton = self.get_widget_for_response(RESPONSETYPE_ACCEPT)
+        okButton = self.get_widget_for_response(Gtk.ResponseType.ACCEPT)
         okButton.set_sensitive(sensitive)
 
     def _autoUpdateToggled(self, button):
@@ -841,9 +841,9 @@ class Preferences(Gtk.Dialog):
         if not self._settingFromConfig and not self._warnedAutoUpdate and \
            not self._autoUpdate.get_active():
             dialog = Gtk.MessageDialog(parent = self,
-                                       type = MESSAGETYPE_INFO,
+                                       type = Gtk.MessageType.INFO,
                                        message_format = xstr("prefs_update_auto_warning"))
-            dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+            dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
             dialog.set_title(self.get_title())
             dialog.run()
             dialog.hide()

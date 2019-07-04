@@ -39,11 +39,11 @@ class MessageFrame(Gtk.Frame):
         self._heading = heading = Gtk.TextView()
         heading.set_editable(False)
         heading.set_can_focus(False)
-        heading.set_wrap_mode(WRAP_WORD)
+        heading.set_wrap_mode(Gtk.WrapMode.WORD)
         heading.set_size_request(-1, 16)
 
         buffer = heading.get_buffer()
-        self._headingTag  = buffer.create_tag("heading", weight=WEIGHT_BOLD)
+        self._headingTag  = buffer.create_tag("heading", weight=Pango.Weight.BOLD)
         buffer.set_text("%s - %s" % (senderPID, senderName))
         buffer.apply_tag(self._headingTag,
                          buffer.get_start_iter(), buffer.get_end_iter())
@@ -56,7 +56,7 @@ class MessageFrame(Gtk.Frame):
         vbox.pack_start(headingAlignment, True, True, 4)
 
         self._messageView = messageView = Gtk.TextView()
-        messageView.set_wrap_mode(WRAP_WORD)
+        messageView.set_wrap_mode(Gtk.WrapMode.WORD)
         messageView.set_editable(False)
         messageView.set_can_focus(False)
         messageView.set_accepts_tab(False)
@@ -111,8 +111,8 @@ class MessagesWidget(Gtk.Frame):
         innerBox.add(alignment)
 
         scroller = Gtk.ScrolledWindow()
-        scroller.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
-        scroller.set_shadow_type(SHADOW_NONE)
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroller.set_shadow_type(Gtk.ShadowType.NONE)
 
         self._messages = Gtk.VBox()
         self._messages.set_homogeneous(False)
@@ -203,11 +203,12 @@ class PIREPViewer(Gtk.Dialog):
         - the window,
         - the text view."""
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_shadow_type(SHADOW_IN)
-        scrolledWindow.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC)
+        scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
+        scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                  Gtk.PolicyType.AUTOMATIC)
 
         textView = Gtk.TextView()
-        textView.set_wrap_mode(WRAP_WORD)
+        textView.set_wrap_mode(Gtk.WrapMode.WORD)
         textView.set_editable(editable)
         textView.set_cursor_visible(editable)
         textView.set_size_request(-1, heightRequest)
@@ -312,7 +313,7 @@ class PIREPViewer(Gtk.Dialog):
             label.set_tooltip_text(xstr("pirepView_tab_messages_tooltip"))
             self._notebook.append_page(messagesTab, label)
 
-        self._okButton = self.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        self._okButton = self.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         self._okButton.set_can_default(True)
 
     def setPIREP(self, pirep):
@@ -867,9 +868,9 @@ class PIREPEditor(Gtk.Dialog):
         label.set_tooltip_text(xstr("pirepView_tab_log_tooltip"))
         self._notebook.append_page(logTab, label)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.CANCEL)
 
-        self._okButton = self.add_button(xstr("button_save"), RESPONSETYPE_NONE)
+        self._okButton = self.add_button(xstr("button_save"), Gtk.ResponseType.NONE)
         self._okButton.connect("clicked", self._okClicked)
         self._okButton.set_can_default(True)
         self._modified = False
@@ -1511,7 +1512,7 @@ class PIREPEditor(Gtk.Dialog):
 
         The PIREP is updated from the data in the window."""
         if not askYesNo(xstr("pirepEdit_save_question"), parent = self):
-            self.response(RESPONSETYPE_CANCEL)
+            self.response(Gtk.ResponseType.CANCEL)
 
         pirep = self._pirep
 
@@ -1558,7 +1559,7 @@ class PIREPEditor(Gtk.Dialog):
         pirep.comments = self._flightInfo.comments
         pirep.flightDefects = self._flightInfo.faultsAndExplanations
 
-        self.response(RESPONSETYPE_OK)
+        self.response(Gtk.ResponseType.OK)
 
 
 #------------------------------------------------------------------------------

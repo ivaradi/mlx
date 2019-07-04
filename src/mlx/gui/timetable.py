@@ -75,9 +75,9 @@ class Timetable(Gtk.Alignment):
 
         self._model = Gtk.ListStore(*types)
         if defaultSortableIndex is not None:
-            sortOrder = SORT_DESCENDING \
+            sortOrder = Gtk.SortType.DESCENDING \
               if self._columnDescriptors[defaultSortableIndex-1]._defaultDescending \
-              else SORT_ASCENDING
+              else Gtk.SortType.ASCENDING
             self._model.set_sort_column_id(defaultSortableIndex, sortOrder)
         self._view = Gtk.TreeView(self._model)
 
@@ -174,7 +174,7 @@ class Timetable(Gtk.Alignment):
 
     def _buttonPressEvent(self, widget, event):
         """Called when a mouse button is pressed or released."""
-        if event.type!=EVENT_BUTTON_PRESS or event.button!=3 or \
+        if event.type!=Gdk.EventType.BUTTON_PRESS or event.button!=3 or \
            self._popupMenuProducer is None:
             return
 
@@ -440,9 +440,9 @@ class BookDialog(Gtk.Dialog):
         frame.add(mainAlignment)
         contentArea.pack_start(frame, True, True, 4)
 
-        self.add_button(xstr("button_cancel"), RESPONSETYPE_CANCEL)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.CANCEL)
 
-        self._okButton = self.add_button(xstr("button_book"), RESPONSETYPE_OK)
+        self._okButton = self.add_button(xstr("button_book"), Gtk.ResponseType.OK)
         self._okButton.set_use_underline(True)
         self._okButton.set_can_default(True)
 
@@ -754,7 +754,7 @@ class TimetableWindow(Gtk.Window):
         dialog.show_all()
         result = dialog.run()
         dialog.hide()
-        if result==RESPONSETYPE_OK:
+        if result==Gtk.ResponseType.OK:
             flightIDs = [flightPair.flight0.id]
             if flightPair.flight1 is not None:
                 flightIDs.append(flightPair.flight1.id)
@@ -771,16 +771,16 @@ class TimetableWindow(Gtk.Window):
         """Called when the booking has finished."""
         if returned:
             dialog = Gtk.MessageDialog(parent = self,
-                                       type = MESSAGETYPE_INFO,
+                                       type = Gtk.MessageType.INFO,
                                        message_format = xstr("bookflights_successful"))
             dialog.format_secondary_markup(xstr("bookflights_successful_secondary"))
         else:
             dialog = Gtk.MessageDialog(parent = self,
-                                       type = MESSAGETYPE_ERROR,
+                                       type = Gtk.MessageType.ERROR,
                                        message_format = xstr("bookflights_failed"))
             dialog.format_secondary_markup(xstr("bookflights_failed_secondary"))
 
-        dialog.add_button(xstr("button_ok"), RESPONSETYPE_OK)
+        dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
 
         dialog.run()
