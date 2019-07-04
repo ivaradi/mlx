@@ -23,16 +23,16 @@ appIndicator = False
 import gi
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk
-from gi.repository import GdkPixbuf as gdkPixbuf
+from gi.repository import GdkPixbuf
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 try:
     gi.require_version("AppIndicator3", "0.1")
-    from gi.repository import AppIndicator3 as appindicator
+    from gi.repository import AppIndicator3
     appIndicator = True
 except:
     pass
-from gi.repository import Pango as pango
+from gi.repository import Pango
 
 
 MESSAGETYPE_ERROR = Gtk.MessageType.ERROR
@@ -74,8 +74,8 @@ POLICY_AUTOMATIC = Gtk.PolicyType.AUTOMATIC
 POLICY_NEVER = Gtk.PolicyType.NEVER
 POLICY_ALWAYS = Gtk.PolicyType.ALWAYS
 
-WEIGHT_NORMAL = pango.Weight.NORMAL
-WEIGHT_BOLD = pango.Weight.BOLD
+WEIGHT_NORMAL = Pango.Weight.NORMAL
+WEIGHT_BOLD = Pango.Weight.BOLD
 
 WINDOW_STATE_ICONIFIED = Gdk.WindowState.ICONIFIED
 WINDOW_STATE_WITHDRAWN = Gdk.WindowState.WITHDRAWN
@@ -94,7 +94,7 @@ UPDATE_IF_VALID = Gtk.SpinButtonUpdatePolicy.IF_VALID
 
 SELECTION_MULTIPLE = Gtk.SelectionMode.MULTIPLE
 
-pixbuf_new_from_file = gdkPixbuf.Pixbuf.new_from_file
+pixbuf_new_from_file = GdkPixbuf.Pixbuf.new_from_file
 
 import codecs
 _utf8Decoder = codecs.getdecoder("utf-8")

@@ -83,7 +83,7 @@ class Page(Gtk.Alignment):
         alignment = Gtk.Alignment(xalign = 0.0, xscale = 0.0)
 
         titleLabel = Gtk.Label(title)
-        titleLabel.modify_font(pango.FontDescription("bold 24"))
+        titleLabel.modify_font(Pango.FontDescription("bold 24"))
         alignment.set_padding(padding_top = 4, padding_bottom = 4,
                               padding_left = 6, padding_right = 0)
 
@@ -713,13 +713,13 @@ class FlightSelectionPage(Page):
 
         layout = cr.create_layout()
         layout.set_text("Malév VA official briefing")
-        font = pango.FontDescription("sans")
-        font.set_size(int(32 * scale * pango.SCALE))
-        font.set_weight(pango.WEIGHT_NORMAL)
+        font = Pango.FontDescription("sans")
+        font.set_size(int(32 * scale * Pango.SCALE))
+        font.set_weight(Pango.WEIGHT_NORMAL)
         layout.set_font_description(font)
 
         (_ink, (x0, y0, x1, y1)) = layout.get_extents()
-        width = float(x1 + 1 - x0) / pango.SCALE
+        width = float(x1 + 1 - x0) / Pango.SCALE
 
         y = 25 * scale
 
@@ -729,18 +729,18 @@ class FlightSelectionPage(Page):
         cr.stroke_preserve()
         cr.fill()
 
-        y += float(y1 + 1 - y0) / pango.SCALE
+        y += float(y1 + 1 - y0) / Pango.SCALE
         y += 6 * scale
 
         layout = cr.create_layout()
         layout.set_text("%s (%s) részére" %
                         (loginResult.pilotName, loginResult.pilotID))
-        font = pango.FontDescription("sans")
-        font.set_size(int(16 * scale * pango.SCALE))
+        font = Pango.FontDescription("sans")
+        font.set_size(int(16 * scale * Pango.SCALE))
         font.set_weight(450)
         layout.set_font_description(font)
         (_ink, (x0, y0, x1, y1)) = layout.get_extents()
-        width = float(x1 + 1 - x0) / pango.SCALE
+        width = float(x1 + 1 - x0) / Pango.SCALE
 
         cr.move_to((context.get_width() - width)/2.0, y)
         cr.set_line_width(0.1 * scale)
@@ -748,7 +748,7 @@ class FlightSelectionPage(Page):
         cr.stroke_preserve()
         cr.fill()
 
-        y += float(y1 + 1 - y0) / pango.SCALE
+        y += float(y1 + 1 - y0) / Pango.SCALE
         y += 4 * scale
 
         cr.move_to(0, y)
@@ -758,8 +758,8 @@ class FlightSelectionPage(Page):
 
         y += 20 * scale
 
-        font = pango.FontDescription("sans")
-        font.set_size(int(7 * scale * pango.SCALE))
+        font = Pango.FontDescription("sans")
+        font.set_size(int(7 * scale * Pango.SCALE))
         font.set_weight(150)
 
         table = []
@@ -806,7 +806,7 @@ class FlightSelectionPage(Page):
 
             labelLayouts.append((labelLayout, valueLayout, labelHeight))
 
-        maxLabelWidth = maxLabelWidth / pango.SCALE
+        maxLabelWidth = maxLabelWidth / Pango.SCALE
 
         valueX = labelX + labelValueFill + maxLabelWidth
 
@@ -814,12 +814,12 @@ class FlightSelectionPage(Page):
         valueWidth = tableWidth - \
             (labelFill + maxLabelWidth + labelValueFill + valueFill)
         for (labelLayout, valueLayout, labelHeight) in labelLayouts:
-            valueLayout.set_width(int(valueWidth * pango.SCALE))
+            valueLayout.set_width(int(valueWidth * Pango.SCALE))
 
             (_ink, (x0, y0, x1, y1)) = valueLayout.get_extents()
             valueHeight = y1 + 1 - y0
 
-            height = float(max(labelHeight, valueHeight))/pango.SCALE
+            height = float(max(labelHeight, valueHeight))/Pango.SCALE
             layouts.append((labelLayout, valueLayout, height))
 
         rowIndex = 0
