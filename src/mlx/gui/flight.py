@@ -3256,6 +3256,8 @@ class FuelTank(Gtk.VBox):
         self._tankFigure.connect("draw", self._drawTankFigure)
         self._tankFigure.connect("button_press_event", self._buttonPressed)
         self._tankFigure.connect("motion_notify_event", self._motionNotify)
+
+        self._tankFigure.add_events(Gdk.EventMask.SCROLL_MASK)
         self._tankFigure.connect("scroll-event", self._scrolled)
 
         alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
