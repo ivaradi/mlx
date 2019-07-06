@@ -683,12 +683,12 @@ class FlightSelectionPage(Page):
         printOperation.set_export_filename(name)
         printOperation.set_use_full_page(False)
 
-        result = printOperation.run(Gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG,
+        result = printOperation.run(Gtk.PrintOperationAction.PRINT_DIALOG,
                                     wizard.gui.mainWindow)
 
-        if result == Gtk.PRINT_OPERATION_RESULT_APPLY:
+        if result == Gtk.PrintOperationResult.APPLY:
             self._printSettings = printOperation.get_print_settings()
-        elif result == Gtk.PRINT_OPERATION_RESULT_ERROR:
+        elif result == Gtk.PrintOperationResult.ERROR:
             errorDialog(xstr("flightsel_print_failed",
                              wizard.gui.mainWindow,
                              secondary = printOperation.get_error()))
@@ -704,6 +704,7 @@ class FlightSelectionPage(Page):
         scale = context.get_dpi_x() / 72.0
 
         cr = context.get_cairo_context()
+
         cr.set_antialias(cairo.ANTIALIAS_GRAY)
 
         cr.set_source_rgb(0.0, 0.0, 0.0)
@@ -711,44 +712,46 @@ class FlightSelectionPage(Page):
         cr.rectangle(0, 0, context.get_width(), context.get_height())
         cr.stroke()
 
-        layout = cr.create_layout()
+        pcr = context.create_pango_context()
+
+        layout = Pango.Layout(pcr) # cr.create_layout()
         layout.set_text("Malév VA official briefing")
         font = Pango.FontDescription("sans")
         font.set_size(int(32 * scale * Pango.SCALE))
         font.set_weight(Pango.Weight.NORMAL)
         layout.set_font_description(font)
 
-        (_ink, (x0, y0, x1, y1)) = layout.get_extents()
-        width = float(x1 + 1 - x0) / Pango.SCALE
+        (_ink, logical) = layout.get_extents()
+        width = logical.width / Pango.SCALE
 
         y = 25 * scale
 
         cr.move_to((context.get_width() - width)/2.0, y)
         cr.set_line_width(0.1 * scale)
-        cr.layout_path(layout)
+        PangoCairo.layout_path(cr, layout)
         cr.stroke_preserve()
         cr.fill()
 
-        y += float(y1 + 1 - y0) / Pango.SCALE
+        y += logical.height / Pango.SCALE
         y += 6 * scale
 
-        layout = cr.create_layout()
+        layout = Pango.Layout(pcr)
         layout.set_text("%s (%s) részére" %
                         (loginResult.pilotName, loginResult.pilotID))
         font = Pango.FontDescription("sans")
         font.set_size(int(16 * scale * Pango.SCALE))
-        font.set_weight(450)
+        font.set_weight(Pango.Weight.MEDIUM)
         layout.set_font_description(font)
-        (_ink, (x0, y0, x1, y1)) = layout.get_extents()
-        width = float(x1 + 1 - x0) / Pango.SCALE
+        (_ink, logical) = layout.get_extents()
+        width = logical.width / Pango.SCALE
 
         cr.move_to((context.get_width() - width)/2.0, y)
         cr.set_line_width(0.1 * scale)
-        cr.layout_path(layout)
+        PangoCairo.layout_path(cr, layout)
         cr.stroke_preserve()
         cr.fill()
 
-        y += float(y1 + 1 - y0) / Pango.SCALE
+        y += logical.height / Pango.SCALE
         y += 4 * scale
 
         cr.move_to(0, y)
@@ -760,7 +763,7 @@ class FlightSelectionPage(Page):
 
         font = Pango.FontDescription("sans")
         font.set_size(int(7 * scale * Pango.SCALE))
-        font.set_weight(150)
+        font.set_weight(Pango.Weight.ULTRALIGHT)
 
         table = []
         table.append(("Flight", flight.callsign))
@@ -792,15 +795,15 @@ class FlightSelectionPage(Page):
         maxLabelWidth = 0
         totalHeight = 0
         for (label, value) in table:
-            labelLayout = cr.create_layout()
+            labelLayout = Pango.Layout(pcr)
             labelLayout.set_text(label)
             labelLayout.set_font_description(font)
 
-            (_ink, (x0, y0, x1, y1)) = labelLayout.get_extents()
-            maxLabelWidth = max(maxLabelWidth, x1 + 1 - x0)
-            labelHeight = y1 + 1 - y0
+            (_ink, logical) = labelLayout.get_extents()
+            maxLabelWidth = max(maxLabelWidth, logical.width)
+            labelHeight = logical.height
 
-            valueLayout = cr.create_layout()
+            valueLayout = Pango.Layout(pcr)
             valueLayout.set_text(value)
             valueLayout.set_font_description(font)
 
@@ -816,8 +819,8 @@ class FlightSelectionPage(Page):
         for (labelLayout, valueLayout, labelHeight) in labelLayouts:
             valueLayout.set_width(int(valueWidth * Pango.SCALE))
 
-            (_ink, (x0, y0, x1, y1)) = valueLayout.get_extents()
-            valueHeight = y1 + 1 - y0
+            (_ink, logical) = valueLayout.get_extents()
+            valueHeight = logical.height
 
             height = float(max(labelHeight, valueHeight))/Pango.SCALE
             layouts.append((labelLayout, valueLayout, height))
@@ -836,13 +839,13 @@ class FlightSelectionPage(Page):
 
             cr.move_to(labelX, y)
             cr.set_line_width(0.1)
-            cr.layout_path(labelLayout)
+            PangoCairo.layout_path(cr, labelLayout)
             cr.stroke_preserve()
             cr.fill()
 
             cr.move_to(valueX, y)
             cr.set_line_width(0.1)
-            cr.layout_path(valueLayout)
+            PangoCairo.layout_path(cr, valueLayout)
             cr.stroke_preserve()
             cr.fill()
 
