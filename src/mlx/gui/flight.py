@@ -5198,10 +5198,10 @@ class FinishPage(Page):
         """Callback for the plane updating."""
         pass
 
-    def _formatTime(self, scheduledTime, realTimestamp, xxx_todo_changeme):
+    def _formatTime(self, scheduledTime, realTimestamp, warningError):
         """Format the departure or arrival time based on the given data as a
         markup for a label."""
-        (warning, error) = xxx_todo_changeme
+        (warning, error) = warningError
         realTime = time.gmtime(realTimestamp)
 
         if warning:

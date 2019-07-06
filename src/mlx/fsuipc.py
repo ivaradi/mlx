@@ -1092,16 +1092,16 @@ class Simulator(object):
         if disconnect:
             self._handler.disconnect()
 
-    def _handleNumHotkeys(self, data, xxx_todo_changeme5):
+    def _handleNumHotkeys(self, data, hotkeySet):
         """Handle the result of the query of the number of hotkeys"""
-        (id, generation) = xxx_todo_changeme5
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
                 numHotkeys = data[0]
                 print("fsuipc.Simulator._handleNumHotkeys: numHotkeys:", numHotkeys)
                 data = [(0x3210 + i*4, "d") for i in range(0, numHotkeys)]
                 self._handler.requestRead(data, self._handleHotkeyTable,
-                                          (id, generation))
+                                          hotkeySet)
 
     def _setupHotkeys(self, data):
         """Setup the hiven hotkeys and return the data to be written.
@@ -1144,19 +1144,19 @@ class Simulator(object):
 
         return writeData
 
-    def _handleHotkeyTable(self, data, xxx_todo_changeme6):
+    def _handleHotkeyTable(self, data, hotkeySet):
         """Handle the result of the query of the hotkey table."""
-        (id, generation) = xxx_todo_changeme6
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if id==self._hotkeySetID and generation==self._hotkeySetGeneration:
                 writeData = self._setupHotkeys(data)
                 self._handler.requestWrite(writeData,
                                            self._handleHotkeysWritten,
-                                           (id, generation))
+                                           hotkeySet)
 
-    def _handleHotkeysWritten(self, success, xxx_todo_changeme7):
+    def _handleHotkeysWritten(self, success, hotkeySet):
         """Handle the result of the hotkeys having been written."""
-        (id, generation) = xxx_todo_changeme7
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
@@ -1165,11 +1165,11 @@ class Simulator(object):
                 self._hotkeyRequestID = \
                     self._handler.requestPeriodicRead(0.5, data,
                                                       self._handleHotkeys,
-                                                      (id, generation))
+                                                      hotkeySet)
 
-    def _handleHotkeys(self, data, xxx_todo_changeme8):
+    def _handleHotkeys(self, data, hotkeySet):
         """Handle the hotkeys."""
-        (id, generation) = xxx_todo_changeme8
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
                 return

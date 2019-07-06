@@ -1142,20 +1142,20 @@ class Simulator(object):
         if disconnect:
             self._handler.disconnect()
 
-    def _handleHotkeysRegistered(self, success, xxx_todo_changeme2):
+    def _handleHotkeysRegistered(self, success, hotkeySet):
         """Handle the result of the hotkeys having been written."""
-        (id, generation) = xxx_todo_changeme2
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if success and id==self._hotkeySetID and \
             generation==self._hotkeySetGeneration:
                 self._hotkeyRequestID = \
                   self._handler.requestHotkeysState(0.5,
                                                     self._handleHotkeys,
-                                                    (id, generation))
+                                                    hotkeySet)
 
-    def _handleHotkeys(self, data, xxx_todo_changeme3):
+    def _handleHotkeys(self, data, hotkeySet):
         """Handle the hotkeys."""
-        (id, generation) = xxx_todo_changeme3
+        (id, generation) = hotkeySet
         with self._hotkeyLock:
             if id!=self._hotkeySetID or generation!=self._hotkeySetGeneration:
                 return
@@ -1752,11 +1752,10 @@ class DH8DModel(GenericAircraftModel):
 class FJSDH8DModel(DH8DModel):
     """Model handler for the FlyJSim Dash 8-Q400."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme):
+    def doesHandle(aircraft, data):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (tailnum, author, description, notes,
-                              icao, liveryPath) = xxx_todo_changeme
+        (tailnum, author, description, notes, icao, liveryPath) = data
         return aircraft.type==const.AIRCRAFT_DH8D and \
           description.find("Dash 8 Q400")!=-1 and \
           ((author in ["2012", "2013"] and tailnum=="N62890") or \
@@ -1914,11 +1913,10 @@ class T154Model(GenericAircraftModel):
 class FelisT154Model(T154Model):
     """Model for Felis' Tupolev Tu-154-M aircraft."""
     @staticmethod
-    def doesHandle(aircraft, xxx_todo_changeme1):
+    def doesHandle(aircraft, data):
         """Determine if this model handler handles the aircraft with the given
         name."""
-        (tailnum, author, description, notes,
-                              icao, liveryPath) = xxx_todo_changeme1
+        (tailnum, author, description, notes, icao, liveryPath) = data
         return aircraft.type==const.AIRCRAFT_T154 and \
           author.find("Felis")!=-1 and \
           description.find("Tu154M")!=-1

@@ -42,9 +42,9 @@ def getDegMinSec(degrees):
 
 #------------------------------------------------------------------------------
 
-def getCoordinateString(xxx_todo_changeme):
+def getCoordinateString(coordinates):
     """Get the string representation of the given coordinate pair."""
-    (latitude, longitude) = xxx_todo_changeme
+    (latitude, longitude) = coordinates
     latitude_str = getLatitudeString(latitude)
     longitude_str = getLongitudeString(longitude)
 
