@@ -314,7 +314,7 @@ class BookDialog(Gtk.Dialog):
                                          parent = timetableWindow)
         contentArea = self.get_content_area()
 
-        frame = Gtk.Frame(xstr("timetable_book_frame_title"))
+        frame = Gtk.Frame(label = xstr("timetable_book_frame_title"))
         frame.set_size_request(600, -1)
 
         mainAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
