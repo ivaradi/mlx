@@ -127,11 +127,11 @@ class MonitorWindow(Gtk.Window):
         table.attach(label, 6, 7, 3, 4)
         table.attach(self._squawk, 7, 8, 3, 4)
 
-        (label, self._nav1) = self._createLabeledEntry("NAV1:", 5)
+        (label, self._nav1) = self._createLabeledEntry("NAV1:", 6)
         table.attach(label, 8, 9, 3, 4)
         table.attach(self._nav1, 9, 10, 3, 4)
 
-        (label, self._nav2) = self._createLabeledEntry("NAV2:", 5)
+        (label, self._nav2) = self._createLabeledEntry("NAV2:", 6)
         table.attach(label, 10, 11, 3, 4)
         table.attach(self._nav2, 11, 12, 3, 4)
 
