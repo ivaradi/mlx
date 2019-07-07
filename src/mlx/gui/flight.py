@@ -714,10 +714,10 @@ class FlightSelectionPage(Page):
 
         pcr = context.create_pango_context()
 
-        layout = Pango.Layout(pcr) # cr.create_layout()
+        layout = Pango.Layout(pcr)
         layout.set_text("Malév VA official briefing")
         font = Pango.FontDescription("sans")
-        font.set_size(int(32 * scale * Pango.SCALE))
+        font.set_size(int(32 * Pango.SCALE))
         font.set_weight(Pango.Weight.NORMAL)
         layout.set_font_description(font)
 
@@ -739,7 +739,7 @@ class FlightSelectionPage(Page):
         layout.set_text("%s (%s) részére" %
                         (loginResult.pilotName, loginResult.pilotID))
         font = Pango.FontDescription("sans")
-        font.set_size(int(16 * scale * Pango.SCALE))
+        font.set_size(int(16 * Pango.SCALE))
         font.set_weight(Pango.Weight.MEDIUM)
         layout.set_font_description(font)
         (_ink, logical) = layout.get_extents()
@@ -762,7 +762,7 @@ class FlightSelectionPage(Page):
         y += 20 * scale
 
         font = Pango.FontDescription("sans")
-        font.set_size(int(7 * scale * Pango.SCALE))
+        font.set_size(int(7 * Pango.SCALE))
         font.set_weight(Pango.Weight.ULTRALIGHT)
 
         table = []
