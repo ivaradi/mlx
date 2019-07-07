@@ -1,0 +1,20 @@
+-- php.ini.orig 2019-07-07 11:52:31.501011566 +0000
++++ php.ini     2019-07-07 11:53:38.813227611 +0000
+@@ -199,7 +199,7 @@
+ ; Development Value: Off
+ ; Production Value: Off
+ ; http://php.net/short-open-tag
+-short_open_tag = Off
++short_open_tag = On
+
+ ; Allow ASP-style <% %> tags.
+ ; http://php.net/asp-tags
+@@ -741,7 +741,7 @@
+ ; properly in multithreaded servers, such as IIS or Zeus, and is automatically
+ ; disabled on them.
+ ; http://php.net/enable-dl
+-enable_dl = Off
++enable_dl = On
+
+ ; cgi.force_redirect is necessary to provide security running PHP as a CGI under
+ ; most web servers.  Left undefined, PHP turns this on by default.  You can
