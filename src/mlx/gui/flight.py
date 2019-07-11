@@ -3481,6 +3481,7 @@ class FuelPage(Page):
         self._fuelTable = Gtk.Grid()
         self._fuelTable.set_column_homogeneous(True)
         self._fuelTable.set_row_spacing(4)
+        self._fuelTable.set_column_spacing(16 if numTanks<5 else 0)
         index = 0
         for (tank, current, capacity) in tankData:
             fuelTank = FuelTank(tank,
@@ -3492,21 +3493,26 @@ class FuelPage(Page):
             alignment = Gtk.Alignment(xalign = 0.5, yalign = 1.0,
                                       xscale = 1.0, yscale = 0.0)
             alignment.add(fuelTank.label)
-            self._fuelTable.attach(alignment, index*2, 0, 3, 1)
+            self._fuelTable.attach(alignment,
+                                   index*(1 if numTanks<5 else 2), 0,
+                                   1 if numTanks<5 else 3, 1)
 
             alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 0.0, yscale = 1.0)
             alignment.add(fuelTank)
-            self._fuelTable.attach(alignment, index*2+1, 1, 1, 1)
+            self._fuelTable.attach(alignment,
+                                   index*(1 if numTanks<5 else 2) +
+                                   (0 if numTanks<5 else 1), 1, 1, 1)
 
 
             alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                       xscale = 1.0, yscale = 0.0)
             alignment.add(fuelTank.expectedButton)
 
-            self._fuelTable.attach(alignment, index*2,
-                                   2 if (index%2)==0 or numTanks==2 else 3,
-                                   3, 1)
+            self._fuelTable.attach(alignment,
+                                   index* (1 if numTanks<5 else 2),
+                                   2 if (index%2)==0 or numTanks<5 else 3,
+                                   1 if numTanks<5 else 3, 1)
 
             index += 1
 
