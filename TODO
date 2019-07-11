@@ -1,9 +1,4 @@
 - Python 3:
-  - Book flight:
-    "Book" button -> crash
-  - Print briefing -> crash
-  - Fuel setup: mouse wheel does not work
-  - Remove: xxx_todo
   - icons besides menus
   - X-Plane on Linux and Windows
   - streamline distribution (remove unnecessary stuff)
