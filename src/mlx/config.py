@@ -210,7 +210,7 @@ class ApproachCallouts(object):
 
 class Config(object):
     """Our configuration."""
-    DEFAULT_UPDATE_URL = "http://mlx.varadiistvan.hu/update"
+    DEFAULT_UPDATE_URL = "https://mlx.varadiistvan.hu/update"
 
     _messageTypesSection = "messageTypes"
 
@@ -257,6 +257,7 @@ class Config(object):
         self._updateURL = Config.DEFAULT_UPDATE_URL
         if secondaryInstallation:
             self._updateURL += "/exp"
+        self._updateURLUpdated = True
         self._useRPC = True
 
         self._messageTypeLevels = {}
@@ -702,6 +703,8 @@ class Config(object):
 
     def load(self):
         """Load the configuration from its default location."""
+        self._updateURLUpdated = False
+
         try:
             config = configparser.RawConfigParser()
             config.read(configPath)
@@ -787,6 +790,12 @@ class Config(object):
         self._updateURL = self._get(config, "update", "url",
                                     Config.DEFAULT_UPDATE_URL +
                                     ("/exp" if secondaryInstallation else ""))
+        self._updateURLUpdated = self._getBoolean(config, "update",
+                                                  "urlUpdated", False)
+        if self._updateURL.startswith("http://") and not self._updateURLUpdated:
+            self._updateURL = "https://" + self._updateURL[7:]
+            self._updateURLUpdated = True
+
         self._useRPC = self._getBoolean(config, "general", "useRPC", True)
 
         for aircraftType in const.aircraftTypes:
@@ -879,6 +888,7 @@ class Config(object):
         config.set("update", "auto",
                    "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
+        config.set("update", "urlUpdated", self._updateURLUpdated)
 
         config.set("general", "useRPC",
                    "yes" if self._useRPC else "no")
@@ -1017,6 +1027,7 @@ class Config(object):
 
         print("  autoUpdate:", self._autoUpdate)
         print("  updateURL:", self._updateURL)
+        print("  updateURLUpdated:", self._updateURLUpdated)
         print("  useRPC:", self._useRPC)
 
         print("  messageTypeLevels:")
