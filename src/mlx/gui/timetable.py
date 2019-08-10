@@ -464,7 +464,7 @@ class BookDialog(Gtk.Dialog):
 
     def _flightDateClicked(self, button):
         """Called when the flight date button is clicked."""
-        self._calendarWindow.set_position(Gtk.WIN_POS_MOUSE)
+        self._calendarWindow.set_position(Gtk.WindowPosition.MOUSE)
         self.set_focus(self._calendarWindow)
         self._calendarWindow.show_all()
 
@@ -677,7 +677,7 @@ class TimetableWindow(Gtk.Window):
 
     def _flightDateClicked(self, button):
         """Called when the flight date button is clicked."""
-        self._calendarWindow.set_position(Gtk.WIN_POS_MOUSE)
+        self._calendarWindow.set_position(Gtk.WindowPosition.MOUSE)
         self.set_focus(self._calendarWindow)
         self._calendarWindow.show_all()
 
