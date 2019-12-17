@@ -654,6 +654,7 @@ class TimetableWindow(Gtk.Window):
 
         for (typeFamily, checkButton) in self._typeFamilyButtons.items():
             checkButton.set_sensitive(typeFamily in typeFamilies)
+            checkButton.set_active(typeFamily in typeFamilies)
 
     def clear(self):
         """Clear all flight pairs."""
