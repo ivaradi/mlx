@@ -738,7 +738,7 @@ class Simulator(object):
             else: duration = -duration
 
         try:
-            message = str(message)
+            message = bytes(str(message), "iso-8859-1")
         except Exception as e:
             print("fsuipc.Simulator.sendMessage: failed to convert the message to a string:", e)
 
@@ -894,7 +894,10 @@ class Simulator(object):
         """
         timestamp = Simulator._getTimestamp(data)
 
-        createdNewModel = self._setAircraftName(timestamp, data[5], data[6])
+        aircraftName = str(data[5], "iso-8859-1")
+        aircraftPath = str(data[6], "iso-8859-1")
+
+        createdNewModel = self._setAircraftName(timestamp, aircraftName, aircraftPath)
         if self._fuelCallback is not None:
             self._aircraftModel.getFuel(self._handler, self._fuelCallback)
             self._fuelCallback = None
