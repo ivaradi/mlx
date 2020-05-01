@@ -1780,7 +1780,6 @@ class PMDGBoeing737NGModel(B737Model):
 
         state.apHeading = data[self._pmdgidx_aphdg]
         state.apAltitude = data[self._pmdgidx_apalt]
-        state.elevatorTrim += 5.0
 
         gearControl = data[self._monidx_gearControl]
         noseGear = data[self._monidx_noseGear]
