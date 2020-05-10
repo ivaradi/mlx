@@ -255,7 +255,7 @@ else:     # os.name=="nt"
             for i in range(0, 3):
                 try:
                     s.connect(self._socketName)
-                    s.send("hello")
+                    s.send(bytes("hello", "ascii"))
                     s.close()
                     return
                 except Exception as e:
