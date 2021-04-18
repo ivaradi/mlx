@@ -502,8 +502,9 @@ class Handler(threading.Thread):
                 needReconnect = True
 
             if needReconnect:
-                with self._requestCondition:
-                    self._requests.insert(0, request)
+                if time is None:
+                    with self._requestCondition:
+                        self._requests.insert(0, request)
                 self._disconnect()
                 return self._connect(autoReconnection = True, attempts = attempts)
             else:
