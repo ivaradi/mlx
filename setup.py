@@ -79,6 +79,7 @@ if os.name=="nt":
                                 ["share", "icons", "Adwaita", "icon-theme.cache"],
                                 ["share", "icons", "Adwaita", "index.theme"],
                                 ["share", "icons", "Adwaita", "16x16"],
+                                ["share", "icons", "Adwaita", "scalable"],
                                 ["share", "locale", "hu"],
                                 ["share", "locale", "en"],
                                 ["share", "themes"],
