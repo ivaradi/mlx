@@ -210,7 +210,7 @@ class ApproachCallouts(object):
 
 class Config(object):
     """Our configuration."""
-    DEFAULT_UPDATE_URL = "https://mlx.varadiistvan.hu/update"
+    DEFAULT_UPDATE_URL = "https://mlx.varadiistvan.hu/update/new"
 
     _messageTypesSection = "messageTypes"
 
@@ -255,8 +255,8 @@ class Config(object):
 
         self._autoUpdate = True
         self._updateURL = Config.DEFAULT_UPDATE_URL
-        if secondaryInstallation:
-            self._updateURL += "/exp"
+        #if secondaryInstallation:
+        #    self._updateURL += "/exp"
         self._updateURLUpdated = True
         self._useRPC = True
 
@@ -787,11 +787,12 @@ class Config(object):
                                             "checklistHotkey", "CS0"))
 
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
-        self._updateURL = self._get(config, "update", "url",
-                                    Config.DEFAULT_UPDATE_URL +
-                                    ("/exp" if secondaryInstallation else ""))
         self._updateURLUpdated = self._getBoolean(config, "update",
                                                   "urlUpdated", False)
+        if self._updateURLUpdated:
+            self._updateURL = self._get(config, "update", "url",
+                                        Config.DEFAULT_UPDATE_URL) # +
+                                        #("/exp" if secondaryInstallation else ""))
         if self._updateURL.startswith("http://") and not self._updateURLUpdated:
             self._updateURL = "https://" + self._updateURL[7:]
             self._updateURLUpdated = True
