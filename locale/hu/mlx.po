@@ -639,17 +639,35 @@ msgstr ""
 "\n"
 "Azt is ellenőrizheted, hogy a szimulátor milyen ZFW-t jelent."
 
+msgid "payload_help_few_crew"
+msgstr "Túl kevés kabinszemélyzet (legalább %d legyen)."
+
+msgid "payload_help_many_pax"
+msgstr "Túl sok utas (legfeljebb %d lehet)."
+
 msgid "payload_crew"
 msgstr "_Legénység:"
 
 msgid "payload_crew_tooltip"
-msgstr "A legénység létszáma."
+msgstr "A kabin személyzet létszáma."
+
+msgid "payload_crew_info"
+msgstr "pilóta + kabin"
 
 msgid "payload_pax"
 msgstr "_Utasok:"
 
 msgid "payload_pax_tooltip"
-msgstr "Az utasok száma."
+msgstr "A felnőtt utasok száma."
+
+msgid "payload_pax_children_tooltip"
+msgstr "A gyermek utasok száma."
+
+msgid "payload_pax_infants_tooltip"
+msgstr "A csecsemőkorú utasok száma."
+
+msgid "payload_pax_info"
+msgstr "felnőtt + gyermek + csecsemő"
 
 msgid "payload_bag"
 msgstr "_Poggyász:"

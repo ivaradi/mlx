@@ -569,3 +569,20 @@ languages = ["$system", "en_GB", "hu_HU"]
 defaultDate = datetime.date(1900, 1, 1)
 
 #-------------------------------------------------------------------------------
+
+# The weight of a cabin crew member [kg]
+WEIGHT_CABIN_CREW = 75
+
+# The weight of an adult passenger [kg]
+WEIGHT_PASSENGER = 84
+
+# The weight of an adult passenger on charter flight [kg]
+WEIGHT_PASSENGER_CHARTER = 76
+
+# The weight of a child passenger [kg]
+WEIGHT_CHILD = 35
+
+# The weight of an infant passenger [kg]
+WEIGHT_INFANT = 0
+
+#-------------------------------------------------------------------------------

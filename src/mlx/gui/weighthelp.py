@@ -3,6 +3,9 @@ from mlx.gui.common import *
 
 from mlx.i18n import xstr
 from mlx.checks import PayloadChecker
+from mlx.rpc import BookedFlight
+
+import mlx.const as const
 
 #-------------------------------------------------------------------------------
 
@@ -318,10 +321,14 @@ class WeightHelp(Gtk.VBox):
         self._usingHelp.set_active(False)
         self._usingHelp.set_sensitive(True)
         self._weightsTable.set_sensitive(False)
-        
-        self._crew = -1
+
+        self._flightType = -1
+        self._dowCabinCrew = -1
+        self._cockpitCrew = -1
+        self._cabinCrew = -1
         self._pax = -1
-        self._humanWeight = 82.0
+        self._children = -1
+        self._infants = -1
         self._bag = -1
         self._cargo = -1
         self._mail = -1        
@@ -340,20 +347,25 @@ class WeightHelp(Gtk.VBox):
 
     def _setupCalculated(self):
         """Setup the labels for the calculated values."""
-        if self._crew<0:
+        crewWeight = self._getCrewWeight()
+        if crewWeight is None:
             self._crewLabel.set_text(xstr("weighthelp_crew") % ("-",))
             self._crewWeight.set_text("-")
         else:
-            self._crewLabel.set_text(xstr("weighthelp_crew") % (str(self._crew),))
-            crewWeight = self._crew * self._humanWeight
+            self._crewLabel.set_text(xstr("weighthelp_crew") %
+                                    (str(self._cockpitCrew) + "+" +
+                                     str(self._cabinCrew),))
             self._crewWeight.set_text("%.0f" % (crewWeight,))
-            
-        if self._pax<0:
+
+        paxWeight = self._getPaxWeight()
+        if paxWeight<0:
             self._paxLabel.set_text(xstr("weighthelp_pax") % ("-",))
             self._paxWeight.set_text("-")
         else:
-            self._paxLabel.set_text(xstr("weighthelp_pax") % (str(self._pax),))
-            paxWeight = self._pax * self._humanWeight
+            self._paxLabel.set_text(xstr("weighthelp_pax") %
+                                    (str(self._pax) + "+" +
+                                     str(self._children) + "+" +
+                                     str(self._infants),))
             self._paxWeight.set_text("%.0f" % (paxWeight,))
 
         self._setWeightLabel(self._bagWeight, self._bag)
@@ -415,17 +427,38 @@ class WeightHelp(Gtk.VBox):
 
         self._setWeightLabel(self._fsGross, self._fsGrossValue)
 
+    def _getCrewWeight(self):
+        """Get the crew weight for the flight."""
+        if self._cockpitCrew>=0 and self._dowCabinCrew>=0 and self._cabinCrew>=0:
+            return (self._cabinCrew - self._dowCabinCrew) * const.WEIGHT_CABIN_CREW
+        else:
+            return None
+        
+    def _getPaxWeight(self):
+        """Get the passenger weight for the flight."""
+        if self._flightType>=0 and self._pax>=0 and self._children>=0 and \
+           self._infants>=0:
+            return self._pax * \
+                (const.WEIGHT_PASSENGER_CHARTER
+                 if self._flightType==BookedFlight.FLIGHT_TYPE_CHARTER
+                 else const.WEIGHT_PASSENGER) + \
+                self._children * const.WEIGHT_CHILD + \
+                self._infants * const.WEIGHT_INFANT
+        else:
+            return -1
+
     def _calculateWeights(self):
         """Calculate the payload and the zero-fuel weight.
 
         It returns a tuple with these two items. If any of the items cannot be
         calculated, that is -1."""
-        if self._crew<0 or self._pax<0 or \
+        crewWeight = self._getCrewWeight()
+        paxWeight = self._getPaxWeight()
+        if crewWeight is None or paxWeight<0 or \
                self._bag<0 or self._cargo<0 or self._mail<0:
             payload = -1
         else:
-            payload = (self._crew + self._pax) * self._humanWeight + \
-                      self._bag + self._cargo + self._mail
+            payload = crewWeight + paxWeight + self._bag + self._cargo + self._mail
 
         if payload<0 or self._dowValue<0:
             zfw = -1
@@ -441,15 +474,20 @@ class WeightHelp(Gtk.VBox):
 
         self._gui.logger.untimedMessage("The weight calculation help function was used by the pilot")
 
-        self._crew = self._gui.numCrew
+        bookedFlight = self._gui.bookedFlight
+        self._flightType = bookedFlight.flightType
+        self._dowCabinCrew = bookedFlight.dowNumCabinCrew
+        self._cockpitCrew = self._gui.numCockpitCrew
+        self._cabinCrew = self._gui.numCabinCrew
         self._pax = self._gui.numPassengers
+        self._children = self._gui.numChildren
+        self._infants = self._gui.numInfants
         self._bag = self._gui.bagWeight
         self._cargo = self._gui.cargoWeight
         self._mail = self._gui.mailWeight
+        self._dowValue = bookedFlight.dow
         
         aircraft = self._gui.flight.aircraft
-        self._humanWeight = aircraft.humanWeight
-        self._dowValue = aircraft.dow
         self._mzfwValue = aircraft.mzfw
         self._mtowValue = aircraft.mtow
         self._mlwValue = aircraft.mlw

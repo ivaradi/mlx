@@ -275,13 +275,29 @@ class BookedFlight(RPCObject):
     # FIXME: copied from web.BookedFlight
     STATUS_REJECTED = 4
 
+    # Flight type: scheduled
+    FLIGHT_TYPE_SCHEDULED = 0
+
+    # Flight type: VIP
+    FLIGHT_TYPE_VIP = 1
+
+    # Flight type: charter
+    FLIGHT_TYPE_CHARTER = 2
+
     # The instructions for the construction
     _instructions = {
         "numPassengers" : int,
-        "numCrew" : int,
+        "numChildren" : int,
+        "numInfants" : int,
+        "numCabinCrew" : int,
+        "dowNumCabinCrew" : int,
+        "numCockpitCrew" : int,
         "bagWeight" : int,
         "cargoWeight" : int,
         "mailWeight" : int,
+        "flightType" : int,
+        "dow": int,
+        "maxPassengers": int,
         "aircraftType" : lambda value: BookedFlight._decodeAircraftType(value),
         "status" : lambda value: BookedFlight._decodeStatus(value)
         }
@@ -341,6 +357,8 @@ class AcceptedFlight(RPCObject):
     _instructions = {
         "bookedFlight" : lambda value: BookedFlight(value),
         "numPassengers" : int,
+        "numChildren" : int,
+        "numInfants" : int,
         "fuelUsed" : int,
         "rating" : lambda value: float(value) if value else 0.0
         }
@@ -357,6 +375,8 @@ class AcceptedFlight(RPCObject):
                                         self.flightTimeEnd)
         if self.flightTimeEnd<self.flightTimeStart:
             self.flightTimeEnd += 24*60*60
+
+        self.totalNumPassengers = self.numPassengers + self.numChildren + self.numInfants
 
 #---------------------------------------------------------------------------------------
 

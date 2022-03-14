@@ -635,17 +635,35 @@ msgstr ""
 "\n"
 "You can also query the ZFW reported by the simulator."
 
+msgid "payload_help_few_crew"
+msgstr "Too few cabin crew members (minimum: %d)."
+
+msgid "payload_help_many_pax"
+msgstr "Too many passengers (maximum: %d)."
+
 msgid "payload_crew"
 msgstr "C_rew:"
 
 msgid "payload_crew_tooltip"
-msgstr "The number of the crew members on your flight."
+msgstr "The number of the cabin crew members on your flight."
+
+msgid "payload_crew_info"
+msgstr "cockpit + cabin"
 
 msgid "payload_pax"
 msgstr "P_assengers:"
 
 msgid "payload_pax_tooltip"
-msgstr "The number of passengers on your flight."
+msgstr "The number of adult passengers on your flight."
+
+msgid "payload_pax_children_tooltip"
+msgstr "The number of child passengers on your flight."
+
+msgid "payload_pax_infants_tooltip"
+msgstr "The number of infant passengers on your flight."
+
+msgid "payload_pax_info"
+msgstr "adults + children + infants"
 
 msgid "payload_bag"
 msgstr "_Baggage:"

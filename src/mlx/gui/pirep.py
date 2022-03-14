@@ -335,8 +335,11 @@ class PIREPViewer(Gtk.Dialog):
                                    (bookedFlight.arrivalTime.hour,
                                     bookedFlight.arrivalTime.minute))
 
-        self._numPassengers.set_text(str(bookedFlight.numPassengers))
-        self._numCrew.set_text(str(bookedFlight.numCrew))
+        self._numPassengers.set_text(str(bookedFlight.numPassengers) + " + " +
+                                     str(bookedFlight.numChildren) + " + " +
+                                     str(bookedFlight.numInfants))
+        self._numCrew.set_text(str(bookedFlight.numCockpitCrew) + " + " +
+                               str(bookedFlight.numCabinCrew))
         self._bagWeight.set_text(str(bookedFlight.bagWeight))
         self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
@@ -377,7 +380,7 @@ class PIREPViewer(Gtk.Dialog):
         else:
             self._rating.set_text("%.1f %%" % (rating,))
 
-        self._flownNumCrew.set_text("%d" % (pirep.numCrew,))
+        self._flownNumCabinCrew.set_text("%d" % (pirep.numCabinCrew,))
         self._flownNumPassengers.set_text("%d" % (pirep.numPassengers,))
         self._flownBagWeight.set_text("%.0f" % (pirep.bagWeight,))
         self._flownCargoWeight.set_text("%.0f" % (pirep.cargoWeight,))
@@ -695,7 +698,7 @@ class PIREPViewer(Gtk.Dialog):
                                     xstr("pirepView_numPassengers"),
                                     width = 4)
 
-        self._flownNumCrew = \
+        self._flownNumCabinCrew = \
             PIREPViewer.tableAttach(table, 1, 0,
                                     xstr("pirepView_numCrew"),
                                     width = 3)
@@ -897,8 +900,11 @@ class PIREPEditor(Gtk.Dialog):
                                    (bookedFlight.arrivalTime.hour,
                                     bookedFlight.arrivalTime.minute))
 
-        self._numPassengers.set_text(str(bookedFlight.numPassengers))
-        self._numCrew.set_text(str(bookedFlight.numCrew))
+        self._numPassengers.set_text(str(bookedFlight.numPassengers) + " + " +
+                                     str(bookedFlight.numChildren) + " + " +
+                                     str(bookedFlight.numInfants))
+        self._numCrew.set_text(str(bookedFlight.numCockpitCrew) + " + " +
+                               str(bookedFlight.numCabinCrew))
         self._bagWeight.set_text(str(bookedFlight.bagWeight))
         self._cargoWeight.set_text(str(bookedFlight.cargoWeight))
         self._mailWeight.set_text(str(bookedFlight.mailWeight))
@@ -942,8 +948,10 @@ class PIREPEditor(Gtk.Dialog):
         else:
             self._rating.set_text("%.1f %%" % (rating,))
 
-        self._flownNumCrew.set_value(pirep.numCrew)
+        self._flownNumCabinCrew.set_value(pirep.numCabinCrew)
         self._flownNumPassengers.set_value(pirep.numPassengers)
+        self._flownNumChildren.set_value(pirep.numChildren)
+        self._flownNumInfants.set_value(pirep.numInfants)
         self._flownBagWeight.set_value(pirep.bagWeight)
         self._flownCargoWeight.set_value(pirep.cargoWeight)
         self._flownMailWeight.set_value(pirep.mailWeight)
@@ -1361,19 +1369,58 @@ class PIREPEditor(Gtk.Dialog):
         table.set_col_spacings(8)
         table.set_homogeneous(False)
 
-        self._flownNumPassengers = \
-            PIREPEditor.tableAttachSpinButton(table, 0, 0,
-                                              xstr("pirepView_numPassengers"),
-                                              300)
-        self._flownNumPassengers.connect("value-changed", self._updateButtons)
-        self._flownNumPassengers.set_tooltip_text(xstr("payload_pax_tooltip"))
+        label = Gtk.Label("<b>" + xstr("pirepView_numPassengers") + "</b>")
+        label.set_use_markup(True)
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(label)
+        table.attach(alignment, 0, 1, 0, 1)
 
-        self._flownNumCrew = \
-            PIREPEditor.tableAttachSpinButton(table, 2, 0,
+
+
+        self._flownNumPassengers = button = Gtk.SpinButton()
+        button.set_range(min = 0, max = 300)
+        button.set_increments(step = 1, page = 10)
+        button.set_numeric(True)
+        button.set_width_chars(2)
+        button.set_alignment(1.0)
+        button.connect("value-changed", self._updateButtons)
+        button.set_tooltip_text(xstr("payload_pax_tooltip"))
+
+        self._flownNumChildren = button = Gtk.SpinButton()
+        button.set_range(min = 0, max = 300)
+        button.set_increments(step = 1, page = 10)
+        button.set_numeric(True)
+        button.set_width_chars(2)
+        button.set_alignment(1.0)
+        button.connect("value-changed", self._updateButtons)
+        button.set_tooltip_text(xstr("payload_pax_children_tooltip"))
+
+        self._flownNumInfants = button = Gtk.SpinButton()
+        button.set_range(min = 0, max = 300)
+        button.set_increments(step = 1, page = 10)
+        button.set_numeric(True)
+        button.set_width_chars(2)
+        button.set_alignment(1.0)
+        button.connect("value-changed", self._updateButtons)
+        button.set_tooltip_text(xstr("payload_pax_infants_tooltip"))
+
+        paxBox = Gtk.HBox()
+        paxBox.pack_start(self._flownNumPassengers, False, False, 0)
+        paxBox.pack_start(Gtk.Label("+"), False, False, 4)
+        paxBox.pack_start(self._flownNumChildren, False, False, 0)
+        paxBox.pack_start(Gtk.Label("+"), False, False, 4)
+        paxBox.pack_start(self._flownNumInfants, False, False, 0)
+        paxBox.set_halign(Gtk.Align.END)
+
+        table.attach(paxBox, 1, 4, 0, 1)
+
+        self._flownNumCabinCrew = \
+            PIREPEditor.tableAttachSpinButton(table, 4, 0,
                                               xstr("pirepView_numCrew"),
                                               10)
-        self._flownNumCrew.connect("value-changed", self._updateButtons)
-        self._flownNumCrew.set_tooltip_text(xstr("payload_crew_tooltip"))
+        self._flownNumCabinCrew.connect("value-changed", self._updateButtons)
+        self._flownNumCabinCrew.set_tooltip_text(xstr("payload_crew_tooltip"))
 
         self._flownBagWeight = \
             PIREPEditor.tableAttachSpinButton(table, 0, 1,
@@ -1492,10 +1539,18 @@ class PIREPEditor(Gtk.Dialog):
         route =  buffer.get_text(buffer.get_start_iter(),
                                  buffer.get_end_iter(), True)
 
+        numPassengers = \
+            self._flownNumPassengers.get_value_as_int() + \
+            self._flownNumChildren.get_value_as_int() + \
+            self._flownNumInfants.get_value_as_int()
+
+        minCabinCrew = 0 if numPassengers==0 else \
+            (bookedFlight.maxPassengers // 50) + 1
+
         self._okButton.set_sensitive(self._modified and timesOK and
                                      self._flightInfo.faultsFullyExplained and
-                                     self._flownNumPassengers.get_value_as_int()>0 and
-                                     self._flownNumCrew.get_value_as_int()>2 and
+                                     numPassengers<=bookedFlight.maxPassengers and
+                                     self._flownNumCabinCrew.get_value_as_int()>=minCabinCrew and
                                      self._fuelUsed.get_value_as_int()>0 and
                                      self._departureRunway.get_text_length()>0 and
                                      self._arrivalRunway.get_text_length()>0 and
@@ -1546,7 +1601,7 @@ class PIREPEditor(Gtk.Dialog):
 
         pirep.fuelUsed = self._fuelUsed.get_value()
 
-        pirep.numCrew = self._flownNumCrew.get_value()
+        pirep.numCabinCrew = self._flownNumCabinCrew.get_value()
         pirep.numPassengers = self._flownNumPassengers.get_value()
         pirep.bagWeight = self._flownBagWeight.get_value()
         pirep.cargoWeight = self._flownCargoWeight.get_value()

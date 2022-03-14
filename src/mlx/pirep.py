@@ -115,10 +115,17 @@ class PIREP(object):
         try:
             with open(path, "rb") as f:
                 pirep = pickle.load(f, fix_imports = True, encoding = "bytes")
-                if "numCrew" not in dir(pirep):
-                    pirep.numCrew = pirep.bookedFlight.numCrew
+                if "numCabinCrew" not in dir(pirep):
+                    if "numCrew" not in dir(pirep):
+                        pirep.numCabinCrew = pirep.bookedFlight.numCabinCrew
+                    else:
+                        pirep.numCabinCrew = pirep.bookedFlight.numCrew
                 if "numPassengers" not in dir(pirep):
                     pirep.numPassengers = pirep.bookedFlight.numPassengers
+                if "numChildren" not in dir(pirep):
+                    pirep.numChildren = 0
+                if "numInfants" not in dir(pirep):
+                    pirep.numInfants = 0
                 if "bagWeight" not in dir(pirep):
                     pirep.bagWeight = pirep.bookedFlight.bagWeight
                 if "mailWeight" not in dir(pirep):
@@ -136,8 +143,10 @@ class PIREP(object):
 
         self.bookedFlight = flight.bookedFlight
 
-        self.numCrew = flight.numCrew
+        self.numCabinCrew = flight.numCabinCrew
         self.numPassengers = flight.numPassengers
+        self.numChildren = flight.numChildren
+        self.numInfants = flight.numInfants
         self.bagWeight = flight.bagWeight
         self.cargoWeight = flight.cargoWeight
         self.mailWeight = flight.mailWeight
@@ -182,8 +191,10 @@ class PIREP(object):
 
         self.bookedFlight = bookedFlight
 
-        self.numCrew = int(pirepData["numCrew"])
+        self.numCabinCrew = int(pirepData["numCabinCrew"])
         self.numPassengers = int(pirepData["numPassengers"])
+        self.numChildren = int(pirepData["numChildren"])
+        self.numInfants = int(pirepData["numInfants"])
         self.bagWeight = int(pirepData["bagWeight"])
         self.cargoWeight = int(pirepData["cargoWeight"])
         self.mailWeight = int(pirepData["mailWeight"])
@@ -381,7 +392,9 @@ class PIREP(object):
         attrs["departureICAO"] = self.bookedFlight.departureICAO
         attrs["arrivalICAO"] = self.bookedFlight.arrivalICAO
         attrs["numPassengers"] = self.numPassengers
-        attrs["numCrew"] = self.numCrew
+        attrs["numChildren"] = self.numChildren
+        attrs["numInfants"] = self.numInfants
+        attrs["numCabinCrew"] = self.numCabinCrew
         attrs["cargoWeight"] = self.cargoWeight
         attrs["bagWeight"] = self.bagWeight
         attrs["mailWeight"] = self.mailWeight

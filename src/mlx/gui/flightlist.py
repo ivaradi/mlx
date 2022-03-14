@@ -609,7 +609,7 @@ class AcceptedFlightsWindow(Gtk.Window):
                          convertFn = getFlightDuration, sortable = True,
                          extraColumnAttributes =
                              { "alignment": 0.5 } ),
-        ColumnDescriptor("numPassengers", xstr("acceptedflt_num_pax"),
+        ColumnDescriptor("totalNumPassengers", xstr("acceptedflt_num_pax"),
                          type = int, sortable = True,
                          extraColumnAttributes =
                              { "alignment": 1.0 } ),

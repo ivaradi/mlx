@@ -285,7 +285,11 @@ class BookedFlight(object):
           self._decodeAircraftType(bookedFlightData["aircraftType"])
         self.tailNumber = bookedFlightData["tailNumber"]
         self.numPassengers = int(bookedFlightData["numPassengers"])
-        self.numCrew = int(bookedFlightData["numCrew"])
+        self.numChildren = int(bookedFlightData["numChildren"])
+        self.numInfants = int(bookedFlightData["numInfants"])
+        self.maxPassengers = int(bookedFlightData["maxPassengers"])
+        self.numCockpitCrew = int(bookedFlightData["numCockpitCrew"])
+        self.numCabinCrew = int(bookedFlightData["numCabinCrew"])
         self.bagWeight = int(bookedFlightData["bagWeight"])
         self.cargoWeight = int(bookedFlightData["cargoWeight"])
         self.mailWeight = int(bookedFlightData["mailWeight"])
