@@ -860,7 +860,7 @@ def generateFiles(baseDir):
         print("def _extract(table, row):", file=dcdata)
         print("    code = row[0].strip()", file=dcdata)
         print("    meaning = table[code] if code in table else None", file=dcdata)
-        print("    return code + ((\" (\" + meaning + \")\") if meaning else \"\")", file=dcdata)
+        print("    return code", file=dcdata)
         print(file=dcdata)
 
         tableMask = 1
