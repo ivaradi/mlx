@@ -108,6 +108,9 @@ AIRCRAFT_YK40 = 15
 ## Aircraft type: British Aerospace BAe-146
 AIRCRAFT_B462 = 17
 
+## Aircraft type: Ilyushin IL-62
+AIRCRAFT_IL62 = 18
+
 #-------------------------------------------------------------------------------
 
 ## The list of aircraft types that we know of
@@ -121,7 +124,7 @@ aircraftTypes = [AIRCRAFT_B736, AIRCRAFT_B737,
                  AIRCRAFT_B732, AIRCRAFT_B733, AIRCRAFT_B734, AIRCRAFT_B735,
                  AIRCRAFT_T154, AIRCRAFT_T134,
                  AIRCRAFT_YK40, AIRCRAFT_DC3,
-                 AIRCRAFT_B462]
+                 AIRCRAFT_B462, AIRCRAFT_IL62]
 
 #-------------------------------------------------------------------------------
 
