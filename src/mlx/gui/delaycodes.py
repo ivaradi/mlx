@@ -336,6 +336,15 @@ class DelayCodeTable(DelayCodeTableBase):
 
     def _delayCodesChanged(self, button):
         """Called when one of the delay codes have changed."""
+        numDelayCodes = len(self.delayCodes)
+        if numDelayCodes>=4:
+            for checkButton in self._checkButtons:
+                if not checkButton.get_active():
+                    checkButton.set_sensitive(False)
+        else:
+            for checkButton in self._checkButtons:
+                checkButton.set_sensitive(True)
+
         self._info.delayCodesChanged()
 
 #------------------------------------------------------------------------------
