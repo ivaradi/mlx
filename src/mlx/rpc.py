@@ -8,6 +8,8 @@ import hashlib
 import datetime
 import calendar
 import sys
+import ssl
+import certifi
 
 #---------------------------------------------------------------------------------------
 
@@ -480,7 +482,13 @@ class Client(object):
         """Construct the client."""
         self._getCredentialsFn = getCredentialsFn
 
-        self._server = jsonrpclib.Server(MAVA_BASE_URL + "/jsonrpc.php")
+        sslContext = ssl.SSLContext()
+        sslContext.load_verify_locations(cafile = certifi.where())
+        transport = jsonrpclib.jsonrpc.SafeTransport(jsonrpclib.config.DEFAULT,
+                                                     sslContext)
+
+        self._server = jsonrpclib.Server(MAVA_BASE_URL + "/jsonrpc.php",
+                                         transport = transport)
 
         self._userName = None
         self._passwordHash = None
