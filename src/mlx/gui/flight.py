@@ -2328,7 +2328,7 @@ class PayloadPage(Page):
         self._bagWeight.set_int(bookedFlight.bagWeight)
         self._bagWeight.set_sensitive(True)
 
-        if bookedFlight.flightType==BookedFlight.FLIGHT_TYPE_CHARTER:
+        if bookedFlight.flightType==const.FLIGHTTYPE_CHARTER:
             self._cargoWeight.set_int(0)
             self._cargoWeight.set_sensitive(False)
             self._mailWeight.set_int(0)
@@ -2364,7 +2364,7 @@ class PayloadPage(Page):
             const.WEIGHT_CABIN_CREW
         zfw += self._numPassengers.get_int() * \
             (const.WEIGHT_PASSENGER_CHARTER
-             if bookedFlight.flightType==BookedFlight.FLIGHT_TYPE_CHARTER
+             if bookedFlight.flightType==const.FLIGHTTYPE_CHARTER
              else const.WEIGHT_PASSENGER)
         zfw += self._numChildren.get_int() * const.WEIGHT_CHILD
         zfw += self._numInfants.get_int() * const.WEIGHT_INFANT
@@ -5106,17 +5106,6 @@ class FinishPage(Page):
         labelAlignment.add(label)
         table.attach(labelAlignment, 0, 1, row, row+1)
 
-        self._flightType = createFlightTypeComboBox()
-        self._flightType.set_tooltip_text(xstr("finish_type_tooltip"))
-        self._flightType.set_active(0)
-        self._flightType.connect("changed", self._flightTypeChanged)
-        flightTypeAlignment = Gtk.Alignment(xalign=0.0, xscale=0.0)
-        flightTypeAlignment.add(self._flightType)
-        table.attach(flightTypeAlignment, 1, 2, row, row+1)
-        label.set_mnemonic_widget(self._flightType)
-
-        row += 1
-
         self._onlineFlight = Gtk.CheckButton(xstr("finish_online"))
         self._onlineFlight.set_use_underline(True)
         self._onlineFlight.set_tooltip_text(xstr("finish_online_tooltip"))
@@ -5177,12 +5166,6 @@ class FinishPage(Page):
         # self._formatTime(datetime.datetime(1970, 1, 1, 23, 55), (23*60.0+45)*60.0)
 
     @property
-    def flightType(self):
-        """Get the flight type."""
-        index = self._flightType.get_active()
-        return None if index<0 else self._flightType.get_model()[index][1]
-
-    @property
     def online(self):
         """Get whether the flight was an online flight or not."""
         return self._onlineFlight.get_active()
@@ -5214,7 +5197,6 @@ class FinishPage(Page):
         self._fuelUsed.set_markup("<b>%.0f kg</b>" % \
                                   (flight.startFuel - flight.endFuel,))
 
-        self._flightType.set_active(-1)
         self._onlineFlight.set_active(self._wizard.loggedIn)
 
         self._gatesModel.clear()
@@ -5239,12 +5221,10 @@ class FinishPage(Page):
         """Update the sensitivity state of the buttons."""
         gui = self._wizard.gui
         faultsExplained = gui.faultsFullyExplained
-        timesCorrect = self.flightType is None or \
-                       not self._tooBigTimeDifference or \
+        timesCorrect = not self._tooBigTimeDifference or \
                        gui.hasComments or gui.hasDelayCode
         sensitive = gui.flight is not None and \
                     gui.flight.stage==const.STAGE_END and \
-                    self._flightType.get_active()>=0 and \
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0) and \
                      faultsExplained and timesCorrect
@@ -5280,10 +5260,6 @@ class FinishPage(Page):
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
         self.goBack()
-
-    def _flightTypeChanged(self, comboBox):
-        """Called when the flight type has changed."""
-        self._updateTimes()
 
     def _gateChanged(self, comboBox):
         """Called when the arrival gate has changed."""
@@ -5373,10 +5349,10 @@ class FinishPage(Page):
         (departureWarning, departureError) = flight.blockTimeStartWrong
         (arrivalWarning, arrivalError) = flight.blockTimeEndWrong
 
-        if self.flightType==const.FLIGHTTYPE_VIP:
+        if bookedFlight.flightType==const.FLIGHTTYPE_VIP:
             departureError = arrivalError = False
 
-        self._tooBigTimeDifference = departureError or arrivalError
+        self._tooBigTimeDifference = departureError and arrivalError
 
         self._depTime.set_markup(self._formatTime(bookedFlight.departureTime,
                                                   flight.blockTimeStart,

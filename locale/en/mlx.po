@@ -1300,12 +1300,6 @@ msgstr "Distance flown:"
 msgid "finish_fuel"
 msgstr "Fuel used:"
 
-msgid "finish_type"
-msgstr "_Type:"
-
-msgid "finish_type_tooltip"
-msgstr "Select the type of the flight."
-
 msgid "finish_online"
 msgstr "_Online flight"
 

@@ -146,6 +146,19 @@ class BookedFlight(object):
 
         return flight
 
+    @staticmethod
+    def _convertFlightType(ft):
+        """Convert the in-database flight-type to one of our constants."""
+        ft = int(ft)
+        if ft==0:
+            return const.FLIGHTTYPE_SCHEDULED
+        elif ft==1:
+            return const.FLIGHTTYPE_VIP
+        elif ft==2:
+            return const.FLIGHTTYPE_CHARTER
+        else:
+            return const.FLIGHTTYPE_SCHEDULED
+
     def __init__(self, id = None):
         """Construct a booked flight with the given ID."""
         self.id = id
@@ -294,6 +307,7 @@ class BookedFlight(object):
         self.cargoWeight = int(bookedFlightData["cargoWeight"])
         self.mailWeight = int(bookedFlightData["mailWeight"])
         self.route = bookedFlightData["route"]
+        self.flightType = BookedFlight._convertFlightType(bookedFlightData["flightType"])
 
     def writeIntoFile(self, f):
         """Write the flight into a file."""

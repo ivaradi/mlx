@@ -256,6 +256,19 @@ class BookedFlight(RPCObject):
         else:
             raise Exception("Invalid flight status code: '" + status + "'")
 
+    @staticmethod
+    def _convertFlightType(ft):
+        """Convert the in-database flight-type to one of our constants."""
+        ft = int(ft)
+        if ft==0:
+            return const.FLIGHTTYPE_SCHEDULED
+        elif ft==1:
+            return const.FLIGHTTYPE_VIP
+        elif ft==2:
+            return const.FLIGHTTYPE_CHARTER
+        else:
+            return const.FLIGHTTYPE_SCHEDULED
+
     # FIXME: copied from web.BookedFlight
     @staticmethod
     def getDateTime(date, time):
@@ -275,15 +288,6 @@ class BookedFlight(RPCObject):
     # FIXME: copied from web.BookedFlight
     STATUS_REJECTED = 4
 
-    # Flight type: scheduled
-    FLIGHT_TYPE_SCHEDULED = 0
-
-    # Flight type: VIP
-    FLIGHT_TYPE_VIP = 1
-
-    # Flight type: charter
-    FLIGHT_TYPE_CHARTER = 2
-
     # The instructions for the construction
     _instructions = {
         "numPassengers" : int,
@@ -295,7 +299,7 @@ class BookedFlight(RPCObject):
         "bagWeight" : int,
         "cargoWeight" : int,
         "mailWeight" : int,
-        "flightType" : int,
+        "flightType" : lambda value: BookedFlight._convertFlightType(value),
         "dow": int,
         "maxPassengers": int,
         "aircraftType" : lambda value: BookedFlight._decodeAircraftType(value),

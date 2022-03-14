@@ -41,9 +41,9 @@ class PIREP(object):
             self.senderName = senderName
 
     _flightTypes = { const.FLIGHTTYPE_SCHEDULED : "SCHEDULED",
-                     const.FLIGHTTYPE_OLDTIMER : "OT",
                      const.FLIGHTTYPE_VIP : "VIP",
-                     const.FLIGHTTYPE_CHARTER : "CHARTER" }
+                     const.FLIGHTTYPE_CHARTER : "CHARTER",
+                     const.FLIGHTTYPE_OLDTIMER : "OT" }
 
     @staticmethod
     def _formatLine(timeStr, line):
@@ -166,7 +166,6 @@ class PIREP(object):
         self.approachType = flight.approachType.upper()
         self.arrivalRunway = flight.arrivalRunway.upper()
 
-        self.flightType = flight.flightType
         self.online = flight.online
 
         self.comments = flight.comments
@@ -236,7 +235,6 @@ class PIREP(object):
         self.approachType = pirepData["approachType"]
         self.arrivalRunway = pirepData["arrivalRunway"]
 
-        self.flightType = PIREP.decodeFlightTypeText(pirepData["flightType"])
         self.online = int(pirepData["online"])!=0
 
         self.comments = pirepData["comments"]
@@ -299,7 +297,7 @@ class PIREP(object):
     @property
     def flightTypeText(self):
         """Get the text representation of the flight type."""
-        return PIREP._flightTypes[self.flightType]
+        return PIREP._flightTypes[self.bookedFlight.flightType]
 
     @property
     def blockTimeStartText(self):
@@ -398,7 +396,6 @@ class PIREP(object):
         attrs["cargoWeight"] = self.cargoWeight
         attrs["bagWeight"] = self.bagWeight
         attrs["mailWeight"] = self.mailWeight
-        attrs["flightType"] = self.flightTypeText
         attrs["online"] = 1 if self.online else 0
         attrs["blockTimeStart"] = self.blockTimeStartText
         attrs["blockTimeEnd"] = self.blockTimeEndText

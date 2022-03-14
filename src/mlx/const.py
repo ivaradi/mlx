@@ -299,28 +299,28 @@ PLANE_PARKING = 3
 ## Flight type: scheduled
 FLIGHTTYPE_SCHEDULED = 0
 
-## Flight type: old-timer
-FLIGHTTYPE_OLDTIMER = 1
-
 ## Flight type: VIP
-FLIGHTTYPE_VIP = 2
+FLIGHTTYPE_VIP = 1
 
 ## Flight type: charter
-FLIGHTTYPE_CHARTER = 3
+FLIGHTTYPE_CHARTER = 2
+
+## Flight type: old timer (not used anymore)
+FLIGHTTYPE_OLDTIMER = -1
 
 #-------------------------------------------------------------------------------
 
 flightTypes = [ FLIGHTTYPE_SCHEDULED,
-                FLIGHTTYPE_OLDTIMER,
                 FLIGHTTYPE_VIP,
-                FLIGHTTYPE_CHARTER ]
+                FLIGHTTYPE_CHARTER,
+                FLIGHTTYPE_OLDTIMER ]
 
 #-------------------------------------------------------------------------------
 
 _flightTypeStrings = { FLIGHTTYPE_SCHEDULED : "scheduled",
-                       FLIGHTTYPE_OLDTIMER : "ot",
                        FLIGHTTYPE_VIP : "vip",
-                       FLIGHTTYPE_CHARTER : "charter" }
+                       FLIGHTTYPE_CHARTER : "charter",
+                       FLIGHTTYPE_OLDTIMER : "ot" }
 
 def flightType2string(flightType):
     """Get the string equivalent of the given flight type."""

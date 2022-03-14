@@ -386,7 +386,7 @@ class PIREPViewer(Gtk.Dialog):
         self._flownCargoWeight.set_text("%.0f" % (pirep.cargoWeight,))
         self._flownMailWeight.set_text("%.0f" % (pirep.mailWeight,))
         self._flightType.set_text(xstr("flighttype_" +
-                                       flightType2string(pirep.flightType)))
+                                       flightType2string(pirep.bookedFlight.flightType)))
         self._online.set_text(xstr("pirepView_" +
                                    ("yes" if pirep.online else "no")))
 
@@ -955,7 +955,8 @@ class PIREPEditor(Gtk.Dialog):
         self._flownBagWeight.set_value(pirep.bagWeight)
         self._flownCargoWeight.set_value(pirep.cargoWeight)
         self._flownMailWeight.set_value(pirep.mailWeight)
-        self._flightType.set_active(flightType2index(pirep.flightType))
+        self._flightType.set_text(xstr("flighttype_" +
+                                       flightType2string(pirep.bookedFlight.flightType)))
         self._online.set_active(pirep.online)
 
         self._flightInfo.reset()
@@ -1443,12 +1444,10 @@ class PIREPEditor(Gtk.Dialog):
         self._flownMailWeight.connect("value-changed", self._updateButtons)
         self._flownMailWeight.set_tooltip_text(xstr("payload_mail_tooltip"))
 
-        self._flightType = createFlightTypeComboBox()
+        self._flightType = PIREPViewer.getDataLabel(width = 3)
         PIREPEditor.tableAttachWidget(table, 0, 2,
                                       xstr("pirepView_flightType"),
                                       self._flightType)
-        self._flightType.connect("changed", self._updateButtons)
-        self._flightType.set_tooltip_text(xstr("pirepEdit_flight_type_tooltip"))
 
         self._online = Gtk.CheckButton(xstr("pirepEdit_online"))
         table.attach(self._online, 2, 3, 2, 3)
@@ -1607,7 +1606,6 @@ class PIREPEditor(Gtk.Dialog):
         pirep.cargoWeight = self._flownCargoWeight.get_value()
         pirep.mailWeight = self._flownMailWeight.get_value()
 
-        pirep.flightType = flightTypes[self._flightType.get_active()]
         pirep.online = self._online.get_active()
 
         pirep.delayCodes = self._flightInfo.delayCodes

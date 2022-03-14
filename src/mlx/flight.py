@@ -53,7 +53,8 @@ class Flight(object):
         return -1*diff if diff2<diff1 else diff
 
     @staticmethod
-    def isTimeDifferenceTooMuch(scheduledTime, realTimestamp):
+    def isTimeDifferenceTooMuch(scheduledTime, realTimestamp,
+                                earlyOnlyWarning = False):
         """Determine if the given real time differs to much from the scheduled
         time.
 
@@ -70,7 +71,7 @@ class Flight(object):
         diff = abs(Flight.getMinutesDifference(scheduledMinute, realMinute))
 
         return (diff>Flight.TIME_WARNING_DIFFERENCE,
-                diff>Flight.TIME_ERROR_DIFFERENCE)
+                False if earlyOnlyWarning else diff>Flight.TIME_ERROR_DIFFERENCE)
 
     def __init__(self, logger, gui):
         """Construct the flight."""
@@ -384,7 +385,8 @@ class Flight(object):
         - a boolean indicating if the difference warrants not only a warning,
           but an error as well."""
         return self.isTimeDifferenceTooMuch(self.bookedFlight.arrivalTime,
-                                            self.blockTimeEnd)
+                                            self.blockTimeEnd,
+                                            earlyOnlyWarning = True)
 
     def disconnected(self):
         """Called when the connection to the simulator has failed."""

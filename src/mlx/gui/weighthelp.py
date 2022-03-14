@@ -3,7 +3,6 @@ from mlx.gui.common import *
 
 from mlx.i18n import xstr
 from mlx.checks import PayloadChecker
-from mlx.rpc import BookedFlight
 
 import mlx.const as const
 
@@ -440,7 +439,7 @@ class WeightHelp(Gtk.VBox):
            self._infants>=0:
             return self._pax * \
                 (const.WEIGHT_PASSENGER_CHARTER
-                 if self._flightType==BookedFlight.FLIGHT_TYPE_CHARTER
+                 if self._flightType==const.FLIGHTTYPE_CHARTER
                  else const.WEIGHT_PASSENGER) + \
                 self._children * const.WEIGHT_CHILD + \
                 self._infants * const.WEIGHT_INFANT
