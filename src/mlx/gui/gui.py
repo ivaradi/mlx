@@ -1846,7 +1846,7 @@ class GUI(fs.ConnectionListener):
 
             dialog.set_program_name(PROGRAM_NAME)
             dialog.set_version(const.VERSION)
-            dialog.set_copyright("(c) 2012 - 2019 by István Váradi")
+            dialog.set_copyright("(c) 2012 - 2022 by István Váradi")
             dialog.set_website("http://mlx.varadiistvan.hu")
             dialog.set_website_label(xstr("about_website"))
 
