@@ -1713,6 +1713,171 @@ class B737Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
+class ZiboB737NGModel(B737Model):
+    """Base model for the Zibo and LevelUp Boeing 737 models."""
+    def __init__(self, flapsRatios = [0.0, 0.081633, 0.142857, 0.224490,
+                                      0.285714, 0.367347, 0.551020, 0.714286,
+                                      1.0]):
+        super(ZiboB737NGModel, self).__init__()
+        self._flapsRatios = flapsRatios
+
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super(ZiboB737NGModel, self).addMonitoringData(data, fsType)
+
+        self._speedBrakeIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/speedbrake1_deg",
+                                        (TYPE_FLOAT_ARRAY, 2))
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/speedbrake2_deg",
+                                        (TYPE_FLOAT_ARRAY, 2))
+        self._cgIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/fms/calc_to_cg",
+                                        TYPE_FLOAT)
+        self._wingHeatIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/ice/wing_heat_pos",
+                                        TYPE_FLOAT)
+        self._eng1HeatIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/ice/eng1_heat_pos",
+                                        TYPE_FLOAT)
+        self._eng2HeatIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/ice/eng2_heat_pos",
+                                        TYPE_FLOAT)
+        self._spoilersArmedIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/annunciator/speedbrake_armed",
+                                        TYPE_FLOAT)
+
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state."""
+        state = super(ZiboB737NGModel, self).getAircraftState(aircraft,
+                                                              timestamp,
+                                                              data)
+        state.cog = data[self._cgIndex]/100.0
+
+        flapsRatios = self._flapsRatios
+        flapsRatio = data[self._monidx_flapsLeft]
+        index = len(flapsRatios)
+        for i in range(1, len(flapsRatios)):
+            if flapsRatio<flapsRatios[i]:
+                index = i-1
+                break
+        if index<len(flapsRatios):
+            flapsRatio0 = flapsRatios[index]
+            flapsNotch0 = self._flapsNotches[index]
+            state.flaps = flapsNotch0 + \
+                (self._flapsNotches[index+1] - flapsNotch0) * \
+                (flapsRatio - flapsRatio0) / \
+                (flapsRatios[index+1] - flapsRatio0)
+        else:
+            state.flaps = self._flapsNotches[-1]
+
+        # 0 -> -1
+        # 15 -> 0.790881
+        state.elevatorTrim = \
+            15.0 * (data[self._monidx_elevatorTrim] + 1) / 1.790881
+
+        state.spoilersExtension = \
+            sum(data[self._speedBrakeIndex] + data[self._speedBrakeIndex+1])/4
+
+        state.antiIceOn = data[self._wingHeatIndex]!=0 or \
+                          data[self._eng1HeatIndex]!=0 or \
+                          data[self._eng2HeatIndex]!=0
+
+        state.spoilersArmed = data[self._spoilersArmedIndex]!=0
+
+        return state
+
+#------------------------------------------------------------------------------
+
+class ZiboB738Model(ZiboB737NGModel):
+    """Model for the Zibo Boeing 737-800 model."""
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return author=="Alex Unruh" and \
+            description=="Boeing 737-800X" and \
+            notes.startswith("ZIBOmod") and \
+            icao=="B738"
+
+    def __init__(self):
+        """Construct the model."""
+        super(ZiboB738Model, self).__init__(
+            flapsRatios = [0.0, 0.081633, 0.142857, 0.224490, 0.285714, 0.346939,
+                           0.551020, 0.673469, 1.0])
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "Zibo Boeing 737-800"
+
+#------------------------------------------------------------------------------
+
+class LevelUpB736Model(ZiboB737NGModel):
+    """Model for the LevelUp Boeing 737-600 model."""
+
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return author=="Alex Unruh" and \
+            description=="Boeing 737-600NG" and \
+            icao=="B736"
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "LevelUp Boeing 737-600"
+
+#------------------------------------------------------------------------------
+
+class LevelUpB737Model(ZiboB737NGModel):
+    """Model for the LevelUp Boeing 737-700 model."""
+
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return author=="Alex Unruh" and \
+            description=="Boeing 737-700NG" and \
+            icao=="B737"
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "LevelUp Boeing 737-700"
+
+#------------------------------------------------------------------------------
+
+class LevelUpB738Model(ZiboB737NGModel):
+    """Model for the LevelUp Boeing 737-800 model."""
+
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return author=="Alex Unruh" and \
+            description=="Boeing 737-800NG" and \
+            icao=="B738"
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "LevelUp Boeing 737-800"
+
+#------------------------------------------------------------------------------
+
 class B767Model(GenericAircraftModel):
     """Generic model for the Boeing 767 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
@@ -1973,6 +2138,10 @@ _genericModels = { const.AIRCRAFT_B736  : B737Model,
 
 #------------------------------------------------------------------------------
 
+AircraftModel.registerSpecial(ZiboB738Model)
+AircraftModel.registerSpecial(LevelUpB736Model)
+AircraftModel.registerSpecial(LevelUpB737Model)
+AircraftModel.registerSpecial(LevelUpB738Model)
 AircraftModel.registerSpecial(FJSDH8DModel)
 AircraftModel.registerSpecial(FelisT154Model)
 
