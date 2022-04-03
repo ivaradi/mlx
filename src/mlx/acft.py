@@ -515,8 +515,9 @@ class Aircraft(object):
 
         This default implementation checks the N1 values, but for
         piston-powered aircraft you need to check the RPMs."""
-        for n1 in aircraftState.n1:
-            if n1>=0.5: return False
+        if aircraftState.n1 is not None:
+            for n1 in aircraftState.n1:
+                if n1 is not None and n1>=0.5: return False
         return True
 
     def updateV1R2(self):

@@ -976,7 +976,10 @@ class AntiCollisionLightsChecker(PatientFaultChecker):
         """Determine if the engines are in such a state that the lights should
         be on."""
         if state.n1 is not None:
-            return max(state.n1)>5
+            for n1 in state.n1:
+                if n1 is not None and n1>5:
+                    return True
+            return False
         elif state.rpm is not None:
             return max(state.rpm)>0
         else:
@@ -1589,8 +1592,11 @@ class ThrustChecker(SimpleFaultChecker):
     FIXME: is this really so general, for all aircraft?"""
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
-        return flight.stage==const.STAGE_TAKEOFF and \
-               state.n1 is not None and max(state.n1)>97
+        if flight.stage==const.STAGE_TAKEOFF and state.n1 is not None:
+            for n1 in state.n1:
+                if n1 is not None and n1>97:
+                    return True
+        return False
 
     def logFault(self, flight, aircraft, logger, oldState, state):
         """Log the fault."""
