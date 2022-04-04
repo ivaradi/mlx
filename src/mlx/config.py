@@ -780,6 +780,11 @@ class Config(object):
             self._updateURL = self._get(config, "update", "url",
                                         Config.DEFAULT_UPDATE_URL) # +
                                         #("/exp" if secondaryInstallation else ""))
+
+        if self._updateURL.find("update/new")>0 or \
+           self._updateURL.find("update/py3")>0:
+            self._updateURL = "https://mlx.varadiistvan.hu/update"
+            self._updateURLUpdated = False
         if self._updateURL.startswith("http://") and not self._updateURLUpdated:
             self._updateURL = "https://" + self._updateURL[7:]
             self._updateURLUpdated = True
