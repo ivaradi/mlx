@@ -193,28 +193,42 @@ class ScheduledFlightPair(object):
 
 class BookedFlight(RPCObject):
     """A booked flight."""
-    # FIXME: copied from web.BookedFlight
     TYPECODE2TYPE = { "B736"  : const.AIRCRAFT_B736,
+                      "736"   : const.AIRCRAFT_B736,
                       "B737"  : const.AIRCRAFT_B737,
+                      "73G"   : const.AIRCRAFT_B737,
                       "B738"  : const.AIRCRAFT_B738,
+                      "738"   : const.AIRCRAFT_B738,
                       "B73H"  : const.AIRCRAFT_B738C,
+                      "73H"   : const.AIRCRAFT_B738C,
                       "B732"  : const.AIRCRAFT_B732,
+                      "732"   : const.AIRCRAFT_B732,
                       "B733"  : const.AIRCRAFT_B733,
+                      "733"   : const.AIRCRAFT_B733,
                       "B734"  : const.AIRCRAFT_B734,
+                      "734"   : const.AIRCRAFT_B734,
                       "B735"  : const.AIRCRAFT_B735,
+                      "735"   : const.AIRCRAFT_B735,
                       "DH8D"  : const.AIRCRAFT_DH8D,
+                      "DH4"   : const.AIRCRAFT_DH8D,
                       "B762"  : const.AIRCRAFT_B762,
+                      "762"   : const.AIRCRAFT_B762,
                       "B763"  : const.AIRCRAFT_B763,
+                      "763"   : const.AIRCRAFT_B763,
                       "CRJ2"  : const.AIRCRAFT_CRJ2,
-                      "F70"  : const.AIRCRAFT_F70,
-                      "LI2"  : const.AIRCRAFT_DC3,
+                      "CR2"   : const.AIRCRAFT_CRJ2,
+                      "F70"   : const.AIRCRAFT_F70,
+                      "LI2"   : const.AIRCRAFT_DC3,
                       "T134"  : const.AIRCRAFT_T134,
+                      "TU3"   : const.AIRCRAFT_T134,
                       "T154"  : const.AIRCRAFT_T154,
+                      "TU5"   : const.AIRCRAFT_T154,
                       "YK40"  : const.AIRCRAFT_YK40,
+                      "YK4"   : const.AIRCRAFT_YK40,
                       "B462"  : const.AIRCRAFT_B462,
+                      "146"   : const.AIRCRAFT_B462,
                       "IL62"  : const.AIRCRAFT_IL62 }
 
-    # FIXME: copied from web.BookedFlight
     TYPE2TYPECODE = { const.AIRCRAFT_B736  : "B736",
                       const.AIRCRAFT_B737  : "B737",
                       const.AIRCRAFT_B738  : "B738",
@@ -235,7 +249,9 @@ class BookedFlight(RPCObject):
                       const.AIRCRAFT_B462  : "B462",
                       const.AIRCRAFT_IL62  : "IL62" }
 
-    # FIXME: copied from web.BookedFlight
+    checkFlightTypes = [ const.AIRCRAFT_B736, const.AIRCRAFT_B737,
+                         const.AIRCRAFT_B738, const.AIRCRAFT_DH8D ]
+
     @staticmethod
     def _decodeAircraftType(typeCode):
         """Decode the aircraft type from the given typeCode."""
@@ -271,24 +287,53 @@ class BookedFlight(RPCObject):
         else:
             return const.FLIGHTTYPE_SCHEDULED
 
-    # FIXME: copied from web.BookedFlight
     @staticmethod
     def getDateTime(date, time):
         """Get a datetime object from the given textual date and time."""
         return datetime.datetime.strptime(date + " " + time,
                                           "%Y-%m-%d %H:%M:%S")
 
-    # FIXME: copied from web.BookedFlight
     STATUS_BOOKED = 1
 
-    # FIXME: copied from web.BookedFlight
     STATUS_REPORTED = 2
 
-    # FIXME: copied from web.BookedFlight
     STATUS_ACCEPTED = 3
 
-    # FIXME: copied from web.BookedFlight
     STATUS_REJECTED = 4
+
+    @staticmethod
+    def forCheckFlight(aircraftType):
+        """Create a booked flight for a check flight with the given aircraft
+        type."""
+        flight = BookedFlight()
+
+        flight.departureICAO = "LHBP"
+        flight.arrivalICAO = "LHBP"
+
+        flight.aircraftType = aircraftType
+        flight.aircraftTypeName = BookedFlight.TYPE2TYPECODE[aircraftType]
+
+        # FIXME: perhaps find one for the type
+        flight.tailNumber = "HA-CHK"
+        flight.callsign = "HA-CHK"
+
+        flight.numPassengers = 0
+        flight.numChildren = 0
+        flight.numInfants = 0
+        flight.numCabinCrew = 0
+        flight.bagWeight = 0
+        flight.cargoWeight = 0
+        flight.mailWeight = 0
+        flight.route = "DCT"
+
+        t = datetime.datetime.now() + datetime.timedelta(minutes = 20)
+        flight.departureTime = datetime.datetime(t.year, t.month, t.day,
+                                                 t.hour, t.minute)
+        t = flight.departureTime + datetime.timedelta(minutes = 30)
+        flight.arrivalTime = datetime.datetime(t.year, t.month, t.day,
+                                               t.hour, t.minute)
+
+        return flight
 
     # The instructions for the construction
     _instructions = {
@@ -308,17 +353,146 @@ class BookedFlight(RPCObject):
         "status" : lambda value: BookedFlight._decodeStatus(value)
         }
 
-    def __init__(self, value):
+    def __init__(self, value = None, id = None):
         """Construct the booked flight object from the given RPC result
         value."""
         self.status = BookedFlight.STATUS_BOOKED
-        super(BookedFlight, self).__init__(value, BookedFlight._instructions)
-        self.departureTime = \
-          BookedFlight.getDateTime(self.date, self.departureTime)
-        self.arrivalTime = \
-          BookedFlight.getDateTime(self.date, self.arrivalTime)
+        if value is None:
+            self.id = id
+        else:
+            super(BookedFlight, self).__init__(value, BookedFlight._instructions)
+            self.departureTime = \
+              BookedFlight.getDateTime(self.date, self.departureTime)
+            self.arrivalTime = \
+              BookedFlight.getDateTime(self.date, self.arrivalTime)
+            if self.arrivalTime<self.departureTime:
+                self.arrivalTime += datetime.timedelta(days = 1)
+
+    def readFromFile(self, f, fleet):
+        """Read the data of the flight from a file via the given file
+        object."""
+        date = None
+        departureTime = None
+        arrivalTime = None
+
+        line = f.readline()
+        lineNumber = 0
+        self.numChildren = 0
+        self.numInfants = 0
+        self.numCockpitCrew = 2
+        self.flightType = const.FLIGHTTYPE_SCHEDULED
+        while line:
+            lineNumber += 1
+            line = line.strip()
+
+            hashIndex = line.find("#")
+            if hashIndex>=0: line = line[:hashIndex]
+            if line:
+                equalIndex = line.find("=")
+                lineOK = equalIndex>0
+
+                if lineOK:
+                    key = line[:equalIndex].strip()
+                    value = line[equalIndex+1:].strip().replace("\:", ":")
+
+                    lineOK = key and value
+
+                if lineOK:
+                    if key=="callsign": self.callsign = value
+                    elif key=="date": date = value
+                    elif key=="dep_airport": self.departureICAO = value
+                    elif key=="dest_airport": self.arrivalICAO = value
+                    elif key=="planecode": self.aircraftType = \
+                         BookedFlight._decodeAircraftType(value)
+                    elif key=="planetype": self.aircraftTypeName = value
+                    elif key=="tail_nr": self.tailNumber = value
+                    elif key=="passenger": self.numPassengers = int(value)
+                    elif key=="child": self.numChildren = int(value)
+                    elif key=="infant": self.numInfants = int(value)
+                    elif key=="crew": self.numCabinCrew = int(value) - 2
+                    elif key=="cabin_crew": self.numCabinCrew = int(value)
+                    elif key=="cockpit_crew": self.numCockpitCrew = int(value)
+                    elif key=="bag": self.bagWeight = int(value)
+                    elif key=="cargo": self.cargoWeight = int(value)
+                    elif key=="mail": self.mailWeight = int(value)
+                    elif key=="flight_route": self.route = value
+                    elif key=="departure_time": departureTime = value
+                    elif key=="arrival_time": arrivalTime = value
+                    elif key=="foglalas_id":
+                        self.id = None if value=="0" else value
+                    elif key=="flight_type": self.flightType = int(value)
+                    else: lineOK = False
+
+                if not lineOK:
+                    print("web.BookedFlight.readFromFile: line %d is invalid" % \
+                          (lineNumber,))
+
+            line = f.readline()
+
+        if date is not None:
+            if departureTime is not None:
+                self.departureTime = BookedFlight.getDateTime(date,
+                                                              departureTime)
+            if arrivalTime is not None:
+                self.arrivalTime = BookedFlight.getDateTime(date,
+                                                            arrivalTime)
+
+        d = dir(self)
+        for attribute in ["callsign", "departureICAO", "arrivalICAO",
+                          "aircraftType", "tailNumber",
+                          "numPassengers", "numCockpitCrew", "numCabinCrew",
+                          "bagWeight", "cargoWeight", "mailWeight",
+                          "route", "departureTime", "arrivalTime"]:
+            if attribute not in d:
+                raise Exception("Attribute %s could not be read" % (attribute,))
+
+        if "aircraftTypeName" not in d:
+            self.aircraftTypeName = \
+                BookedFlight.TYPE2TYPECODE[self.aircraftType]
+
+        plane = fleet[self.tailNumber]
+        if plane is None:
+            self.dow = 0
+            self.maxPassengers = 0
+            self.dowNumCabinCrew = 0
+        else:
+            self.dow = plane.dow
+            self.maxPassengers = plane.maxPassengers
+            self.dowNumCabinCrew = plane.dowNumCabinCrew
+
+    def setupFromPIREPData(self, pirepData):
+        """Setup the booked flight from the given PIREP data."""
+        bookedFlightData = pirepData["bookedFlight"]
+
+        self.callsign = bookedFlightData["callsign"]
+
+        date = bookedFlightData["date"]
+
+        departureTime = bookedFlightData["departureTime"]
+        self.departureTime = BookedFlight.getDateTime(date, departureTime)
+
+        arrivalTime = bookedFlightData["arrivalTime"]
+        self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
         if self.arrivalTime<self.departureTime:
             self.arrivalTime += datetime.timedelta(days = 1)
+
+        self.departureICAO = bookedFlightData["departureICAO"]
+        self.arrivalICAO = bookedFlightData["arrivalICAO"]
+
+        self.aircraftType = \
+            BookedFlight._decodeAircraftType(bookedFlightData["aircraftType"])
+        self.tailNumber = bookedFlightData["tailNumber"]
+        self.numPassengers = int(bookedFlightData["numPassengers"])
+        self.numChildren = int(bookedFlightData["numChildren"])
+        self.numInfants = int(bookedFlightData["numInfants"])
+        self.maxPassengers = int(bookedFlightData["maxPassengers"])
+        self.numCockpitCrew = int(bookedFlightData["numCockpitCrew"])
+        self.numCabinCrew = int(bookedFlightData["numCabinCrew"])
+        self.bagWeight = int(bookedFlightData["bagWeight"])
+        self.cargoWeight = int(bookedFlightData["cargoWeight"])
+        self.mailWeight = int(bookedFlightData["mailWeight"])
+        self.route = bookedFlightData["route"]
+        self.flightType = BookedFlight._convertFlightType(bookedFlightData["flightType"])
 
     def writeIntoFile(self, f):
         """Write the flight into a file."""
@@ -332,7 +506,10 @@ class BookedFlight(RPCObject):
         print("planetype=%s" % (self.aircraftTypeName,), file=f)
         print("tail_nr=%s" % (self.tailNumber,), file=f)
         print("passenger=%d" % (self.numPassengers,), file=f)
-        print("crew=%d" % (self.numCrew,), file=f)
+        print("child=%d" % (self.numChildren,), file=f)
+        print("infant=%d" % (self.numInfants,), file=f)
+        print("cockpit_crew=%d" % (self.numCockpitCrew,), file=f)
+        print("cabin_crew=%d" % (self.numCabinCrew,), file=f)
         print("bag=%d" % (self.bagWeight,), file=f)
         print("cargo=%d" % (self.cargoWeight,), file=f)
         print("mail=%d" % (self.mailWeight,), file=f)
@@ -344,10 +521,24 @@ class BookedFlight(RPCObject):
         print("arrival_time=%02d\\:%02d\\:%02d" % \
               (arrivalTime.hour, arrivalTime.minute, arrivalTime.second), file=f)
         print("foglalas_id=%s" % ("0" if self.id is None else self.id,), file=f)
+        print("flight_type=%d" % (self.flightType,))
 
     def __setstate__(self, state):
         """Set the state from the given unpickled dictionary."""
         self.__dict__.update(fixUnpickled(state))
+
+    def __repr__(self):
+        """Get a representation of the flight."""
+        s = "<Flight: %s-%s, %s, %s-%s," % (self.departureICAO,
+                                           self.arrivalICAO,
+                                           self.route,
+                                           self.departureTime, self.arrivalTime)
+        s += " %d %s," % (self.aircraftType, self.tailNumber)
+        s += " pax=%d, crew=%d, bag=%d, cargo=%d, mail=%d" % \
+             (self.numPassengers, self.numCrew,
+              self.bagWeight, self.cargoWeight, self.mailWeight)
+        s += ">"
+        return s
 
 #---------------------------------------------------------------------------------------
 
@@ -391,7 +582,10 @@ class Plane(rpccommon.Plane, RPCObject):
     _instructions = {
         "status" : lambda value: rpccommon.Plane.str2status(value),
         "gateNumber" : lambda value: value if value else None,
-        "typeCode": lambda value: BookedFlight._decodeAircraftType(value)
+        "typeCode": lambda value: BookedFlight._decodeAircraftType(value),
+        "dow": int,
+        "dowNumCabinCrew": int,
+        "maxPassengers": int,
         }
 
     def __init__(self, value):

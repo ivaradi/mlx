@@ -1,7 +1,7 @@
 
 from . import const
 from . import util
-from .rpc import Registration
+from .rpc import Registration, BookedFlight
 from . import rpc
 from . import rpccommon
 
@@ -52,314 +52,6 @@ def readline(f):
         line = line.strip()
         if line:
             return line
-
-#---------------------------------------------------------------------------------------
-
-class BookedFlight(object):
-    """A flight that was booked."""
-    TYPECODE2TYPE = { "B736"  : const.AIRCRAFT_B736,
-                      "B737"  : const.AIRCRAFT_B737,
-                      "B738"  : const.AIRCRAFT_B738,
-                      "B73H"  : const.AIRCRAFT_B738C,
-                      "B732"  : const.AIRCRAFT_B732,
-                      "B733"  : const.AIRCRAFT_B733,
-                      "B734"  : const.AIRCRAFT_B734,
-                      "B735"  : const.AIRCRAFT_B735,
-                      "DH8D"  : const.AIRCRAFT_DH8D,
-                      "B762"  : const.AIRCRAFT_B762,
-                      "B763"  : const.AIRCRAFT_B763,
-                      "CRJ2"  : const.AIRCRAFT_CRJ2,
-                      "F70"  : const.AIRCRAFT_F70,
-                      "LI2"  : const.AIRCRAFT_DC3,
-                      "T134"  : const.AIRCRAFT_T134,
-                      "T154"  : const.AIRCRAFT_T154,
-                      "YK40"  : const.AIRCRAFT_YK40,
-                      "B462"  : const.AIRCRAFT_B462,
-                      "IL62"  : const.AIRCRAFT_IL62 }
-
-    TYPE2TYPECODE = { const.AIRCRAFT_B736  : "B736",
-                      const.AIRCRAFT_B737  : "B737",
-                      const.AIRCRAFT_B738  : "B738",
-                      const.AIRCRAFT_B738C : "B73H",
-                      const.AIRCRAFT_B732  : "B732",
-                      const.AIRCRAFT_B733  : "B733",
-                      const.AIRCRAFT_B734  : "B734",
-                      const.AIRCRAFT_B735  : "B735",
-                      const.AIRCRAFT_DH8D  : "DH8D",
-                      const.AIRCRAFT_B762  : "B762",
-                      const.AIRCRAFT_B763  : "B763",
-                      const.AIRCRAFT_CRJ2  : "CRJ2",
-                      const.AIRCRAFT_F70   : "F70",
-                      const.AIRCRAFT_DC3   : "LI2",
-                      const.AIRCRAFT_T134  : "T134",
-                      const.AIRCRAFT_T154  : "T155",
-                      const.AIRCRAFT_YK40  : "YK40",
-                      const.AIRCRAFT_B462  : "B462",
-                      const.AIRCRAFT_IL62  : "IL62" }
-
-    checkFlightTypes = [ const.AIRCRAFT_B736, const.AIRCRAFT_B737,
-                         const.AIRCRAFT_B738, const.AIRCRAFT_DH8D ]
-
-    STATUS_BOOKED = 1
-
-    STATUS_REPORTED = 2
-
-    STATUS_ACCEPTED = 3
-
-    STATUS_REJECTED = 4
-
-    @staticmethod
-    def getDateTime(date, time):
-        """Get a datetime object from the given textual date and time."""
-        return datetime.datetime.strptime(date + " " + time,
-                                          "%Y-%m-%d %H:%M:%S")
-
-    @staticmethod
-    def forCheckFlight(aircraftType):
-        """Create a booked flight for a check flight with the given aircraft
-        type."""
-        flight = BookedFlight()
-
-        flight.departureICAO = "LHBP"
-        flight.arrivalICAO = "LHBP"
-
-        flight.aircraftType = aircraftType
-        flight.aircraftTypeName = BookedFlight.TYPE2TYPECODE[aircraftType]
-
-        # FIXME: perhaps find one for the type
-        flight.tailNumber = "HA-CHK"
-        flight.callsign = "HA-CHK"
-
-        flight.numPassengers = 0
-        flight.numCrew = 2
-        flight.bagWeight = 0
-        flight.cargoWeight = 0
-        flight.mailWeight = 0
-        flight.route = "DCT"
-
-        t = datetime.datetime.now() + datetime.timedelta(minutes = 20)
-        flight.departureTime = datetime.datetime(t.year, t.month, t.day,
-                                                 t.hour, t.minute)
-        t = flight.departureTime + datetime.timedelta(minutes = 30)
-        flight.arrivalTime = datetime.datetime(t.year, t.month, t.day,
-                                               t.hour, t.minute)
-
-        return flight
-
-    @staticmethod
-    def _convertFlightType(ft):
-        """Convert the in-database flight-type to one of our constants."""
-        ft = int(ft)
-        if ft==0:
-            return const.FLIGHTTYPE_SCHEDULED
-        elif ft==1:
-            return const.FLIGHTTYPE_VIP
-        elif ft==2:
-            return const.FLIGHTTYPE_CHARTER
-        else:
-            return const.FLIGHTTYPE_SCHEDULED
-
-    def __init__(self, id = None):
-        """Construct a booked flight with the given ID."""
-        self.id = id
-
-    @property
-    def status(self):
-        """Get the status of the flight.
-
-        For web-based flights this is always STATUS_BOOKED."""
-        return BookedFlight.STATUS_BOOKED
-
-    def readFromWeb(self, f):
-        """Read the data of the flight from the web via the given file
-        object."""
-        self.callsign = readline(f)
-
-        date = readline(f)
-        print("web.BookedFlight.readFromWeb: date:", date)
-        if date=="0000-00-00": date = "0001-01-01"
-
-        self.departureICAO = readline(f)
-        self.arrivalICAO = readline(f)
-
-        self._readAircraftType(f)
-        self.tailNumber = readline(f)
-        self.numPassengers = int(readline(f))
-        self.numCrew = int(readline(f))
-        self.bagWeight = int(readline(f))
-        self.cargoWeight = int(readline(f))
-        self.mailWeight = int(readline(f))
-        self.route = readline(f)
-
-        departureTime = readline(f)
-        self.departureTime = BookedFlight.getDateTime(date, departureTime)
-
-        arrivalTime = readline(f)
-        self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
-        if self.arrivalTime<self.departureTime:
-            self.arrivalTime += datetime.timedelta(days = 1)
-
-        if not readline(f)==".NEXT.":
-            raise Exception("Invalid line in flight data")
-
-    def readFromFile(self, f):
-        """Read the data of the flight from a file via the given file
-        object."""
-        date = None
-        departureTime = None
-        arrivalTime = None
-
-        line = f.readline()
-        lineNumber = 0
-        while line:
-            lineNumber += 1
-            line = line.strip()
-
-            hashIndex = line.find("#")
-            if hashIndex>=0: line = line[:hashIndex]
-            if line:
-                equalIndex = line.find("=")
-                lineOK = equalIndex>0
-
-                if lineOK:
-                    key = line[:equalIndex].strip()
-                    value = line[equalIndex+1:].strip().replace("\:", ":")
-
-                    lineOK = key and value
-
-                if lineOK:
-                    if key=="callsign": self.callsign = value
-                    elif key=="date": date = value
-                    elif key=="dep_airport": self.departureICAO = value
-                    elif key=="dest_airport": self.arrivalICAO = value
-                    elif key=="planecode": self.aircraftType = \
-                         self._decodeAircraftType(value)
-                    elif key=="planetype": self.aircraftTypeName = value
-                    elif key=="tail_nr": self.tailNumber = value
-                    elif key=="passenger": self.numPassengers = int(value)
-                    elif key=="crew": self.numCrew = int(value)
-                    elif key=="bag": self.bagWeight = int(value)
-                    elif key=="cargo": self.cargoWeight = int(value)
-                    elif key=="mail": self.mailWeight = int(value)
-                    elif key=="flight_route": self.route = value
-                    elif key=="departure_time": departureTime = value
-                    elif key=="arrival_time": arrivalTime = value
-                    elif key=="foglalas_id":
-                        self.id = None if value=="0" else value
-                    else: lineOK = False
-
-                if not lineOK:
-                    print("web.BookedFlight.readFromFile: line %d is invalid" % \
-                          (lineNumber,))
-
-            line = f.readline()
-
-        if date is not None:
-            if departureTime is not None:
-                self.departureTime = BookedFlight.getDateTime(date,
-                                                              departureTime)
-            if arrivalTime is not None:
-                self.arrivalTime = BookedFlight.getDateTime(date,
-                                                            arrivalTime)
-
-        d = dir(self)
-        for attribute in ["callsign", "departureICAO", "arrivalICAO",
-                          "aircraftType", "tailNumber",
-                          "numPassengers", "numCrew",
-                          "bagWeight", "cargoWeight", "mailWeight",
-                          "route", "departureTime", "arrivalTime"]:
-            if attribute not in d:
-                raise Exception("Attribute %s could not be read" % (attribute,))
-
-        if "aircraftTypeName" not in d:
-            self.aircraftTypeName = \
-                BookedFlight.TYPE2TYPECODE[self.aircraftType]
-
-    def setupFromPIREPData(self, pirepData):
-        """Setup the booked flight from the given PIREP data."""
-        bookedFlightData = pirepData["bookedFlight"]
-
-        self.callsign = bookedFlightData["callsign"]
-
-        date = bookedFlightData["date"]
-
-        departureTime = bookedFlightData["departureTime"]
-        self.departureTime = BookedFlight.getDateTime(date, departureTime)
-
-        arrivalTime = bookedFlightData["arrivalTime"]
-        self.arrivalTime = BookedFlight.getDateTime(date, arrivalTime)
-        if self.arrivalTime<self.departureTime:
-            self.arrivalTime += datetime.timedelta(days = 1)
-
-        self.departureICAO = bookedFlightData["departureICAO"]
-        self.arrivalICAO = bookedFlightData["arrivalICAO"]
-
-        self.aircraftType = \
-          self._decodeAircraftType(bookedFlightData["aircraftType"])
-        self.tailNumber = bookedFlightData["tailNumber"]
-        self.numPassengers = int(bookedFlightData["numPassengers"])
-        self.numChildren = int(bookedFlightData["numChildren"])
-        self.numInfants = int(bookedFlightData["numInfants"])
-        self.maxPassengers = int(bookedFlightData["maxPassengers"])
-        self.numCockpitCrew = int(bookedFlightData["numCockpitCrew"])
-        self.numCabinCrew = int(bookedFlightData["numCabinCrew"])
-        self.bagWeight = int(bookedFlightData["bagWeight"])
-        self.cargoWeight = int(bookedFlightData["cargoWeight"])
-        self.mailWeight = int(bookedFlightData["mailWeight"])
-        self.route = bookedFlightData["route"]
-        self.flightType = BookedFlight._convertFlightType(bookedFlightData["flightType"])
-
-    def writeIntoFile(self, f):
-        """Write the flight into a file."""
-        print("callsign=%s" % (self.callsign,), file=f)
-        date = self.departureTime.date()
-        print("date=%04d-%02d-%0d" % (date.year, date.month, date.day), file=f)
-        print("dep_airport=%s" % (self.departureICAO,), file=f)
-        print("dest_airport=%s" % (self.arrivalICAO,), file=f)
-        print("planecode=%s" % \
-              (BookedFlight.TYPE2TYPECODE[self.aircraftType],), file=f)
-        print("planetype=%s" % (self.aircraftTypeName,), file=f)
-        print("tail_nr=%s" % (self.tailNumber,), file=f)
-        print("passenger=%d" % (self.numPassengers,), file=f)
-        print("crew=%d" % (self.numCrew,), file=f)
-        print("bag=%d" % (self.bagWeight,), file=f)
-        print("cargo=%d" % (self.cargoWeight,), file=f)
-        print("mail=%d" % (self.mailWeight,), file=f)
-        print("flight_route=%s" % (self.route,), file=f)
-        departureTime = self.departureTime
-        print("departure_time=%02d\\:%02d\\:%02d" % \
-              (departureTime.hour, departureTime.minute, departureTime.second), file=f)
-        arrivalTime = self.arrivalTime
-        print("arrival_time=%02d\\:%02d\\:%02d" % \
-              (arrivalTime.hour, arrivalTime.minute, arrivalTime.second), file=f)
-        print("foglalas_id=%s" % ("0" if self.id is None else self.id,), file=f)
-
-    def _readAircraftType(self, f):
-        """Read the aircraft type from the given file."""
-        line = readline(f)
-        typeCode = line[:3]
-        self.aircraftType = self._decodeAircraftType(typeCode)
-        self.aircraftTypeName = line[3:]
-
-    def _decodeAircraftType(self, typeCode):
-        """Decode the aircraft type from the given typeCode."""
-        if typeCode in self.TYPECODE2TYPE:
-            return self.TYPECODE2TYPE[typeCode]
-        else:
-            raise Exception("Invalid aircraft type code: '" + typeCode + "'")
-
-    def __repr__(self):
-        """Get a representation of the flight."""
-        s = "<Flight: %s-%s, %s, %s-%s," % (self.departureICAO,
-                                           self.arrivalICAO,
-                                           self.route,
-                                           self.departureTime, self.arrivalTime)
-        s += " %d %s," % (self.aircraftType, self.tailNumber)
-        s += " pax=%d, crew=%d, bag=%d, cargo=%d, mail=%d" % \
-             (self.numPassengers, self.numCrew,
-              self.bagWeight, self.cargoWeight, self.mailWeight)
-        s += ">"
-        return s
 
 #------------------------------------------------------------------------------
 
@@ -768,62 +460,6 @@ class Register(RPCRequest):
 
 #------------------------------------------------------------------------------
 
-class Login(Request):
-    """A login request."""
-    iso88592decoder = codecs.getdecoder("iso-8859-2")
-
-    def __init__(self, callback, pilotID, password):
-        """Construct the login request with the given pilot ID and
-        password."""
-        super(Login, self).__init__(callback)
-
-        self._pilotID = pilotID
-        self._password = password
-
-    def run(self):
-        """Perform the login request."""
-        md5 = hashlib.md5()
-        md5.update(self._pilotID)
-        pilotID = md5.hexdigest()
-
-        md5 = hashlib.md5()
-        md5.update(self._password)
-        password = md5.hexdigest()
-
-        url = MAVA_BASE_URL + "/leker2.php?pid=%s&psw=%s" %  (pilotID, password)
-
-        result = Result()
-
-        f = urllib.request.urlopen(url, timeout = 10.0)
-
-        status = readline(f)
-        result.loggedIn = status == ".OK."
-
-        if result.loggedIn:
-            result.pilotID = self._pilotID
-            result.password = self._password
-            result.rank = "FO"
-            result.flights = []
-
-            result.pilotName = self.iso88592decoder(readline(f))[0]
-            result.exams = readline(f)
-
-            while True:
-                line = readline(f)
-                if not line or line == "#ENDPIREP": break
-
-                flight = BookedFlight(line)
-                flight.readFromWeb(f)
-                result.flights.append(flight)
-
-            result.flights.sort(key = lambda flight: flight.departureTime)
-
-        f.close()
-
-        return result
-
-#------------------------------------------------------------------------------
-
 class LoginRPC(RPCRequest):
     """An RPC-based login request."""
     @staticmethod
@@ -838,6 +474,7 @@ class LoginRPC(RPCRequest):
             result.rank = loginResult[1]
             result.types = loginResult[2]
             result.password = password
+            result.fleet = client.getFleet()
             flights = client.getFlights()
             result.flights = flights[0]
             result.reportedFlights = flights[1]
@@ -892,26 +529,6 @@ class GetEntryExamStatus(RPCRequest):
 
 #------------------------------------------------------------------------------
 
-class GetFleet(Request):
-    """Request to get the fleet from the website."""
-
-    def __init__(self, callback):
-        """Construct the fleet request."""
-        super(GetFleet, self).__init__(callback)
-
-    def run(self):
-        """Perform the login request."""
-        url = MAVA_BASE_URL + "/onlinegates_get.php"
-
-        f = urllib.request.urlopen(url, timeout = 10.0)
-        result = Result()
-        result.fleet = Fleet(f)
-        f.close()
-
-        return result
-
-#------------------------------------------------------------------------------
-
 class GetFleetRPC(RPCRequest):
     """Request to get the fleet from the website using RPC."""
     def __init__(self, client, callback):
@@ -923,37 +540,6 @@ class GetFleetRPC(RPCRequest):
         result = Result()
 
         result.fleet = self._client.getFleet()
-
-        return result
-
-#------------------------------------------------------------------------------
-
-class UpdatePlane(Request):
-    """Update the status of one of the planes in the fleet."""
-    def __init__(self, callback, tailNumber, status, gateNumber = None):
-        """Construct the request."""
-        super(UpdatePlane, self).__init__(callback)
-        self._tailNumber = tailNumber
-        self._status = status
-        self._gateNumber = gateNumber
-
-    def run(self):
-        """Perform the plane update."""
-        url = MAVA_BASE_URL + "/onlinegates_set.php"
-
-        status = Plane.status2str(self._status)
-
-        gateNumber = self._gateNumber if self._gateNumber else ""
-
-        data = urllib.parse.urlencode([("lajstrom", self._tailNumber),
-                                 ("status", status),
-                                 ("kapu", gateNumber)])
-
-        f = urllib.request.urlopen(url, data, timeout = 10.0)
-        line = readline(f)
-
-        result = Result()
-        result.success = line == "OK"
 
         return result
 
@@ -1094,84 +680,6 @@ class GetMETARs(Request):
 
 #------------------------------------------------------------------------------
 
-class SendPIREP(Request):
-    """A request to send a PIREP to the MAVA website."""
-    _latin2Encoder = codecs.getencoder("iso-8859-2")
-
-    def __init__(self, callback, pirep):
-        """Construct the sending of the PIREP."""
-        super(SendPIREP, self).__init__(callback)
-        self._pirep = pirep
-
-    def run(self):
-        """Perform the sending of the PIREP."""
-        url = MAVA_BASE_URL + "/malevacars.php"
-
-        pirep = self._pirep
-
-        data = {}
-        data["acarsdata"] = SendPIREP._latin2Encoder(pirep.getACARSText())[0]
-
-        bookedFlight = pirep.bookedFlight
-        data["foglalas_id"] = bookedFlight.id
-        data["repdate"] = bookedFlight.departureTime.date().strftime("%Y-%m-%d")
-        data["fltnum"] = bookedFlight.callsign
-        data["depap"] = bookedFlight.departureICAO
-        data["arrap"] = bookedFlight.arrivalICAO
-        data["pass"] = str(pirep.numPassengers)
-        data["crew"] = str(pirep.numCrew)
-        data["cargo"] = str(pirep.cargoWeight)
-        data["bag"] = str(pirep.bagWeight)
-        data["mail"] = str(pirep.mailWeight)
-
-        data["flttype"] = pirep.flightTypeText
-        data["onoff"] = "1" if pirep.online else "0"
-        data["bt_dep"] = util.getTimestampString(pirep.blockTimeStart)
-        data["bt_arr"] = util.getTimestampString(pirep.blockTimeEnd)
-        data["bt_dur"] = util.getTimeIntervalString(pirep.blockTimeEnd -
-                                                    pirep.blockTimeStart)
-        data["ft_dep"] = util.getTimestampString(pirep.flightTimeStart)
-        data["ft_arr"] = util.getTimestampString(pirep.flightTimeEnd)
-        data["ft_dur"] = util.getTimeIntervalString(pirep.flightTimeEnd -
-                                                    pirep.flightTimeStart)
-        data["timecomm"] = pirep.getTimeComment()
-        data["fuel"] = "%.2f" % (pirep.fuelUsed,)
-        data["dep_rwy"] = pirep.departureRunway
-        data["arr_rwy"] = pirep.arrivalRunway
-        data["wea_dep"] = pirep.departureMETAR
-        data["wea_arr"] = pirep.arrivalMETAR
-        data["alt"] = "FL%.0f" % (pirep.filedCruiseAltitude/100.0,)
-        if pirep.filedCruiseAltitude!=pirep.cruiseAltitude:
-            data["mod_alt"] = "FL%.0f" % (pirep.cruiseAltitude/100.0,)
-        else:
-            data["mod_alt"] = ""
-        data["sid"] = pirep.sid
-        data["navroute"] = pirep.route
-        data["star"] = pirep.getSTAR()
-        data["aprtype"] = pirep.approachType
-        data["diff"] = "2"
-        data["comment"] = SendPIREP._latin2Encoder(pirep.comments)[0]
-        data["flightdefect"] = SendPIREP._latin2Encoder(pirep.flightDefects)[0]
-        data["kritika"] = pirep.getRatingText()
-        data["flightrating"] = "%.1f" % (max(0.0, pirep.rating),)
-        data["distance"] = "%.3f" % (pirep.flownDistance,)
-        data["insdate"] = datetime.date.today().strftime("%Y-%m-%d")
-
-        postData = urllib.parse.urlencode(data)
-        f = urllib.request.urlopen(url, postData, timeout = 10.0)
-        try:
-            result = Result()
-            line = f.readline().strip()
-            print("PIREP result from website:", line)
-            result.success = line=="OK"
-            result.alreadyFlown = line=="MARVOLT"
-            result.notAvailable = line=="NOMORE"
-        finally:
-            f.close()
-
-        return result
-#------------------------------------------------------------------------------
-
 class SendPIREPRPC(RPCRequest):
     """A request to send a PIREP to the MAVA website via the RPC interface."""
 
@@ -1191,53 +699,6 @@ class SendPIREPRPC(RPCRequest):
         result.success = resultCode==rpc.Client.RESULT_OK
         result.alreadyFlown = resultCode==rpc.Client.RESULT_FLIGHT_ALREADY_REPORTED
         result.notAvailable = resultCode==rpc.Client.RESULT_FLIGHT_NOT_EXISTS
-
-        return result
-
-#------------------------------------------------------------------------------
-
-class SendACARS(Request):
-    """A request to send an ACARS to the MAVA website."""
-    _latin2Encoder = codecs.getencoder("iso-8859-2")
-
-    def __init__(self, callback, acars):
-        """Construct the request for the given PIREP."""
-        super(SendACARS, self).__init__(callback)
-        self._acars = acars
-
-    def run(self):
-        """Perform the sending of the ACARS."""
-        print("Sending the online ACARS")
-
-        url = MAVA_BASE_URL  + "/acars2/acarsonline.php"
-
-        acars = self._acars
-        bookedFlight = acars.bookedFlight
-
-        data = {}
-        data["pid"] = acars.pid
-        data["pilot"] = SendACARS._latin2Encoder(acars.pilotName)[0]
-
-        data["pass"] = str(bookedFlight.numPassengers)
-        data["callsign"] = bookedFlight.callsign
-        data["airplane"] = bookedFlight.aircraftTypeName
-        data["from"] = bookedFlight.departureICAO
-        data["to"] = bookedFlight.arrivalICAO
-        data["lajstrom"] = bookedFlight.tailNumber
-
-        data["block_time"] = acars.getBlockTimeText()
-        data["longitude"] = str(acars.state.longitude)
-        data["latitude"] = str(acars.state.latitude)
-        data["altitude"] = str(acars.state.altitude)
-        data["speed"] = str(acars.state.groundSpeed)
-
-        data["event"] = acars.getEventText()
-
-        f = urllib.request.urlopen(url, urllib.parse.urlencode(data), timeout = 10.0)
-        try:
-            result = Result()
-        finally:
-            f.close()
 
         return result
 
@@ -1319,7 +780,7 @@ class GetPIREP(RPCRequest):
         pirepData = self._client.getPIREP(self._flightID)
         print("pirepData:", pirepData)
 
-        bookedFlight = BookedFlight(self._flightID)
+        bookedFlight = BookedFlight(id = self._flightID)
         bookedFlight.setupFromPIREPData(pirepData)
 
         result.pirep = PIREP(None)
@@ -1436,9 +897,7 @@ class Handler(threading.Thread):
 
     def login(self, callback, pilotID, password):
         """Enqueue a login request."""
-        request = \
-          LoginRPC(self._rpcClient, callback, pilotID, password) \
-          if self._config.useRPC else Login(callback, pilotID, password)
+        request = LoginRPC(self._rpcClient, callback, pilotID, password)
 
         self._addRequest(request)
 
@@ -1448,18 +907,13 @@ class Handler(threading.Thread):
 
     def getFleet(self, callback):
         """Enqueue a fleet retrieval request."""
-        request = \
-          GetFleetRPC(self._rpcClient, callback,) if self._config.useRPC \
-          else GetFleet(callback)
+        request = GetFleetRPC(self._rpcClient, callback,)
         self._addRequest(request)
 
     def updatePlane(self, callback, tailNumber, status, gateNumber = None):
         """Update the status of the given plane."""
-        request = \
-          UpdatePlaneRPC(self._rpcClient, callback,
-                         tailNumber, status, gateNumber) \
-          if self._config.useRPC \
-          else UpdatePlane(callback, tailNumber, status, gateNumber)
+        request = UpdatePlaneRPC(self._rpcClient, callback,
+                                 tailNumber, status, gateNumber)
         self._addRequest(request)
 
     def getNOTAMs(self, callback, departureICAO, arrivalICAO):
@@ -1472,16 +926,12 @@ class Handler(threading.Thread):
 
     def sendPIREP(self, callback, pirep, update = False):
         """Send the given PIREP."""
-        request = \
-          SendPIREPRPC(self._rpcClient, callback, pirep, update) \
-          if self._config.useRPC else SendPIREP(callback, pirep)
+        request = SendPIREPRPC(self._rpcClient, callback, pirep, update)
         self._addRequest(request)
 
     def sendACARS(self, callback, acars):
         """Send the given ACARS"""
-        request = \
-          SendACARSRPC(self._rpcClient, callback, acars) if self._config.useRPC \
-          else SendACARS(callback, acars)
+        request = SendACARSRPC(self._rpcClient, callback, acars)
         self._addRequest(request)
 
     def sendBugReport(self, callback, summary, description, email):

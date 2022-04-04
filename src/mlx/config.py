@@ -258,7 +258,6 @@ class Config(object):
         #if secondaryInstallation:
         #    self._updateURL += "/exp"
         self._updateURLUpdated = True
-        self._useRPC = True
 
         self._messageTypeLevels = {}
 
@@ -669,18 +668,6 @@ class Config(object):
             self._updateURL = updateURL
             self._modified = True
 
-    @property
-    def useRPC(self):
-        """Determine if RPC calls should be used."""
-        return self._useRPC
-
-    @useRPC.setter
-    def useRPC(self, useRPC):
-        """Set whether RPC calls should be used."""
-        if useRPC!=self._useRPC:
-            self._useRPC = useRPC
-            self._modified = True
-
     def getChecklist(self, aircraftType):
         """Get the checklist for the given aircraft type."""
         return self._checklists[aircraftType]
@@ -797,8 +784,6 @@ class Config(object):
             self._updateURL = "https://" + self._updateURL[7:]
             self._updateURLUpdated = True
 
-        self._useRPC = self._getBoolean(config, "general", "useRPC", True)
-
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = \
                 Checklist.fromConfig(config, aircraftType)
@@ -890,9 +875,6 @@ class Config(object):
                    "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
         config.set("update", "urlUpdated", self._updateURLUpdated)
-
-        config.set("general", "useRPC",
-                   "yes" if self._useRPC else "no")
 
         config.add_section(Checklist.SECTION)
         config.add_section(ApproachCallouts.SECTION)
@@ -1029,7 +1011,6 @@ class Config(object):
         print("  autoUpdate:", self._autoUpdate)
         print("  updateURL:", self._updateURL)
         print("  updateURLUpdated:", self._updateURLUpdated)
-        print("  useRPC:", self._useRPC)
 
         print("  messageTypeLevels:")
         for (type, level) in self._messageTypeLevels.items():

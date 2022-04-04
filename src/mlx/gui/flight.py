@@ -941,7 +941,7 @@ class FlightSelectionPage(Page):
             bookedFlight = web.BookedFlight()
             try:
                 with open(fileName, "rt") as f:
-                    bookedFlight.readFromFile(f)
+                    bookedFlight.readFromFile(f, self._wizard._loginResult.fleet)
                 self.addFlight(bookedFlight)
             except Exception as e:
                 print("Failed to load flight:", util.utf2unicode(str(e)))
