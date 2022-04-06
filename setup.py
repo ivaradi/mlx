@@ -49,7 +49,8 @@ for language in ["en", "hu"]:
                        [os.path.join("locale", language, "LC_MESSAGES",
                                      "mlx.mo")]))
 
-rootFiles = ["logo.png", "conn_grey.png", "conn_red.png", "conn_green.png"]
+rootFiles = ["logo.png", "conn_grey.png", "conn_red.png", "conn_green.png",
+             "mavalogo.png"]
 if os.name!="nt":
     rootFiles.append("Microsoft.VC90.CRT.manifest")
 data_files.append(("", rootFiles))

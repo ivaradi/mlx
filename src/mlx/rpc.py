@@ -368,6 +368,22 @@ class BookedFlight(RPCObject):
             if self.arrivalTime<self.departureTime:
                 self.arrivalTime += datetime.timedelta(days = 1)
 
+    @property
+    def payload(self):
+        """Get the default payload of the flight."""
+        payload= (self.numCabinCrew - self.dowNumCabinCrew) *  \
+            const.WEIGHT_CABIN_CREW
+        payload += self.numPassengers * \
+            (const.WEIGHT_PASSENGER_CHARTER
+             if self.flightType==const.FLIGHTTYPE_CHARTER
+             else const.WEIGHT_PASSENGER)
+        payload += self.numChildren * const.WEIGHT_CHILD
+        payload += self.numInfants * const.WEIGHT_INFANT
+        payload += self.bagWeight
+        payload += self.cargoWeight
+        payload += self.mailWeight
+        return payload
+
     def readFromFile(self, f, fleet):
         """Read the data of the flight from a file via the given file
         object."""

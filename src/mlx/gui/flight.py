@@ -702,47 +702,62 @@ class FlightSelectionPage(Page):
 
         print("DPI", context.get_dpi_x(), context.get_dpi_y())
 
+        logoSurface = cairo.ImageSurface.create_from_png(
+            os.path.join(wizard.gui.programDirectory, "mavalogo.png"))
+
         scale = context.get_dpi_x() / 72.0
 
         cr = context.get_cairo_context()
 
         cr.set_antialias(cairo.ANTIALIAS_GRAY)
 
-        cr.set_source_rgb(0.0, 0.0, 0.0)
-        cr.set_line_width(2.0 * scale)
-        cr.rectangle(0, 0, context.get_width(), context.get_height())
-        cr.stroke()
-
         pcr = context.create_pango_context()
 
+        delimiter = "*" * 70
+
         layout = Pango.Layout(pcr)
-        layout.set_text("Malév VA official briefing")
-        font = Pango.FontDescription("sans")
-        font.set_size(int(32 * Pango.SCALE))
-        font.set_weight(Pango.Weight.NORMAL)
+
+        font = Pango.FontDescription("Courier")
+        font.set_size(int(12 * Pango.SCALE))
+        font.set_weight(Pango.Weight.THIN)
         layout.set_font_description(font)
 
+        fontBold = Pango.FontDescription("Courier")
+        fontBold.set_size(int(12 * Pango.SCALE))
+        fontBold.set_weight(Pango.Weight.BOLD)
+
+        layout.set_text(delimiter)
         (_ink, logical) = layout.get_extents()
         width = logical.width / Pango.SCALE
 
+        x0 = (context.get_width() - width)/2.0
+
+        logoWidth = width / 3
+        logoScale = logoSurface.get_width() / logoWidth
+
         y = 25 * scale
 
-        cr.move_to((context.get_width() - width)/2.0, y)
+        source = cr.get_source()
+        logoSurface.set_device_scale(logoScale, logoScale)
+        cr.set_source_surface(logoSurface, x0, y)
+        cr.rectangle(x0, y, logoSurface.get_width() / logoScale,
+                     logoSurface.get_height() / logoScale)
+        cr.fill()
+        cr.set_source(source)
+
+        y += logoSurface.get_height() / logoScale
+        y += 12 * scale
+
+        cr.move_to(x0, y)
         cr.set_line_width(0.1 * scale)
         PangoCairo.layout_path(cr, layout)
         cr.stroke_preserve()
         cr.fill()
 
         y += logical.height / Pango.SCALE
-        y += 6 * scale
+        y += 4 * scale
 
-        layout = Pango.Layout(pcr)
-        layout.set_text("%s (%s) részére" %
-                        (loginResult.pilotName, loginResult.pilotID))
-        font = Pango.FontDescription("sans")
-        font.set_size(int(16 * Pango.SCALE))
-        font.set_weight(Pango.Weight.MEDIUM)
-        layout.set_font_description(font)
+        layout.set_text("F L I G H T  B R I E F I N G  S H E E T")
         (_ink, logical) = layout.get_extents()
         width = logical.width / Pango.SCALE
 
@@ -755,114 +770,391 @@ class FlightSelectionPage(Page):
         y += logical.height / Pango.SCALE
         y += 4 * scale
 
-        cr.move_to(0, y)
-        cr.line_to(context.get_width(), y)
-        cr.set_line_width(1.0 * scale)
-        cr.stroke()
+        layout.set_text(delimiter)
+        (_ink, logical) = layout.get_extents()
+        width = logical.width / Pango.SCALE
 
-        y += 20 * scale
+        x2 = x0 + width * 0.4
 
-        font = Pango.FontDescription("sans")
-        font.set_size(int(7 * Pango.SCALE))
-        font.set_weight(Pango.Weight.ULTRALIGHT)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-        table = []
-        table.append(("Flight", flight.callsign))
-        table.append(("Date", flight.date))
-        table.append(("Aircraft",
-                      aircraftNames[flight.aircraftType] + ", Lajstrom: " +
-                      flight.tailNumber))
-        table.append(("DOW",
-                      str(acft.getClass(flight.aircraftType).dow) + " kgs"))
-        table.append(("From", flight.departureICAO))
-        table.append(("To", flight.arrivalICAO))
-        table.append(("ETD (UTC)", flight.departureTime.strftime("%H:%M:%S")))
-        table.append(("ETA (UTC)", flight.arrivalTime.strftime("%H:%M:%S")))
-        table.append(("Crew", str(flight.numCrew)))
-        table.append(("Pass", str(flight.numPassengers)))
-        table.append(("Bag", str(flight.bagWeight)))
-        table.append(("Mail", str(flight.mailWeight)))
-        table.append(("Route", flight.route))
+        y += logical.height / Pango.SCALE
+        y += 5 * scale
 
-        tableY = y
-        tableX = 15 * scale
-        labelFill = 5 * scale
-        labelValueFill = 25 * scale
-        valueFill = 5 * scale
-        labelX = tableX + labelFill
-        tableWidth = context.get_width() * 55 / 100 - tableX
+        layout.set_text("AIRCRAFT: ")
+        layout.set_font_description(fontBold)
+        (_ink, logical) = layout.get_extents()
+        x1 = x0 + logical.width / Pango.SCALE
 
-        labelLayouts = []
-        maxLabelWidth = 0
-        totalHeight = 0
-        for (label, value) in table:
-            labelLayout = Pango.Layout(pcr)
-            labelLayout.set_text(label)
-            labelLayout.set_font_description(font)
+        layout.set_text("FLIGHT:")
+        layout.set_font_description(fontBold)
 
-            (_ink, logical) = labelLayout.get_extents()
-            maxLabelWidth = max(maxLabelWidth, logical.width)
-            labelHeight = logical.height
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-            valueLayout = Pango.Layout(pcr)
-            valueLayout.set_text(value)
-            valueLayout.set_font_description(font)
+        layout.set_text("%s %s-%s" % (flight.callsign,
+                                      flight.departureICAO,
+                                      flight.arrivalICAO))
 
-            labelLayouts.append((labelLayout, valueLayout, labelHeight))
+        layout.set_font_description(font)
 
-        maxLabelWidth = maxLabelWidth / Pango.SCALE
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-        valueX = labelX + labelValueFill + maxLabelWidth
+        layout.set_text("DATE:")
+        layout.set_font_description(fontBold)
+        (_ink, logical) = layout.get_extents()
+        x3 = x2 + logical.width / Pango.SCALE
 
-        layouts = []
-        valueWidth = tableWidth - \
-            (labelFill + maxLabelWidth + labelValueFill + valueFill)
-        for (labelLayout, valueLayout, labelHeight) in labelLayouts:
-            valueLayout.set_width(int(valueWidth * Pango.SCALE))
+        cr.move_to(x2, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-            (_ink, logical) = valueLayout.get_extents()
-            valueHeight = logical.height
+        layout.set_text(" %s" % (flight.date,))
+        layout.set_font_description(font)
 
-            height = float(max(labelHeight, valueHeight))/Pango.SCALE
-            layouts.append((labelLayout, valueLayout, height))
+        cr.move_to(x3, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-        rowIndex = 0
-        for (labelLayout, valueLayout, height) in layouts:
-            if (rowIndex%2)==0:
-                cr.set_source_rgb(0.85, 0.85, 0.85)
-            else:
-                cr.set_source_rgb(0.9, 0.9, 0.9)
+        layout.set_text("  %02d:%02d" % (flight.departureTime.hour,
+                                         flight.departureTime.minute))
+        (_ink, logical) = layout.get_extents()
+        x5 = x0 + width - logical.width / Pango.SCALE
+        cr.move_to(x5, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-            cr.rectangle(tableX, y-2*scale, tableWidth, height + 4 * scale)
-            cr.fill()
+        layout.set_text("ETD (UTC):")
+        layout.set_font_description(fontBold)
+        (_ink, logical) = layout.get_extents()
+        x4 = x5 - logical.width / Pango.SCALE
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
-            cr.set_source_rgb(0.0, 0.0, 0.0)
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
 
-            cr.move_to(labelX, y)
-            cr.set_line_width(0.1)
-            PangoCairo.layout_path(cr, labelLayout)
+        layout.set_text("AIRCRAFT:")
+        layout.set_font_description(fontBold)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(aircraftNames[flight.aircraftType].upper())
+        layout.set_font_description(font)
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("  %02d:%02d" % (flight.arrivalTime.hour,
+                                         flight.arrivalTime.minute))
+        cr.move_to(x5, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("ETA (UTC):")
+        layout.set_font_description(fontBold)
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("CREW:")
+        layout.set_font_description(fontBold)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("%d + %d" % (flight.numCockpitCrew,
+                                     flight.numCabinCrew))
+        layout.set_font_description(font)
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("DOW:")
+        layout.set_font_description(fontBold)
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("%d KG" % (flight.dow,))
+        layout.set_font_description(font)
+        (_ink, logical) = layout.get_extents()
+        x5 = x0 + width - logical.width / Pango.SCALE
+        cr.move_to(x5, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("PASSENGERS")
+        layout.set_font_description(fontBold)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("CARGO HOLDS")
+        layout.set_font_description(fontBold)
+        cr.move_to(x2, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("TOTAL")
+        layout.set_font_description(fontBold)
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("CHILDREN:")
+        layout.set_font_description(font)
+        (_ink, logical) = layout.get_extents()
+        x1 = x0 + logical.width / Pango.SCALE
+
+        layout.set_text("CARGO:")
+        layout.set_font_description(font)
+        (_ink, logical) = layout.get_extents()
+        x3 = x2 + logical.width / Pango.SCALE
+
+        layout.set_text("ADULTS:")
+        layout.set_font_description(font)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %3d" % (flight.numPassengers,))
+        layout.set_font_description(font)
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("BAGS:")
+        layout.set_font_description(font)
+        cr.move_to(x2, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %5d KG" % (flight.bagWeight,))
+        layout.set_font_description(font)
+        cr.move_to(x3, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("CHILDREN:")
+        layout.set_font_description(font)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %3d" % (flight.numChildren,))
+        layout.set_font_description(font)
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("MAIL:")
+        layout.set_font_description(font)
+        cr.move_to(x2, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %5d KG" % (flight.mailWeight,))
+        layout.set_font_description(font)
+        cr.move_to(x3, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("PAYLOAD:")
+        layout.set_font_description(font)
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("%5d KG" % (flight.payload,))
+        layout.set_font_description(font)
+        (_ink, logical) = layout.get_extents()
+        x5 = x0 + width - logical.width / Pango.SCALE
+        cr.move_to(x5, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("INFANTS:")
+        layout.set_font_description(font)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %3d" % (flight.numInfants,))
+        layout.set_font_description(font)
+        cr.move_to(x1, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("CARGO:")
+        layout.set_font_description(font)
+        cr.move_to(x2, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text(" %5d KG" % (flight.cargoWeight,))
+        layout.set_font_description(font)
+        cr.move_to(x3, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("ZFW:")
+        layout.set_font_description(font)
+        cr.move_to(x4, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        layout.set_text("%5d KG" % (flight.dow + flight.payload,))
+        layout.set_font_description(font)
+        (_ink, logical) = layout.get_extents()
+        x5 = x0 + width - logical.width / Pango.SCALE
+        cr.move_to(x5, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        y += logical.height / Pango.SCALE
+        y += logical.height / Pango.SCALE
+        y += 4 * scale
+
+        layout.set_text("ROUTE:")
+        layout.set_font_description(fontBold)
+        (_ink, logical) = layout.get_extents()
+        x1 = x0 + logical.width / Pango.SCALE
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
+
+        routeWords = flight.route.split(" ")
+        layout.set_font_description(font)
+
+        startWord = 0
+        textWidth = width - (x1 - x0)
+        while startWord<len(routeWords):
+            endWord = startWord + 1
+            while endWord<=len(routeWords):
+                layout.set_text(" %s" % (" ".join(routeWords[startWord:endWord]),))
+                (_ink, logical) = layout.get_extents()
+                if textWidth<logical.width / Pango.SCALE:
+                    endWord -= 1
+                    if endWord<=startWord:
+                        endWord = startWord + 1
+                    break
+                endWord += 1
+
+            layout.set_text(" %s" % (" ".join(routeWords[startWord:endWord]),))
+            cr.move_to(x1, y)
+            cr.set_line_width(0.1 * scale)
+            PangoCairo.layout_path(cr, layout)
             cr.stroke_preserve()
             cr.fill()
 
-            cr.move_to(valueX, y)
-            cr.set_line_width(0.1)
-            PangoCairo.layout_path(cr, valueLayout)
-            cr.stroke_preserve()
-            cr.fill()
+            startWord = endWord
 
-            y += height
+            y += logical.height / Pango.SCALE
             y += 4 * scale
 
-            rowIndex += 1
+        y += logical.height / Pango.SCALE
 
-        cr.set_source_rgb(0.0, 0.0, 0.0)
-        cr.set_line_width(1.0 * scale)
-        cr.rectangle(tableX, tableY - 2 * scale, tableWidth, y - tableY)
-        cr.stroke()
-
-        cr.move_to(valueX - 5 * scale, tableY - 2 * scale)
-        cr.line_to(valueX - 5 * scale, y - 2 * scale)
-        cr.stroke()
+        layout.set_text(delimiter)
+        layout.set_font_description(font)
+        cr.move_to(x0, y)
+        cr.set_line_width(0.1 * scale)
+        PangoCairo.layout_path(cr, layout)
+        cr.stroke_preserve()
+        cr.fill()
 
     def _deleteClicked(self, button):
         """Called when the Delete flight button is clicked."""

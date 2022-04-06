@@ -104,6 +104,11 @@ class GUI(fs.ConnectionListener):
 
         self.toRestart = False
 
+    @property
+    def programDirectory(self):
+        """Get the program directory."""
+        return self._programDirectory
+
     def build(self, iconDirectory):
         """Build the GUI."""
 
