@@ -8,7 +8,7 @@ import os
 #
 #---------------------------------------------------------------------------------------
 
-MAVA_BASE_URL = os.environ.get("MAVA_BASE_URL", "https://new.virtualairlines.hu")
+MAVA_BASE_URL = os.environ.get("MAVA_BASE_URL", "https://virtualairlines.hu")
 
 #-------------------------------------------------------------------------------
 
