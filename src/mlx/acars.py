@@ -57,7 +57,10 @@ class ACARS(object):
         attrs["longitude"] = state.longitude
         attrs["latitude"] = state.latitude
         attrs["pilotName"] = self.pilotName
-        attrs["numPassengers"] = bookedFlight.numPassengers
+        attrs["numPassengers"] = \
+            bookedFlight.numPassengers + \
+            bookedFlight.numChildren + \
+            bookedFlight.numInfants
         attrs["blockTime"] = self.getBlockTimeText()
         attrs["callsign"] = bookedFlight.callsign
         attrs["aircraftTypeName"] = bookedFlight.aircraftTypeName
