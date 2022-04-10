@@ -1734,7 +1734,7 @@ class ZiboB737NGModel(B737Model):
                                         (TYPE_FLOAT_ARRAY, 2))
         self._cgIndex = len(data)
         self._addDatarefWithIndexMember(data,
-                                        "laminar/B738/fms/calc_to_cg",
+                                        "laminar/B738/tab/cg_pos",
                                         TYPE_FLOAT)
         self._wingHeatIndex = len(data)
         self._addDatarefWithIndexMember(data,
