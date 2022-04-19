@@ -621,7 +621,10 @@ class GetNOTAMs(Request):
             url = "https://pilotweb.nas.faa.gov/PilotWeb/notamRetrievalByICAOAction.do?method=displayByICAOs&formatType=ICAO&retrieveLocId=%s&reportType=RAW&actionType=notamRetrievalByICAOs" % \
               (icao.upper(),)
 
-            f = urllib.request.urlopen(url, timeout = 10.0, cafile=certifi.where())
+            request = urllib.request.Request(url, headers = {
+                "cookie": "akamai_pilotweb_access=true;"
+            });
+            f = urllib.request.urlopen(request, timeout = 10.0, cafile=certifi.where())
             try:
                 data = f.read(16384)
                 while data:
