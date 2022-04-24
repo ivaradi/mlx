@@ -945,9 +945,13 @@ class Simulator(object):
         zuluSeconds = data[1]
         if self._lastZuluSeconds is not None and \
            zuluSeconds<self._lastZuluSeconds:
-            print("xplane.Simulator._getTimestamp: Zulu seconds have gone backwards (%f -> %f), increasing day offset" % \
-              (self._lastZuluSeconds, zuluSeconds))
-            self._timestampDaysOffset += 1
+            diff = self._lastZuluSeconds - zuluSeconds
+            print("xplane.Simulator._getTimestamp: Zulu seconds have gone backwards: %f -> %f, diff: %f" % \
+                  (self._lastZuluSeconds, zuluSeconds, diff))
+            if diff>23*60*60:
+                self._timestampDaysOffset += 1
+            else:
+                zuluSeconds = self._lastZuluSeconds
 
         self._lastZuluSeconds = zuluSeconds
 
