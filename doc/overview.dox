@@ -210,7 +210,7 @@
  *    may be some other member variables or functions that should be
  * -# \c src/mlx/acft.py: there is a dictionary named \c _classes
  *    towards the end of the file. Add the type to it.
- * -# \c src/mlx/rpc.py: the \ref mlx.web.BookedFlight class contains
+ * -# \c src/mlx/rpc.py: the \ref mlx.rpc.BookedFlight class contains
  *    two dictionaries, the mapping between the types and the values the MAVA
  *    website uses to identify the type. Add the appropriate values
  *    here.
