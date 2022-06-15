@@ -36,8 +36,7 @@ import certifi
 # thread then takes the requests one by one, and executes them.
 #
 # This module also defines some data classes the contents of which are
-# retrieved or sent via HTTP. \ref BookedFlight contains data of a flight
-# booked on the MAVA website, \ref Fleet and \ref Plane represents the MAVA
+# retrieved or sent via HTTP. \ref Fleet and \ref Plane represents the MAVA
 # fleet and the gates at Ferihegy and \ref NOTAM is a NOTAM.
 
 #---------------------------------------------------------------------------------------
