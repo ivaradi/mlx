@@ -1296,6 +1296,10 @@ class MZFWChecker(WeightChecker):
 
 class NavLightsChecker(PatientFaultChecker):
     """Check if the navigational lights are used properly."""
+    def __init__(self):
+        """Construct the NAV lights checker."""
+        super(NavLightsChecker, self).__init__(timeout = 5.0)
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return flight.stage!=const.STAGE_BOARDING and \
@@ -1564,6 +1568,10 @@ class SpeedChecker(StateChecker):
 
 class StrobeLightsChecker(PatientFaultChecker):
     """Check if the strobe lights are used properly."""
+    def __init__(self):
+        """Construct the Strobe lights checker."""
+        super(StrobeLightsChecker, self).__init__(timeout = 5.0)
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return state.strobeLightsOn is not None and \
