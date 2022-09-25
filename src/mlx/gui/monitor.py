@@ -190,7 +190,7 @@ class MonitorWindow(Gtk.Window):
         table.attach(label, 6, 7, 6, 7)
         table.attach(self._position, 7, 10, 6, 7)
 
-        (label, self._elevatorTrim) = self._createLabeledEntry("Trim:", 5)
+        (label, self._elevatorTrim) = self._createLabeledEntry("Trim:", 7)
         table.attach(label, 10, 11, 6, 7)
         table.attach(self._elevatorTrim, 11, 12, 6, 7)
 
