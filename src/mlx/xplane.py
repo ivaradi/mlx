@@ -1757,6 +1757,27 @@ class ZiboB737NGModel(B737Model):
                                         "laminar/B738/annunciator/speedbrake_armed",
                                         TYPE_FLOAT)
 
+        self._apCMDStatusIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/autopilot/cmd_a_status",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/autopilot/cmd_b_status",
+                                        TYPE_FLOAT)
+
+        self._apHeadingIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/autopilot/hdg_sel_status",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/hud/hdg_bug_tape",
+                                        TYPE_FLOAT)
+
+        self._apAltitudeIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/autopilot/alt_hld_status",
+                                        TYPE_FLOAT)
+
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state."""
@@ -1795,6 +1816,17 @@ class ZiboB737NGModel(B737Model):
                           data[self._eng2HeatIndex]!=0
 
         state.spoilersArmed = data[self._spoilersArmedIndex]!=0
+
+        state.apMaster = \
+            data[self._apCMDStatusIndex]==1 or \
+            data[self._apCMDStatusIndex+1]==1
+
+        mcpHeadingHoldStatus = data[self._apHeadingIndex]
+        mcpHeadingBugStatus = data[self._apHeadingIndex+1]
+        state.apHeadingHold = mcpHeadingHoldStatus!=0 and \
+            (mcpHeadingBugStatus<=0.5 and mcpHeadingBugStatus>=-0.5)
+
+        state.apAltitudeHold = data[self._apAltitudeIndex]==1
 
         return state
 
