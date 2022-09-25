@@ -1490,7 +1490,7 @@ class AircraftModel(object):
 
         state.cog = data[self._monidx_cog]
 
-        state.xpdrC = data[self._monidx_xpdrC]==2
+        state.xpdrC = data[self._monidx_xpdrC]>=2
         state.autoXPDR = False
 
         state.apMaster = data[self._monidx_apMaster]==2
@@ -2002,6 +2002,84 @@ class FJSDH8DModel(DH8DModel):
 
 #------------------------------------------------------------------------------
 
+class FJSDH8DXPModel(DH8DModel):
+    """Model handler for the FlyJSim Q4XP."""
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return aircraft.type==const.AIRCRAFT_DH8D and \
+          description.find("Dash 8 Q400")!=-1 and \
+          author=="FlyJSim" and tailnum=="N62890"
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "X-Plane/FlyJSim Q4XP"
+
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super(FJSDH8DXPModel, self).addMonitoringData(data, fsType)
+
+        self._speedBrakeIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/spoiler1_deg",
+                                        (TYPE_FLOAT_ARRAY, 32))
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/spoiler2_deg",
+                                        (TYPE_FLOAT_ARRAY, 32))
+
+        self._gearIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "FJS/Q4XP/Manips/GearDeployHandle_Ctl",
+                                        (TYPE_FLOAT_ARRAY, 1))
+
+        self._apIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "FJS/Q4XP/FMA/roll_act",
+                                        TYPE_INT)
+        self._addDatarefWithIndexMember(data,
+                                        "FJS/Q4XP/FMA/pitch_act",
+                                        TYPE_INT)
+
+        self._propPitchIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/engines/prop_pitch_deg",
+                                        (TYPE_FLOAT_ARRAY, 2))
+
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then invert the pitot heat state."""
+        state = super(FJSDH8DXPModel, self).getAircraftState(aircraft,
+                                                             timestamp,
+                                                             data)
+        state.antiCollisionLightsOn = \
+          state.antiCollisionLightsOn or state.strobeLightsOn
+        state.cog = (state.cog * 41.656436697 + 27.586779769)/100.0
+
+        # It seems that N1 does not always go down to 0 properly
+        # (maybe due to winds?)
+        state.n1 = [0 if n1<2.0 else n1 for n1 in state.n1]
+
+        state.spoilersExtension = \
+            sum(data[self._speedBrakeIndex] + data[self._speedBrakeIndex+1])/4
+        if state.spoilersExtension<40:
+            state.spoilersExtension = 0.0
+
+        state.gearControlDown = data[self._gearIndex][0]>0.5
+
+        state.apHeadingHold = data[self._apIndex]==4
+        state.apAltitudeHold = data[self._apIndex+1] in [4, 5]
+
+        state.reverser = [p<=-12.0 for p in data[self._propPitchIndex]]
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class CRJ2Model(GenericAircraftModel):
     """Generic model for the Bombardier CRJ-200 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE, const.FUELTANK_RIGHT]
@@ -2179,6 +2257,7 @@ AircraftModel.registerSpecial(LevelUpB736Model)
 AircraftModel.registerSpecial(LevelUpB737Model)
 AircraftModel.registerSpecial(LevelUpB738Model)
 AircraftModel.registerSpecial(FJSDH8DModel)
+AircraftModel.registerSpecial(FJSDH8DXPModel)
 AircraftModel.registerSpecial(FelisT154Model)
 
 #------------------------------------------------------------------------------
