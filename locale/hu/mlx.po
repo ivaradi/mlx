@@ -1301,6 +1301,9 @@ msgstr "Repült táv:"
 msgid "finish_fuel"
 msgstr "Elhasznált üzemanyag:"
 
+msgid "finish_type"
+msgstr "Járat típusa:"
+
 msgid "finish_online"
 msgstr "_Online repülés"
 
