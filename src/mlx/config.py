@@ -259,6 +259,9 @@ class Config(object):
         #    self._updateURL += "/exp"
         self._updateURLUpdated = True
 
+        self._xplaneRemote = False
+        self._xplaneAddress = ""
+
         self._messageTypeLevels = {}
 
         self._checklists = {}
@@ -668,6 +671,30 @@ class Config(object):
             self._updateURL = updateURL
             self._modified = True
 
+    @property
+    def xplaneRemote(self):
+        """Indicate if X-Plane should be accessed remotely."""
+        return self._xplaneRemote
+
+    @xplaneRemote.setter
+    def xplaneRemote(self, xplaneRemote):
+        """Set if X-Plane should be accessed remotely."""
+        if xplaneRemote!=self._xplaneRemote:
+            self._xplaneRemote = xplaneRemote
+            self._modified = True
+
+    @property
+    def xplaneAddress(self):
+        """Get the address of the machine running X-Plane"""
+        return self._xplaneAddress
+
+    @xplaneAddress.setter
+    def xplaneAddress(self, xplaneAddress):
+        """Set the address of the machine running X-Plane."""
+        if xplaneAddress!=self._xplaneAddress:
+            self._xplaneAddress = xplaneAddress
+            self._modified = True
+
     def getChecklist(self, aircraftType):
         """Get the checklist for the given aircraft type."""
         return self._checklists[aircraftType]
@@ -798,6 +825,11 @@ class Config(object):
         self._defaultMSFS = self._getBoolean(config, "general",
                                              "defaultMSFS", os.name=="nt")
 
+        self._xplaneRemote = self._getBoolean(config, "general",
+                                              "xplaneRemote", False)
+        self._xplaneAddress = self._get(config, "general",
+                                        "xplaneAddress", "")
+
         self._modified = False
 
     def save(self):
@@ -850,6 +882,10 @@ class Config(object):
 
         config.set("general", "defaultMSFS",
                    "yes" if self._defaultMSFS else "no")
+
+        config.set("general", "xplaneRemote",
+                   "yes" if self._xplaneRemote else "no")
+        config.set("general", "xplaneAddress", self._xplaneAddress)
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:
@@ -1001,6 +1037,8 @@ class Config(object):
         print("  pirepAutoSave:", self._pirepAutoSave)
 
         print("  defaultMSFS:", self._defaultMSFS)
+        print("  xplaneRemote:", self._xplaneRemote)
+        print("  xplaneAddress:", self._xplaneAddress)
 
         print("  enableSounds:", self._enableSounds)
 

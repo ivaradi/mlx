@@ -276,6 +276,9 @@ class Preferences(Gtk.Dialog):
 
         self._updateURL.set_text(config.updateURL)
 
+        self._xplaneRemote.set_active(config.xplaneRemote)
+        self._xplaneAddress.set_text(config.xplaneAddress)
+
         self._settingFromConfig = False
 
     def _toConfig(self, config):
@@ -319,6 +322,9 @@ class Preferences(Gtk.Dialog):
 
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
+
+        config.xplaneRemote = self._xplaneRemote.get_active()
+        config.xplaneAddress = self._xplaneAddress.get_text()
 
     def _buildGeneral(self):
         """Build the page for the general settings."""
@@ -792,8 +798,12 @@ class Preferences(Gtk.Dialog):
         mainBox = Gtk.VBox()
         mainAlignment.add(mainBox)
 
+        frame = Gtk.Frame.new()
+
         self._autoUpdate = Gtk.CheckButton(xstr("prefs_update_auto"))
-        mainBox.pack_start(self._autoUpdate, False, False, 4)
+        frame.set_label_widget(self._autoUpdate)
+        frame.set_label_align(0.025, 0.5)
+        mainBox.pack_start(frame, False, False, 4)
 
         self._autoUpdate.set_use_underline(True)
         self._autoUpdate.connect("toggled", self._autoUpdateToggled)
@@ -801,7 +811,6 @@ class Preferences(Gtk.Dialog):
         self._warnedAutoUpdate = False
 
         updateURLBox = Gtk.HBox()
-        mainBox.pack_start(updateURLBox, False, False, 4)
         label = Gtk.Label(xstr("prefs_update_url"))
         label.set_use_underline(True)
         updateURLBox.pack_start(label, False, False, 4)
@@ -813,6 +822,40 @@ class Preferences(Gtk.Dialog):
         self._updateURL.connect("changed", self._updateURLChanged)
         updateURLBox.pack_start(self._updateURL, True, True, 4)
 
+        updateURLBox.set_margin_top(6)
+        updateURLBox.set_margin_bottom(6)
+        updateURLBox.set_margin_left(4)
+        updateURLBox.set_margin_right(4)
+        frame.add(updateURLBox)
+
+        frame = Gtk.Frame.new()
+        self._xplaneRemote = Gtk.CheckButton(xstr("prefs_xplane_remote"))
+        frame.set_label_widget(self._xplaneRemote)
+        frame.set_label_align(0.025, 0.5)
+        mainBox.pack_start(frame, False, False, 4)
+
+        self._xplaneRemote.set_use_underline(True)
+        self._xplaneRemote.set_tooltip_text(xstr("prefs_xplane_remote_tooltip"))
+        self._xplaneRemote.connect("toggled", self._xplaneRemoteToggled)
+
+        xplaneAddressBox = Gtk.HBox()
+        label = Gtk.Label(xstr("prefs_xplane_address"))
+        label.set_use_underline(True)
+        xplaneAddressBox.pack_start(label, False, False, 4)
+
+        self._xplaneAddress = Gtk.Entry()
+        label.set_mnemonic_widget(self._xplaneAddress)
+        self._xplaneAddress.set_width_chars(40)
+        self._xplaneAddress.set_tooltip_text(xstr("prefs_xplane_address_tooltip"))
+        self._xplaneAddress.connect("changed", self._xplaneAddressChanged)
+        xplaneAddressBox.pack_start(self._xplaneAddress, True, True, 4)
+
+        xplaneAddressBox.set_margin_top(6)
+        xplaneAddressBox.set_margin_bottom(6)
+        xplaneAddressBox.set_margin_left(4)
+        xplaneAddressBox.set_margin_right(4)
+        frame.add(xplaneAddressBox)
+
         return mainAlignment
 
     def _setOKButtonSensitivity(self):
@@ -823,6 +866,10 @@ class Preferences(Gtk.Dialog):
             sensitive = result.scheme!="" and (result.netloc + result.path)!=""
         except:
             pass
+
+        if sensitive:
+            sensitive = not self._xplaneRemote.get_active() or \
+                len(self._xplaneAddress.get_text())>0
 
         okButton = self.get_widget_for_response(Gtk.ResponseType.ACCEPT)
         okButton.set_sensitive(sensitive)
@@ -844,3 +891,10 @@ class Preferences(Gtk.Dialog):
         """Called when the update URL is changed."""
         self._setOKButtonSensitivity()
 
+    def _xplaneRemoteToggled(self, button):
+        """Called when the X-Plane remote access checkbox is toggled."""
+        self._setOKButtonSensitivity()
+
+    def _xplaneAddressChanged(self, entry):
+        """Called when the X-Plane address is changed."""
+        self._setOKButtonSensitivity()

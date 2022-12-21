@@ -1890,6 +1890,22 @@ msgstr ""
 "Az URL, ahol a frissítéseket keresi a program. Csak akkor változtasd meg, "
 "ha biztos vagy a dolgodban!"
 
+msgid "prefs_xplane_remote"
+msgstr "X-Plane _távoli elérése"
+
+msgid "prefs_xplane_remote_tooltip"
+msgstr ""
+"Ha ez ki van választva, és X-Plane-t használsz, a logger a lent megadott "
+"névvel vagy IP címmel rendelkező másik gépen futó X-Plane-hez fog "
+"kapcsolódni."
+
+msgid "prefs_xplane_address"
+msgstr "_Cím vagy név:"
+
+msgid "prefs_xplane_address_tooltip"
+msgstr ""
+"Add meg az X-Plane-t futtató gép IP címét vagy nevét."
+
 msgid "prefs_use_rpc"
 msgstr "_RPC hívások"
 

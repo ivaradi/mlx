@@ -1856,7 +1856,7 @@ msgid "prefs_sounds_checklistHotkeyShift_tooltip"
 msgstr "If checked, the Shift key should be pressed together with the main key."
 
 msgid "prefs_update_auto"
-msgstr "Update the program auto_matically"
+msgstr "Update the program automaticall_y"
 
 msgid "prefs_update_auto_tooltip"
 msgstr ""
@@ -1877,6 +1877,23 @@ msgid "prefs_update_url_tooltip"
 msgstr ""
 "The URL from which to download the updates. Change this only if you "
 "know what you are doing!"
+
+msgid "prefs_xplane_remote"
+msgstr "Connect to X-Plane _remotely"
+
+msgid "prefs_xplane_remote_tooltip"
+msgstr ""
+"If selected and you are usinb X-Plane, the logger will connect to X-Plane "
+"running on another machine, whose IP address or domain name should be "
+"entered below."
+
+msgid "prefs_xplane_address"
+msgstr "_Address or name:"
+
+msgid "prefs_xplane_address_tooltip"
+msgstr ""
+"Enter the IP address or the domain name of the machine, "
+"where X-Plane runs."
 
 msgid "prefs_use_rpc"
 msgstr "Use _RPC calls"

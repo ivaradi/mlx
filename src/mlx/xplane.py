@@ -493,6 +493,14 @@ class Handler(threading.Thread):
         Returns True if the connection has been established, False if it was
         not due to no longer requested.
         """
+        config = self._connectionListener.config
+        if config.xplaneRemote:
+            address = "tcp:" + config.xplaneAddress
+        else:
+            address = "local"
+
+        print("xplane.Handler._connect: address:", address)
+
         while self._connectionRequested:
             if attempts>=self.NUM_CONNECTATTEMPTS:
                 self._connectionRequested = False
@@ -506,7 +514,7 @@ class Handler(threading.Thread):
 
             try:
                 attempts += 1
-                self._xplane.connect()
+                self._xplane.connect(address = address)
 
                 (xplaneVersion, xplmVersion, xplraVersion) = \
                   self._xplane.getVersions()
@@ -733,6 +741,11 @@ class Simulator(object):
         self._hotkeyCallback = None
 
         self._fuelCallback = None
+
+    @property
+    def config(self):
+        """Get the configuration."""
+        return self._connectionListener.config
 
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
