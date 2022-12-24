@@ -1025,7 +1025,8 @@ class BankChecker(SimpleFaultChecker):
         """Check if the fault condition holds."""
         isXPlane = (flight.aircraftType==const.AIRCRAFT_DH8D or
                     flight.aircraftType==const.AIRCRAFT_B733) and \
-                    (flight.fsType==const.SIM_XPLANE11 or
+                    (flight.fsType==const.SIM_XPLANE12 or
+                     flight.fsType==const.SIM_XPLANE11 or
                      flight.fsType==const.SIM_XPLANE10 or
                      flight.fsType==const.SIM_XPLANE9)
         if flight.stage==const.STAGE_CRUISE:

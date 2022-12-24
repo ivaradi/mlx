@@ -61,7 +61,8 @@ def createSimulator(type, connectionListener):
     """
     if type in [const.SIM_MSFS9, const.SIM_MSFSX]:
         return fsuipc.Simulator(connectionListener, connectAttempts = 3)
-    elif type in [const.SIM_XPLANE9, const.SIM_XPLANE10, const.SIM_XPLANE11]:
+    elif type in [const.SIM_XPLANE9, const.SIM_XPLANE10, const.SIM_XPLANE11,
+                  const.SIM_XPLANE12]:
         return xplane.Simulator(connectionListener, connectAttempts = 3)
     else:
         "Only MS Flight Simulator 2004 and X or X-Plane 9, 10 and 11 are supported"
