@@ -550,8 +550,9 @@ class BookedFlight(RPCObject):
                                            self.route,
                                            self.departureTime, self.arrivalTime)
         s += " %d %s," % (self.aircraftType, self.tailNumber)
-        s += " pax=%d, crew=%d, bag=%d, cargo=%d, mail=%d" % \
-             (self.numPassengers, self.numCrew,
+        s += " pax=%d+%d+%d, crew=%d+%d, bag=%d, cargo=%d, mail=%d" % \
+             (self.numPassengers, self.numChildren, self.numInfants,
+              self.numCockpitCrew, self.numCabinCrew,
               self.bagWeight, self.cargoWeight, self.mailWeight)
         s += ">"
         return s
