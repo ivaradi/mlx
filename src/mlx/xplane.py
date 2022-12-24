@@ -574,7 +574,7 @@ class Handler(threading.Thread):
 
             self._connected = False
 
-    def _processRequest(self, request, time, attempts):
+    def _processRequest(self, request, time, attempts, isPeriodic):
         """Process the given request.
 
         If an exception occurs or invalid data is read too many times, we try
@@ -604,7 +604,8 @@ class Handler(threading.Thread):
 
             if needReconnect:
                 with self._requestCondition:
-                    self._requests.insert(0, request)
+                    if not isPeriodic:
+                        self._requests.insert(0, request)
                 self._disconnect()
                 return self._connect(autoReconnection = True, attempts = attempts)
             else:
@@ -627,13 +628,13 @@ class Handler(threading.Thread):
             if request.nextFire>t:
                 break
 
-            attempts = self._processRequest(request, t, attempts)
+            attempts = self._processRequest(request, t, attempts, True)
 
         while self._connectionRequested and self._requests:
             request = self._requests[0]
             del self._requests[0]
 
-            attempts = self._processRequest(request, None, attempts)
+            attempts = self._processRequest(request, None, attempts, False)
 
         return self._connectionRequested
 
