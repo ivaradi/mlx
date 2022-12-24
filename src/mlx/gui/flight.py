@@ -1217,7 +1217,8 @@ class FlightSelectionPage(Page):
     def _updateNextButton(self):
         """Update the sensitivity of the Next button."""
         sensitive = len(self._flightList.selectedIndexes)==1 and \
-          not self._pendingFlightsWindowShown
+            len(self._flights)>0 and \
+            not self._pendingFlightsWindowShown
         if sensitive:
             flight = self._getSelectedFlight()
             flightDate = datetime.datetime.strptime(flight.date, "%Y-%m-%d").date()
