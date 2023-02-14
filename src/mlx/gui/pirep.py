@@ -60,7 +60,7 @@ class MessageFrame(Gtk.Frame):
         messageView.set_editable(False)
         messageView.set_can_focus(False)
         messageView.set_accepts_tab(False)
-        messageView.set_size_request(-1, 60)
+        messageView.set_size_request(-1, -1)
 
         buffer = messageView.get_buffer()
         buffer.set_text(message)
