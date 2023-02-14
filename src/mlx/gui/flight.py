@@ -239,6 +239,11 @@ class Page(Gtk.Alignment):
         This default implementation does nothing."""
         pass
 
+    def prepareShow(self):
+        """Prepare the page for showing, either initially on when later
+        returned to."""
+        pass
+
     def setHelp(self, help):
         """Set the help string."""
         self._help = help
@@ -265,6 +270,11 @@ class Page(Gtk.Alignment):
         """If the page has a default button, make it the default one."""
         if self._defaultButton is not None:
             self._defaultButton.grab_default()
+
+    def prepareHide(self):
+        """Prepare the page for hiding, either initially on when later
+        the user returned to it and then navigates away from it."""
+        pass
 
     def reset(self):
         """Reset the page if the wizard is reset."""
@@ -5929,6 +5939,7 @@ class Wizard(Gtk.VBox):
             page = self._pages[fromPage]
             if finalize and not page._completed:
                 page.complete()
+            page.prepareHide()
             self.remove(page)
             if fromPageShift is not None:
                 fromPage -= fromPageShift
@@ -5939,6 +5950,7 @@ class Wizard(Gtk.VBox):
         if page._fromPage is None:
             page._fromPage = fromPage
             page.initialize()
+        page.prepareShow()
         self.show_all()
         if fromPage is not None:
             self.grabDefault()
