@@ -1744,9 +1744,10 @@ class PMDGBoeing737NGModel(B737Model):
 
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
-        if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D:
+        if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D or fsType==const.SIM_MSFS2020:
             print("%s detected, adding PMDG 737 NGX-specific offsets" % \
-                  ("FSX" if fsType==const.SIM_MSFSX else "P3D",))
+                  ("FSX" if fsType==const.SIM_MSFSX else
+                   "P3D" if fsType==const.SIM_P3D else "MSFS 2020",))
             self._addOffsetWithIndexMember(data, 0x6500, "b",
                                            "_pmdgidx_lts_positionsw")
             self._addOffsetWithIndexMember(data, 0x6545, "b", "_pmdgidx_cmda")
@@ -1754,7 +1755,10 @@ class PMDGBoeing737NGModel(B737Model):
             self._addOffsetWithIndexMember(data, 0x6543, "b", "_pmdgidx_apalthold")
             self._addOffsetWithIndexMember(data, 0x652c, "H", "_pmdgidx_aphdg")
             self._addOffsetWithIndexMember(data, 0x652e, "H", "_pmdgidx_apalt")
-            self._addOffsetWithIndexMember(data, 0x65cd, "b", "_pmdgidx_xpdr")
+            if fsType==const.SIM_MSFS2020:
+                self._addOffsetWithIndexMember(data, 0x0b46, "b", "_pmdgidx_xpdr")
+            else:
+                self._addOffsetWithIndexMember(data, 0x65cd, "b", "_pmdgidx_xpdr")
         else:
             print("FS9 detected, adding PMDG 737 NG-specific offsets")
             self._addOffsetWithIndexMember(data, 0x6202, "b", "_pmdgidx_switches")
@@ -1772,7 +1776,22 @@ class PMDGBoeing737NGModel(B737Model):
         state = super(PMDGBoeing737NGModel, self).getAircraftState(aircraft,
                                                                    timestamp,
                                                                    data)
-        if self._fsType==const.SIM_MSFS9:
+
+        fsType = self._fsType
+        if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D or \
+           fsType==const.SIM_MSFS2020:
+            state.apMaster = data[self._pmdgidx_cmda]!=0
+            state.apHeadingHold = data[self._pmdgidx_aphdgsel]!=0
+            state.apAltitudeHold = data[self._pmdgidx_apalthold]!=0
+
+            # state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
+            # state.xpdrC = data[self._pmdgidx_xpdr]==4
+            if fsType==const.SIM_MSFS2020:
+                state.xpdrC = data[self._pmdgidx_xpdr]==4
+            else:
+                state.strobeLightsOn = None
+                state.xpdrC = None
+        else:
             if data[self._pmdgidx_switches]&0x01==0x01:
                 state.altimeter = 1013.25
             state.apMaster = data[self._pmdgidx_ap]&0x02==0x02
@@ -1784,15 +1803,6 @@ class PMDGBoeing737NGModel(B737Model):
             # Uncomment the following to test the speed-based takeoff
             # state.strobeLightsOn = None
             # state.xpdrC = None
-        else:
-            state.apMaster = data[self._pmdgidx_cmda]!=0
-            state.apHeadingHold = data[self._pmdgidx_aphdgsel]!=0
-            state.apAltitudeHold = data[self._pmdgidx_apalthold]!=0
-
-            # state.strobeLightsOn = data[self._pmdgidx_lts_positionsw]==0x02
-            # state.xpdrC = data[self._pmdgidx_xpdr]==4
-            state.strobeLightsOn = None
-            state.xpdrC = None
 
         state.apHeading = data[self._pmdgidx_aphdg]
         state.apAltitude = data[self._pmdgidx_apalt]
