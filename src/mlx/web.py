@@ -472,6 +472,7 @@ class LoginRPC(RPCRequest):
             result.pilotName = loginResult[0]
             result.rank = loginResult[1]
             result.types = loginResult[2]
+            result.sessionID = loginResult[3]
             result.password = password
             result.fleet = client.getFleet()
             flights = client.getFlights()
@@ -875,6 +876,23 @@ class BookFlights(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class GetSimBriefResult(RPCRequest):
+    """Request the SimBrief result."""
+    def __init__(self, client, callback, timestamp):
+        """Construct the request with the given client and callback function."""
+        super(GetSimBriefResult, self).__init__(client, callback)
+        self._timestamp = timestamp
+
+    def run(self):
+        """Perform the request."""
+        result = Result()
+
+        result.result = self._client.getSimBriefResult(self._timestamp)
+
+        return result
+
+#------------------------------------------------------------------------------
+
 class Handler(threading.Thread):
     """The handler for the web services.
 
@@ -969,6 +987,11 @@ class Handler(threading.Thread):
         """Enqueue a request to book some flights."""
         self._addRequest(BookFlights(self._rpcClient, callback,
                                      flightIDs, date, tailNumber))
+
+    def getSimBriefResult(self, callback, timestamp):
+        """Enqueue a request to get the SimBrief result."""
+        self._addRequest(GetSimBriefResult(self._rpcClient, callback,
+                                           timestamp))
 
     def run(self):
         """Process the requests."""

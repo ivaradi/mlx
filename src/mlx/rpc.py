@@ -751,7 +751,8 @@ class Client(object):
             types = [BookedFlight.TYPECODE2TYPE[typeCode]
                      for typeCode in reply.value["typeCodes"]]
 
-            return (reply.value["name"], reply.value["rank"], types)
+            return (reply.value["name"], reply.value["rank"], types,
+                    self._sessionID)
         else:
             return None
 
@@ -868,6 +869,12 @@ class Client(object):
                                                             date.strftime("%Y-%m-%d"),
                                                             tailNumber))
         return [BookedFlight(value) for value in values]
+
+    def getSimBriefResult(self, timestamp):
+        """Get the SimBrief results for the given timestamp."""
+        return self._performCall(lambda sessionID:
+                                 self._server.getSimBriefResult(sessionID,
+                                                                timestamp))
 
     def _performCall(self, callFn, acceptResults = []):
         """Perform a call using the given call function.
