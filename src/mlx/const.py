@@ -55,6 +55,9 @@ SIM_XPLANE11 = 6
 ## Flight simulator type: X-Plane 12
 SIM_XPLANE12 = 7
 
+#---light simulator type: MSFS 2020
+SIM_MSFS2020 = 8
+
 #-------------------------------------------------------------------------------
 
 ## Aircraft type: Boeing 737-600

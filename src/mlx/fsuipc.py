@@ -415,7 +415,9 @@ class Handler(threading.Thread):
                     (pyuipc.fsuipc_version, pyuipc.lib_version,
                      pyuipc.fs_version)
                 if not autoReconnection:
-                    fsType = const.SIM_MSFSX \
+                    fsType = const.SIM_MSFS2020 \
+                             if (pyuipc.fs_version == pyuipc.SIM_FS2020) \
+                             else const.SIM_MSFSX \
                              if (pyuipc.fs_version == pyuipc.SIM_FSX or
                                  pyuipc.fs_version == pyuipc.SIM_FSX64) \
                              else const.SIM_P3D \
