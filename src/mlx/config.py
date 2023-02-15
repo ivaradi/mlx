@@ -210,7 +210,7 @@ class ApproachCallouts(object):
 
 class Config(object):
     """Our configuration."""
-    DEFAULT_UPDATE_URL = "https://mlx.varadiistvan.hu/update/new"
+    DEFAULT_UPDATE_URL = "https://mlx.varadiistvan.hu/update"
 
     _messageTypesSection = "messageTypes"
 
@@ -255,9 +255,6 @@ class Config(object):
 
         self._autoUpdate = True
         self._updateURL = Config.DEFAULT_UPDATE_URL
-        #if secondaryInstallation:
-        #    self._updateURL += "/exp"
-        self._updateURLUpdated = True
 
         self._xplaneRemote = False
         self._xplaneAddress = ""
@@ -717,8 +714,6 @@ class Config(object):
 
     def load(self):
         """Load the configuration from its default location."""
-        self._updateURLUpdated = False
-
         try:
             config = configparser.RawConfigParser()
             config.read(configPath)
@@ -801,20 +796,8 @@ class Config(object):
                                             "checklistHotkey", "CS0"))
 
         self._autoUpdate = self._getBoolean(config, "update", "auto", True)
-        self._updateURLUpdated = self._getBoolean(config, "update",
-                                                  "urlUpdated", False)
-        if self._updateURLUpdated:
-            self._updateURL = self._get(config, "update", "url",
-                                        Config.DEFAULT_UPDATE_URL) # +
-                                        #("/exp" if secondaryInstallation else ""))
-
-        if self._updateURL.find("update/new")>0 or \
-           self._updateURL.find("update/py3")>0:
-            self._updateURL = "https://mlx.varadiistvan.hu/update"
-            self._updateURLUpdated = False
-        if self._updateURL.startswith("http://") and not self._updateURLUpdated:
-            self._updateURL = "https://" + self._updateURL[7:]
-            self._updateURLUpdated = True
+        self._updateURL = self._get(config, "update", "url",
+                                    Config.DEFAULT_UPDATE_URL)
 
         for aircraftType in const.aircraftTypes:
             self._checklists[aircraftType] = \
@@ -915,7 +898,6 @@ class Config(object):
         config.set("update", "auto",
                    "yes" if self._autoUpdate else "no")
         config.set("update", "url", self._updateURL)
-        config.set("update", "urlUpdated", self._updateURLUpdated)
 
         config.add_section(Checklist.SECTION)
         config.add_section(ApproachCallouts.SECTION)
@@ -1053,7 +1035,6 @@ class Config(object):
 
         print("  autoUpdate:", self._autoUpdate)
         print("  updateURL:", self._updateURL)
-        print("  updateURLUpdated:", self._updateURLUpdated)
 
         print("  messageTypeLevels:")
         for (type, level) in self._messageTypeLevels.items():
