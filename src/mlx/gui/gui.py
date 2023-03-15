@@ -483,6 +483,8 @@ class GUI(fs.ConnectionListener):
         Gtk.main()
         singleton.raiseCallback = None
 
+        self._acars.stop()
+
         cef.finalize()
 
         self._disconnect()

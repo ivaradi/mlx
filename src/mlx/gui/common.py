@@ -34,6 +34,7 @@ except:
     pass
 from gi.repository import Pango
 from gi.repository import PangoCairo
+from gi.repository import GLib
 
 import codecs
 _utf8Decoder = codecs.getdecoder("utf-8")

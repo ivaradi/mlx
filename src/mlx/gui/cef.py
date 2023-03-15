@@ -91,12 +91,10 @@ class SimBriefHandler(object):
         self._browser.SetClientHandler(OffscreenRenderHandler())
         self._browser.SetFocus(True)
         self._browser.SetClientCallback("OnLoadEnd", self._onLoadEnd)
-
-        bindings = cefpython.JavascriptBindings(bindToFrames=True,
-                                                bindToPopups=True)
-        bindings.SetFunction("briefingData", self._briefingDataAvailable)
-        bindings.SetFunction("formFilled", self._formFilled)
-        self._browser.SetJavascriptBindings(bindings)
+        self._browser.SetClientCallback("OnLoadError", self._onLoadError)
+        self._browser.SetClientCallback("OnBeforeBrowse",
+                                        lambda browser, frame, request,
+                                        user_gesture, is_redirect: False)
 
     def call(self, plan, getCredentials, updateProgress, htmlFilePath):
         """Call SimBrief with the given plan."""
@@ -111,6 +109,11 @@ class SimBriefHandler(object):
         self._browser.LoadUrl(SimBriefHandler._formURL)
         self._updateProgress(SIMBRIEF_PROGRESS_LOADING_FORM,
                              SIMBRIEF_RESULT_NONE, None)
+
+    def finalize(self):
+        """Close the browser and release it."""
+        self._browser.CloseBrowser()
+        self._browser = None
 
     def _onLoadEnd(self, browser, frame, http_code):
         """Called when a page has been loaded in the SimBrief browser."""
@@ -181,14 +184,12 @@ class SimBriefHandler(object):
             self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
                                  SIMBRIEF_RESULT_ERROR_OTHER, None)
 
-    def _resultsAvailable(self, flightInfo):
-        """Called from the result retrieval thread when the result is
-        available.
-
-        It checks for the plan being not None, as we may time out."""
-        if self._plan is not None:
-            self._updateProgress(SIMBRIEF_PROGRESS_DONE,
-                                 SIMBRIEF_RESULT_OK, flightInfo)
+    def _onLoadError(self, browser, frame, error_code, error_text_out,
+                     failed_url):
+        """Called when loading of an URL fails."""
+        print("gui.cef.SimBriefHandler._onLoadError", browser, frame, error_code, error_text_out, failed_url)
+        self._updateProgress(self._lastProgress,
+                             SIMBRIEF_RESULT_ERROR_OTHER, None)
 
     def _updateProgress(self, progress, results, flightInfo):
         """Update the progress."""
@@ -280,6 +281,9 @@ def _initializeCEF(args, initializedCallback):
         "resources_dir_path": cefpython.GetModuleDirectory(),
         "browser_subprocess_path": "%s/%s" % \
             (cefpython.GetModuleDirectory(), "subprocess"),
+        "windowless_rendering_enabled": True,
+        "cache_path": os.path.join(GLib.get_user_cache_dir(),
+                                   "mlxcef")
     }
 
     switches={}
@@ -306,13 +310,9 @@ def _initializeCEF(args, initializedCallback):
 def getContainer():
     """Get a container object suitable for running a browser instance
     within."""
-    if os.name=="nt":
-        container = Gtk.DrawingArea()
-        container.set_property("can-focus", True)
-        container.connect("size-allocate", _handleSizeAllocate)
-    else:
-        container = Gtk.DrawingArea()
-
+    container = Gtk.DrawingArea()
+    container.set_property("can-focus", True)
+    container.connect("size-allocate", _handleSizeAllocate)
     container.show()
 
     return container
@@ -332,29 +332,34 @@ def startInContainer(container, url, browserSettings = {}):
         windowID = libgdk.gdk_win32_window_get_handle(gpointer)
         container.windowID = windowID
         Gdk.threads_leave()
+        windowRect = [0, 0, 1, 1]
     else:
         container.set_visual(container.get_screen().lookup_visual(0x21))
         windowID = container.get_window().get_xid()
+        windowRect = None
 
     windowInfo = cefpython.WindowInfo()
     if windowID is not None:
-        windowInfo.SetAsChild(windowID)
+        windowInfo.SetAsChild(windowID, windowRect = windowRect)
 
-    return cefpython.CreateBrowserSync(windowInfo,
-                                       browserSettings = browserSettings,
-                                       navigateUrl = url)
+    browser = cefpython.CreateBrowserSync(windowInfo,
+                                          browserSettings = browserSettings,
+                                          navigateUrl = url)
+    container.browser = browser
+
+    return browser
 
 #------------------------------------------------------------------------------
 
 class OffscreenRenderHandler(object):
     def GetRootScreenRect(self, browser, rect_out):
         #print "GetRootScreenRect"
-        rect_out += [0, 0, 800, 600]
+        rect_out += [0, 0, 1920, 1080]
         return True
 
     def GetViewRect(self, browser, rect_out):
         #print "GetViewRect"
-        rect_out += [0, 0, 800, 600]
+        rect_out += [0, 40, 1920, 1040]
         return True
 
     def GetScreenPoint(self, browser, viewX, viewY, screenCoordinates):
@@ -386,13 +391,15 @@ class OffscreenRenderHandler(object):
         #print "OnScrollOffsetChange"
         pass
 
-    def OnBeforePopup(self, browser, frame, targetURL, targetFrameName,
-                      popupFeatures, windowInfo, client, browserSettings,
-                      noJavascriptAccess):
+    def OnBeforePopup(self, browser, frame, target_url, target_frame_name,
+                      target_disposition, user_gesture,
+                      popup_features, window_info_out, client,
+                      browser_settings_out, no_javascript_access_out,
+                      **kwargs):
         wInfo = cefpython.WindowInfo()
         wInfo.SetAsOffscreen(int(0))
 
-        windowInfo.append(wInfo)
+        window_info_out.append(wInfo)
 
         return False
 
@@ -416,6 +423,9 @@ def finalize():
     """Finalize the Chrome Embedded Framework."""
     global _toQuit
     _toQuit = True
+
+    _simBriefHandler.finalize()
+
     cefpython.Shutdown()
 
 #------------------------------------------------------------------------------
@@ -432,5 +442,11 @@ def _handleTimeout():
 
 def _handleSizeAllocate(widget, sizeAlloc):
     """Handle the size-allocate event on Windows."""
-    if widget is not None:
-        cefpython.WindowUtils.OnSize(widget.windowID, 0, 0, 0)
+    if os.name=="nt":
+        if widget is not None and hasattr(widget, "windowID"):
+            cefpython.WindowUtils.OnSize(widget.windowID, 0, 0, 0)
+    else:
+         if widget is not None and hasattr(widget, "browser") and \
+            widget.browser is not None:
+             widget.browser.SetBounds(sizeAlloc.x, sizeAlloc.y,
+                                      sizeAlloc.width, sizeAlloc.height)

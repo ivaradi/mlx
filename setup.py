@@ -125,10 +125,10 @@ if os.name=="nt":
 
     cefDir = os.environ.get("CEFDIR")
     if cefDir:
-        for fileName in ["icudtl.dat", "subprocess.exe", "natives_blob.bin",
+        for fileName in ["icudtl.dat", "subprocess.exe",
                          "snapshot_blob.bin", "v8_context_snapshot.bin",
-                         "cef.pak", "cef_100_percent.pak",
-                         "cef_200_percent.pak", "cef_extensions.pak"]:
+                         "chrome_100_percent.pak", "chrome_200_percent.pak",
+                         "resources.pak"]:
             data_files.append(("", [os.path.join(cefDir, fileName)]))
 
         data_files.append(("locales",
