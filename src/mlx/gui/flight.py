@@ -3242,7 +3242,7 @@ class SimBriefSetupPage(Page):
         alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = Gtk.Table(6, 3)
+        table = Gtk.Table(7, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -3252,39 +3252,66 @@ class SimBriefSetupPage(Page):
 
         row = 0
 
-        # label = Gtk.Label(xstr("simbrief_username"))
-        # label.set_use_underline(True)
-        # label.set_alignment(0.0, 0.5)
-        # table.attach(label, 0, 1, row, row+1)
+        frame = Gtk.Frame.new()
+        self._useInternalBrowser = Gtk.CheckButton(xstr("simbrief_uib"))
+        frame.set_label_widget(self._useInternalBrowser)
+        frame.set_label_align(0.025, 0.5)
 
-        # self._userName = Gtk.Entry()
-        # self._userName.set_width_chars(16)
-        # self._userName.connect("changed",
-        #                        lambda button: self._updateForwardButton())
-        # self._userName.set_tooltip_text(xstr("simbrief_username_tooltip"))
-        # table.attach(self._userName, 1, 2, row, row+1)
-        # label.set_mnemonic_widget(self._userName)
-        # row += 1
+        self._useInternalBrowser.set_use_underline(True)
+        self._useInternalBrowser.connect("toggled",
+                                         self._useInternalBrowserToggled)
+        self._useInternalBrowser.set_tooltip_text(xstr("simbrief_uib_tooltip"))
 
-        # label = Gtk.Label(xstr("simbrief_password"))
-        # label.set_use_underline(True)
-        # label.set_alignment(0.0, 0.5)
-        # table.attach(label, 0, 1, row, row+1)
+        uibTable = Gtk.Table(2, 3)
+        uibTable.set_row_spacings(4)
+        uibTable.set_col_spacings(16)
+        uibTable.set_homogeneous(False)
 
-        # self._password = Gtk.Entry()
-        # self._password.set_visibility(False)
-        # self._password.connect("changed",
-        #                        lambda button: self._updateForwardButton())
-        # self._password.set_tooltip_text(xstr("simbrief_password_tooltip"))
-        # table.attach(self._password, 1, 2, row, row+1)
-        # label.set_mnemonic_widget(self._password)
-        # row += 1
+        uibRow = 0
 
-        # self._rememberButton = Gtk.CheckButton(xstr("simbrief_remember_password"))
-        # self._rememberButton.set_use_underline(True)
-        # self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
-        # table.attach(self._rememberButton, 1, 2, row, row+1, ypadding = 8)
-        # row += 1
+        label = Gtk.Label(xstr("simbrief_username"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        uibTable.attach(label, 0, 1, uibRow, uibRow+1)
+
+        self._userName = Gtk.Entry()
+        self._userName.set_width_chars(16)
+        self._userName.connect("changed",
+                               lambda button: self._updateForwardButton())
+        self._userName.set_tooltip_text(xstr("simbrief_username_tooltip"))
+        uibTable.attach(self._userName, 1, 2, uibRow, uibRow+1)
+        label.set_mnemonic_widget(self._userName)
+        uibRow += 1
+
+        label = Gtk.Label(xstr("simbrief_password"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        uibTable.attach(label, 0, 1, uibRow, uibRow+1)
+
+        self._password = Gtk.Entry()
+        self._password.set_visibility(False)
+        self._password.connect("changed",
+                               lambda button: self._updateForwardButton())
+        self._password.set_tooltip_text(xstr("simbrief_password_tooltip"))
+        uibTable.attach(self._password, 1, 2, uibRow, uibRow+1)
+        label.set_mnemonic_widget(self._password)
+
+        self._rememberButton = Gtk.CheckButton(xstr("simbrief_remember_password"))
+        self._rememberButton.set_use_underline(True)
+        self._rememberButton.set_tooltip_text(xstr("simbrief_remember_tooltip"))
+        uibTable.attach(self._rememberButton, 2, 3, uibRow, uibRow+1, ypadding = 8)
+        uibRow += 1
+
+        uibTable.set_margin_top(6)
+        uibTable.set_margin_bottom(6)
+        uibTable.set_margin_left(4)
+        uibTable.set_margin_right(4)
+
+        frame.add(uibTable)
+        frame.set_margin_bottom(10)
+
+        table.attach(frame, 0, 3, row, row+1)
+        row += 1
 
         label = Gtk.Label(xstr("simbrief_extra_fuel"))
         label.set_use_underline(True)
@@ -3297,7 +3324,9 @@ class SimBriefSetupPage(Page):
         table.attach(self._extraFuel, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._extraFuel)
 
-        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
+        label = Gtk.Label("kg")
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 2, 3, row, row+1)
         row += 1
 
         label = Gtk.Label(xstr("simbrief_takeoff_runway"))
@@ -3378,14 +3407,17 @@ class SimBriefSetupPage(Page):
         """Activate the SimBrief setup page"""
         config = self._wizard.gui.config
 
-        # self._userName.set_text(config.simBriefUserName)
-        # self._userName.set_sensitive(True)
+        self._useInternalBrowser.set_active(config.useInternalBrowserForSimBrief)
+        self._useInternalBrowser.set_sensitive(True)
 
-        # self._password.set_text(config.simBriefPassword)
-        # self._password.set_sensitive(True)
+        self._userName.set_text(config.simBriefUserName)
+        self._userName.set_sensitive(config.useInternalBrowserForSimBrief)
 
-        # self._rememberButton.set_active(config.rememberSimBriefPassword)
-        # self._rememberButton.set_sensitive(True)
+        self._password.set_text(config.simBriefPassword)
+        self._password.set_sensitive(config.useInternalBrowserForSimBrief)
+
+        self._rememberButton.set_active(config.rememberSimBriefPassword)
+        self._rememberButton.set_sensitive(config.useInternalBrowserForSimBrief)
 
         self._extraFuel.set_int(0)
         self._extraFuel.set_sensitive(True)
@@ -3421,8 +3453,8 @@ class SimBriefSetupPage(Page):
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
         self._button.set_sensitive(True)
-        # self._button.set_sensitive(len(self._userName.get_text())>0 and
-        #                            len(self._password.get_text())>0)
+        self._button.set_sensitive(len(self._userName.get_text())>0 and
+                                   len(self._password.get_text())>0)
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -3432,18 +3464,29 @@ class SimBriefSetupPage(Page):
         if self._completed:
             self._wizard.nextPage()
         else:
-            # config = self._wizard.gui.config
+            config = self._wizard.gui.config
 
-            # config.simBriefUserName = self._userName.get_text()
+            config.simBriefUserName = self._userName.get_text()
 
-            # rememberPassword = self._rememberButton.get_active()
-            # config.simBriefPassword = \
-            #   self._password.get_text() if rememberPassword else ""
-            # config.rememberSimBriefPassword = rememberPassword
+            rememberPassword = self._rememberButton.get_active()
+            config.simBriefPassword = \
+              self._password.get_text() if rememberPassword else ""
+            config.rememberSimBriefPassword = rememberPassword
 
-            # config.save()
+            config.useInternalBrowserForSimBrief = \
+                self._useInternalBrowser.get_active()
+
+            config.save()
 
             self._wizard.gui.simulator.requestTime(self._handleTime)
+
+    def _useInternalBrowserToggled(self, checkButton):
+        """Called when the check button indicating if the internal browser
+        should be used is toggled."""
+        useInternalBrowserForSimBrief = self._useInternalBrowser.get_active()
+        self._userName.set_sensitive(useInternalBrowserForSimBrief)
+        self._password.set_sensitive(useInternalBrowserForSimBrief)
+        self._rememberButton.set_sensitive(useInternalBrowserForSimBrief)
 
     def _handleTime(self, simulatorNow):
         """Handle the result of a time retrieval."""
@@ -3462,9 +3505,9 @@ class SimBriefSetupPage(Page):
         if landingRunway:
             self._wizard.landingRunway = landingRunway
 
-        # self._userName.set_sensitive(False)
-        # self._password.set_sensitive(False)
-        # self._rememberButton.set_sensitive(False)
+        self._userName.set_sensitive(False)
+        self._password.set_sensitive(False)
+        self._rememberButton.set_sensitive(False)
         self._extraFuel.set_sensitive(False)
         self._takeoffRunway.set_sensitive(False)
         self._landingRunway.set_sensitive(False)
@@ -3475,101 +3518,98 @@ class SimBriefSetupPage(Page):
 
         self._wizard.gui.beginBusy(xstr("simbrief_calling"))
 
-        url = MAVA_BASE_URL + "/simbrief_form.php?" + \
-            urllib.parse.urlencode(plan)
+        url = cef.SimBriefHandler.getFormURL(plan)
         print("url:", url)
 
-        # GObject.idle_add(self._resultsAvailable,
-        #                  { "orig_metar": "LDZA...",
-        #                    "dest_metar": "LHBP..." })
-        # return
+        config = self._wizard.gui.config
+        if config.useInternalBrowserForSimBrief:
+            self._waitEnd = 0
+            cef.callSimBrief(plan,
+                             self._getCredentials,
+                             self._simBriefProgress,
+                             SimBriefSetupPage.getHTMLFilePath())
+        else:
+            webbrowser.open(url = url, new = 1)
+            self._waitEnd = time.time() + SimBriefSetupPage._waitTimeout
+            GObject.timeout_add(SimBriefSetupPage._resultQueryInterval,
+                                lambda: self._wizard.gui.webHandler. \
+                                getSimBriefResult(self._resultCallback,
+                                                  self._resultTimestamp))
 
-        webbrowser.open(url = url, new = 1)
-
-        # cef.callSimBrief(plan,
-        #                  self._getCredentials,
-        #                  self._simBriefProgress,
-        #                 SimBriefSetupPage.getHTMLFilePath())
 
         startSound(const.SOUND_NOTAM)
 
-        self._waitEnd = time.time() + SimBriefSetupPage._waitTimeout
-        GObject.timeout_add(SimBriefSetupPage._resultQueryInterval,
-                            lambda: self._wizard.gui.webHandler. \
-                            getSimBriefResult(self._resultCallback,
-                                              self._resultTimestamp))
+    def _getCredentials(self, count):
+        """Get the credentials.
 
-    # def _getCredentials(self, count):
-    #     """Get the credentials.
+        If count is 0, the user name and password entered into the setup page
+        are returned. Otherwise a dialog box is displayed informing the user of
+        invalid credentials and requesting another set of them."""
+        print("_getCredentials", count)
+        if count==0:
+            return (self._userName.get_text(), self._password.get_text())
+        else:
+            gui = self._wizard.gui
+            config = gui.config
 
-    #     If count is 0, the user name and password entered into the setup page
-    #     are returned. Otherwise a dialog box is displayed informing the user of
-    #     invalid credentials and requesting another set of them."""
-    #     print("_getCredentials", count)
-    #     if count==0:
-    #         return (self._userName.get_text(), self._password.get_text())
-    #     else:
-    #         gui = self._wizard.gui
-    #         config = gui.config
+            dialog = SimBriefCredentialsDialog(gui,
+                                               config.simBriefUserName,
+                                               config.simBriefPassword,
+                                               config.rememberSimBriefPassword)
+            response = dialog.run()
 
-    #         dialog = SimBriefCredentialsDialog(gui,
-    #                                            config.simBriefUserName,
-    #                                            config.simBriefPassword,
-    #                                            config.rememberSimBriefPassword)
-    #         response = dialog.run()
+            if response==Gtk.ResponseType.OK:
+                userName = dialog.userName
+                self._userName.set_text(userName)
+                password = dialog.password
+                self._password.set_text(password)
+                rememberPassword = dialog.rememberPassword
 
-    #         if response==Gtk.ResponseType.OK:
-    #             userName = dialog.userName
-    #             self._userName.set_text(userName)
-    #             password = dialog.password
-    #             self._password.set_text(password)
-    #             rememberPassword = dialog.rememberPassword
+                config.simBriefUserName = userName
 
-    #             config.simBriefUserName = userName
+                config.simBriefPassword = \
+                    password if rememberPassword else ""
+                config.rememberSimBriefPassword = rememberPassword
 
-    #             config.simBriefPassword = \
-    #                 password if rememberPassword else ""
-    #             config.rememberSimBriefPassword = rememberPassword
+                config.save()
 
-    #             config.save()
+                return (userName, password)
+            else:
+                return (None, None)
 
-    #             return (userName, password)
-    #         else:
-    #             return (None, None)
+    def _simBriefProgress(self, progress, result, flightInfo):
+        """The real SimBrief progress handler."""
+        print("_simBriefProgress", progress, result, flightInfo)
+        if result==cef.SIMBRIEF_RESULT_NONE:
+            message = SimBriefSetupPage.progress2Message.get(progress,
+                                                             "simbrief_progress_unknown")
+            self._wizard.gui.updateBusyState(xstr(message))
+        else:
+            if result==cef.SIMBRIEF_RESULT_OK:
+                self._waitEnd = 0
+                self._wizard.gui.webHandler. \
+                    getSimBriefResult(self._resultCallback,
+                                      self._resultTimestamp)
+            else:
+                self._wizard.gui.endBusy()
 
-    # def _simBriefProgress(self, progress, result, flightInfo):
-    #     """The real SimBrief progress handler."""
-    #     print("_simBriefProgress", progress, result, flightInfo)
-    #     if result==cef.SIMBRIEF_RESULT_NONE:
-    #         message = SimBriefSetupPage.progress2Message.get(progress,
-    #                                                          "simbrief_progress_unknown")
-    #         self._wizard.gui.updateBusyState(xstr(message))
-    #     else:
-    #         self._wizard.gui.endBusy()
+                message = SimBriefSetupPage.result2Message.get(result,
+                                                               "simbrief_result_unknown")
+                dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
+                                           type = Gtk.MessageType.ERROR,
+                                           message_format =
+                                           xstr(message) + "\n"+
+                                           xstr("simbrief_cancelled"))
 
-    #         if result==cef.SIMBRIEF_RESULT_OK:
-    #             self._wizard.departureMETARChanged(flightInfo["orig_metar"],
-    #                                                self)
-    #             self._wizard.arrivalMETARChanged(flightInfo["dest_metar"], self)
-    #             self._wizard.nextPage()
-    #         else:
-    #             message = SimBriefSetupPage.result2Message.get(result,
-    #                                                            "simbrief_result_unknown")
-    #             dialog = Gtk.MessageDialog(parent = self._wizard.gui.mainWindow,
-    #                                        type = Gtk.MessageType.ERROR,
-    #                                        message_format =
-    #                                        xstr(message) + "\n"+
-    #                                        xstr("simbrief_cancelled"))
+                dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
+                dialog.set_title(WINDOW_TITLE_BASE)
+                secondary = xstr("flightsel_save_failed_sec")
+                dialog.format_secondary_markup(secondary)
+                dialog.run()
+                dialog.hide()
 
-    #             dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
-    #             dialog.set_title(WINDOW_TITLE_BASE)
-    #             secondary = xstr("flightsel_save_failed_sec")
-    #             dialog.format_secondary_markup(secondary)
-    #             dialog.run()
-    #             dialog.hide()
-
-    #             self._wizard.usingSimBrief = False
-    #             self._wizard.jumpPage("fuel", fromPageShift = 1)
+                self._wizard.usingSimBrief = False
+                self._wizard.jumpPage("fuel", fromPageShift = 1)
 
     def _getPlan(self, simulatorNow):
         """Get the flight plan data for SimBrief."""

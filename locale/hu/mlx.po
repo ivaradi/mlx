@@ -866,20 +866,34 @@ msgstr "Töltsd ki a lenti adatokat a SimBrief eligazítás előállítása cél
 msgid "simbrief_setup_chelp"
 msgstr "A SimBrief eligazítás az alábbi adatok alapján keszült."
 
+msgid "simbrief_uib"
+msgstr "Beépített böngésző használata"
+
+msgid "simbrief_uib_tooltip"
+msgstr ""
+"Ha ezt bejelölöd, a loggerba épített böngészőt használjuk a "
+"SimBrief eligazítás előállításához. Ilyenkor a logger hattérben "
+"a lenti felhasználónévvel és jelszóval automatikusan bejelentkezik "
+"SimBrief-be, átadja az adatokat és megvárja, míg az eligazítás elkészül."
+""
+"Ha ezt nem jelölöd be, a logger a rendszereden lévő alapértelmezett "
+"böngészőben nyit egy ablakot, és abban hívja meg a SimBriefet. Ilyenkor "
+"a szokott módon kell bejelentkezned."
+
 msgid "simbrief_username"
 msgstr "Fel_használónév:"
 
 msgid "simbrief_username_tooltip"
-msgstr "Írd be a SimBrief felhasználónevedet"
+msgstr "Írd be a SimBrief/Navigraph felhasználónevedet (e-mail címedet)"
 
 msgid "simbrief_password"
 msgstr "Jels_zó:"
 
 msgid "simbrief_password_tooltip"
-msgstr "Írdbe a SimBrief jelszavadat"
+msgstr "Írd be a SimBrief jelszavadat"
 
 msgid "simbrief_remember_password"
-msgstr "E_mlékezz a jelszóra"
+msgstr "E_mlékezz"
 
 msgid "simbrief_remember_tooltip"
 msgstr ""

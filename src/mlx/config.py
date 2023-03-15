@@ -233,6 +233,7 @@ class Config(object):
         self._vsSmoothingLength = -2
 
         self._useSimBrief = False
+        self._useInternalBrowserForSimBrief = False
         self._simBriefUserName = ""
         self._simBriefPassword = ""
         self._rememberSimBriefPassword = False
@@ -459,6 +460,18 @@ class Config(object):
         """Check if SimBrief should be used."""
         if self._useSimBrief != useSimBrief:
             self._useSimBrief = useSimBrief
+            self._modified = True
+
+    @property
+    def useInternalBrowserForSimBrief(self):
+        """Get if we should use the internal browser to handle SimBrief."""
+        return self._useInternalBrowserForSimBrief
+
+    @useInternalBrowserForSimBrief.setter
+    def useInternalBrowserForSimBrief(self, useInternalBrowserForSimBrief):
+        """Set if we should use the internal browser to handle SimBrief."""
+        if useInternalBrowserForSimBrief!=self._useInternalBrowserForSimBrief:
+            self._useInternalBrowserForSimBrief = useInternalBrowserForSimBrief
             self._modified = True
 
     @property
@@ -758,6 +771,9 @@ class Config(object):
 
         self._useSimBrief = self._getBoolean(config, "simbrief",
                                              "use", False)
+        self._useInternalBrowserForSimBrief = self._getBoolean(config, "simbrief",
+                                                               "useInternalBrowser",
+                                                               False)
         self._simBriefUserName = self._get(config, "simbrief",
                                            "username", "")
         self._simBriefPassword = self._get(config, "simbrief",
@@ -853,6 +869,8 @@ class Config(object):
         config.add_section("simbrief")
         config.set("simbrief", "use",
                    "yes" if self._useSimBrief else "no")
+        config.set("simbrief", "useInternalBrowser",
+                   "yes" if self._useInternalBrowserForSimBrief else "no")
         config.set("simbrief", "username", self._simBriefUserName)
         config.set("simbrief", "password", self._simBriefPassword)
         config.set("simbrief", "rememberPassword",
@@ -1012,6 +1030,7 @@ class Config(object):
         print("  vsSmoothingLength:", self._vsSmoothingLength)
 
         print("  useSimBrief:", self._useSimBrief)
+        print("  useInternalBrowserForSimBrief:", self._useInternalBrowserForSimBrief)
         print("  simBriefUserName:", self._simBriefUserName)
         print("  rememberSimBriefPassword:", self._rememberSimBriefPassword)
 

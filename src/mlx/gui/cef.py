@@ -56,7 +56,15 @@ SIMBRIEF_RESULT_ERROR_LOGIN_FAILED = 13
 
 class SimBriefHandler(object):
     """An object to store the state of a SimBrief query."""
-    _formURL = "http://flare.privatedns.org/mava_simbrief/simbrief_form.html"
+    _formURLBase = MAVA_BASE_URL + "/simbrief_form.php"
+
+    _resultURLBase = MAVA_BASE_URL + "/simbrief_briefing.php"
+
+    @staticmethod
+    def getFormURL(plan):
+        """Get the form URL for the given plan."""
+        return SimBriefHandler._formURLBase + "?" + \
+            urllib.parse.urlencode(plan)
 
     _querySettings = {
         'navlog': True,
@@ -86,8 +94,7 @@ class SimBriefHandler(object):
         windowInfo.SetAsOffscreen(int(0))
 
         self._browser = \
-          cefpython.CreateBrowserSync(windowInfo, browserSettings = {},
-                                      navigateUrl = SimBriefHandler._formURL)
+          cefpython.CreateBrowserSync(windowInfo, browserSettings = {})
         self._browser.SetClientHandler(OffscreenRenderHandler())
         self._browser.SetFocus(True)
         self._browser.SetClientCallback("OnLoadEnd", self._onLoadEnd)
@@ -106,7 +113,7 @@ class SimBriefHandler(object):
         self._updateProgressFn = updateProgress
         self._htmlFilePath = htmlFilePath
 
-        self._browser.LoadUrl(SimBriefHandler._formURL)
+        self._browser.LoadUrl(SimBriefHandler.getFormURL(plan))
         self._updateProgress(SIMBRIEF_PROGRESS_LOADING_FORM,
                              SIMBRIEF_RESULT_NONE, None)
 
@@ -122,28 +129,13 @@ class SimBriefHandler(object):
         if http_code>=300:
             self._updateProgress(self._lastProgress,
                                  SIMBRIEF_RESULT_ERROR_OTHER, None)
-        elif url.startswith("http://flare.privatedns.org/mava_simbrief/simbrief_form.html"):
-            if self._plan is None:
-                return
-
-            self._updateProgress(SIMBRIEF_PROGRESS_FILLING_FORM,
+        elif url.startswith(SimBriefHandler._formURLBase):
+            self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
                                  SIMBRIEF_RESULT_NONE, None)
-
-            js = "form=document.getElementById(\"sbapiform\");"
-            for (name, value) in self._plan.items():
-                js += "form." + name + ".value=\"" + value + "\";"
-            for (name, value) in SimBriefHandler._querySettings.items():
-                if isinstance(value, bool):
-                    js += "form." + name + ".checked=" + \
-                      ("true" if value else "false") + ";"
-                elif isinstance(value, str):
-                    js += "form." + name + ".value=\"" + value + "\";"
-
-            js += "form.submitform.click();"
-            js += "window.formFilled();"
-
+        elif url.startswith("https://www.simbrief.com/system/login.api.sso.php"):
+            js = "document.getElementsByClassName(\"login_option navigraph\")[0].click();"
             frame.ExecuteJavascript(js)
-        elif url.startswith("http://www.simbrief.com/system/login.api.php"):
+        elif url.startswith("https://identity.api.navigraph.com/login?"):
             (user, password) = self._getCredentials(self._getCredentialsCount)
             if user is None or password is None:
                 self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
@@ -151,38 +143,18 @@ class SimBriefHandler(object):
                 return
 
             self._getCredentialsCount += 1
-            js = "form=document.forms[0];"
-            js += "form.user.value=\"" + user + "\";"
-            js += "form.pass.value=\"" + password + "\";"
-            js += "form.submit();"
+
+            js = "form=document.getElementsByName(\"form\")[0];"
+            js +="form.username.value=\"" + user + "\";"
+            js +="form.password.value=\"" + password + "\";"
+            js +="form.submit();"
             frame.ExecuteJavascript(js)
-        elif url.startswith("http://www.simbrief.com/ofp/ofp.loader.api.php"):
+        elif url.startswith("https://www.simbrief.com/ofp/ofp.loader.api.php"):
             self._updateProgress(SIMBRIEF_PROGRESS_WAITING_RESULT,
                                  SIMBRIEF_RESULT_NONE, None)
-        elif url.startswith("http://flare.privatedns.org/mava_simbrief/simbrief_briefing.php"):
-            js = "form=document.getElementById(\"hiddenform\");"
-            js += "window.briefingData(form.hidden_is_briefing_available.value, form.hidden_link.value);";
-            frame.ExecuteJavascript(js)
-
-    def _formFilled(self):
-        """Called when the form has been filled and submitted."""
-        self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
-                             SIMBRIEF_RESULT_NONE, None)
-
-    def _briefingDataAvailable(self, available, link):
-        """Called when the briefing data is available."""
-        if available:
-            link ="http://www.simbrief.com/ofp/flightplans/xml/" + link + ".xml"
-
+        elif url.startswith(SimBriefHandler._resultURLBase):
             self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
-                                 SIMBRIEF_RESULT_NONE, None)
-
-            thread = threading.Thread(target = self._getResults, args = (link,))
-            _thread.daemon = True
-            _thread.start()
-        else:
-            self._updateProgress(SIMBRIEF_PROGRESS_RETRIEVING_BRIEFING,
-                                 SIMBRIEF_RESULT_ERROR_OTHER, None)
+                                 SIMBRIEF_RESULT_OK, None)
 
     def _onLoadError(self, browser, frame, error_code, error_text_out,
                      failed_url):
@@ -214,44 +186,6 @@ class SimBriefHandler(object):
         self._updateProgress(self._lastProgress, result, None)
 
         return False
-
-    def _getResults(self, link):
-        """Get the result from the given link."""
-        availableInfo = {}
-        ## Holds analysis data to be used
-        flightInfo = {}
-
-        # Obtaining the xml
-        response = urllib.request.urlopen(link)
-        xmlContent = response.read()
-        # Processing xml
-        content = etree.iterparse(StringIO(xmlContent))
-
-        for (action, element) in content:
-            # Processing tags that occur multiple times
-            if element.tag == "weather":
-                weatherElementList = list(element)
-                for weatherElement in weatherElementList:
-                    flightInfo[weatherElement.tag] = weatherElement.text
-            else:
-                availableInfo[element.tag] = element.text
-
-        # Processing plan_html
-        ## Obtaining chart links
-        imageLinks = []
-        for imageLinkElement in lxml.html.find_class(availableInfo["plan_html"],
-                                                     "ofpmaplink"):
-            for imageLink in imageLinkElement.iterlinks():
-                if imageLink[1] == 'src':
-                    imageLinks.append(imageLink[2])
-        flightInfo["image_links"] = imageLinks
-        print((sorted(availableInfo.keys())))
-        htmlFilePath = "simbrief_plan.html" if self._htmlFilePath is None \
-          else self._htmlFilePath
-        with open(htmlFilePath, 'w') as f:
-            f.write(availableInfo["plan_html"])
-
-        GObject.idle_add(self._resultsAvailable, flightInfo)
 
 #------------------------------------------------------------------------------
 

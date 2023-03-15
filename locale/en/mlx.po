@@ -866,11 +866,25 @@ msgstr "Complete the following data to start generating your SimBrief briefing."
 msgid "simbrief_setup_chelp"
 msgstr "Your SimBrief briefing was generated with the following data."
 
+msgid "simbrief_uib"
+msgstr "Use the built-in browser"
+
+msgid "simbrief_uib_tooltip"
+msgstr ""
+"If this is ticked, the browser built in the browser is used to "
+"produce the SimBrief building. The logger will log in to SimBrief "
+"using the username and password below automatically and wait for "
+"the briefing to be completed in the background."
+""
+"If this is not ticked, the logger will open a window of the default "
+"browser on your system, and calls SimBrief in that. In this case "
+"you have to log in as usual."
+
 msgid "simbrief_username"
 msgstr "_Username:"
 
 msgid "simbrief_username_tooltip"
-msgstr "Enter your Simbrief username"
+msgstr "Enter your Simbrief/Navigraph username (e-mail address)"
 
 msgid "simbrief_password"
 msgstr "_Password:"
@@ -879,7 +893,7 @@ msgid "simbrief_password_tooltip"
 msgstr "Enter your Simbrief password"
 
 msgid "simbrief_remember_password"
-msgstr "_Remember password"
+msgstr "_Remember"
 
 msgid "simbrief_remember_tooltip"
 msgstr ""
