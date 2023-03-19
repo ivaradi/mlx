@@ -419,6 +419,8 @@ class Values(object):
             return int(self.longitude * 65536.0 * 65536.0 * 65536.0 * 65536.0 / 360.0)
         elif offset==0x0570:       # Altitude
             return int(self.altitude * const.FEETTOMETRES * 65536.0 * 65536.0)
+        elif offset==0x0590:       # Altitude (MSFS 2020)
+            return self.altitude
         elif offset==0x0578:       # Pitch
             return int(self.pitch * 65536.0 * 65536.0 / 360.0)
         elif offset==0x057c:       # Bank
@@ -685,6 +687,9 @@ class Values(object):
             self.longitude = value * 360.0 / 65536.0 / 65536.0 / 65536.0 / 65536.0
         elif offset==0x0570:       # Altitude
             self.altitude = value / const.FEETTOMETRES / 65536.0 / 65536.0
+            self.radioAltitude = self.altitude - 517
+        elif offset==0x0590:       # Altitude
+            self.altitude = value
             self.radioAltitude = self.altitude - 517
         elif offset==0x0578:       # Pitch
             self.pitch = value * 360.0 / 65536.0 / 65536.0
@@ -1303,6 +1308,9 @@ class CLI(cmd.Cmd):
                                            lambda word: int(float(word) *
                                                              const.FEETTOMETRES *
                                                              65536.0 * 65536.0))
+        self._valueHandlers["msfs2020Altitude"] = ([(0x0590, "F")],
+                                                   lambda value: value,
+                                                   lambda word: float(word))
         self._valueHandlers["gLoad"] = ([(0x11ba, "H")],
                                         lambda value: value / 625.0,
                                         lambda word: int(float(word) * 625.0))

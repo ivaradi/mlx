@@ -1233,6 +1233,7 @@ class AircraftModel(object):
                       ("vs", 0x02c8, "d"),
                       ("radioAltitude", 0x31e4, "d"),
                       ("altitude", 0x0570, "l"),
+                      ("msfs2020Altitude", 0x0590, "F"),
                       ("gLoad", 0x11ba, "h"),
                       ("flapsControl", 0x0bdc, "d"),
                       ("flapsLeft", 0x0be0, "d"),
@@ -1412,7 +1413,10 @@ class AircraftModel(object):
 
         state.radioAltitude = \
             Handler.fsuipc2radioAltitude(data[self._monidx_radioAltitude])
-        state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
+        if self._fsType==const.SIM_MSFS2020:
+            state.altitude = data[self._monidx_msfs2020Altitude]
+        else:
+            state.altitude = data[self._monidx_altitude]/const.FEETTOMETRES/65536.0/65536.0
 
         state.gLoad = data[self._monidx_gLoad] / 625.0
 
