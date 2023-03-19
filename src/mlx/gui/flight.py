@@ -3487,6 +3487,7 @@ class SimBriefSetupPage(Page):
         self._userName.set_sensitive(useInternalBrowserForSimBrief)
         self._password.set_sensitive(useInternalBrowserForSimBrief)
         self._rememberButton.set_sensitive(useInternalBrowserForSimBrief)
+        self._updateForwardButton()
 
     def _handleTime(self, simulatorNow):
         """Handle the result of a time retrieval."""
@@ -3505,6 +3506,7 @@ class SimBriefSetupPage(Page):
         if landingRunway:
             self._wizard.landingRunway = landingRunway
 
+        self._useInternalBrowser.set_sensitive(False)
         self._userName.set_sensitive(False)
         self._password.set_sensitive(False)
         self._rememberButton.set_sensitive(False)
