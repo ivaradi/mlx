@@ -989,6 +989,7 @@ class Simulator(object):
         It will be queried for the data to monitor and the monitoring request
         will be replaced by a new one."""
         self._aircraftModel = model
+        model.setFSType(self._fsType)
 
         if self._monitoring:
             self._stopNormal()
@@ -1331,11 +1332,16 @@ class AircraftModel(object):
         self._flapsNotches = flapsNotches
         self._xpdrReliable = False
         self._flapsSet = -1
+        self._fsType = None
 
     @property
     def name(self):
         """Get the name for this aircraft model."""
         return "FSUIPC/Generic"
+
+    def setFSType(self, fsType):
+        """Set the flight simulator type."""
+        self._fsType = fsType
 
     def doesHandle(self, aircraft, aircraftName):
         """Determine if the model handles the given aircraft name.
@@ -1740,8 +1746,6 @@ class PMDGBoeing737NGModel(B737Model):
 
     def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
-        self._fsType = fsType
-
         super(PMDGBoeing737NGModel, self).addMonitoringData(data, fsType)
 
         if fsType==const.SIM_MSFSX or fsType==const.SIM_P3D or fsType==const.SIM_MSFS2020:
@@ -2177,7 +2181,6 @@ class PTT154Model(T154Model):
     def __init__(self):
         """Construct the model."""
         super(PTT154Model, self).__init__()
-        self._fsType = None
 
     @property
     def name(self):
@@ -2188,8 +2191,6 @@ class PTT154Model(T154Model):
         """Add the model-specific monitoring data to the given array.
 
         It only stores the flight simulator type."""
-        self._fsType = fsType
-
         super(PTT154Model, self).addMonitoringData(data, fsType)
 
     def getAircraftState(self, aircraft, timestamp, data):
