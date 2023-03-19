@@ -86,11 +86,19 @@ class SmoothedValue(object):
 
 class SimBriefData(object):
     """Data to be used when creating SimBrief briefings."""
-    def __init__(self, climbProfiles, cruiseProfiles, descentProfiles):
-        """Construct the SimBrief data with the given profiles."""
+    def __init__(self, climbProfiles, cruiseProfiles, descentProfiles,
+                 cruiseParameters = {}):
+        """Construct the SimBrief data with the given profiles.
+
+        cruiseParameters is a dictionary keyed by the cruise profile index. It
+        contains a tuple of:
+        - a boolean indicating if the parameter is mandatory,
+        - the name of the parameter for the SimBrief API
+        """
         self.climbProfiles = climbProfiles
         self.cruiseProfiles = cruiseProfiles
         self.descentProfiles = descentProfiles
+        self.cruiseParameters = cruiseParameters
 
 #---------------------------------------------------------------------------------------
 
@@ -742,7 +750,8 @@ class B736(Boeing737):
         self.maxTouchDownPitch = 14.7
         self.simBriefData = SimBriefData(["250/280/78"],
                                          ["CI", "M75", "M78", "M79", "M80", "LRC"],
-                                         ["78/280/250"])
+                                         ["78/280/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -759,7 +768,8 @@ class B737(Boeing737):
         self.maxTouchDownPitch = 13.2
         self.simBriefData = SimBriefData(["250/280/78"],
                                          ["CI", "M75", "M78", "M79", "M80", "LRC"],
-                                         ["78/280/250", "78/250/250"])
+                                         ["78/280/250", "78/250/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -776,7 +786,8 @@ class B738(Boeing737):
         self.maxTouchDownPitch = 9.5
         self.simBriefData = SimBriefData(["250/280/78"],
                                          ["CI", "M76", "M78", "M79", "M80", "LRC"],
-                                         ["78/280/250", "78/250/250"])
+                                         ["78/280/250", "78/250/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 

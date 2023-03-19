@@ -3379,8 +3379,17 @@ class SimBriefSetupPage(Page):
         self._cruiseProfile.pack_start(renderer, True)
         self._cruiseProfile.add_attribute(renderer, "text", 0)
         self._cruiseProfile.set_tooltip_text(xstr("simbrief_cruise_profile_tooltip"))
+        self._cruiseProfile.connect("changed", self._cruiseProfileChanged)
         table.attach(self._cruiseProfile, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._cruiseProfile)
+
+        self._cruiseParameter = Gtk.Entry()
+        self._cruiseParameter.set_width_chars(5)
+        self._cruiseParameter.set_tooltip_text(xstr("simbrief_cruise_parameter_tooltip"))
+        self._cruiseParameter.set_sensitive(False)
+        self._cruiseParameter.connect("changed", self._cruiseParameterChanged)
+        table.attach(self._cruiseParameter, 2, 3, row, row+1)
+
         row += 1
 
         label = Gtk.Label(xstr("simbrief_descent_profile"))
@@ -3453,8 +3462,19 @@ class SimBriefSetupPage(Page):
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
         self._button.set_sensitive(True)
-        self._button.set_sensitive(len(self._userName.get_text())>0 and
-                                   len(self._password.get_text())>0)
+
+        sensitive = not self._useInternalBrowser.get_active() or \
+           (len(self._userName.get_text())>0 and
+            len(self._password.get_text())>0)
+        if sensitive:
+            simBriefData = self._wizard.gui.flight.aircraft.simBriefData
+            cruiseProfileIndex = self._cruiseProfile.get_active()
+            sensitive = \
+                cruiseProfileIndex not in simBriefData.cruiseParameters or \
+                not simBriefData.cruiseParameters[cruiseProfileIndex][0] or \
+                len(self._cruiseParameter.get_text())>0
+
+        self._button.set_sensitive(sensitive)
 
     def _backClicked(self, button):
         """Called when the Back button is pressed."""
@@ -3516,6 +3536,7 @@ class SimBriefSetupPage(Page):
 
         self._climbProfile.set_sensitive(False)
         self._cruiseProfile.set_sensitive(False)
+        self._cruiseParameter.set_sensitive(False)
         self._descentProfile.set_sensitive(False)
 
         self._wizard.gui.beginBusy(xstr("simbrief_calling"))
@@ -3693,6 +3714,13 @@ class SimBriefSetupPage(Page):
             value = model.get_value(active, 0)
             plan[key] = value
 
+        cruiseParameters = self._wizard.gui.flight.aircraft.simBriefData.cruiseParameters
+        cruiseProfileIndex = self._cruiseProfile.get_active()
+        if cruiseProfileIndex in cruiseParameters:
+            value = self._cruiseParameter.get_text()
+            if value:
+                plan[cruiseParameters[cruiseProfileIndex][1]] = value
+
         return plan
 
     def _resultCallback(self, returned, result):
@@ -3729,6 +3757,24 @@ class SimBriefSetupPage(Page):
         """Called when the value of some entry widget has changed and the value
         should be converted to uppercase."""
         entry.set_text(entry.get_text().upper())
+
+    def _cruiseProfileChanged(self, comboBox):
+        """Called when the cruise profile has changed.
+
+        It updates the sensitivity of the cruise parameter entry field"""
+        simBriefData = self._wizard.gui.flight.aircraft.simBriefData
+
+        activeIndex = self._cruiseProfile.get_active()
+        self._cruiseParameter.set_sensitive(activeIndex in
+                                            simBriefData.cruiseParameters)
+
+        self._updateForwardButton()
+
+    def _cruiseParameterChanged(self, entry):
+        """Called when the cruise parameter has changed.
+
+        The sensitivty of the Forward button will be updated"""
+        self._updateForwardButton()
 
     def _getResults(self, link):
         """Get the result from the given link."""

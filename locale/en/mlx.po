@@ -936,6 +936,12 @@ msgstr "C_ruise profile:"
 msgid "simbrief_cruise_profile_tooltip"
 msgstr "Select the cruise profile."
 
+msgid "simbrief_cruise_parameter_tooltip"
+msgstr ""
+"A parameter for the cruise profile. For example, "
+"the Cost Index in case of the Boeing 737NG aircraft, "
+"if the selected cruise profile is CI."
+
 msgid "simbrief_descent_profile"
 msgstr "_Descent profile:"
 
