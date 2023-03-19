@@ -998,6 +998,15 @@ msgstr ""
 msgid "simbrief_result_title"
 msgstr "SimBrief repülési terv"
 
+msgid "simbrief_result_briefing"
+msgstr "Eligazítás:"
+
+msgid "simbrief_result_downloads"
+msgstr "Letöltések:"
+
+msgid "simbrief_result_prefile"
+msgstr "Repülési terv beküldése:"
+
 msgid "briefing_title"
 msgstr "Eligazítás (%d/2): %s"
 

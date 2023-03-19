@@ -999,6 +999,15 @@ msgstr ""
 msgid "simbrief_result_title"
 msgstr "SimBrief flight plan"
 
+msgid "simbrief_result_briefing"
+msgstr "Briefing:"
+
+msgid "simbrief_result_downloads"
+msgstr "Downloads:"
+
+msgid "simbrief_result_prefile"
+msgstr "Prefile flight plan:"
+
 msgid "briefing_title"
 msgstr "Briefing (%d/2): %s"
 

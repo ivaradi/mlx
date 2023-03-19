@@ -3746,6 +3746,8 @@ class SimBriefSetupPage(Page):
                     weatherElementList = list(element)
                     for weatherElement in weatherElementList:
                         flightInfo[weatherElement.tag] = weatherElement.text
+                elif element.tag in ["files", "prefile"]:
+                    availableInfo[element.tag] = element
                 else:
                     availableInfo[element.tag] = element.text
 
@@ -3761,7 +3763,61 @@ class SimBriefSetupPage(Page):
             print((sorted(availableInfo.keys())))
             htmlFilePath = SimBriefSetupPage.getHTMLFilePath()
             with open(htmlFilePath, 'w') as f:
+                f.write("<html>")
+                f.write("<body>")
+                f.write("<h3 style=\"text-align: center;\">%s</h3></br>" % (xstr("simbrief_result_briefing"),))
+                f.write("<div style=\"height: 300px; width: fit-content; overflow: auto; margin: 0 auto;\">")
                 f.write(availableInfo["plan_html"])
+                f.write("</div>\n")
+
+                f.write("<h2/>");
+                f.write("<h3 style=\"text-align: center;\">%s</h3></br>" % (xstr("simbrief_result_downloads"),))
+                f.write("<div style=\"height: 300px; width: fit-content; overflow: auto; margin: 0 auto\">")
+                f.write("<table style=\"border: 1px solid; border-collapse: collapse;\">")
+
+                directory = ""
+                for fileData in availableInfo["files"]:
+                    if fileData.tag=="directory":
+                        directory = fileData.text
+
+                for fileData in availableInfo["files"]:
+                    if fileData.tag in ["pdf", "file"]:
+                        name = fileData.find("name").text
+                        link = fileData.find("link").text
+
+                        f.write("<tr>")
+                        f.write("<td style=\"border: 1px solid; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;\">")
+                        f.write(name)
+                        f.write("</td>")
+                        f.write("<td style=\"border: 1px solid; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;\">")
+                        url = directory + link
+                        target = " target=\"_blank\"" if fileData.tag=="pdf" else ""
+                        f.write("<a href=\"%s\"%s>%s</a>" % (url, target, name))
+                        f.write("</td>")
+                        f.write("</tr>")
+
+                f.write("</table>")
+                f.write("</div>\n")
+
+                f.write("<h2/>")
+                f.write("<h3 style=\"text-align: center;\">%s</h3></br>" % (xstr("simbrief_result_prefile"),))
+                f.write("<div style=\"height: 400px; width: fit-content; margin: 0 auto\">")
+                f.write("<table style=\"border: 1px solid; border-collapse: collapse;\">")
+                for prefileData in availableInfo["prefile"]:
+                    name = prefileData.find("name").text
+                    link = prefileData.find("link").text
+                    f.write("<tr>")
+                    f.write("<td style=\"border: 1px solid; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;\">")
+                    f.write("<a href=\"%s\" target=\"_blank\">%s</a>" % (link, name))
+                    f.write("</td>");
+                    f.write("</tr>")
+
+                f.write("</table>")
+                f.write("</div>\n")
+
+                f.write("</body>")
+                f.write("</html>")
+
         except Exception as e:
             print("_getResults", e)
 
@@ -3814,7 +3870,12 @@ class SimBriefingPage(Page):
 
         def OnBeforeClose(self, browser):
             """Called before closing the browser."""
-            self._simBriefingPage._invalidateBrowser()
+            if browser is self._simBriefingPage._browser:
+                self._simBriefingPage._invalidateBrowser()
+
+        def OnBeforeDownload(self, browser, downloadItem, suggestedName, callback):
+            callback.Continue(suggestedName, True)
+            return True
 
     def __init__(self, wizard):
         """Construct the setup page."""
@@ -3822,13 +3883,10 @@ class SimBriefingPage(Page):
         super(SimBriefingPage, self).__init__(wizard, "simbrief_result",
                                               xstr("simbrief_result_title"), "")
 
-        self._alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
-                                       xscale = 1.0, yscale = 1.0)
-
         self._container = cef.getContainer()
-        self._alignment.add(self._container)
+        self._container.set_size_request(650, -1)
 
-        self.setMainWidget(self._alignment)
+        self.setMainWidget(self._container)
 
         self._browser = None
 
@@ -3880,7 +3938,7 @@ class SimBriefingPage(Page):
         If a container is needed, create one."""
         if self._container is None:
             self._container = cef.getContainer()
-            self._alignment.add(self._container)
+            self.setMainWidget(self._container)
         else:
             self._container.show()
 
