@@ -15,8 +15,8 @@ CEF_FULL_VERSION="${CEF_VERSION}+ga98cd4c+chromium-108.0.5359.125"
 
 CEF_NAME="cef_binary_${CEF_FULL_VERSION}_linux64"
 CEFPYTHON_CEF_DIRNAME="cef${CEF_VERSION_MAJOR}_${CEF_FULL_VERSION}_linux64"
-CEFPYTHON_SHA="2c3c542c469808aa2308f5f29498f3a2cd4c4f88"
-MAKEJOBS="4"
+CEFPYTHON_SHA="dbc68bb401f2163496e2503bb89a7084cd92bd56"
+MAKEJOBS="16"
 
 builddir="${1}"
 
@@ -52,7 +52,7 @@ mv "${builddir}/${CEF_NAME}/build/libcef_dll_wrapper/libcef_dll_wrapper.a" "${CE
 
 mv "${builddir}/${CEF_NAME}/LICENSE.txt" "${CEFPYTHON_CEF_DIRNAME}"
 
-pip3 install -r ../tools/requirements.txt
+pip3 install --break-system-packages -r ../tools/requirements.txt
 
 python3 ../tools/build.py "${CEF_VERSION}" || true
 python3 ../tools/make_installer.py "${CEF_VERSION_SHORT}"
