@@ -1233,7 +1233,7 @@ class AircraftModel(object):
                       ("vs", 0x02c8, "d"),
                       ("radioAltitude", 0x31e4, "d"),
                       ("altitude", 0x0570, "l"),
-                      ("msfs2020Altitude", 0x0590, "F"),
+                      ("msfs2020Altitude", 0x0590, "d"),
                       ("gLoad", 0x11ba, "h"),
                       ("flapsControl", 0x0bdc, "d"),
                       ("flapsLeft", 0x0be0, "d"),
