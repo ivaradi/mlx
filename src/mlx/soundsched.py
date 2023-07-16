@@ -148,11 +148,13 @@ class TaxiSound(SimpleSound):
 
     def __init__(self, flight, boardingSound = None):
         """Construct the taxi sound."""
+        config = flight.config
+
         super(TaxiSound, self).__init__(const.SOUND_MALEV,
                                         const.STAGE_PUSHANDTAXI,
                                         previousSound = boardingSound,
                                         extraCondition = lambda _flight, state:
-                                        state.groundSpeed>5)
+                                        config.taxiSoundOnPushback or state.groundSpeed>5)
 
         self._flight = flight
 

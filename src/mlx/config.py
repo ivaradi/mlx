@@ -248,6 +248,8 @@ class Config(object):
         self._pilotControlsSounds = True
         self._pilotHotkey = Hotkey(ctrl = True, shift = False, key = "0")
 
+        self._taxiSoundOnPushback = False
+
         self._enableApproachCallouts = False
         self._speedbrakeAtTD = True
 
@@ -610,6 +612,18 @@ class Config(object):
             self._modified = True
 
     @property
+    def taxiSoundOnPushback(self):
+        """Get whether the taxi sound should be played as soon as pushback starts."""
+        return self._taxiSoundOnPushback
+
+    @taxiSoundOnPushback.setter
+    def taxiSoundOnPushback(self, taxiSoundOnPushback):
+        """Set whether the taxi sound should be played as soon as pushback starts."""
+        if taxiSoundOnPushback!=self._taxiSoundOnPushback:
+            self._taxiSoundOnPushback = taxiSoundOnPushback
+            self._modified = True
+
+    @property
     def enableApproachCallouts(self):
         """Get whether the approach callouts should be played."""
         return self._enableApproachCallouts
@@ -801,6 +815,9 @@ class Config(object):
                                                      "pilotControls", True)
         self._pilotHotkey.set(self._get(config, "sounds",
                                         "pilotHotkey", "C0"))
+
+        self._taxiSoundOnPushback = \
+            self._getBoolean(config, "sounds", "taxiSoundOnPushback", False)
         self._enableApproachCallouts = \
             self._getBoolean(config, "sounds", "enableApproachCallouts", False)
         self._speedbrakeAtTD = self._getBoolean(config, "sounds",
@@ -902,6 +919,8 @@ class Config(object):
         config.set("sounds", "pilotControls",
                    "yes" if self._pilotControlsSounds else "no")
         config.set("sounds", "pilotHotkey", str(self._pilotHotkey))
+        config.set("sounds", "taxiSoundOnPushback",
+                   "yes" if self._taxiSoundOnPushback else "no")
         config.set("sounds", "enableApproachCallouts",
                    "yes" if self._enableApproachCallouts else "no")
         config.set("sounds", "speedbrakeAtTD",
@@ -1045,6 +1064,8 @@ class Config(object):
 
         print("  pilotControlsSounds:", self._pilotControlsSounds)
         print("  pilotHotkey:", str(self._pilotHotkey))
+
+        print("  taxiSoundOnPushback:", self._taxiSoundOnPushback)
 
         print("  enableApproachCallouts:", self._enableApproachCallouts)
         print("  speedbrakeAtTD:", self._speedbrakeAtTD)

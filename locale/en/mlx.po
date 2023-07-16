@@ -1848,6 +1848,15 @@ msgstr "If checked, the Ctrl key should be pressed together with the main key."
 msgid "prefs_sounds_pilotHotkeyShift_tooltip"
 msgstr "If checked, the Shift key should be pressed together with the main key."
 
+msgid "prefs_sounds_taxiSoundOnPushback"
+msgstr "Play safety _demo on pushback"
+
+msgid "prefs_sounds_taxiSoundOnPushback_tooltip"
+msgstr ""
+"If checked, the Malév song and the safety demo are played "
+"immediately as pushback begins. Otherwise they are played when "
+"the plane is taxiing at 5 knots at least"
+
 msgid "prefs_sounds_approachCallouts"
 msgstr "Enable app_roach callouts"
 

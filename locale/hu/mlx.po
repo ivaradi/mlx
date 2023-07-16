@@ -1857,6 +1857,16 @@ msgid "prefs_sounds_pilotHotkeyShift_tooltip"
 msgstr ""
 "Ha kijelölöd, a Shift billentyűt is le kell nyomni a főbillentyűvel együtt."
 
+msgid "prefs_sounds_taxiSoundOnPushback"
+msgstr "Biztonsági _ismertető indítása hátratoláskor"
+
+msgid "prefs_sounds_taxiSoundOnPushback_tooltip"
+msgstr ""
+"Ha bejelölöd, a Malév dalt és a biztonsági ismertetőt "
+"már a hátratolás megkezdésekor elkezdi játszani a program. "
+"Egyébként ezeket csak gurulás közben, 5 csomós sebesség "
+"elérésekor kezdi el."
+
 msgid "prefs_sounds_approachCallouts"
 msgstr "Megközelítési _bemondások engedélyezése"
 

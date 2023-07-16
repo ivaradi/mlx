@@ -270,6 +270,8 @@ class Preferences(Gtk.Dialog):
         self._enableChecklists.set_active(config.enableChecklists)
         self._checklistHotkey.set(config.checklistHotkey)
 
+        self._taxiSoundOnPushback.set_active(config.taxiSoundOnPushback)
+
         self._autoUpdate.set_active(config.autoUpdate)
         if not config.autoUpdate:
             self._warnedAutoUpdate = True
@@ -319,6 +321,8 @@ class Preferences(Gtk.Dialog):
 
         config.enableChecklists = self._enableChecklists.get_active()
         config.checklistHotkey = self._checklistHotkey.get()
+
+        config.taxiSoundOnPushback = self._taxiSoundOnPushback.get_active()
 
         config.autoUpdate = self._autoUpdate.get_active()
         config.updateURL = self._updateURL.get_text()
@@ -699,6 +703,11 @@ class Preferences(Gtk.Dialog):
 
         backgroundBox.pack_start(self._pilotHotkey, False, False, 4)
 
+        self._taxiSoundOnPushback = Gtk.CheckButton(xstr("prefs_sounds_taxiSoundOnPushback"))
+        self._taxiSoundOnPushback.set_use_underline(True)
+        self._taxiSoundOnPushback.set_tooltip_text(xstr("prefs_sounds_taxiSoundOnPushback_tooltip"))
+        backgroundBox.pack_start(self._taxiSoundOnPushback, False, False, 4)
+
         self._enableApproachCallouts = Gtk.CheckButton(xstr("prefs_sounds_approachCallouts"))
         self._enableApproachCallouts.set_use_underline(True)
         self._enableApproachCallouts.set_tooltip_text(xstr("prefs_sounds_approachCallouts_tooltip"))
@@ -749,6 +758,7 @@ class Preferences(Gtk.Dialog):
         active = button.get_active()
         self._pilotControlsSounds.set_sensitive(active)
         self._pilotControlsSoundsToggled(self._pilotControlsSounds)
+        self._taxiSoundOnPushback.set_sensitive(active)
         self._enableApproachCallouts.set_sensitive(active)
         self._speedbrakeAtTD.set_sensitive(active)
 
