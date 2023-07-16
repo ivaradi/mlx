@@ -18,6 +18,7 @@ import urllib.request, urllib.error, urllib.parse
 from lxml import etree
 from io import StringIO
 import lxml.html
+import shutil
 
 #------------------------------------------------------------------------------
 
@@ -220,6 +221,14 @@ def _initializeCEF1(args, initializedCallback):
     """Perform the actual initialization of CEF using the given arguments."""
     print("Initializing CEF with args:", args)
 
+    cacheDir = os.path.join(GLib.get_user_cache_dir(), "mlxcef")
+
+    try:
+        shutil.rmtree(cacheDir)
+        print("gui.cef._initializeCEF1: the cache directory is removed")
+    except Exception as e:
+        print("gui.cef._initializeCEF1: cache directory removal failed:", e)
+
     settings = {
         "debug": True, # cefpython debug messages in console and in log_file
         "log_severity": cefpython.LOGSEVERITY_VERBOSE, # LOGSEVERITY_VERBOSE
@@ -231,8 +240,7 @@ def _initializeCEF1(args, initializedCallback):
         "browser_subprocess_path": "%s/%s" % \
             (cefpython.GetModuleDirectory(), "subprocess"),
         "windowless_rendering_enabled": True,
-        "cache_path": os.path.join(GLib.get_user_cache_dir(),
-                                   "mlxcef")
+        "cache_path": cacheDir
     }
 
     switches={}
