@@ -160,8 +160,14 @@ class SimBriefHandler(object):
                      failed_url):
         """Called when loading of an URL fails."""
         print("gui.cef.SimBriefHandler._onLoadError", browser, frame, error_code, error_text_out, failed_url)
-        self._updateProgress(self._lastProgress,
-                             SIMBRIEF_RESULT_ERROR_OTHER, None)
+        if error_code==-3 and \
+           failed_url.startswith("https://identity.api.navigraph.com/connect/authorize"):
+            self._browser.LoadUrl(SimBriefHandler.getFormURL(self._plan))
+            self._updateProgress(SIMBRIEF_PROGRESS_LOADING_FORM,
+                                 SIMBRIEF_RESULT_NONE, None)
+        else:
+            self._updateProgress(self._lastProgress,
+                                 SIMBRIEF_RESULT_ERROR_OTHER, None)
 
     def _updateProgress(self, progress, results, flightInfo):
         """Update the progress."""
