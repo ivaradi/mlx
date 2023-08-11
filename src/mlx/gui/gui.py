@@ -868,7 +868,7 @@ class GUI(fs.ConnectionListener):
 
     def flushStdIO(self):
         """Flush any text to the standard error that could not be logged."""
-        if self._stdioText:
+        if self._stdioText and sys.__stderr__ is not None:
             sys.__stderr__.write(self._stdioText)
 
     def writeStdIO(self, text):

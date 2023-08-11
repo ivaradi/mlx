@@ -33,6 +33,7 @@ try:
 except:
     pass
 from gi.repository import Pango
+gi.require_version("PangoCairo", "1.0")
 from gi.repository import PangoCairo
 from gi.repository import GLib
 

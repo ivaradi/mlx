@@ -123,8 +123,9 @@ class SimBriefHandler(object):
 
     def finalize(self):
         """Close the browser and release it."""
-        self._browser.CloseBrowser()
-        self._browser = None
+        if self._browser is not None:
+            self._browser.CloseBrowser(True)
+            self._browser = None
 
     def _onLoadEnd(self, browser, frame, http_code):
         """Called when a page has been loaded in the SimBrief browser."""
