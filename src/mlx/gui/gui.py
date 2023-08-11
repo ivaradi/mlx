@@ -117,7 +117,7 @@ class GUI(fs.ConnectionListener):
             window.set_visual(window.get_screen().lookup_visual(0x21))
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
-        window.set_resizable(False)
+        window.set_resizable(self.config.mainWindowResizable)
         window.connect("delete-event", self.deleteMainWindow)
         window.connect("window-state-event", self._handleMainWindowState)
         if os.name=="nt":
@@ -1431,6 +1431,7 @@ class GUI(fs.ConnectionListener):
         """Callback for editing the preferences."""
         self._clearHotkeys()
         self._preferences.run(self.config)
+        self._mainWindow.set_resizable(self.config.mainWindowResizable)
         self._setupTimeSync()
         self._listenHotkeys()
 

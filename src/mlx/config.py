@@ -223,6 +223,7 @@ class Config(object):
 
         self._clearBrowserCacheOnStart = False
         self._language = ""
+        self._mainWindowResizable = False
         self._hideMinimizedWindow = True
         self._quitOnClose = False
         self._onlineGateSystem = not secondaryInstallation
@@ -331,6 +332,18 @@ class Config(object):
         """Set the language to use."""
         if language!=self._language:
             self._language = language
+            self._modified = True
+
+    @property
+    def mainWindowResizable(self):
+        """Get whether a the main window should be resizable."""
+        return self._mainWindowResizable
+
+    @mainWindowResizable.setter
+    def mainWindowResizable(self, mainWindowResizable):
+        """Set whether a minimized window should be hidden."""
+        if mainWindowResizable!=self._mainWindowResizable:
+            self._mainWindowResizable = mainWindowResizable
             self._modified = True
 
     @property
@@ -772,6 +785,9 @@ class Config(object):
 
         self._language = self._get(config, "general", "language", "")
 
+        self._mainWindowResizable = self._getBoolean(config, "general",
+                                                     "mainWindowResizable",
+                                                     False)
         self._hideMinimizedWindow = self._getBoolean(config, "general",
                                                      "hideMinimizedWindow",
                                                      True)
@@ -883,6 +899,8 @@ class Config(object):
                    "yes" if self._clearBrowserCacheOnStart else "no")
         if self._language:
             config.set("general", "language", self._language)
+        config.set("general", "mainWindowResizable",
+                   "yes" if self._mainWindowResizable else "no")
         config.set("general", "hideMinimizedWindow",
                    "yes" if self._hideMinimizedWindow else "no")
         config.set("general", "quitOnClose",
@@ -1055,6 +1073,7 @@ class Config(object):
         print("  clearBrowseCacheOnStart:", self._clearBrowserCacheOnStart)
         print("  language:", self._language)
 
+        print("  mainWindowResizable:", self._mainWindowResizable)
         print("  hideMinimizedWindow:", self._hideMinimizedWindow)
         print("  quitOnClose:", self._quitOnClose)
 

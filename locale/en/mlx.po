@@ -1676,6 +1676,17 @@ msgstr "English"
 msgid "prefs_lang_hu_HU"
 msgstr "Hungarian"
 
+msgid "prefs_mainWindowResizable"
+msgstr "_Resizable main window"
+
+msgid "prefs_mainWindowResizable_tooltip"
+msgstr ""
+"If checked, the main window can be resized. The default size of the "
+"main window is just enough to be able to show the interface elements "
+"properly, so resizing it is rarely necessary. However, there may be "
+"case when it is desirable. For example, if you have a screen that is "
+"just a bit larger than the window."
+
 msgid "prefs_hideMinimizedWindow"
 msgstr "_Hide the main window when minimized"
 

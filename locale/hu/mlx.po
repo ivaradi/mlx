@@ -1717,6 +1717,17 @@ msgstr "angol"
 msgid "prefs_lang_hu_HU"
 msgstr "magyar"
 
+msgid "prefs_mainWindowResizable"
+msgstr "Át_méretezhető főablak"
+
+msgid "prefs_mainWindowResizable_tooltip"
+msgstr ""
+"Ha ezt kijelölöd, a főablakot át lehet méretezni. Az induláskor "
+"látható méret éppen megfelel ahhoz, hogy a grafikus felület elemeit "
+"megfelelően lássuk. Ezért az átméretezésre ritkán van szükség, de "
+"előfordulhatnak olyan esetek, amikor az hasznos. Például akkor, "
+"ha a képernyőnk mérete csak egy kicsivel nagyobb az ablakénál."
+
 msgid "prefs_hideMinimizedWindow"
 msgstr "A főablak _eltüntetése minimalizáláskor"
 

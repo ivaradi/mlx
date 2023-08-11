@@ -230,6 +230,7 @@ class Preferences(Gtk.Dialog):
         self._settingFromConfig = True
 
         self._setLanguage(config.language)
+        self._mainWindowResizable.set_active(config.mainWindowResizable)
         self._hideMinimizedWindow.set_active(config.hideMinimizedWindow)
         self._quitOnClose.set_active(config.quitOnClose)
         self._onlineGateSystem.set_active(config.onlineGateSystem)
@@ -286,6 +287,7 @@ class Preferences(Gtk.Dialog):
     def _toConfig(self, config):
         """Setup the given config from the settings in the dialog."""
         config.language = self._getLanguage()
+        config.mainWindowResizable = self._mainWindowResizable.get_active()
         config.hideMinimizedWindow = self._hideMinimizedWindow.get_active()
         config.quitOnClose = self._quitOnClose.get_active()
         config.onlineGateSystem = self._onlineGateSystem.get_active()
@@ -367,6 +369,11 @@ class Preferences(Gtk.Dialog):
 
         self._changingLanguage = False
         self._warnedRestartNeeded = False
+
+        self._mainWindowResizable = Gtk.CheckButton(xstr("prefs_mainWindowResizable"))
+        self._mainWindowResizable.set_use_underline(True)
+        self._mainWindowResizable.set_tooltip_text(xstr("prefs_mainWindowResizable_tooltip"))
+        guiBox.pack_start(self._mainWindowResizable, False, False, 4)
 
         self._hideMinimizedWindow = Gtk.CheckButton(xstr("prefs_hideMinimizedWindow"))
         self._hideMinimizedWindow.set_use_underline(True)
