@@ -195,6 +195,14 @@ msgstr "_Preferences"
 msgid "menu_tools_prefs_key"
 msgstr "p"
 
+msgid "menu_tools_clear_cef_cache"
+msgstr "C_lear browser cache"
+
+msgid "clear_cef_cache_confirmation"
+msgstr ""
+"Are you sure to clear the browser cache?\n\n"
+"If so, the program will quit and then restart."
+
 msgid "menu_tools_bugreport"
 msgstr "_Report bug"
 

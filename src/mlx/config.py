@@ -221,6 +221,7 @@ class Config(object):
         self._password = ""
         self._rememberPassword = False
 
+        self._clearBrowserCacheOnStart = False
         self._language = ""
         self._hideMinimizedWindow = True
         self._quitOnClose = False
@@ -306,6 +307,18 @@ class Config(object):
         """Set if we should remember the password."""
         if rememberPassword!=self._rememberPassword:
             self._rememberPassword = rememberPassword
+            self._modified = True
+
+    @property
+    def clearBrowseCacheOnStart(self):
+        """Get whether the browser cache should be cleared on start."""
+        return self._clearBrowserCacheOnStart
+
+    @clearBrowseCacheOnStart.setter
+    def clearBrowseCacheOnStart(self, clearBrowseCacheOnStart):
+        """Set whether the browser cache should be cleared on start."""
+        if clearBrowseCacheOnStart!=self._clearBrowserCacheOnStart:
+            self._clearBrowserCacheOnStart = clearBrowseCacheOnStart
             self._modified = True
 
     @property
@@ -753,6 +766,10 @@ class Config(object):
         self._rememberPassword = self._getBoolean(config, "login",
                                                   "rememberPassword", False)
 
+        self._clearBrowserCacheOnStart = \
+            self._getBoolean(config, "general",
+                             "clearBrowseCacheOnStart", False)
+
         self._language = self._get(config, "general", "language", "")
 
         self._hideMinimizedWindow = self._getBoolean(config, "general",
@@ -862,6 +879,8 @@ class Config(object):
                    "yes" if self._rememberPassword else "no")
 
         config.add_section("general")
+        config.set("general", "clearBrowseCacheOnStart",
+                   "yes" if self._clearBrowserCacheOnStart else "no")
         if self._language:
             config.set("general", "language", self._language)
         config.set("general", "hideMinimizedWindow",
@@ -1033,6 +1052,7 @@ class Config(object):
         print("  pilot ID:", self._pilotID)
         print("  rememberPassword:", self._rememberPassword)
 
+        print("  clearBrowseCacheOnStart:", self._clearBrowserCacheOnStart)
         print("  language:", self._language)
 
         print("  hideMinimizedWindow:", self._hideMinimizedWindow)

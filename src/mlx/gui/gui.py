@@ -479,10 +479,16 @@ class GUI(fs.ConnectionListener):
         else:
             self.updateDone()
 
+        if self.config.clearBrowseCacheOnStart:
+            cef.clearCache()
+            self.config.clearBrowseCacheOnStart = False
+
         singleton.raiseCallback = self.raiseCallback
         Gtk.main()
         singleton.raiseCallback = None
 
+        self._wizard.finalizeCEF()
+        cef.finalizeSimBrief()
         self._acars.stop()
 
         cef.finalize()
@@ -854,9 +860,10 @@ class GUI(fs.ConnectionListener):
         else:
             self.showMonitorWindow()
 
-    def restart(self):
+    def restart(self, clearCEFCache = False):
         """Quit and restart the application."""
         self.toRestart = True
+        self.config.clearBrowseCacheOnStart = clearCEFCache
         self._quit(force = True)
 
     def flushStdIO(self):
@@ -1176,6 +1183,14 @@ class GUI(fs.ConnectionListener):
 
         toolsMenu.append(Gtk.SeparatorMenuItem())
 
+        clearCEFCacheMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_DISCARD)
+        clearCEFCacheMenuItem.set_use_stock(True)
+        clearCEFCacheMenuItem.set_label(xstr("menu_tools_clear_cef_cache"))
+        clearCEFCacheMenuItem.connect("activate", self._clearCEFCache)
+        toolsMenu.append(clearCEFCacheMenuItem)
+
+        toolsMenu.append(Gtk.SeparatorMenuItem())
+
         bugReportMenuItem = Gtk.ImageMenuItem(Gtk.STOCK_PASTE)
         bugReportMenuItem.set_use_stock(True)
         bugReportMenuItem.set_label(xstr("menu_tools_bugreport"))
@@ -1418,6 +1433,12 @@ class GUI(fs.ConnectionListener):
         self._preferences.run(self.config)
         self._setupTimeSync()
         self._listenHotkeys()
+
+    def _clearCEFCache(self, menuItem):
+        """Callback for clearing the CEF cache."""
+        if askYesNo(xstr("clear_cef_cache_confirmation"),
+                    parent = self._mainWindow):
+            self.restart(clearCEFCache = True)
 
     def _reportBug(self, menuItem):
         """Callback for reporting a bug."""

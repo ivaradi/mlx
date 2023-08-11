@@ -195,6 +195,14 @@ msgstr "_Beállítások"
 msgid "menu_tools_prefs_key"
 msgstr "b"
 
+msgid "menu_tools_clear_cef_cache"
+msgstr "Böngésző gyorsítótár _törlése"
+
+msgid "clear_cef_cache_confirmation"
+msgstr ""
+"Biztosan törölni szeretnéd a böngésző gyorsítótárát?\n\n"
+"Ha igen, a program újra fog indulni."
+
 msgid "menu_tools_bugreport"
 msgstr "_Hibajelentés"
 

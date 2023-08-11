@@ -26,18 +26,22 @@ class ACARS(Gtk.VBox):
         """Construct the flight info tab."""
         super(ACARS, self).__init__()
         self._gui = gui
+        self._container = None
         self._browser = None
 
     def start(self):
         """Start the browser."""
-        container = cef.getContainer()
+        self._container = cef.getContainer()
+        self.pack_start(self._container, True, True, 0)
 
-        self.pack_start(container, True, True, 0)
-
-        self._browser = cef.startInContainer(container, ACARS.URL)
+        self._browser = cef.startInContainer(self._container, ACARS.URL)
 
     def stop(self):
         """Close the browser."""
         if self._browser is not None:
-            self._browser.CloseBrowser(False)
+            self._browser.CloseBrowser(True)
             self._browser = None
+
+        if self._container is not None:
+            self.remove(self._container)
+            self._container = None

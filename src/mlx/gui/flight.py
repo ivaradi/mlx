@@ -4001,6 +4001,13 @@ class SimBriefingPage(Page):
         self._container.hide()
         self._browser = None
 
+    def finalizeCEF(self):
+        """Close the CEF browser."""
+        if self._browser is not None:
+            self._container.hide()
+            self._browser.CloseBrowser(True)
+            self._browser = None
+
 #-----------------------------------------------------------------------------
 
 class FuelTank(Gtk.VBox):
@@ -6737,6 +6744,10 @@ class Wizard(Gtk.VBox):
     def rtoToggled(self, indicated):
         """Called when the RTO indication has changed."""
         self.gui.rtoToggled(indicated)
+
+    def finalizeCEF(self):
+        """Called when any CEF browsers should be finalized."""
+        self._simBriefingPage.finalizeCEF()
 
     def _connectSimulator(self, simulatorType):
         """Connect to the simulator."""
