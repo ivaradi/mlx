@@ -445,6 +445,7 @@ class BookedFlight(RPCObject):
 
             line = f.readline()
 
+        self.date = date
         if date is not None:
             if departureTime is not None:
                 self.departureTime = BookedFlight.getDateTime(date,
