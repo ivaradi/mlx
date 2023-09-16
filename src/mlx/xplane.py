@@ -963,7 +963,8 @@ class Simulator(object):
 
         zuluSeconds = data[1]
         if self._lastZuluSeconds is not None and \
-           zuluSeconds<self._lastZuluSeconds:
+           zuluSeconds<self._lastZuluSeconds and \
+           self._monitoring:
             diff = self._lastZuluSeconds - zuluSeconds
             print("xplane.Simulator._getTimestamp: Zulu seconds have gone backwards: %f -> %f, diff: %f" % \
                   (self._lastZuluSeconds, zuluSeconds, diff))
