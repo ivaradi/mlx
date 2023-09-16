@@ -2233,6 +2233,50 @@ class FelisT154Model(T154Model):
 
 #------------------------------------------------------------------------------
 
+class FelisT154B2Model(T154Model):
+    """Model for Felis' Tupolev Tu-154-B2 aircraft."""
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return aircraft.type==const.AIRCRAFT_T154 and \
+          author.find("Felis")!=-1 and \
+          description.find("Tu154B2")!=-1
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "X-Plane/Felis Tupolev Tu-154-B2"
+
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super(FelisT154B2Model, self).addMonitoringData(data, fsType)
+
+        self._parkingBrakeIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/custom/controll/parking_brake",
+                                        TYPE_INT)
+        self._cgIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/custom/misc/cg_pos_actual",
+                                        TYPE_FLOAT)
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then invert the pitot heat state."""
+        state = super(FelisT154B2Model, self).getAircraftState(aircraft,
+                                                               timestamp,
+                                                               data)
+
+        state.parking = data[self._parkingBrakeIndex]!=0
+        state.cog = data[self._cgIndex]/100.0
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class YK40Model(GenericAircraftModel):
     """Generic model for the Yakovlev Yak-40 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
@@ -2278,6 +2322,7 @@ AircraftModel.registerSpecial(LevelUpB738Model)
 AircraftModel.registerSpecial(FJSDH8DModel)
 AircraftModel.registerSpecial(FJSDH8DXPModel)
 AircraftModel.registerSpecial(FelisT154Model)
+AircraftModel.registerSpecial(FelisT154B2Model)
 
 #------------------------------------------------------------------------------
 
