@@ -52,7 +52,8 @@ class StageChecker(StateChecker):
             aircraft.setStage(state, const.STAGE_BOARDING)
         elif stage==const.STAGE_BOARDING:
             if not state.parking or \
-               (not state.trickMode and state.groundSpeed>5.0):
+               (not state.trickMode and state.groundSpeed>5.0) or \
+               (flight.departureGateIsTaxiThrough and state.antiCollisionLightsOn):
                 aircraft.setStage(state, const.STAGE_PUSHANDTAXI)
         elif stage==const.STAGE_TAKEOFF:
             if not state.gearsDown or \
