@@ -10,7 +10,7 @@
 class Gate(object):
     """Information about a gate."""
     def __init__(self, number, terminal, type,
-                 availableFn = None):
+                 availableFn = None, taxiThrough = False):
         """Construct the gate with the given information.
 
         number is the gate's number as a string (as it can contain letters).
@@ -24,11 +24,17 @@ class Gate(object):
         self._terminal = terminal
         self._type = type
         self._availableFn = availableFn
+        self._taxiThrough = taxiThrough
 
     @property
     def number(self):
         """Get the number of the gate."""
         return self._number
+
+    @property
+    def taxiThrough(self):
+        """Get if the gate is a taxi through one."""
+        return self._taxiThrough
 
     def isAvailable(self, gates, occupiedGateNumbers):
         """Determine if this gate is available given the set of gates and
@@ -88,6 +94,12 @@ class Gates(object):
         self._gates.append(gate)
         self._displayInfos.append((Gates.DISPLAY_GATE, gate))
         self._addRow()
+
+    def find(self, gateNumber):
+        """Find a gate by its number."""
+        for gate in self._gates:
+            if gate.number == gateNumber:
+                return gate
 
     def addSpace(self):
         """Add a space between subsequent gates."""
@@ -181,13 +193,17 @@ lhbpGates.add(Gate("R117", "1", "S"))
 lhbpGates.addNewColumn()
 
 lhbpGates.add(Gate("R210", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R212A"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R212A"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R211", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R212A"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R212A"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R212", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R212A"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R212A"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R212A", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R210", "R211", "R212"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R210", "R211", "R212"]),
+                   taxiThrough = True))
 lhbpGates.addSpace()
 
 lhbpGates.add(Gate("R220", "2B", "S"))
@@ -210,8 +226,11 @@ lhbpGates.add(Gate("R275", "2A", "S"))
 lhbpGates.add(Gate("R276", "2A", "S"))
 lhbpGates.add(Gate("R277", "2A", "S"))
 lhbpGates.add(Gate("R278", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R278A"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R278A"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R278A", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R278", "R279"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R278", "R279"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R279", "2A", "S",
-                   availableFn = getAvilableIf(othersAvailable = ["R278A"])))
+                   availableFn = getAvilableIf(othersAvailable = ["R278A"]),
+                   taxiThrough = True))
