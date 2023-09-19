@@ -1910,8 +1910,8 @@ class MajesticDH8DModel(DH8DModel):
         (name, airPath) = aircraftName
         return aircraft.type==const.AIRCRAFT_DH8D and \
             (name.find("MJC8Q400")!=-1 or \
-             airPath.lower().find("mjc8q400") or \
-             airPath.lower().find("mjc8q4.air"))
+             airPath.lower().find("mjc8q400")!=-1 or \
+             airPath.lower().find("mjc8q4.air")!=-1)
 
     @property
     def name(self):
