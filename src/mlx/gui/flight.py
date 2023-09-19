@@ -16,6 +16,7 @@ from mlx.i18n import xstr, getLanguage
 from mlx.sound import startSound
 from mlx.rpc import BookedFlight
 import mlx.web as web
+from mlx.gates import lhbpGates
 
 import datetime
 import time
@@ -6557,6 +6558,15 @@ class Wizard(Gtk.VBox):
 
         self.setCurrentPage(firstPage)
         #self.setCurrentPage(10)
+
+    @property
+    def isDepartureGateTaxiThrough(self):
+        """Determine if the departure gate is a taxi-through one."""
+        if self._departureGate=="-":
+            return True
+        else:
+            gate = lhbpGates.find(self._departureGate)
+            return False if gate is None else gate.taxiThrough
 
     def login(self, callback, pilotID, password):
         """Called when the login button was clicked."""

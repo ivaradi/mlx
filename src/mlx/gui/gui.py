@@ -1059,6 +1059,11 @@ class GUI(fs.ConnectionListener):
         self._flight.aircraft = acft.Aircraft.create(self._flight, bookedFlight)
         self._flight.aircraft._checkers.append(self)
 
+        self._flight.departureGateIsTaxiThrough = self._wizard.isDepartureGateTaxiThrough
+        print("The departure gate is '%s', and it is %staxi-through" %
+              (self._wizard._departureGate,
+               "" if self._flight.departureGateIsTaxiThrough else "not "))
+
         if self._simulator is None:
             self._simulator = fs.createSimulator(simulatorType, self)
             fs.setupMessageSending(self.config, self._simulator)

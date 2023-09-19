@@ -121,6 +121,8 @@ class Flight(object):
 
         self._maxAltitude = 0
 
+        self.departureGateIsTaxiThrough = True
+
     @property
     def config(self):
         """Get the configuration."""
