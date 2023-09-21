@@ -214,15 +214,6 @@ def initialize(initializedCallback):
 
 def _initializeCEF(args, initializedCallback):
     """Perform the actual initialization of CEF using the given arguments."""
-    if os.name=="nt":
-        _initializeCEF1(args, initializedCallback)
-    else:
-        GObject.timeout_add(100, _initializeCEF1, args, initializedCallback)
-
-#------------------------------------------------------------------------------
-
-def _initializeCEF1(args, initializedCallback):
-    """Perform the actual initialization of CEF using the given arguments."""
     print("Initializing CEF with args:", args)
 
     settings = {
@@ -260,6 +251,12 @@ def _initializeCEF1(args, initializedCallback):
     print("Initialized, executing callback...")
     initializedCallback()
     return False
+
+#------------------------------------------------------------------------------
+
+def messageLoop():
+    """Run the CEF message loop"""
+    cefpython.MessageLoop()
 
 #------------------------------------------------------------------------------
 
@@ -379,6 +376,12 @@ def finalizeSimBrief():
     """Finallize the (hidden) browser window for SimBrief."""
     if _simBriefHandler is not None:
         _simBriefHandler.finalize()
+
+#------------------------------------------------------------------------------
+
+def quitMessageLoop():
+    """Quit the CEF message loop"""
+    cefpython.QuitMessageLoop()
 
 #------------------------------------------------------------------------------
 

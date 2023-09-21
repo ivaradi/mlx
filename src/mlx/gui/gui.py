@@ -484,7 +484,12 @@ class GUI(fs.ConnectionListener):
             self.config.clearBrowseCacheOnStart = False
 
         singleton.raiseCallback = self.raiseCallback
-        Gtk.main()
+        if os.name=="nt":
+            Gtk.main()
+        else:
+            cef.initialize(self._cefInitialized)
+            cef.messageLoop()
+
         singleton.raiseCallback = None
 
         self._wizard.finalizeCEF()
@@ -1322,7 +1327,11 @@ class GUI(fs.ConnectionListener):
 
         if result==Gtk.ResponseType.YES:
             self._statusIcon.destroy()
-            return Gtk.main_quit()
+            if os.name=="nt":
+                return Gtk.main_quit()
+            else:
+                cef.quitMessageLoop()
+                return True
 
     def _notebookPageSwitch(self, notebook, page, page_num):
         """Called when the current page of the notebook has changed."""
@@ -1971,7 +1980,8 @@ class GUI(fs.ConnectionListener):
 
         It checks if we already know the PID, and if not, asks the user whether
         to register."""
-        cef.initialize(self._cefInitialized)
+        if os.name=="nt":
+            cef.initialize(self._cefInitialized)
 
         if not self.config.pilotID and not self.config.password:
             dialog = Gtk.MessageDialog(parent = self._mainWindow,
