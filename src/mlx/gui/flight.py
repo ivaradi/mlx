@@ -3881,7 +3881,8 @@ class SimBriefSetupPage(Page):
         if flightInfo:
             self._wizard.departureMETARChanged(flightInfo["orig_metar"],
                                                self)
-            self._wizard.arrivalMETARChanged(flightInfo["dest_metar"], self)
+            self._wizard.arrivalMETARChanged(flightInfo["dest_metar"], self,
+                                             fromDownload = True)
             self._wizard.nextPage()
         else:
             self._finishWithError()
@@ -4470,7 +4471,7 @@ class BriefingPage(Page):
         self._metar.get_buffer().set_text(metar)
         self.metarEdited = False
 
-    def changeMETAR(self, metar):
+    def changeMETAR(self, metar, fromEditing = True):
         """Change the METAR as a result of an edit on one of the other
         pages."""
         self._updatingMETAR = True
@@ -4478,7 +4479,7 @@ class BriefingPage(Page):
         self._updatingMETAR = False
 
         self._updateButton()
-        self.metarEdited = True
+        self.metarEdited = fromEditing
 
     def activate(self):
         """Activate the page."""
@@ -4873,7 +4874,7 @@ class TakeoffPage(Page):
             self._rto.set_active(False)
         self._rto.set_sensitive(enabled)
 
-    def changeMETAR(self, metar):
+    def changeMETAR(self, metar, fromEditing = True):
         """Change the METAR as a result of an edit on one of the other
         pages."""
         if self._active:
@@ -5392,7 +5393,7 @@ class LandingPage(Page):
         self._flightEnded = True
         self._updateForwardButton()
 
-    def changeMETAR(self, metar):
+    def changeMETAR(self, metar, fromEditing = True):
         """Change the METAR as a result of an edit on one of the other
         pages."""
         if self._active:
@@ -6640,7 +6641,7 @@ class Wizard(Gtk.VBox):
             if page is not originator:
                 page.changeMETAR(metar)
 
-    def arrivalMETARChanged(self, metar, originator):
+    def arrivalMETARChanged(self, metar, originator, fromDownload = False):
         """Called when the arrival METAR has been edited on one of the
         pages.
 
@@ -6648,7 +6649,7 @@ class Wizard(Gtk.VBox):
         called to set the METAR, while others will be."""
         for page in [self._arrivalBriefingPage, self._landingPage]:
             if page is not originator:
-                page.changeMETAR(metar)
+                page.changeMETAR(metar, fromEditing = not fromDownload)
 
     def _removePendingFlight(self, flight):
         """Remove the given pending flight from the login result."""
