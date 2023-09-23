@@ -2263,6 +2263,15 @@ class FelisT154B2Model(T154Model):
                                         "sim/custom/misc/cg_pos_actual",
                                         TYPE_FLOAT)
 
+        self._flapsControlIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/custom/controll/flaps_lever",
+                                        TYPE_FLOAT)
+        self._flapsIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel/controls/fla1_def",
+                                        (TYPE_FLOAT_ARRAY, 2, 8))
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
@@ -2273,6 +2282,8 @@ class FelisT154B2Model(T154Model):
 
         state.parking = data[self._parkingBrakeIndex]!=0
         state.cog = data[self._cgIndex]/100.0
+        state.flapsSet = data[self._flapsControlIndex]
+        state.flaps = data[self._flapsIndex][0]
 
         return state
 
