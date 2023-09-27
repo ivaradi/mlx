@@ -208,7 +208,7 @@ def initialize(initializedCallback):
     GObject.threads_init()
 
     _simBriefHandler = SimBriefHandler()
-    _initializeCEF([], initializedCallback)
+    GObject.timeout_add(100, _initializeCEF, [], initializedCallback)
 
 #------------------------------------------------------------------------------
 
@@ -250,6 +250,10 @@ def _initializeCEF(args, initializedCallback):
 
     print("Initialized, executing callback...")
     initializedCallback()
+
+    if os.name != "nt":
+        Gtk.main_quit()
+
     return False
 
 #------------------------------------------------------------------------------
