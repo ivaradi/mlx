@@ -24,7 +24,11 @@ mkdir -p "${builddir}"
 
 cd "${builddir}"
 rm  -rf "${CEF_NAME}"
-wget -O - "https://cef-builds.spotifycdn.com/${CEF_NAME}.tar.bz2" | bzip2 -dc | tar xf -
+if test -f "${HOME}/sources/mlx/${CEF_NAME}.tar.bz2"; then
+    tar xf "${HOME}/sources/mlx/${CEF_NAME}.tar.bz2"
+else
+    wget -O - "https://cef-builds.spotifycdn.com/${CEF_NAME}.tar.bz2" | bzip2 -dc | tar xf -
+fi
 
 cd "${CEF_NAME}"
 mv tests tests.orig
