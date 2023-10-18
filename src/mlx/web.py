@@ -653,13 +653,10 @@ class GetMETARs(Request):
 
     def run(self):
         """Perform the retrieval opf the METARs."""
-        url = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?"
-        data = urllib.parse.urlencode([ ("dataSource" , "metars"),
-                                  ("requestType",  "retrieve"),
-                                  ("format", "csv"),
-                                  ("stationString", " ".join(self._airports)),
-                                  ("hoursBeforeNow", "24"),
-                                  ("mostRecentForEachStation", "constraint")])
+        url = "https://aviationweather.gov/cgi-bin/data/metar.php?"
+        data = urllib.parse.urlencode([ ("ids", ",".join(self._airports)),
+                                        ("hours", "0"),
+                                        ("format", "raw") ])
         result = Result()
         result.metars = {}
         try:
