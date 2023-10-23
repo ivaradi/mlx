@@ -821,6 +821,9 @@ class B732(Boeing737CL):
         self.mzfw = 43091
         self.maxTakeOffPitch = 15.5
         self.maxTouchDownPitch = 15.5
+        self.simBriefData = SimBriefData(["250/280/70"],
+                                         ["LRC", "M72", "M73", "M74"],
+                                         ["74/320/250"])
 
 #---------------------------------------------------------------------------------------
 
@@ -835,6 +838,10 @@ class B733(Boeing737CL):
         self.mzfw = 47625
         self.maxTakeOffPitch = 13.4
         self.maxTouchDownPitch = 12.0
+        self.simBriefData = SimBriefData(["250/280/74"],
+                                         ["CI", "M74", "M76", "M78", "LRC"],
+                                         ["74/280/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -848,6 +855,10 @@ class B734(Boeing737CL):
         self.mzfw = 51256
         self.maxTakeOffPitch = 11.4
         self.maxTouchDownPitch = 10
+        self.simBriefData = SimBriefData(["250/280/74"],
+                                         ["CI", "M74", "M76", "M78", "LRC"],
+                                         ["74/280/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -862,6 +873,10 @@ class B735(Boeing737CL):
         self.mzfw = 46720
         self.maxTakeOffPitch = 14.7
         self.maxTouchDownPitch = 13.2
+        self.simBriefData = SimBriefData(["250/280/74"],
+                                         ["CI", "M74", "M76", "M78", "LRC"],
+                                         ["74/280/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -931,6 +946,11 @@ class B762(Boeing767):
         self.mzfw = 114758
         self.maxTakeOffPitch = 13.1
         self.maxTouchDownPitch = 11.6
+        self.simBriefData = SimBriefData(["250/290/78"],
+                                         ["CI", "M76", "M78", "M80", "M82",
+                                          "M84", "M85", "LRC"],
+                                         ["78/290/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -947,7 +967,8 @@ class B763(Boeing767):
         self.maxTouchDownPitch = 8.1
         self.simBriefData = SimBriefData(["250/290/78"],
                                          ["CI", "M76", "M78", "M80", "M82", "M84", "LRC"],
-                                         ["78/290/250"])
+                                         ["78/290/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
     def setBookedFlight(self, bookedFlight):
         """Update the aircraft based on the booked flight data (e.g. tail number)."""
@@ -981,7 +1002,8 @@ class CRJ2(Aircraft):
         self.maxTouchDownPitch = 18.0
         self.simBriefData = SimBriefData(["250/70", "290/74"],
                                          ["CI", "LRC", "M70", "M72", "M74", "M77", "M80"],
-                                         ["74/290/250", "77/320/250"])
+                                         ["74/290/250", "77/320/250"],
+                                         cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
 
@@ -1009,6 +1031,9 @@ class F70(Aircraft):
         self.reverseMinSpeed = 50
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
+        self.simBriefData = SimBriefData(["250/280/70"],
+                                         ["M70", "LRC"],
+                                         ["70/280/250"])
 
     @property
     def derateType(self):
@@ -1130,7 +1155,7 @@ class T154(Aircraft):
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
         self.simBriefData = SimBriefData(["AUTO"],
-                                         ["300/M80"],
+                                         ["AUTO"],
                                          ["AUTO"])
 
     @property
@@ -1249,7 +1274,9 @@ class B462(Aircraft):
                                  24 : 180,
                                  30 : 170,
                                  33 : 150 }
-
+        self.simBriefData = SimBriefData(["HighSpeed", "LongRange"],
+                                         ["M70", "MCR", "LRC"],
+                                         ["HighSpeed", "LongRange"])
     @property
     def derateType(self):
         """Get the derate type for this type."""
