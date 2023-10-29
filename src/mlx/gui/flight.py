@@ -2998,10 +2998,20 @@ class RoutePage(Page):
         """Get the filed cruise level."""
         return self._cruiseLevel.get_value_as_int()
 
+    @filedCruiseLevel.setter
+    def filedCruiseLevel(self, fl):
+        """Set the filed cruise level."""
+        self._cruiseLevel.set_value(fl)
+
     @property
     def route(self):
         """Get the route."""
         return self._getRoute()
+
+    @route.setter
+    def route(self, r):
+        """Set the route."""
+        self._route.get_buffer().set_text(r)
 
     @property
     def alternate(self):
@@ -3024,11 +3034,20 @@ class RoutePage(Page):
 
     def _updateForwardButton(self):
         """Update the sensitivity of the forward button."""
-        cruiseLevelText = self._cruiseLevel.get_text()
-        cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
+        flight = self._wizard.gui.flight
+        useSimBrief = \
+            flight is not None and flight.aircraft.simBriefData is not None and \
+            self._wizard.gui.config.useSimBrief and \
+            self._wizard.usingSimBrief is not False
+
         alternate = self._alternate.get_text()
-        self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="" and
-                                   (len(alternate)==4 or self._wizard.entranceExam))
+        if useSimBrief:
+            self._button.set_sensitive(len(alternate)==4 or self._wizard.entranceExam)
+        else:
+            cruiseLevelText = self._cruiseLevel.get_text()
+            cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
+            self._button.set_sensitive(cruiseLevel>=50 and self._getRoute()!="" and
+                                       (len(alternate)==4 or self._wizard.entranceExam))
 
     def _cruiseLevelChanged(self, *arg):
         """Called when the cruise level has changed."""
@@ -3454,6 +3473,7 @@ class SimBriefSetupPage(Page):
         self._climbProfile.set_active(0)
         self._cruiseProfile.set_active(0)
         self._descentProfile.set_active(0)
+        self._cruiseParameter.set_text("")
 
         self._resultTimestamp = None
         self._waitEnd = None
@@ -3699,8 +3719,13 @@ class SimBriefSetupPage(Page):
         plan["manualzfw"] = str(wizard.zfw / 1000.0)
         plan["cargo"] = str((wizard.bagWeight + wizard.cargoWeight + wizard.mailWeight)/1000.0)
 
-        plan["route"] = wizard.route
-        plan["fl"] = str(wizard.filedCruiseAltitude)
+        route = wizard.route
+        if route:
+            plan["route"] = route
+
+        filedCruiseAltitude = wizard.filedCruiseAltitude
+        if filedCruiseAltitude>0:
+            plan["fl"] = filedCruiseAltitude
         plan["altn"] = wizard.alternate
 
         plan["addedfuel"] = str(self._extraFuel.get_int() / 1000.0)
@@ -3797,6 +3822,28 @@ class SimBriefSetupPage(Page):
                         flightInfo[weatherElement.tag] = weatherElement.text
                 elif element.tag in ["files", "prefile"]:
                     availableInfo[element.tag] = element
+                elif element.tag == "general":
+                    generalElementList = list(element)
+                    for generalElement in generalElementList:
+                        if generalElement.tag in ["initial_altitude",
+                                                  "route_ifps",
+                                                  "costindex"]:
+                            flightInfo[generalElement.tag] = generalElement.text
+                elif element.tag == "origin":
+                    originElementList = list(element)
+                    for originElement in originElementList:
+                        if originElement.tag == "plan_rwy":
+                            flightInfo["dep_rwy"] = originElement.text
+                elif element.tag == "destination":
+                    destinationElementList = list(element)
+                    for destinationElement in destinationElementList:
+                        if destinationElement.tag == "plan_rwy":
+                            flightInfo["arr_rwy"] = destinationElement.text
+                elif element.tag == "fuel":
+                    fuelElementList = list(element)
+                    for fuelElement in fuelElementList:
+                        if fuelElement.tag == "extra":
+                            flightInfo["fuel_extra"] = fuelElement.text
                 else:
                     availableInfo[element.tag] = element.text
 
@@ -3883,6 +3930,29 @@ class SimBriefSetupPage(Page):
                                                self)
             self._wizard.arrivalMETARChanged(flightInfo["dest_metar"], self,
                                              fromDownload = True)
+
+            cruiseLevel = int(flightInfo["initial_altitude"])/100
+            self._wizard.filedCruiseLevel = cruiseLevel
+
+            (route, sid, star) = self._getRouteData(flightInfo)
+            self._wizard.route = route
+            self._wizard.departureSID = sid
+            self._wizard.arrivalSTAR = star
+
+            takeoffRunway = flightInfo["dep_rwy"]
+            self._wizard.takeoffRunway = takeoffRunway
+            self._takeoffRunway.set_text(takeoffRunway)
+
+            landingRunway = flightInfo["arr_rwy"]
+            self._wizard.landingRunway = landingRunway
+            self._landingRunway.set_text(landingRunway)
+
+            if "costindex" in flightInfo:
+                self._setCostIndex(flightInfo["costindex"])
+
+            if "fuel_extra" in flightInfo:
+                self._extraFuel.set_text(flightInfo["fuel_extra"])
+
             self._wizard.nextPage()
         else:
             self._finishWithError()
@@ -3906,7 +3976,49 @@ class SimBriefSetupPage(Page):
         self._wizard.usingSimBrief = False
         self._wizard.jumpPage("fuel", fromPageShift = 1)
 
+    def _getRouteData(self, flightInfo):
+        """Analyze the route information provided by SimBrief.
 
+        Returns a tuple of
+        - the route
+        - the SID (may be None)
+        - the STAR (may be None)"""
+        route = flightInfo["route_ifps"]
+        print("route:", route)
+        words = re.split("\\s+", route)
+
+        sid = None
+        star = None
+
+        if len(words)>1:
+            if words[0]=="DCT":
+                words = words[1:]
+            elif len(words[0])>=7 and len(words[1])==5:
+                if words[0][:5]==words[1]:
+                    sid = words[0]
+                    words = words[1:]
+
+            if words[-1]=="DCT":
+                words = words[:-1]
+            elif len(words[-1])>=7 and len(words[-2])==5:
+                if words[-1][:5]==words[-2]:
+                    star = words[-1]
+                    words = words[:-1]
+
+        if sid is not None and sid[5].isdigit():
+            sid = sid[:5] + " " + sid[5:]
+        if star is not None and star[5].isdigit():
+            star = star[:5] + " " + star[5:]
+
+        return (" ".join(words), sid, star)
+
+    def _setCostIndex(self, costIndex):
+        """Set the cost index, if the selected cruise profile is a CI."""
+        cruiseParameters = self._wizard.gui.flight.aircraft.simBriefData.cruiseParameters
+        cruiseProfileIndex = self._cruiseProfile.get_active()
+        if cruiseProfileIndex in cruiseParameters:
+            if cruiseParameters[cruiseProfileIndex][1]=="civalue":
+                self._cruiseParameter.set_text(str(costIndex))
 
 #-----------------------------------------------------------------------------
 
@@ -4819,7 +4931,10 @@ class TakeoffPage(Page):
         else:
             self._runway.set_text(self._wizard.takeoffRunway)
         self._runway.set_sensitive(True)
-        self._sid.set_active(0)
+        if self._wizard.departureSID is None:
+            self._sid.set_active(0)
+        else:
+            self._sid.get_child().set_text(self._wizard.departureSID)
         self._sid.set_sensitive(True)
         self._v1.set_int(None)
         self._v1.set_sensitive(True)
@@ -5358,7 +5473,10 @@ class LandingPage(Page):
         self._metar.get_buffer().set_text(self._wizard.arrivalMETAR, -1)
         self._updatingMETAR = False
 
-        self._star.set_active(0)
+        if self._wizard.arrivalSTAR is None:
+            self._star.set_active(0)
+        else:
+            self._star.get_child().set_text(self._wizard.arrivalSTAR)
         self._star.set_sensitive(True)
 
         self._transition.set_active(0)
@@ -6348,6 +6466,11 @@ class Wizard(Gtk.VBox):
         """Get the filed cruise level."""
         return self._routePage.filedCruiseLevel
 
+    @filedCruiseLevel.setter
+    def filedCruiseLevel(self, fl):
+        """Set the filed cruise level."""
+        self._routePage.filedCruiseLevel = fl
+
     @property
     def filedCruiseAltitude(self):
         """Get the filed cruise altitude."""
@@ -6373,6 +6496,11 @@ class Wizard(Gtk.VBox):
         """Get the route."""
         return self._routePage.route
 
+    @route.setter
+    def route(self, r):
+        """Set the route."""
+        self._routePage.route = r
+
     @property
     def alternate(self):
         """Get the ICAO code of the alternate airport."""
@@ -6397,6 +6525,11 @@ class Wizard(Gtk.VBox):
     def sid(self):
         """Get the SID."""
         return self._takeoffPage.sid
+
+    @sid.setter
+    def sid(self, s):
+        """Set the SID."""
+        self._takeoffPage.sid = s
 
     @property
     def v1(self):
@@ -6442,6 +6575,11 @@ class Wizard(Gtk.VBox):
     def star(self):
         """Get the STAR."""
         return self._landingPage.star
+
+    @star.setter
+    def star(self, s):
+        """Set the STAR."""
+        self._landingPage.star = s
 
     @property
     def transition(self):
@@ -6551,7 +6689,9 @@ class Wizard(Gtk.VBox):
         self._arrivalMETAR = None
         self._usingSimBrief = None
         self.takeoffRunway = None
+        self.departureSID = None
         self.landingRunway = None
+        self.arrivalSTAR = None
 
         firstPage = 0 if self._loginResult is None else 1
         for page in self._pages[firstPage:]:
