@@ -3045,10 +3045,14 @@ class RoutePage(Page):
             self._wizard.gui.config.useSimBrief and \
             self._wizard.usingSimBrief is not False
 
+        cruiseLevelText = self._cruiseLevel.get_text()
+        cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
+
         alternate = self._alternate.get_text()
         if useSimBrief:
-            self._button.set_sensitive(len(alternate)==0 or len(alternate)==4
-                                       or self._wizard.entranceExam)
+            self._button.set_sensitive((len(alternate)==0 or len(alternate)==4
+                                        or self._wizard.entranceExam) and
+                                       (cruiseLevel==0 or cruiseLevel>=50))
         else:
             cruiseLevelText = self._cruiseLevel.get_text()
             cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
