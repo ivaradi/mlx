@@ -3018,6 +3018,11 @@ class RoutePage(Page):
         """Get the ICAO code of the alternate airport."""
         return self._alternate.get_text()
 
+    @alternate.setter
+    def alternate(self, a):
+        """Set the ICAO code of the alternate airport."""
+        self._alternate.set_text(a)
+
     def activate(self):
         """Setup the route from the booked flight."""
         self._cruiseLevel.set_value(0)
@@ -3042,7 +3047,8 @@ class RoutePage(Page):
 
         alternate = self._alternate.get_text()
         if useSimBrief:
-            self._button.set_sensitive(len(alternate)==4 or self._wizard.entranceExam)
+            self._button.set_sensitive(len(alternate)==0 or len(alternate)==4
+                                       or self._wizard.entranceExam)
         else:
             cruiseLevelText = self._cruiseLevel.get_text()
             cruiseLevel = int(cruiseLevelText) if cruiseLevelText else 0
@@ -3726,7 +3732,10 @@ class SimBriefSetupPage(Page):
         filedCruiseAltitude = wizard.filedCruiseAltitude
         if filedCruiseAltitude>0:
             plan["fl"] = filedCruiseAltitude
-        plan["altn"] = wizard.alternate
+
+        alternate = wizard.alternate
+        if alternate:
+            plan["altn"] = wizard.alternate
 
         plan["addedfuel"] = str(self._extraFuel.get_int() / 1000.0)
         plan["origrwy"] = self._takeoffRunway.get_text()
@@ -3839,6 +3848,11 @@ class SimBriefSetupPage(Page):
                     for destinationElement in destinationElementList:
                         if destinationElement.tag == "plan_rwy":
                             flightInfo["arr_rwy"] = destinationElement.text
+                elif element.tag == "alternate":
+                    alternateElementList = list(element)
+                    for alternateElement in alternateElementList:
+                        if alternateElement.tag == "icao_code":
+                            flightInfo["altn_icao"] = alternateElement.text
                 elif element.tag == "fuel":
                     fuelElementList = list(element)
                     for fuelElement in fuelElementList:
@@ -3938,6 +3952,8 @@ class SimBriefSetupPage(Page):
             self._wizard.route = route
             self._wizard.departureSID = sid
             self._wizard.arrivalSTAR = star
+
+            self._wizard.alternate = flightInfo["altn_icao"]
 
             takeoffRunway = flightInfo["dep_rwy"]
             self._wizard.takeoffRunway = takeoffRunway
@@ -6505,6 +6521,11 @@ class Wizard(Gtk.VBox):
     def alternate(self):
         """Get the ICAO code of the alternate airport."""
         return self._routePage.alternate
+
+    @alternate.setter
+    def alternate(self, a):
+        """Set the ICAO code of the alternate airport."""
+        self._routePage.alternate = a
 
     @property
     def departureMETAR(self):
