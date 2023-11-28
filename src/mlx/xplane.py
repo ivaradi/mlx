@@ -2303,6 +2303,14 @@ class FelisT154B2Model(T154Model):
                                         "sim/flightmodel/controls/fla1_def",
                                         (TYPE_FLOAT_ARRAY, 2, 8))
 
+        self._spoilersIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/spoiler1_deg",
+                                        (TYPE_FLOAT_ARRAY, 2, 0))
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel2/wing/spoiler2_deg",
+                                        (TYPE_FLOAT_ARRAY, 2, 2))
+
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state.
 
@@ -2315,6 +2323,12 @@ class FelisT154B2Model(T154Model):
         state.cog = data[self._cgIndex]/100.0
         state.flapsSet = data[self._flapsControlIndex]
         state.flaps = data[self._flapsIndex][0]
+
+        state.spoilersExtension = max(
+            max(data[self._spoilersIndex])*100.0/50.0,
+            max(data[self._spoilersIndex+1])*100.0/45.0)
+        if state.spoilersExtension<=10.0:
+            state.spoilersExtension = 0.0
 
         return state
 
