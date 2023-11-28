@@ -1952,6 +1952,37 @@ class B767Model(GenericAircraftModel):
 
 #------------------------------------------------------------------------------
 
+class FFSTSB767Model(B767Model):
+    """Model handler for the FlighFactor and StepToSky Boeing 767 aircraft."""
+    @staticmethod
+    def doesHandle(aircraft, data):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (tailnum, author, description, notes, icao, liveryPath) = data
+        return (aircraft.type==const.AIRCRAFT_B762 and
+                tailnum=="FFSTS" and icao=="B762") or \
+               (aircraft.type==const.AIRCRAFT_B763 and
+                tailnum=="FFSTS" and icao=="B763")
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "X-Plane/FlightFactor and StepToSky Boeing 767"
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then invert the pitot heat state."""
+        state = super(FFSTSB767Model, self).getAircraftState(aircraft,
+                                                             timestamp,
+                                                             data)
+        if state.spoilersExtension<40:
+            state.spoilersExtension = 0.0
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class DH8DModel(GenericAircraftModel):
     """Generic model for the Bombardier  Dash 8-Q400 aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_RIGHT]
@@ -2331,6 +2362,7 @@ AircraftModel.registerSpecial(ZiboB738Model)
 AircraftModel.registerSpecial(LevelUpB736Model)
 AircraftModel.registerSpecial(LevelUpB737Model)
 AircraftModel.registerSpecial(LevelUpB738Model)
+AircraftModel.registerSpecial(FFSTSB767Model)
 AircraftModel.registerSpecial(FJSDH8DModel)
 AircraftModel.registerSpecial(FJSDH8DXPModel)
 AircraftModel.registerSpecial(FelisT154Model)
