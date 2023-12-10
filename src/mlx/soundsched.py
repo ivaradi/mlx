@@ -138,13 +138,21 @@ class TaxiSound(SimpleSound):
     sound. The playback is started only, if the boarding sound is not being
     played."""
 
-    _sounds = { const.AIRCRAFT_B736  : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B737  : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B738  : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG,
-                const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767,
-                const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767,
-                const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 }
+    _sounds = [{ const.AIRCRAFT_B736  : const.SOUND_TAXI_BOEING737NG,
+                 const.AIRCRAFT_B737  : const.SOUND_TAXI_BOEING737NG,
+                 const.AIRCRAFT_B738  : const.SOUND_TAXI_BOEING737NG,
+                 const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG,
+                 const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767,
+                 const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767,
+                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 },
+               { const.AIRCRAFT_B736  : const.SOUND_TAXI_BOEING737NG_ALT1,
+                 const.AIRCRAFT_B737  : const.SOUND_TAXI_BOEING737NG_ALT1,
+                 const.AIRCRAFT_B738  : const.SOUND_TAXI_BOEING737NG_ALT1,
+                 const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG_ALT1,
+                 const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767_ALT1,
+                 const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767_ALT1,
+                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 },
+               ]
 
     def __init__(self, flight, boardingSound = None):
         """Construct the taxi sound."""
@@ -164,7 +172,11 @@ class TaxiSound(SimpleSound):
         It starts playing the aircraft type-specific taxi sound, if any."""
         super(TaxiSound, self)._playbackDone(success, extra)
         aircraftType = self._flight.aircraftType
+
+        soundSet = self._flight.config.soundSet
         sounds = TaxiSound._sounds
+        sounds = sounds[soundSet] if soundSet<len(sounds) else sounds[-1]
+
         if aircraftType in sounds:
             startSound(sounds[aircraftType])
 

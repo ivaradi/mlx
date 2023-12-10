@@ -1902,6 +1902,17 @@ msgstr ""
 "Ha kijelölöd, egy, a spoilerek kibocsájtását imitáló hang "
 "hallatszik földetérés után, ha a spoilerek automatikusan kinyílnak."
 
+msgid "prefs_sounds_alternativeSoundSet"
+msgstr "Al_ternatív hangkészlet használata"
+
+msgid "prefs_sounds_alternativeSoundSet_tooltip"
+msgstr ""
+"Ha bejelölöd, alternatív hangkészletet használ a program bizonyos esetekben. "
+"Jelenleg Boeing 737 és 767 típusú gépeknél a gurulás során lejátszott hangfelvétel "
+"a korábban és alapértelmezésben jelenleg is használtnak egy kibővített változata, "
+"amely a Malév eredeti biztonsági bemutatóját is tartalmazza. "
+"A többi hangfelvétel ugyanaz, mint korábban is."
+
 msgid "prefs_sounds_frame_checklists"
 msgstr "Ellenőrzőlisták"
 

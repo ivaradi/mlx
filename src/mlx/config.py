@@ -254,6 +254,7 @@ class Config(object):
 
         self._enableApproachCallouts = False
         self._speedbrakeAtTD = True
+        self._soundSet = 0
 
         self._enableChecklists = False
         self._checklistHotkey = Hotkey(ctrl = True, shift = True, key = "0")
@@ -674,6 +675,18 @@ class Config(object):
             self._modified = True
 
     @property
+    def soundSet(self):
+        """Get the number of the  sound set to use."""
+        return self._soundSet
+
+    @soundSet.setter
+    def soundSet(self, soundSet):
+        """Set the number of the sound set."""
+        if soundSet!=self._soundSet:
+            self._soundSet = soundSet
+            self._modified = True
+
+    @property
     def enableChecklists(self):
         """Get whether aircraft-specific checklists should be played."""
         return self._enableChecklists
@@ -855,6 +868,8 @@ class Config(object):
             self._getBoolean(config, "sounds", "enableApproachCallouts", False)
         self._speedbrakeAtTD = self._getBoolean(config, "sounds",
                                                 "speedbrakeAtTD", True)
+        self._soundSet = self._getInteger(config, "sounds",
+                                          "soundSet", 0)
 
         self._enableChecklists = self._getBoolean(config, "sounds",
                                                   "enableChecklists", False)
@@ -962,6 +977,7 @@ class Config(object):
                    "yes" if self._enableApproachCallouts else "no")
         config.set("sounds", "speedbrakeAtTD",
                    "yes" if self._speedbrakeAtTD else "no")
+        config.set("sounds", "soundSet", str(self._soundSet))
 
         config.set("sounds", "enableChecklists",
                    "yes" if self._enableChecklists else "no")
@@ -997,6 +1013,13 @@ class Config(object):
         """Get the given option as a boolean, if found in the given config,
         otherwise the default."""
         return config.getboolean(section, option) \
+               if config.has_option(section, option) \
+               else default
+
+    def _getInteger(self, config, section, option, default):
+        """Get the given option as an integer, if found in the given config,
+        otherwise the default."""
+        return config.getint(section, option) \
                if config.has_option(section, option) \
                else default
 
@@ -1108,6 +1131,7 @@ class Config(object):
 
         print("  enableApproachCallouts:", self._enableApproachCallouts)
         print("  speedbrakeAtTD:", self._speedbrakeAtTD)
+        print("  soundSet:", self._soundSet)
 
         print("  enableChecklists:", self._enableChecklists)
         print("  checklistHotkey:", str(self._checklistHotkey))

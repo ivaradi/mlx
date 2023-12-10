@@ -267,6 +267,7 @@ class Preferences(Gtk.Dialog):
         self._pilotHotkey.set(config.pilotHotkey)
         self._enableApproachCallouts.set_active(config.enableApproachCallouts)
         self._speedbrakeAtTD.set_active(config.speedbrakeAtTD)
+        self._alternativeSoundSet.set_active(config.soundSet!=0)
 
         self._enableChecklists.set_active(config.enableChecklists)
         self._checklistHotkey.set(config.checklistHotkey)
@@ -320,6 +321,7 @@ class Preferences(Gtk.Dialog):
         config.pilotHotkey = self._pilotHotkey.get()
         config.enableApproachCallouts = self._enableApproachCallouts.get_active()
         config.speedbrakeAtTD = self._speedbrakeAtTD.get_active()
+        config.soundSet = 1 if self._alternativeSoundSet.get_active() else 0
 
         config.enableChecklists = self._enableChecklists.get_active()
         config.checklistHotkey = self._checklistHotkey.get()
@@ -725,6 +727,12 @@ class Preferences(Gtk.Dialog):
         self._speedbrakeAtTD.set_tooltip_text(xstr("prefs_sounds_speedbrakeAtTD_tooltip"))
         backgroundBox.pack_start(self._speedbrakeAtTD, False, False, 4)
 
+        self._alternativeSoundSet = Gtk.CheckButton(xstr("prefs_sounds_alternativeSoundSet"))
+        self._alternativeSoundSet.set_use_underline(True)
+        self._alternativeSoundSet.set_tooltip_text(
+            xstr("prefs_sounds_alternativeSoundSet_tooltip"))
+        backgroundBox.pack_start(self._alternativeSoundSet, False, False, 4)
+
         checklistFrame = Gtk.Frame(label = xstr("prefs_sounds_frame_checklists"))
         mainBox.pack_start(checklistFrame, False, False, 4)
 
@@ -768,6 +776,7 @@ class Preferences(Gtk.Dialog):
         self._taxiSoundOnPushback.set_sensitive(active)
         self._enableApproachCallouts.set_sensitive(active)
         self._speedbrakeAtTD.set_sensitive(active)
+        self._alternativeSoundSet.set_sensitive(active)
 
     def _pilotControlsSoundsToggled(self, button):
         """Called when the enable sounds button is toggled."""

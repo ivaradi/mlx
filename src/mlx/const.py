@@ -460,8 +460,14 @@ SOUND_MALEV = "malev.mp3"
 ## Sound: taxi: Boeing 737 NG
 SOUND_TAXI_BOEING737NG = "737taxi.mp3"
 
+## Sound: taxi: Boeing 737 NG (alternative variant)
+SOUND_TAXI_BOEING737NG_ALT1 = "737taxi_1.mp3"
+
 ## Sound: taxi: Boeing 767
 SOUND_TAXI_BOEING767 = "767taxi.mp3"
+
+## Sound: taxi: Boeing 767 (alternative variant)
+SOUND_TAXI_BOEING767_ALT1 = "767taxi_1.mp3"
 
 ## Sound: taxi: Fokker F70
 SOUND_TAXI_F70 = "F70taxi.mp3"

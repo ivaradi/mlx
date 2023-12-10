@@ -1890,6 +1890,16 @@ msgstr ""
 "If checked, a speedbrake sound will be played after touchdown, "
 "when the speedbrakes deploy."
 
+msgid "prefs_sounds_alternativeSoundSet"
+msgstr "Use an a_lternative sound set"
+
+msgid "prefs_sounds_alternativeSoundSet_tooltip"
+msgstr ""
+"If checked, an alternative set of sound recording will be used, when available. "
+"Currently, an extended version of the taxi sounds is played, which includes "
+"the original Malév safety demo when flying a Boeing 737 or 767 aircraft. "
+"The rest of the recordings remains unchanged."
+
 msgid "prefs_sounds_frame_checklists"
 msgstr "Checklists"
 
