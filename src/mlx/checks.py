@@ -958,6 +958,10 @@ class PatientFaultChecker(FaultChecker):
 
 class AntiCollisionLightsChecker(PatientFaultChecker):
     """Check for the anti-collision light being off at high N1 values."""
+    def __init__(self):
+        """Construct the anti-collision lights checker."""
+        super(AntiCollisionLightsChecker, self).__init__(timeout = 5.0)
+
     def isCondition(self, flight, aircraft, oldState, state):
         """Check if the fault condition holds."""
         return (not flight.config.usingFS2Crew or not state.parking or
