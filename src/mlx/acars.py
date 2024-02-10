@@ -19,6 +19,7 @@ class ACARS(object):
         self.pid = gui.config.pilotID
         self.pilotName = gui.loginResult.pilotName
 
+        self._gui = gui
         flight = gui.flight
         aircraft = flight.aircraft
 
@@ -58,9 +59,9 @@ class ACARS(object):
         attrs["latitude"] = state.latitude
         attrs["pilotName"] = self.pilotName
         attrs["numPassengers"] = \
-            bookedFlight.numPassengers + \
-            bookedFlight.numChildren + \
-            bookedFlight.numInfants
+            self._gui.numPassengers + \
+            self._gui.numChildren + \
+            self._gui.numInfants
         attrs["blockTime"] = self.getBlockTimeText()
         attrs["callsign"] = bookedFlight.callsign
         attrs["aircraftTypeName"] = bookedFlight.aircraftTypeName
