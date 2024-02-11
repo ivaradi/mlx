@@ -1798,6 +1798,14 @@ class ZiboB737NGModel(B737Model):
                                         "laminar/B738/autopilot/alt_hld_status",
                                         TYPE_FLOAT)
 
+        self._reverserIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/flt_ctrls/reverse_lever1",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/flt_ctrls/reverse_lever2",
+                                        TYPE_FLOAT)
+
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state."""
@@ -1847,6 +1855,8 @@ class ZiboB737NGModel(B737Model):
             (mcpHeadingBugStatus<=0.5 and mcpHeadingBugStatus>=-0.5)
 
         state.apAltitudeHold = data[self._apAltitudeIndex]==1
+        state.reverser = [data[self._reverserIndex+0]>=0.2,
+                          data[self._reverserIndex+1]>=0.2]
 
         return state
 
