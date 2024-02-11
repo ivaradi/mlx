@@ -1860,7 +1860,7 @@ class ZiboB738Model(ZiboB737NGModel):
         name."""
         (tailnum, author, description, notes, icao, liveryPath) = data
         return author=="Alex Unruh" and \
-            description=="Boeing 737-800X" and \
+            description.startswith("Boeing 737-800X") and \
             notes.startswith("ZIBOmod") and \
             icao=="B738"
 
