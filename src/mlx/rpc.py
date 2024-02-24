@@ -245,7 +245,7 @@ class BookedFlight(RPCObject):
                       const.AIRCRAFT_F70   : "F70",
                       const.AIRCRAFT_DC3   : "LI2",
                       const.AIRCRAFT_T134  : "T134",
-                      const.AIRCRAFT_T154  : "T155",
+                      const.AIRCRAFT_T154  : "T154",
                       const.AIRCRAFT_YK40  : "YK40",
                       const.AIRCRAFT_B462  : "B462",
                       const.AIRCRAFT_IL62  : "IL62" }
