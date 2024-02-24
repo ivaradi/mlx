@@ -700,7 +700,7 @@ class Client(object):
         transport = jsonrpclib.jsonrpc.SafeTransport(jsonrpclib.config.DEFAULT,
                                                      sslContext)
 
-        self._server = jsonrpclib.Server(MAVA_BASE_URL + "/jsonrpc.php",
+        self._server = jsonrpclib.Server(MAVA_BASE_URL + "/jsonrpc1.php",
                                          transport = transport)
 
         self._userName = None
