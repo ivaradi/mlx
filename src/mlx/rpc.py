@@ -199,6 +199,7 @@ class BookedFlight(RPCObject):
                       "73G"   : const.AIRCRAFT_B737,
                       "B738"  : const.AIRCRAFT_B738,
                       "738"   : const.AIRCRAFT_B738,
+                      "B738C" : const.AIRCRAFT_B738C,
                       "B73H"  : const.AIRCRAFT_B738C,
                       "73H"   : const.AIRCRAFT_B738C,
                       "B732"  : const.AIRCRAFT_B732,
