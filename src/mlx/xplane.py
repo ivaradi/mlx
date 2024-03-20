@@ -675,7 +675,8 @@ class Simulator(object):
                     TYPE_FLOAT),
                    ("sim/flightmodel/position/theta", TYPE_FLOAT),
                    ("sim/flightmodel/position/phi", TYPE_FLOAT),
-                   ("sim/flightmodel/position/psi", TYPE_FLOAT) ]
+                   ("sim/flightmodel/position/psi", TYPE_FLOAT),
+                   ("sim/flightmodel/forces/g_nrml", TYPE_FLOAT) ]
 
     TIME_SYNC_INTERVAL = 3.0
 
@@ -1134,12 +1135,15 @@ class Simulator(object):
             tdRate = min(self._flareRates)
             tdRateCalculatedByFS = False
 
+            gLoad = data[7]
+
             heading = data[6]
             if heading<0.0: heading += 360.0
 
             self._aircraft.flareFinished(flareEnd, flareEndFS,
                                          tdRate, tdRateCalculatedByFS,
-                                         data[3], data[4], data[5], heading)
+                                         data[3], data[4], data[5], heading,
+                                         gLoad)
         else:
             self._addFlareRate(data[2])
 

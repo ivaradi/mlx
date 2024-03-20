@@ -479,7 +479,7 @@ class Aircraft(object):
         fs.sendMessage(const.MESSAGETYPE_INFORMATION, "Flare-time", 3)
 
     def flareFinished(self, flareEnd, flareEndFS, tdRate, tdRateCalculatedByFS,
-                      ias, pitch, bank, heading):
+                      ias, pitch, bank, heading, gLoad):
         """Called when the flare has finished."""
         (flareTimeFromFS, flareTime) = self.flight.flareFinished(flareEnd,
                                                                  flareEndFS,
@@ -493,6 +493,8 @@ class Aircraft(object):
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown rate was calculated by the %s" % \
                             ("simulator" if tdRateCalculatedByFS else "logger",))
+        self.logger.message(self._aircraftState.timestamp,
+                            "Touchdown G-load: %.2f" % (gLoad,))
         flight = self._flight
         self.logger.message(self._aircraftState.timestamp,
                             "Touchdown speed: %.0f %s" % \

@@ -571,7 +571,8 @@ class Simulator(object):
                    (0x02bc, "d"),            # IAS
                    (0x0578, "d"),            # Pitch
                    (0x057c, "d"),            # Bank
-                   (0x0580, "d") ]           # Heading
+                   (0x0580, "d"),            # Heading
+                   (0x11b8, "h")]            # G-Load
 
     TIME_SYNC_INTERVAL = 3.0
 
@@ -1057,12 +1058,15 @@ class Simulator(object):
                 tdRate = min(self._flareRates)
                 tdRateCalculatedByFS = False
 
+            gLoad = data[8] / 625.0
+
             self._aircraft.flareFinished(flareEnd, flareEndFS,
                                          tdRate, tdRateCalculatedByFS,
                                          Handler.fsuipc2IAS(data[4]),
                                          Handler.fsuipc2Degrees(data[5]),
                                          Handler.fsuipc2Degrees(data[6]),
-                                         Handler.fsuipc2PositiveDegrees(data[7]))
+                                         Handler.fsuipc2PositiveDegrees(data[7]),
+                                         gLoad)
         else:
             self._addFlareRate(data[2])
 
