@@ -649,6 +649,9 @@ msgstr "Too few cabin crew members (minimum: %d)."
 msgid "payload_help_many_pax"
 msgstr "Too many passengers (maximum: %d)."
 
+msgid "payload_help_many_infants"
+msgstr "Too many infants (maximum: %d)."
+
 msgid "payload_crew"
 msgstr "C_rew:"
 

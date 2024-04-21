@@ -2704,11 +2704,9 @@ class PayloadPage(Page):
         """Called when one of the weight values or humanm counts has
         changed."""
         bookedFlight = self._wizard._bookedFlight
-        numPassengers = \
-            self._numPassengers.get_int() + \
-            self._numChildren.get_int() + \
-            self._numInfants.get_int()
-        minCabinCrew = 0 if numPassengers==0 else \
+        numPassengers = self._numPassengers.get_int()
+        numSeatsOccupied = numPassengers + self._numChildren.get_int()
+        minCabinCrew = 0 if numSeatsOccupied==0 else \
             (bookedFlight.maxPassengers // 50) + 1
 
         extraHelp = []
@@ -2723,14 +2721,22 @@ class PayloadPage(Page):
             extraHelp.append(xstr("payload_help_few_crew") % (minCabinCrew,))
         self._crewLabel.set_use_underline(True)
 
-        tooManyPassengers = numPassengers>bookedFlight.maxPassengers
-        if tooManyPassengers:
+        tooManyPassengers = numSeatsOccupied>bookedFlight.maxPassengers
+        tooManyInfants = self._numInfants.get_int() > numPassengers
+        if tooManyPassengers or tooManyInfants:
             self._paxLabel.set_markup("<b><span foreground=\"red\">" +
                                       xstr("payload_pax") +
                                       "</span></b>")
-            extraHelp.append(xstr("payload_help_many_pax") % (bookedFlight.maxPassengers,))
         else:
             self._paxLabel.set_text(xstr("payload_pax"))
+
+        if tooManyPassengers:
+            extraHelp.append(xstr("payload_help_many_pax") %
+                             (bookedFlight.maxPassengers,))
+        elif tooManyInfants:
+            extraHelp.append(xstr("payload_help_many_infants") %
+                             (numPassengers,))
+
         self._paxLabel.set_use_underline(True)
 
         hlp = xstr("payload_help") + "\n\n"
@@ -2739,8 +2745,8 @@ class PayloadPage(Page):
         hlp += " \n" * (2-len(extraHelp))
         self.setHelp(hlp)
 
-        self._button.set_sensitive(enoughCrew and not tooManyPassengers)
-
+        self._button.set_sensitive(enoughCrew and not tooManyPassengers and
+                                   not tooManyInfants)
 
         self._updateCalculatedZFW()
 

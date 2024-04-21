@@ -653,6 +653,9 @@ msgstr "Túl kevés kabinszemélyzet (legalább %d legyen)."
 msgid "payload_help_many_pax"
 msgstr "Túl sok utas (legfeljebb %d lehet)."
 
+msgid "payload_help_many_infants"
+msgstr "Túl sok csecsemő (legfeljebb %d lehet)."
+
 msgid "payload_crew"
 msgstr "_Legénység:"
 
