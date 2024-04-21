@@ -598,3 +598,11 @@ WEIGHT_CHILD = 35
 WEIGHT_INFANT = 0
 
 #-------------------------------------------------------------------------------
+
+def getPassengerWeight(flightType):
+    """Get the passenger weight for the given flight type."""
+    return WEIGHT_PASSENGER_CHARTER if flightType==FLIGHTTYPE_CHARTER \
+        else WEIGHT_PASSENGER
+
+
+#-------------------------------------------------------------------------------
