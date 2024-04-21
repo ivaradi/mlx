@@ -370,14 +370,16 @@ class BookedFlight(RPCObject):
                 self.arrivalTime += datetime.timedelta(days = 1)
 
     @property
+    def passengerWeight(self):
+        """Get the passenger (adult) weight for the flight."""
+        return const.getPassengerWeight(self.flightType)
+
+    @property
     def payload(self):
         """Get the default payload of the flight."""
         payload= (self.numCabinCrew - self.dowNumCabinCrew) *  \
             const.WEIGHT_CABIN_CREW
-        payload += self.numPassengers * \
-            (const.WEIGHT_PASSENGER_CHARTER
-             if self.flightType==const.FLIGHTTYPE_CHARTER
-             else const.WEIGHT_PASSENGER)
+        payload += self.numPassengers * self.passengerWeight
         payload += self.numChildren * const.WEIGHT_CHILD
         payload += self.numInfants * const.WEIGHT_INFANT
         payload += self.bagWeight
