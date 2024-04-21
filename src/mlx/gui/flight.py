@@ -2426,7 +2426,7 @@ class PayloadPage(Page):
         alignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
 
-        table = Gtk.Table(7, 3)
+        table = Gtk.Table(8, 3)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
         table.set_homogeneous(False)
@@ -2434,6 +2434,16 @@ class PayloadPage(Page):
         self.setMainWidget(alignment)
 
         row  = 0
+
+        label = Gtk.Label(xstr("payload_flight_type"))
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, row, row+1)
+
+        self._flightType = label = Gtk.Label(xstr("flighttype_scheduled"))
+        label.set_alignment(1.0, 0.5)
+        table.attach(label, 1, 2, row, row + 1)
+
+        row += 1
 
         self._crewLabel = label = Gtk.Label(xstr("payload_crew"))
         label.set_use_underline(True)
@@ -2456,7 +2466,7 @@ class PayloadPage(Page):
         table.attach(crewBox, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._numCabinCrew)
 
-        label = Gtk.Label(xstr("payload_crew_info"))
+        label = Gtk.Label(xstr("payload_crew_info") % (const.WEIGHT_CABIN_CREW))
         label.set_halign(Gtk.Align.START)
         table.attach(label, 2, 3, row, row+1)
 
@@ -2492,7 +2502,8 @@ class PayloadPage(Page):
         table.attach(paxBox, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._numPassengers)
 
-        label = Gtk.Label(xstr("payload_pax_info"))
+        self._paxInfo = label = Gtk.Label(xstr("payload_pax_info") % (
+            const.WEIGHT_PASSENGER, const.WEIGHT_CHILD, const.WEIGHT_INFANT))
         label.set_halign(Gtk.Align.START)
         table.attach(label, 2, 3, row, row+1)
 
@@ -2637,6 +2648,12 @@ class PayloadPage(Page):
     def activate(self):
         """Setup the information."""
         bookedFlight = self._wizard._bookedFlight
+
+        self._flightType.set_text(xstr("flighttype_" +
+                                       const.flightType2string(bookedFlight.flightType)))
+
+        self._paxInfo.set_text(xstr("payload_pax_info") % (
+            bookedFlight.passengerWeight, const.WEIGHT_CHILD, const.WEIGHT_INFANT))
 
         self._numCockpitCrew.set_markup("<b>" +
                                         str(bookedFlight.numCockpitCrew) +

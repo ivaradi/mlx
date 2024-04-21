@@ -656,6 +656,9 @@ msgstr "Túl sok utas (legfeljebb %d lehet)."
 msgid "payload_help_many_infants"
 msgstr "Túl sok csecsemő (legfeljebb %d lehet)."
 
+msgid "payload_flight_type"
+msgstr "Járattípus:"
+
 msgid "payload_crew"
 msgstr "_Legénység:"
 
@@ -663,7 +666,7 @@ msgid "payload_crew_tooltip"
 msgstr "A kabin személyzet létszáma."
 
 msgid "payload_crew_info"
-msgstr "pilóta + kabin"
+msgstr "pilóta + kabin (%d kg)"
 
 msgid "payload_pax"
 msgstr "_Utasok:"
@@ -678,7 +681,7 @@ msgid "payload_pax_infants_tooltip"
 msgstr "A csecsemőkorú utasok száma."
 
 msgid "payload_pax_info"
-msgstr "felnőtt + gyermek + csecsemő"
+msgstr "felnőtt (%d kg) + gyermek (%d kg) + csecsemő (%d kg)"
 
 msgid "payload_bag"
 msgstr "_Poggyász:"
@@ -1551,11 +1554,20 @@ msgstr ""
 "<b><span foreground=\"red\">piros</span></b>, egyébként "
 "<b><span foreground=\"orange\">sárga</span></b> színben olvasható."
 
+msgid "weighthelp_flight_type"
+msgstr "Járattípus:"
+
 msgid "weighthelp_crew"
 msgstr "Legénység (%s):"
 
+msgid "weighthelp_crew_info"
+msgstr "(DOW kabin személyzet: %s fő)"
+
 msgid "weighthelp_pax"
 msgstr "Utasok (%s):"
+
+msgid "weighthelp_pax_info"
+msgstr "(felnőtt: %s kg, gyermek: %s kg\ncsecsemő: %s kg)"
 
 msgid "weighthelp_baggage"
 msgstr "Poggyász:"

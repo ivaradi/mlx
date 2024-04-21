@@ -652,6 +652,9 @@ msgstr "Too many passengers (maximum: %d)."
 msgid "payload_help_many_infants"
 msgstr "Too many infants (maximum: %d)."
 
+msgid "payload_flight_type"
+msgstr "Flight type:"
+
 msgid "payload_crew"
 msgstr "C_rew:"
 
@@ -659,7 +662,7 @@ msgid "payload_crew_tooltip"
 msgstr "The number of the cabin crew members on your flight."
 
 msgid "payload_crew_info"
-msgstr "cockpit + cabin"
+msgstr "cockpit + cabin (%d kg)"
 
 msgid "payload_pax"
 msgstr "P_assengers:"
@@ -674,7 +677,7 @@ msgid "payload_pax_infants_tooltip"
 msgstr "The number of infant passengers on your flight."
 
 msgid "payload_pax_info"
-msgstr "adults + children + infants"
+msgstr "adults (%d kg) + children (%d kg) +\ninfants (%d kg)"
 
 msgid "payload_bag"
 msgstr "_Baggage:"
@@ -1548,11 +1551,20 @@ msgstr ""
 "<b><span foreground=\"red\">red</span></b>, otherwise in "
 "<b><span foreground=\"orange\">yellow</span></b>."
 
+msgid "weighthelp_flight_type"
+msgstr "Flight type:"
+
 msgid "weighthelp_crew"
 msgstr "Crew (%s):"
 
+msgid "weighthelp_crew_info"
+msgstr "(DOW cabin crew: %s)"
+
 msgid "weighthelp_pax"
 msgstr "Passengers (%s):"
+
+msgid "weighthelp_pax_info"
+msgstr "(adult: %s kg, child: %s kg\ninfant: %s kg)"
 
 msgid "weighthelp_baggage"
 msgstr "Baggage:"

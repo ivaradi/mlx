@@ -57,7 +57,7 @@ class WeightHelp(Gtk.VBox):
         mainBox.pack_start(self._usingHelp, False, False, 4)
 
         
-        self._weightsTable = table = Gtk.Table(16, 5)
+        self._weightsTable = table = Gtk.Table(17, 5)
         table.set_homogeneous(False)
         table.set_row_spacings(4)
         table.set_col_spacings(16)
@@ -94,6 +94,15 @@ class WeightHelp(Gtk.VBox):
         row += 1
 
         
+        label = Gtk.Label(xstr("weighthelp_flight_type"))
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, row, row+1)
+
+        self._flightTypeLabel = label = Gtk.Label(xstr("flighttype_scheduled"))
+        label.set_alignment(1.0, 0.5)
+        table.attach(label, 1, 2, row, row + 1)
+
+        row += 1
 
         self._crewLabel = Gtk.Label(xstr("weighthelp_crew") % ("99",))
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
@@ -108,6 +117,12 @@ class WeightHelp(Gtk.VBox):
         table.attach(alignment, 1, 2, row, row+1)
         
         table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
+
+        self._crewInfo = Gtk.Label(xstr("weighthelp_crew_info") % ("-",))
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(self._crewInfo)
+        table.attach(alignment, 3, 5, row, row+1)
         
         row += 1
 
@@ -128,6 +143,13 @@ class WeightHelp(Gtk.VBox):
         
         table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
         
+        self._paxInfo = Gtk.Label(xstr("weighthelp_pax_info") %
+                                  ("-", "-", "-"))
+        alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
+                                  xscale = 0.0, yscale = 0.0)
+        alignment.add(self._paxInfo)
+        table.attach(alignment, 3, 5, row, row+1)
+
         row += 1
 
         label = Gtk.Label(xstr("weighthelp_baggage"))
@@ -381,24 +403,35 @@ class WeightHelp(Gtk.VBox):
         """Setup the labels for the calculated values."""
         crewWeight = self._getCrewWeight()
         if crewWeight is None:
+            self._flightTypeLabel.set_text("-")
             self._crewLabel.set_text(xstr("weighthelp_crew") % ("-",))
             self._crewWeight.set_text("-")
+            self._crewInfo.set_text(xstr("weighthelp_crew_info") % ("-",))
         else:
+            self._flightTypeLabel.set_text(xstr("flighttype_" +
+                                                const.flightType2string(self._flightType)))
             self._crewLabel.set_text(xstr("weighthelp_crew") %
                                     (str(self._cockpitCrew) + "+" +
                                      str(self._cabinCrew),))
             self._crewWeight.set_text("%.0f" % (crewWeight,))
+            self._crewInfo.set_text(xstr("weighthelp_crew_info") %
+                                    (self._dowCabinCrew,))
+
 
         paxWeight = self._getPaxWeight()
         if paxWeight<0:
             self._paxLabel.set_text(xstr("weighthelp_pax") % ("-",))
             self._paxWeight.set_text("-")
+            self._paxInfo.set_text(xstr("weighthelp_pax_info") % ("-", "-", "-"))
         else:
             self._paxLabel.set_text(xstr("weighthelp_pax") %
                                     (str(self._pax) + "+" +
                                      str(self._children) + "+" +
                                      str(self._infants),))
             self._paxWeight.set_text("%.0f" % (paxWeight,))
+            self._paxInfo.set_text(xstr("weighthelp_pax_info") %
+                                   (const.getPassengerWeight(self._flightType),
+                                    const.WEIGHT_CHILD, const.WEIGHT_INFANT))
 
         self._setWeightLabel(self._bagWeight, self._bag)
 
