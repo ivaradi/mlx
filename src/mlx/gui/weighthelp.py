@@ -66,6 +66,8 @@ class WeightHelp(Gtk.VBox):
         alignment.add(table)
         mainBox.pack_start(alignment, True, True, 4)
 
+        row = 0
+        
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
         alignment.set_padding(padding_bottom = 16, padding_top = 0,
@@ -75,7 +77,7 @@ class WeightHelp(Gtk.VBox):
         # FIXME: should be a constant in common
         label.set_justify(Gtk.Justification.CENTER)
         alignment.add(label)
-        table.attach(alignment, 1, 2, 0, 1)
+        table.attach(alignment, 1, 2, row, row+1)
         
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.0,
                                   xscale = 0.0, yscale = 0.0)
@@ -87,22 +89,27 @@ class WeightHelp(Gtk.VBox):
         label = button.get_child()
         label.set_justify(Gtk.Justification.CENTER)
         alignment.add(button)
-        table.attach(alignment, 3, 4, 0, 1)
+        table.attach(alignment, 3, 4, row, row+1)
+
+        row += 1
+
         
 
         self._crewLabel = Gtk.Label(xstr("weighthelp_crew") % ("99",))
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._crewLabel)
-        table.attach(alignment, 0, 1, 1, 2)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._crewWeight = Gtk.Label("0")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._crewWeight)
-        table.attach(alignment, 1, 2, 1, 2)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 1, 2)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
+        
+        row += 1
 
         text = xstr("weighthelp_pax") % ("999",)
         self._paxLabel = Gtk.Label(text)
@@ -111,198 +118,224 @@ class WeightHelp(Gtk.VBox):
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._paxLabel)
-        table.attach(alignment, 0, 1, 2, 3)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._paxWeight = Gtk.Label("20000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._paxWeight)
-        table.attach(alignment, 1, 2, 2, 3)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 2, 3)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
         
+        row += 1
+
         label = Gtk.Label(xstr("weighthelp_baggage"))
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 3, 4)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._bagWeight = Gtk.Label("2000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._bagWeight)
-        table.attach(alignment, 1, 2, 3, 4)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 3, 4)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
         
+        row += 1
+
         label = Gtk.Label(xstr("weighthelp_cargo"))
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 4, 5)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._cargoWeight = Gtk.Label("2000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._cargoWeight)
-        table.attach(alignment, 1, 2, 4, 5)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 4, 5)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
         
+        row += 1
+
         label = Gtk.Label(xstr("weighthelp_mail"))
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 5, 6)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._mailWeight = Gtk.Label("2000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._mailWeight)
-        table.attach(alignment, 1, 2, 5, 6)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 5, 6)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
 
-        table.attach(Gtk.HSeparator(), 1, 2, 6, 7)
+        row += 1
+
+        table.attach(Gtk.HSeparator(), 1, 2, row, row+1)
+
+        row += 1
 
         label = Gtk.Label("<b>" + xstr("weighthelp_payload") + "</b>")
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 7, 8)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._payload = Gtk.Label("<b>32000</b>")
         self._payload.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._payload)
-        table.attach(alignment, 1, 2, 7, 8)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 7, 8)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
 
         self._fsPayload = Gtk.Label("<b>32001</b>")
         self._fsPayload.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._fsPayload)
-        table.attach(alignment, 3, 4, 7, 8)
+        table.attach(alignment, 3, 4, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 4, 5, 7, 8)
+        table.attach(Gtk.Label("kg"), 4, 5, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("weighthelp_dow"))
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 8, 9)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._dow = Gtk.Label("35000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._dow)
-        table.attach(alignment, 1, 2, 8, 9)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 8, 9)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
 
         self._fsDOW = Gtk.Label("33012")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._fsDOW)
-        table.attach(alignment, 3, 4, 8, 9)
+        table.attach(alignment, 3, 4, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 4, 5, 8, 9)
+        table.attach(Gtk.Label("kg"), 4, 5, row, row+1)
 
-        table.attach(Gtk.HSeparator(), 1, 2, 9, 10)
+        row += 1
 
-        table.attach(Gtk.HSeparator(), 3, 4, 9, 10)
+        table.attach(Gtk.HSeparator(), 1, 2, row, row+1)
+
+        table.attach(Gtk.HSeparator(), 3, 4, row, row+1)
+
+        row += 1
 
         label = Gtk.Label("<b>" + xstr("weighthelp_zfw") + "</b>")
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 10, 11)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._zfw = Gtk.Label("<b>122000</b>")
         self._zfw.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._zfw)
-        table.attach(alignment, 1, 2, 10, 11)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 10, 11)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
 
         self._fsZFW = Gtk.Label("<b>124000</b>")
         self._fsZFW.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._fsZFW)
-        table.attach(alignment, 3, 4, 10, 11)
+        table.attach(alignment, 3, 4, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 4, 5, 10, 11)
+        table.attach(Gtk.Label("kg"), 4, 5, row, row+1)
 
-        table.attach(Gtk.HSeparator(), 0, 5, 11, 12)
+        row += 1
+
+        table.attach(Gtk.HSeparator(), 0, 5, row, row+1)
         
+        row += 1
+
         label = Gtk.Label(xstr("weighthelp_gross"))
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 12, 13)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._fsGross = Gtk.Label("124000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._fsGross)
-        table.attach(alignment, 3, 4, 12, 13)
+        table.attach(alignment, 3, 4, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 4, 5, 12, 13)
+        table.attach(Gtk.Label("kg"), 4, 5, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("weighthelp_mzfw"))
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 13, 14)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._mzfw = Gtk.Label("35000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._mzfw)
-        table.attach(alignment, 1, 2, 13, 14)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 13, 14)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("weighthelp_mtow"))
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 14, 15)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._mtow = Gtk.Label("35000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._mtow)
-        table.attach(alignment, 1, 2, 14, 15)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 14, 15)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("weighthelp_mlw"))
         label.set_use_markup(True)
         alignment = Gtk.Alignment(xalign = 0.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(label)
-        table.attach(alignment, 0, 1, 15, 16)
+        table.attach(alignment, 0, 1, row, row+1)
 
         self._mlw = Gtk.Label("35000")
         alignment = Gtk.Alignment(xalign = 1.0, yalign = 0.5,
                                   xscale = 0.0, yscale = 0.0)
         alignment.add(self._mlw)
-        table.attach(alignment, 1, 2, 15, 16)
+        table.attach(alignment, 1, 2, row, row+1)
         
-        table.attach(Gtk.Label("kg"), 2, 3, 15, 16)
+        table.attach(Gtk.Label("kg"), 2, 3, row, row+1)
 
         self.show_all()
 

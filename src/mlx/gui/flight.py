@@ -2433,10 +2433,12 @@ class PayloadPage(Page):
         alignment.add(table)
         self.setMainWidget(alignment)
 
+        row  = 0
+
         self._crewLabel = label = Gtk.Label(xstr("payload_crew"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 0, 1)
+        table.attach(label, 0, 1, row, row+1)
 
         self._numCockpitCrew = Gtk.Label()
 
@@ -2451,17 +2453,19 @@ class PayloadPage(Page):
         crewBox.pack_start(self._numCabinCrew, False, False, 0)
         crewBox.set_halign(Gtk.Align.END)
 
-        table.attach(crewBox, 1, 2, 0, 1)
+        table.attach(crewBox, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._numCabinCrew)
 
         label = Gtk.Label(xstr("payload_crew_info"))
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 0, 1)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         self._paxLabel = label = Gtk.Label(xstr("payload_pax"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 1, 2)
+        table.attach(label, 0, 1, row, row+1)
 
         self._numPassengers = IntegerEntry(defaultValue = 0)
         self._numPassengers.set_width_chars(6)
@@ -2485,17 +2489,19 @@ class PayloadPage(Page):
         paxBox.pack_start(Gtk.Label("+"), False, False, 4)
         paxBox.pack_start(self._numInfants, False, False, 0)
 
-        table.attach(paxBox, 1, 2, 1, 2)
+        table.attach(paxBox, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._numPassengers)
 
         label = Gtk.Label(xstr("payload_pax_info"))
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 1, 2)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("payload_bag"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 2, 3)
+        table.attach(label, 0, 1, row, row+1)
 
         self._bagWeight = IntegerEntry(defaultValue = 0)
         self._bagWeight.set_width_chars(6)
@@ -2503,17 +2509,19 @@ class PayloadPage(Page):
         self._bagWeight.set_tooltip_text(xstr("payload_bag_tooltip"))
         self._bagWeight.set_hexpand(False)
         self._bagWeight.set_halign(Gtk.Align.END)
-        table.attach(self._bagWeight, 1, 2, 2, 3)
+        table.attach(self._bagWeight, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._bagWeight)
 
         label = Gtk.Label("kg")
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 2, 3)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("payload_cargo"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 3, 4)
+        table.attach(label, 0, 1, row, row+1)
 
         self._cargoWeight = IntegerEntry(defaultValue = 0)
         self._cargoWeight.set_width_chars(6)
@@ -2521,17 +2529,19 @@ class PayloadPage(Page):
         self._cargoWeight.set_tooltip_text(xstr("payload_cargo_tooltip"))
         self._cargoWeight.set_hexpand(False)
         self._cargoWeight.set_halign(Gtk.Align.END)
-        table.attach(self._cargoWeight, 1, 2, 3, 4)
+        table.attach(self._cargoWeight, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._cargoWeight)
 
         label = Gtk.Label("kg")
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 3, 4)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label(xstr("payload_mail"))
         label.set_use_underline(True)
         label.set_alignment(0.0, 0.5)
-        table.attach(label, 0, 1, 4, 5)
+        table.attach(label, 0, 1, row, row+1)
 
         self._mailWeight = IntegerEntry(defaultValue = 0)
         self._mailWeight.set_width_chars(6)
@@ -2539,42 +2549,46 @@ class PayloadPage(Page):
         self._mailWeight.set_tooltip_text(xstr("payload_mail_tooltip"))
         self._mailWeight.set_hexpand(False)
         self._mailWeight.set_halign(Gtk.Align.END)
-        table.attach(self._mailWeight, 1, 2, 4, 5)
+        table.attach(self._mailWeight, 1, 2, row, row+1)
         label.set_mnemonic_widget(self._mailWeight)
 
         label = Gtk.Label("kg")
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 4, 5)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         label = Gtk.Label("<b>" + xstr("payload_zfw") + "</b>")
         label.set_alignment(0.0, 0.5)
         label.set_use_markup(True)
-        table.attach(label, 0, 1, 5, 6)
+        table.attach(label, 0, 1, row, row+1)
 
         self._calculatedZFW = Gtk.Label()
         self._calculatedZFW.set_width_chars(6)
         self._calculatedZFW.set_alignment(1.0, 0.5)
-        table.attach(self._calculatedZFW, 1, 2, 5, 6)
+        table.attach(self._calculatedZFW, 1, 2, row, row+1)
 
         label = Gtk.Label("kg")
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 5, 6)
+        table.attach(label, 2, 3, row, row+1)
+
+        row += 1
 
         self._zfwButton = Gtk.Button(xstr("payload_fszfw"))
         self._zfwButton.set_use_underline(True)
         self._zfwButton.connect("clicked", self._zfwRequested)
         self._zfwButton.set_tooltip_text(xstr("payload_fszfw_tooltip"))
-        table.attach(self._zfwButton, 0, 1, 6, 7)
+        table.attach(self._zfwButton, 0, 1, row, row+1)
 
         self._simulatorZFW = Gtk.Label("-")
         self._simulatorZFW.set_width_chars(6)
         self._simulatorZFW.set_alignment(1.0, 0.5)
-        table.attach(self._simulatorZFW, 1, 2, 6, 7)
+        table.attach(self._simulatorZFW, 1, 2, row, row+1)
         self._simulatorZFWValue = None
 
         label = Gtk.Label("kg")
         label.set_halign(Gtk.Align.START)
-        table.attach(label, 2, 3, 6, 7)
+        table.attach(label, 2, 3, row, row+1)
 
         self.addCancelFlightButton()
         self._backButton = self.addPreviousButton(clicked = self._backClicked)
