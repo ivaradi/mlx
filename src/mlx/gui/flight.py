@@ -2677,10 +2677,7 @@ class PayloadPage(Page):
         zfw = bookedFlight.dow
         zfw += (self._numCabinCrew.get_int() - bookedFlight.dowNumCabinCrew) *  \
             const.WEIGHT_CABIN_CREW
-        zfw += self._numPassengers.get_int() * \
-            (const.WEIGHT_PASSENGER_CHARTER
-             if bookedFlight.flightType==const.FLIGHTTYPE_CHARTER
-             else const.WEIGHT_PASSENGER)
+        zfw += self._numPassengers.get_int() * bookedFlight.passengerWeight
         zfw += self._numChildren.get_int() * const.WEIGHT_CHILD
         zfw += self._numInfants.get_int() * const.WEIGHT_INFANT
         zfw += self._bagWeight.get_int()

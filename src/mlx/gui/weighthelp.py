@@ -437,10 +437,7 @@ class WeightHelp(Gtk.VBox):
         """Get the passenger weight for the flight."""
         if self._flightType>=0 and self._pax>=0 and self._children>=0 and \
            self._infants>=0:
-            return self._pax * \
-                (const.WEIGHT_PASSENGER_CHARTER
-                 if self._flightType==const.FLIGHTTYPE_CHARTER
-                 else const.WEIGHT_PASSENGER) + \
+            return self._pax * const.getPassengerWeight(self._flightType) + \
                 self._children * const.WEIGHT_CHILD + \
                 self._infants * const.WEIGHT_INFANT
         else:
