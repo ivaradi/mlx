@@ -27,6 +27,9 @@ CAPTION = 1
 # Row type: an actual delay code
 DELAYCODE = 2
 
+# Row type: an actual delay code requiring a textual explanation
+DELAYCODE_EXPLANATION_REQUIRED = 3
+
 #----------------------------------------------------------------------------
 
 # Prefixes for the generated tables
@@ -701,7 +704,7 @@ def generateFiles(baseDir):
                     poFile = poFiles[i]
                     print("msgid \"%srow%d\"" % (poPrefix, rowIndex), file=poFile)
                     generateMsgStr(poFile, columns[i])
-            elif type==DELAYCODE:
+            elif type in [DELAYCODE, DELAYCODE_EXPLANATION_REQUIRED]:
                 columnIndex = 0
                 for column in columns:
                     if isinstance(column, list):
@@ -738,7 +741,7 @@ def generateFiles(baseDir):
                 if (mask&tableMask)!=tableMask:
                     continue
 
-                if type==DELAYCODE:
+                if type in [DELAYCODE, DELAYCODE_EXPLANATION_REQUIRED]:
                     print("    \"%s\": \"%s\"," % \
                       (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", "")), file=dcdata)
 
@@ -755,9 +758,46 @@ def generateFiles(baseDir):
 
         tableMask = 1
         for i in range(0, len(tablePrefixes)):
+            print("_%s_code2explanationRequired = {" % (tablePrefixes[i],), file=dcdata)
+
+            columnIndexes = []
+            for j in range(0, len(headings)):
+                if ( (headingFlags[j]&tableMask)==tableMask ):
+                    columnIndexes.append(j)
+
+            codeIndex = columnIndexes[0]
+            meaningIndex = columnIndexes[2]
+
+            rowIndex = 0
+            for (type, mask, columns) in rows:
+                if (mask&tableMask)!=tableMask:
+                    continue
+
+                if type in [DELAYCODE, DELAYCODE_EXPLANATION_REQUIRED]:
+                    print("    \"%s\": %s," % \
+                          (str(columns[codeIndex]).strip(),
+                           "True" if type==DELAYCODE_EXPLANATION_REQUIRED else
+                           "False"),
+                          file = dcdata)
+
+            print("}", file=dcdata)
+            print(file=dcdata)
+
+            tableMask <<= 1
+
+        print("def _isExplanationRequired(table, row):", file=dcdata)
+        print("    code = row[0].strip()", file=dcdata)
+        print("    return table[code] if code in table else false", file=dcdata)
+        print(file=dcdata)
+
+        tableMask = 1
+        for i in range(0, len(tablePrefixes)):
 
             print("_%s_data = (" % (tablePrefixes[i],), file=dcdata)
-            print("    lambda row: _extract(_%s_code2meaning, row)," % \
+            print("    (lambda row: row[0].strip(),", file=dcdata)
+            print("     lambda row: _extract(_%s_code2meaning, row)," % \
+              (tablePrefixes[i],), file=dcdata)
+            print("     lambda row: _isExplanationRequired(_%s_code2explanationRequired, row))," % \
               (tablePrefixes[i],), file=dcdata)
             print("    [", end=' ', file=dcdata)
 
@@ -782,7 +822,7 @@ def generateFiles(baseDir):
                 if type==CAPTION:
                     print("        (CAPTION, xstr(\"%srow%d\"))," % \
                       (poPrefix, rowIndex), file=dcdata)
-                elif type==DELAYCODE:
+                elif type in [DELAYCODE, DELAYCODE_EXPLANATION_REQUIRED]:
                     print("        (DELAYCODE, [", file=dcdata)
                     for j in columnIndexes:
                         column = columns[j]

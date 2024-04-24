@@ -190,6 +190,7 @@ class DelayCodeTable(DelayCodeTableBase):
 
         self._alignments = []
         self._checkButtons = []
+        self._codesToExplain = []
 
         self._eventBox = Gtk.EventBox()
 
@@ -204,15 +205,26 @@ class DelayCodeTable(DelayCodeTableBase):
         self._previousWidth = 0
 
     @property
+    def _delayCodeRows(self):
+        """Get a list of the row indexes in the delay code data table of
+        the delay codes that are enabled."""
+        rows = []
+
+        for checkButton in self._checkButtons:
+            if checkButton.get_active():
+                rows.append(checkButton.delayCodeRow)
+
+        return rows
+
+    @property
     def delayCodes(self):
         """Get a list of the delay codes checked by the user."""
         codes = []
 
         if self._delayCodeData is not None:
-            codeExtractor = self._delayCodeData[0]
-            for checkButton in self._checkButtons:
-                if checkButton.get_active():
-                    codes.append(codeExtractor(checkButton.delayCodeRow))
+            codeExtractor = self._delayCodeData[0][1]
+            for row in self._delayCodeRows:
+                codes.append(codeExtractor(row))
 
         return codes
 
@@ -336,7 +348,8 @@ class DelayCodeTable(DelayCodeTableBase):
 
     def _delayCodesChanged(self, button):
         """Called when one of the delay codes have changed."""
-        numDelayCodes = len(self.delayCodes)
+        delayCodeRows = self._delayCodeRows
+        numDelayCodes = len(delayCodeRows)
         if numDelayCodes>=4:
             for checkButton in self._checkButtons:
                 if not checkButton.get_active():
@@ -344,6 +357,22 @@ class DelayCodeTable(DelayCodeTableBase):
         else:
             for checkButton in self._checkButtons:
                 checkButton.set_sensitive(True)
+
+        codeExtractor = self._delayCodeData[0][0]
+        isExplanationRequired = self._delayCodeData[0][2]
+        codesToExplain = []
+        for row in delayCodeRows:
+            if isExplanationRequired(row):
+                code = codeExtractor(row)
+                codesToExplain.append(code)
+                if code not in self._codesToExplain:
+                    self._info.addFault("dc_" + code,
+                                        xstr("info_delay_explain") % (code,))
+
+        for code in self._codesToExplain:
+            if code not in codesToExplain:
+                self._info.clearFault("dc_" + code)
+        self._codesToExplain = codesToExplain
 
         self._info.delayCodesChanged()
 

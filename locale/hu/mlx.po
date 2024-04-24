@@ -1407,6 +1407,9 @@ msgstr "_Hibák, megfigyelések"
 msgid "info_delay"
 msgstr "Késés kódok"
 
+msgid "info_delay_explain"
+msgstr "Késés kód: %s"
+
 msgid "statusbar_conn_tooltip"
 msgstr ""
 "A kapcsolat állapota.\n"

@@ -1404,6 +1404,9 @@ msgstr "F_aults, observations"
 msgid "info_delay"
 msgstr "Delay codes"
 
+msgid "info_delay_explain"
+msgstr "Delay code: %s"
+
 msgid "statusbar_conn_tooltip"
 msgstr ""
 "The state of the connection.\n"
