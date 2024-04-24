@@ -743,7 +743,7 @@ def generateFiles(baseDir):
 
                 if type in [DELAYCODE, DELAYCODE_EXPLANATION_REQUIRED]:
                     print("    \"%s\": \"%s\"," % \
-                      (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", "")), file=dcdata)
+                      (str(columns[codeIndex]).strip(), columns[meaningIndex][0].replace("\n", " ")), file=dcdata)
 
             print("}", file=dcdata)
             print(file=dcdata)
