@@ -1478,7 +1478,7 @@ class GateSelectionPage(Page):
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add(self._gateList)
-        scrolledWindow.set_size_request(50, -1)
+        scrolledWindow.set_size_request(70, -1)
         scrolledWindow.set_policy(Gtk.PolicyType.AUTOMATIC,
                                   Gtk.PolicyType.AUTOMATIC)
         scrolledWindow.set_shadow_type(Gtk.ShadowType.IN)
