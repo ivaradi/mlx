@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------
 
 from . import const
+from .gates import lhbpGates
 
 #------------------------------------------------------------------------------
 
@@ -50,11 +51,16 @@ class Fleet(object):
     def isGateConflicting(self, plane):
         """Check if the gate of the given plane conflicts with another plane's
         position."""
+        gate = lhbpGates.find(plane.gateNumber)
         for p in self._planes.values():
             if p.tailNumber!=plane.tailNumber and \
-               p.status==const.PLANE_HOME and \
-               p.gateNumber==plane.gateNumber:
-                return True
+               p.status==const.PLANE_HOME:
+                if p.gateNumber==plane.gateNumber:
+                    return True
+                if gate is not None and not gate.isAvailable(plane,
+                                                             lhbpGates,
+                                                             [p.gateNumber]):
+                    return True
 
         return False
 
@@ -65,6 +71,14 @@ class Fleet(object):
             if p.status==const.PLANE_HOME and p.gateNumber:
                 gateNumbers.add(p.gateNumber)
         return gateNumbers
+
+    def iterAvailableLHBPGates(self, tailNumber):
+        """Iterate over the available gates at LHBP."""
+        occupiedGateNumbers = self.getOccupiedGateNumbers()
+        plane = self.__getitem__(tailNumber)
+        for gate in lhbpGates.gates:
+            if gate.isAvailable(plane, lhbpGates, occupiedGateNumbers):
+                yield gate
 
     def updatePlane(self, tailNumber, status, gateNumber = None):
         """Update the status of the given plane."""

@@ -1,5 +1,6 @@
 from . import const
 from . import rpccommon
+from . import gates
 
 from .common import MAVA_BASE_URL, fixUnpickled
 
@@ -629,6 +630,32 @@ class Fleet(rpccommon.Fleet):
 
 #---------------------------------------------------------------------------------------
 
+class Gate(gates.Gate, RPCObject):
+    """A gate."""
+    _instructions = {
+        "number": str,
+        "terminal": str,
+        "type": str,
+        "maxSpan": float,
+        "maxLength": float
+    }
+
+    def __init__(self, value):
+        """Construct the gate."""
+        RPCObject.__init__(self, value, instructions = Gate._instructions)
+
+#---------------------------------------------------------------------------------------
+
+class Gates(gates.Gates):
+    """The gates."""
+    def __init__(self, value):
+        """Construct the gates."""
+        super(Gates, self).__init__()
+        for gateValue in value:
+            self.add(Gate(gateValue))
+
+#---------------------------------------------------------------------------------------
+
 class Registration(object):
     """Data for registration."""
     def __init__(self, surName, firstName, nameOrder,
@@ -806,6 +833,13 @@ class Client(object):
                                   self._server.getFleet(sessionID))
 
         return Fleet(value)
+
+    def getGates(self):
+        """Query and return the gate information."""
+        value = self._performCall(lambda sessionID:
+                                  self._server.getGates(sessionID))
+
+        return Gates(value)
 
     def updatePlane(self, tailNumber, status, gateNumber):
         """Update the state and position of the plane with the given tail

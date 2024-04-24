@@ -672,11 +672,9 @@ class Aircraft(object):
         """Callback for the fleet retrieval result."""
         if fleet is not None:
             gateList = ""
-            occupiedGateNumbers = fleet.getOccupiedGateNumbers()
-            for gate in gates.lhbpGates.gates:
-                if gate.isAvailable(gates.lhbpGates, occupiedGateNumbers):
-                    if gateList: gateList += ", "
-                    gateList += gate.number
+            for gate in fleet.iterAvailableLHBPGates(self.flight.bookedFlight.tailNumber):
+                if gateList: gateList += ", "
+                gateList += gate.number
             fs.sendMessage(const.MESSAGETYPE_GATE_SYSTEM,
                            "Free gates: " + gateList, 20)
 

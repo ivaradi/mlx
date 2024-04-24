@@ -10,7 +10,8 @@
 class Gate(object):
     """Information about a gate."""
     def __init__(self, number, terminal, type,
-                 availableFn = None, taxiThrough = False):
+                 availableFn = None, taxiThrough = False,
+                 maxSpan = 0.0, maxLength = 0.0):
         """Construct the gate with the given information.
 
         number is the gate's number as a string (as it can contain letters).
@@ -20,29 +21,26 @@ class Gate(object):
         the statuses of other gates. Its arguments are:
         - a collection of the gates, and
         - a set of occupied gate numbers."""
-        self._number = number
-        self._terminal = terminal
-        self._type = type
+        self.number = number
+        self.terminal = terminal
+        self.type = type
         self._availableFn = availableFn
-        self._taxiThrough = taxiThrough
+        self.taxiThrough = taxiThrough
+        self.maxSpan = maxSpan
+        self.maxLength = maxLength
 
-    @property
-    def number(self):
-        """Get the number of the gate."""
-        return self._number
-
-    @property
-    def taxiThrough(self):
-        """Get if the gate is a taxi through one."""
-        return self._taxiThrough
-
-    def isAvailable(self, gates, occupiedGateNumbers):
-        """Determine if this gate is available given the set of gates and
-        occupied gate numbers."""
-        if self._number in occupiedGateNumbers:
+    def isAvailable(self, plane, gates, occupiedGateNumbers):
+        """Determine if this gate is available for the given plane and the
+        given the set of gates and occupied gate numbers."""
+        if self.number in occupiedGateNumbers:
             return False
-        return True if self._availableFn is None else \
-               self._availableFn(gates, occupiedGateNumbers)
+        if self._availableFn is None or \
+           self._availableFn(gates, occupiedGateNumbers):
+            return plane is None or \
+                (plane.wingSpan <= self.maxSpan and \
+                 plane.fuselageLength <= self.maxLength)
+        else:
+            return False
 
 #--------------------------------------------------------------------------------------
 
@@ -111,6 +109,32 @@ class Gates(object):
         self._displayInfos.append((Gates.DISPLAY_NEW_COLUMN, None))
         self._numRowsInColumn = 0
         self._numColumns += 1
+
+    def merge(self, otherGates):
+        """Merge the information from the given gate list (retrieved from the
+        MAVA server) into this gate list."""
+        for otherGate in otherGates.gates:
+            gate = self.find(otherGate.number)
+            if gate is None:
+                print("Received data for gate %s, but it does not exist locally!" %
+                      (otherGate.number,))
+            else:
+                if gate.terminal != otherGate.terminal:
+                    print("The terminal for gate %s is received as: %s" %
+                          (gate.number, otherGate.terminal))
+                    gate.terminal = otherGate.terminal
+                if gate.type != otherGate.type:
+                    print("The type for gate %s is received as: %s" %
+                          (gate.number, otherGate.type))
+                    gate.type = otherGate.type
+
+                gate.maxSpan = otherGate.maxSpan
+                gate.maxLength = otherGate.maxLength
+
+        for gate in self.gates:
+            if gate.maxSpan==0.0 or gate.maxLength==0.0:
+                    print("Gate %s has no maximal dimensions from the database" %
+                          (gate.number,))
 
     def _addRow(self):
         """Add a new row."""

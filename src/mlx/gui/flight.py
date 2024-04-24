@@ -1499,10 +1499,8 @@ class GateSelectionPage(Page):
         """Fill the gate list."""
         self._listStore.clear()
         self._gateList.set_sensitive(True)
-        occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
-        for gate in lhbpGates.gates:
-            if gate.isAvailable(lhbpGates, occupiedGateNumbers):
-                self._listStore.append([gate.number])
+        for gate in self._wizard.iterAvailableLHBPGates():
+            self._listStore.append([gate.number])
 
     def finalize(self):
         """Finalize the page."""
@@ -6022,10 +6020,8 @@ class FinishPage(Page):
            self._wizard.loggedIn and \
            self._wizard.bookedFlight.arrivalICAO=="LHBP" and \
            not self._wizard.entranceExam:
-            occupiedGateNumbers = self._wizard._fleet.getOccupiedGateNumbers()
-            for gate in lhbpGates.gates:
-                if gate.isAvailable(lhbpGates, occupiedGateNumbers):
-                    self._gatesModel.append([gate.number])
+            for gate in self._wizard.iterAvailableLHBPGates():
+                self._gatesModel.append([gate.number])
             self._gateLabel.set_sensitive(True)
             self._gate.set_sensitive(True)
             self._gate.set_active(-1)
@@ -6870,6 +6866,7 @@ class Wizard(Gtk.VBox):
         if returned:
             if result.loggedIn:
                 self._loginResult = result
+                self._mergeGates()
                 self.gui.loginSuccessful()
             else:
                 if isReload:
@@ -6959,6 +6956,11 @@ class Wizard(Gtk.VBox):
         """Called when any CEF browsers should be finalized."""
         self._simBriefingPage.finalizeCEF()
 
+    def iterAvailableLHBPGates(self):
+        """Iterate over the available gates at LHBP for the current flight's plane."""
+        for gate in self._fleet.iterAvailableLHBPGates(self._bookedFlight.tailNumber):
+            yield gate
+
     def _connectSimulator(self, simulatorType):
         """Connect to the simulator."""
         self.gui.connectSimulator(self._bookedFlight, simulatorType)
@@ -6984,5 +6986,10 @@ class Wizard(Gtk.VBox):
             if page.id==pageID:
                 return index
         assert False
+
+    def _mergeGates(self):
+        """Merge the gate information retrieved during login into the
+        existing gate information for LHBP."""
+        lhbpGates.merge(self._loginResult.gates)
 
 #-----------------------------------------------------------------------------

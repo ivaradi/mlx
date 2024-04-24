@@ -475,6 +475,7 @@ class LoginRPC(RPCRequest):
             result.sessionID = loginResult[3]
             result.password = password
             result.fleet = client.getFleet()
+            result.gates = client.getGates()
             flights = client.getFlights()
             result.flights = flights[0]
             result.reportedFlights = flights[1]
