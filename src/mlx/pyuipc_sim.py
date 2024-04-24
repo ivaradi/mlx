@@ -521,6 +521,8 @@ class Values(object):
             return int(self.windDirection * 65536.0 / 360.0)
         elif offset==0x0ec6:       # QNH
             return int(self.qnh * 16.0)
+        elif offset==0x11b8:       # G-Load at touchdown
+            return int(self.gLoad * 625.0)
         elif offset==0x11ba:       # G-Load
             return int(self.gLoad * 625.0)
         elif offset==0x11c6:       # Mach
