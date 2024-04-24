@@ -607,6 +607,8 @@ class Plane(rpccommon.Plane, RPCObject):
         "dow": int,
         "dowNumCabinCrew": int,
         "maxPassengers": int,
+        "fuselageLength": float,
+        "wingSpan": float
         }
 
     def __init__(self, value):
