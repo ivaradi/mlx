@@ -472,6 +472,9 @@ SOUND_TAXI_BOEING767_ALT1 = "767taxi_1.mp3"
 ## Sound: taxi: Fokker F70
 SOUND_TAXI_F70 = "F70taxi.mp3"
 
+## Sound: taxi: Tupolev Tu-154
+SOUND_TAXI_T154 = "154taxi.mp3"
+
 ## Sound: takeoff preparation request from the captain
 SOUND_CAPTAIN_TAKEOFF = "cpt_takeoff.mp3"
 

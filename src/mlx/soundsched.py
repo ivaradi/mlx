@@ -144,14 +144,16 @@ class TaxiSound(SimpleSound):
                  const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG,
                  const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767,
                  const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767,
-                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 },
+                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70,
+                 const.AIRCRAFT_T154  : const.SOUND_TAXI_T154 },
                { const.AIRCRAFT_B736  : const.SOUND_TAXI_BOEING737NG_ALT1,
                  const.AIRCRAFT_B737  : const.SOUND_TAXI_BOEING737NG_ALT1,
                  const.AIRCRAFT_B738  : const.SOUND_TAXI_BOEING737NG_ALT1,
                  const.AIRCRAFT_B738C : const.SOUND_TAXI_BOEING737NG_ALT1,
                  const.AIRCRAFT_B762  : const.SOUND_TAXI_BOEING767_ALT1,
                  const.AIRCRAFT_B763  : const.SOUND_TAXI_BOEING767_ALT1,
-                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70 },
+                 const.AIRCRAFT_F70   : const.SOUND_TAXI_F70,
+                 const.AIRCRAFT_T154  : const.SOUND_TAXI_T154 },
                ]
 
     def __init__(self, flight, boardingSound = None):
