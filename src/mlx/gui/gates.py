@@ -48,7 +48,7 @@ class FleetGateStatus(Gtk.VBox):
         self._fleetList.set_tooltip_markup(xstr("gates_planes_tooltip"))
         fleetLabel.set_mnemonic_widget(self._fleetList)
         column = Gtk.TreeViewColumn(xstr("gates_tailno"), Gtk.CellRendererText(),
-                                    text = 0)
+                                    markup = 0)
         column.set_expand(True)
         column.set_sort_column_id(0)
         self._fleetList.append_column(column)
