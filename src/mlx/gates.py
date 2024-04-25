@@ -169,7 +169,7 @@ def getAvailableIf(othersAvailable = []):
 # The gates at LHBP
 lhbpGates = Gates()
 
-lhbpGates.add(Gate("R101", "1", "S"))
+lhbpGates.add(Gate("R101", "1", "S", taxiThrough = True))
 lhbpGates.add(Gate("R102", "1", "S"))
 lhbpGates.add(Gate("R103", "1", "S"))
 lhbpGates.add(Gate("R104", "1", "S",
@@ -196,7 +196,8 @@ lhbpGates.add(Gate("R114", "1", "S",
                    availableFn = getAvailableIf(othersAvailable = ["R113"])))
 lhbpGates.add(Gate("R115", "1", "S"))
 lhbpGates.add(Gate("R116", "1", "S",
-                   availableFn = getAvailableIf(othersAvailable = ["R117"])))
+                   availableFn = getAvailableIf(othersAvailable = ["R117"]),
+                   taxiThrough = True))
 lhbpGates.add(Gate("R117", "1", "S",
                    availableFn = getAvailableIf(othersAvailable = ["R116", "R117A"])))
 lhbpGates.add(Gate("R117A", "1", "S",
@@ -211,9 +212,9 @@ lhbpGates.add(Gate("G154", "1", "S"))
 lhbpGates.add(Gate("G155", "1", "S"))
 
 lhbpGates.addSpace()
-lhbpGates.add(Gate("G170", "1", "S"))
-lhbpGates.add(Gate("G171", "1", "S"))
-lhbpGates.add(Gate("G172", "1", "S"))
+lhbpGates.add(Gate("G170", "1", "S", taxiThrough = True))
+lhbpGates.add(Gate("G171", "1", "S", taxiThrough = True))
+lhbpGates.add(Gate("G172", "1", "S", taxiThrough = True))
 lhbpGates.addNewColumn()
 
 lhbpGates.add(Gate("31", "2B", "G"))
@@ -293,8 +294,7 @@ lhbpGates.add(Gate("R278", "2A", "S",
                    availableFn = getAvailableIf(othersAvailable = ["R278A"]),
                    taxiThrough = True))
 lhbpGates.add(Gate("R278A", "2A", "S",
-                   availableFn = getAvailableIf(othersAvailable = ["R278", "R279"]),
-                   taxiThrough = True))
+                   availableFn = getAvailableIf(othersAvailable = ["R278", "R279"])))
 lhbpGates.add(Gate("R279", "2A", "S",
                    availableFn = getAvailableIf(othersAvailable = ["R278A"]),
                    taxiThrough = True))
