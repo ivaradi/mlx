@@ -24,6 +24,14 @@ class Plane(object):
                "A" if status==const.PLANE_AWAY else \
                "P" if status==const.PLANE_PARKING else ""
 
+    @property
+    def hasStairs(self):
+        """Indicate if the plane has its own stairs."""
+        return self.aircraftType in [const.AIRCRAFT_YK40,
+                                     const.AIRCRAFT_CRJ2,
+                                     const.AIRCRAFT_F70,
+                                     const.AIRCRAFT_DH8D]
+
     def _setStatus(self, letter):
         """Set the status from the given letter."""
         self.status = Plane.str2status(letter)
