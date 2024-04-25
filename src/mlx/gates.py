@@ -37,8 +37,8 @@ class Gate(object):
         if self._availableFn is None or \
            self._availableFn(gates, occupiedGateNumbers):
             return plane is None or \
-                (plane.wingSpan <= self.maxSpan and \
-                 plane.fuselageLength <= self.maxLength)
+                ((self.maxSpan<0.1 or plane.wingSpan <= self.maxSpan) and
+                 (self.maxLength<0.1 or plane.fuselageLength <= self.maxLength))
         else:
             return False
 
