@@ -6166,7 +6166,7 @@ class FinishPage(Page):
         if bookedFlight.flightType==const.FLIGHTTYPE_VIP:
             departureError = arrivalError = False
 
-        self._tooBigTimeDifference = departureError and arrivalError
+        self._tooBigTimeDifference = departureError or arrivalError
 
         self._depTime.set_markup(self._formatTime(bookedFlight.departureTime,
                                                   flight.blockTimeStart,
