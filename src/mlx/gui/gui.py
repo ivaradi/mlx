@@ -60,6 +60,8 @@ class GUI(fs.ConnectionListener):
                  ("Szebenyi", "Bálint", "test"),
                  ("Zsebényi-Loksa", "Gergely", "test") ]
 
+    _maxInlineDebugLogLines = 200
+
     def __init__(self, programDirectory, config):
         """Construct the GUI."""
         GObject.threads_init()
@@ -1768,17 +1770,28 @@ class GUI(fs.ConnectionListener):
         for (timestampString, text) in self._logger.lines:
             description += str(formatFlightLogLine(timestampString, text))
 
-        description += "\n\n" + ("=" * 40)
-        description += "\n\nThe contents of the debug log:\n\n"
-
         buffer = self._debugLogView.get_buffer()
-        description += buffer.get_text(buffer.get_start_iter(),
-                                       buffer.get_end_iter(), True)
+        debugLogTooLong = buffer.get_line_count()>GUI._maxInlineDebugLogLines
+
+        description += "\n\n" + ("=" * 40)
+        description += "\n\nThe contents of the debug log%s:\n\n" % \
+            (" (truncated)" if debugLogTooLong else "")
+
+        debugLog = buffer.get_text(buffer.get_start_iter(),
+                                   buffer.get_end_iter(), True)
+        if debugLogTooLong:
+            description += buffer.get_text(buffer.get_start_iter(),
+                                           buffer.get_iter_at_line(GUI._maxInlineDebugLogLines),
+                                           True)
+        else:
+            description += debugLog
+            debugLog = None
 
         self.beginBusy(xstr("sendBugReport_busy"))
         self._sendBugReportCallback = callback
         self.webHandler.sendBugReport(self._bugReportSentCallback,
-                                      summary, description, email)
+                                      summary, description, email,
+                                      debugLog = debugLog)
 
     def _cefInitialized(self):
         """Called when CEF has been initialized."""

@@ -22,6 +22,7 @@ import xml.sax
 import xmlrpc.client
 import html.parser
 import certifi
+import base64
 
 #---------------------------------------------------------------------------------------
 
@@ -725,12 +726,13 @@ class SendBugReport(Request):
     """A request to send a bug report to the project homepage."""
     _latin2Encoder = codecs.getencoder("iso-8859-2")
 
-    def __init__(self, callback, summary, description, email):
+    def __init__(self, callback, summary, description, email, debugLog):
         """Construct the request for the given bug report."""
         super(SendBugReport, self).__init__(callback)
         self._summary = summary
         self._description = description
         self._email = email
+        self._debugLog = debugLog
 
     def run(self):
         """Perform the sending of the bug report."""
@@ -746,6 +748,12 @@ class SendBugReport(Request):
         result.ticketID = serverProxy.ticket.create(self._summary, self._description,
                                                     attributes, True)
         print("Created ticket with ID:", result.ticketID)
+        if self._debugLog:
+            serverProxy.ticket.putAttachment(result.ticketID, "debug.log",
+                                             "Debug log",
+                                             bytes(self._debugLog, "utf-8"))
+
+
         result.success = True
 
         return result
@@ -952,9 +960,10 @@ class Handler(threading.Thread):
         request = SendACARSRPC(self._rpcClient, callback, acars)
         self._addRequest(request)
 
-    def sendBugReport(self, callback, summary, description, email):
+    def sendBugReport(self, callback, summary, description, email, debugLog = None):
         """Send a bug report with the given data."""
-        self._addRequest(SendBugReport(callback, summary, description, email))
+        self._addRequest(SendBugReport(callback, summary, description, email,
+                                       debugLog = debugLog))
 
     def setCheckFlightPassed(self, callback, aircraftType):
         """Mark the check flight as passed."""
