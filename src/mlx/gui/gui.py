@@ -64,6 +64,9 @@ class GUI(fs.ConnectionListener):
         """Construct the GUI."""
         GObject.threads_init()
 
+        GLib.set_prgname("mlx")
+        Gdk.set_program_class("MAVA-Logger-X")
+
         self._programDirectory = programDirectory
         self.config = config
         self._connecting = False
