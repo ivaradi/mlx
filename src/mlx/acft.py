@@ -289,6 +289,12 @@ class Aircraft(object):
         This default implementation returns DERATE_NONE."""
         return DERATE_NONE
 
+    @property
+    def machSpeedAbove(self):
+        """Get the altitude above which the cruise speed should be reported
+        in Machs."""
+        return 24500
+
     def setBookedFlight(self, bookedFlight):
         """Update the aircraft based on the booked flight data (e.g. tail number).
 

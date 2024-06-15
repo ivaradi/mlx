@@ -205,7 +205,7 @@ class CruiseSpeedLogger(StateChecker):
         if flight.stage==const.STAGE_CRUISE and \
            (self._lastTime is None or \
             (self._lastTime+800)<=state.timestamp):
-                if state.altitude>24500.0:
+                if state.altitude>aircraft.machSpeedAbove:
                     logger.message(state.timestamp,
                                    "Cruise speed: %.3f mach" % (state.mach,))
                 else:
