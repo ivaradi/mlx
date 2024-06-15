@@ -1179,6 +1179,12 @@ class T154(Aircraft):
         """Get the derate type for this type."""
         return DERATE_TUPOLEV
 
+    @property
+    def machSpeedAbove(self):
+        """Get the altitude above which the cruise speed should be reported
+        in Machs."""
+        return 32000
+
     def setBookedFlight(self, bookedFlight):
         """Update the aircraft based on the booked flight data (e.g. tail number)."""
         if bookedFlight.tailNumber in ["HA-LCM", "HA-LCN", "HA-LCO", "HA-LCP",
