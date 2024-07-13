@@ -1253,7 +1253,7 @@ msgid "landing_approach"
 msgstr "Megközelítés _típusa:"
 
 msgid "landing_approach_tooltip"
-msgstr "A megközelítgés típusa, pl. ILS vagy VISUAL."
+msgstr "A megközelítés típusa. Válaszd ki a listából. Az OTHER választása esetén a megjegyzésben jelezd az okát."
 
 msgid "landing_vref"
 msgstr "V<sub>_Ref</sub>:"
@@ -1300,6 +1300,11 @@ msgid "finish_help_wrongtime"
 msgstr ""
 "<span foreground=\"red\">\n\nAz érkezési és/vagy indulási idő jelentősen eltér a menetrendtől.\n"
 "Kérlek, írj megjegyzést vagy adj meg késési kódot a PIREP elküldése előtt.</span>"
+
+msgid "finish_help_otherappr"
+msgstr ""
+"<span foreground=\"red\">\n\nA megközelítés típusaként az OTHER-t választottad.\n"
+"Kérlek, írj megjegyzést az okáról.</span>"
 
 msgid "finish_help_goodtime"
 msgstr ""

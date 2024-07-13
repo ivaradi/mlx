@@ -67,6 +67,31 @@ comboModel = Gtk.ListStore(GObject.TYPE_STRING)
 comboModel.append(("N/A",))
 comboModel.append(("VECTORS",))
 
+approachModel = Gtk.ListStore(GObject.TYPE_STRING)
+approachModel.append(("ILS",))
+approachModel.append(("RNAV",))
+approachModel.append(("RNAV X",))
+approachModel.append(("RNAV Y",))
+approachModel.append(("RNAV Z",))
+approachModel.append(("RNP",))
+approachModel.append(("RNP X",))
+approachModel.append(("RNP Y",))
+approachModel.append(("RNP Z",))
+approachModel.append(("LOC",))
+approachModel.append(("LOC DME",))
+approachModel.append(("LOC DME X",))
+approachModel.append(("LOC DME Y",))
+approachModel.append(("LOC DME Z",))
+approachModel.append(("LCTR",))
+approachModel.append(("VOR",))
+approachModel.append(("VOR DME",))
+approachModel.append(("VOR DME X",))
+approachModel.append(("VOR DME Y",))
+approachModel.append(("VOR DME Z",))
+approachModel.append(("NDB",))
+approachModel.append(("VISUAL",))
+approachModel.append(("OTHER",))
+
 #-----------------------------------------------------------------------------
 
 class Page(Gtk.Alignment):
@@ -5432,10 +5457,12 @@ class LandingPage(Page):
         label.set_alignment(0.0, 0.5)
         table.attach(label, 1, 2, row, row + 1)
 
-        self._approachType = Gtk.Entry()
-        self._approachType.set_width_chars(10)
+        self._approachType = Gtk.ComboBox(model = approachModel)
+        renderer = Gtk.CellRendererText()
+        self._approachType.pack_start(renderer, True)
+        self._approachType.add_attribute(renderer, "text", 0)
         self._approachType.set_tooltip_text(xstr("landing_approach_tooltip"))
-        self._approachType.connect("changed", self._upperChanged)
+        self._approachType.set_sensitive(False)
         table.attach(self._approachType, 2, 4, row, row + 1)
         label.set_mnemonic_widget(self._approachType)
 
@@ -5489,7 +5516,8 @@ class LandingPage(Page):
     @property
     def approachType(self):
         """Get the approach type."""
-        return self._approachType.get_text()
+        index = self._approachType.get_active()
+        return self._approachType.get_model()[index][0]
 
     @property
     def runway(self):
@@ -5540,7 +5568,7 @@ class LandingPage(Page):
             self._runway.set_text(self._wizard.landingRunway)
         self._runway.set_sensitive(True)
 
-        self._approachType.set_text("")
+        self._approachType.set_active(0)
         self._approachType.set_sensitive(True)
 
         self._vref.set_int(None)
@@ -5581,7 +5609,7 @@ class LandingPage(Page):
                     (self.star is not None or
                      self.transition is not None) and \
                     self._runway.get_text()!="" and \
-                    self._approachType.get_text()!="" and \
+                    self.approachType is not None and \
                     self.vref is not None
         self._button.set_sensitive(sensitive)
 
@@ -6029,6 +6057,10 @@ class FinishPage(Page):
             self._gateLabel.set_sensitive(False)
             self._gate.set_sensitive(False)
 
+
+    def prepareShow(self):
+        """Prepare the page for showing by updating the times and
+        the buttons as well."""
         self._updateTimes()
 
     def updateButtons(self):
@@ -6037,13 +6069,16 @@ class FinishPage(Page):
         faultsExplained = gui.faultsFullyExplained
         timesCorrect = not self._tooBigTimeDifference or \
                        gui.hasComments or gui.hasDelayCode
+        otherApproach = self._wizard.approachType=="OTHER" and \
+            not gui.hasComments
         sensitive = gui.flight is not None and \
                     gui.flight.stage==const.STAGE_END and \
                     (self._gatesModel.get_iter_first() is None or
                      self._gate.get_active()>=0) and \
-                     faultsExplained and timesCorrect
+                     faultsExplained and timesCorrect and \
+                     not otherApproach
 
-        self._updateHelp(faultsExplained, timesCorrect)
+        self._updateHelp(faultsExplained, timesCorrect, otherApproach)
 
         wasSensitive = self._saveButton.get_sensitive()
 
@@ -6180,12 +6215,14 @@ class FinishPage(Page):
 
         self.updateButtons()
 
-    def _updateHelp(self, faultsExplained, timesCorrect):
+    def _updateHelp(self, faultsExplained, timesCorrect, otherApproach):
         """Update the help text according to the actual situation."""
         if not faultsExplained:
             self.setHelp(xstr("finish_help") + xstr("finish_help_faults"))
         elif not timesCorrect:
             self.setHelp(xstr("finish_help") + xstr("finish_help_wrongtime"))
+        elif otherApproach:
+            self.setHelp(xstr("finish_help") + xstr("finish_help_otherappr"))
         else:
             self.setHelp(xstr("finish_help") + xstr("finish_help_goodtime"))
 

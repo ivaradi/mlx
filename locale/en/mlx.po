@@ -1252,7 +1252,7 @@ msgid "landing_approach"
 msgstr "_Approach type:"
 
 msgid "landing_approach_tooltip"
-msgstr "The type of the approach, e.g. ILS or VISUAL."
+msgstr "The type of the approach. Select it from the list. If you select OTHER, provide a comment about the reason."
 
 msgid "landing_vref"
 msgstr "V<sub>_Ref</sub>:"
@@ -1299,6 +1299,11 @@ msgid "finish_help_wrongtime"
 msgstr ""
 "<span foreground=\"red\">\n\nYour departure and/or arrival time differ too much from the scheduled time(s).\n"
 "Please, provide a comment or a delay code to proceed.</span>"
+
+msgid "finish_help_otherappr"
+msgstr ""
+"<span foreground=\"red\">\n\nYou selected OTHER as approach type.\n"
+"Please, provide a comment on the reason.</span>"
 
 msgid "finish_help_goodtime"
 msgstr ""
