@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from mlx.gui.common import *
 import mlx.gui.cef as cef
