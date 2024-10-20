@@ -1712,7 +1712,8 @@ class GUI(fs.ConnectionListener):
 
         dialog.add_button(xstr("button_cancel"), Gtk.ResponseType.REJECT)
         dialog.add_button(xstr("viewPIREP"), 1)
-        dialog.add_button(xstr("sendPIREP"), Gtk.ResponseType.OK)
+        if self.loggedIn:
+            dialog.add_button(xstr("sendPIREP"), Gtk.ResponseType.OK)
 
         return dialog
 
