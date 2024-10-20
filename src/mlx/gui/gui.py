@@ -180,6 +180,7 @@ class GUI(fs.ConnectionListener):
         label.set_use_underline(True)
         label.set_tooltip_text(xstr("tab_gates_tooltip"))
         self._notebook.append_page(self._fleetGateStatus, label)
+        self._fleetGateStatus.disable()
 
         self._acars = ACARS(self)
         label = Gtk.Label("ACARS")
@@ -1347,6 +1348,7 @@ class GUI(fs.ConnectionListener):
         """Called when the login is successful."""
         self._flightsMenuItem.set_sensitive(True)
         self._timetableMenuItem.set_sensitive(True)
+        self._fleetGateStatus.enable()
 
     def isWizardActive(self):
         """Determine if the flight wizard is active."""
