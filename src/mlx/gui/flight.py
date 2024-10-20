@@ -588,6 +588,7 @@ class FlightSelectionPage(Page):
         self._flightList.set_sensitive(True)
         self._loadButton.set_sensitive(True)
         self._refreshButton.set_sensitive(self._wizard.loggedIn)
+        self._bookButton.set_sensitive(self._wizard.loggedIn)
         self._buildFlights()
 
     def finalize(self):
