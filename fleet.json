@@ -1,0 +1,767 @@
+[
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBI",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBK",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBN",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBO",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBP",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 13,
+        "dow": 29500,
+        "dowNumCabinCrew": 3,
+        "fuselageLength": 37.05,
+        "maxPassengers": 68,
+        "tailNumber": "HA-LBR",
+        "wingSpan": 29.01
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCA",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCB",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCE",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 147,
+        "tailNumber": "HA-LCF",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 147,
+        "tailNumber": "HA-LCG",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 147,
+        "tailNumber": "HA-LCH",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCI",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCK",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 157,
+        "tailNumber": "HA-LCL",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 152,
+        "tailNumber": "HA-LCM",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCN",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCO",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCP",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCR",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 147,
+        "tailNumber": "HA-LCS",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 147,
+        "tailNumber": "HA-LCT",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCU",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 14,
+        "dow": 53259,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 47.9,
+        "maxPassengers": 161,
+        "tailNumber": "HA-LCV",
+        "wingSpan": 37.5
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEA",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEB",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEC",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LED",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LEF",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LEG",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEI",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LEJ",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEK",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 18,
+        "dow": 27646,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 30.48,
+        "maxPassengers": 113,
+        "tailNumber": "HA-LEM",
+        "wingSpan": 28.35
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEN",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEO",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 6,
+        "dow": 31900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 29.8,
+        "maxPassengers": 105,
+        "tailNumber": "HA-LEP",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 6,
+        "dow": 31900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 29.8,
+        "maxPassengers": 105,
+        "tailNumber": "HA-LER",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LES",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LET",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEU",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEV",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 4,
+        "dow": 32900,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 32.2,
+        "maxPassengers": 123,
+        "tailNumber": "HA-LEX",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEY",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 5,
+        "dow": 35100,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 36.4,
+        "maxPassengers": 143,
+        "tailNumber": "HA-LEZ",
+        "wingSpan": 28.9
+    },
+    {
+        "aircraftType": 8,
+        "dow": 84507,
+        "dowNumCabinCrew": 6,
+        "fuselageLength": 47.24,
+        "maxPassengers": 185,
+        "tailNumber": "HA-LHA",
+        "wingSpan": 47.57
+    },
+    {
+        "aircraftType": 8,
+        "dow": 84507,
+        "dowNumCabinCrew": 6,
+        "fuselageLength": 47.24,
+        "maxPassengers": 185,
+        "tailNumber": "HA-LHB",
+        "wingSpan": 47.57
+    },
+    {
+        "aircraftType": 9,
+        "dow": 91311,
+        "dowNumCabinCrew": 7,
+        "fuselageLength": 54.9,
+        "maxPassengers": 229,
+        "tailNumber": "HA-LHC",
+        "wingSpan": 47.57
+    },
+    {
+        "aircraftType": 9,
+        "dow": 91311,
+        "dowNumCabinCrew": 7,
+        "fuselageLength": 54.9,
+        "maxPassengers": 229,
+        "tailNumber": "HA-LHD",
+        "wingSpan": 47.57
+    },
+    {
+        "aircraftType": 18,
+        "dow": 69500,
+        "dowNumCabinCrew": 6,
+        "fuselageLength": 53.12,
+        "maxPassengers": 174,
+        "tailNumber": "HA-LIA",
+        "wingSpan": 43.2
+    },
+    {
+        "aircraftType": 15,
+        "dow": 9855,
+        "dowNumCabinCrew": 1,
+        "fuselageLength": 20.4,
+        "maxPassengers": 32,
+        "tailNumber": "HA-LJA",
+        "wingSpan": 25.0
+    },
+    {
+        "aircraftType": 15,
+        "dow": 9855,
+        "dowNumCabinCrew": 1,
+        "fuselageLength": 20.4,
+        "maxPassengers": 32,
+        "tailNumber": "HA-LJB",
+        "wingSpan": 25.0
+    },
+    {
+        "aircraftType": 15,
+        "dow": 9855,
+        "dowNumCabinCrew": 1,
+        "fuselageLength": 20.4,
+        "maxPassengers": 32,
+        "tailNumber": "HA-LJC",
+        "wingSpan": 25.0
+    },
+    {
+        "aircraftType": 11,
+        "dow": 24283,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 30.91,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LMA",
+        "wingSpan": 28.08
+    },
+    {
+        "aircraftType": 11,
+        "dow": 24283,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 30.91,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LMB",
+        "wingSpan": 28.08
+    },
+    {
+        "aircraftType": 11,
+        "dow": 24283,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 30.91,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LMC",
+        "wingSpan": 28.08
+    },
+    {
+        "aircraftType": 11,
+        "dow": 24283,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 30.91,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LME",
+        "wingSpan": 28.08
+    },
+    {
+        "aircraftType": 11,
+        "dow": 24283,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 30.91,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LMF",
+        "wingSpan": 28.08
+    },
+    {
+        "aircraftType": 10,
+        "dow": 14549,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 26.8,
+        "maxPassengers": 50,
+        "tailNumber": "HA-LNA",
+        "wingSpan": 21.2
+    },
+    {
+        "aircraftType": 10,
+        "dow": 14549,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 26.8,
+        "maxPassengers": 50,
+        "tailNumber": "HA-LNB",
+        "wingSpan": 21.2
+    },
+    {
+        "aircraftType": 10,
+        "dow": 14549,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 26.8,
+        "maxPassengers": 50,
+        "tailNumber": "HA-LNC",
+        "wingSpan": 21.2
+    },
+    {
+        "aircraftType": 10,
+        "dow": 14549,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 26.8,
+        "maxPassengers": 50,
+        "tailNumber": "HA-LND",
+        "wingSpan": 21.2
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOA",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOB",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 16,
+        "dow": 42690,
+        "dowNumCabinCrew": 5,
+        "fuselageLength": 38.5,
+        "maxPassengers": 180,
+        "tailNumber": "HA-LOC",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LOD",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LOE",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LOF",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LOG",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 16,
+        "dow": 42690,
+        "dowNumCabinCrew": 5,
+        "fuselageLength": 38.5,
+        "maxPassengers": 180,
+        "tailNumber": "HA-LOH",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOI",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LOJ",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 3,
+        "dow": 42690,
+        "dowNumCabinCrew": 5,
+        "fuselageLength": 38.5,
+        "maxPassengers": 168,
+        "tailNumber": "HA-LOK",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOL",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 16,
+        "dow": 42690,
+        "dowNumCabinCrew": 5,
+        "fuselageLength": 38.5,
+        "maxPassengers": 180,
+        "tailNumber": "HA-LOM",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 1,
+        "dow": 38307,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 31.2,
+        "maxPassengers": 109,
+        "tailNumber": "HA-LON",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOP",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOR",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 2,
+        "dow": 39250,
+        "dowNumCabinCrew": 4,
+        "fuselageLength": 33.6,
+        "maxPassengers": 121,
+        "tailNumber": "HA-LOS",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 3,
+        "dow": 42690,
+        "dowNumCabinCrew": 5,
+        "fuselageLength": 38.5,
+        "maxPassengers": 168,
+        "tailNumber": "HA-LOU",
+        "wingSpan": 34.3
+    },
+    {
+        "aircraftType": 7,
+        "dow": 18508,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 32.84,
+        "maxPassengers": 78,
+        "tailNumber": "HA-LQA",
+        "wingSpan": 28.42
+    },
+    {
+        "aircraftType": 7,
+        "dow": 18508,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 32.84,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LQB",
+        "wingSpan": 28.42
+    },
+    {
+        "aircraftType": 7,
+        "dow": 18508,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 32.84,
+        "maxPassengers": 78,
+        "tailNumber": "HA-LQC",
+        "wingSpan": 28.42
+    },
+    {
+        "aircraftType": 7,
+        "dow": 18508,
+        "dowNumCabinCrew": 2,
+        "fuselageLength": 32.84,
+        "maxPassengers": 72,
+        "tailNumber": "HA-LQD",
+        "wingSpan": 28.42
+    },
+    {
+        "aircraftType": 17,
+        "dow": 25706,
+        "dowNumCabinCrew": 0,
+        "fuselageLength": 28.55,
+        "maxPassengers": 112,
+        "tailNumber": "HA-TAB",
+        "wingSpan": 26.34
+    }
+]

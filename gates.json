@@ -1,0 +1,492 @@
+[
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "31",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "32",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "33",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 74.0,
+        "maxSpan": 65.0,
+        "number": "34",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "34L",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "34R",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 74.0,
+        "maxSpan": 65.0,
+        "number": "35",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "35L",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "35R",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 74.0,
+        "maxSpan": 65.0,
+        "number": "36",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 38.65,
+        "maxSpan": 28.72,
+        "number": "36L",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "36R",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "37",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "38",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 74.0,
+        "maxSpan": 65.0,
+        "number": "39",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "39L",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "39R",
+        "terminal": "2B",
+        "type": "G"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 38.0,
+        "number": "42",
+        "terminal": "2A",
+        "type": "G"
+    },
+    {
+        "maxLength": 56.0,
+        "maxSpan": 51.0,
+        "number": "43",
+        "terminal": "2A",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "44",
+        "terminal": "2A",
+        "type": "G"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "45",
+        "terminal": "2A",
+        "type": "G"
+    },
+    {
+        "maxLength": 30.5,
+        "maxSpan": 30.4,
+        "number": "G150",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 30.5,
+        "maxSpan": 30.4,
+        "number": "G151",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 30.3,
+        "maxSpan": 28.65,
+        "number": "G152",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 30.3,
+        "maxSpan": 28.65,
+        "number": "G153",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 30.3,
+        "maxSpan": 28.65,
+        "number": "G154",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 30.3,
+        "maxSpan": 28.65,
+        "number": "G155",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 27.5,
+        "maxSpan": 23.9,
+        "number": "G170",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 27.5,
+        "maxSpan": 23.9,
+        "number": "G171",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 27.5,
+        "maxSpan": 23.9,
+        "number": "G172",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 48.0,
+        "number": "R101",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 48.0,
+        "number": "R102",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 48.0,
+        "number": "R103",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R104",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 48.0,
+        "number": "R105",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R106",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R107",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 48.0,
+        "number": "R108",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R110",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 61.62,
+        "maxSpan": 52.0,
+        "number": "R111",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R112",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 61.62,
+        "maxSpan": 52.0,
+        "number": "R113",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R114",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 75.39,
+        "maxSpan": 68.59,
+        "number": "R115",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R116",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 75.39,
+        "maxSpan": 68.59,
+        "number": "R117",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 75.39,
+        "maxSpan": 68.59,
+        "number": "R117A",
+        "terminal": "1",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R210",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R211",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R212",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 55.0,
+        "maxSpan": 47.57,
+        "number": "R212A",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R220",
+        "terminal": "2B",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R221",
+        "terminal": "2B",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R222",
+        "terminal": "2B",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R223",
+        "terminal": "2B",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R224",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R225",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R226",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R227",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R270",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R271",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R272",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R273",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R274",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R275",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R276",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 48.0,
+        "maxSpan": 38.0,
+        "number": "R277",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 52.0,
+        "maxSpan": 43.0,
+        "number": "R278",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 71.0,
+        "maxSpan": 65.0,
+        "number": "R278A",
+        "terminal": "2A",
+        "type": "S"
+    },
+    {
+        "maxLength": 52.0,
+        "maxSpan": 50.0,
+        "number": "R279",
+        "terminal": "2A",
+        "type": "S"
+    }
+]

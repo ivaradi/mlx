@@ -441,6 +441,7 @@ class LoginPage(Page):
     def _offlineClicked(self, button):
         """Called when the offline button was clicked."""
         print("mlx.flight.LoginPage: offline flight selected")
+        self._wizard.setupOfflineFlight()
         self._wizard.nextPage()
 
     def _loginClicked(self, button):
@@ -6818,6 +6819,56 @@ class Wizard(Gtk.VBox):
 
         self.gui.webHandler.login(self._loginResultCallback,
                                   pilotID, password)
+
+    def setupOfflineFlight(self):
+        """Setup an offline flight."""
+        #import pickle
+        import random
+        import json
+        from mlx.rpccommon import Fleet
+        from mlx.gates import Gates
+
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "fleet.pickle"), "rb") as f:
+        #     fleet = pickle.load(f)
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "fleet.json"), "wt") as f:
+        #     json.dump(fleet.toJSON(), f, sort_keys = True, indent = 4)
+        with open(os.path.join(self.gui.programDirectory,
+                               "fleet.json"), "rt") as f:
+            fleet = Fleet.fromJSON(json.load(f))
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "fleet1.json"), "wt") as f:
+        #     json.dump(fleet.toJSON(), f, sort_keys = True, indent = 4)
+
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "gates.pickle"), "rb") as f:
+        #     gates = pickle.load(f)
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "gates.json"), "wt") as f:
+        #     json.dump(gates.toJSON(), f, sort_keys = True, indent = 4)
+        with open(os.path.join(self.gui.programDirectory,
+                               "gates.json"), "rt") as f:
+            gates = Gates.fromJSON(json.load(f))
+        # with open(os.path.join(self.gui.programDirectory,
+        #                        "gates1.json"), "wt") as f:
+        #     json.dump(gates.toJSON(), f, sort_keys = True, indent = 4)
+
+        class OfflineLoginResult:
+            def __init__(self, fleet, gates, gui):
+                self.loggedIn = False
+                if gui.config and gui.config.pilotID:
+                    self.pilotID = gui.config.pilotID
+                else:
+                    self.pilotID = "P999"
+                self.pilotName = "Joe Captain"
+                self.fleet = fleet
+                self.gates = gates
+                self.reportedFlights = []
+                self.rejectedFlights = []
+                self.flights = []
+                self.sessionID = "".join(random.choices("0123456789", k = 16))
+        self._loginResult = OfflineLoginResult(fleet, gates, self.gui)
 
     def reloadFlights(self, callback):
         """Reload the flights from the MAVA server."""
