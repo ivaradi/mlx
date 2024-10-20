@@ -415,7 +415,7 @@ class BookedFlight(RPCObject):
                     key = line[:equalIndex].strip()
                     value = line[equalIndex+1:].strip().replace("\:", ":")
 
-                    lineOK = key and value
+                    lineOK = key and (value or key=="flight_route")
 
                 if lineOK:
                     if key=="callsign": self.callsign = value
