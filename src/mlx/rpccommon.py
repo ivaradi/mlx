@@ -9,6 +9,10 @@ from .gates import lhbpGates
 
 class Plane(object):
     """Information about an airplane in the fleet."""
+    _jsonAttributes = ["tailNumber", "aircraftType",
+                       "dow", "dowNumCabinCrew", "maxPassengers",
+                       "fuselageLength", "wingSpan"]
+
     @staticmethod
     def str2status(letter):
         """Convert the given letter into a plane status."""
@@ -24,6 +28,18 @@ class Plane(object):
                "A" if status==const.PLANE_AWAY else \
                "P" if status==const.PLANE_PARKING else ""
 
+    @staticmethod
+    def fromJSON(data):
+        """Create a Plane object from the given JSON data."""
+        plane = Plane()
+
+        for attributeName in Plane._jsonAttributes:
+            setattr(plane, attributeName, data[attributeName])
+        plane.status = const.PLANE_AWAY
+        plane.gateNumber = "-"
+
+        return plane
+
     @property
     def hasStairs(self):
         """Indicate if the plane has its own stairs."""
@@ -31,6 +47,13 @@ class Plane(object):
                                      const.AIRCRAFT_CRJ2,
                                      const.AIRCRAFT_F70,
                                      const.AIRCRAFT_DH8D]
+
+    def toJSON(self):
+        """Create a JSON representation of the Plane object from the given JSON data."""
+        data = {}
+        for attributeName in Plane._jsonAttributes:
+            data[attributeName] = getattr(self, attributeName)
+        return data
 
     def _setStatus(self, letter):
         """Set the status from the given letter."""
@@ -52,6 +75,14 @@ class Plane(object):
 
 class Fleet(object):
     """Information about the whole fleet."""
+    @staticmethod
+    def fromJSON(data):
+        """Load the fleet data from the given JSON file."""
+        fleet = Fleet()
+        for planeData in data:
+            fleet._addPlane(Plane.fromJSON(planeData))
+        return fleet
+
     def __init__(self):
         """Construct the fleet information by reading the given file object."""
         self._planes = {}
@@ -94,6 +125,10 @@ class Fleet(object):
             plane = self._planes[tailNumber]
             plane.status = status
             plane.gateNumber = gateNumber
+
+    def toJSON(self):
+        """Convert the fleet into a JSON data."""
+        return [plane.toJSON() for plane in self._planes.values()]
 
     def _addPlane(self, plane):
         """Add the given plane to the fleet."""
