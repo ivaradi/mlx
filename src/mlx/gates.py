@@ -9,6 +9,14 @@
 
 class Gate(object):
     """Information about a gate."""
+    @staticmethod
+    def fromJSON(data):
+        """Create the gate from the given JSON data."""
+        return Gate(data["number"], data["terminal"],
+                    data["type"],
+                    maxSpan = data["maxSpan"],
+                    maxLength = data["maxLength"])
+
     def __init__(self, number, terminal, type,
                  availableFn = None, taxiThrough = False,
                  maxSpan = 0.0, maxLength = 0.0):
@@ -43,6 +51,14 @@ class Gate(object):
         else:
             return False
 
+    def toJSON(self):
+        """Create a JSON representation of the gate."""
+        data = {}
+        for attributeName in ["number", "terminal", "type",
+                              "maxSpan", "maxLength"]:
+            data[attributeName] = getattr(self, attributeName)
+        return data
+
 #--------------------------------------------------------------------------------------
 
 class Gates(object):
@@ -55,6 +71,14 @@ class Gates(object):
 
     # Display info type: a new column
     DISPLAY_NEW_COLUMN=3
+
+    @staticmethod
+    def fromJSON(data):
+        """Create a gates object from the given JSON data."""
+        gates = Gates()
+        for gateData in data:
+            gates.add(Gate.fromJSON(gateData))
+        return gates
 
     def __init__(self):
         """Construct the gate collection."""
@@ -136,6 +160,10 @@ class Gates(object):
             if gate.maxSpan==0.0 or gate.maxLength==0.0:
                     print("Gate %s has no maximal dimensions from the database" %
                           (gate.number,))
+
+    def toJSON(self):
+        """Convert the list of gates into a JSON data."""
+        return [gate.toJSON() for gate in self._gates]
 
     def _addRow(self):
         """Add a new row."""
