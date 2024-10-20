@@ -6095,7 +6095,8 @@ class FinishPage(Page):
 
         self._saveButton.set_sensitive(sensitive)
         self._sendButton.set_sensitive(sensitive and
-                                       self._wizard.bookedFlight.id is not None)
+                                       self._wizard.bookedFlight.id is not None and
+                                       self._wizard.loggedIn)
 
     def grabDefault(self):
         """If the page has a default button, make it the default one."""
