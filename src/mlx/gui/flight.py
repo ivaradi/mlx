@@ -6451,12 +6451,12 @@ class Wizard(Gtk.VBox):
     @property
     def entranceExam(self):
         """Get whether an entrance exam is about to be taken."""
-        return self._loginResult is not None and self._loginResult.rank=="STU"
+        return self.loggedIn and self._loginResult.rank=="STU"
 
     @property
     def loggedIn(self):
         """Indicate if there was a successful login."""
-        return self._loginResult is not None
+        return self._loginResult is not None and self.loginResult.loggedIn
 
     @property
     def loginResult(self):
