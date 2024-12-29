@@ -13,3 +13,4 @@ debug.log
 moodlesetup.txt
 docker/msys/id_rsa
 src/mlx.egg-info
+bugreport.txt
