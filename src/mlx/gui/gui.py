@@ -104,7 +104,8 @@ class GUI(fs.ConnectionListener):
         self._bookFlightsUserCallback = None
         self._bookFlightsBusyCallback = None
 
-        self.webHandler = web.Handler(config, self._getCredentialsCallback)
+        self.webHandler = web.Handler(config, self._getCredentialsCallback,
+                                      programDirectory)
         self.webHandler.start()
 
         self.toRestart = False

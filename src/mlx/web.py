@@ -23,6 +23,8 @@ import xmlrpc.client
 import html.parser
 import certifi
 import base64
+import os.path
+import ssl
 
 #---------------------------------------------------------------------------------------
 
@@ -722,22 +724,76 @@ class SendACARSRPC(RPCRequest):
 
 #------------------------------------------------------------------------------
 
+class BugReportPasswordManager:
+    """Password manager for the Trac XML-RPC server"""
+    def __init__(self, programDirectory):
+        """Construct the password manager by reading the password from
+        the bugreport.txt file"""
+        with open(os.path.join(programDirectory, "bugreport.txt")) as f:
+            self._password = f.read().strip()
+
+    def add_password(self, realm, uri, username, password):
+        pass
+
+    def find_user_password(self, realm, uri):
+        return ("mlxbugreport", self._password)
+
+#------------------------------------------------------------------------------
+
+class BugReportTransport(xmlrpc.client.Transport):
+    """A transport for digest authentication towards the Trac XML-RPC server"""
+    verbose = True
+
+    def __init__(self, programDirectory):
+        """Construct the transport for the given program directory."""
+        super().__init__()
+
+        sslContext = ssl.create_default_context(ssl.Purpose.SERVER_AUTH,
+                                                cafile = certifi.where())
+        sslContext.set_alpn_protocols(['http/1.1'])
+        httpsHandler = urllib.request.HTTPSHandler(context = sslContext)
+
+        authHandler = urllib.request.HTTPDigestAuthHandler(
+            BugReportPasswordManager(programDirectory))
+
+        self._opener = urllib.request.build_opener(httpsHandler, authHandler)
+
+    def single_request(self, host, handler, request_body, verbose=False):
+        """Perform a single request"""
+        url = "https://" + host + handler
+        request = urllib.request.Request(url, data = request_body)
+        request.add_header("User-Agent", self.user_agent)
+        request.add_header("Content-Type", "text/xml")
+
+        with self._opener.open(request) as f:
+            if f.status==200:
+                return self.parse_response(f)
+            else:
+                raise xmlrpc.client.ProtocolError(
+                    host + handler,
+                    f.status, f.reason,
+                    f.getheaders())
+
+#------------------------------------------------------------------------------
+
 class SendBugReport(Request):
     """A request to send a bug report to the project homepage."""
     _latin2Encoder = codecs.getencoder("iso-8859-2")
 
-    def __init__(self, callback, summary, description, email, debugLog):
+    def __init__(self, callback, summary, description, email, debugLog,
+                 transport):
         """Construct the request for the given bug report."""
         super(SendBugReport, self).__init__(callback)
         self._summary = summary
         self._description = description
         self._email = email
         self._debugLog = debugLog
+        self._transport = transport
 
     def run(self):
         """Perform the sending of the bug report."""
-        serverProxy = xmlrpc.client.ServerProxy("http://mlx.varadiistvan.hu/rpc")
-
+        serverProxy = xmlrpc.client.ServerProxy("https://mlx.varadiistvan.hu/login/rpc",
+                                                transport = self._transport)
         result = Result()
         result.success = False
 
@@ -904,7 +960,7 @@ class Handler(threading.Thread):
 
     It can process one request at a time. The results are passed to a callback
     function."""
-    def __init__(self, config, getCredentialsFn):
+    def __init__(self, config, getCredentialsFn, programDirectory):
         """Construct the handler."""
         super(Handler, self).__init__()
 
@@ -916,6 +972,7 @@ class Handler(threading.Thread):
         self._rpcClient = rpc.Client(getCredentialsFn)
         if config.rememberPassword:
             self._rpcClient.setCredentials(config.pilotID, config.password)
+        self._bugReportTransport = BugReportTransport(programDirectory)
 
     def register(self, callback, registrationData):
         """Enqueue a registration request."""
@@ -963,7 +1020,8 @@ class Handler(threading.Thread):
     def sendBugReport(self, callback, summary, description, email, debugLog = None):
         """Send a bug report with the given data."""
         self._addRequest(SendBugReport(callback, summary, description, email,
-                                       debugLog = debugLog))
+                                       debugLog = debugLog,
+                                       transport = self._bugReportTransport))
 
     def setCheckFlightPassed(self, callback, aircraftType):
         """Mark the check flight as passed."""

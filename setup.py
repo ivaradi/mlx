@@ -50,7 +50,7 @@ for language in ["en", "hu"]:
                                      "mlx.mo")]))
 
 rootFiles = ["logo.png", "conn_grey.png", "conn_red.png", "conn_green.png",
-             "mavalogo.png", "fleet.json", "gates.json"]
+             "mavalogo.png", "fleet.json", "gates.json", "bugreport.txt"]
 if os.name!="nt":
     rootFiles.append("Microsoft.VC90.CRT.manifest")
 data_files.append(("", rootFiles))
