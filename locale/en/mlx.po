@@ -916,6 +916,21 @@ msgstr ""
 "the password is stored as text, and anybody who can access "
 "your files will be able to read it."
 
+msgid "simbrief_mfa_code_title"
+msgstr "Enter MFA code"
+
+msgid "simbrief_mfa_code_needed"
+msgstr ""
+"An MFA code is sent by Navigraph to your\n"
+"e-mail address to complete the login.\n"
+"Check your e-mail for the code and enter it below."
+
+msgid "simbrief_mfa_code"
+msgstr "MFA code:"
+
+msgid "simbrief_mfa_code_tooltip"
+msgstr "Enter the code received by e-mail."
+
 msgid "simbrief_extra_fuel"
 msgstr "_Extra fuel:"
 

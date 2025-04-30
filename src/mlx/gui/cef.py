@@ -56,6 +56,78 @@ SIMBRIEF_RESULT_ERROR_NO_FORM = 11
 SIMBRIEF_RESULT_ERROR_NO_POPUP = 12
 SIMBRIEF_RESULT_ERROR_LOGIN_FAILED = 13
 
+#-----------------------------------------------------------------------------
+
+class SimBriefMFACodeDialog(Gtk.Dialog):
+    """A dialog window to ask for the SimBrief (Navigraph) MFA code."""
+    def __init__(self, gui):
+        """Construct the dialog."""
+        super(SimBriefMFACodeDialog, self).__init__(WINDOW_TITLE_BASE + " - " +
+                                                    xstr("simbrief_mfa_code_title"),
+                                                    gui.mainWindow,
+                                                    Gtk.DialogFlags.MODAL)
+        self.add_button(xstr("button_cancel"), Gtk.ResponseType.CANCEL)
+        self.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
+
+        contentArea = self.get_content_area()
+
+        contentAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                         xscale = 0.0, yscale = 0.0)
+        contentAlignment.set_padding(padding_top = 4, padding_bottom = 16,
+                                     padding_left = 8, padding_right = 8)
+
+        contentArea.pack_start(contentAlignment, False, False, 0)
+
+        contentVBox = Gtk.VBox()
+        contentAlignment.add(contentVBox)
+
+        label = Gtk.Label(xstr("simbrief_mfa_code_needed"))
+        label.set_line_wrap(True)
+        label.set_justify(Gtk.Justification.CENTER)
+        label.set_alignment(0.5, 0.0)
+
+        contentVBox.pack_start(label, False, False, 0)
+
+        tableAlignment = Gtk.Alignment(xalign = 0.5, yalign = 0.5,
+                                       xscale = 0.0, yscale = 0.0)
+        tableAlignment.set_padding(padding_top = 24, padding_bottom = 0,
+                                   padding_left = 0, padding_right = 0)
+
+        table = Gtk.Table(1, 2)
+        table.set_row_spacings(4)
+        table.set_col_spacings(16)
+        table.set_homogeneous(False)
+
+        tableAlignment.add(table)
+        contentVBox.pack_start(tableAlignment, True, True, 0)
+
+        label = Gtk.Label(xstr("simbrief_mfa_code"))
+        label.set_use_underline(True)
+        label.set_alignment(0.0, 0.5)
+        table.attach(label, 0, 1, 0, 1)
+
+        self._mfaCode = Gtk.Entry()
+        self._mfaCode.set_width_chars(16)
+        self._mfaCode.set_tooltip_text(xstr("simbrief_mfa_code_tooltip"))
+        table.attach(self._mfaCode, 1, 2, 0, 1)
+        label.set_mnemonic_widget(self._mfaCode)
+
+
+    @property
+    def mfaCode(self):
+        """Get the MFA code entered."""
+        return self._mfaCode.get_text()
+
+    def run(self):
+        """Run the dialog."""
+        self.show_all()
+
+        response = super(SimBriefMFACodeDialog, self).run()
+
+        self.hide()
+
+        return response
+
 #------------------------------------------------------------------------------
 
 class SimBriefHandler(object):
@@ -81,7 +153,7 @@ class SimBriefHandler(object):
         };
 
 
-    def __init__(self):
+    def __init__(self, gui):
         """Construct the handler."""
         self._browser = None
         self._plan = None
@@ -91,6 +163,7 @@ class SimBriefHandler(object):
         self._htmlFilePath = None
         self._lastProgress = SIMBRIEF_PROGRESS_SEARCHING_BROWSER
         self._timeoutID = None
+        self._gui = gui
 
     def initialize(self):
         """Create and initialize the browser used for Simbrief."""
@@ -154,6 +227,23 @@ class SimBriefHandler(object):
             js +="form.password.value=\"" + password + "\";"
             js +="form.submit();"
             frame.ExecuteJavascript(js)
+        elif url.startswith("https://identity.api.navigraph.com//mfaEmail"):
+            dialog = SimBriefMFACodeDialog(self._gui)
+            response = dialog.run()
+
+            if response!=Gtk.ResponseType.OK:
+                self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
+                                     SIMBRIEF_RESULT_ERROR_LOGIN_FAILED, None)
+                return
+
+            mfaCode = dialog.mfaCode
+            js = "form=document.getElementById(\"form1\");"
+            js +="form.txtcdvl.value=\"" + mfaCode + "\";"
+            js +="form.btnApprove.click();"
+            frame.ExecuteJavascript(js)
+        elif url.startswith("https://identity.api.navigraph.com/mfaFailed"):
+            self._updateProgress(SIMBRIEF_PROGRESS_WAITING_LOGIN,
+                                 SIMBRIEF_RESULT_ERROR_LOGIN_FAILED, None)
         elif url.startswith("https://www.simbrief.com/ofp/ofp.loader.api.php"):
             self._updateProgress(SIMBRIEF_PROGRESS_WAITING_RESULT,
                                  SIMBRIEF_RESULT_NONE, None)
@@ -200,14 +290,14 @@ class SimBriefHandler(object):
 
 #------------------------------------------------------------------------------
 
-def initialize(initializedCallback):
+def initialize(initializedCallback, gui):
     """Initialize the Chrome Embedded Framework."""
     global _toQuit, _simBriefHandler
     _toQuit = False
 
     GObject.threads_init()
 
-    _simBriefHandler = SimBriefHandler()
+    _simBriefHandler = SimBriefHandler(gui)
     GObject.timeout_add(100, _initializeCEF, [], initializedCallback)
 
 #------------------------------------------------------------------------------

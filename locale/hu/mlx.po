@@ -915,6 +915,21 @@ msgstr ""
 "mindig újból beírnod. Vedd azonban figyelembe, hogy a jelszót szövegként "
 "tároljuk, ezért bárki elolvashatja, aki hozzáfér a fájljaidhoz."
 
+msgid "simbrief_mfa_code_title"
+msgstr "2FA kód bírása"
+
+msgid "simbrief_mfa_code_needed"
+msgstr ""
+"A Navigraph egy, a kétlépcsős azonosításhoz szükséges\n"
+"kódot küldött az e-mail címedre a belépéshez.\n"
+"Keresd meg a kódot a leveleid között és írd be."
+
+msgid "simbrief_mfa_code"
+msgstr "2FA kód:"
+
+msgid "simbrief_mfa_code_tooltip"
+msgstr "Írd be az e-mailben kapott kódot."
+
 msgid "simbrief_extra_fuel"
 msgstr "E_xtra üzemanyag:"
 

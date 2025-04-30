@@ -1998,7 +1998,7 @@ class GUI(fs.ConnectionListener):
 
         It checks if we already know the PID, and if not, asks the user whether
         to register."""
-        cef.initialize(self._cefInitialized)
+        cef.initialize(self._cefInitialized, self)
 
         if not self.config.pilotID and not self.config.password:
             dialog = Gtk.MessageDialog(parent = self._mainWindow,
