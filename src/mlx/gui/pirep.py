@@ -322,7 +322,7 @@ class PIREPViewer(Gtk.Dialog):
 
         self._callsign.set_text(bookedFlight.callsign)
         self._tailNumber.set_text(bookedFlight.tailNumber)
-        aircraftType = xstr("aircraft_" + icaoCodes[bookedFlight.aircraftType].lower())
+        aircraftType = xstr("aircraft_" + extendedICAOCodes[bookedFlight.aircraftType].lower())
         self._aircraftType.set_text(aircraftType)
 
         self._departureICAO.set_text(bookedFlight.departureICAO)
@@ -887,7 +887,7 @@ class PIREPEditor(Gtk.Dialog):
 
         self._callsign.set_text(bookedFlight.callsign)
         self._tailNumber.set_text(bookedFlight.tailNumber)
-        aircraftType = xstr("aircraft_" + icaoCodes[bookedFlight.aircraftType].lower())
+        aircraftType = xstr("aircraft_" + extendedICAOCodes[bookedFlight.aircraftType].lower())
         self._aircraftType.set_text(aircraftType)
 
         self._departureICAO.set_text(bookedFlight.departureICAO)

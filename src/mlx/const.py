@@ -213,7 +213,7 @@ def aircraftType2Family(aircraftType):
 icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_B737  : "B737",
               AIRCRAFT_B738  : "B738",
-              AIRCRAFT_B738C : "B738C",
+              AIRCRAFT_B738C : "B738",
               AIRCRAFT_B732  : "B732",
               AIRCRAFT_B733  : "B733",
               AIRCRAFT_B734  : "B734",
@@ -228,6 +228,12 @@ icaoCodes = { AIRCRAFT_B736  : "B736",
               AIRCRAFT_T154  : "T154",
               AIRCRAFT_YK40  : "YK40",
               AIRCRAFT_B462  : "B462" }
+
+## A mapping of aircraft types to their 'extended' ICAO codes, which
+# are usually the same as the 'internal' ones above, but in certain
+# cases 'sub-types' are distinguished
+extendedICAOCodes = icaoCodes.copy()
+extendedICAOCodes[AIRCRAFT_B738C] = "B738C"
 
 #-------------------------------------------------------------------------------
 

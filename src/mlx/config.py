@@ -76,7 +76,7 @@ class Checklist(object):
     def fromConfig(config, aircraftType):
         """Create a checklist for the given aircraft type from the given
         config."""
-        baseName = "checklist." + const.icaoCodes[aircraftType] + "."
+        baseName = "checklist." + const.extendedICAOCodes[aircraftType] + "."
         fileList = []
         while True:
             option = baseName + str(len(fileList))
@@ -97,7 +97,7 @@ class Checklist(object):
 
     def toConfig(self, config, aircraftType):
         """Add this checklist to the given config."""
-        baseName = "checklist." + const.icaoCodes[aircraftType] + "."
+        baseName = "checklist." + const.extendedICAOCodes[aircraftType] + "."
         for index in range(0, len(self._fileList)):
             option = baseName + str(index)
             config.set(Checklist.SECTION, option,
@@ -134,7 +134,7 @@ class ApproachCallouts(object):
     def fromConfig(config, aircraftType):
         """Create a checklist for the given aircraft type from the given
         config."""
-        baseName = "callouts." + const.icaoCodes[aircraftType] + "."
+        baseName = "callouts." + const.extendedICAOCodes[aircraftType] + "."
         mapping = {}
         while True:
             option = baseName + str(len(mapping))
@@ -160,7 +160,7 @@ class ApproachCallouts(object):
 
     def toConfig(self, config, aircraftType):
         """Add this checklist to the given config."""
-        baseName = "callouts." + const.icaoCodes[aircraftType] + "."
+        baseName = "callouts." + const.extendedICAOCodes[aircraftType] + "."
         index = 0
         for (altitude, path) in self._mapping.items():
             option = baseName + str(index)
@@ -1146,13 +1146,13 @@ class Config(object):
 
         print("  checklists:")
         for (type, checklist) in self._checklists.items():
-            print("    %s:" % (const.icaoCodes[type],))
+            print("    %s:" % (const.extendedICAOCodes[type],))
             for path in checklist:
                 print("      " + path)
 
         print("  approachCallouts:")
         for (type, approachCallouts) in self._approachCallouts.items():
-            print("    %s:" % (const.icaoCodes[type],))
+            print("    %s:" % (const.extendedICAOCodes[type],))
             for (altitude, path) in approachCallouts:
                 print("      %d: %s" % (altitude, path))
 

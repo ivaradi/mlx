@@ -245,7 +245,7 @@ class PendingFlightsFrame(Gtk.Frame):
         This is the tail number followed by the ICAO code of the aircraft's
         type."""
         return tailNumber + \
-            " (" + const.icaoCodes[bookedFlight.aircraftType] + ")"
+            " (" + const.extendedICAOCodes[bookedFlight.aircraftType] + ")"
 
     def _getAcft(tailNumber, bookedFlight):
         return PendingFlightsFrame.getAircraft(tailNumber, bookedFlight)
