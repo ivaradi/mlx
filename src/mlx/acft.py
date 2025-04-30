@@ -792,7 +792,7 @@ class B738(Boeing737):
         self.maxTouchDownPitch = 9.5
         self.simBriefData = SimBriefData(["250/280/78"],
                                          ["CI", "M76", "M78", "M79", "M80", "LRC"],
-                                         ["78/280/250", "78/250/250"],
+                                         ["78/280/250"],
                                          cruiseParameters = {0: (False, "civalue")})
 
 #---------------------------------------------------------------------------------------
@@ -802,9 +802,6 @@ class B738Charter(B738):
     def __init__(self, flight):
         super(B738Charter, self).__init__(flight)
         self.mtow = 77791
-        self.simBriefData = SimBriefData(["AUTO"],
-                                         ["280/M74"],
-                                         ["AUTO"])
 
 #---------------------------------------------------------------------------------------
 
@@ -1067,6 +1064,9 @@ class DC3(Aircraft):
         self.flapSpeedLimits = { 15 : 135,
                                  30 : 99,
                                  45 : 97 }
+        self.simBriefData = SimBriefData(["Normal"],
+                                         ["600BHP", "400BHP", "700BHP"],
+                                         ["500FPM"])
 
     def _checkFlightEnd(self, aircraftState):
         """Check if the end of the flight has arrived.
@@ -1104,6 +1104,9 @@ class T134(Aircraft):
 
         self.maxTakeOffPitch = 16.0
         self.maxTouchDownPitch = 16.0
+        self.simBriefData = SimBriefData(["250/270/70"],
+                                         ["MRC"],
+                                         ["82/320/250"])
 
     @property
     def derateType(self):
@@ -1236,6 +1239,9 @@ class YK40(Aircraft):
                                  35 : 135 }
 
         self.hasStrobeLight = False
+        self.simBriefData = SimBriefData(["250/280/70"],
+                                         ["M70", "LRC"],
+                                         ["70/280/250"])
 
     @property
     def speedInKnots(self):
