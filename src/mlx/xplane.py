@@ -2299,19 +2299,35 @@ class FelisT154B2Model(T154Model):
         """Add the model-specific monitoring data to the given array."""
         super(FelisT154B2Model, self).addMonitoringData(data, fsType)
 
-        self._parkingBrakeIndex = len(data)
-        self._addDatarefWithIndexMember(data,
-                                        "sim/custom/controll/parking_brake",
-                                        TYPE_INT)
-        self._cgIndex = len(data)
-        self._addDatarefWithIndexMember(data,
-                                        "sim/custom/misc/cg_pos_actual",
-                                        TYPE_FLOAT)
+        if fsType==const.SIM_XPLANE12:
+            self._parkingBrakeIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/controll/parking_brake",
+                                            TYPE_INT)
+            self._cgIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/misc/cg_pos_actual",
+                                            TYPE_FLOAT)
 
-        self._flapsControlIndex = len(data)
-        self._addDatarefWithIndexMember(data,
-                                        "sim/custom/controll/flaps_lever",
-                                        TYPE_FLOAT)
+            self._flapsControlIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/controll/flaps_lever",
+                                            TYPE_FLOAT)
+        else:
+            self._parkingBrakeIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "sim/custom/controll/parking_brake",
+                                            TYPE_INT)
+            self._cgIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "sim/custom/misc/cg_pos_actual",
+                                            TYPE_FLOAT)
+
+            self._flapsControlIndex = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "sim/custom/controll/flaps_lever",
+                                            TYPE_FLOAT)
+
         self._flapsIndex = len(data)
         self._addDatarefWithIndexMember(data,
                                         "sim/flightmodel/controls/fla1_def",
