@@ -29,7 +29,6 @@ import urllib.request, urllib.error, urllib.parse
 from lxml import etree
 from io import StringIO
 import lxml.html
-import certifi
 
 #-----------------------------------------------------------------------------
 
@@ -3882,8 +3881,7 @@ class SimBriefSetupPage(Page):
             availableInfo = {}
 
             # Obtaining the xml
-            response = urllib.request.urlopen(link,
-                                              cafile = certifi.where())
+            response = urllib.request.urlopen(link, context = sslContext)
             content = etree.iterparse(response)
 
             for (action, element) in content:

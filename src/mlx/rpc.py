@@ -2,15 +2,13 @@ from . import const
 from . import rpccommon
 from . import gates
 
-from .common import MAVA_BASE_URL, fixUnpickled
+from .common import MAVA_BASE_URL, fixUnpickled, sslContext
 
 import jsonrpclib
 import hashlib
 import datetime
 import calendar
 import sys
-import ssl
-import certifi
 
 #---------------------------------------------------------------------------------------
 
@@ -726,8 +724,6 @@ class Client(object):
         """Construct the client."""
         self._getCredentialsFn = getCredentialsFn
 
-        sslContext = ssl.SSLContext()
-        sslContext.load_verify_locations(cafile = certifi.where())
         transport = jsonrpclib.jsonrpc.SafeTransport(jsonrpclib.config.DEFAULT,
                                                      sslContext)
 

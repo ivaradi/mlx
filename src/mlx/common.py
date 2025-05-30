@@ -1,4 +1,6 @@
 import os
+import ssl
+import certifi
 
 #-----------------------------------------------------------------------------
 
@@ -43,3 +45,7 @@ def fixUnpickled(state):
         newDict[fixUnpickledValue(key)] = fixUnpickledValue(value)
 
     return newDict
+
+#-------------------------------------------------------------------------------
+
+sslContext = ssl.create_default_context(cafile = certifi.where())

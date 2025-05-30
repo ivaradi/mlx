@@ -5,7 +5,7 @@ from .rpc import Registration, BookedFlight
 from . import rpc
 from . import rpccommon
 
-from .common import MAVA_BASE_URL
+from .common import MAVA_BASE_URL, sslContext
 from .pirep import PIREP
 
 import threading
@@ -628,7 +628,8 @@ class GetNOTAMs(Request):
             request = urllib.request.Request(url, headers = {
                 "cookie": "akamai_pilotweb_access=true;"
             });
-            f = urllib.request.urlopen(request, timeout = 10.0, cafile=certifi.where())
+            f = urllib.request.urlopen(request, timeout = 10.0,
+                                       context = sslContext)
             try:
                 data = f.read(16384)
                 while data:
@@ -665,7 +666,8 @@ class GetMETARs(Request):
         result.metars = {}
         try:
             url += data
-            f = urllib.request.urlopen(url, timeout = 10.0, cafile = certifi.where())
+            f = urllib.request.urlopen(url, timeout = 10.0,
+                                       context = sslContext)
             try:
                 for line in f.readlines():
                     line = str(line, "iso-8859-1")
