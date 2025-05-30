@@ -1862,6 +1862,9 @@ class ZiboB737NGModel(B737Model):
         state.reverser = [data[self._reverserIndex+0]>=0.2,
                           data[self._reverserIndex+1]>=0.2]
 
+        # N1 goes down very slowly, so we hasten it a bit
+        state.n1 = [0 if n1<4.0 else n1 for n1 in state.n1]
+
         return state
 
 #------------------------------------------------------------------------------
