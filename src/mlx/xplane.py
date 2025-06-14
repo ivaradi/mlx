@@ -2376,6 +2376,7 @@ class FelisT154B2Model(T154Model):
 
         if self._n1Index>=0:
             state.n1 = data[self._n1Index:self._n1Index+3]
+            state.n1 = [0 if n1<10.0 else n1 for n1 in state.n1]
 
         return state
 
