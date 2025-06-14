@@ -2316,6 +2316,16 @@ class FelisT154B2Model(T154Model):
             self._addDatarefWithIndexMember(data,
                                             "tu154b2/custom/controll/flaps_lever",
                                             TYPE_FLOAT)
+            self._n1Index = len(data)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/gauges/engine/rpm_high_1",
+                                            TYPE_FLOAT)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/gauges/engine/rpm_high_2",
+                                            TYPE_FLOAT)
+            self._addDatarefWithIndexMember(data,
+                                            "tu154b2/custom/gauges/engine/rpm_high_3",
+                                            TYPE_FLOAT)
         else:
             self._parkingBrakeIndex = len(data)
             self._addDatarefWithIndexMember(data,
@@ -2330,6 +2340,7 @@ class FelisT154B2Model(T154Model):
             self._addDatarefWithIndexMember(data,
                                             "sim/custom/controll/flaps_lever",
                                             TYPE_FLOAT)
+            self._n1Index = -1
 
         self._flapsIndex = len(data)
         self._addDatarefWithIndexMember(data,
@@ -2362,6 +2373,9 @@ class FelisT154B2Model(T154Model):
             max(data[self._spoilersIndex+1])*100.0/45.0)
         if state.spoilersExtension<=10.0:
             state.spoilersExtension = 0.0
+
+        if self._n1Index>=0:
+            state.n1 = data[self._n1Index:self._n1Index+3]
 
         return state
 
