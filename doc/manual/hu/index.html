@@ -1376,7 +1376,7 @@
 
   <h2><a name="bugReportWindow">A Hibajelentés ablak</a></h2>
 
-  <img src="bugreport.png" alt="A Hibajelentés ablak"/>
+  <!-- img src="bugreport.png" alt="A Hibajelentés ablak"/-->
 
   <p>
   A hibajelentés ablak segítségével a program használata során
@@ -1399,16 +1399,44 @@
   szükséges kitölteni, de ha bármilyen egyéb, hasznos információ
   eszünkbe jut, azt ide beírhatjuk. Mivel a program magától
   hozzáfűzi a napló és a debug napló tartalmát, azokat ide ne másoljuk
-  be. Megadhatjuk továbbá az e-mail címünket is, hogy automatikusan
-  értesítést kapjunk a hibajelentés állapotáról, de ebben az esetben a
-  cím megjelenik a projekt honlapján, a hibajelentésben.
+  be.
+  </p>
+
+  <p>
+  Jelöljük be az ablak alján lévő jelölődobozt ha rendelkezünk
+  GitLab felhasználónévvel, illetve szeretnénk (vagy legalábbis
+  nem bánjuk) egy ilyen létrehozását. Ez azért lehet hasznos,
+  hogy a hibajelentés állapotáról kaphassunk e-mailben értesítést,
+  hacsak a GitLab fiókot nem konfiguráljuk másképp. Első alkalommal
+  a gép böngészőjében megnyílik a GitLab oldala, ahol be tudunk jelentkezni,
+  vagy regisztrálhatunk. Sikeres bejelentkezés vagy regisztráció
+  után egy másik oldal jelenik meg, ahol engedélyezhetjük, hogy
+  a logger nevünkben hibajelentést küldhessen (az engedély valójában
+  szélesebb körű, de a szerző ígéri, hogy a logger mást nem tesz :).
+  Ha később újabb hibát jelentünk, erre nem feltétlenül lesz szükség,
+  de ha csak ritkán jelentünk hibát - és remélhetőleg ez a helyzet -,
+  akkor szükséges lehet újra bejelentkezni és engedélyt adni, ugyanis
+  a logger nem menti el a GitLab felhasználónevünket és jelszavunkat,
+  csak egy tokent, amely korlátozott ideig ad hozzáférést.
+  </p>
+
+  <p>
+  Ha a jelölődobozt üresen hagyjuk, egy általános tokent használ
+  a program a hibajelentés beküldéséhez, így nem kapunk róla a
+  továbbiakban információt automatikusan.
+  </p>
+
+  <p>
+  Az így elküldött hibajelentések nyilvánosan hozzáférhetők, ezért
+  semmilyen érzékeny, személyes információt ne írjunk beléjük.
   </p>
 
   <p>
   A <i>Küldés...</i> gomb megnyomásával elkészül a hibajelentés. Ha
   sikerül létrehozni, erről üzenetet kapunk, amely tartalmazza a
   hibajelentés azonosítóját is. Ezt célszerű feljegyezni, hogy a
-  későbbiekben hivatkozhassunk rá.
+  későbbiekben hivatkozhassunk rá. Ha rákattintunk az azonosítóra,
+  a hibajelentés GitLab oldala megnyílik a böngészőnkben.
   </p>
 
   <h2><a name="monitorWindow">A Monitor ablak</a></h2>

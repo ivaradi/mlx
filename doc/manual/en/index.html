@@ -1339,7 +1339,7 @@
 
   <h2><a name="bugReportWindow">The Bug Report Window</a></h2>
 
-  <img src="bugreport.png" alt="The Bug Report Window"/>
+  <!--img src="bugreport.png" alt="The Bug Report Window"/-->
 
   <p>
   The bug reporting window can be used to report any non-fatal bugs
@@ -1360,16 +1360,42 @@
   problem. The <i>Description</i> part is not mandatory, but if you
   can think of any useful additional information, you might give it
   here. As the program automatically appends the log and the debug to
-  the description, you should not copy them here. You can also give
-  your e-mail address to receive automatic notifications of the status
-  of your bug report, but consider that your e-mail address will then
-  appear on the project's website in the bug report.
+  the description, you should not copy them here.
+  </p>
+
+  <p>
+  Tick the checkbox at the bottom if you have a GitLab account, or
+  you want (or don't mind) to create one. This is useful, because
+  you can receive updates about the bug report via e-mail, unless
+  your account on GitLab is configured not to. On the first occasion,
+  your web browser will open a GitLab page where you can log in or
+  register. If you have successfully logged in or registered, GitLab
+  displays a page where you can agree to give the logger permission
+  to create the new bug report on GitLab in your name (actually, the
+  permission is broader, but the author promises the logger will not
+  do anything else :). If you report a bug later, this may not be needed
+  again, but if you report bugs rarely, which is hopefully the case,
+  logging in and giving permission will have to be done again, because the
+  logger does not save your GitLab user name or password, merely a token
+  received from GitLab granting access for a limited time only.
+  </p>
+
+  <p>
+  If the checkbox is not empty, a general access token will be used
+  to send the bug report, thus you will not receive any updates
+  automatically.
+  </p>
+
+  <p>
+  The bug reports sent are available publicly, so don't include any
+  sensitive personal information in them.
   </p>
 
   <p>
   By pressing <i>Send...</i>, you can create the bug report. If it is
   successful, you will receive a message telling so and including the
-  ticket's ID that you may refer to later.
+  ticket's ID that you may refer to later. You can also click on the ID
+  to open the bug report in GitLab in your browser.
   </p>
 
   <h2><a name="monitorWindow">The Monitor Window</a></h2>
