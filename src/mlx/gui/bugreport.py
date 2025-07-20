@@ -78,28 +78,18 @@ class BugReportDialog(Gtk.Dialog):
 
         contentVBox.pack_start(alignment, True, True, 4)
 
-        emailBox = Gtk.HBox()
-        contentVBox.pack_start(emailBox, False, False, 4)
+        self._hasGitLabUser = hasGitLabUser = \
+            Gtk.CheckButton(xstr("bugreport_has_gitlab"))
+        hasGitLabUser.set_use_underline(True)
+        hasGitLabUser.set_tooltip_text(xstr("bugreport_has_gitlab_tooltip"))
 
-        label = Gtk.Label(xstr("bugreport_email"))
-        label.set_use_underline(True)
-        label.set_alignment(0.0, 0.5)
-
-        emailBox.pack_start(label, False, False, 0)
-
-        alignment = Gtk.Alignment()
-        emailBox.pack_start(alignment, False, False, 8)
-
-        self._email = email = Gtk.Entry()
-        email.set_tooltip_text(xstr("bugreport_email_tooltip"))
-        label.set_mnemonic_widget(email)
-        emailBox.pack_start(email, True, True, 0)
-
+        contentVBox.pack_start(hasGitLabUser, False, False, 4)
 
     def run(self):
         """Run the checklist editor dialog."""
         self.set_sensitive(True)
         self._description.set_sensitive(True)
+        self._hasGitLabUser.set_active(self._gui.config.gitlabRefreshToken)
         self._updateButtons()
         self._sendButton.grab_default()
         self.show_all()
@@ -129,7 +119,7 @@ class BugReportDialog(Gtk.Dialog):
         self.set_sensitive(False)
         self._gui.sendBugReport(self._summary.get_text(),
                                 description,
-                                self._email.get_text(),
+                                self._hasGitLabUser.get_active(),
                                 self._bugReportSent)
 
     def _bugReportSent(self, returned, result):
@@ -140,6 +130,6 @@ class BugReportDialog(Gtk.Dialog):
             self.hide()
             self._summary.set_text("")
             self._description.get_buffer().set_text("")
-            self._email.set_text("")
+            self._gui.config.save()
         else:
             self.run()

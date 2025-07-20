@@ -8,10 +8,11 @@ from . import rpccommon
 from .common import MAVA_BASE_URL, sslContext
 from .pirep import PIREP
 
+from mlx.i18n import xstr
+
 import threading
 import sys
 import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 import hashlib
 import time
 import re
@@ -25,6 +26,12 @@ import certifi
 import base64
 import os.path
 import ssl
+import json
+import random
+import string
+import uuid
+import webbrowser
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 #---------------------------------------------------------------------------------------
 
@@ -726,95 +733,314 @@ class SendACARSRPC(RPCRequest):
 
 #------------------------------------------------------------------------------
 
-class BugReportPasswordManager:
-    """Password manager for the Trac XML-RPC server"""
-    def __init__(self, programDirectory):
-        """Construct the password manager by reading the password from
-        the bugreport.txt file"""
-        with open(os.path.join(programDirectory, "bugreport.txt")) as f:
-            self._password = f.read().strip()
-
-    def add_password(self, realm, uri, username, password):
-        pass
-
-    def find_user_password(self, realm, uri):
-        return ("mlxbugreport", self._password)
-
-#------------------------------------------------------------------------------
-
-class BugReportTransport(xmlrpc.client.Transport):
-    """A transport for digest authentication towards the Trac XML-RPC server"""
-    verbose = True
-
-    def __init__(self, programDirectory):
-        """Construct the transport for the given program directory."""
-        super().__init__()
-
-        sslContext = ssl.create_default_context(ssl.Purpose.SERVER_AUTH,
-                                                cafile = certifi.where())
-        sslContext.set_alpn_protocols(['http/1.1'])
-        httpsHandler = urllib.request.HTTPSHandler(context = sslContext)
-
-        authHandler = urllib.request.HTTPDigestAuthHandler(
-            BugReportPasswordManager(programDirectory))
-
-        self._opener = urllib.request.build_opener(httpsHandler, authHandler)
-
-    def single_request(self, host, handler, request_body, verbose=False):
-        """Perform a single request"""
-        url = "https://" + host + handler
-        request = urllib.request.Request(url, data = request_body)
-        request.add_header("User-Agent", self.user_agent)
-        request.add_header("Content-Type", "text/xml")
-
-        with self._opener.open(request) as f:
-            if f.status==200:
-                return self.parse_response(f)
-            else:
-                raise xmlrpc.client.ProtocolError(
-                    host + handler,
-                    f.status, f.reason,
-                    f.getheaders())
-
-#------------------------------------------------------------------------------
-
 class SendBugReport(Request):
-    """A request to send a bug report to the project homepage."""
-    _latin2Encoder = codecs.getencoder("iso-8859-2")
+    """A request to send a bug report to the project on GitLab."""
+    class HTTPRequestHandler(BaseHTTPRequestHandler):
+        """Handle the redirect call by GitLab with the access code."""
+        def do_GET(self):
+            print("SendBugReport.HTTPRequestHandler.do_GET")
 
-    def __init__(self, callback, summary, description, email, debugLog,
-                 transport):
+            try:
+                result = urllib.parse.urlparse(self.path)
+                queryData = urllib.parse.parse_qs(result.query)
+
+                if "code" in queryData:
+                    self.server.mlxCode = queryData["code"][0]
+                    self.server.mlxSuccess = True
+                else:
+                    self.server.mlxSuccess = False
+                    self.server.mlxErrorMessage = \
+                        queryData["error_description"][0]
+            except Exception as e:
+                print("SendBugReport.HTTPRequestHandler.do_GET: failed to extract the code:",
+                      e)
+                self.server.mlxSuccess = False
+                self.server.mlxErrorMessage = str(e)
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(bytes(
+                "<div align=\"center\"><h1>%s<h1></div>" %
+                (xstr("sendBugReport_can_close")), "utf-8"))
+            self.wfile.flush()
+
+    # The base URL of the GitLab server
+    #GITLAB_BASE_URL="http://localhost:9080"
+    GITLAB_BASE_URL="https://gitlab.com"
+
+    # The GitLab project to upload the issue to
+    GITLAB_PROJECT = "ivaradi/mlx"
+
+    # The ID of the milestone the issue should belong to
+    MILESTONE_ID = 55
+
+    # The labels to use for the issue
+    LABELS = "major, defect"
+
+    # The listening ports for the redirect URL
+    REDIRECT_LISTENER_PORTS = [33445, 33446, 33447, 33448, 33449]
+
+    # The redirect timeout in seconds.
+    REDIRECT_TIMEOUT = 120
+
+    # The characters used to create the code verifier
+    CODE_VERIFIER_CHARACTERS= \
+        string.ascii_uppercase + string.ascii_lowercase + \
+        string.digits + "-._~"
+
+    # Base URL for the project
+    GITLAB_PROJECT_BASE_URL = \
+        GITLAB_BASE_URL + "/api/v4/projects/" + \
+        urllib.parse.quote(GITLAB_PROJECT, safe = "")
+
+    # The client ID. Will be filled on first query.
+    _clientID = None
+
+    # The project access token for anonymous bug reports.
+    # Will be filled on first query
+    _projectAccessToken = None
+
+    @staticmethod
+    def _readCredentials(programDirectory):
+        """Read the credentials file and set up the client ID and the project
+        access token."""
+        with open(os.path.join(programDirectory, "bugreport.txt")) as f:
+            data = json.load(f)
+        SendBugReport._clientID = data["clientID"]
+        SendBugReport._projectAccessToken = data["projectAccessToken"]
+
+    def __init__(self, callback, config, programDirectory,
+                 summary, description, flightLog, debugLog,
+                 hasGitLabUser):
         """Construct the request for the given bug report."""
         super(SendBugReport, self).__init__(callback)
+        self._config = config
+        self._programDirectory = programDirectory
         self._summary = summary
         self._description = description
-        self._email = email
+        self._flightLog = flightLog
         self._debugLog = debugLog
-        self._transport = transport
+        self._hasGitLabUser = hasGitLabUser
 
     def run(self):
         """Perform the sending of the bug report."""
-        serverProxy = xmlrpc.client.ServerProxy("https://mlx.varadiistvan.hu/login/rpc",
-                                                transport = self._transport)
         result = Result()
         result.success = False
 
-        attributes = {}
-        if self._email:
-            attributes["reporter"] = self._email
+        if self._hasGitLabUser:
+            (accessToken, errorMessage) = self._getGitLabUserAccessToken()
+            if accessToken is None:
+                result.errorMessage = errorMessage
+        else:
+            accessToken = self._getProjectAccessToken()
 
-        result.ticketID = serverProxy.ticket.create(self._summary, self._description,
-                                                    attributes, True)
-        print("Created ticket with ID:", result.ticketID)
-        if self._debugLog:
-            serverProxy.ticket.putAttachment(result.ticketID, "debug.log",
-                                             "Debug log",
-                                             bytes(self._debugLog, "utf-8"))
-
-
-        result.success = True
+        if accessToken:
+            (ticketID, ticketURL) = self._createIssue(accessToken)
+            result.success = True
+            result.ticketID = ticketID
+            result.ticketURL = ticketURL
 
         return result
+
+    def _getGitLabUserAccessToken(self):
+        """Get the access token from GitLab.
+
+        If there is a refresh token, a new access token will be queried from
+        the site. If there is no refresh token, or the access token cannot be
+        queried, an OAuth2 authorisation sequence is attempted."""
+        accessToken = None
+        if self._config.gitlabRefreshToken:
+            try:
+                accessToken = self._refreshGitLabTokens()
+                if accessToken:
+                    return accessToken, None
+            except Exception as e:
+                print("SendBugReport._getGitLabUserAccessToken: failed to refresh token:", e)
+
+        (code, redirectURI, codeVerifier, errorMessage) = \
+            self._gitlabAuthorizeApplication()
+        if code is None:
+            return None, errorMessage
+
+        return self._getGitLabAccessTokenByCode(
+            code, redirectURI, codeVerifier)
+
+    def _refreshGitLabTokens(self):
+        """Try to acquire a GitLab access token using the current refresh
+        token. If it succeeds, the refresh token itself is updated."""
+
+        data = {
+            "client_id": self._getClientID(),
+            "refresh_token": self._config.gitlabRefreshToken,
+            "grant_type": "refresh_token",
+        }
+
+        request = urllib.request.Request(
+            url = SendBugReport.GITLAB_BASE_URL + "/oauth/token",
+            data = bytes(urllib.parse.urlencode(data), "utf-8"))
+
+        with urllib.request.urlopen(request, context = sslContext) as reply:
+            data = json.load(reply)
+
+        self._config.gitlabRefreshToken = data["refresh_token"]
+        return data["access_token"]
+
+    def _gitlabAuthorizeApplication(self):
+        """Authorise the application via GitLab and return an access code."""
+        httpServer = self._getRedirectListener()
+        if httpServer is None:
+            return (None, None, None,
+                    xstr("sendBugReport_no_server_port"))
+
+        redirectURI = "http://%s:%d" % httpServer.server_address
+
+        codeVerifierLength = random.randint(43, 128)
+        codeVerifier = "".join(random.choices(
+            SendBugReport.CODE_VERIFIER_CHARACTERS,
+            k = codeVerifierLength))
+        codeChallenge = str(base64.urlsafe_b64encode(
+            hashlib.sha256(bytes(codeVerifier, "ascii")).digest()), "ascii").\
+            rstrip("=")
+
+        data = {
+            "client_id": self._getClientID(),
+            "redirect_uri": redirectURI,
+            "response_type": "code",
+            "scope": "api",
+            "code_challenge": codeChallenge,
+            "code_challenge_method" :"S256"
+        }
+
+        url = SendBugReport.GITLAB_BASE_URL + "/oauth/authorize?" + \
+            urllib.parse.urlencode(data)
+        webbrowser.open(url = url, new = 1)
+
+        httpServer.mlxSuccess = False
+        httpServer.mlxErrorMessage = xstr("sendBugReport_timed_out")
+        httpServer.timeout = SendBugReport.REDIRECT_TIMEOUT
+
+        httpServer.handle_request()
+
+        if httpServer.mlxSuccess:
+            return (httpServer.mlxCode, redirectURI, codeVerifier, None)
+        else:
+            return (None, None, None, httpServer.mlxErrorMessage)
+
+    def _getRedirectListener(self):
+        """Get a HTTP server that listens on one of the ports listed
+        in REDIRECT_LISTENER_PORTS."""
+        for port in SendBugReport.REDIRECT_LISTENER_PORTS:
+            try:
+                return HTTPServer(("127.0.0.1", port),
+                                  SendBugReport.HTTPRequestHandler)
+            except Exception as e:
+                print("SendBugReport._getRedirectListener: failed to create HTTP server on port %d: %s" %
+                      (port, e))
+
+    def _getGitLabAccessTokenByCode(self, code, redirectURI, codeVerifier):
+        """Get a GitHub access token using the given code.
+
+        The refresh token is also retrieved and stored."""
+        data = {
+            "client_id": self._getClientID(),
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": redirectURI,
+            "code_verifier": codeVerifier
+        }
+        request = urllib.request.Request(
+            url = SendBugReport.GITLAB_BASE_URL + "/oauth/token",
+            data =  bytes(urllib.parse.urlencode(data), "utf-8"))
+
+        with urllib.request.urlopen(request, context = sslContext) as reply:
+            data = json.load(reply)
+
+        self._config.gitlabRefreshToken = data["refresh_token"]
+        return data["access_token"], None
+
+    def _createIssue(self, accessToken):
+        """Create the issue in GitLab."""
+
+        headers = {
+            "Authorization": "Bearer " + accessToken
+        }
+
+        issueData = {
+            "title": self._summary,
+            "labels": SendBugReport.LABELS,
+        }
+
+        description = ""
+        if self._description:
+            description = self._description
+
+        if self._flightLog or self._debugLog:
+            if description:
+                description += "\n\n"
+
+            description += "### Log files:\n"
+            if self._flightLog:
+                ref = self._uploadLog(headers,
+                                      "flight.log", self._flightLog)
+                description += "* Flight log: " + ref + "\n"
+
+            if self._debugLog:
+                ref = self._uploadLog(headers,
+                                            "debug.log", self._debugLog)
+                description += "* Debug log: " + ref + "\n"
+
+        if description:
+            issueData["description"] = description
+
+        request = urllib.request.Request(
+            url = SendBugReport.GITLAB_PROJECT_BASE_URL + "/issues",
+            data = bytes(urllib.parse.urlencode(issueData), "utf-8"),
+            headers = headers)
+
+        with urllib.request.urlopen(request, context = sslContext) as reply:
+            data = json.load(reply)
+
+        return data["iid"], data["web_url"]
+
+    def _uploadLog(self, headers, fileName, log):
+        """Upload the given log with the given name"""
+        boundary = uuid.uuid4().hex
+
+        data = "--%s\r\n" % (boundary,)
+        data += "Content-Disposition: file; name=\"file\"; filename=\"%s\"\r\n" % \
+            (fileName,)
+        data += "Content-Type: text/plain\r\n"
+        data += "\r\n"
+        data += log
+        data += "\r\n"
+        data += "--%s--\r\n" % (boundary,)
+
+        data = bytes(data, "utf8")
+
+        request = urllib.request.Request(
+            url = SendBugReport.GITLAB_PROJECT_BASE_URL + "/uploads",
+            data = data,
+            headers = headers)
+
+        request.add_header("Content-Type",
+                           "multipart/form-data; boundary=" + boundary)
+        with urllib.request.urlopen(request, context = sslContext) as reply:
+            data = json.load(reply)
+        return data["markdown"]
+
+    def _getClientID(self):
+        """Get the client ID by reading the credentials data file in the
+        program directory, if needed."""
+        if SendBugReport._clientID is None:
+           SendBugReport._readCredentials(self._programDirectory)
+        return SendBugReport._clientID
+
+    def _getProjectAccessToken(self):
+        """Get the project access token by reading the credentials data file in
+        the program directory, if needed."""
+        if SendBugReport._projectAccessToken is None:
+            SendBugReport._readCredentials(self._programDirectory)
+        return SendBugReport._projectAccessToken
 
 #------------------------------------------------------------------------------
 
@@ -972,9 +1198,10 @@ class Handler(threading.Thread):
         self.daemon = True
         self._config = config
         self._rpcClient = rpc.Client(getCredentialsFn)
+        self._programDirectory = programDirectory
         if config.rememberPassword:
             self._rpcClient.setCredentials(config.pilotID, config.password)
-        self._bugReportTransport = BugReportTransport(programDirectory)
+        # self._bugReportTransport = BugReportTransport(programDirectory)
 
     def register(self, callback, registrationData):
         """Enqueue a registration request."""
@@ -1019,11 +1246,14 @@ class Handler(threading.Thread):
         request = SendACARSRPC(self._rpcClient, callback, acars)
         self._addRequest(request)
 
-    def sendBugReport(self, callback, summary, description, email, debugLog = None):
+    def sendBugReport(self, callback, summary, description, flightLog,
+                      debugLog, hasGitLabUser):
         """Send a bug report with the given data."""
-        self._addRequest(SendBugReport(callback, summary, description, email,
-                                       debugLog = debugLog,
-                                       transport = self._bugReportTransport))
+        self._addRequest(SendBugReport(callback, self._config,
+                                       self._programDirectory,
+                                       summary, description,
+                                       flightLog, debugLog,
+                                       hasGitLabUser))
 
     def setCheckFlightPassed(self, callback, aircraftType):
         """Mark the check flight as passed."""

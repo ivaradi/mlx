@@ -2422,14 +2422,20 @@ msgstr ""
 "A naplót és a debug naplót a program automatikusan csatolja a "
 "hibajelentéshez, így azokat ide nem kell bemásolni."
 
-msgid "bugreport_email"
-msgstr "_E-mail (nem kötelező):"
+msgid "bugreport_has_gitlab"
+msgstr "Van _GitLab felhasználó nevem, vagy szeretnék regisztrálni"
 
-msgid "bugreport_email_tooltip"
-msgstr "Ha itt megadod az e-mail címed, a hibajelentés állapotáról értesítéseket fogsz kapni a megadott címre."
+msgid "bugreport_has_gitlab_tooltip"
+msgstr ""
+"Jelöld be ha van már GitLab felhasználó neved, vagy szeretnél "
+"regisztrálni egyet. Ebben az esetben a hibajelentésed állapotáról a "
+"GitLab e-mailt küld."
 
 msgid "sendBugReport_busy"
 msgstr "Hibajelentés küldése..."
+
+msgid "sendBugReport_can_close"
+msgstr "Most már bezárhatod ezt a böngészőablakoto."
 
 msgid "sendBugReport_success"
 msgstr "A %d. számú hibajelentés létrehozva."
@@ -2438,10 +2444,20 @@ msgid "sendBugReport_success_sec"
 msgstr ""
 "A jelentést elemezzük és felvesszük veled a kapcsolatot "
 "amilyen hamar csak lehet. A fenti számot jegyezd fel, "
-"hogy a későbbiekben hivatkozhass rá."
+"hogy a későbbiekben hivatkozhass rá. Rá is kattinthatsz, "
+"hogy a böngésződben megnézhesd a hibajelentést."
 
 msgid "sendBugReport_error"
 msgstr "Nem sikerült elküldeni a hibajelentést."
+
+msgid "sendBugReport_timed_out"
+msgstr "Időtúllépés történt."
+
+msgid "sendBugReport_no_server_port"
+msgstr ""
+"Nem tudtam létrehozni helyi HTTP kiszolgálót a program "
+"hozzáférésének engedélyezéséhez. "
+"Próbáld meg GitLab felhasználónév nélkül elküldeni a hibajelentést."
 
 msgid "sendBugReport_siteerror_sec"
 msgstr ""

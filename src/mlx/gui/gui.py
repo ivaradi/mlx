@@ -1766,36 +1766,21 @@ class GUI(fs.ConnectionListener):
         if callback is not None:
             callback(returned, result)
 
-    def sendBugReport(self, summary, description, email, callback = None):
+    def sendBugReport(self, summary, description, hasGitLabUser, callback = None):
         """Send the bug report with the given data."""
-        description += "\n\n" + ("=" * 40)
-        description += "\n\nThe contents of the log:\n\n"
-
+        flightLog = ""
         for (timestampString, text) in self._logger.lines:
-            description += str(formatFlightLogLine(timestampString, text))
+            flightLog += str(formatFlightLogLine(timestampString, text))
 
         buffer = self._debugLogView.get_buffer()
-        debugLogTooLong = buffer.get_line_count()>GUI._maxInlineDebugLogLines
-
-        description += "\n\n" + ("=" * 40)
-        description += "\n\nThe contents of the debug log%s:\n\n" % \
-            (" (truncated)" if debugLogTooLong else "")
-
         debugLog = buffer.get_text(buffer.get_start_iter(),
                                    buffer.get_end_iter(), True)
-        if debugLogTooLong:
-            description += buffer.get_text(buffer.get_start_iter(),
-                                           buffer.get_iter_at_line(GUI._maxInlineDebugLogLines),
-                                           True)
-        else:
-            description += debugLog
-            debugLog = None
 
         self.beginBusy(xstr("sendBugReport_busy"))
         self._sendBugReportCallback = callback
         self.webHandler.sendBugReport(self._bugReportSentCallback,
-                                      summary, description, email,
-                                      debugLog = debugLog)
+                                      summary, description,
+                                      flightLog, debugLog, hasGitLabUser)
 
     def _cefInitialized(self):
         """Called when CEF has been initialized."""
@@ -1814,17 +1799,22 @@ class GUI(fs.ConnectionListener):
         if returned:
             if result.success:
                 type = Gtk.MessageType.INFO
-                messageFormat = xstr("sendBugReport_success") % (result.ticketID,)
+                messageFormat = xstr("sendBugReport_success") % \
+                    (result.ticketURL, result.ticketID)
                 secondaryMarkup = xstr("sendBugReport_success_sec")
             else:
                 messageFormat = xstr("sendBugReport_error")
-                secondaryMarkup = xstr("sendBugReport_siteerror_sec")
+                secondaryMarkup = getattr(result, "errorMessage", None)
+                print("secondaryMarkup:", secondaryMarkup)
+                if not secondaryMarkup:
+                    secondaryMarkup = xstr("sendBugReport_siteerror_sec")
         else:
             messageFormat = xstr("sendBugReport_error")
             secondaryMarkup = xstr("sendBugReport_error_sec")
 
         dialog = Gtk.MessageDialog(parent = self._wizard.gui._bugReportDialog,
-                                   type = type, message_format = messageFormat)
+                                   type = type)
+        dialog.set_markup(messageFormat)
         dialog.add_button(xstr("button_ok"), Gtk.ResponseType.OK)
         dialog.set_title(WINDOW_TITLE_BASE)
         if secondaryMarkup is not None:

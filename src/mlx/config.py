@@ -273,6 +273,8 @@ class Config(object):
             self._checklists[aircraftType] = Checklist()
             self._approachCallouts[aircraftType] = ApproachCallouts()
 
+        self._gitlabRefreshToken = None
+
         self._modified = False
 
     @property
@@ -758,6 +760,18 @@ class Config(object):
             self._xplaneAddress = xplaneAddress
             self._modified = True
 
+    @property
+    def gitlabRefreshToken(self):
+        """Get the GitLab refreshh token"""
+        return self._gitlabRefreshToken
+
+    @gitlabRefreshToken.setter
+    def gitlabRefreshToken(self, token):
+        """Set the GitLab refresh token"""
+        if token != self._gitlabRefreshToken:
+            self._gitlabRefreshToken = token
+            self._modified = True
+
     def getChecklist(self, aircraftType):
         """Get the checklist for the given aircraft type."""
         return self._checklists[aircraftType]
@@ -894,6 +908,9 @@ class Config(object):
         self._xplaneAddress = self._get(config, "general",
                                         "xplaneAddress", "")
 
+        self._gitlabRefreshToken = self._get(config, "general",
+                                             "gitlabRefreshToken", "")
+
         self._modified = False
 
     def save(self):
@@ -956,6 +973,10 @@ class Config(object):
         config.set("general", "xplaneRemote",
                    "yes" if self._xplaneRemote else "no")
         config.set("general", "xplaneAddress", self._xplaneAddress)
+
+        if self._gitlabRefreshToken:
+            config.set("general", "gitlabRefreshToken",
+                       self._gitlabRefreshToken)
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:
@@ -1121,6 +1142,9 @@ class Config(object):
         print("  defaultMSFS:", self._defaultMSFS)
         print("  xplaneRemote:", self._xplaneRemote)
         print("  xplaneAddress:", self._xplaneAddress)
+
+        print("  gitlabRefreshToken:",
+              "yes" if self._gitlabRefreshToken else "no")
 
         print("  enableSounds:", self._enableSounds)
 

@@ -106,7 +106,8 @@ if os.name=="nt":
                 data_files.append((path, files[path]))
             data_files.append(("",
                                [os.path.join(gtkRuntimeDir, "bin", "librsvg-2-2.dll"),
-                                os.path.join(gtkRuntimeDir, "bin", "libcroco-0.6-3.dll")]))
+                                os.path.join(gtkRuntimeDir, "bin", "libcroco-0.6-3.dll"),
+                                os.path.join(gtkRuntimeDir, "bin", "gspawn-win32-helper.exe")]))
         else:
             path = os.path.join("lib", "gtk-2.0", "2.10.0", "engines")
             data_files.append((os.path.join("library", path),

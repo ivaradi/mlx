@@ -2406,23 +2406,38 @@ msgstr ""
 "The log and the debug log will be automatically appended to the bug report, "
 "so there is no need to copy those here."
 
-msgid "bugreport_email"
-msgstr "_E-mail (optional):"
+msgid "bugreport_has_gitlab"
+msgstr "I have a _GitLab user account or want to register one"
 
-msgid "bugreport_email_tooltip"
-msgstr "If you enter your e-mail here, you will get status updates about your bug report to this address."
+msgid "bugreport_has_gitlab_tooltip"
+msgstr ""
+"Check this if you have a GitLab user account or would like to "
+"register one. This way you can get e-mail updates about the "
+"progress of your bug report."
 
 msgid "sendBugReport_busy"
 msgstr "Sending bug report..."
 
+msgid "sendBugReport_can_close"
+msgstr "You can now close this browser window."
+
 msgid "sendBugReport_success"
-msgstr "Bug report #%d created successfully."
+msgstr "Bug report <a href=\"%s\">#%d</a> created successfully."
 
 msgid "sendBugReport_success_sec"
 msgstr ""
 "The report will be analysed and you will be contacted "
 "as soon as possible. Write down the ID above, so that "
-"you could refer to it later."
+"you could refer to it later. You can also click on the "
+"ID to see the bug report in your browser."
+
+msgid "sendBugReport_timed_out"
+msgstr "Timeout occurred."
+
+msgid "sendBugReport_no_server_port"
+msgstr ""
+"Could not create local HTTP server for authorisation. "
+"Try sending the bug report without a GitLab account."
 
 msgid "sendBugReport_error"
 msgstr "Failed to send the bug report."
