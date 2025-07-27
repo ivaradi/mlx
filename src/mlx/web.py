@@ -7,6 +7,7 @@ from . import rpccommon
 
 from .common import MAVA_BASE_URL, sslContext
 from .pirep import PIREP
+from .config import Config
 
 from mlx.i18n import xstr
 
@@ -793,6 +794,9 @@ class SendBugReport(Request):
         GITLAB_BASE_URL + "/api/v4/projects/" + \
         urllib.parse.quote(GITLAB_PROJECT, safe = "")
 
+    # URL of the credentials file
+    CREDENTIALS_FILE_URL = Config.DEFAULT_UPDATE_URL + "/bugreport.txt"
+
     # The client ID. Will be filled on first query.
     _clientID = None
 
@@ -801,13 +805,24 @@ class SendBugReport(Request):
     _projectAccessToken = None
 
     @staticmethod
-    def _readCredentials(programDirectory):
-        """Read the credentials file and set up the client ID and the project
-        access token."""
-        with open(os.path.join(programDirectory, "bugreport.txt")) as f:
-            data = json.load(f)
-        SendBugReport._clientID = data["clientID"]
-        SendBugReport._projectAccessToken = data["projectAccessToken"]
+    def _readCredentials(config: Config, programDirectory):
+        """Read the credentials from the server and set up the client ID
+        and the project access token. If there is some problem reading the
+        credentials, use the cached values, if any"""
+        request = urllib.request.Request(SendBugReport.CREDENTIALS_FILE_URL)
+        try:
+            with urllib.request.urlopen(request, timeout = 10.0,
+                                        context = sslContext) as f:
+                data = json.load(f)
+
+            config.gitlabClientID = \
+                SendBugReport._clientID = data["clientID"]
+            config.gitlabProjectAccessToken = \
+                SendBugReport._projectAccessToken = data["projectAccessToken"]
+        except Exception as e:
+            print("Failed to download the credentials:", e)
+            SendBugReport._clientID = config.gitlabClientID
+            SendBugReport._projectAccessToken = config.gitlabProjectAccessToken
 
     def __init__(self, callback, config, programDirectory,
                  summary, description, flightLog, debugLog,
@@ -827,7 +842,7 @@ class SendBugReport(Request):
         result = Result()
         result.success = False
 
-        if self._hasGitLabUser:
+        if self._hasGitLabUser and self._getClientID() is not None:
             (accessToken, errorMessage) = self._getGitLabUserAccessToken()
             if accessToken is None:
                 result.errorMessage = errorMessage
@@ -1032,14 +1047,16 @@ class SendBugReport(Request):
         """Get the client ID by reading the credentials data file in the
         program directory, if needed."""
         if SendBugReport._clientID is None:
-           SendBugReport._readCredentials(self._programDirectory)
+           SendBugReport._readCredentials(self._config,
+                                          self._programDirectory)
         return SendBugReport._clientID
 
     def _getProjectAccessToken(self):
         """Get the project access token by reading the credentials data file in
         the program directory, if needed."""
         if SendBugReport._projectAccessToken is None:
-            SendBugReport._readCredentials(self._programDirectory)
+            SendBugReport._readCredentials(self._config,
+                                           self._programDirectory)
         return SendBugReport._projectAccessToken
 
 #------------------------------------------------------------------------------

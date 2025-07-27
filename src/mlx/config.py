@@ -274,6 +274,8 @@ class Config(object):
             self._approachCallouts[aircraftType] = ApproachCallouts()
 
         self._gitlabRefreshToken = None
+        self._gitlabClientID = None
+        self._gitlabProjectAccessToken = None
 
         self._modified = False
 
@@ -772,6 +774,30 @@ class Config(object):
             self._gitlabRefreshToken = token
             self._modified = True
 
+    @property
+    def gitlabClientID(self):
+        """Get the cached GitLab client ID"""
+        return self._gitlabClientID
+
+    @gitlabClientID.setter
+    def gitlabClientID(self, clientID):
+        """Set the cached GitLab client ID"""
+        if clientID != self._gitlabClientID:
+            self._gitlabClientID = clientID
+            self._modified = True
+
+    @property
+    def gitlabProjectAccessToken(self):
+        """Get the cached GitLab project access token"""
+        return self._gitlabProjectAccessToken
+
+    @gitlabProjectAccessToken.setter
+    def gitlabProjectAccessToken(self, projectAccessToken):
+        """Set the cached GitLab project access token"""
+        if projectAccessToken != self._gitlabProjectAccessToken:
+            self._gitlabProjectAccessToken = projectAccessToken
+            self._modified = True
+
     def getChecklist(self, aircraftType):
         """Get the checklist for the given aircraft type."""
         return self._checklists[aircraftType]
@@ -910,6 +936,10 @@ class Config(object):
 
         self._gitlabRefreshToken = self._get(config, "general",
                                              "gitlabRefreshToken", "")
+        self._gitlabClientID = self._get(config, "general",
+                                         "gitlabClientID", None)
+        self._gitlabProjectAccessToken = \
+            self._get(config, "general", "gitlabProjectAccessToken", None)
 
         self._modified = False
 
@@ -977,6 +1007,12 @@ class Config(object):
         if self._gitlabRefreshToken:
             config.set("general", "gitlabRefreshToken",
                        self._gitlabRefreshToken)
+        if self._gitlabClientID:
+            config.set("general", "gitlabClientID",
+                       self._gitlabClientID)
+        if self._gitlabProjectAccessToken:
+            config.set("general", "gitlabProjectAccessToken",
+                       self._gitlabProjectAccessToken)
 
         config.add_section(Config._messageTypesSection)
         for messageType in const.messageTypes:
@@ -1145,6 +1181,10 @@ class Config(object):
 
         print("  gitlabRefreshToken:",
               "yes" if self._gitlabRefreshToken else "no")
+        print("  gitlabClientID:",
+              "yes" if self._gitlabClientID else "no")
+        print("  gitlabProjectAccessToken:",
+              "yes" if self._gitlabProjectAccessToken else "no")
 
         print("  enableSounds:", self._enableSounds)
 
