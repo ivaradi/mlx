@@ -1231,6 +1231,10 @@ class T154(Aircraft):
         self._checkers.append(checks.LandingLightsChecker())
         self._checkers.append(checks.NavLightsChecker())
 
+    def _getFlapsSpeedLimitChecker(self):
+        """Get the object to check the flaps speed limits."""
+        return checks.FlapsPositionSpeedLimitChecker()
+
 #---------------------------------------------------------------------------------------
 
 class YK40(Aircraft):
