@@ -1261,7 +1261,8 @@ class AircraftModel(object):
                        ("flapsControl",
                         "sim/flightmodel/controls/flaprqst", TYPE_FLOAT),
                        ("flapsLeft",
-                        "sim/flightmodel/controls/flaprat", TYPE_FLOAT),
+                        "sim/flightmodel/controls/fla1_def",
+                        (TYPE_FLOAT_ARRAY, 56)),
                        ("flapsRight",
                         "sim/flightmodel/controls/flap2rat", TYPE_FLOAT),
                        ("navLights",
@@ -1470,7 +1471,7 @@ class AircraftModel(object):
         flapsIndex = int(round(flapsControl * (len(self._flapsNotches)-1)))
         state.flapsSet = 0 if flapsIndex<1 else self._flapsNotches[flapsIndex]
 
-        state.flaps = self._flapsNotches[-1]*data[self._monidx_flapsLeft]
+        state.flaps = max(data[self._monidx_flapsLeft])
 
         state.navLightsOn = data[self._monidx_navLights] != 0
         state.antiCollisionLightsOn = data[self._monidx_beaconLights] != 0
@@ -1743,11 +1744,10 @@ class B737Model(GenericAircraftModel):
 
 class ZiboB737NGModel(B737Model):
     """Base model for the Zibo and LevelUp Boeing 737 models."""
-    def __init__(self, flapsRatios = [0.0, 0.081633, 0.142857, 0.224490,
-                                      0.285714, 0.367347, 0.551020, 0.714286,
-                                      1.0]):
+    def __init__(self, flapsDeflections = [0.0, 5.0, 7.0, 8.5, 10.0,
+                                           12.2, 22.0, 29.0, 40.0]):
         super(ZiboB737NGModel, self).__init__()
-        self._flapsRatios = flapsRatios
+        self._flapsDeflections = flapsDeflections
 
     def addMonitoringData(self, data, fsType):
         """Add the model-specific monitoring data to the given array."""
@@ -1818,20 +1818,20 @@ class ZiboB737NGModel(B737Model):
                                                               data)
         state.cog = data[self._cgIndex]/100.0
 
-        flapsRatios = self._flapsRatios
-        flapsRatio = data[self._monidx_flapsLeft]
-        index = len(flapsRatios)
-        for i in range(1, len(flapsRatios)):
-            if flapsRatio<flapsRatios[i]:
+        flapsDeflections = self._flapsDeflections
+        flapsDeflection = max(data[self._monidx_flapsLeft])
+        index = len(flapsDeflections)
+        for i in range(1, len(flapsDeflections)):
+            if flapsDeflection<flapsDeflections[i]:
                 index = i-1
                 break
-        if index<len(flapsRatios):
-            flapsRatio0 = flapsRatios[index]
+        if index<len(flapsDeflections):
+            flapsDeflection0 = flapsDeflections[index]
             flapsNotch0 = self._flapsNotches[index]
             state.flaps = flapsNotch0 + \
                 (self._flapsNotches[index+1] - flapsNotch0) * \
-                (flapsRatio - flapsRatio0) / \
-                (flapsRatios[index+1] - flapsRatio0)
+                (flapsDeflection - flapsDeflection0) / \
+                (flapsDeflections[index+1] - flapsDeflection0)
         else:
             state.flaps = self._flapsNotches[-1]
 
@@ -1881,12 +1881,6 @@ class ZiboB738Model(ZiboB737NGModel):
             notes.startswith("ZIBOmod") and \
             icao=="B738"
 
-    def __init__(self):
-        """Construct the model."""
-        super(ZiboB738Model, self).__init__(
-            flapsRatios = [0.0, 0.081633, 0.142857, 0.224490, 0.285714, 0.346939,
-                           0.551020, 0.673469, 1.0])
-
     @property
     def name(self):
         """Get the name for this aircraft model."""
@@ -1894,7 +1888,19 @@ class ZiboB738Model(ZiboB737NGModel):
 
 #------------------------------------------------------------------------------
 
-class LevelUpB736Model(ZiboB737NGModel):
+class LevelUpB737NGModel(ZiboB737NGModel):
+    """Base model for the LevelUp Boeing 737NG models."""
+    def __init__(self):
+        """Construct the model"""
+    def __init__(self):
+        """Construct the model."""
+        super(LevelUpB737NGModel, self).__init__(
+            flapsDeflections=[0.0, 4.0, 7.0, 11.0, 14.0, 18.0, 27.0,
+                              35.0, 49.0])
+
+#------------------------------------------------------------------------------
+
+class LevelUpB736Model(LevelUpB737NGModel):
     """Model for the LevelUp Boeing 737-600 model."""
 
     @staticmethod
@@ -1913,7 +1919,7 @@ class LevelUpB736Model(ZiboB737NGModel):
 
 #------------------------------------------------------------------------------
 
-class LevelUpB737Model(ZiboB737NGModel):
+class LevelUpB737Model(LevelUpB737NGModel):
     """Model for the LevelUp Boeing 737-700 model."""
 
     @staticmethod
@@ -1932,7 +1938,7 @@ class LevelUpB737Model(ZiboB737NGModel):
 
 #------------------------------------------------------------------------------
 
-class LevelUpB738Model(ZiboB737NGModel):
+class LevelUpB738Model(LevelUpB737NGModel):
     """Model for the LevelUp Boeing 737-800 model."""
 
     @staticmethod
@@ -2342,11 +2348,6 @@ class FelisT154B2Model(T154Model):
                                             TYPE_FLOAT)
             self._n1Index = -1
 
-        self._flapsIndex = len(data)
-        self._addDatarefWithIndexMember(data,
-                                        "sim/flightmodel/controls/fla1_def",
-                                        (TYPE_FLOAT_ARRAY, 2, 8))
-
         self._spoilersIndex = len(data)
         self._addDatarefWithIndexMember(data,
                                         "sim/flightmodel2/wing/spoiler1_deg",
@@ -2366,7 +2367,7 @@ class FelisT154B2Model(T154Model):
         state.parking = data[self._parkingBrakeIndex]!=0
         state.cog = data[self._cgIndex]/100.0
         state.flapsSet = data[self._flapsControlIndex]
-        state.flaps = data[self._flapsIndex][0]
+        state.flaps = data[self._monidx_flapsLeft][8]
 
         state.spoilersExtension = max(
             max(data[self._spoilersIndex])*100.0/50.0,
