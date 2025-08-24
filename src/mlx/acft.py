@@ -199,7 +199,7 @@ class Aircraft(object):
         self._checkers.append(checks.BankChecker())
 
         self._checkers.append(checks.FlapsRetractChecker())
-        self._checkers.append(checks.FlapsSpeedLimitChecker())
+        self._checkers.append(self._getFlapsSpeedLimitChecker())
 
         self._checkers.append(checks.GearsDownChecker())
         self._checkers.append(checks.GearSpeedLimitChecker())
@@ -718,6 +718,10 @@ class Aircraft(object):
         self._flight.logger.message(timestamp,
                                     "Aircraft: name='%s', model='%s'" % \
                                     (self._name, self._modelName))
+
+    def _getFlapsSpeedLimitChecker(self):
+        """Get the object to check the flaps speed limits."""
+        return checks.FlapsSpeedLimitChecker()
 
 #---------------------------------------------------------------------------------------
 
