@@ -1098,6 +1098,16 @@ class FlapsSpeedLimitChecker(SimpleFaultChecker):
 
 #---------------------------------------------------------------------------------------
 
+class FlapsPositionSpeedLimitChecker(FlapsSpeedLimitChecker):
+    """Check if the actual position of the flaps is correct for the
+    speed.":"""""
+    def isCondition(self, flight, aircraft, oldState, state):
+        """Check if the fault condition holds."""
+        speedLimit = aircraft.getFlapsSpeedLimitFuzzy(state.flaps)
+        return speedLimit is not None and state.smoothedIAS>speedLimit
+
+#---------------------------------------------------------------------------------------
+
 class GearsDownChecker(SimpleFaultChecker):
     """Check if the gears are down at low altitudes."""
     def isCondition(self, flight, aircraft, oldState, state):

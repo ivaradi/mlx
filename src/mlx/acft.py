@@ -330,6 +330,16 @@ class Aircraft(object):
         return self.flapSpeedLimits[flaps] if flaps in self.flapSpeedLimits \
                else None
 
+    def getFlapsSpeedLimitFuzzy(self, flaps):
+        """Get the speed limit for the given flaps setting. It considers
+        the flap settings to not necessarily be exact and allows a small
+        difference to the actual value in the flap speed limit dictionary.
+        """
+        for f, limit in self.flapSpeedLimits.items():
+            if abs(flaps-f)<0.1:
+                return limit
+        return None
+
     def modelChanged(self, timestamp, aircraftName, modelName):
         """Called when the simulator's aircraft changes."""
         self._name = aircraftName
