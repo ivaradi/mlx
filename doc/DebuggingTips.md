@@ -1,0 +1,1 @@
+Some aircraft for the Flight Simulator report certain values at special offsets. In most cases, the offsets used for these values can be determined by using the [FsInterrogate](FsInterrogate.md) tool provided with the FSUIPC SDK.

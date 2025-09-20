@@ -2,6 +2,13 @@
 
 This project is for the new version of the [MAVA](https://virtualairlines.hu) Logger. The software is currently quite mature, although some improvements are made sometimes.
 
-You can also [download](https://gitlab.com/ivaradi/mlx/-/wikis/Download) the latest stable version.
+## Download
 
-See some [technical notes](https://gitlab.com/ivaradi/mlx/-/wikis/TechnicalNotes).
+The installer for the latest stable version of the logger can be downloaded below. After downloading, start it and it will install the application.
+
+- [MAVA Logger X-0.66.1-Setup.exe](<https://mlx.varadiistvan.hu/update/MAVA Logger X-0.66.1-Setup.exe>)
+
+## Technical Notes
+
+See some [technical notes](doc/TechnicalNotes.md).
+
