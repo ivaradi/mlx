@@ -4,7 +4,7 @@ doxygen:
   script:
     - apt-get -y update && apt-get install -y doxygen
     - cd doc
-    - (cat Doxyfile; echo "OUTPUT_DIRECTORY=html"; echo "HTML_OUTPUT=."; echo "QUIET=YES"; echo "WARNINGS=NO"; echo "WARN_IF_UNDOCUMENTED=NO"; echo "HTML_HEADER=TracHeader.html"; echo "HTML_FOOTER=TracFooter.html") | doxygen -
+    - (cat Doxyfile; echo "OUTPUT_DIRECTORY=html"; echo "HTML_OUTPUT=."; echo "QUIET=YES"; echo "WARNINGS=NO"; echo "WARN_IF_UNDOCUMENTED=NO" ) | doxygen -
   artifacts:
     paths:
       - "doc/html"
