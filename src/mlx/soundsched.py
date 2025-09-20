@@ -17,15 +17,16 @@ import threading
 # for takeoff". Some sounds are played only when the pilot presses a hotkey, if
 # the program is set up that way.
 #
-# Each sound is represented by an instance of a subclass of \ref Sound. If a
-# new \ref mlx.fs.AircraftState "aircraft state" comes in from the simulator,
-# the \ref Sound.shouldPlay "shouldPlay" functions of the registered sound
-# objects are called with that state, and if the function returns \c True, the
-# corresponding sound file is played.
+# Each sound is represented by an instance of a subclass of \ref
+# mlx.soundsched.Sound "Sound" . If a new \ref mlx.fs.AircraftState
+# "aircraft state" comes in from the simulator, the \ref
+# mlx.soundsched.Sound.shouldPlay "shouldPlay" functions of the registered
+# sound objects are called with that state, and if the function returns \c
+# True, the corresponding sound file is played.
 #
-# The \ref ChecklistScheduler class handles the playback of the checklists,
-# which are basically sequences of sound files played back one-by-one when a
-# certain hotkey is pressed.
+# The \ref mlx.soundsched.ChecklistScheduler "ChecklistScheduler" class handles
+# the playback of the checklists, which are basically sequences of sound files
+# played back one-by-one when a certain hotkey is pressed.
 
 #------------------------------------------------------------------------------
 

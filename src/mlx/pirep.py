@@ -15,9 +15,9 @@ import time
 #
 # The PIREP module.
 #
-# This module defines only one class, \ref PIREP. It is used to extract and
-# store the information needed for a PIREP. The saved PIREPs are pickled
-# instances of this class.
+# This module defines only one class, \ref mlx.pirep.PIREP "PIREP". It is used
+# to extract and store the information needed for a PIREP. The saved PIREPs are
+# pickled instances of this class.
 
 #------------------------------------------------------------------------------
 

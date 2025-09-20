@@ -14,8 +14,8 @@ import threading
 #
 # The global flight state.
 #
-# This module defines a single class, \ref Flight, which represents the flight
-# in progress.
+# This module defines a single class, \ref mlx.flight.Flight "Flight", which
+# represents the flight in progress.
 
 #---------------------------------------------------------------------------------------
 

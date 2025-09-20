@@ -12,8 +12,9 @@ from mlx.gui.common import *
 # The widget and associated logic to display faults and allow the pilot to
 # explain them. Each fault is displayed as the text it is accompanied by in the
 # log and there is a text entry field where the user can enter the
-# corresponding explanation. \ref FaultFrame belongs to one fault, while
-# \ref FaultExplainWidget contains the collection of all frames, which is a
+# corresponding explanation. \ref mlx.gui.faultexplain.FaultFrame "FaultFrame"
+# belongs to one fault, while \ref mlx.gui.faultexplain.FaultExplainWidget
+#"FaultExplainWidget" contains the collection of all frames, which is a
 # VBox in a scrolled window.
 
 #-------------------------------------------------------------------------------

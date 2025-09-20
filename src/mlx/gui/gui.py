@@ -42,9 +42,9 @@ import webbrowser
 #
 # The main GUI class.
 #
-# The \ref GUI class is the main class of the GUI. It is a connection listener,
-# and aggregates all the windows, the menu, etc. It maintains the connection to
-# the simulator as well as the flight object.
+# The \ref mlx.gui.gui.GUI "GUI" class is the main class of the GUI. It is a
+# connection listener, and aggregates all the windows, the menu, etc. It
+# maintains the connection to the simulator as well as the flight object.
 
 #------------------------------------------------------------------------------
 

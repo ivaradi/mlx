@@ -10,9 +10,10 @@ import traceback
 #
 # Sound playback handling.
 #
-# This is the low level sound playback handling. The \ref initializeSound
-# function should be called to initialize the sound handling with the directory
-# containing the sound files. Then the \ref startSound function should be
+# This is the low level sound playback handling. The \ref
+# mlx.sound.initializeSound "initializeSound" # function should be called to
+# initialize the sound handling with the directory  containing the sound
+# files. Then the \ref mlx.sound.startSound "startSound" function should be
 # called to start the playback of a certain sound file. A callback may be
 # called when the playback of a certain file has finished.
 #

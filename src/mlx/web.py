@@ -42,13 +42,15 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 #
 # This module implements a thread that can perform (HTTP) requests
 # asynchronously. When the request is performed, a callback is called. The main
-# interface is the \ref Handler class. Each of its functions creates a \ref
-# Request subclass instance and puts it to the request queue. The handler
-# thread then takes the requests one by one, and executes them.
+# interface is the \ref mlx.web.Handler "Handler" class. Each of its functions
+# creates a \ref mlx.web.Request "Request" subclass instance and puts it to the
+# request queue. The handler thread then takes the requests one by one, and
+# executes them.
 #
 # This module also defines some data classes the contents of which are
-# retrieved or sent via HTTP. \ref Fleet and \ref Plane represents the MAVA
-# fleet and the gates at Ferihegy and \ref NOTAM is a NOTAM.
+# retrieved or sent via HTTP. \ref mlx.web.Fleet "Fleet" and \ref mlx.web.Plane
+# "Plane" represents the MAVA fleet and the gates at Ferihegy and \ref
+# mlx.web.NOTAM "NOTAM" is a NOTAM.
 
 #---------------------------------------------------------------------------------------
 

@@ -9,8 +9,8 @@ import sys
 # The mapping of ICAO codes to airport names.
 #
 # This module contains the mapping of ICAO codes to airport cities and names,
-# as well as a \ref getWelcomeMessage "function" to produce a welcome message
-# for a certain airport.
+# as well as a \ref mlx.airports.getWelcomeMessage "function" to produce a
+# welcome message for a certain airport.
 
 #-----------------------------------------------------------------------------
 

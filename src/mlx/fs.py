@@ -16,14 +16,15 @@ import time
 #
 # The main interface to the flight simulator.
 #
-# The \ref createSimulator function can be used to create an instance of
-# the class that can be used to access the simulator. It expects an instance of
-# the \ref ConnectionListener class, the member functions of which will be
+# The \ref mlx.fs.createSimulator "createSimulator" function can be used to
+# create an instance of the class that can be used to access the simulator.
+# It expects an instance of the \ref mlx.fs.ConnectionListener
+# "ConnectionListener" class, the member functions of which will be
 # called when something happens with the connection to the simulator.
 #
 # The simulator interface is most often used to retrieve the state of the
-# simulated aircraft. Instances of class \ref AircraftState are used for this
-# purpose.
+# simulated aircraft. Instances of class \ref mlx.fs.AircraftState
+# "AircraftState" are used for this purpose.
 #
 # This module also contains some definitions for message sending and implements
 # the timing logic itself.

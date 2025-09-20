@@ -19,16 +19,17 @@ from collections import deque
 # The simulator-independent aircraft classes.
 #
 # This module contains the aircraft classes that contain some general data
-# about each aircraft type in the MAVA Fleet. The base class, \ref Aircraft
-# also implements some parts of the logging and traces some data. The classes
-# are also responsible for creating the \ref mlx.checks "checkers". Most of
-# them are created by the \ref Aircraft class' constructor, but there can be
+# about each aircraft type in the MAVA Fleet. The base class, \ref
+# mlx.acft.Aircraft "Aircraft" also implements some parts of the logging and
+# traces some data. The classes  are also responsible for creating the
+# \ref mlx.checks "checkers". Most of them are created by the \ref
+# mlx.acft.Aircraft "Aircraft" class' constructor, but there can be
 # type-specific differences. For example the lights are different for different
-# types, so there is a \ref Aircraft._appendLightsLoggers "function" which can
-# be reimplemented in child classes, if needed. This class maintains also the
-# \ref SmoothedValue "smoothed values" of the IAS and the VS and set these
-# values in the \ref mlx.fs.AircraftState "aircraft state" when it is received
-# from the simulator.
+# types, so there is a \ref mlx.acft.Aircraft._appendLightsLoggers "function"
+# which can be reimplemented in child classes, if needed. This class maintains
+# also the \ref mlx.acft.SmoothedValue "smoothed values" of the IAS and the VS
+# and set these values in the \ref mlx.fs.AircraftState "aircraft state" when
+# it is received from the simulator.
 
 #---------------------------------------------------------------------------------------
 

@@ -11,8 +11,8 @@ import traceback
 # Internationalization support.
 #
 # This module handles the internationalization support in the logger. It is
-# based on the GNU gettext library, and exports the \ref xstr function that
-# returns the translation for a certain key.
+# based on the GNU gettext library, and exports the \ref mlx.i18n.xstr "xstr"
+# function that returns the translation for a certain key.
 
 #------------------------------------------------------------------------------
 

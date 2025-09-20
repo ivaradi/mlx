@@ -22,7 +22,8 @@ import re
 # of those numbers will be used. Otherwise a 'usual' altitude is searched for,
 # in the direction according to the sort order, and if that fails too, the
 # altitudes are tried one-by-one. See the
-# \ref ApproachCalloutsEditor._getNewAltitude function for more details.
+# \ref mlx.gui.callouts.ApproachCalloutsEditor._getNewAltitude
+# "ApproachCalloutsEditor._getNewAltitude"  function for more details.
 
 #------------------------------------------------------------------------------
 

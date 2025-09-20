@@ -11,10 +11,11 @@ from mlx.gates import Gates, lhbpGates
 #
 # The gate status display.
 #
-# This module contains the \ref FleetGateStatus widget, which is the tab
-# displaying the status of the MAVA Fleet and the gates at LHBP. The left side
-# of the widget is the table with the list of the planes and their states. The
-# right side displays the numbers of the gates and their occupation status.
+# This module contains the \ref mlx.gui.gates.FleetGateStatus "FleetGateStatus"
+# widget, which is the tab displaying the status of the MAVA Fleet and the
+# gates at LHBP. The left side of the widget is the table with the list of the
+# planes and their states. The right side displays the numbers of the gates and
+# their occupation status.
 
 #-------------------------------------------------------------------------------
 

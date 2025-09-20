@@ -12,8 +12,8 @@ import time
 #
 # The monitoring window
 #
-# The \ref MonitorWindow class is a window containing the data received from
-# the simulator by the logger.
+# The \ref mlx.gui.monitor.MonitorWindow "MonitorWindow" class is a window
+# containing the data received from the simulator by the logger.
 
 #------------------------------------------------------------------------------
 

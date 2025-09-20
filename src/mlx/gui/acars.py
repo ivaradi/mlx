@@ -12,8 +12,8 @@ from . import cef
 #
 # The ACARS tab.
 #
-# This module implements to \ref ACARS class, which displays the MAVA ACARS in a
-# browser window using CEF
+# This module implements to \ref mlx.gui.acars.ACARS "ACARS" class, which
+# displays the MAVA ACARS in a browser window using CEF
 
 #------------------------------------------------------------------------------
 

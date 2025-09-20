@@ -17,11 +17,11 @@ import re
 #
 # The detailed PIREP viewer and editor windows.
 #
-# The \ref PIREPViewer class is a dialog displaying all information found in a
-# PIREP. It consists of three tabs. The Data tab displays the simple,
-# itemizable data. The Comments & defects tab contains the flight comments and
-# defects, while the Log tab contains the flight log collected by the
-# \ref mlx.logger.Logger "logger".
+# The \ref mlx.gui.pirep.PIREPViewer "PIREPViewer" class is a dialog displaying
+# all information found in a PIREP. It consists of three tabs. The Data tab
+# displays the simple, itemizable data. The Comments & defects tab contains the
+# flight comments and defects, while the Log tab contains the flight log
+# collected by the \ref mlx.logger.Logger "logger".
 
 #------------------------------------------------------------------------------
 

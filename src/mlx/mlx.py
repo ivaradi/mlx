@@ -16,7 +16,7 @@ import sys
 # The main program.
 #
 # This module contains the main program of the logger as well as the \ref
-# restart "restart" handling.
+# mlx.mlx.restart "restart" handling.
 
 #--------------------------------------------------------------------------------------
 

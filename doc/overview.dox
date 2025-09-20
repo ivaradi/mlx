@@ -119,8 +119,8 @@
  * "strobe lights" are switched on and off at the right stages of the
  * flight. But some checkers simply log some \ref
  * mlx.checks.AltimeterLogger "value" whenever it changes
- * in an "interesting" way, or \ref mlx.checks.ACARSSender "send the
- * ACARS" periodically.
+ * in an "interesting" way, or \ref mlx.checks.ACARSSender "send the ACARS"
+ * periodically.
  *
  * There is also a \ref mlx.checks.StageChecker "checker" which
  * detects the changes in the stage of the flight, and calls the

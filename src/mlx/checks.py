@@ -16,13 +16,14 @@ import time
 # During the flight the program periodically queries various data from the
 # simulator. This data is returned in instances of the \ref
 # mlx.fs.AircraftState class and passed to the various "checkers",
-# i.e. instances of subclasses of the \ref StateChecker class. These checkers
-# perform various checks to see if the aircraft's parameters are within the
-# expected limits, or some of them just logs something.
+# i.e. instances of subclasses of the \ref mlx.checks.StateChecker "StateChecker"
+# class. These checkers perform various checks to see if the aircraft's
+# parameters are within the expected limits, or some of them just logs something.
 #
-# There are a few special ones, such as \ref StageChecker which computes the
-# transitions from one stage of the flight to the next one. Or \ref ACARSSender
-# which sends the ACARS periodically
+# There are a few special ones, such as
+# \ref mlx.checks.StageChecker "StageChecker" which computes the
+# transitions from one stage of the flight to the next one. Or
+# \ref mlx.checks.ACARSSender "ACARSSender" which sends the ACARS periodically
 
 #---------------------------------------------------------------------------------------
 

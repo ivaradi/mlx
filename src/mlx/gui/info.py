@@ -13,10 +13,10 @@ import mlx.const as const
 #
 # The flight info tab.
 #
-# This module implements to \ref FlightInfo class, which is the widget for the
-# extra information related to the flight. It contains a text area for the
-# comments, the fault list widget, and the frame for the delay codes at the
-# bottom in the centre.
+# This module implements to \ref mlx.gui.info.FlightInfo "FlightInfo" class,
+# which is the widget for the extra information related to the flight. It
+# contains a text area for the comments, the fault list widget, and the frame
+# for the delay codes at the bottom in the centre.
 
 #------------------------------------------------------------------------------
 

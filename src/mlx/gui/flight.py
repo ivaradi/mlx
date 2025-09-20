@@ -37,14 +37,15 @@ import lxml.html
 # The flight "wizard".
 #
 # This module implements the main tab of the application, the flight
-# wizard. The wizard consists of \ref Page "pages", that come one after the
-# other. As some pages might be skipped, the pages dynamically store the index
-# of the previous page so that going back to it is simpler. The \ref
-# Page.activate "activate" function is called before a page is first shown
-# during a flight. This function should initialize the page's controls and fill
-# it with initial data. When a page is left for the first time, its \ref
-# Page.finalize "finalize" function is called. It should set those controls
-# insensitive, that will not be available if the user comes back to this page.
+# wizard. The wizard consists of \ref mlx.gui.flight.Page "pages", that come
+# one after the other. As some pages might be skipped, the pages dynamically
+# store the index of the previous page so that going back to it is simpler. The
+# \ref mlx.gui.flight.Page.activate "activate" function is called before a page
+# is first shown during a flight. This function should initialize the page's
+# controls and fill it with initial data. When a page is left for the first
+# time, its \ref mlx.gui.flight.Page.finalize "finalize" function is called. It
+# should set those controls insensitive, that will not be available if the user
+# comes back to this page.
 #
 # Each page has a title at the top displayed in inverted colors and a big
 # font. There is a help text below it centered, that shortly describes what is
@@ -52,13 +53,14 @@ import lxml.html
 # first displayed during a flight, another shown when the user goes back to the
 # page. The main content area is below this, also centered. Finally, there are
 # some buttons at the bottom on the right. As some buttons occur very
-# frequently, there are functions to add them (\ref Page.addCancelFlightButton
-# "addCancelFlightButton", \ref Page.addPreviousButton "addPreviousButton" and
-# \ref Page.addNextButton "addNextButton".
+# frequently, there are functions to add them (\ref
+# mlx.gui.flight.Page.addCancelFlightButton "addCancelFlightButton",
+# \ref mlx.gui.flight.Page.addPreviousButton "addPreviousButton" and
+# \ref mlx.gui.flight.Page.addNextButton "addNextButton".
 #
-# The \ref Wizard class is the main class to collect the pages. It also stores
-# some data passed from one page to another and provides properties to access
-# data items set via the wizard pages.
+# The \ref mlx.gui.flight.Wizard "Wizard" class is the main class to collect
+# the pages. It also stores some data passed from one page to another and
+# provides properties to access data items set via the wizard pages.
 
 #-----------------------------------------------------------------------------
 
