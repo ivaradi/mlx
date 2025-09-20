@@ -8,3 +8,12 @@ doxygen:
   artifacts:
     paths:
       - "doc/html"
+
+pages:
+  stage: deploy
+  script:
+    - mv doc/html public
+  artifacts:
+    paths:
+      - public
+      
