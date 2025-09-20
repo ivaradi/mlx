@@ -11,6 +11,7 @@ doxygen:
 
 pages:
   stage: deploy
+  image: busybox
   script:
     - mv doc/html public
   artifacts:
