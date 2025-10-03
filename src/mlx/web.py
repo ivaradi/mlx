@@ -668,10 +668,8 @@ class GetMETARs(Request):
 
     def run(self):
         """Perform the retrieval opf the METARs."""
-        url = "https://aviationweather.gov/cgi-bin/data/metar.php?"
-        data = urllib.parse.urlencode([ ("ids", ",".join(self._airports)),
-                                        ("hours", "0"),
-                                        ("format", "raw") ])
+        url = "https://aviationweather.gov/api/data/metar?"
+        data = urllib.parse.urlencode([("ids", ",".join(self._airports))])
         result = Result()
         result.metars = {}
         try:
@@ -681,10 +679,12 @@ class GetMETARs(Request):
             try:
                 for line in f.readlines():
                     line = str(line, "iso-8859-1")
-                    if len(line)>5 and line[4]==' ':
-                        icao = line[0:4]
+                    if len(line)>10 and \
+                       line.startswith("METAR ") and \
+                       line[10]==" ":
+                        icao = line[6:10]
                         if icao in self._airports:
-                            result.metars[icao] = line.strip().split(",")[0]
+                            result.metars[icao] = line[6:].strip().split(",")[0]
             finally:
                 f.close()
         except Exception as e:
