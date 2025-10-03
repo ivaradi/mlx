@@ -6,7 +6,7 @@ This project is for the new version of the [MAVA](https://virtualairlines.hu) Lo
 
 The installer for the latest stable version of the logger can be downloaded below. After downloading, start it and it will install the application.
 
-- [MAVA Logger X-0.66.1-Setup.exe](<https://mlx.varadiistvan.hu/update/MAVA Logger X-0.66.1-Setup.exe>)
+- [MAVA Logger X-0.66.2-Setup.exe](<https://mlx.varadiistvan.hu/update/MAVA Logger X-0.66.2-Setup.exe>)
 
 ## Technical Notes
 
