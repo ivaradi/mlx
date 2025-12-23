@@ -29,7 +29,7 @@ class StatusIcon(FlightStatusHandler):
         self._gui = gui
         self._selfToggling = False
 
-        menu = Gtk.Menu()
+        self._menu = menu = Gtk.Menu()
 
         if appIndicator:
             self._stageMenuItem = Gtk.MenuItem("-")
@@ -81,16 +81,41 @@ class StatusIcon(FlightStatusHandler):
             self._indicator = indicator
         else:
             def popup_menu(status, button, time):
-                menu.popup(None, None, Gtk.status_icon_position_menu,
-                           button, time, status)
+                def focus_out(window, event):
+                    window.destroy()
+                    return False
+
+                # Seemingly known trick on Windows to make the menu
+                # disappear when a mouse click occurs outside the menu
+                hidden = Gtk.Window()
+                hidden.set_resizable(False)
+                hidden.set_decorated(False)
+                hidden.set_skip_taskbar_hint(True)
+                hidden.set_skip_pager_hint(True)
+                hidden.set_size_request(0, 0)
+                hidden.set_transient_for(None)
+                hidden.connect("focus-out-event", focus_out)
+                hidden.show()
+
+                menu.popup(None, None, None, None,
+                           button, time)
+
+            def notify(object, pspec):
+                print("notify", object, pspec)
+
+            def focus(menu, event):
+                print("focus", event)
 
             statusIcon = Gtk.StatusIcon()
             statusIcon.set_from_file(iconFile)
             statusIcon.set_visible(True)
             statusIcon.connect('popup-menu', popup_menu)
+            statusIcon.connect('notify', notify)
             statusIcon.connect('activate',
                                lambda status: self._gui.toggleMainWindow())
             self._statusIcon = statusIcon
+
+            menu.connect("focus_out_event", focus)
 
         self._updateFlightStatus()
 
