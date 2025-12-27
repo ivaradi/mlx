@@ -137,7 +137,7 @@
   </p>
 
   <p>
-  The program also includes a built-in <a href="#bugReportWindow">bug
+  The program also includes a builtin <a href="#bugReportWindow">bug
   reporting</a> facility, which can be used to report any trouble
   encountered while using it.
   </p>
@@ -532,9 +532,22 @@
   </p>
 
   <p>
-  Enter your SimBrief user name and password. The former one is always saved
-  and offered as the default entry, but the latter one only when the checkbox
-  below is checked. Some further data should also be entered.
+  If you would like to use the browser built in the logger to handle the
+  SimBrief connection, tick the checkbox. Then enter your SimBrief user name
+  and password. The former one is always saved and offered as the default
+  entry, but the latter one only when the checkbox below is checked.
+  </p>
+
+  <p>
+  If the builtin browser is not used, the default browser of your
+  operating system will be used. A new window will be displayed,
+  where you may have to log in, unless you used SimBrief not
+  long ago.
+  </p>
+
+  <p>
+  The other data items may be left unset, if you want to rely on
+  SimBrief to supply suitable ones. Otherwise you can fill in one or more.
   </p>
 
   <p>
@@ -725,11 +738,10 @@
 
   <p>
   You also have to provide a few pieces of information. You have to
-  select the type of the flight from the list provided (scheduled,
-  old-timer, VIP, charter) and whether it was an online flight or
-  not. If you arrive at the Budapest Ferihegy Airport, and are using
-  the Online Gate System, you also need to specify the number of the
-  gate or stand you have parked you aircraft at.
+  select whether it was an online flight or not. If you arrive at
+  the Budapest Ferihegy Airport, and are using the Online Gate System,
+  you also need to specify the number of the gate or stand you have
+  parked you aircraft at.
   </p>
 
   <p>
@@ -798,7 +810,7 @@
   This tab provides some help for calculating and setting the payload
   weight of the aircraft. It can be used once the
   <a href="#payloadPage"><i>Payload</i></a>
-  (i.e. the cargo weight) is finalized. To use this tab, check
+  is finalized. To use this tab, check
   the <b>Using help</b> checkbox. It causes the page to become
   sensitive and filled with data. Note, that the fact of using the
   help is <a href="#logTab">logged</a>, so the PIREP reviewers will
@@ -862,12 +874,12 @@
   and <i>AWAY</i>. The former indicates that the aircraft is parked at
   the Budapest Ferihegy Airport at gate or stand <i>nn</i>, while the
   latter one denotes that the airplane is parked at another
-  airport. Another possible status is <i>PARKED</i>, which means that
+  airport. Another possible status is <i>PARKING</i>, which means that
   the airplane is parked somewhere at the Ferihegy Airport, but we
   (or at least the Gate System) don't know where. It may happen that
   several aircraft are parked at the same gate or stand at
   Ferihegy. In this case the tail numbers and the statuses of those
-  airplanes are displayed in red.
+  planes are displayed in red.
   </p>
 
   <p>
@@ -904,7 +916,8 @@
   pressing <b>Ctrl+D</b>. It is another kind of log, which is mainly
   useful for debugging. If you experience some problem with the
   program, please, include the contents of this log with your bug
-  report. It can help a lot with finding a solution to the problem.
+  report, unless you use the builtin bug reporting feature.
+  It can help a lot with finding a solution to the problem.
   </p>
 
   <h2><a name="flightBooking">Booking flights</a></h2>
@@ -1176,11 +1189,14 @@
   of <i>system default</i> means that the operating system's default
   language is used if it is one of the supported ones or English
   otherwise. Note, that the program must be restarted for the change
-  to take effect if you modify this setting. If the <b>Hide main window
-  when minimized</b> checkbox is checked, and you minimize the window,
-  it will actually disappear completely (i.e. not appear among the
-  other minimized windows). You can make it appear by using the tray
-  icon. If the <b>Quit when the window close button is clicked</b>
+  to take effect if you modify this setting.
+  If the <b>Resizable main window</b> is checked, the program's main
+  window can be resized.
+  If the <b>Hide main window when minimized</b> checkbox is checked,
+  and you minimize the window, it will actually disappear completely
+  (i.e. not appear among the other minimized windows). You can make it
+  appear by using the tray icon. If the
+  <b>Quit when the window close button is clicked</b>
   checkbox is checked, the program will quit, after you have confirmed
   it. Otherwise it will just disappear, and you can use the tray icon
   to display it again.
@@ -1300,10 +1316,26 @@
   </p>
 
   <p>
+  If <b>Play safety demo on pushback</b> is enabled, the Malév song
+  and the safety demo are played immediately when pushback begins.
+  Otherwise these are played only during taxiing when reaching a
+  speed of 5 knots.
+  </p>
+
+  <p>
   If the <b>Enable approach callouts</b> checkbox is
   checked, and you have also <a href="#calloutsEditor">set up</a>
   approach callouts for the aircraft being used, you will hear those
   callouts during approach.
+  </p>
+
+  <p>
+  If the <b>Use an alternative sound set</b> option is ticked,
+  an alternative set of sound files will be played for some
+  portions of the flight for certain aircraft types.
+  Currently, an extended version of the of the taxi sounds is
+  played for Boeing 737 and 767 aircraft, which includes the
+  original Malév safety demo.
   </p>
 
   <p>
@@ -1337,9 +1369,16 @@
   organizational reasons, such as moving to a new server, etc.
   </p>
 
+  <p>
+  If you use X-Plane with the logger and the logger is running on
+  a machine different from the one running the simulator, you can
+  tick the <b>Connect to X-Plane remotely</b> checkbox, and provide
+  the IP address or the domain name of the machine running X-Plane.
+  </p>
+
   <h2><a name="bugReportWindow">The Bug Report Window</a></h2>
 
-  <!--img src="bugreport.png" alt="The Bug Report Window"/-->
+  <img src="bugreport.png" alt="The Bug Report Window">
 
   <p>
   The bug reporting window can be used to report any non-fatal bugs
@@ -1395,8 +1434,10 @@
   By pressing <i>Send...</i>, you can create the bug report. If it is
   successful, you will receive a message telling so and including the
   ticket's ID that you may refer to later. You can also click on the ID
-  to open the bug report in GitLab in your browser.
+  to open the bug report in GitLab in your browser:
   </p>
+
+  <img src="bugreportResult.png" alt="The Bug Report Result Window">
 
   <h2><a name="monitorWindow">The Monitor Window</a></h2>
 
@@ -1456,6 +1497,10 @@
   have successfully completed the test the status in the <i>Student</i> page
   will update. However, this might take a few minutes until the website will
   update itself and the logger will also notice it.
+  </p>
+  <p>
+  <b>NOTE:</b> As of this writing, the Education Centre does not work. Please,
+  contact someone from MAVA to take your exam.
   </p>
 
   <p>

@@ -531,11 +531,26 @@
   </p>
 
   <p>
-  Meg kell adnunk SimBrief felhasználónevünket és jelszavunkat. Előbbit
-  mindenképpen elmenti és később felajánlja a program, utóbbit akkor, ha az
-  alatta lévő jelölődobozt kijelöljük. A továbbiakban meg kell adnunk a
-  tervezéshez szükséges néhány adatot értelemszerűen.
+  Ha a loggerbe épített böngészőt szeretnénk használni, jelöljük ki a
+  jelölődobozt. Adjuk meg SimBrief felhasználónevünket és jelszavunkat.
+  Előbbit mindenképpen elmenti és később felajánlja a program, utóbbit akkor,
+  ha az alatta lévő jelölődobozt kijelöljük. A továbbiakban meg kell adnunk
+  a tervezéshez szükséges néhány adatot értelemszerűen.
   </p>
+
+  <p>
+  Ha nem a beépített böngészőt használjuk, az operációs rendszer
+  alapértelmezett böngészőjét veszi igénybe a logger. Annak egy új
+  ablaka nyílik meg, amelyben valószínűleg be is kell jelentkezni,
+  hacsak nem a közelmúltban használtuk a SimBrief-et.
+  </p>
+
+  <p>
+  A többi adat maradhat akár kitöltetlenül vagy változatlanul is, ha azoknak
+  a meghatározását a SimBrief-re szeretnénk bízni. Ellenkező esetben adjuk
+  meg a kívánt értékeket.
+  </p>
+
 
   <p>
   A repülési terv előállításának megkezdéséhez nyomjuk meg az <b>Előre</b>
@@ -728,8 +743,7 @@
   </p>
 
   <p>
-  Emellett néhány adatot is meg kell adnunk. Ki kell választani a
-  járat típusát (menetrendszerint, old-timer, VIP vagy charter), és
+  Emellett néhány adatot is meg kell adnunk. Ki kell választani,
   hogy online repülés volt-e. Ha a ferihegyi repülőtérre érkezünk, ki
   kell választani annak a kapunak vagy állóhelynek a számát, ahol a
   repülőgépet leparkoltuk.
@@ -801,11 +815,10 @@
   <p>
   Ez a fül segít a repülőgép hasznos terhének kiszámításában. Azután
   használható, hogy a <a href="#payloadPage"><i>Terhelés</i></a>
-  lapot, pontosabban ott a teherszállítmány tömegét véglegesítettük. A
-  segítség igénybe vételéhez jelöljük ki a <b>Használom a
-  segítséget</b> négyzetet. Ekkor a fülön látható adatok kitöltésre
-  kerülnek és a szimulátorból is letölthetjük az adatokat. A segítség
-  igénybevételének ténye bekerül a
+  lapot véglegesítettük. A segítség igénybe vételéhez jelöljük ki a
+  <b>Használom a segítséget</b> négyzetet. Ekkor a fülön látható adatok
+  kitöltésre kerülnek és a szimulátorból is letölthetjük az adatokat.
+  A segítség igénybevételének ténye bekerül a
   repülési <a href="#logTab">naplóba</a>, így a PIREP javítója tudni
   fog róla.
   </p>
@@ -1195,8 +1208,10 @@
   jelenti, hogy ha az operációs rendszer nyelve valamelyik támogatott
   nyelv, akkor a program is azon a nyelven fut, egyébként pedig
   angolul. Ha ezt a beállítást megváltoztatjuk, a programot újra kell
-  indítani, hogy érvényre is jusson. Ha az <b>A főablak eltüntetése
-  minimalizálásakor</b> jelölőnégyzetet kijelöljük, akkor a főablak
+  indítani, hogy érvényre is jusson. Az <b>Átméretezhető főablak</b>
+  engedélyezése esetén a program fő ablakát át tudjuk méretezni.
+  Ha az <b>A főablak eltüntetése minimalizálásakor</b> jelölőnégyzetet
+  kijelöljük, akkor a főablak
   minimalizálásakor az teljesen eltűnik (nem jelenik meg a többi
   minimalizált ablak között). Az ablak a tálcaikon használatával
   jeleníthető meg újra. Ha a <b>Kilépés az ablakzáró gomb
@@ -1335,10 +1350,25 @@
   </p>
 
   <p>
+  Ha bekapcsoljuk a <b>Biztonsági ismerető indítása hátratoláskor</b>
+  jelölőnégyzetet, a Malév dalt majd a biztonsági ismertetőt a program
+  a hátratolás megkezdésekor elkezdi lejátszani, míg egyébként ezt csak
+  guruláskor, az 5 csomó sebesség elérésekor teszi.
+  <p>
+
+  <p>
   Ha a <b>Megközelítési bemondások engedélyezése</b> jelölőnégyzetet
   kijelöljük, és a használt repülőgép típushoz
   <a href="#calloutsEditor">megadunk</a> megközelítési bemondásokat,
   akkor azokat a program megközelítéskor le is fogja játszani.
+  </p>
+
+  <p>
+  Ha engedélyezzük az <b>Alternatív hangkészlet használata</b> jelölőnégyzetet,
+  bizonyos fázisokban, bizonyos repülőgép típusok esetén a program alternatív
+  hangállományokat játszik le. Jelenleg a Boeing 737 és 767 típusú
+  repülőgépekkel való guruláskor ez egy olyan felvételt jelent,
+  amely tartalmazza a Malév eredeti biztonsági bemutatóját.
   </p>
 
   <p>
@@ -1374,9 +1404,16 @@
   szerverre való költözés miatt kell megváltoztatni, stb.
   </p>
 
+  <p>
+  Ha X-Plane-t használunk és a loggert nem ugyanazon a gépen szeretnénk
+  futtatni, ahol a szimulátort, jelöljük ki az <b>X-Plane távoli elérése</b>
+  négyzetet, és az alatta lévő mezőbe írjuk be a szimulátort futtató
+  gép címét vagy domain nevét.
+  </p>
+
   <h2><a name="bugReportWindow">A Hibajelentés ablak</a></h2>
 
-  <!-- img src="bugreport.png" alt="A Hibajelentés ablak"/-->
+  <img src="bugreport.png" alt="A Hibajelentés ablak"/>
 
   <p>
   A hibajelentés ablak segítségével a program használata során
@@ -1436,8 +1473,10 @@
   sikerül létrehozni, erről üzenetet kapunk, amely tartalmazza a
   hibajelentés azonosítóját is. Ezt célszerű feljegyezni, hogy a
   későbbiekben hivatkozhassunk rá. Ha rákattintunk az azonosítóra,
-  a hibajelentés GitLab oldala megnyílik a böngészőnkben.
+  a hibajelentés GitLab oldala megnyílik a böngészőnkben:
   </p>
+
+  <img src="bugreportResult.png" alt="The Bug Report Result Window">
 
   <h2><a name="monitorWindow">A Monitor ablak</a></h2>
 
@@ -1498,6 +1537,11 @@
   a <i>Jelölt</i> lapon a vizsga állapota frissül. Erre azonban csak néhány
   perc elteltével kerül sor, mire a háttérben futó rendszerekben frissül az
   állapot és erről a logger is értesül.
+  </p>
+
+  <p>
+  <b>FIGYELEM!</b> Jelenleg az Oktatási Központ nem működik. Konzultálj a MAVA
+  valamelyik tagjával, hogyan tehetnéd le a vizsgát.
   </p>
 
   <p>
