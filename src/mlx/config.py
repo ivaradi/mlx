@@ -1144,7 +1144,12 @@ class Config(object):
             return self._language
         else:
             locale.setlocale(locale.LC_ALL, "")
-            return locale.getdefaultlocale()[0]
+            if os.name=="nt":
+                import ctypes
+                languageID  = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+                return locale.windows_locale.get(languageID, 'unknown')
+            else:
+                return locale.getdefaultlocale()[0]
 
     def log(self):
         """Log the configuration by printing the values"""
