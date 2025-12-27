@@ -881,7 +881,7 @@ msgid "simbrief_setup_chelp"
 msgstr "Your SimBrief briefing was generated with the following data."
 
 msgid "simbrief_uib"
-msgstr "Use the built-in browser"
+msgstr "Use the builtin browser"
 
 msgid "simbrief_uib_tooltip"
 msgstr ""
@@ -1232,12 +1232,12 @@ msgstr "Landing"
 msgid "landing_help"
 msgstr ""
 "Enter the STAR and/or transition, runway,\n"
-"approach type and V<sub>Ref</sub> used."
+"approach type and V<sub>ref</sub> used."
 
 msgid "landing_chelp"
 msgstr ""
 "The STAR and/or transition, runway, approach\n"
-"type and V<sub>Ref</sub> logged can be seen below."
+"type and V<sub>ref</sub> logged can be seen below."
 
 msgid "landing_metar"
 msgstr "_METAR:"

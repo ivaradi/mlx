@@ -1233,12 +1233,12 @@ msgstr "Leszállás"
 msgid "landing_help"
 msgstr ""
 "Írd be a tervezett STAR és/vagy bevezetési eljárás nevét,\n"
-"a használt futópályát, a megközelítés módját, és a V<sub>Ref</sub>-et."
+"a használt futópályát, a megközelítés módját, és a V<sub>ref</sub>-et."
 
 msgid "landing_chelp"
 msgstr ""
 "A tervezett STAR és/vagy bevezetési eljárás neve, a használt\n"
-"futópálya, a megközelítés módja és a V<sub>Ref</sub> lent olvasható."
+"futópálya, a megközelítés módja és a V<sub>ref</sub> lent olvasható."
 
 msgid "landing_metar"
 msgstr "_METAR:"
@@ -2435,10 +2435,10 @@ msgid "sendBugReport_busy"
 msgstr "Hibajelentés küldése..."
 
 msgid "sendBugReport_can_close"
-msgstr "Most már bezárhatod ezt a böngészőablakoto."
+msgstr "Most már bezárhatod ezt a böngészőablakot."
 
 msgid "sendBugReport_success"
-msgstr "A %d. számú hibajelentés létrehozva."
+msgstr "A <a href=\"%s\">%d</a>. számú hibajelentés létrehozva."
 
 msgid "sendBugReport_success_sec"
 msgstr ""
