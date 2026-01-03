@@ -381,12 +381,23 @@ def startInContainer(container, url, browserSettings = {}):
         Gdk.threads_leave()
         windowRect = [0, 0, 1, 1]
     else:
-        container.set_visual(container.get_screen().lookup_visual(0x21))
-        windowID = container.get_window().get_xid()
+        try:
+            container.set_visual(container.get_screen().lookup_visual(0x21))
+        except Exception as e:
+            print("cef.startInContainer: cannot set the visual of the container:", e)
+
+        window = container.get_window()
+        try:
+            windowID = container.get_window().get_xid()
+        except Exception as e:
+            print("cef.startInContainer: cannot get the window ID:", e)
+            windowID = None
         windowRect = None
 
     windowInfo = cefpython.WindowInfo()
-    if windowID is not None:
+    if windowID is None:
+        windowInfo.SetAsOffscreen(int(0))
+    else:
         windowInfo.SetAsChild(windowID, windowRect = windowRect)
 
     browser = cefpython.CreateBrowserSync(windowInfo,

@@ -120,7 +120,10 @@ class GUI(fs.ConnectionListener):
 
         self._mainWindow = window = Gtk.Window()
         if os.name!="nt":
-            window.set_visual(window.get_screen().lookup_visual(0x21))
+            try:
+                window.set_visual(window.get_screen().lookup_visual(0x21))
+            except Exception as e:
+                print("Cannot set the visual of the main window:", e)
         window.set_title(WINDOW_TITLE_BASE)
         window.set_icon_from_file(os.path.join(iconDirectory, "logo.ico"))
         window.set_resizable(self.config.mainWindowResizable)
