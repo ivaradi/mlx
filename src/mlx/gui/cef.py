@@ -382,7 +382,7 @@ def startInContainer(container, url, browserSettings = {}):
         windowRect = [0, 0, 1, 1]
     else:
         try:
-            container.set_visual(container.get_screen().lookup_visual(0x21))
+            container.set_visual(defaultVisual)
         except Exception as e:
             print("cef.startInContainer: cannot set the visual of the container:", e)
 

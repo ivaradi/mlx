@@ -121,7 +121,7 @@ class GUI(fs.ConnectionListener):
         self._mainWindow = window = Gtk.Window()
         if os.name!="nt":
             try:
-                window.set_visual(window.get_screen().lookup_visual(0x21))
+                window.set_visual(defaultVisual)
             except Exception as e:
                 print("Cannot set the visual of the main window:", e)
         window.set_title(WINDOW_TITLE_BASE)

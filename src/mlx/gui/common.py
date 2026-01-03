@@ -22,7 +22,7 @@ appIndicator = False
 
 import gi
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk
+from gi.repository import Gdk, GdkX11
 from gi.repository import GdkPixbuf
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -41,6 +41,37 @@ import codecs
 _utf8Decoder = codecs.getdecoder("utf-8")
 
 import cairo
+
+#------------------------------------------------------------------------------
+
+isX11 = False if os.name=="nt" else isinstance(Gdk.Display.get_default(),
+                                               GdkX11.X11Display)
+defaultVisual = Gdk.Display.get_default().\
+    get_default_screen().get_system_visual()
+if isX11:
+    import ctypes
+    libX11 = ctypes.CDLL("libX11.so")
+
+    libX11.XOpenDisplay.restype = ctypes.c_void_p
+    libX11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+
+    libX11.XDefaultScreen.argtypes = [ctypes.c_void_p]
+
+    libX11.XDefaultVisual.restype = ctypes.c_void_p
+    libX11.XDefaultVisual.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+    libX11.XVisualIDFromVisual.argtypes = [ctypes.c_void_p]
+
+    libX11.XCloseDisplay.argtypes = [ctypes.c_void_p]
+
+    display = libX11.XOpenDisplay(None)
+    screen = libX11.XDefaultScreen(display)
+    defaultVisual = libX11.XDefaultVisual(display, screen)
+    visualID = libX11.XVisualIDFromVisual(defaultVisual)
+    libX11.XCloseDisplay(display)
+
+    defaultVisual = \
+        Gdk.Display.get_default().get_default_screen().lookup_visual(visualID)
 
 #------------------------------------------------------------------------------
 
