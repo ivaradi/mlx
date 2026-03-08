@@ -22,7 +22,9 @@ appIndicator = False
 
 import gi
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, GdkX11
+from gi.repository import Gdk
+if os.name!="nt":
+    from gi.repository import GdkX11
 from gi.repository import GdkPixbuf
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
