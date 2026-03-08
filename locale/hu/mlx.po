@@ -187,7 +187,7 @@ msgid "menu_tools_callouts"
 msgstr "_Megközelítési bemondások szerkesztése"
 
 msgid "menu_tools_callouts_key"
-msgstr "m"
+msgstr "g"
 
 msgid "menu_tools_prefs"
 msgstr "_Beállítások"
