@@ -1829,6 +1829,10 @@ class PMDGBoeing737NGModel(B737Model):
             self._lastGearControl = gearControl
             self._lastNoseGear = noseGear
 
+        if fsType==const.SIM_MSFS2020:
+            # N1 goes down very slowly, so we hasten it a bit
+            state.n1 = [0 if n1<4.0 else n1 for n1 in state.n1]
+
         return state
 
 #------------------------------------------------------------------------------
