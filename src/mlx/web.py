@@ -197,6 +197,76 @@ class NOTAMHandler(xml.sax.handler.ContentHandler):
 
 class PilotsWebNOTAMsParser(html.parser.HTMLParser):
     """XML handler for the NOTAM query results on the PilotsWeb website."""
+    @staticmethod
+    def parseNOTAM2(message):
+        """Parse the given NOTAM message in ICAO format"""
+        lines = message.splitlines()
+        if len(lines)==1:
+            lines = lines[0].splitlines()
+        lines = [line.strip() for line in lines]
+
+        if not lines:
+            return None
+
+        ident = lines[0].split()[0]
+
+        lines = lines[1:]
+        for i in range(0, 2):
+            l = lines[-1].lower()
+            if l.startswith("created:") or l.startswith("source:"):
+                lines = lines[:-1]
+
+        lines = [line.strip() for line in lines]
+        contents = " ".join(lines).split()
+
+        items = {}
+        for i in ["Q)", "A)", "B)", "C)", "D)", "E)"]:
+            items[i] = ""
+
+        currentItem = None
+        for word in contents:
+            if word in items:
+                currentItem = word
+            elif currentItem in items:
+                s = items[currentItem]
+                if s: s+= " "
+                s += word
+                items[currentItem] = s
+
+        if not items["Q)"] or not items["A)"] or not items["B)"] or \
+           not items["E)"]:
+            return None
+
+        def parseTime(item):
+            item = re.sub("([0-9]+).*", "\\1", item)
+            try:
+                return datetime.datetime.strptime(item, "%y%m%d%H%M")
+            except ValueError:
+                return datetime.datetime.strptime(item, "%Y%m%d%H%M")
+
+        basic = items["Q)"]
+        begin = parseTime(items["B)"])
+
+        end = None
+        permanent = False
+        if items["C)"]:
+            endItem = items["C)"]
+            if endItem in ["PERM", "UFN"]:
+                permanent = True
+            else:
+                end = parseTime(items["C)"])
+        else:
+            permanent = True
+
+        repeatCycle = None
+        if items["D)"]:
+            repeatCycle = items["D)"]
+
+        notice = items["E)"]
+
+        return NOTAM(ident, basic, begin, notice, end = end,
+                     permanent = permanent, repeatCycle = repeatCycle)
+
     def __init__(self):
         """Construct the handler."""
         html.parser.HTMLParser.__init__(self)
@@ -304,72 +374,7 @@ class PilotsWebNOTAMsParser(html.parser.HTMLParser):
     def _parseCurrentNOTAM2(self):
         """Parse the current NOTAM with a second, more flexible method."""
         self._currentNOTAM = self._currentNOTAM.replace("\\n", "\n")
-        lines = self._currentNOTAM.splitlines()
-        if len(lines)==1:
-            lines = lines[0].splitlines()
-        lines = [line.strip() for line in lines]
-
-        if not lines:
-            return None
-
-        ident = lines[0].split()[0]
-
-        lines = lines[1:]
-        for i in range(0, 2):
-            l = lines[-1].lower()
-            if l.startswith("created:") or l.startswith("source:"):
-                lines = lines[:-1]
-
-        lines = [line.strip() for line in lines]
-        contents = " ".join(lines).split()
-
-        items = {}
-        for i in ["Q)", "A)", "B)", "C)", "D)", "E)"]:
-            items[i] = ""
-
-        currentItem = None
-        for word in contents:
-            if word in items:
-                currentItem = word
-            elif currentItem in items:
-                s = items[currentItem]
-                if s: s+= " "
-                s += word
-                items[currentItem] = s
-
-        if not items["Q)"] or not items["A)"] or not items["B)"] or \
-           not items["E)"]:
-            return None
-
-        def parseTime(item):
-            item = re.sub("([0-9]+).*", "\\1", item)
-            try:
-                return datetime.datetime.strptime(item, "%y%m%d%H%M")
-            except ValueError:
-                return datetime.datetime.strptime(item, "%Y%m%d%H%M")
-
-        basic = items["Q)"]
-        begin = parseTime(items["B)"])
-
-        end = None
-        permanent = False
-        if items["C)"]:
-            endItem = items["C)"]
-            if endItem in ["PERM", "UFN"]:
-                permanent = True
-            else:
-                end = parseTime(items["C)"])
-        else:
-            permanent = True
-
-        repeatCycle = None
-        if items["D)"]:
-            repeatCycle = items["D)"]
-
-        notice = items["E)"]
-
-        return NOTAM(ident, basic, begin, notice, end = end,
-                     permanent = permanent, repeatCycle = repeatCycle)
+        return PilotsWebNOTAMsParser.parseNOTAM2(self._currentNOTAM)
 
 #------------------------------------------------------------------------------
 
@@ -630,25 +635,34 @@ class GetNOTAMs(Request):
 
         Returns a list of PilotsWEBNOTAM objects, or None in case of an error."""
         try:
-            parser = PilotsWebNOTAMsParser()
+            url = "https://notams.aim.faa.gov/notamSearch/search"
 
-            url = "https://pilotweb.nas.faa.gov/PilotWeb/notamRetrievalByICAOAction.do?method=displayByICAOs&formatType=ICAO&retrieveLocId=%s&reportType=RAW&actionType=notamRetrievalByICAOs" % \
-              (icao.upper(),)
+            data = bytes("searchType=0&designatorsForLocation=%s" % (icao.upper()),
+                         "utf-8")
 
-            request = urllib.request.Request(url, headers = {
-                "cookie": "akamai_pilotweb_access=true;"
+            request = urllib.request.Request(url, data = data, headers = {
+                "User-Agent": "Mozilla/5.0",
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
             });
             f = urllib.request.urlopen(request, timeout = 10.0,
                                        context = sslContext)
             try:
-                data = f.read(16384)
-                while data:
-                    parser.feed(str(data))
-                    data = f.read(16384)
+                data = json.load(f)
             finally:
                 f.close()
 
-            return parser.getNOTAMs()
+            notams = []
+            for notamData in data["notamList"]:
+                message = notamData["icaoMessage"]
+                notam = PilotsWebNOTAMsParser.parseNOTAM2(message)
+                if notam is None:
+                    print("Could not parse NOTAM: " + message)
+                    if message:
+                        notams.append(message + "\n")
+                else:
+                    notams.append(notam)
+            return notams
 
         except Exception as e:
             traceback.print_exc()
