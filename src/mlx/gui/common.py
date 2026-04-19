@@ -52,7 +52,7 @@ defaultVisual = Gdk.Display.get_default().\
     get_default_screen().get_system_visual()
 if isX11:
     import ctypes
-    libX11 = ctypes.CDLL("libX11.so")
+    libX11 = ctypes.CDLL("libX11.so.6")
 
     libX11.XOpenDisplay.restype = ctypes.c_void_p
     libX11.XOpenDisplay.argtypes = [ctypes.c_char_p]
