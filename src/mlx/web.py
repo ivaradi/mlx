@@ -645,8 +645,10 @@ class GetNOTAMs(Request):
                 "Accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
             });
+
+            context = sslContext if os.name=="nt" else None
             f = urllib.request.urlopen(request, timeout = 10.0,
-                                       context = sslContext)
+                                       context = context)
             try:
                 data = json.load(f)
             finally:
