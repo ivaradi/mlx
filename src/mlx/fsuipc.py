@@ -664,6 +664,11 @@ class Simulator(object):
 
         self._fuelCallback = None
 
+    @property
+    def maxMessageLength(self):
+        """Get the maximal length of a message displayed in the simulator"""
+        return 127
+
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft

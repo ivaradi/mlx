@@ -754,6 +754,11 @@ class Simulator(object):
         """Get the configuration."""
         return self._connectionListener.config
 
+    @property
+    def maxMessageLength(self):
+        """Get the maximal length of a message displayed in the simulator"""
+        return None
+
     def connect(self, aircraft):
         """Initiate a connection to the simulator."""
         self._aircraft = aircraft

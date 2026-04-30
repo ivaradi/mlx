@@ -72,6 +72,8 @@ def createSimulator(type, connectionListener):
 
 class MessageThread(threading.Thread):
     """Thread to handle messages."""
+    prefix = "[MLX] "
+
     def __init__(self, config, simulator):
         """Initialize the message thread with the given configuration and
         simulator."""
@@ -90,6 +92,21 @@ class MessageThread(threading.Thread):
     def add(self, messageType, text, duration, disconnect):
         """Add the given message to the requested messages."""
         with self._requestCondition:
+            maxMessageLength = self._simulator.maxMessageLength
+            if maxMessageLength is not None:
+                maxMessageLength -= len(MessageThread.prefix)
+            while maxMessageLength is not None and \
+                  len(text)>maxMessageLength:
+                text1 = text[:maxMessageLength]
+                lastSpaceIndex = text1.rfind(" ")
+                if lastSpaceIndex>0:
+                    text1 = text1[:lastSpaceIndex]
+                    text = text[lastSpaceIndex+1:]
+                else:
+                    text = text[len(text1):]
+                self._messages.append((messageType, text1, duration,
+                                       False))
+
             self._messages.append((messageType, text, duration,
                                    disconnect))
             self._requestCondition.notify()
@@ -138,10 +155,10 @@ class MessageThread(threading.Thread):
         if (messageLevel==const.MESSAGELEVEL_FS or \
             messageLevel==const.MESSAGELEVEL_BOTH):
             if disconnect:
-                self._simulator.disconnect("[MLX] " + text,
+                self._simulator.disconnect(MessageThread.prefix + text,
                                            duration = duration)
             else:
-                self._simulator.sendMessage("[MLX] " + text,
+                self._simulator.sendMessage(MessageThread.prefix + text,
                                             duration = duration)
         elif disconnect:
             self._simulator.disconnect()
