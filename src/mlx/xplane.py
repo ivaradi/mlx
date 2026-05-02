@@ -1765,6 +1765,9 @@ class B737Model(GenericAircraftModel):
 
 class ZiboB737NGModel(B737Model):
     """Base model for the Zibo and LevelUp Boeing 737 models."""
+    # Some fixed weight added to some values
+    _fixedWeight = 524
+
     def __init__(self, flapsDeflections = [0.0, 5.0, 7.0, 8.5, 10.0,
                                            12.2, 22.0, 29.0, 40.0]):
         super(ZiboB737NGModel, self).__init__()
@@ -1831,6 +1834,29 @@ class ZiboB737NGModel(B737Model):
                                         "laminar/B738/flt_ctrls/reverse_lever2",
                                         TYPE_FLOAT)
 
+        self._oewIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/oew_kg",
+                                        TYPE_FLOAT)
+
+        self._equipmentWeightIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/fa_fwd_kg",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/fa_aft_kg",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/galley_fwd_kg",
+                                        TYPE_FLOAT)
+        self._addDatarefWithIndexMember(data,
+                                        "laminar/B738/galley_aft_kg",
+                                        TYPE_FLOAT)
+
+        self._fuelTotalIndex = len(data)
+        self._addDatarefWithIndexMember(data,
+                                        "sim/flightmodel/weight/m_fuel_total",
+                                        TYPE_FLOAT)
 
     def getAircraftState(self, aircraft, timestamp, data):
         """Get the aircraft state."""
@@ -1886,7 +1912,54 @@ class ZiboB737NGModel(B737Model):
         # N1 goes down very slowly, so we hasten it a bit
         state.n1 = [0 if n1<4.0 else n1 for n1 in state.n1]
 
+        dow = data[self._oewIndex]
+        payload = data[self._monidx_payloadWeight] - \
+            sum(data[self._equipmentWeightIndex:self._equipmentWeightIndex+4]) - \
+            ZiboB737NGModel._fixedWeight
+        state.zfw = dow + payload
+
+        state.grossWeight = state.zfw + data[self._fuelTotalIndex]
+
         return state
+
+    def requestZFW(self, handler, callback):
+        """Request the ZFW value from the simulator via the given handler"""
+        data = [ ("laminar/B738/oew_kg", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT),
+                 ("laminar/B738/fa_fwd_kg", TYPE_FLOAT),
+                 ("laminar/B738/fa_aft_kg", TYPE_FLOAT),
+                 ("laminar/B738/galley_fwd_kg", TYPE_FLOAT),
+                 ("laminar/B738/galley_aft_kg", TYPE_FLOAT)]
+        handler.requestRead(data, self._handleZFW, extra = callback)
+
+    def requestWeights(self, handler, callback):
+        """Request the following weights: DOW, ZFW, payload.
+
+        These values will be passed to the callback function in this order, as
+        separate arguments."""
+        data = [ ("laminar/B738/oew_kg", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT),
+                 ("laminar/B738/fa_fwd_kg", TYPE_FLOAT),
+                 ("laminar/B738/fa_aft_kg", TYPE_FLOAT),
+                 ("laminar/B738/galley_fwd_kg", TYPE_FLOAT),
+                 ("laminar/B738/galley_aft_kg", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fuel_total", TYPE_FLOAT) ]
+        handler.requestRead(data, self._handleWeights, extra = callback)
+
+    def _handleZFW(self, data, callback):
+        """Callback for a ZFW retrieval request."""
+        dow = data[0]
+        payload = data[1] - sum(data[2:6]) - ZiboB737NGModel._fixedWeight
+        zfw = dow + payload
+        callback(zfw)
+
+    def _handleWeights(self, data, callback):
+        """Callback for the weights retrieval request."""
+        dow = data[0]
+        payload = data[1] - sum(data[2:6]) - ZiboB737NGModel._fixedWeight
+        zfw = dow + payload
+        grossWeight = zfw + data[6]
+        callback(dow, payload, zfw, grossWeight)
 
 #------------------------------------------------------------------------------
 
