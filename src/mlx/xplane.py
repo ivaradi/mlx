@@ -778,20 +778,20 @@ class Simulator(object):
 
     def requestZFW(self, callback):
         """Send a request for the ZFW."""
-        data = [ ("sim/aircraft/weight/acf_m_empty", TYPE_FLOAT),
-                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT) ]
-        self._handler.requestRead(data, self._handleZFW, extra = callback)
+        if self._aircraftModel is None:
+            callback(0.0)
+        else:
+            self._aircraftModel.requestZFW(self._handler, callback)
 
     def requestWeights(self, callback):
         """Request the following weights: DOW, ZFW, payload.
 
         These values will be passed to the callback function in this order, as
         separate arguments."""
-        data = [ ("sim/aircraft/weight/acf_m_empty", TYPE_FLOAT),
-                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT),
-                 ("sim/flightmodel/weight/m_total", TYPE_FLOAT) ]
-        self._handler.requestRead(data, self._handleWeights,
-                                  extra = callback)
+        if self._aircraftModel is None:
+            callback(0.0, 0.0, 0.0, 0.0)
+        else:
+            self._aircraftModel.requestWeights(self._handler, callback)
 
     def requestTime(self, callback):
         """Request the time from the simulator."""
@@ -1152,22 +1152,9 @@ class Simulator(object):
         else:
             self._addFlareRate(data[2])
 
-    def _handleZFW(self, data, callback):
-        """Callback for a ZFW retrieval request."""
-        zfw = data[0] + data[1]
-        callback(zfw)
-
     def _handleTime(self, data, callback):
         """Callback for a time retrieval request."""
         callback(self._getTimestamp(data))
-
-    def _handleWeights(self, data, callback):
-        """Callback for the weights retrieval request."""
-        dow = data[0]
-        payload = data[1]
-        zfw = dow + payload
-        grossWeight = data[2]
-        callback(dow, payload, zfw, grossWeight)
 
     def _handleMessageSent(self, success, disconnect):
         """Callback for a message sending request."""
@@ -1542,6 +1529,35 @@ class AircraftModel(object):
                           data[self._monidx_propHeat]!=0
 
         return state
+
+    def requestZFW(self, handler, callback):
+        """Request the ZFW value from the simulator via the given handler"""
+        data = [ ("sim/aircraft/weight/acf_m_empty", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT) ]
+        handler.requestRead(data, self._handleZFW, extra = callback)
+
+    def requestWeights(self, handler, callback):
+        """Request the following weights: DOW, ZFW, payload.
+
+        These values will be passed to the callback function in this order, as
+        separate arguments."""
+        data = [ ("sim/aircraft/weight/acf_m_empty", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_fixed", TYPE_FLOAT),
+                 ("sim/flightmodel/weight/m_total", TYPE_FLOAT) ]
+        handler.requestRead(data, self._handleWeights, extra = callback)
+
+    def _handleZFW(self, data, callback):
+        """Callback for a ZFW retrieval request."""
+        zfw = data[0] + data[1]
+        callback(zfw)
+
+    def _handleWeights(self, data, callback):
+        """Callback for the weights retrieval request."""
+        dow = data[0]
+        payload = data[1]
+        zfw = dow + payload
+        grossWeight = data[2]
+        callback(dow, payload, zfw, grossWeight)
 
 #------------------------------------------------------------------------------
 
