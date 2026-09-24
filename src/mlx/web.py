@@ -641,9 +641,11 @@ class GetNOTAMs(Request):
                          "utf-8")
 
             request = urllib.request.Request(url, data = data, headers = {
-                "User-Agent": "Mozilla/5.0",
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:156.0) Gecko/20100101 Firefox/156.0",
                 "Accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+                "Cookie": "fnsDisclaimer=agreed",
+                "Referer": "https://notams.aim.faa.gov/notamSearch/nsapp.html",
             });
 
             context = sslContext if os.name=="nt" else None
