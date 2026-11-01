@@ -2042,6 +2042,41 @@ class DAF70Model(F70Model):
 
 #------------------------------------------------------------------------------
 
+class JustFlightF70Model(F70Model):
+    """Model for the Digital Aviation F70 implementation on FS9."""
+    @staticmethod
+    def doesHandle(aircraft, aircraftName):
+        """Determine if this model handler handles the aircraft with the given
+        name."""
+        (name, _airPath) = aircraftName
+        return aircraft.type == const.AIRCRAFT_F70 and \
+            name.find("Just Flight F70")!=-1
+
+    @property
+    def name(self):
+        """Get the name for this aircraft model."""
+        return "FSUIPC/Just Flight Fokker 70"
+
+    def addMonitoringData(self, data, fsType):
+        """Add the model-specific monitoring data to the given array."""
+        super().addMonitoringData(data, fsType)
+
+        self._addOffsetWithIndexMember(data, 0x0b46, "b", "_jff70_xpdr")
+
+    def getAircraftState(self, aircraft, timestamp, data):
+        """Get the aircraft state.
+
+        Get it from the parent, and then check some PMDG-specific stuff."""
+        state = super().getAircraftState(aircraft,
+                                         timestamp,
+                                         data)
+
+        state.xpdrC = data[self._jff70_xpdr]==4
+
+        return state
+
+#------------------------------------------------------------------------------
+
 class DC3Model(GenericAircraftModel):
     """Generic model for the Lisunov Li-2 (DC-3) aircraft."""
     fuelTanks = [const.FUELTANK_LEFT, const.FUELTANK_CENTRE,
@@ -2296,6 +2331,7 @@ AircraftModel.registerSpecial(PMDGBoeing737NGModel)
 AircraftModel.registerSpecial(DreamwingsDH8DModel)
 AircraftModel.registerSpecial(MajesticDH8DModel)
 AircraftModel.registerSpecial(DAF70Model)
+AircraftModel.registerSpecial(JustFlightF70Model)
 AircraftModel.registerSpecial(PTT154Model)
 
 #------------------------------------------------------------------------------
