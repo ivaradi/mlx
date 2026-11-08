@@ -320,6 +320,12 @@ class Values(object):
 
         self.pmdg_737ng_switches = 0
         self.pmdg_737ngx_lts_positionsw = 0
+        self.pmdg_xpdr = 0
+        self.pmdg_ap = 0
+        self.pmdg_aphdgsel = 0
+        self.pmdg_apalthold = 0
+        self.pmdg_aphdg = 0
+        self.pmdg_apalt = 0
 
         self.xpdrC = False
 
@@ -615,6 +621,18 @@ class Values(object):
             return bytes(self.aircraftName, "iso-8859-1")
         elif offset==0x6202:       # PMDG 737NG switches
             return self.pmdg_737ng_switches
+        elif offset==0x6216:       # PMDG Transponder
+            return self.pmdg_xpdr
+        elif offset==0x6227:       # PMDG autopilot
+            return self.pmdg_ap
+        elif offset==0x6228:       # PMDG autopilot HDG select
+            return self.pmdg_aphdgsel
+        elif offset==0x622a:       # PMDG autopilot ALT hold
+            return self.pmdg_apalthold
+        elif offset==0x622c:       # PMDG autopilot HDG
+            return self.pmdg_aphdg
+        elif offset==0x622e:       # PMDG autopilot ALT
+            return self.pmdg_apalt
         elif offset==0x6500:       # PMDG 737NGX lights position SW
             return self.pmdg_737ngx_lts_positionsw
         elif offset==0x7b91:       # Transponder standby
